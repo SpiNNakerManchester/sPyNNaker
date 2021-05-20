@@ -36,6 +36,19 @@ struct sdram_config {
     uint32_t time_for_transfer;
 };
 
+//! The key and mask being used to send spikes from neurons processed on this
+//! core.
+struct key_config {
+    //! The key
+    uint32_t key;
+    //! The mask
+    uint32_t mask;
+    //! The mask to get the spike ID
+    uint32_t spike_id_mask;
+    //! Is the node self connected
+    uint32_t self_connected;
+};
+
 //! \brief Set up spike processing
 //! \param[in] row_max_n_words The maximum row length in words
 //! \param[in] spike_buffer_size The size to make the spike buffer
@@ -44,13 +57,15 @@ struct sdram_config {
 //!                                 the next time step
 //! \param[in] pkts_per_ts_rec_region The ID of the recording region to record
 //!                                   packets-per-time-step to
+//! \param[in] multicast_priority The priority of multicast processing
 //! \param[in] sdram_inputs_param Details of the SDRAM transfer for the ring buffers
 //! \param[in] ring_buffers_param The ring buffers to update with synapse weights
 //! \return Whether the setup was successful or not
 bool spike_processing_fast_initialise(
         uint32_t row_max_n_words, uint32_t spike_buffer_size,
         bool discard_late_packets, uint32_t pkts_per_ts_rec_region,
-        struct sdram_config sdram_inputs_param, weight_t *ring_buffers_param);
+        uint32_t multicast_priority, struct sdram_config sdram_inputs_param,
+        struct key_config key_config_param, weight_t *ring_buffers_param);
 
 //! \brief The main loop of spike processing to be run once per time step.
 //!        Note that this function will not return until the end of the time

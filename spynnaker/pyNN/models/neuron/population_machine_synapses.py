@@ -104,7 +104,7 @@ class PopulationMachineSynapses(
         """
         return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
 
-    def _create_synaptic_matrices(self):
+    def _create_synaptic_matrices(self, allow_direct=True):
         """ Creates the synaptic matrices object.
 
         :note: This is required because this object cannot have any storage
@@ -114,7 +114,7 @@ class PopulationMachineSynapses(
         return SynapticMatrices(
             self._vertex_slice,
             self._app_vertex.neuron_impl.get_n_synapse_types(),
-            self._app_vertex.all_single_syn_size,
+            self._app_vertex.all_single_syn_size if allow_direct else 0,
             self._synapse_regions.synaptic_matrix,
             self._synapse_regions.direct_matrix,
             self._synapse_regions.pop_table,

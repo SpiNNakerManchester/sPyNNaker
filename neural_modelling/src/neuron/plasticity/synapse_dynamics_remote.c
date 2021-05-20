@@ -18,6 +18,6 @@
 #include "synapse_dynamics.h"
 
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, uint32_t neuron_index) {
-    // TODO: Fill in with sending of spike back to synapses
+        UNUSED uint32_t time, UNUSED uint32_t neuron_index) {
+    // Does nothing, because the spike will be sent back using multicast
 }

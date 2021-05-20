@@ -29,6 +29,10 @@ from spinn_utilities.abstract_base import abstractmethod
 #  + 1 word for time to send
 SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
+# Size of the Key config params = 1 work for key + 1 word for mask
+#  + 1 word for spike mask + 1 word for self connection boolean
+KEY_CONFIG_SIZE = 4 * BYTES_PER_WORD
+
 # Overhead in time to write, which includes the clearing of input spikes
 TIME_TO_CLEAR_SPIKES = 50
 
@@ -40,7 +44,8 @@ class PopulationSynapsesMachineVertexCommon(
     """
 
     __slots__ = [
-        "__sdram_partition"]
+        "__sdram_partition",
+        "__neuron_to_synapse_edge"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -56,9 +61,10 @@ class PopulationSynapsesMachineVertexCommon(
         STRUCTURAL_DYNAMICS = 9
         BIT_FIELD_FILTER = 10
         SDRAM_EDGE_PARAMS = 11
-        CONNECTOR_BUILDER = 12
-        BIT_FIELD_BUILDER = 13
-        BIT_FIELD_KEY_MAP = 14
+        KEY_REGION = 12
+        CONNECTOR_BUILDER = 13
+        BIT_FIELD_BUILDER = 14
+        BIT_FIELD_KEY_MAP = 15
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -108,6 +114,7 @@ class PopulationSynapsesMachineVertexCommon(
             SynapseProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition = None
+        self.__neuron_to_synapse_edge = None
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance
@@ -120,6 +127,15 @@ class PopulationSynapsesMachineVertexCommon(
             raise SynapticConfigurationException(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
+
+    def set_neuron_to_synapse_edge(self, neuron_to_synapse_edge):
+        """ Set the edge that goes from the neuron core back to the synapse\
+            core.
+
+        :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
+            The edge that we will receive spikes from
+        """
+        self.__neuron_to_synapse_edge = neuron_to_synapse_edge
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
@@ -157,6 +173,32 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(send_size)
         spec.write_value(TIME_TO_CLEAR_SPIKES +
                          get_time_to_write_us(send_size, n_send_cores))
+
+    def _write_key_spec(self, spec, routing_info):
+        """ Write key config region
+
+        :param DataSpecificationGenerator spec:
+            The generator of the specification to write
+        :param RoutingInfo routing_info:
+            Container of keys and masks for edges
+        """
+        spec.reserve_memory_region(
+            region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
+            label="Key Config")
+        spec.switch_write_focus(self.REGIONS.KEY_REGION.value)
+        if self.__neuron_to_synapse_edge is None:
+            # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
+            spec.write_value(1)
+            spec.write_value(0)
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
+            r_info = routing_info.get_routing_info_for_edge(
+                self.__neuron_to_synapse_edge)
+            spec.write_value(r_info.first_key)
+            spec.write_value(r_info.first_mask)
+            spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
+            spec.write_value(int(self._app_vertex.self_projection is not None))
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

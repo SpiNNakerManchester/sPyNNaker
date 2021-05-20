@@ -30,9 +30,12 @@ from spynnaker.pyNN.models.neuron import (
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from data_specification.reference_context import ReferenceContext
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
-    import SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, SynapseRegions
-from spynnaker.pyNN.utilities.constants import SYNAPSE_SDRAM_PARTITION_ID
+    import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
+            SynapseRegions)
+from spynnaker.pyNN.utilities.constants import (
+    SYNAPSE_SDRAM_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
@@ -158,13 +161,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse_references, syn_label = self.__add_lead_synapse_core(
                 vertex_slice, independent_synapse_sdram, proj_dependent_sdram,
                 label, rb_shifts, weight_scales, all_resources, machine_graph,
-                synapse_vertices)
+                synapse_vertices, neuron_vertex)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
-                    all_resources, machine_graph, synapse_vertices)
+                    all_resources, machine_graph, synapse_vertices,
+                    neuron_vertex)
 
             # Add resources for Poisson vertices
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -227,7 +231,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_lead_synapse_core(
             self, vertex_slice, independent_synapse_sdram,
             proj_dependent_sdram, label, rb_shifts, weight_scales,
-            all_resources, machine_graph, synapse_vertices):
+            all_resources, machine_graph, synapse_vertices, neuron_vertex):
         # Get common synapse resources
         app_vertex = self._governed_app_vertex
         structural_sz = app_vertex.get_structural_dynamics_size(
@@ -260,11 +264,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)
 
+        self.__add_plastic_feedback(
+            machine_graph, neuron_vertex, lead_synapse_vertex)
+
         return synapse_references, syn_label
 
     def __add_shared_synapse_core(
             self, syn_label, i, vertex_slice, synapse_references,
-            all_resources, machine_graph, synapse_vertices):
+            all_resources, machine_graph, synapse_vertices,
+            neuron_vertex):
         app_vertex = self._governed_app_vertex
         synapse_label = "{}({})".format(syn_label, i)
         synapse_resources = self.__get_synapse_resources(vertex_slice)
@@ -275,6 +283,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         machine_graph.add_vertex(synapse_vertex)
         self.__synapse_vertices.append(synapse_vertex)
         synapse_vertices.append(synapse_vertex)
+
+        self.__add_plastic_feedback(
+            machine_graph, neuron_vertex, synapse_vertex)
+
+    def __add_plastic_feedback(
+            self, machine_graph, neuron_vertex, synapse_vertex):
+
+        # If synapse dynamics is not simply static, link the neuron vertex
+        # back to the synapse vertex
+        app_vertex = self._governed_app_vertex
+        if (not isinstance(app_vertex.synapse_dynamics,
+                           SynapseDynamicsStatic) and
+                app_vertex.self_projection is None):
+            neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
+            machine_graph.add_edge(neuron_to_synapse_edge, SPIKE_PARTITION_ID)
+            synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
 
     def __handle_poisson_sources(self, label, machine_graph):
         """ Go through the incoming projections and find Poisson sources with
@@ -449,6 +473,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.REGIONS
             .SDRAM_EDGE_PARAMS.value, SYNAPSES_SDRAM_PARAMS_SIZE)
+        sdram.add_cost(
+            PopulationSynapsesMachineVertexLead.REGIONS.KEY_REGION.value,
+            KEY_CONFIG_SIZE)
         sdram.nest(
             len(PopulationSynapsesMachineVertexLead.REGIONS) + 1,
             variable_sdram)

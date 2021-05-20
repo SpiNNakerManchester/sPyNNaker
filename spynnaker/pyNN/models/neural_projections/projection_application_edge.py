@@ -46,7 +46,8 @@ class ProjectionApplicationEdge(
         "__post_slices",
         # True if slices have been convered to sorted lists
         "__slices_list_mode",
-        "__machine_edges_by_slices"
+        "__machine_edges_by_slices",
+        "__filter"
     ]
 
     def __init__(
@@ -80,6 +81,9 @@ class ProjectionApplicationEdge(
         self.__post_slices = set()
         self.__slices_list_mode = False
 
+        # By default, allow filtering
+        self.__filter = True
+
     def add_synapse_information(self, synapse_information):
         """
         :param SynapseInformation synapse_information:
@@ -105,6 +109,13 @@ class ProjectionApplicationEdge(
     def delay_edge(self, delay_edge):
         self.__delay_edge = delay_edge
 
+    def set_filter(self, do_filter):
+        """ Set the ability to filter or not
+
+        @param bool do_filter: Whether to allow filtering
+        """
+        self.__filter = do_filter
+
     @property
     def n_delay_stages(self):
         """
@@ -128,6 +139,8 @@ class ProjectionApplicationEdge(
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
+        if not self.__filter:
+            return False
         for synapse_info in self.__synapse_information:
             # Structual Plasticity can learn connection not originally included
             if are_dynamics_structural(synapse_info.synapse_dynamics):

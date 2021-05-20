@@ -115,7 +115,8 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__synapse_expander_size"]
+        "__synapse_expander_size",
+        "__self_projection"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -232,6 +233,7 @@ class AbstractPopulationVertex(
         # Set up for incoming
         self.__incoming_projections = list()
         self.__max_row_info = dict()
+        self.__self_projection = None
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -270,6 +272,16 @@ class AbstractPopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
         self.__incoming_projections.append(projection)
+        if projection._projection_edge.pre_vertex == self:
+            self.__self_projection = projection
+
+    @property
+    def self_projection(self):
+        """ Get any projection from this vertex to itself
+
+        :rtype: PyNNProjectionCommon or None
+        """
+        return self.__self_projection
 
     @property
     @overrides(TDMAAwareApplicationVertex.n_atoms)

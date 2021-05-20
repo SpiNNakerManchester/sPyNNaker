@@ -62,7 +62,7 @@ class PopulationSynapsesMachineVertexLead(
         self.__synapse_references = synapse_references
 
         # Need to do this last so that the values above can be used
-        self.__synaptic_matrices = self._create_synaptic_matrices()
+        self.__synaptic_matrices = self._create_synaptic_matrices(False)
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
@@ -119,6 +119,9 @@ class PopulationSynapsesMachineVertexLead(
 
         # Write information about SDRAM
         self._write_sdram_edge_spec(spec)
+
+        # Write information about keys
+        self._write_key_spec(spec, routing_info)
 
         # End the writing of this specification:
         spec.end_specification()

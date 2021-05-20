@@ -130,15 +130,6 @@ class Projection(object):
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
-        # If the target is a population, add to the list of incoming
-        # projections
-        if isinstance(post_vertex, AbstractPopulationVertex):
-            post_vertex.add_incoming_projection(self)
-
-        # If the source is a poisson, add to the list of outgoing projections
-        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
-            pre_vertex.add_outgoing_projection(self)
-
         # sort out synapse type
         synaptic_type = post_vertex.get_synapse_id_by_target(receptor_type)
         if synaptic_type is None:
@@ -208,6 +199,15 @@ class Projection(object):
 
             self.__synapse_information.add_pre_run_connection_holder(
                 connection_holder)
+
+        # If the target is a population, add to the list of incoming
+        # projections
+        if isinstance(post_vertex, AbstractPopulationVertex):
+            post_vertex.add_incoming_projection(self)
+
+        # If the source is a poisson, add to the list of outgoing projections
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            pre_vertex.add_outgoing_projection(self)
 
     @staticmethod
     def __check_population(param, connector):

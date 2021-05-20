@@ -171,13 +171,15 @@ static bool initialise(void) {
     }
 
     // Setup for writing synaptic inputs at the end of each run
-    struct sdram_config * sdram_config = data_specification_get_region(
+    struct sdram_config *sdram_config = data_specification_get_region(
             SDRAM_PARAMS_REGION, ds_regions);
+    struct key_config *key_config = data_specification_get_region(
+            KEY_REGION, ds_regions);
 
     if (!spike_processing_fast_initialise(
             row_max_n_words, incoming_spike_buffer_size,
             clear_input_buffer_of_late_packets, 0, MC, *sdram_config,
-            ring_buffers)) {
+            *key_config, ring_buffers)) {
         return false;
     }
 

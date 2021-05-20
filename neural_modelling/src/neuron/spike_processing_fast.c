@@ -18,6 +18,8 @@
 #include "spike_processing_fast.h"
 #include "population_table/population_table.h"
 #include "synapses.h"
+#include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <spin1_api_params.h>
 #include <scamp_spin1_sync.h>
 #include <simulation.h>
@@ -117,6 +119,9 @@ static uint32_t p_per_ts_region;
 
 //! Where synaptic input is to be written
 static struct sdram_config sdram_inputs;
+
+//! Key configuration to detect local neuron spikes
+static struct key_config key_config;
 
 //! The ring buffers to use
 static weight_t *ring_buffers;
@@ -292,22 +297,33 @@ static inline void read_synaptic_row(spike_t spike, synaptic_row_t row,
 }
 
 //! \brief Get the next spike, keeping track of provenance data
-//! \param[out] spike: Pointer to receive the next spike
+//! \param[in] time Simulation time step
+//! \param[out] spike Pointer to receive the next spike
 //! \return True if a spike was retrieved
-static inline bool get_next_spike(spike_t *spike) {
+static inline bool get_next_spike(uint32_t time, spike_t *spike) {
     uint32_t n_spikes = in_spikes_size();
     if (biggest_fill_size_of_input_buffer < n_spikes) {
         biggest_fill_size_of_input_buffer = n_spikes;
     }
-    return in_spikes_get_next_spike(spike);
+    if (!in_spikes_get_next_spike(spike)) {
+        return false;
+    }
+    // Detect a looped back spike
+    if ((*spike & key_config.mask) == key_config.key) {
+        synapse_dynamics_process_post_synaptic_event(
+                time, *spike & key_config.spike_id_mask);
+        return key_config.self_connected;
+    }
+    return true;
 }
 
 //! \brief Start the first DMA after awaking from spike reception.  Loops over
 //!        available spikes until one causes a DMA.
+//! \param[in] time Simulation time step
 //! \param[in/out] spike Starts as the first spike received, but might change
 //!                      if the first spike doesn't cause a DMA
 //! \return True if a DMA was started
-static inline bool start_first_dma(spike_t *spike) {
+static inline bool start_first_dma(uint32_t time, spike_t *spike) {
     synaptic_row_t row;
     uint32_t n_bytes;
 
@@ -316,24 +332,25 @@ static inline bool start_first_dma(spike_t *spike) {
             read_synaptic_row(*spike, row, n_bytes);
             return true;
         }
-    } while (!is_end_of_time_step() && get_next_spike(spike));
+    } while (!is_end_of_time_step() && get_next_spike(time, spike));
 
     return false;
 }
 
 //! \brief Get the details for the next DMA, but don't start it.
+//! \param[in] time Simulation time step
 //! \param[out] spike Pointer to receive the spike the DMA relates to
 //! \param[out] row Pointer to receive the address to be transferred
 //! \param[out] n_bytes Pointer to receive the number of bytes to transfer
 //! \return True if there is a DMA to do
-static inline bool get_next_dma(spike_t *spike, synaptic_row_t *row,
+static inline bool get_next_dma(uint32_t time, spike_t *spike, synaptic_row_t *row,
         uint32_t *n_bytes) {
     if (population_table_is_next() && population_table_get_next_address(
             spike, row, n_bytes)) {
         return true;
     }
 
-    while (!is_end_of_time_step() && get_next_spike(spike)) {
+    while (!is_end_of_time_step() && get_next_spike(time, spike)) {
         if (population_table_get_first_address(*spike, row, n_bytes)) {
             return true;
         }
@@ -376,21 +393,30 @@ static inline void handle_row_error(dma_buffer *buffer) {
 
 //! \brief Process a row that has been transferred
 //! \param[in] time The current time step of the simulation
-static inline void process_current_row(uint32_t time) {
+static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
 
     if (!synapses_process_synaptic_row(time, buffer->row, &write_back)) {
         handle_row_error(buffer);
     }
+    synaptogenesis_spike_received(time, buffer->originating_spike);
     spike_processing_count++;
     if (write_back) {
         uint32_t n_bytes = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
         void *system_address = synapse_row_plastic_region(
                 buffer->sdram_writeback_address);
         void *tcm_address = synapse_row_plastic_region(buffer->row);
-        wait_for_dma_to_complete();
+        // Make sure an outstanding DMA is completed before starting this one
+        if (dma_in_progress) {
+            wait_for_dma_to_complete();
+        }
         do_fast_dma_write(tcm_address, system_address, n_bytes);
+        // Only wait for this DMA to complete if there isn't another running,
+        // as otherwise the next wait will fail!
+        if (!dma_in_progress) {
+            wait_for_dma_to_complete();
+        }
     }
     next_buffer_to_process = (next_buffer_to_process + 1) & DMA_BUFFER_MOD_MASK;
     spikes_processed_this_time_step++;
@@ -427,7 +453,8 @@ static inline void measure_transfer_time(void) {
             sdram_inputs.size_in_bytes, sdram_inputs.address, clocks_to_transfer);
 }
 
-void spike_processing_fast_time_step_loop(uint32_t time) {
+//! \brief Prepare the start of a time step
+static inline void prepare_timestep(void) {
     uint32_t cspr = spin1_int_disable();
 
     // Reset these to ensure consistency
@@ -466,13 +493,18 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
 
     synapses_flush_ring_buffers(time);
     spin1_mode_restore(cspr);
+}
+
+void spike_processing_fast_time_step_loop(uint32_t time) {
+    // Prepare for the start
+    prepare_timestep();
 
     // Loop until the end of a time step is reached
     while (true) {
 
         // Wait for a spike, or the timer to expire
         uint32_t spike;
-        while (!is_end_of_time_step() && !get_next_spike(&spike)) {
+        while (!is_end_of_time_step() && !get_next_spike(time, &spike)) {
             // This doesn't wait for interrupt currently because there isn't
             // a way to have a T2 interrupt without a callback function, and
             // a callback function is too slow!  This is therefore a busy wait.
@@ -487,13 +519,13 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
         }
 
         // There must be a spike!  Start a DMA processing loop...
-        bool dma_in_progress = start_first_dma(&spike);
+        bool dma_in_progress = start_first_dma(time, &spike);
         while (dma_in_progress && !is_end_of_time_step()) {
 
             // See if there is another DMA to do
             synaptic_row_t row;
             uint32_t n_bytes;
-            dma_in_progress = get_next_dma(&spike, &row, &n_bytes);
+            dma_in_progress = get_next_dma(time, &spike, &row, &n_bytes);
 
             // Finish the current DMA before starting the next
             if (!wait_for_dma_to_complete_or_end()) {
@@ -506,7 +538,7 @@ void spike_processing_fast_time_step_loop(uint32_t time) {
             }
 
             // Process the row we already have while the DMA progresses
-            process_current_row(time);
+            process_current_row(time, dma_in_progress);
         }
     }
 }
@@ -546,7 +578,7 @@ bool spike_processing_fast_initialise(
         uint32_t row_max_n_words, uint32_t spike_buffer_size,
         bool discard_late_packets, uint32_t pkts_per_ts_rec_region,
         uint32_t multicast_priority, struct sdram_config sdram_inputs_param,
-        weight_t *ring_buffers_param) {
+        struct key_config key_config_param, weight_t *ring_buffers_param) {
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -569,6 +601,7 @@ bool spike_processing_fast_initialise(
     clear_input_buffers_of_late_packets = discard_late_packets;
     p_per_ts_region = pkts_per_ts_rec_region;
     sdram_inputs = sdram_inputs_param;
+    key_config = key_config_param;
     ring_buffers = ring_buffers_param;
 
     // Configure for multicast reception

@@ -54,16 +54,18 @@ class PopulationSynapsesMachineVertexShared(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
+        "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "data_n_time_steps",
+            "machine_time_step", "time_scale_factor", "routing_info",
+            "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            data_n_time_steps):
+            routing_info, data_n_time_steps):
         """
         :param machine_time_step: (injected)
         :param time_scale_factor: (injected)
@@ -84,6 +86,9 @@ class PopulationSynapsesMachineVertexShared(
 
         # Write information about SDRAM
         self._write_sdram_edge_spec(spec)
+
+        # Write information about keys
+        self._write_key_spec(spec, routing_info)
 
         # End the writing of this specification:
         spec.end_specification()
