@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sqlite3
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 
@@ -42,7 +44,7 @@ def structural_formation_to_full():
 
     num_rewires = None
 
-    report_dir = p.globals_variables.get_simulator()._report_default_directory
+    report_dir = report_default_directory()
     prov_file = os.path.join(
         report_dir, "provenance_data", "provenance.sqlite3")
     with sqlite3.connect(prov_file) as prov_db:
