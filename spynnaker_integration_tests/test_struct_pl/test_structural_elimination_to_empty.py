@@ -45,7 +45,7 @@ def structural_without_stdp():
 
     num_rewires = None
 
-    report_dir = globals_variables.run_report_directory()
+    report_dir = globals_variables.report_default_directory()
     prov_file = os.path.join(
             report_dir, "provenance_data", "provenance.sqlite3")
     with sqlite3.connect(prov_file) as prov_db:
