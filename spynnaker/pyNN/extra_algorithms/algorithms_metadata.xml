@@ -58,10 +58,6 @@
                 <param_type>MemoryTransceiver</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -74,7 +70,6 @@
             <param_name>extract_iobuf</param_name>
             <param_name>placements</param_name>
             <param_name>transceiver</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>executable_finder</param_name>
             <token part="DSGDataLoaded">DataLoaded</token>
         </required_inputs>
@@ -113,10 +108,6 @@
             <parameter>
                 <param_name>app_id</param_name>
                 <param_type>APPID</param_type>
-            </parameter>
-            <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
                 <param_name>compress_as_much_as_possible</param_name>
@@ -187,7 +178,6 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>produce_report</param_name>
@@ -246,10 +236,6 @@
                 <param_type>APPID</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>compress_as_much_as_possible</param_name>
                 <param_type>CompressionAsFarAsPos</param_type>
             </parameter>
@@ -318,7 +304,6 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>produce_report</param_name>
@@ -380,10 +365,6 @@
                 <param_type>APPID</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>compress_as_much_as_possible</param_name>
                 <param_type>CompressionAsFarAsPos</param_type>
             </parameter>
@@ -447,7 +428,6 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
             <param_name>produce_report</param_name>
@@ -486,10 +466,6 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>MemoryTransceiver</param_type>
             </parameter>
@@ -526,7 +502,6 @@
             <param_name>app_graph</param_name>
             <param_name>placements</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
             <param_name>write_bit_field_generator_iobuf</param_name>
             <param_name>generating_bitfield_report</param_name>

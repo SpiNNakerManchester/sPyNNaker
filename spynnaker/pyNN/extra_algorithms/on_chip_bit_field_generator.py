@@ -89,7 +89,7 @@ class OnChipBitFieldGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver, write_bit_field_generator_iobuf,
+            transceiver, write_bit_field_generator_iobuf,
             generating_bitfield_report, default_report_folder, machine_graph,
             routing_infos, generating_bit_field_summary_report):
         """ Loads and runs the bit field generator on chip.
@@ -100,8 +100,6 @@ class OnChipBitFieldGenerator(object):
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param str provenance_file_path:
-            the path to where provenance data items are written
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
         :param bool write_bit_field_generator_iobuf: flag for report
@@ -134,9 +132,8 @@ class OnChipBitFieldGenerator(object):
         # run app
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder,
-            write_bit_field_generator_iobuf, self.__check_for_success,
-            [CPUState.FINISHED], False,
+            executable_finder, write_bit_field_generator_iobuf,
+            self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()

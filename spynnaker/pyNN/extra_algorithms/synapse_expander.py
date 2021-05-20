@@ -29,8 +29,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def synapse_expander(
-        placements, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf):
+        placements, transceiver, executable_finder, extract_iobuf):
     """ Run the synapse expander.
 
     .. note::
@@ -40,7 +39,6 @@ def synapse_expander(
         Where all vertices are on the machine.
     :param ~spinnman.transceiver.Transceiver transceiver:
         How to talk to the machine.
-    :param str provenance_file_path: Where provenance data should be written.
     :param executable_finder:
         How to find the synapse expander binaries.
     :param bool extract_iobuf: flag for extracting iobuf
@@ -58,10 +56,10 @@ def synapse_expander(
                            "Expanding Synapses")
     expander_app_id = transceiver.app_id_tracker.get_new_id()
     run_system_application(
-        expander_cores, expander_app_id, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf, None,
-        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt",
-        progress_bar=progress, logger=logger)
+        expander_cores, expander_app_id, transceiver, executable_finder,
+        extract_iobuf, None, [CPUState.FINISHED], False,
+        "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
+        logger=logger)
     progress.end()
     _fill_in_connection_data(expanded_pop_vertices, transceiver)
 
