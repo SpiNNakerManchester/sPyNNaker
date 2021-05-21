@@ -454,7 +454,9 @@ static inline void measure_transfer_time(void) {
 }
 
 //! \brief Prepare the start of a time step
-static inline void prepare_timestep(uint32_t time) {
+//! \param[in] time The time step being executed
+//! \return Whether we should proceed or not
+static inline bool prepare_timestep(uint32_t time) {
     uint32_t cspr = spin1_int_disable();
 
     // Reset these to ensure consistency
@@ -469,6 +471,9 @@ static inline void prepare_timestep(uint32_t time) {
 
     // Start timer2 to tell us when to stop
     uint32_t timer = tc[T1_COUNT];
+    if (timer < clocks_to_transfer) {
+        return false;
+    }
     uint32_t time_until_stop = timer - clocks_to_transfer;
     tc[T2_CONTROL] = 0;
     tc[T2_LOAD] = time_until_stop;
@@ -493,6 +498,7 @@ static inline void prepare_timestep(uint32_t time) {
 
     synapses_flush_ring_buffers(time);
     spin1_mode_restore(cspr);
+    return true;
 }
 
 static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
@@ -563,7 +569,10 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
     do_rewiring(time, n_rewires);
 
     // Prepare for the start
-    prepare_timestep(time);
+    if (!prepare_timestep(time)) {
+        // TODO: Need to add some provenance here
+        return;
+    }
 
     // Loop until the end of a time step is reached
     while (true) {
