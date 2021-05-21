@@ -30,7 +30,8 @@ from spynnaker.pyNN.models.neuron import (
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from data_specification.reference_context import ReferenceContext
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -107,12 +108,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
+        app_vertex = self._governed_app_vertex
+        label = app_vertex.label
+
+        # Structural plasticity can only be run on a single synapse core
+        if (isinstance(app_vertex.synapse_dynamics,
+                       AbstractSynapseDynamicsStructural) and
+                self.__n_synapse_vertices != 1):
+            raise SynapticConfigurationException(
+                "The current implementation of structural plasticity can only"
+                " be run on a single synapse core.  Please ensure the number"
+                " of synapse cores is set to 1")
+
         # Do some checks to make sure everything is likely to fit
         atoms_per_core = min(
-            self._governed_app_vertex.get_max_atoms_per_core(),
-            self._governed_app_vertex.n_atoms)
-        n_synapse_types = (
-            self._governed_app_vertex.neuron_impl.get_n_synapse_types())
+            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
+        n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
                 get_n_bits(self.__max_delay)) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
@@ -128,13 +139,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_verts_for_edge = defaultdict(list)
         self.__synapse_verts_by_incoming = defaultdict(list)
 
-        label = self._governed_app_vertex.label
-
         incoming_direct_poisson = self.__handle_poisson_sources(
             label, machine_graph)
 
         # Work out the ring buffer shifts based on all incoming things
-        app_vertex = self._governed_app_vertex
         rb_shifts = app_vertex.get_ring_buffer_shifts(
             app_vertex.incoming_projections)
         weight_scales = app_vertex.get_weight_scales(rb_shifts)

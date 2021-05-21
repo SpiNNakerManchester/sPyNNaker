@@ -526,6 +526,7 @@ static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
     // Go in a loop until all done
     while (dma_in_progress) {
 
+        // Start the next DMA if possible
         dma_in_progress = false;
         while (rewires_to_go > 0 && !dma_in_progress) {
             if (synaptogenesis_dynamics_rewire(time, &spike, &row, &n_bytes)) {
@@ -553,8 +554,8 @@ static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
                 wait_for_dma_to_complete();
             }
             do_fast_dma_write(
-                    dma_buffers[current_buffer].sdram_writeback_address,
                     dma_buffers[current_buffer].row,
+                    dma_buffers[current_buffer].sdram_writeback_address,
                     dma_buffers[current_buffer].n_bytes_transferred);
             if (!dma_in_progress) {
                 wait_for_dma_to_complete();
@@ -565,14 +566,16 @@ static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
 }
 
 void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
-    // Do rewiring
-    do_rewiring(time, n_rewires);
 
     // Prepare for the start
     if (!prepare_timestep(time)) {
         // TODO: Need to add some provenance here
+        process_end_of_time_step(time);
         return;
     }
+
+    // Do rewiring
+    do_rewiring(time, n_rewires);
 
     // Loop until the end of a time step is reached
     while (true) {

@@ -101,7 +101,8 @@ class SynapseDynamicsStructuralCommon(
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, machine_time_step)
+            weight_scales, synaptic_matrices, machine_time_step,
+            vertex_slice)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -109,11 +110,16 @@ class SynapseDynamicsStructuralCommon(
 
         # Write the component parameters
         # pylint: disable=no-member
+        spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
+            spec.comment("Writing formation parameters for {}".format(
+                proj.label))
             dynamics = proj._synapse_information.synapse_dynamics
             dynamics.formation.write_parameters(spec)
         for proj in structural_projections:
+            spec.comment("Writing elimination parameters for {}".format(
+                proj.label))
             dynamics = proj._synapse_information.synapse_dynamics
             dynamics.elimination.write_parameters(
                 spec, weight_scales[proj._synapse_information.synapse_type])
@@ -155,6 +161,7 @@ class SynapseDynamicsStructuralCommon(
         :return: None
         :rtype: None
         """
+        spec.comment("Writing common rewiring data")
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
@@ -190,7 +197,8 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, machine_time_step):
+            weight_scales, synaptic_matrices, machine_time_step,
+            post_vertex_slice):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -209,18 +217,25 @@ class SynapseDynamicsStructuralCommon(
         :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
+        spec.comment("Writing pre-population info")
         pop_index = dict()
         index = 0
         for proj in structural_projections:
+            spec.comment("Writing pre-population info for {}".format(
+                proj.label))
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
             dynamics = synapse_info.synapse_dynamics
 
+            machine_edges = list()
+            for machine_edge in app_edge.machine_edges:
+                if machine_edge.post_vertex.vertex_slice == post_vertex_slice:
+                    machine_edges.append(machine_edge)
+
             # Number of machine edges
-            spec.write_value(
-                len(app_edge.machine_edges), data_type=DataType.UINT16)
+            spec.write_value(len(machine_edges), data_type=DataType.UINT16)
             # Controls - currently just if this is a self connection or not
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
@@ -244,7 +259,7 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for machine_edge in app_edge.machine_edges:
+            for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = machine_edge.pre_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
@@ -253,6 +268,7 @@ class SynapseDynamicsStructuralCommon(
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
                     app_edge, synapse_info, machine_edge))
+
         return pop_index
 
     def __write_post_to_pre_table(
@@ -312,6 +328,12 @@ class SynapseDynamicsStructuralCommon(
         # Finally make the table and write it out
         post_to_pre = numpy.core.records.fromarrays(
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
+        if len(post_to_pre) != vertex_slice.n_atoms * self.s_max:
+            raise Exception(
+                "Wrong size of pre-to-pop tables: {} Found, {} Expected"
+                .format(len(post_to_pre), vertex_slice.n_atoms * self.s_max))
+        spec.comment("Writing post-to-pre table of {} words".format(
+            vertex_slice.n_atoms * self.s_max))
         spec.write_array(post_to_pre)
 
     @overrides(AbstractSynapseDynamicsStructural.
@@ -324,28 +346,24 @@ class SynapseDynamicsStructuralCommon(
         param_sizes = (
             self.partner_selection.get_parameters_sdram_usage_in_bytes())
         n_sub_edges = 0
-        n_structural_edges = 0
-        for proj in incoming_projections:
+        structural_projections = self.__get_structural_projections(
+            incoming_projections)
+        for proj in structural_projections:
             dynamics = proj._synapse_information.synapse_dynamics
-            if isinstance(dynamics, AbstractSynapseDynamicsStructural):
-                n_structural_edges += 1
-                app_edge = proj._projection_edge
-                if app_edge.pre_vertex.machine_vertices:
-                    # TODO: Check the type of the vertices
-                    n_sub_edges += len(app_edge.pre_vertex.machine_vertices)
-                else:
-                    n_sub_edges += len(
-                        app_edge.pre_vertex.splitter.get_outgoing_slices())
-                param_sizes += dynamics.formation\
-                    .get_parameters_sdram_usage_in_bytes()
-                param_sizes += dynamics.elimination\
-                    .get_parameters_sdram_usage_in_bytes()
+            app_edge = proj._projection_edge
+            n_sub_edges += len(
+                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+            param_sizes += dynamics.formation\
+                .get_parameters_sdram_usage_in_bytes()
+            param_sizes += dynamics.elimination\
+                .get_parameters_sdram_usage_in_bytes()
 
-        return int((self._REWIRING_DATA_SIZE +
-                   (self._PRE_POP_INFO_BASE_SIZE * n_structural_edges) +
-                   (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
-                   (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.s_max) +
-                   param_sizes))
+        return int(
+            self._REWIRING_DATA_SIZE +
+            (self._PRE_POP_INFO_BASE_SIZE * len(structural_projections)) +
+            (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
+            (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.s_max) +
+            param_sizes)
 
     def get_vertex_executable_suffix(self):
         """

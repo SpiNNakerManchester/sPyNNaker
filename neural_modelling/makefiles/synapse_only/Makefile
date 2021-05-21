@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 MODELS = synapses\
-         synapses_stdp_mad_pair_additive
+         synapses_stdp_mad_pair_additive\
+         synapses_structural_random_distance_weight\
+         synapses_stdp_mad_pair_additive_structural_random_distance_weight
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
