@@ -89,17 +89,18 @@ class PopulationSynapsesMachineVertexLead(
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
+        "data_n_time_steps": "DataNTimeSteps",
+        "routing_tables": "MemoryRoutingTables"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "routing_info",
-            "data_n_time_steps"
+            "data_n_time_steps", "routing_tables"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, data_n_time_steps):
+            routing_info, data_n_time_steps, routing_tables):
         """
         :param machine_time_step: (injected)
         :param time_scale_factor: (injected)
