@@ -397,7 +397,7 @@ class SynapseIORowBased(object):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * machine_time_step_ms())
+            connections["delay"] * machine_time_step_per_ms())
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
