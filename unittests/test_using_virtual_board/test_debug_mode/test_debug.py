@@ -15,8 +15,9 @@
 
 import os
 import unittest
-import pacman.operations.algorithm_reports.reports as reports_names
-from pacman.operations.algorithm_reports.network_specification import (
+import spinn_front_end_common.utilities.report_functions.reports as \
+    reports_names
+from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
 from spinn_front_end_common.utilities import globals_variables
 from spinnaker_testbase import BaseTestCase
