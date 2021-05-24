@@ -15,9 +15,10 @@
 
 import os
 from spinn_utilities.config_holder import get_config_bool
-import pacman.operations.algorithm_reports.reports as reports_names
-from pacman.operations.algorithm_reports.network_specification import \
-    NetworkSpecification
+import spinn_front_end_common.utilities.report_functions.reports as \
+    reports_names
+from spinn_front_end_common.utilities.report_functions import (
+    NetworkSpecification)
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
