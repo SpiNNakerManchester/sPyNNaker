@@ -26,7 +26,7 @@ from pacman.model.graphs.machine import (
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
-    AbstractPopulationVertex)
+    AbstractPopulationVertex, SpikeProcessingFastProvenance)
 from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from data_specification.reference_context import ReferenceContext
@@ -475,7 +475,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             vertex_slice)
         sdram = MultiRegionSDRAM()
         sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
-            n_record, SynapseProvenance.N_ITEMS,
+            n_record,
+            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             PopulationSynapsesMachineVertexLead.COMMON_REGIONS))
 
         sdram.add_cost(

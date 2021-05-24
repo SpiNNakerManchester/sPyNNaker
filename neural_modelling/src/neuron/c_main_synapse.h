@@ -25,7 +25,6 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "direct_synapses.h"
-#include "synapse_provenance.h"
 
 //! The region IDs used by synapse processing
 struct synapse_regions {
@@ -43,6 +42,24 @@ struct synapse_regions {
     uint32_t structural_dynamics;
     //! The filters to avoid DMA transfers of empty rows
     uint32_t bitfield_filter;
+};
+
+//! The provenance information for synaptic processing
+struct synapse_provenance {
+    //! A count of presynaptic events.
+    uint32_t n_pre_synaptic_events;
+    //! A count of synaptic saturations.
+    uint32_t n_synaptic_weight_saturations;
+    //! The number of STDP weight saturations.
+    uint32_t n_plastic_synaptic_weight_saturations;
+    //! The number of population table searches that had no match
+    uint32_t n_ghost_pop_table_searches;
+    //! The number of bit field reads that couldn't be read in due to DTCM limits
+    uint32_t n_failed_bitfield_reads;
+    //! The number of population table searches that found an "invalid" entry
+    uint32_t n_invalid_master_pop_table_hits;
+    //! The number of spikes that a bit field filtered, stopping a DMA
+    uint32_t n_filtered_by_bitfield;
 };
 
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).

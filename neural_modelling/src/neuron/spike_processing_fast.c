@@ -108,6 +108,12 @@ static uint32_t spikes_processed_this_time_step = 0;
 //! The maximum number of spikes processed in a time step
 static uint32_t max_spikes_processed = 0;
 
+//! The number of times the transfer ran to the next time step
+static uint32_t transfer_timer_overruns = 0;
+
+//! The number of times the timer tick was skipped entirely
+static uint32_t skipped_time_steps = 0;
+
 //! The number of packets received this time step for recording
 static struct {
     uint32_t time;
@@ -276,11 +282,10 @@ static inline void process_end_of_time_step(uint32_t time) {
     transfer_buffers(time);
     wait_for_dma_to_complete();
 
-// TODO: Make this extra provenance
-//    uint32_t end = tc[T1_COUNT];
-//    if (end > clocks_to_transfer) {
-//        log_info("Transfer took too long; clocks now %d", end);
-//    }
+    uint32_t end = tc[T1_COUNT];
+    if (end > clocks_to_transfer) {
+        transfer_timer_overruns++;
+    }
 
     spin1_mode_restore(cspr);
 }
@@ -569,7 +574,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
 
     // Prepare for the start
     if (!prepare_timestep(time)) {
-        // TODO: Need to add some provenance here
+        skipped_time_steps++;
         process_end_of_time_step(time);
         return;
     }
@@ -624,10 +629,6 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
 void spike_processing_fast_pause(uint32_t time) {
     store_data(time - 1);
     write_data_next = false;
-
-    // TODO: Make this provenance data
-    log_info("Max packets received = %d", max_spikes_received);
-    log_info("Max spikes processed = %d", max_spikes_processed);
 }
 
 //! \brief Called when a multicast packet is received
@@ -696,12 +697,16 @@ bool spike_processing_fast_initialise(
     return true;
 }
 
-void spike_processing_fast_store_provenance(struct synapse_provenance *prov) {
+void spike_processing_fast_store_provenance(
+        struct spike_processing_fast_provenance *prov) {
     prov->n_input_buffer_overflows = in_spikes_get_n_buffer_overflows();
     prov->n_dmas_complete = dma_complete_count;
     prov->n_spikes_processed = spike_processing_count;
     prov->n_rewires = n_successful_rewires;
     prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
-    prov->spike_processing_get_max_filled_input_buffer_size =
-            biggest_fill_size_of_input_buffer;
+    prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
+    prov->max_spikes_processed = max_spikes_processed;
+    prov->max_spikes_received = max_spikes_received;
+    prov->n_transfer_timer_overruns = transfer_timer_overruns;
+    prov->n_skipped_time_steps = skipped_time_steps;
 }

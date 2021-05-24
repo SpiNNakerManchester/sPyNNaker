@@ -18,13 +18,10 @@ from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon)
-from .population_machine_synapses_provenance import (
-    PopulationMachineSynapsesProvenance)
 
 
 class PopulationSynapsesMachineVertexShared(
         PopulationSynapsesMachineVertexCommon,
-        PopulationMachineSynapsesProvenance,
         AbstractGeneratesDataSpecification):
     """ A machine vertex for PyNN Populations
     """
@@ -92,8 +89,3 @@ class PopulationSynapsesMachineVertexShared(
 
         # End the writing of this specification:
         spec.end_specification()
-
-    @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
-    def _parse_synapse_provenance(self, label, names, provenance_data):
-        yield from PopulationMachineSynapsesProvenance.\
-            _parse_synapse_provenance(self, label, names, provenance_data)

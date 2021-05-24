@@ -44,6 +44,11 @@ typedef enum callback_priorities {
     MC = -1, DMA = -2, TIMER = 0, SDP = 0
 } callback_priorities;
 
+struct provenance_data {
+    struct synapse_provenance synapse_prov;
+    struct spike_processing_fast_provenance spike_processing_prov;
+};
+
 enum regions {
     SYSTEM_REGION,
     PROVENANCE_DATA_REGION,
@@ -106,9 +111,9 @@ static bool restart = true;
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void store_provenance_data(address_t provenance_region) {
-    struct synapse_provenance *prov = (void *) provenance_region;
-    store_synapse_provenance(prov);
-    spike_processing_fast_store_provenance(prov);
+    struct provenance_data *prov = (void *) provenance_region;
+    store_synapse_provenance(&prov->synapse_prov);
+    spike_processing_fast_store_provenance(&prov->spike_processing_prov);
 }
 
 //! \brief the function to call when resuming a simulation

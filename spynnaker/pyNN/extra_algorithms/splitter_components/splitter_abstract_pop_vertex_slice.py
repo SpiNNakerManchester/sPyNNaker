@@ -27,7 +27,8 @@ from pacman.utilities import utility_calls
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
-    NeuronProvenance, SynapseProvenance, MainProvenance)
+    NeuronProvenance, SynapseProvenance, MainProvenance,
+    SpikeProcessingProvenance)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
@@ -152,8 +153,9 @@ class SplitterAbstractPopulationVertexSlice(
         n_record = (
             len(self._governed_app_vertex.neuron_recordables) +
             len(self._governed_app_vertex.synapse_recordables))
-        n_provenance = (NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
-                        MainProvenance.N_ITEMS)
+        n_provenance = (
+            NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
+            MainProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
         sdram = MultiRegionSDRAM()
         sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
             n_record, n_provenance, PopulationMachineVertex.COMMON_REGIONS))

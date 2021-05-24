@@ -24,7 +24,6 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 #include "synapse_row.h"
-#include "synapse_provenance.h"
 
 //! A region of SDRAM used to transfer synapses
 struct sdram_config {
@@ -47,6 +46,31 @@ struct key_config {
     uint32_t spike_id_mask;
     //! Is the node self connected
     uint32_t self_connected;
+};
+
+// Provenance for spike processing
+struct spike_processing_fast_provenance {
+    //! A count of the times that the synaptic input circular buffers overflowed
+    uint32_t n_input_buffer_overflows;
+    //! The number of DMAs performed
+    uint32_t n_dmas_complete;
+    //! The number of spikes received and processed
+    uint32_t n_spikes_processed;
+    //! The number of rewirings performed.
+    uint32_t n_rewires;
+    //! The number of packets that were cleared at the end of timesteps
+    uint32_t n_packets_dropped_from_lateness;
+    //! The maximum size of the input buffer
+    uint32_t max_filled_input_buffer_size;
+    //! The maximum number of spikes received in a time step
+    uint32_t max_spikes_received;
+    //! The maximum number of spikes processed in a time step
+    uint32_t max_spikes_processed;
+    //! The number of times the transfer took longer than expected
+    uint32_t n_transfer_timer_overruns;
+    //! The number of times a time step was skipped entirely
+    uint32_t n_skipped_time_steps;
+
 };
 
 //! \brief Set up spike processing
@@ -74,7 +98,8 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires);
 
 //! \brief Store any provenance data gathered from spike processing
 //! \param[in] prov The structure to store the provenance data in
-void spike_processing_fast_store_provenance(struct synapse_provenance *prov);
+void spike_processing_fast_store_provenance(
+        struct spike_processing_fast_provenance *prov);
 
 //! \brief Called to tell the spike processing that the time step to record
 //!        final data.

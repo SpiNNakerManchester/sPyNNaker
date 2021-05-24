@@ -44,6 +44,7 @@
 struct combined_provenance {
     struct neuron_provenance neuron_provenance;
     struct synapse_provenance synapse_provenance;
+    struct spike_processing_provenance spike_processing_provenance;
     //! Maximum backgrounds queued
     uint32_t max_backgrounds_queued;
     //! Background queue overloads
@@ -127,7 +128,7 @@ static void c_main_store_provenance_data(address_t provenance_region) {
     prov->max_backgrounds_queued = max_backgrounds_queued;
     store_neuron_provenance(&prov->neuron_provenance);
     store_synapse_provenance(&prov->synapse_provenance);
-    spike_processing_store_provenance(&prov->synapse_provenance);
+    spike_processing_store_provenance(&prov->spike_processing_provenance);
 }
 
 //! \brief the function to call when resuming a simulation

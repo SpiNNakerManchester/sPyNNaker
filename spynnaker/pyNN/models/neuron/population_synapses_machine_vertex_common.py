@@ -13,17 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
+import ctypes
 
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses import SynapseRegions
-from .population_machine_synapses_provenance import SynapseProvenance
-from spinn_utilities.abstract_base import abstractmethod
+from .population_machine_synapses import SynapseRegions, SynapseProvenance
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
@@ -37,11 +37,50 @@ KEY_CONFIG_SIZE = 4 * BYTES_PER_WORD
 TIME_TO_CLEAR_SPIKES = 50
 
 
+class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
+    _fields_ = [
+        # A count of the times that the synaptic input circular buffers
+        # overflowed
+        ("n_buffer_overflows", ctypes.c_uint32),
+        # The number of DMA transfers done
+        ("n_dmas_complete", ctypes.c_uint32),
+        # The number of spikes successfully processed
+        ("n_spikes_processed", ctypes.c_uint32),
+        # The number of rewirings performed.
+        ("n_rewires", ctypes.c_uint32),
+        # The number of packets that were dropped due to being late
+        ("n_late_packets", ctypes.c_uint32),
+        # The maximum size of the spike input buffer during simulation
+        ("max_size_input_buffer", ctypes.c_uint32),
+        # The maximum number of spikes in a time step
+        ("max_spikes_received", ctypes.c_uint32),
+        # The maximum number of spikes processed in a time step
+        ("max_spikes_processed", ctypes.c_uint32),
+        # The number of times the transfer time over ran
+        ("n_transfer_timer_overruns", ctypes.c_uint32),
+        # The number of times a time step was skipped entirely
+        ("n_skipped_time_steps", ctypes.c_uint32)
+    ]
+
+    N_ITEMS = len(_fields_)
+
+
 class PopulationSynapsesMachineVertexCommon(
         PopulationMachineCommon,
         SendsSynapticInputsOverSDRAM):
     """ Common parts of a machine vertex for the synapses of a Population
     """
+
+    INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
+    DMA_COMPLETE = "DMA's that were completed"
+    SPIKES_PROCESSED = "How many spikes were processed"
+    N_RE_WIRES_NAME = "Number_of_rewires"
+    N_LATE_SPIKES_NAME = "Number_of_late_spikes"
+    MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
+    MAX_SPIKES_RECEIVED = "Max_spikes_received_in_time_step"
+    MAX_SPIKES_PROCESSED = "Max_spikes_processed_in_time_step"
+    N_TRANSFER_TIMER_OVERRUNS = "Times_the_transfer_did_not_complete_in_time"
+    N_SKIPPED_TIME_STEPS = "Times_a_time_step_was_skipped"
 
     __slots__ = [
         "__sdram_partition",
@@ -111,7 +150,7 @@ class PopulationSynapsesMachineVertexCommon(
         super(PopulationSynapsesMachineVertexCommon, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
             self.COMMON_REGIONS,
-            SynapseProvenance.N_ITEMS,
+            SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition = None
         self.__neuron_to_synapse_edge = None
@@ -210,10 +249,73 @@ class PopulationSynapsesMachineVertexCommon(
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, names, provenance_data):
+        proc_offset = SynapseProvenance.N_ITEMS
         yield from self._parse_synapse_provenance(
-            label, names, provenance_data)
+            label, names, provenance_data[:proc_offset])
+        yield from self._parse_spike_processing_fast_provenance(
+            label, names, provenance_data[proc_offset:])
 
-    @abstractmethod
-    def _parse_synapse_provenance(self, label, names, provenance_data):
-        """ Parse the synapse provenance data
+    def _parse_spike_processing_fast_provenance(
+            self, label, names, provenance_data):
+        """ Extract and yield spike processing provenance
+
+        :param str label: The label of the node
+        :param list(str) names: The hierarchy of names for the provenance data
+        :param list(int) provenance_data: A list of data items to interpret
+        :return: a list of provenance data items
+        :rtype: iterator of ProvenanceDataItem
         """
+        prov = SpikeProcessingFastProvenance(*provenance_data)
+
+        yield ProvenanceDataItem(
+            names + [self.INPUT_BUFFER_FULL_NAME],
+            prov.n_buffer_overflows,
+            prov.n_buffer_overflows > 0,
+            f"The input buffer for {label} lost packets on "
+            f"{prov.n_buffer_overflows} occasions. This is often a "
+            "sign that the system is running too quickly for the number of "
+            "neurons per core.  Please increase the timer_tic or"
+            " time_scale_factor or decrease the number of neurons per core.")
+        yield ProvenanceDataItem(
+            names + [self.DMA_COMPLETE], prov.n_dmas_complete)
+        yield ProvenanceDataItem(
+            names + [self.SPIKES_PROCESSED],
+            prov.n_spikes_processed)
+        yield ProvenanceDataItem(
+            names + [self.N_RE_WIRES_NAME], prov.n_rewires)
+
+        late_message = (
+            f"On {label}, {prov.n_late_packets} packets were dropped "
+            "from the input buffer, because they arrived too late to be "
+            "processed in a given time step. Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method."
+            if self._app_vertex.drop_late_spikes else
+            f"On {label}, {prov.n_late_packets} packets arrived too "
+            "late to be processed in a given time step. Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method.")
+        yield ProvenanceDataItem(
+            names + [self.N_LATE_SPIKES_NAME], prov.n_late_packets,
+            prov.n_late_packets > 0, late_message)
+
+        yield ProvenanceDataItem(
+            names + [self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME],
+            prov.max_size_input_buffer, report=False)
+        yield ProvenanceDataItem(
+            names + [self.MAX_SPIKES_RECEIVED], prov.max_spikes_received)
+        yield ProvenanceDataItem(
+            names + [self.MAX_SPIKES_PROCESSED], prov.max_spikes_processed)
+        yield ProvenanceDataItem(
+            names + [self.N_TRANSFER_TIMER_OVERRUNS],
+            prov.n_transfer_timer_overruns, prov.n_transfer_timer_overruns > 0,
+            f"On {label}, the transfer of synaptic inputs to SDRAM did not end"
+            " before the next timer tick started"
+            f" {prov.n_transfer_timer_overruns} times.")
+        yield ProvenanceDataItem(
+            names + [self.N_SKIPPED_TIME_STEPS], prov.n_skipped_time_steps,
+            prov.n_skipped_time_steps > 0,
+            f"On {label}, synaptic processing did not start on"
+            f" {prov.n_skipped_time_steps} time steps.  Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method.")
