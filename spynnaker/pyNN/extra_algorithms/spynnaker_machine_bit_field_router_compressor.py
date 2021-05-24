@@ -47,7 +47,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             self, routing_tables, transceiver, machine, app_id,
             machine_graph,
             placements, executable_finder, write_compressor_iobuf,
-            produce_report, default_report_folder, target_length,
+            produce_report, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
             retry_count, executable_targets, read_expander_iobuf,
@@ -69,7 +69,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param bool write_compressor_iobuf: flag saying if read iobuf
         :param bool produce_report:
-        :param str default_report_folder:
         :param int target_length:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         :param int threshold_percentage:
@@ -97,7 +96,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 placements=placements, executable_finder=executable_finder,
                 write_compressor_iobuf=write_compressor_iobuf,
                 produce_report=produce_report,
-                default_report_folder=default_report_folder,
                 target_length=target_length, routing_infos=routing_infos,
                 time_to_try_for_each_iteration=time_to_try_for_each_iteration,
                 use_timer_cut_off=use_timer_cut_off,

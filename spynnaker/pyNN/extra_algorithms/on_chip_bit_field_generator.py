@@ -25,6 +25,8 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -90,7 +92,7 @@ class OnChipBitFieldGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             transceiver, write_bit_field_generator_iobuf,
-            generating_bitfield_report, default_report_folder, machine_graph,
+            generating_bitfield_report, machine_graph,
             routing_infos, generating_bit_field_summary_report):
         """ Loads and runs the bit field generator on chip.
 
@@ -104,7 +106,6 @@ class OnChipBitFieldGenerator(object):
             the SpiNNMan instance
         :param bool write_bit_field_generator_iobuf: flag for report
         :param bool generating_bitfield_report: flag for report
-        :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
@@ -141,10 +142,10 @@ class OnChipBitFieldGenerator(object):
         # read in bit fields for debugging purposes
         if generating_bitfield_report:
             self._full_report_bit_fields(app_graph, os.path.join(
-                default_report_folder, self._BIT_FIELD_REPORT_FILENAME))
+                report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
         if generating_bit_field_summary_report:
             self._summary_report_bit_fields(app_graph, os.path.join(
-                default_report_folder,
+                report_default_directory(),
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
     def _summary_report_bit_fields(self, app_graph, file_path):
