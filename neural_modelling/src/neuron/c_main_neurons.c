@@ -36,6 +36,7 @@
 #include "c_main_neuron.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
+#include "dma_common.h"
 #include <tdma_processing.h>
 #include <spin1_api_params.h>
 
@@ -44,6 +45,7 @@ typedef enum callback_priorities {
     DMA = -2, SDP = 0, TIMER = 0
 } callback_priorities;
 
+//! Overall regions to be used by the neuron core
 enum regions {
     SYSTEM_REGION,
     PROVENANCE_DATA_REGION,
@@ -54,6 +56,7 @@ enum regions {
     SDRAM_PARAMS_REGION
 };
 
+//! From the regions, select those that are common
 const struct common_regions COMMON_REGIONS = {
     .system = SYSTEM_REGION,
     .provenance = PROVENANCE_DATA_REGION,
@@ -61,12 +64,16 @@ const struct common_regions COMMON_REGIONS = {
     .recording = RECORDING_REGION
 };
 
+//! Identify the priority of certain tasks
 const struct common_priorities COMMON_PRIORITIES = {
     .sdp = SDP,
     .dma = DMA,
     .timer = TIMER
 };
 
+/**
+ * From the regions, select those that are used for neuron-specific things
+ */
 const struct neuron_regions NEURON_REGIONS = {
     .neuron_params = NEURON_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
@@ -93,13 +100,8 @@ struct neurons_provenance {
     uint32_t n_timer_overruns;
 };
 
-static const uint32_t DMA_FLAGS = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21
-        | DMA_READ << 19;
-
 //! The number of buffers for synaptic data (one processing, one in progress)
 #define N_SYNAPTIC_BUFFERS 2
-
-// Globals
 
 //! The current timer tick value.
 // the timer tick callback returning the same value.
@@ -156,14 +158,6 @@ void resume_callback(void) {
     }
 }
 
-static inline void read(uint8_t *system_address, weight_t *tcm_address,
-        uint32_t length) {
-    uint32_t desc = DMA_FLAGS | length;
-    dma[DMA_ADRS] = (uint32_t) system_address;
-    dma[DMA_ADRT] = (uint32_t) tcm_address;
-    dma[DMA_DESC] = desc;
-}
-
 //! \brief Add up all the synaptic contributions into a global buffer
 //! \param[in] syns The weights to be added
 static inline void sum(weight_t *syns) {
@@ -217,31 +211,24 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     uint32_t write_index = 0;
     uint32_t read_index = 0;
 
-    // Reset DMA
-    dma[DMA_CTRL] = 0x08;
-    read(sdram, synaptic_contributions[write_index], sdram_inputs.size_in_bytes);
+    // Start the first DMA
+    do_fast_dma_read(sdram, synaptic_contributions[write_index],
+            sdram_inputs.size_in_bytes);
     write_index = !write_index;
 
     for (uint32_t i = 0; i < sdram_inputs.n_synapse_cores; i++) {
         // Wait for the last DMA to complete
-        uint32_t n_loops = 0;
-        while (!(dma[DMA_STAT] & (1 << 10)) && n_loops < 10000) {
-            n_loops++;
-        }
-        if (!(dma[DMA_STAT] & (1 << 10))) {
-            log_error("DMA Wait timed out - stat = 0x%08x", dma[DMA_STAT]);
-            rt_error(RTE_SWERR);
-        }
-        dma[DMA_CTRL] = 0x08;
+        wait_for_dma_to_complete();
 
         // Start the next DMA if not finished
         if (i + 1 < sdram_inputs.n_synapse_cores) {
             sdram += sdram_inputs.size_in_bytes;
-            read(sdram, synaptic_contributions[write_index],
+            do_fast_dma_read(sdram, synaptic_contributions[write_index],
                     sdram_inputs.size_in_bytes);
             write_index = !write_index;
         }
 
+        // Add in the contributions from the last read item
         sum(synaptic_contributions[read_index]);
         read_index = !read_index;
     }

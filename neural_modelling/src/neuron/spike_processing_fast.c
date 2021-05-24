@@ -20,7 +20,7 @@
 #include "synapses.h"
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
-#include <spin1_api_params.h>
+#include "dma_common.h"
 #include <scamp_spin1_sync.h>
 #include <simulation.h>
 #include <recording.h>
@@ -53,22 +53,8 @@ typedef struct dma_buffer {
 //! The extra overhead to add to the transfer time
 #define TRANSFER_OVERHEAD_CLOCKS 100
 
-//! Value of the masked DMA status register when transfer is complete
-#define DMA_COMPLETE 0x400
-
-//! Mask to apply to the DMA status register to check for completion
-#define DMA_CHECK_MASK 0x401
-
 //! The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
-
-//! DMA write flags
-static const uint32_t DMA_WRITE_FLAGS =
-        DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | DMA_WRITE << 19;
-
-//! DMA read flags
-static const uint32_t DMA_READ_FLAGS =
-        DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | DMA_READ << 19;
 
 //! The index of the next buffer to be filled by a DMA
 static uint32_t next_buffer_to_fill;
@@ -136,12 +122,6 @@ static weight_t *ring_buffers;
 //! because some things are recorded for time step t in time step t + 1.
 static bool write_data_next = false;
 
-//! \brief Is there a DMA currently running?
-//! \return True if there is something transferring now.
-static inline bool dma_done(void) {
-    return (dma[DMA_STAT] & DMA_CHECK_MASK) == DMA_COMPLETE;
-}
-
 //! \brief Determine if this is the end of the time step
 //! \return True if end of time step
 static inline bool is_end_of_time_step(void) {
@@ -151,72 +131,6 @@ static inline bool is_end_of_time_step(void) {
 //! \brief Clear end of time step so it can be detected again
 static inline void clear_end_of_time_step(void) {
     tc[T2_INT_CLR] = 1;
-}
-
-//! \brief Start the DMA doing a write; the write may not be finished at the
-//!        end of this call.
-//! \param[in] tcm_address: The local DTCM address to read the data from
-//! \param[in] system_address: The SDRAM address to write the data to
-//! \param[in] n_bytes: The number of bytes to be written from DTCM to SDRAM
-static inline void do_fast_dma_write(void *tcm_address, void *system_address,
-        uint32_t n_bytes) {
-#if LOG_LEVEL >= LOG_DEBUG
-    // Useful for checking when things are going wrong, but shouldn't be
-    // needed in normal code
-    uint32_t stat = dma[DMA_STAT];
-    if (stat & 0x1FFFFF) {
-        log_error("DMA pending or in progress on write: 0x%08x", stat);
-        rt_error(RTE_SWERR);
-    }
-#endif
-    uint32_t desc = DMA_WRITE_FLAGS | n_bytes;
-    dma[DMA_ADRS] = (uint32_t) system_address;
-    dma[DMA_ADRT] = (uint32_t) tcm_address;
-    dma[DMA_DESC] = desc;
-}
-
-//! \brief Start the DMA doing a read; the read may not be finished at the end
-//!        of this call.
-//! \param[in] system_address: The SDRAM address to read the data from
-//! \param[in] tcm_address: The DTCM address to write the data to
-//! \param[in] n_bytes: The number of bytes to be read from SDRAM to DTCM
-static inline void do_fast_dma_read(void *system_address, void *tcm_address,
-        uint32_t n_bytes) {
-#if LOG_LEVEL >= LOG_DEBUG
-    // Useful for checking when things are going wrong, but shouldn't be
-    // needed in normal code
-    uint32_t stat = dma[DMA_STAT];
-    if (stat & 0x1FFFFF) {
-        log_error("DMA pending or in progress on read: 0x%08x", stat);
-        rt_error(RTE_SWERR);
-    }
-#endif
-    uint32_t desc = DMA_READ_FLAGS | n_bytes;
-    dma[DMA_ADRS] = (uint32_t) system_address;
-    dma[DMA_ADRT] = (uint32_t) tcm_address;
-    dma[DMA_DESC] = desc;
-}
-
-//! \brief Wait for a DMA transfer to complete.
-static inline void wait_for_dma_to_complete(void) {
-#if LOG_LEVEL >= LOG_DEBUG
-    // Useful for checking when things are going wrong, but shouldn't be
-    // needed in normal code
-    uint32_t n_loops = 0;
-    while (!dma_done() && n_loops < 10000) {
-        n_loops++;
-    }
-    if (!dma_done()) {
-        log_error("Timeout on DMA loop: DMA stat = 0x%08x!", dma[DMA_STAT]);
-        rt_error(RTE_SWERR);
-    }
-#else
-    // This is the normal loop, done without checking
-    while (!dma_done()) {
-        continue;
-    }
-#endif
-    dma[DMA_CTRL] = 0x8;
 }
 
 //! \brief Wait for a DMA to complete or the end of a time step, whichever
@@ -243,18 +157,6 @@ static inline bool wait_for_dma_to_complete_or_end(void) {
     dma[DMA_CTRL] = 0x8;
 
     return !is_end_of_time_step();
-}
-
-//! \brief Cancel any outstanding DMA transfers
-static inline void cancel_dmas(void) {
-    dma[DMA_CTRL] = 0x3F;
-    while (dma[DMA_STAT] & 0x1) {
-        continue;
-    }
-    dma[DMA_CTRL] = 0xD;
-    while (dma[DMA_CTRL] & 0xD) {
-        continue;
-    }
 }
 
 //! \brief Transfer the front of the ring buffers to SDRAM to be read by the
