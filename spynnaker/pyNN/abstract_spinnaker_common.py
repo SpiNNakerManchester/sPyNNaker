@@ -77,7 +77,7 @@ class AbstractSpiNNakerCommon(
         :param n_boards_required:
         :type n_boards_required: int or None
         :param timestep:
-            machine_time_step but in mirco seconds. If None uses the cfg value
+            machine_time_step but in milli seconds. If None uses the cfg value
         :type timestep: float or None
         :param float max_delay:
         :param float min_delay:
@@ -198,7 +198,7 @@ class AbstractSpiNNakerCommon(
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
-        :param timestep: machine_time_Step in micro seconds
+        :param timestep: machine_time_Step in milli seconds
         :type timestep: float or None
         :tpye min_delay: int or None
         :type time_scale_factor: int or None
@@ -227,17 +227,16 @@ class AbstractSpiNNakerCommon(
         # Sort out the time scale factor if not user specified
         # (including config)
         if self.time_scale_factor is None:
-            new_value = max(
+            self.time_scale_factor = max(
                 1.0, math.ceil(
                     MICRO_TO_MILLISECOND_CONVERSION / self.machine_time_step))
-            self.time_scale_factor = new_value
-            if new_value > 1:
+            if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    new_value, CONFIG_FILE_NAME)
+                    self.time_scale_factor, CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
         if (self.machine_time_step_ms * self.time_scale_factor < 1):
