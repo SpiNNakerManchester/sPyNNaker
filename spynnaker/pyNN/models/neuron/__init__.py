@@ -25,7 +25,7 @@ from .population_synapses_machine_vertex_shared import (
     PopulationSynapsesMachineVertexShared)
 from .population_synapses_machine_vertex_common import (
     PopulationSynapsesMachineVertexCommon, SpikeProcessingFastProvenance)
-from .population_machine_synapses import SynapseProvenance
+from .population_machine_synapses_provenance import SynapseProvenance
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)

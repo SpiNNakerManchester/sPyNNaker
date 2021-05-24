@@ -24,7 +24,8 @@ from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
 from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
-from .population_machine_synapses import SynapseRegions, SynapseProvenance
+from .population_machine_synapses import SynapseRegions
+from .population_machine_synapses_provenance import SynapseProvenance
 
 # Size of SDRAM params = 1 word for address + 1 word for size
 #  + 1 word for time to send
