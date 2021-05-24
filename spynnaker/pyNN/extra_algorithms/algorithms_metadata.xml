@@ -24,7 +24,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_time_step</param_name>
@@ -479,7 +479,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
@@ -645,7 +645,7 @@
         <input_definitions>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -665,7 +665,7 @@
             </parameter>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -679,7 +679,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -717,7 +717,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -733,7 +733,7 @@
         <input_definitions>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>

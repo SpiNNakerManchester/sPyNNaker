@@ -86,7 +86,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.synapse_manager.drop_late_spikes,
             self.__get_binary_file_name())
 
-    @inject_items({"graph": "MemoryApplicationGraph"})
+    @inject_items({"graph": "ApplicationGraph"})
     @overrides(
         AbstractSplitterSlice.get_resources_used_by_atoms,
         additional_arguments=["graph"])
