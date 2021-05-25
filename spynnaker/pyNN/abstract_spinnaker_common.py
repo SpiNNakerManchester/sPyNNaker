@@ -185,7 +185,7 @@ class AbstractSpiNNakerCommon(
                 logger.exception(
                     "write_synaptic_report ignored due to https://github.com/"
                     "SpiNNakerManchester/sPyNNaker/issues/1081")
-                extra_algorithms_pre_run.append("SynapticMatrixReport")
+                # extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
