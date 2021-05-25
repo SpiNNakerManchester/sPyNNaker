@@ -16,6 +16,7 @@
 import logging
 import os
 import numpy
+import sys
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -44,7 +45,7 @@ class SpYNNakerSynapticMatrixReport(object):
 
         # Update the print options to display everything
         print_opts = numpy.get_printoptions()
-        numpy.set_printoptions(threshold=numpy.nan)
+        numpy.set_printoptions(sys.maxsize)
 
         if dsg_targets is None:
             raise SynapticConfigurationException(
