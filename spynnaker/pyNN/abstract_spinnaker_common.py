@@ -186,8 +186,7 @@ class AbstractSpiNNakerCommon(
                         extra_mapping_algorithms:
                     extra_mapping_algorithms.append(
                         "SpYNNakerConnectionHolderGenerator")
-                extra_algorithms_pre_run.append(
-                    "SpYNNakerConnectionHolderGenerator")
+                extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
