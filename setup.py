@@ -118,6 +118,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=install_requires,
+    extras_require={
+        "graphs": ["graphviz"]},
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com",
     **long_description

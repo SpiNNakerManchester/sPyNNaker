@@ -26,3 +26,4 @@ sphinx >= 4
 testfixtures
 statistics
 mock
+graphviz
