@@ -103,9 +103,6 @@ class AbstractPopulationVertex(
         "_parameters",  # See AbstractPyNNModel
         "__pynn_model",
         "_state_variables",  # See AbstractPyNNModel
-        "__time_between_requests",
-        "__units",
-        "__n_data_specs",
         "__initial_state_variables",
         "__has_run",
         "__updated_state_variables",
@@ -115,7 +112,6 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__synapse_expander_size",
         "__self_projection"]
 
     #: recording region IDs
@@ -171,7 +167,6 @@ class AbstractPopulationVertex(
         super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
-        self.__n_data_specs = 0
 
         # buffer data
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
@@ -805,7 +800,9 @@ class AbstractPopulationVertex(
         """ Get the shift of the ring buffers for transfer of values into the
             input buffers for this model.
 
-        :param int machine_timestep: The time step of the simulation
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections to consider in the calculations
+        :rtype: list(int)
         """
         machine_timestep = globals_variables.get_simulator().machine_time_step
         weight_scale = self.__neuron_impl.get_global_weight_scale()
@@ -916,7 +913,9 @@ class AbstractPopulationVertex(
     def get_weight_scales(self, ring_buffer_shifts):
         """ Get the weight scaling to apply to weights in synapses
 
-        :param int machine_time_step: The simulation time step
+        :param list(int) ring_buffer_shifts:
+            The shifts to convert to weight scales
+        :rtype: list(int)
         """
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         return numpy.array([
@@ -966,6 +965,8 @@ class AbstractPopulationVertex(
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to get the usage of
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections to consider in the calculations
         """
         if self.__synapse_dynamics is None:
             return 0
@@ -983,6 +984,8 @@ class AbstractPopulationVertex(
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to get the usage of
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections to consider in the calculations
         """
         addr = 2 * BYTES_PER_WORD
         for proj in incoming_projections:
@@ -990,12 +993,11 @@ class AbstractPopulationVertex(
         return addr
 
     def __add_matrix_size(self, addr, projection, vertex_slice):
-        """ Add the size of the matrices for the projection to the vertex slice
-            to the address
+        """ Add to the address the size of the matrices for the projection to
+            the vertex slice
 
         :param int addr: The address to start from
-        :param ~spynnaker.pyNN.models.pynn_projection_common\
-            .PyNNProjectionCommon projection: The projection to add
+        :param ~spynnaker.pyNN.models.Projection: The projection to add
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice projected to
         :rtype: int
@@ -1026,6 +1028,13 @@ class AbstractPopulationVertex(
         return addr
 
     def get_max_row_info(self, synapse_info, vertex_slice, app_edge):
+        """ Get maximum row length data
+
+        :param SynapseInformation synapse_info: Information about synapses
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice projected to
+        :param ProjectionApplicationEdge app_edge: The edge of the projection
+        """
         key = (app_edge, synapse_info, vertex_slice)
         if key in self.__max_row_info:
             return self.__max_row_info[key]
@@ -1037,6 +1046,8 @@ class AbstractPopulationVertex(
     def get_synapse_expander_size(self, incoming_projections):
         """ Get the size of the synapse expander region in bytes
 
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections to consider in the calculations
         :rtype: int
         """
         size = 0
@@ -1057,12 +1068,13 @@ class AbstractPopulationVertex(
             size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
             size += (self.__neuron_impl.get_n_synapse_types() *
                      DataType.U3232.size)
-        self.__synapse_expander_size = size
         return size
 
     @staticmethod
     def __generator_info_size(synapse_info):
         """ The number of bytes required by the generator information
+
+        :param SynapseInformation synapse_info: The synapse information to use
 
         :rtype: int
         """

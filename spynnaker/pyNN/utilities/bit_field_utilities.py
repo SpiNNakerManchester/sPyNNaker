@@ -42,8 +42,7 @@ BIT_IN_A_WORD = 32.0
 def get_estimated_sdram_for_bit_field_region(incoming_projections):
     """ estimates the SDRAM for the bit field region
 
-    :param iterable(~spynnaker.pyNN.models.pynn_projection_common\
-            .PyNNProjectionCommon) incoming_projections:
+    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
     :return: the estimated number of bytes used by the bit field region
     :rtype: int
@@ -75,8 +74,7 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
 def get_estimated_sdram_for_key_region(incoming_projections):
     """ gets an estimate of the bitfield builder region
 
-    :param iterable(~spynnaker.pyNN.models.pynn_projection_common\
-            .PyNNProjectionCommon) incoming_projections:
+    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
     :return: SDRAM needed
     :rtype: int
@@ -118,8 +116,7 @@ def reserve_bit_field_regions(
 
     :param ~data_specification.DataSpecificationGenerator spec:
         dsg spec writer
-    :param list(~spynnaker.pyNN.models.projection.Projection)\
-            incoming_projections:
+    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections to generate bitfields for
     :param int bit_field_builder_region: region id for the builder region
     :param int bit_filter_region: region id for the bitfield region
@@ -167,10 +164,10 @@ def write_bitfield_init_data(
 
     :param ~data_specification.DataSpecificationGenerator spec:
         data spec writer
-    :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
-        machine vertex
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
+    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+        The projections to generate bitfields for
+    :param ~pacman.model.graphs.common.slice vertex_slice:
+        The slice of the target vertex
     :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
     :param int bit_field_builder_region: the region id for the bitfield builder
     :param int master_pop_region_id: the region id for the master pop table

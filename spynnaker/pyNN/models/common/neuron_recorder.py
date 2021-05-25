@@ -517,7 +517,6 @@ class NeuronRecorder(object):
     def recorded_ids_by_slice(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int offset: The offset to add to the region ids
         :rtype: list(int)
         """
         variables = [

@@ -51,11 +51,12 @@ struct combined_provenance {
     uint32_t n_background_queue_overloads;
 };
 
-//! values for the priority for each callback
+//! Identify the priorities for all tasks
 typedef enum callback_priorities {
     MC = -1, DMA = 0, USER = 0, TIMER = 0, SDP = 1, BACKGROUND = 1
 } callback_priorities;
 
+//! From the regions, extract those that are common
 const struct common_regions COMMON_REGIONS = {
     .system = SYSTEM_REGION,
     .provenance = PROVENANCE_DATA_REGION,
@@ -63,17 +64,20 @@ const struct common_regions COMMON_REGIONS = {
     .recording = RECORDING_REGION
 };
 
+//! Identify the priorities of the common tasks
 const struct common_priorities COMMON_PRIORITIES = {
     .sdp = SDP,
     .dma = DMA,
     .timer = TIMER
 };
 
+//! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
     .neuron_params = NEURON_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
 };
 
+//! From the regions, extract those that are synapse-specific
 const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_params = SYNAPSE_PARAMS_REGION,
     .direct_matrix = DIRECT_MATRIX_REGION,
@@ -83,8 +87,6 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
     .bitfield_filter = BIT_FIELD_FILTER_REGION
 };
-
-// Globals
 
 //! The current timer tick value.
 // the timer tick callback returning the same value.
@@ -148,6 +150,7 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
+//! Process the ring buffers for the next time step
 static inline void process_ring_buffers(void) {
     uint32_t first_index = synapse_row_get_first_ring_buffer_index(
             time, synapse_type_index_bits, synapse_delay_mask);
@@ -160,7 +163,7 @@ static inline void process_ring_buffers(void) {
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-//! \brief Background activites called from timer
+//! \brief Background activities called from timer
 //! \param timer_count the number of times this call back has been
 //!        executed since start of simulation
 //! \param[in] local_time: The time step being executed

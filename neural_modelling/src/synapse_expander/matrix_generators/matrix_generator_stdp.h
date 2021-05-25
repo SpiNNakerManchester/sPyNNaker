@@ -85,6 +85,7 @@ void matrix_generator_stdp_free(void *generator) {
  * \param[in] post_index: The core-relative index of the target neuron
  * \param[in] synapse_type_bits: The number of bits for the synapse type
  * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \param[in] delay_bits: The number of bits for the synaptic delay
  * \return A half-word fixed-plastic synapse
  */
 static uint16_t build_fixed_plastic_half_word(

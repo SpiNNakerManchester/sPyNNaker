@@ -87,6 +87,8 @@ class PopulationMachineVertex(
     N_RE_WIRES_NAME = "Number_of_rewires"
     N_LATE_SPIKES_NAME = "Number_of_late_spikes"
     MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
+    BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
+    BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -134,9 +136,6 @@ class PopulationMachineVertex(
         connection_builder=REGIONS.CONNECTOR_BUILDER.value
     )
 
-    _BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
-    _BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
-
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
         1: "DMA_READ",
@@ -158,6 +157,14 @@ class PopulationMachineVertex(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
+        :param int slice_index:
+            The index of the slice in the ordered list of slices
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(int) weight_scales:
+            The scaling to apply to weights to store them in the synapses
+        :param int all_syn_block_sz: The maximum size of the synapses in bytes
+        :param int structural_sz: The size of the structural data
         """
         super(PopulationMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -232,7 +239,7 @@ class PopulationMachineVertex(
 
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
         yield ProvenanceDataItem(
-            names + [self._BACKGROUND_MAX_QUEUED_NAME],
+            names + [self.BACKGROUND_MAX_QUEUED_NAME],
             main_prov.max_background_queued,
             main_prov.max_background_queued > 1,
             f"A maximum of {main_prov.max_background_queued} background"
@@ -240,7 +247,7 @@ class PopulationMachineVertex(
             " time_scale_factor located within the .spynnaker.cfg file or"
             " in the pynn.setup() method.")
         yield ProvenanceDataItem(
-            names + [self._BACKGROUND_OVERLOADS_NAME],
+            names + [self.BACKGROUND_OVERLOADS_NAME],
             main_prov.n_background_overloads,
             main_prov.n_background_overloads > 0,
             "The background queue overloaded "

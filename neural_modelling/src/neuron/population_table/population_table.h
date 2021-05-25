@@ -69,6 +69,7 @@ bool population_table_get_first_address(
         spike_t spike, synaptic_row_t* row_address,
         size_t* n_bytes_to_transfer);
 
+//! \brief Determine if there are more items with the same key
 static inline bool population_table_is_next(void) {
     return items_to_go > 0;
 }

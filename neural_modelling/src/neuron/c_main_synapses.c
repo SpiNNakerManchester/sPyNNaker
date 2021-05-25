@@ -44,11 +44,13 @@ typedef enum callback_priorities {
     MC = -1, DMA = -2, TIMER = 0, SDP = 0
 } callback_priorities;
 
+//! Provenance data region layout
 struct provenance_data {
     struct synapse_provenance synapse_prov;
     struct spike_processing_fast_provenance spike_processing_prov;
 };
 
+//! Overall regions used by the synapse core
 enum regions {
     SYSTEM_REGION,
     PROVENANCE_DATA_REGION,
@@ -65,6 +67,7 @@ enum regions {
     KEY_REGION
 };
 
+//! From the regions, select those that are common
 const struct common_regions COMMON_REGIONS = {
     .system = SYSTEM_REGION,
     .provenance = PROVENANCE_DATA_REGION,
@@ -72,12 +75,14 @@ const struct common_regions COMMON_REGIONS = {
     .recording = RECORDING_REGION
 };
 
+//! Identify the priority of common tasks
 const struct common_priorities COMMON_PRIORITIES = {
     .sdp = SDP,
     .dma = DMA,
     .timer = TIMER
 };
 
+//! From the regions, select those that are used for synapse-specific things
 const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_params = SYNAPSE_PARAMS_REGION,
     .direct_matrix = DIRECT_MATRIX_REGION,
@@ -87,8 +92,6 @@ const struct synapse_regions SYNAPSE_REGIONS = {
     .structural_dynamics = STRUCTURAL_DYNAMICS_REGION,
     .bitfield_filter = BIT_FIELD_FILTER_REGION
 };
-
-// Globals
 
 //! The current timer tick value.
 // the timer tick callback returning the same value.
@@ -105,8 +108,6 @@ static uint32_t infinite_run;
 
 //! The recording flags indicating if anything is recording
 static uint32_t recording_flags = 0;
-
-static bool restart = true;
 
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
@@ -125,9 +126,6 @@ void resume_callback(void) {
     // Resume synapses
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
     synapses_resume(time + 1);
-
-    // Prepare to process spikes again
-    restart = true;
 }
 
 void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {

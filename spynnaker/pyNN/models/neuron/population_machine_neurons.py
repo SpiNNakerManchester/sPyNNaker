@@ -135,7 +135,8 @@ class PopulationMachineNeurons(
             The data specification to write to
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information to read the key from
-        :param int machine_time_step: The simulation time step
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
         self._set_key(routing_info.get_first_key_from_pre_vertex(
@@ -159,7 +160,8 @@ class PopulationMachineNeurons(
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param int machine_time_step: The simulation time step
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
         """
         self._app_vertex.set_has_run()
 

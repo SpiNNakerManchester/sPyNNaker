@@ -104,6 +104,12 @@ class PopulationNeuronsMachineVertex(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
+        :param int slice_index:
+            The index of the slice in the ordered list of slices
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(int) weight_scales:
+            The scaling to apply to weights to store them in the synapses
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,

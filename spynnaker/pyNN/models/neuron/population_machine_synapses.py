@@ -164,6 +164,12 @@ class PopulationMachineSynapses(
         :param int machine_time_step: The time step of the simulation
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information to read the key from
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
+        :param list(int) weight_scales:
+            The scaling to apply to weights to store them in the synapses
+        :param int all_syn_block_sz: The maximum size of the synapses in bytes
+        :param int structural_sz: The size of the structural data
         """
         # Get incoming projections
         incoming = self._app_vertex.incoming_projections
@@ -234,7 +240,8 @@ class PopulationMachineSynapses(
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param int machine_time_step: The time step of the simulation
+        :param list(int) ring_buffer_shifts:
+            The shifts to apply to convert ring buffer values to S1615 values
         """
         # Reserve space
         spec.reserve_memory_region(

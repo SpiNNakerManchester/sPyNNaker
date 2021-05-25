@@ -324,7 +324,6 @@ bool synapses_initialise(
     return true;
 }
 
-// Flush ring buffers for the given time
 void synapses_flush_ring_buffers(timer_t time) {
     uint32_t synapse_index = 0;
     uint32_t ring_buffer_index = synapse_row_get_first_ring_buffer_index(

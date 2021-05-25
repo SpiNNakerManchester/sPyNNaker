@@ -107,6 +107,7 @@ typedef enum ssp_callback_priorities {
     TIMER = 2
 } callback_priorities;
 
+//! An RNG seed of 4 words
 typedef struct {
     uint32_t x;
     uint32_t y;
@@ -213,6 +214,9 @@ static struct sdram_config *sdram_inputs;
 //! The inputs to be sent at the end of this timestep
 static uint16_t *input_this_timestep;
 
+//! \brief Random number generation for the Poisson sources.
+//!        This is a local version for speed of operation.
+//! \return A random number
 static inline uint32_t rng(void) {
     ssp_params.spike_source_seed.x = 314527869 * ssp_params.spike_source_seed.x + 1234567;
     ssp_params.spike_source_seed.y ^= ssp_params.spike_source_seed.y << 5;
@@ -226,6 +230,9 @@ static inline uint32_t rng(void) {
             + ssp_params.spike_source_seed.y + ssp_params.spike_source_seed.z;
 }
 
+//! \brief How many spikes to generate for a fast Poisson source
+//! \param[in] exp_minus_lambda e^(-mean_rate)
+//! \return How many spikes to generate
 static inline uint32_t n_spikes_poisson_fast(UFRACT exp_minus_lambda) {
     UFRACT p = UFRACT_CONST(1.0);
     uint32_t k = 0;
@@ -239,6 +246,8 @@ static inline uint32_t n_spikes_poisson_fast(UFRACT exp_minus_lambda) {
     return k - 1;
 }
 
+//! \brief How many time steps until the next spike for a slow Poisson source
+//! \return The number of time steps until the next spike
 static inline REAL n_steps_until_next(void) {
     REAL A = REAL_CONST(0.0);
     uint32_t U, U0, USTAR;

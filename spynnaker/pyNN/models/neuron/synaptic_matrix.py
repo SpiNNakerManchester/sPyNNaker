@@ -141,14 +141,12 @@ class SynapticMatrix(object):
             synaptic matrix - this must have an exactly 1 entry per row
 
         :param int single_addr: The current offset of the direct matrix
-        :return: A tuple of a boolean indicating if the matrix is direct and
-            the next offset of the single matrix
-        :rtype: (bool, int)
+        :rtype: bool
         """
         if not self.__is_direct_capable:
             return False
         next_addr = single_addr + self.__single_matrix_size
-        return next_addr <= self.__all_single_syn_sz, next_addr
+        return next_addr <= self.__all_single_syn_sz
 
     def get_row_data(self):
         """ Generate the row data for a synaptic matrix from the description

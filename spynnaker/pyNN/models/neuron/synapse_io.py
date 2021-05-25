@@ -255,6 +255,8 @@ def get_synapses(
         an array of words for delayed synapses. This is used to prepare\
         information for *deployment to SpiNNaker*.
 
+    :param ~numpy.ndarray connections:
+        The connections to get the synapses from
     :param SynapseInformation synapse_info:
         The synapse information to convert to synapses
     :param int n_delay_stages:
@@ -263,8 +265,12 @@ def get_synapses(
         The number of synapse types in total to be represented
     :param list(float) weight_scales:
         The scaling of the weights for each synapse type
-    :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
+    :param ~pacman.model.graphs.appplication.ApplicationEdge app_edge:
         The incoming machine edge that the synapses are on
+    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        The slice of the pre-vertex to get the synapses for
+    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        The slice of the post-vertex to get the synapses for
     :param MaxRowInfo max_row_info:
         The maximum row information for the synapses
     :param bool gen_undelayed:
@@ -502,8 +508,12 @@ def read_all_synapses(
         The total number of synapse types available
     :param list(float) weight_scales:
         A weight scale for each synapse type
-    :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
-        The incoming machine edge that the synapses were generated from
+    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        The slice of the pre-vertex to read the synapses for
+    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        The slice of the post-vertex to read the synapses for
+    :param int post_vertex_max_delay_ticks:
+            max delayed ticks supported from post vertex
     :param MaxRowInfo max_row_info:
         The maximum information for each of the rows
     :return: The connections read from the data; the dtype is

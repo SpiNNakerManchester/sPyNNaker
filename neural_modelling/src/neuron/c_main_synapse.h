@@ -80,9 +80,16 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \brief Read data to set up synapse processing
 //! \param[in] ds_regions: Pointer to region position data
 //! \param[in] regions: The indices of the regions to be read
-//! \param[in] pkts_per_ts_rec_region:
-//!    The *recording* region to use for packets per time step
+//! \param[out] n_neruons: Pointer to receive the number of neurons
+//! \param[out] n_synapse_types: Pointer to receive the number of synapse types
 //! \param[out] ring_buffers: The ring buffers that will be used
+//! \param[out] row_max_n_words: Pointer to receive the maximum number of words
+//!                              in a synaptic row
+//! \param[out] incoming_spike_buffer_size: Pointer to receive the size to make
+//!                                         the spike input buffer
+//! \param[out] clear_input_buffer_of_late_packets: Pointer to receive whether
+//!                                                 to clear the input buffer
+//!                                                 each time step
 //! \return a boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,

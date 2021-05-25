@@ -211,10 +211,11 @@ class SynapticMatrixApp(object):
         return True
 
     def __is_direct_capable(self, machine_edge):
-        """ Determine if the given connection can be done with a "direct"\
+        """ Determine if the given edge can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
 
-        :param int single_addr: The current offset of the direct matrix
+        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
+            The edge to test
         :return: A tuple of a boolean indicating if the matrix is direct and
             the next offset of the single matrix
         :rtype: (bool, int)
@@ -477,6 +478,8 @@ class SynapticMatrixApp(object):
             The current position in the application block
         :param int max_app_addr:
             The position of the end of the allocation
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice to be allocated
         :return: The address after the allocation and the allocated address
         :rtype: int, int
         """
@@ -504,6 +507,8 @@ class SynapticMatrixApp(object):
             The current position in the application block
         :param int max_app_addr:
             The position of the end of the allocation
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice to be allocated
         :return: The address after the allocation and the allocated address
         :rtype: int, int
         """
@@ -532,6 +537,10 @@ class SynapticMatrixApp(object):
             The synaptic matrix offset to write the data to
         :param int d_mat_offset:
             The synaptic matrix offset to write the delayed data to
+        :param list(pacman.model.graphs.common.Slice) pre_vertex_slices:
+            The pre-vertex-slices to get the data for
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice to be allocated
         :rtype: GeneratorData
         """
         post_slices =\
@@ -549,6 +558,11 @@ class SynapticMatrixApp(object):
 
     def __write_on_chip_delay_data(self, pre_vertex_slices, pre_vertex_slice):
         """ Write data for delayed on-chip generation
+        
+        :param list(pacman.model.graphs.common.Slice) pre_vertex_slices:
+            The pre-vertex-slices to get the data for
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice to be allocated
         """
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
@@ -681,6 +695,7 @@ class SynapticMatrixApp(object):
 
         :param int block_addr: The address of the start of the block
         :param int size: The size of the block in bytes
+        :param int max_addr: The maximum allowed address
         :return: The updated address
         :rtype: int
         :raises Exception: If the updated address is out of range

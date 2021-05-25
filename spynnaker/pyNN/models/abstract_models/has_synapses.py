@@ -26,7 +26,7 @@ class HasSynapses(object):
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the connection data
-        :param ~pacman.model.placement.Placement placements:
+        :param ~pacman.model.placement.Placement placement:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read

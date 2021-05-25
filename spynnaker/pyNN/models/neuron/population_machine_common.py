@@ -52,10 +52,15 @@ class PopulationMachineCommon(
     """
 
     __slots__ = [
+        # Resources used by the machine vertex
         "__resources",
+        # Regions to be used
         "__regions",
+        # The total number of provenance items returned by this core
         "__n_provenance_items",
+        # The profile tags to be decoded
         "__profile_tags",
+        # The name of the binary to run on the core
         "__binary_file_name"
     ]
 
@@ -75,7 +80,8 @@ class PopulationMachineCommon(
         :param .CommonRegions regions: The regions to be assigned
         :param int n_provenance_items:
             The number of additional provenance items to be read
-        :param dict(int-->str): A mapping of profile identifiers to names
+        :param dict(int-->str) profile_tags:
+            A mapping of profile identifiers to names
         :param str binary_file_name: The name of the binary file
         """
         super(PopulationMachineCommon, self).__init__(

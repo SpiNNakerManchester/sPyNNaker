@@ -295,17 +295,17 @@ static inline bool row_restructure(
                 return synaptogenesis_formation_rule(current_state,
                         formation_params[current_state->post_to_pre.pop_index], time, row);
             } else {
-              // A synapse cannot be added if one exists between the current pair of neurons
-              if (!synapse_dynamics_find_neuron(
+                // A synapse cannot be added if one exists between the current pair of neurons
+                if (!synapse_dynamics_find_neuron(
                       current_state->post_syn_id, row,
-            &(current_state->weight), &(current_state->delay),
-            &(current_state->offset), &(current_state->synapse_type))) {
+                      &(current_state->weight), &(current_state->delay),
+                      &(current_state->offset), &(current_state->synapse_type))) {
                 return synaptogenesis_formation_rule(current_state,
                     formation_params[current_state->post_to_pre.pop_index], time, row);
-            } else {
-                log_debug("Post neuron %u already in row", current_state->post_syn_id);
-                return false;
-            }
+                } else {
+                    log_debug("Post neuron %u already in row", current_state->post_syn_id);
+                    return false;
+                }
             }
         }
     }

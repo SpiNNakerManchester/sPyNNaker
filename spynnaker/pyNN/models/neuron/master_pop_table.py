@@ -333,19 +333,17 @@ class MasterPopTableAsBinarySearch(object):
     """
     __slots__ = [
         "__entries",
-        "__n_addresses",
-        "__generated"]
+        "__n_addresses"]
 
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
-        self.__generated = False
 
     @staticmethod
     def get_master_population_table_size(incoming_projections):
         """ Get the size of the master population table in SDRAM.
 
-        :param iterable(PyNNProjectionCommon) incoming_projections:
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections arriving at the vertex that are to be handled by
             this table
         :return: the size the master pop table will take in SDRAM (in bytes)
@@ -417,7 +415,6 @@ class MasterPopTableAsBinarySearch(object):
         """
         self.__entries = dict()
         self.__n_addresses = 0
-        self.__generated = False
 
     def add_machine_entry(
             self, block_start_addr, row_length, key_and_mask, is_single=False):
@@ -659,7 +656,11 @@ class MasterPopTableAsBinarySearch(object):
         # Write the arrays
         spec.write_array(_to_numpy(pop_table))
         spec.write_array(_to_numpy(address_list))
-        self.__generated = True
+
+        self.__entries.clear()
+        del self.__entries
+        self.__entries = None
+        self.__n_addresses = 0
 
     @property
     def max_n_neurons_per_core(self):
@@ -708,9 +709,3 @@ class MasterPopTableAsBinarySearch(object):
                 numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
                     "uint32"))
         return next_allowed
-
-    @property
-    def generated(self):
-        """ Indicates if the table has been finished
-        """
-        return self.__generated

@@ -35,6 +35,7 @@ extern uint32_t earliest_send_time;
 //! Latest time from neuron.c
 extern uint32_t latest_send_time;
 
+//! Mask to recognise the Comms Controller "not full" flag
 #define TX_NOT_FULL_MASK 0x10000000
 
 //! \brief Perform direct spike sending with hardware for speed

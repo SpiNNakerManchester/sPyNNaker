@@ -26,8 +26,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
         Note: At the Application level this will be an estimate.
 
-        :param iterable(~spynnaker.pyNN.models.pynn_projection_common\
-                .PyNNProjectionCommon) incoming_projections:
+        :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections that target the vertex in question
         :param int n_neurons:
         :return: the size of the parameters, in bytes

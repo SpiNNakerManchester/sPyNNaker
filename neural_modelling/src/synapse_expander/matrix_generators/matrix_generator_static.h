@@ -70,6 +70,7 @@ typedef struct {
  * \param[in] post_index: The core-relative index of the target neuron
  * \param[in] synapse_type_bits: The number of bits for the synapse type
  * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \param[in] delay_bits: The number of bits for the synaptic delay
  * \return a synaptic word
  */
 static uint32_t build_static_word(

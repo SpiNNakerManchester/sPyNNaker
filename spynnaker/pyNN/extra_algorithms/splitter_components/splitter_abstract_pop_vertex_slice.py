@@ -44,17 +44,26 @@ class SplitterAbstractPopulationVertexSlice(
     """
 
     __slots__ = [
+        # The pre-calculated ring buffer shifts
         "__ring_buffer_shifts",
+        # The pre-calculated weight scales
         "__weight_scales",
+        # The size of all the synapses on a core
         "__all_syn_block_sz",
+        # The size of the structural plasticity data
         "__structural_sz",
+        # The size of the synaptic expander data
         "__synapse_expander_sz",
+        # The size of all the bitfield data
         "__bitfield_sz",
+        # The next index to use for a synapse core
         "__next_index"
     ]
 
+    """ The name of the splitter """
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
 
+    """ The message to use when the Population is invalid """
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterAbstractPopulationVertexSlice as"
@@ -109,10 +118,9 @@ class SplitterAbstractPopulationVertexSlice(
 
     @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
-        """  Gets the resources of a slice of atoms from a given app vertex.
+        """  Gets the resources of a slice of atoms
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
-        :param ~pacman.model.graphs.machine.MachineGraph graph: app graph
         :rtype: ~pacman.model.resources.ResourceContainer
         """
         # pylint: disable=arguments-differ
@@ -131,7 +139,7 @@ class SplitterAbstractPopulationVertexSlice(
         return container
 
     def __get_variable_sdram(self, vertex_slice):
-        """ returns the variable sdram from the recorder.
+        """ returns the variable sdram from the recorders
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the atom slice for recording sdram
@@ -148,7 +156,7 @@ class SplitterAbstractPopulationVertexSlice(
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the atoms to get constant sdram of
-        :rtype: ConstantSDRAM
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         n_record = (
             len(self._governed_app_vertex.neuron_recordables) +
@@ -171,7 +179,7 @@ class SplitterAbstractPopulationVertexSlice(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
 
-        :rtype: int
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         sdram = MultiRegionSDRAM()
         app_vertex = self._governed_app_vertex
@@ -201,6 +209,12 @@ class SplitterAbstractPopulationVertexSlice(
         return sdram
 
     def __all_syn_block_size(self, vertex_slice):
+        """ Work out how much SDRAM is needed for all the synapses
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+        :rtype: int
+        """
         if vertex_slice in self.__all_syn_block_sz:
             return self.__all_syn_block_sz[vertex_slice]
         all_syn_block_sz = self._governed_app_vertex.get_synapses_size(
@@ -209,6 +223,12 @@ class SplitterAbstractPopulationVertexSlice(
         return all_syn_block_sz
 
     def __structural_size(self, vertex_slice):
+        """ Work out how much SDRAM is needed by the structural plasticity data
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+        :rtype: int
+        """
         if vertex_slice in self.__structural_sz:
             return self.__structural_sz[vertex_slice]
         structural_sz = self._governed_app_vertex.get_structural_dynamics_size(
@@ -217,6 +237,10 @@ class SplitterAbstractPopulationVertexSlice(
         return structural_sz
 
     def __synapse_expander_size(self):
+        """ Work out how much SDRAM is needed for the synapse expander
+
+        :rtype: int
+        """
         if self.__synapse_expander_sz is None:
             self.__synapse_expander_sz = \
                 self._governed_app_vertex.get_synapse_expander_size(
@@ -224,6 +248,10 @@ class SplitterAbstractPopulationVertexSlice(
         return self.__synapse_expander_sz
 
     def __bitfield_size(self):
+        """ Work out how much SDRAM is needed by the bit fields
+
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
+        """
         if self.__bitfield_sz is None:
             sdram = MultiRegionSDRAM()
             projections = self._governed_app_vertex.incoming_projections

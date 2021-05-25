@@ -83,6 +83,7 @@ struct spike_processing_fast_provenance {
 //!                                   packets-per-time-step to
 //! \param[in] multicast_priority The priority of multicast processing
 //! \param[in] sdram_inputs_param Details of the SDRAM transfer for the ring buffers
+//! \param[in] key_config_param Details of the key used by the neuron core
 //! \param[in] ring_buffers_param The ring buffers to update with synapse weights
 //! \return Whether the setup was successful or not
 bool spike_processing_fast_initialise(
@@ -94,6 +95,8 @@ bool spike_processing_fast_initialise(
 //! \brief The main loop of spike processing to be run once per time step.
 //!        Note that this function will not return until the end of the time
 //!        step; it will only be interrupted by SDP or MC packets.
+//! \param[in] time The time step of the simulation
+//! \param[in] n_rewires The number of rewiring attempts to be done
 void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires);
 
 //! \brief Store any provenance data gathered from spike processing

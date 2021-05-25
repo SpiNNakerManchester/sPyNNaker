@@ -300,6 +300,7 @@ static inline void handle_row_error(dma_buffer *buffer) {
 
 //! \brief Process a row that has been transferred
 //! \param[in] time The current time step of the simulation
+//! \param[in] dma_in_progress Whether there was a DMA started and not checked
 static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
@@ -408,6 +409,9 @@ static inline bool prepare_timestep(uint32_t time) {
     return true;
 }
 
+//! \brief Perform synaptic rewiring for this time step
+//! \param[in] time The current time step
+//! \param[in] n_rewires The number of rewirings to try
 static inline void do_rewiring(uint32_t time, uint32_t n_rewires) {
     uint32_t spike;
     synaptic_row_t row;
