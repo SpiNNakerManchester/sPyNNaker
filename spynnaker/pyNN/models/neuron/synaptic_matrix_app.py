@@ -558,7 +558,7 @@ class SynapticMatrixApp(object):
 
     def __write_on_chip_delay_data(self, pre_vertex_slices, pre_vertex_slice):
         """ Write data for delayed on-chip generation
-        
+
         :param list(pacman.model.graphs.common.Slice) pre_vertex_slices:
             The pre-vertex-slices to get the data for
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
