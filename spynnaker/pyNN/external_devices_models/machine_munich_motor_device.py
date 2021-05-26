@@ -137,7 +137,7 @@ class MachineMunichMotorDevice(
             "or time_scale_factor or decrease the number of neurons per core.")
 
     @inject_items({
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor"
     })

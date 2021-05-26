@@ -372,7 +372,7 @@ class PopulationMachineVertex(
         "time_scale_factor": "TimeScaleFactor",
         "application_graph": "ApplicationGraph",
         "machine_graph": "MachineGraph",
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
         "n_key_map": "MachinePartitionNKeysMap"
     })
@@ -461,7 +461,7 @@ class PopulationMachineVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    @inject_items({"routing_info": "MemoryRoutingInfos"})
+    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={"routing_info"})

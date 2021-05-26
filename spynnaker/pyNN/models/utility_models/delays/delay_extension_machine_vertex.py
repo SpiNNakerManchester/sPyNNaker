@@ -220,7 +220,7 @@ class DelayExtensionMachineVertex(
 
     @inject_items({
         "machine_graph": "MachineGraph",
-        "routing_infos": "MemoryRoutingInfos",
+        "routing_infos": "RoutingInfos",
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor"})
     @overrides(

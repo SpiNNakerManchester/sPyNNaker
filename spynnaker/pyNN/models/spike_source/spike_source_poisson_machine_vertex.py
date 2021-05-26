@@ -247,7 +247,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
@@ -285,7 +285,7 @@ class SpikeSourcePoissonMachineVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
         "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
