@@ -34,6 +34,7 @@
 #include <debug.h>
 #include <random.h>
 #include <round.h>
+#include <common/rate_generator.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -80,6 +81,19 @@ static post_event_history_t *postsynaptic_rates;
 
 //! Pointer to the SDRAM region for the postsynaptic rates
 static post_event_history_t *postsynaptic_buffer;
+
+static REAL *background_activity;
+
+static uint32_t seeds[] = {100, 200, 300, 40}; 
+
+static inline void generate_background_activity(uint32_t n_neurons) {
+    for (index_t i = 0; i < n_neurons; i++) {
+        background_activity[i] = 0.1k * gaussian_dist_variate(
+                                            mars_kiss64_seed,
+                                            seeds);
+        //io_printf(IO_BUF, "rand %k\n", background_activity[i]);
+    }
+}
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -143,6 +157,14 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     postsynaptic_rates = post_events_init_buffers(n_neurons);
+
+    background_activity = spin1_malloc(n_neurons * sizeof(REAL));
+    if (background_activity == NULL) {
+        log_error("Unable to allocate background activity array - Out of DTCM");
+        return false;
+    }
+
+    generate_background_activity(n_neurons);
 
     return true;
 }
@@ -270,12 +292,7 @@ static inline REAL set_spike_source_rate(REAL somatic_voltage) {
 //        rate = somatic_voltage > 0.0k ? somatic_voltage : 0.0k;
 //    }
 
-    if(somatic_voltage > 2.0k)
-	    somatic_voltage = 2.0k;
-	else if(somatic_voltage < 0.0k)
-	    somatic_voltage = 0.0k;
-
-	return somatic_voltage;
+    return out_rate(somatic_voltage);
 }
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -451,7 +468,7 @@ static inline uint neuron_impl_get_v(index_t neuron_index) {
         uint output;
     } converter;
 
-    converter.input = neuron_array[neuron_index].U_membrane;
+    converter.input = (neuron_array[neuron_index].U_membrane  + 0.5k);
 
     //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_at_last_setting, converter.output);
 
@@ -482,6 +499,8 @@ static inline void neuron_impl_send_postsynaptic_buffer(uint32_t n_neurons) {
     spin1_dma_transfer(
         DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER, postsynaptic_buffer, postsynaptic_rates,
         DMA_WRITE, n_neurons * sizeof(post_event_history_t));
+
+    generate_background_activity(n_neurons);
 }
 
 static void neuron_impl_allocate_postsynaptic_region(uint tag, uint n_neurons) {

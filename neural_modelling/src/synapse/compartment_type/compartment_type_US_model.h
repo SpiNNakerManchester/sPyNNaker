@@ -18,7 +18,7 @@ static inline input_t convert_rate_to_input(uint32_t rate) {
 
 static inline REAL compute_input_rate(uint32_t rate) {
 
-    return convert_rate_to_input(rate);
+    return (convert_rate_to_input(rate) - 0.5k);
 }
 
 static inline REAL get_input_current(REAL input, REAL weight) {

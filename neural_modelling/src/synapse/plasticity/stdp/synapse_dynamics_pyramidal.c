@@ -32,6 +32,8 @@
 #include <synapse/plasticity/synapse_dynamics.h>
 #include <round.h>
 
+#include <common/rate_generator.h>
+
 #define DMA_TAG_READ_POST_BUFFER 2
 
 static uint32_t synapse_type_index_bits;
@@ -268,11 +270,11 @@ bool synapse_dynamics_process_plastic_synapses(
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     // plastic_synapse_t is same type as weight_t, which is accum!
-    plastic_synapse_t *plastic_words =
+    register plastic_synapse_t *plastic_words =
             plastic_synapses(plastic_region_address);
     const control_t *control_words =
             synapse_row_plastic_controls(fixed_region_address);
-    size_t plastic_synapse =
+    register size_t plastic_synapse =
             synapse_row_num_plastic_controls(fixed_region_address);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
@@ -287,12 +289,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
-    REAL real_rate = convert_rate_to_input(rate);
-
-    if (real_rate > 2.0k)
-        real_rate = 2.0k;
-    else if (real_rate < 0.0k)
-        real_rate = 0.0k;
+    register REAL real_rate = out_rate(convert_rate_to_input(rate));
 
     //io_printf(IO_BUF, "plast rate %k\n", real_rate);
 
@@ -344,7 +341,7 @@ bool synapse_dynamics_process_plastic_synapses(
         if(real_rate) {
             // MAYBE EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
             REAL curr_weight = synapse_structure_get_final_weight(final_state);
-            
+
             ring_buffers[index] =
                 sat_accum_sum(ring_buffers[index],
                               MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight));

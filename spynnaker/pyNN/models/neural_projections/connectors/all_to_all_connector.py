@@ -33,8 +33,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         "__random_weight_matrix"]
 
     def __init__(
-            self, allow_self_connections=True, safe=True,
-            verbose=None, random_weight_matrix=False):
+        self, allow_self_connections=True, safe=True,
+        verbose=None, random_weight_matrix=False):
         """
         :param allow_self_connections:
             if the connector is used to connect a\

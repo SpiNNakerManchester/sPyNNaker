@@ -228,8 +228,9 @@ void matrix_generator_stdp_write_row(
                                 (int32_t) sark_rand()) >> 16;
         }
 
+
         weight_words[obj->weight_word] = weight;
-        
+
         n_words_per_row[delay.stage] +=
                 obj->n_words_per_pp_synapse;
         space_words[delay.stage] -= obj->n_words_per_pp_synapse;

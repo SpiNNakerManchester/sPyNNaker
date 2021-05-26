@@ -141,6 +141,7 @@ static inline void dma_complete_callback(address_t synaptic_row) {
     do {
         // Are there any more incoming spikes from the same pre-synaptic
         // neuron?
+        //THIS CAN PROBABLY BE COMMENTED OUT, SINCE WE RECEIVE 1 RATE PER TS FROM A NEURON
         subsequent_spikes = in_rates_is_next_rate_equal(rate.key);
 
         // Process synaptic row, writing it back if it's the last time

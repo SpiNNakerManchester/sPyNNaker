@@ -111,6 +111,8 @@ static uint32_t max_size;
 
 static uint32_t teaching_signal;
 
+static uint32_t neg_teach = UINT32_MAX - ((1 << 20) - 1);
+
 uint32_t elements;
 
 uint32_t rate_value;
@@ -192,7 +194,7 @@ static bool read_rate_parameters(address_t address, address_t starting_values) {
     total_n_refresh = 1;
 
     // Storing 1 as S1615 to imporve performances when sending the teaching signal
-    teaching_signal = 1 << 15;
+    teaching_signal = 1 << 20;
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -318,7 +320,7 @@ static void timer_callback(uint timer_count, uint unused) {
                 }
         }
         else {
-            while (!spin1_send_mc_packet(key | i, 0, WITH_PAYLOAD)) {
+            while (!spin1_send_mc_packet(key | i, neg_teach, WITH_PAYLOAD)) {
                     spin1_delay_us(2);
                 }
         }
@@ -343,6 +345,8 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
+
+    io_printf(IO_BUF, " neg teach %k\n", neg_teach);
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick_and_phase(timer_period, 0);

@@ -32,6 +32,8 @@
 #include <synapse/plasticity/synapse_dynamics.h>
 #include <round.h>
 
+#include <common/rate_generator.h>
+
 #define DMA_TAG_READ_POST_BUFFER 2
 
 static uint32_t synapse_type_index_bits;
@@ -269,12 +271,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
-    REAL real_rate = convert_rate_to_input(rate);
-
-    if (real_rate > 2.0k)
-        real_rate = 2.0k;
-    else if (real_rate < 0.0k)
-        real_rate = 0.0k;
+    REAL real_rate = out_rate(convert_rate_to_input(rate));
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
@@ -300,9 +297,9 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_rate, current_state, &post_event_history[index]);
 
-        // Avoid the multiplication with rounding if the presyn value has input rate = 0
+         // Avoid the mul when input rate = 0
         if(real_rate) {
-        
+
             // EDIT THIS TO BE *plastic_words ONCE THE WEIGHT UPDATE IS ADAPTED
             REAL curr_weight = synapse_structure_get_final_weight(final_state);
 

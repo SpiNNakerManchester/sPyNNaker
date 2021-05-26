@@ -22,7 +22,6 @@ from pacman.model.graphs.application.application_edge \
 
 from spinn_utilities.overrides import overrides
 
-
 # Exported for higher level control:
 # DEFAULT_MAX_ATOMS_PER_SYN_CORE = 8
 # SYN_CORES_PER_NEURON_CORE = 1
@@ -47,17 +46,18 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
-                 incoming_partitions, outgoing_partitions, packet_compressor = None):
+                 incoming_partitions, outgoing_partitions, packet_compressor=None):
 
         self._n_atoms = n_neurons
 
         self._n_incoming_partitions = incoming_partitions
+
         self._max_atoms_neuron_core = max_atoms_neuron_core
 
-        self._n_outgoing_partitions = 1 if self._n_atoms <= self._max_atoms_neuron_core else outgoing_partitions #int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        self._n_outgoing_partitions = 1 if self._n_atoms <= self._max_atoms_neuron_core else outgoing_partitions #int(math.ceil(float(self._n_atoms) / self._max_atoms_neuron_core))
 
         self._packet_compressor = packet_compressor
-        
+
         self._neuron_vertices = list()
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()

@@ -13,7 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APP = rate_source_live_compressor
-SOURCES = spike_source/rate_source/rate_source_live_compressor.c
 
-include ../../neural_support.mk
+APP = $(notdir $(CURDIR))
+
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/stdp/synapse_dynamics_multicomp_Bern.c
+
+TIMING_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
+
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
+
+include ../synapse_build.mk

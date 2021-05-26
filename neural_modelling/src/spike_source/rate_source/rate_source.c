@@ -107,8 +107,8 @@ static uint32_t timer_period;
 
 static uint32_t index;
 static uint32_t mem_index;
- static size_t size;
- static size_t region_size;
+static size_t size;
+static size_t region_size;
 
 static uint32_t looping;
 static uint32_t n_rates;
@@ -241,7 +241,7 @@ static void refresh(void) {
 
     mem_index += size;
     index = 0;
- }
+}
 
 
 //! \brief Timer interrupt callback
@@ -355,7 +355,6 @@ static void timer_callback(uint timer_count, uint unused) {
             spin1_delay_us(1);
         }
     }
-
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 

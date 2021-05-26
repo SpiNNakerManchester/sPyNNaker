@@ -976,7 +976,9 @@ class AbstractPopulationVertex(
         """
         parameters = dict()
         for parameter_name in self.__pynn_model.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+            # BAD CODING : TMP FOR THE US NO TEACH!! FIX!!!!!!!!!!!!!!!!!!!!!
+            if parameter_name != "teach":
+                parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
             "name": self.__neuron_impl.model_name,

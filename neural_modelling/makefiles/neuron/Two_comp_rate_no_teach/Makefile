@@ -13,7 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APP = rate_source_live_compressor
-SOURCES = spike_source/rate_source/rate_source_live_compressor.c
+APP = $(notdir $(CURDIR))
 
-include ../../neural_support.mk
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_two_comp_rate_no_teach_impl.c
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_two_comp_rate.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/synapse_dynamics_static_impl.c
+
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
+
+include ../neural_build.mk

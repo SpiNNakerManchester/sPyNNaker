@@ -81,21 +81,21 @@ void neuron_add_inputs(
         input_t weights_this_timestep);
 
 //! \brief This function adds two s1615 values, saturating the result.
- //!        It uses the ARM assembly instruction QADD for efficiency.
- //! \param[in] x first argument.
- //! \param[in] y second argument.
- //! \return x+y.
+//!        It uses the ARM assembly instruction QADD for efficiency.
+//! \param[in] x first argument.
+//! \param[in] y second argument.
+//! \return x+y.
 
- static inline s1615 sat_accum_sum(
- 	s1615 x,
- 	s1615 y)
- {
-     register s1615 r;
+static inline s1615 sat_accum_sum(
+	s1615 x,
+	s1615 y)
+{
+    register s1615 r;
 
-     asm volatile("qadd %[r], %[x], %[y]"
- 	    : [r] "=r" (r) : [x] "r" (x), [y] "r" (y) : );
-     return r;
- }
+    asm volatile("qadd %[r], %[x], %[y]"
+	    : [r] "=r" (r) : [x] "r" (x), [y] "r" (y) : );
+    return r;
+}
 
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_print_inputs(void);

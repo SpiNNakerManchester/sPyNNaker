@@ -96,7 +96,7 @@ _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 # Reintroduced for now, but reduced from 1.1 to 1.05
-_SYNAPSE_SDRAM_OVERSCALE = 1.05
+_SYNAPSE_SDRAM_OVERSCALE = 1.1
 
 _ONE_WORD = struct.Struct("<I")
 
@@ -155,7 +155,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 packet_compressor, population_table_type=None, synapse_io=None, synapse_rescale = False):
+                 packet_compressor, population_table_type=None, synapse_io=None,
+                 synapse_rescale = False):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
