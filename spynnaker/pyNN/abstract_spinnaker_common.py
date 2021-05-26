@@ -169,9 +169,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         if get_config_bool("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
+            # extra_mapping_algorithms.append(
+            #     "PreAllocateForBitFieldRouterCompressor")
             extra_mapping_algorithms.append(
-                "PreAllocateForBitFieldRouterCompressor")
-            extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
         if get_config_bool("Reports", "reports_enabled"):
