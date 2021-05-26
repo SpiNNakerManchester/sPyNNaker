@@ -20,6 +20,7 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -222,7 +223,8 @@ class PopulationMachineNeurons(
         neurons_pre_size = (
             self._app_vertex.tdma_sdram_size_in_bytes +
             self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self._app_vertex.neuron_impl.get_n_synapse_types())
+            (self._app_vertex.neuron_impl.get_n_synapse_types() *
+             BYTES_PER_WORD))
         neuron_parameters_sdram_address = (
             neuron_region_sdram_address + neurons_pre_size)
 
