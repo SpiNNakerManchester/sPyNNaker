@@ -184,7 +184,7 @@ class TestSynapticExpander(BaseTestCase):
 
     def test_bad_normal_clipping(self):
         with self.assertRaises(SpiNNManCoresNotInStateException):
-            self.runsafe(run_bad_normal_clipping)
+            run_bad_normal_clipping()
 
 
 if __name__ == "__main__":
