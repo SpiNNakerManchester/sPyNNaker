@@ -168,7 +168,7 @@ class SpikeSourcePoissonMachineVertex(
     PARAMS_BASE_WORDS = 14
 
     # Seed offset in parameters and size on bytes
-    SEED_OFFSET_BYTES = 9 * 4
+    SEED_OFFSET_BYTES = 10 * 4
     SEED_SIZE_BYTES = 4 * 4
 
     def __init__(
