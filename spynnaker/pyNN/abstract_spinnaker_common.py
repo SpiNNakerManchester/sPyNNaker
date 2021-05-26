@@ -432,7 +432,7 @@ class AbstractSpiNNakerCommon(
                 self.get_generated_output(
                     "MemoryMCGatherVertexToEthernetConnectedChipMapping"),
                 self.get_generated_output(
-                    "MemoryExtraMonitorToChipMapping"))
+                    "ExtraMonitorToChipMapping"))
 
         # set up the router timeouts to stop packet loss
         for data_receiver, extra_monitor_cores in receivers:
