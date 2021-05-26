@@ -111,7 +111,7 @@ static uint32_t max_size;
 
 static uint32_t teaching_signal;
 
-static uint32_t neg_teach = UINT32_MAX - ((1 << 21) - 1);
+static uint32_t neg_teach = UINT32_MAX - ((1 << 20) - 1);
 
 uint32_t elements;
 
@@ -194,7 +194,7 @@ static bool read_rate_parameters(address_t address, address_t starting_values) {
     total_n_refresh = 1;
 
     // Storing 1 as S1615 to imporve performances when sending the teaching signal
-    teaching_signal = 1 << 21;
+    teaching_signal = 1 << 20;
 
     log_info("read_rate_parameters: completed successfully");
     return true;

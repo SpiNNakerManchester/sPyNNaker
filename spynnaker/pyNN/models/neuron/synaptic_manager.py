@@ -96,7 +96,7 @@ _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 # Reintroduced for now, but reduced from 1.1 to 1.05
-_SYNAPSE_SDRAM_OVERSCALE = 1.05
+_SYNAPSE_SDRAM_OVERSCALE = 1.1
 
 _ONE_WORD = struct.Struct("<I")
 

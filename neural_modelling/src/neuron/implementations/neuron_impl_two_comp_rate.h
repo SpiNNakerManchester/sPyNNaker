@@ -468,7 +468,7 @@ static inline uint neuron_impl_get_v(index_t neuron_index) {
         uint output;
     } converter;
 
-    converter.input = neuron_array[neuron_index].U_membrane;
+    converter.input = (neuron_array[neuron_index].U_membrane  + 0.5k);
 
     //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_at_last_setting, converter.output);
 

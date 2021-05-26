@@ -270,11 +270,11 @@ bool synapse_dynamics_process_plastic_synapses(
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     // plastic_synapse_t is same type as weight_t, which is accum!
-    plastic_synapse_t *plastic_words =
+    register plastic_synapse_t *plastic_words =
             plastic_synapses(plastic_region_address);
     const control_t *control_words =
             synapse_row_plastic_controls(fixed_region_address);
-    size_t plastic_synapse =
+    register size_t plastic_synapse =
             synapse_row_num_plastic_controls(fixed_region_address);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
@@ -289,7 +289,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
-    REAL real_rate = out_rate(convert_rate_to_input(rate));
+    register REAL real_rate = out_rate(convert_rate_to_input(rate));
 
     //io_printf(IO_BUF, "plast rate %k\n", real_rate);
 
