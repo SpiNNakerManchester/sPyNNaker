@@ -88,7 +88,7 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
@@ -219,7 +219,7 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
@@ -353,7 +353,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
