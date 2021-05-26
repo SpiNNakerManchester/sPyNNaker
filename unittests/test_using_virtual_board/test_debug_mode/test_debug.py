@@ -22,6 +22,9 @@ from spinn_front_end_common.utilities.report_functions import (
 from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_neuron_network_specification_report import \
+    SpYNNakerNeuronGraphNetworkSpecificationReport
 import spynnaker8 as sim
 
 
@@ -72,6 +75,9 @@ class TestDebug(BaseTestCase):
             # BoardChipReport.AREA_CODE_REPORT_NAME,
             # write_data_speed_up_report not on a virtual board
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME + "." +
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_FORMAT,
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
