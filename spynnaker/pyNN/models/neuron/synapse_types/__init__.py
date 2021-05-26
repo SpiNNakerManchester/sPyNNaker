@@ -19,7 +19,8 @@ from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
 from .synapse_type_eprop_adaptive import SynapseTypeEPropAdaptive
+from .synapse_type_eprop_shd import SynapseTypeEPropSHD
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
            "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeEPropAdaoptive"]
+           "SynapseTypeEPropAdaoptive", "SynapseTypeEPropSHD"]
