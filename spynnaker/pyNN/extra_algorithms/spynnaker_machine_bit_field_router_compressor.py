@@ -25,8 +25,6 @@ from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         MachineBitFieldPairRouterCompressor,
         MachineBitFieldOrderedCoveringCompressor)
-from spinn_front_end_common.utilities.helpful_functions import (
-    write_address_to_user1)
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
@@ -115,8 +113,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
-            compressor_executable_targets, executable_finder, placements,
-            transceiver)
+            compressor_executable_targets, executable_finder, placements)
 
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
@@ -130,14 +127,11 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         "Method to call the specific compressor to use"
 
     def _locate_expander_rerun_targets(
-            self, bitfield_targets, executable_finder, placements,
-            transceiver):
+            self, bitfield_targets, executable_finder, placements):
         """ removes host based cores for synaptic matrix regeneration
 
         :param ~.ExecutableTargets bitfield_targets: the cores that were used
         :param ~.ExecutableFinder executable_finder: way to get binary path
-        :param ~.Placements placements: placements on machine
-        :param ~.Transceiver transceiver: spinnman instance
         :return: new targets for synaptic expander
         :rtype: ~.ExecutableTargets
         """
@@ -155,10 +149,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 expander_executable_path,
                 placement.x, placement.y, placement.p,
                 executable_type=ExecutableType.SYSTEM)
-            # Write the region to USER1, as that is the best we can do
-            write_address_to_user1(
-                transceiver, placement.x, placement.y, placement.p,
-                placement.vertex.connection_generator_region)
         return new_cores
 
     @staticmethod
