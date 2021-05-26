@@ -213,9 +213,9 @@
         <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;draw_network_graph&quot;</span><span class="p">):</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerConnectionHolderGenerator&quot;</span><span class="p">)</span>
+            <span class="c1"># extra_mapping_algorithms.append(</span>
+            <span class="c1">#     &quot;PreAllocateForBitFieldRouterCompressor&quot;)</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="s2">&quot;PreAllocateForBitFieldRouterCompressor&quot;</span><span class="p">)</span>
-            <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">):</span>
