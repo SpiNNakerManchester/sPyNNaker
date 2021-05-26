@@ -553,10 +553,6 @@
         <python_class>SpYNNakerSynapticMatrixReport</python_class>
         <input_definitions>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
                 <param_name>connection_holder</param_name>
                 <param_type>ConnectionHolders</param_type>
             </parameter>
@@ -566,7 +562,6 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>report_folder</param_name>
             <param_name>connection_holder</param_name>
             <param_name>dsg_targets</param_name>
         </required_inputs>
@@ -605,16 +600,11 @@
         <python_class>SpYNNakerNeuronGraphNetworkSpecificationReport</python_class>
         <input_definitions>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
                 <param_name>application_graph</param_name>
                 <param_type>MemoryApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>report_folder</param_name>
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>
