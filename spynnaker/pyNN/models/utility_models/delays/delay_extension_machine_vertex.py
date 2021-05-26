@@ -219,7 +219,7 @@ class DelayExtensionMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_graph": "MemoryMachineGraph",
+        "machine_graph": "MachineGraph",
         "routing_infos": "MemoryRoutingInfos",
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor"})

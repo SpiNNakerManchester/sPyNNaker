@@ -371,10 +371,10 @@ class PopulationMachineVertex(
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "application_graph": "ApplicationGraph",
-        "machine_graph": "MemoryMachineGraph",
+        "machine_graph": "MachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap"
+        "n_key_map": "MachinePartitionNKeysMap"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
