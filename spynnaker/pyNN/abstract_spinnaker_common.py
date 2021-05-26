@@ -430,7 +430,7 @@ class AbstractSpiNNakerCommon(
             receivers = self._locate_receivers_from_projections(
                 projection_to_attribute_map.keys(),
                 self.get_generated_output(
-                    "MemoryMCGatherVertexToEthernetConnectedChipMapping"),
+                    "VertexToEthernetConnectedChipMapping"),
                 self.get_generated_output(
                     "ExtraMonitorToChipMapping"))
 
