@@ -683,7 +683,7 @@
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryVirtualMachine</param_type>
+                <param_type>VirtualMachine</param_type>
                 <param_type>Machine</param_type>
             </parameter>
             <parameter>
