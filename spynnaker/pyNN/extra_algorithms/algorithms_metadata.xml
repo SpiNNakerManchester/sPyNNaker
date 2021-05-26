@@ -55,7 +55,7 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_file_path</param_name>
@@ -104,7 +104,7 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -235,7 +235,7 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -369,7 +369,7 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
@@ -491,7 +491,7 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
