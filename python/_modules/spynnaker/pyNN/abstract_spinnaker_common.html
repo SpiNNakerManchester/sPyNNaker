@@ -210,17 +210,16 @@
         <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;FinishConnectionHolders&quot;</span><span class="p">)</span>
         <span class="n">extra_algorithms_pre_run</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;draw_network_graph&quot;</span><span class="p">):</span>
-            <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="s2">&quot;SpYNNakerConnectionHolderGenerator&quot;</span><span class="p">)</span>
-            <span class="c1"># extra_mapping_algorithms.append(</span>
-            <span class="c1">#     &quot;PreAllocateForBitFieldRouterCompressor&quot;)</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_network_graph&quot;</span><span class="p">):</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_synaptic_report&quot;</span><span class="p">):</span>
-                <span class="n">extra_algorithms_pre_run</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SynapticMatrixReport&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                    <span class="s2">&quot;write_synaptic_report ignored due to https://github.com/&quot;</span>
+                    <span class="s2">&quot;SpiNNakerManchester/sPyNNaker/issues/1081&quot;</span><span class="p">)</span>
+                <span class="c1"># extra_algorithms_pre_run.append(&quot;SynapticMatrixReport&quot;)</span>
         <span class="k">if</span> <span class="n">user_extra_algorithms_pre_run</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_algorithms_pre_run</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_extra_algorithms_pre_run</span><span class="p">)</span>
 
