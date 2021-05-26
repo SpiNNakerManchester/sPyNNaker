@@ -60,6 +60,8 @@ static uint32_t target_ind = 0;
 
 REAL output_errors[20] = {0.k};
 REAL accumulated_softmax = 0.k;
+REAL min_v_mem = 1000.k;
+REAL max_v_mem = -1000.k;
 bool printed_values = false;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
@@ -286,17 +288,26 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, neuron, neuron_index);
 
-    REAL mem_downscale = 1.k;
-    if (result / mem_downscale > 8.75k){
-        output_errors[neuron_index] = expk(8.75k);
-    }
-    else{
-        output_errors[neuron_index] = expk(result / mem_downscale);
-    }
+//    REAL mem_downscale = 1.k;
+//    if (result / mem_downscale > 8.75k){
+//        output_errors[neuron_index] = expk(8.75k);
+//    }
+//    else{
+//        output_errors[neuron_index] = expk(result / mem_downscale);
+//    }
     if (neuron_index == 0){
+        max_v_mem = -1000.k;
+        min_v_mem = 1000.k;
         accumulated_softmax = 0.k;
     }
-    accumulated_softmax += output_errors[neuron_index];
+    output_errors[neuron_index] = result;
+    if (result > max_v_mem){
+        max_v_mem = result;
+    }
+//    if (result < min_v_mem){
+//        min_v_mem = result;
+//    }
+//    accumulated_softmax += output_errors[neuron_index];
 //    if (!printed_values){
 //        io_printf(IO_BUF, "out:%d, vmem:%k, res:%k\n", neuron_index, voltage, result);
 //    }
@@ -311,12 +322,28 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        if (!printed_values){
 //            io_printf(IO_BUF, "%d Printing learning values: accumulated_softmax %k\n", time, accumulated_softmax);
 //        }
+        REAL norm_rescale = max_v_mem - 8.75k;
+//        if (norm_rescale > 8.75k){
+//            norm_rescale = 8.75k;
+//        }
+        // Normalise errors and exp
+        for (uint32_t n_ind=0; n_ind < 10; n_ind++){
+//            if (norm_rescale > 0){
+//                output_errors[n_ind] -= min_v_mem;
+//                output_errors[n_ind] /= (max_v_mem - min_v_mem) * 0.05k;
+//                output_errors[n_ind] -= 1.k;
+//                output_errors[n_ind] *= norm_rescale;
+//            }
+            output_errors[n_ind] -= norm_rescale;
+            output_errors[n_ind] = expk(output_errors[n_ind]);
+            accumulated_softmax += output_errors[n_ind];
+        }
         // Calculate error
         for (uint32_t n_ind=0; n_ind < 10; n_ind++){  // set to 20 when english and german
 //            if (!printed_values){
 //                io_printf(IO_BUF, "output:%d, error:%k, ", n_ind, output_errors[n_ind]);
 //            }
-            if (accumulated_softmax > 0){ // because overflow and e^-x=0
+            if (accumulated_softmax > 0.k){ // because overflow and e^-x=0
                 output_errors[n_ind] /= accumulated_softmax;
             }
             REAL correct_output = 0.k;

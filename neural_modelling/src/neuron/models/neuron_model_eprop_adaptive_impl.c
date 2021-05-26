@@ -100,7 +100,7 @@ state_t neuron_model_state_update(
 //	if (neuron->refract_timer){
 //	    neuron->psi = 0.0k;
 //	}
-//    neuron->psi *= neuron->A;
+    neuron->psi *= neuron->A;
 
 //  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
 //    uint32_t total_input_synapses_per_neuron = 100; //todo should this be fixed?
@@ -291,9 +291,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	REAL this_dt_weight_change =
     			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	if (v_mem_error < 0.k){
-    	    this_dt_weight_change += v_mem_error * local_eta * 0.01k;//neuron->v_mem_lr;
-    	}
+//    	if (v_mem_error < 0.k){
+//    	    this_dt_weight_change += v_mem_error * local_eta * 0.01k;//neuron->v_mem_lr;
+//    	}
 //    	this_dt_weight_change += v_mem_error * neuron->v_mem_lr;
 //    	this_dt_weight_change += firing_reg * neuron->firing_lr;
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)

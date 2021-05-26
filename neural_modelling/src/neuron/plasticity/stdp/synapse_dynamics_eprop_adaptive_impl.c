@@ -302,9 +302,11 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
         }
 
         if (delta_w_int < 0){
-            current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 0));
+//            current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 0));
+            current_state = weight_one_term_apply_depression(current_state,  delta_w_int);
         } else {
-            current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 0));
+//            current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 0));
+            current_state = weight_one_term_apply_potentiation(current_state,  delta_w_int);
         }
     }
 	else {
@@ -461,18 +463,30 @@ bool synapse_dynamics_process_plastic_synapses(
 //            plastic_saturation_count++;
 //        }
 
-        // overflow check
-        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
-            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
-            accumulation = ring_buffers[ring_buffer_index];
+        bool neg_sat_test = (accumulation < 0);
+        bool neg_check_1 = (ring_buffers[ring_buffer_index] < 0);
+        bool neg_check_2 = (synapse_structure_get_final_weight(final_state) < 0);
+        if (neg_sat_test && !neg_check_1 && !neg_check_2) {
+            accumulation = 0x8000 - 1;
             plastic_saturation_count++;
         }
-        // underflow check
-        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
-            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
-            accumulation = ring_buffers[ring_buffer_index];
+        if (!neg_sat_test && neg_check_1 && neg_check_2) {
+            accumulation = 0x8000;
             plastic_saturation_count++;
         }
+
+//        // overflow check
+//        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+//            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
+//            accumulation = ring_buffers[ring_buffer_index];
+//            plastic_saturation_count++;
+//        }
+//        // underflow check
+//        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+//            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
+//            accumulation = ring_buffers[ring_buffer_index];
+//            plastic_saturation_count++;
+//        }
 
         ring_buffers[ring_buffer_index] = accumulation;
 
