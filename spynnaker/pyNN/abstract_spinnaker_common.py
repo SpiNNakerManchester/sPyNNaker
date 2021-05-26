@@ -172,17 +172,16 @@ class AbstractSpiNNakerCommon(
         extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
-        if get_config_bool("Reports", "draw_network_graph"):
-            extra_mapping_algorithms.append(
-                "SpYNNakerConnectionHolderGenerator")
-            # extra_mapping_algorithms.append(
-            #     "PreAllocateForBitFieldRouterCompressor")
+        if get_config_bool("Reports", "write_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
         if get_config_bool("Reports", "reports_enabled"):
             if get_config_bool("Reports", "write_synaptic_report"):
-                extra_algorithms_pre_run.append("SynapticMatrixReport")
+                logger.exception(
+                    "write_synaptic_report ignored due to https://github.com/"
+                    "SpiNNakerManchester/sPyNNaker/issues/1081")
+                # extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
