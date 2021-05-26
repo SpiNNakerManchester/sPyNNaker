@@ -30,6 +30,9 @@ from spinn_front_end_common.utilities.report_functions.board_chip_report \
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_neuron_network_specification_report import \
+    SpYNNakerNeuronGraphNetworkSpecificationReport
 import spynnaker8 as sim
 
 
@@ -77,6 +80,9 @@ class CheckDebug(BaseTestCase):
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report
             BoardChipReport.AREA_CODE_REPORT_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME + "." +
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_FORMAT,
             ]
 
         sim.setup(1.0)
