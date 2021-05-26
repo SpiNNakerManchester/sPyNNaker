@@ -16,7 +16,6 @@ import struct
 from enum import Enum
 import numpy
 
-from spinn_utilities.config_holder import get_config_int
 from data_specification.enums import DataType
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
@@ -38,6 +37,8 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step, machine_time_step_ms)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import (
     AbstractHasProfileData, profile_utils)
@@ -394,9 +395,8 @@ class SpikeSourcePoissonMachineVertex(
              for s in starts_split[:-1]])
 
         # Compute the spikes per tick for each rate for each atom
-        spikes_per_tick = rates * (get_config_int(
-            "Machine", "machine_time_step") / MICRO_TO_SECOND_CONVERSION)
-
+        spikes_per_tick = rates * (
+                machine_time_step() / MICRO_TO_SECOND_CONVERSION)
         # Determine the properties of the sources
         is_fast_source = spikes_per_tick >= self.SLOW_RATE_PER_TICK_CUTOFF
         is_faster_source = spikes_per_tick >= self.FAST_RATE_PER_TICK_CUTOFF
@@ -492,14 +492,13 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         spec.write_value(
-            data=float(machine_time_step) / MICRO_TO_SECOND_CONVERSION,
+            data=machine_time_step() / MICRO_TO_SECOND_CONVERSION,
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=int(MICRO_TO_SECOND_CONVERSION / float(machine_time_step)))
+            data=int(MICRO_TO_SECOND_CONVERSION / machine_time_step()))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -581,8 +580,7 @@ class SpikeSourcePoissonMachineVertex(
     def _convert_ms_to_n_timesteps(value):
         return numpy.round(
             value * (MICRO_TO_MILLISECOND_CONVERSION /
-                     float(get_config_int(
-                         "Machine", "machine_time_step")))).astype("uint32")
+                     machine_time_step())).astype("uint32")
 
     def poisson_param_region_address(self, placement, transceiver):
         return helpful_functions.locate_memory_region_for_placement(
@@ -655,7 +653,7 @@ class SpikeSourcePoissonMachineVertex(
                 i,
                 spikes_per_tick *
                 (MICRO_TO_SECOND_CONVERSION /
-                 get_config_int("Machine", "machine_time_step")))
+                 machine_time_step()))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded

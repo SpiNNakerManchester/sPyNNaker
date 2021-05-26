@@ -15,7 +15,6 @@
 
 import collections
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.overrides import overrides
@@ -27,6 +26,8 @@ from pacman.exceptions import PacmanInvalidParameterException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge)
 from .abstract_synapse_dynamics_structural import (
@@ -195,20 +196,19 @@ class SynapseDynamicsStructuralCommon(
         :return: None
         :rtype: None
         """
-        machine_time_step = get_config_int("Machine", "machine_time_step")
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(data=int(
-                machine_time_step / (
+                machine_time_step() / (
                     self.p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(data=int((
                 self.p_rew * MICRO_TO_SECOND_CONVERSION) /
-                float(machine_time_step)))
+                machine_time_step()))
         # write s_max
         spec.write_value(data=int(self.s_max))
         # write total number of atoms in the application vertex
@@ -266,7 +266,7 @@ class SynapseDynamicsStructuralCommon(
             # Delay
             delay_scale = (
                     MICRO_TO_MILLISECOND_CONVERSION /
-                    get_config_int("Machine", "machine_time_step"))
+                    machine_time_step())
             if isinstance(dynamics.initial_delay, collections.Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)

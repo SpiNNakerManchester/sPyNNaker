@@ -18,7 +18,6 @@ from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from spinn_utilities.config_holder import get_config_int, set_config
 from spinn_front_end_common.utilities.globals_variables import set_failed_state
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
@@ -204,8 +203,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :return: the machine time step
         :rtype: float
         """
-        return (get_config_int("Machine", "machine_time_step") /
-                float(MICRO_TO_MILLISECOND_CONVERSION))
+        return self.machine_time_step_ms
 
     @dt.setter
     def dt(self, new_value):
@@ -213,8 +211,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
 
         :param float new_value: new value for machine time step in microseconds
         """
-        set_config("Machine", "machine_time_step",
-                   new_value * MICRO_TO_MILLISECOND_CONVERSION)
+        self.machine_time_step = new_value * MICRO_TO_MILLISECOND_CONVERSION
 
     @property
     def t(self):
@@ -223,9 +220,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :return: the current runtime already executed
         :rtype: float
         """
-        return (
-            self._current_run_timesteps * (
-                get_config_int("Machine", "machine_time_step") / 1000.0))
+        return self._current_run_timesteps * self.machine_time_step_ms
 
     @property
     def segment_counter(self):

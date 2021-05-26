@@ -16,9 +16,9 @@
 import math
 import numpy
 
-from spinn_utilities.config_holder import get_config_int
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms, machine_time_step_per_ms)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -143,9 +143,7 @@ class SynapseIORowBased(object):
         :param int post_vertex_max_delay_ticks: post vertex max delay
         :rtype: int
         """
-        return post_vertex_max_delay_ticks * (
-            get_config_int("Machine", "machine_time_step") /
-            MICRO_TO_MILLISECOND_CONVERSION)
+        return post_vertex_max_delay_ticks * machine_time_step_ms()
 
     @staticmethod
     def _n_words(n_bytes):
@@ -381,13 +379,11 @@ class SynapseIORowBased(object):
         """
         # pylint: disable=too-many-arguments, too-many-locals
         # pylint: disable=assignment-from-no-return
-        machine_time_step_us = (MICRO_TO_MILLISECOND_CONVERSION /
-                                get_config_int("Machine", "machine_time_step"))
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(
             app_edge.post_vertex.splitter.max_support_delay())
         if max_delay is not None:
-            max_delay *= machine_time_step_us
+            max_delay *= machine_time_step_per_ms()
 
         # Get the actual connections
         app_edge = machine_edge.app_edge
@@ -401,7 +397,7 @@ class SynapseIORowBased(object):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * machine_time_step_us)
+            connections["delay"] * machine_time_step_per_ms())
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
@@ -484,9 +480,7 @@ class SynapseIORowBased(object):
             The synapse information of the connections
         """
         # Return the delays values to milliseconds
-        connections["delay"] /= (
-                MICRO_TO_MILLISECOND_CONVERSION /
-                get_config_int("Machine", "machine_time_step"))
+        connections["delay"] /= machine_time_step_per_ms()
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
         return connections

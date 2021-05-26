@@ -17,14 +17,15 @@ import math
 import logging
 import struct
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_WORD, BITS_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -141,8 +142,6 @@ class MultiSpikeRecorder(object):
         :param list(~numpy.ndarray) spike_times:
         """
         # pylint: disable=too-many-arguments
-        ms_per_tick = (get_config_int("Machine", "machine_time_step") /
-                       MICRO_TO_MILLISECOND_CONVERSION)
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
         while offset < len(raw_data):
@@ -157,7 +156,7 @@ class MultiSpikeRecorder(object):
             bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                 (-1, 32))).reshape((-1, n_bytes_per_block * 8))
             indices = numpy.nonzero(bits)[1]
-            times = numpy.repeat([time * ms_per_tick], len(indices))
+            times = numpy.repeat([time * machine_time_step_ms()], len(indices))
             indices = indices + vertex_slice.lo_atom
             spike_ids.append(indices)
             spike_times.append(times)

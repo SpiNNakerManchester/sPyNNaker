@@ -16,13 +16,13 @@
 import logging
 import struct
 import numpy
-from spinn_utilities.config_holder import get_config_int
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -143,13 +143,11 @@ class EIEIOSpikeRecorder(object):
         :param int base_key:
         :param list(~numpy.ndarray) results:
         """
-        ms_per_tick = (get_config_int("Machine", "machine_time_step") /
-                       MICRO_TO_MILLISECOND_CONVERSION)
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= ms_per_tick
+            time *= machine_time_step_ms()
             data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(
