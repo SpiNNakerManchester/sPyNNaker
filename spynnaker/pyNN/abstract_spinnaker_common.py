@@ -438,7 +438,7 @@ class AbstractSpiNNakerCommon(
         for data_receiver, extra_monitor_cores in receivers:
             data_receiver.load_system_routing_tables(
                 self._txrx,
-                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self.get_generated_output("ExtraMonitorVertices"),
                 self._placements)
             data_receiver.set_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
@@ -458,7 +458,7 @@ class AbstractSpiNNakerCommon(
                 self._txrx, list(extra_monitor_cores), self._placements)
             data_receiver.load_application_routing_tables(
                 self._txrx,
-                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self.get_generated_output("ExtraMonitorVertices"),
                 self._placements)
 
         # return data items
