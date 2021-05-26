@@ -159,6 +159,7 @@ def check_fixed_prob(n, prob, n_per_core, conns):
 def check_fixed_total(n, total, conns):
     assert(len(conns) == total)
 
+
 def run_bad_normal_clipping():
     p.setup(timestep=1.0)
 
@@ -168,9 +169,8 @@ def run_bad_normal_clipping():
     delays = p.RandomDistribution(
         "normal_clipped", mu=20, sigma=1, low=1, high=6)
 
-    input_proj = p.Projection(input, pop_1, p.AllToAllConnector(),
-                              synapse_type=p.StaticSynapse(
-                                  weight=5, delay=delays))
+    p.Projection(input, pop_1, p.AllToAllConnector(),
+                 synapse_type=p.StaticSynapse(weight=5, delay=delays))
 
     p.run(10)
 
