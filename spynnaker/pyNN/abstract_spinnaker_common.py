@@ -173,7 +173,7 @@ class AbstractSpiNNakerCommon(
         extra_algorithms_pre_run = []
 
         if get_config_bool("Reports", "write_network_graph"):
-           extra_mapping_algorithms.append(
+            extra_mapping_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
         if get_config_bool("Reports", "reports_enabled"):
