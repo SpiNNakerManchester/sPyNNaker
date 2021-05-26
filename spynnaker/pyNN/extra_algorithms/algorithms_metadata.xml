@@ -692,7 +692,7 @@
             </parameter>
             <parameter>
                 <param_name>pre_allocated_resources</param_name>
-                <param_type>MemoryPreAllocatedResources</param_type>
+                <param_type>PreAllocatedResources</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
