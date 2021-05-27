@@ -25,11 +25,11 @@ class Recorder(_BaseClass):
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = []
 
-    def __init__(self, population):
+    def __init__(self, population, vertex):
         """
         :param population: the population to record for
         :type population: ~spynnaker.pyNN.models.populations.Population
         """
         moved_in_v6("spynnaker8.models.recorder",
                     "spynnaker.pyNN.models.recorder")
-        super(Recorder, self).__init__(population)
+        super(Recorder, self).__init__(population, vertex)

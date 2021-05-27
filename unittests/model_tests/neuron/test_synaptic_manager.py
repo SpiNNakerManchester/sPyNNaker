@@ -33,10 +33,11 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from pacman.config_holder import (load_config_cfgs, set_config)
+from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
+from spynnaker.pyNN.config_setup import reset_configs
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
@@ -65,7 +66,8 @@ from spynnaker.pyNN.models.utility_models.delays import (
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterDelayVertexSlice, AbstractSpynnakerSplitterDelay)
-from unittests.mocks import MockSimulator, MockPopulation
+from unittests.mocks import MockPopulation
+import spynnaker8
 
 
 # pylint: disable=unused-argument
@@ -143,13 +145,13 @@ def say_false(self, weights, delays):
 
 
 def test_write_data_spec():
-    MockSimulator.setup()
+    spynnaker8.setup()
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    load_config_cfgs()
+    load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     machine_time_step = 1000.0
@@ -319,11 +321,11 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
-        load_config_cfgs()
+        reset_configs()
 
 
 def test_set_synapse_dynamics():
-    MockSimulator.setup()
+    spynnaker8.setup()
     synaptic_manager = SynapticManager(
         n_synapse_types=2, ring_buffer_sigma=5.0,
         spikes_per_second=100.0, drop_late_spikes=True)
@@ -500,7 +502,7 @@ def test_set_synapse_dynamics():
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         expect_app_keys):
-    MockSimulator.setup()
+    spynnaker8.setup(1.0)
     # Add an sdram so max SDRAM is high enough
     SDRAM(4000000)
 

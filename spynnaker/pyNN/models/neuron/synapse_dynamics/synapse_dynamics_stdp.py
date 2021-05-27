@@ -22,14 +22,15 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
+from spynnaker.pyNN.exceptions import (
+    InvalidParameterType, SynapticConfigurationException)
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import (
-    InvalidParameterType, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -494,29 +495,18 @@ class SynapseDynamicsSTDP(
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
 
+    @overrides(AbstractSynapseDynamics.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
-        """
-        :param str pre_population_label:
-        :param str post_population_label:
-        :rtype:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        prov_data = list()
-        if self.__timing_dependence is not None:
-            prov_data.extend(self.__timing_dependence.get_provenance_data(
-                pre_population_label, post_population_label))
-        if self.__weight_dependence is not None:
-            prov_data.extend(self.__weight_dependence.get_provenance_data(
-                pre_population_label, post_population_label))
-        return prov_data
+        yield from self.__timing_dependence.get_provenance_data(
+            pre_population_label, post_population_label)
+        yield from self.__weight_dependence.get_provenance_data(
+            pre_population_label, post_population_label)
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         names = ['weight', 'delay']
-        if self.__timing_dependence is not None:
-            names.extend(self.__timing_dependence.get_parameter_names())
-        if self.__weight_dependence is not None:
-            names.extend(self.__weight_dependence.get_parameter_names())
+        names.extend(self.__timing_dependence.get_parameter_names())
+        names.extend(self.__weight_dependence.get_parameter_names())
         return names
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)

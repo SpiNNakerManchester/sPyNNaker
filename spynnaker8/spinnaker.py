@@ -18,24 +18,18 @@ from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from spinn_front_end_common.utilities.globals_variables import set_failed_state
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker import _version
 
 _NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
 
 
-class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
-                SpynnakerSimulatorInterface):
+class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
     """
 
@@ -307,15 +301,3 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :param new_value: the new value for the recorder
         """
         self.__recorders = new_value
-
-
-# Defined in this file to prevent an import loop
-class Spynnaker8FailedState(SpynnakerFailedState):
-    __slots__ = ()
-
-    def __init__(self):
-        super(Spynnaker8FailedState, self).__init__(_NAME)
-
-
-# At import time change the default FailedState
-set_failed_state(Spynnaker8FailedState())

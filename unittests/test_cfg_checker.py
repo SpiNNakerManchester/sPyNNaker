@@ -15,12 +15,13 @@
 
 import os
 import unittest
-from pacman.config_holder import check_python_file
+from spinn_utilities.config_holder import (
+    check_python_file, find_double_defaults)
 
 
 class TestCfgChecker(unittest.TestCase):
 
-    def test_import_all(self):
+    def test_cfg_checker(self):
         # This imports AbstractSpiNNakerCommon which calls set_cfg_files
         module = __import__("spynnaker8")
         module = __import__("spynnaker")
@@ -31,3 +32,10 @@ class TestCfgChecker(unittest.TestCase):
                 if file_name.endswith(".py"):
                     py_path = os.path.join(root, file_name)
                     check_python_file(py_path)
+
+    def test_double_defaults(self):
+        find_double_defaults(repeaters=[
+            "application_to_machine_graph_algorithms",
+            "machine_graph_to_machine_algorithms",
+            "machine_graph_to_virtual_machine_algorithms",
+            "loading_algorithms"])
