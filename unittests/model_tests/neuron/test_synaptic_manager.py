@@ -145,7 +145,7 @@ def say_false(self, weights, delays):
 
 
 def test_write_data_spec():
-    spynnaker8.setup()
+    spynnaker8.setup(timestep=1)
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
