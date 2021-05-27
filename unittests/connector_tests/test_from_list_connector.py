@@ -120,11 +120,11 @@ def test_connector_split():
     weight = 1.0
     delay = 1.0
     synapse_info = SynapseInformation(
-            connector=None, pre_population=MockPopulation(n_sources, "Pre"),
-            post_population=MockPopulation(n_targets, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, is_virtual_machine=False, weights=weight,
-            delays=delay)
+        connector=None, pre_population=MockPopulation(n_sources, "Pre"),
+        post_population=MockPopulation(n_targets, "Post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics=None, synapse_type=None, is_virtual_machine=False,
+        weights=weight, delays=delay)
     has_block = set()
     try:
         # Check each connection is in the right place

@@ -25,15 +25,12 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.placements import Placement, Placements
-from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineEdge)
+from pacman.model.graphs.machine import (MachineGraph, MachineEdge)
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
-from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
@@ -44,7 +41,7 @@ from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector, AllToAllConnector,
+    OneToOneConnector, AllToAllConnector,
     FromListConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -102,8 +99,6 @@ def test_write_data_spec():
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
-    # UGLY but the mock transceiver NEED generate_on_machine to be False
-    #AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
     load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
