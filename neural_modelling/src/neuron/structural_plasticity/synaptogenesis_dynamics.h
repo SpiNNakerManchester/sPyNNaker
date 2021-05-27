@@ -33,7 +33,7 @@
 //!     which contains synaptic rewiring params.
 //! \return Whether we were successful.
 bool synaptogenesis_dynamics_initialise(
-        address_t sdram_sp_address);
+        address_t sdram_sp_address, uint32_t *recording_regions_used);
 
 //! \brief Trigger the process of synaptic rewiring
 //! \details Usually called on a timer registered in c_main()
