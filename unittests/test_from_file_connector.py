@@ -19,8 +19,9 @@ import pytest
 from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromFileConnector)
-from unittests.mocks import MockSimulator, MockPopulation
+from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
+import spynnaker8
 
 
 @pytest.mark.parametrize(
@@ -52,7 +53,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    MockSimulator.setup(False)
+    spynnaker8.setup()
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:
         header = ''

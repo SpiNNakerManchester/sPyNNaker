@@ -58,6 +58,7 @@ def structural_formation_to_full():
 
     return conns, num_rewires
 
+
 class TestStructuralFormationToFull(BaseTestCase):
     def do_run(self):
         conns, num_rewires = structural_formation_to_full()

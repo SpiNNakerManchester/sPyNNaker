@@ -15,14 +15,14 @@
 
 import unittest
 from spynnaker.pyNN.protocols import (
-    MunichIoSpiNNakerLinkProtocol, RetinaKey)
+    MunichIoSpiNNakerLinkProtocol, MUNICH_MODES, RetinaKey)
 
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):
 
     def test_call_each_function(self):
         protocol = MunichIoSpiNNakerLinkProtocol(
-            mode=MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT)
+            mode=MUNICH_MODES.PUSH_BOT)
         protocol.add_payload_logic_to_current_output(0)
         protocol.add_payload_logic_to_current_output_key
         protocol.bias_values(0, 0)

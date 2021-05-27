@@ -16,14 +16,15 @@
 import csa
 import sys
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
-from unittests.mocks import MockSimulator, MockPopulation
+from unittests.mocks import MockPopulation
 from pacman.model.graphs.common.slice import Slice
+import spynnaker8
 from unittest import SkipTest
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 def test_csa_one_to_one_connector():
-    MockSimulator.setup()
+    spynnaker8.setup()
     connector = CSAConnector(csa.oneToOne)
     weight = 1.0
     delay = 2.0
@@ -46,7 +47,7 @@ def test_csa_one_to_one_connector():
 
 
 def test_csa_from_list_connector():
-    MockSimulator.setup()
+    spynnaker8.setup()
     conn_list = [(i, i + 1 % 10) for i in range(10)]
     connector = CSAConnector(conn_list)
     weight = 1.0
@@ -73,7 +74,7 @@ def test_csa_from_list_connector():
 
 
 def test_csa_random_connector():
-    MockSimulator.setup()
+    spynnaker8.setup()
     connector = CSAConnector(csa.random(0.05))
     weight = 1.0
     delay = 2.0
@@ -95,7 +96,7 @@ def test_csa_random_connector():
 
 
 def test_csa_block_connector():
-    MockSimulator.setup()
+    spynnaker8.setup()
     try:
         # This creates a block of size (2, 5) with a probability of 0.5; then
         # within the block an individual connection has a probability of 0.3

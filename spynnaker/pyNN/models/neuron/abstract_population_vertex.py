@@ -18,13 +18,12 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractCanReset, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
-from spinn_front_end_common.utilities import (
-    helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
@@ -126,11 +125,8 @@ class AbstractPopulationVertex(
         # buffer data
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
-        # get config from simulator
-        config = globals_variables.get_simulator().config
-
         if incoming_spike_buffer_size is None:
-            self.__incoming_spike_buffer_size = config.getint(
+            self.__incoming_spike_buffer_size = get_config_int(
                 "Simulation", "incoming_spike_buffer_size")
 
         self.__neuron_impl = neuron_impl
@@ -154,7 +150,7 @@ class AbstractPopulationVertex(
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config, drop_late_spikes)
+            spikes_per_second, drop_late_spikes)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -162,8 +158,8 @@ class AbstractPopulationVertex(
         self.__has_run = False
 
         # Set up for profiling
-        self.__n_profile_samples = helpful_functions.read_config_int(
-            config, "Reports", "n_profile_samples")
+        self.__n_profile_samples = get_config_int(
+            "Reports", "n_profile_samples")
 
     @overrides(AbstractNeuronRecordable.get_expected_n_rows)
     def get_expected_n_rows(

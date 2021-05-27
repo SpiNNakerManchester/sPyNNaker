@@ -13,25 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.populations import Population
+import os
+from spinn_utilities.config_holder import (
+    clear_cfg_files, set_cfg_files)
+from spinn_front_end_common.interface.config_setup import add_spinnaker_cfg
+
+CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
-class MockPopulation(object):
+def reset_configs():
+    """
+    Resets the configs so only the local default config is included.
 
-    def __init__(self, size, label):
-        self._size = size
-        self._label = label
+    """
+    clear_cfg_files()
+    add_spynnaker_cfg()
 
-    @property
-    @overrides(Population.size)
-    def size(self):
-        return self._size
 
-    @property
-    @overrides(Population.label)
-    def label(self):
-        return self.label
-
-    def __repr__(self):
-        return "Population {}".format(self._label)
+def add_spynnaker_cfg():
+    """
+    Add the local cfg and all dependent cfg files.
+    """
+    add_spinnaker_cfg()  # This add its dependencies too
+    set_cfg_files(
+        configfile=CONFIG_FILE_NAME,
+        default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

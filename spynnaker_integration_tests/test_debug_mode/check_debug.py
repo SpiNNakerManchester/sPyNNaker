@@ -14,9 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import pacman.operations.algorithm_reports.reports as reports_names
-from pacman.operations.algorithm_reports.network_specification import \
-    NetworkSpecification
+from spinn_utilities.config_holder import get_config_bool
+import spinn_front_end_common.utilities.report_functions.reports as \
+    reports_names
+from spinn_front_end_common.utilities.report_functions import (
+    NetworkSpecification)
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
@@ -28,6 +30,9 @@ from spinn_front_end_common.utilities.report_functions.board_chip_report \
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_neuron_network_specification_report import \
+    SpYNNakerNeuronGraphNetworkSpecificationReport
 import spynnaker8 as sim
 
 
@@ -75,12 +80,14 @@ class CheckDebug(BaseTestCase):
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report
             BoardChipReport.AREA_CODE_REPORT_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME + "." +
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_FORMAT,
             ]
 
         sim.setup(1.0)
-        configs = globals_variables.config()
-        if (configs.getboolean("Machine", "enable_advanced_monitor_support")
-                and not configs.getboolean("Java", "use_java")):
+        if (get_config_bool("Machine", "enable_advanced_monitor_support")
+                and not get_config_bool("Java", "use_java")):
             # write_data_speed_up_report
             reports.append(
                 DataSpeedUpPacketGatherMachineVertex.OUT_REPORT_NAME)

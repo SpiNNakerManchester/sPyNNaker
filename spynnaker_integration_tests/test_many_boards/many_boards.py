@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import time
 from unittest import SkipTest
+from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.provenance import ProvenanceReader
-from spinn_front_end_common.utilities.globals_variables import config
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
 from spynnaker_integration_tests.scripts import check_data
@@ -67,18 +67,16 @@ class ManyBoards(BaseTestCase):
             self._pops.append(self.add_pop(x, y, self.n_neurons, input))
 
     def report_file(self):
-        the_config = config()
-        if the_config.getboolean("Java", "use_java"):
+        if get_config_bool("Java", "use_java"):
             style = "java_"
         else:
             style = "python_"
-        if the_config.getboolean("Machine", "enable_advanced_monitor_support"):
+        if get_config_bool("Machine", "enable_advanced_monitor_support"):
             style += "advanced"
         else:
             style += "simple"
         return "{}_n_boards={}_n_neurons={}_simtime={}".format(
             style, self.n_boards, self.n_neurons, self.simtime)
-
 
     def do_run(self):
         report_file = self.report_file()
