@@ -167,7 +167,6 @@
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.neo_compare">spynnaker.pyNN.utilities.neo_compare module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.neo_convertor">spynnaker.pyNN.utilities.neo_convertor module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.html#module-spynnaker.pyNN.utilities.variable_cache">spynnaker.pyNN.utilities.variable_cache module</a></li>
@@ -185,7 +184,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.abstract_spinnaker_common.</span></span><span class="sig-name descname"><span class="pre">AbstractSpiNNakerCommon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_socket_addresses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_chips_required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_boards_required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_extra_algorithm_xml_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_extra_mapping_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_extra_algorithms_pre_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_post_run_algorithms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_mapping_algorithms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_load_algorithms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">front_end_versions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/abstract_spinnaker_common.html#AbstractSpiNNakerCommon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface/#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface/#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase</span></code></a></p>
 <p>Main interface for neural code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -634,83 +633,6 @@ used, False if SDP is to be used (default)</p></li>
 </dd></dl>
 
 </section>
-<section id="module-spynnaker.pyNN.spynnaker_simulator_interface">
-<span id="spynnaker-pynn-spynnaker-simulator-interface-module"></span><h2>spynnaker.pyNN.spynnaker_simulator_interface module<a class="headerlink" href="#module-spynnaker.pyNN.spynnaker_simulator_interface" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSimulatorInterface</span></span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_simulator_interface.html#SpynnakerSimulatorInterface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.SimulatorInterface" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.SimulatorInterface</span></code></a></p>
-<p>The API exposed by the simulator itself.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.dt">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.dt" title="Permalink to this definition">¶</a></dt>
-<dd><p>The timestep, in milliseconds.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.get_current_time">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_current_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_simulator_interface.html#SpynnakerSimulatorInterface.get_current_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.get_current_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.has_reset_last">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">has_reset_last</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.has_reset_last" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.min_delay">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">min_delay</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.min_delay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.mpi_rank">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mpi_rank</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.mpi_rank" title="Permalink to this definition">¶</a></dt>
-<dd><p>The MPI rank of the controller node.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.name">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the simulator. Used to ensure PyNN recording neo            blocks are correctly labelled.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.num_processes">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_processes</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.num_processes" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of MPI worker processes.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.recorders">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">recorders</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.recorders" title="Permalink to this definition">¶</a></dt>
-<dd><p>The recorders, used by the PyNN state object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.reset">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_simulator_interface.html#SpynnakerSimulatorInterface.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.reset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.segment_counter">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">segment_counter</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.segment_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of the current recording segment being generated.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.set_number_of_neurons_per_core">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">set_number_of_neurons_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_simulator_interface.html#SpynnakerSimulatorInterface.set_number_of_neurons_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.t">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface.t" title="Permalink to this definition">¶</a></dt>
-<dd><p>The current simulation time, in milliseconds.</p>
-</dd></dl>
-
-</dd></dl>
-
-</section>
 <section id="module-spynnaker.pyNN">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN" title="Permalink to this headline">¶</a></h2>
 </section>
@@ -731,7 +653,6 @@ used, False if SDP is to be used (default)</p></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.abstract_spinnaker_common">spynnaker.pyNN.abstract_spinnaker_common module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.exceptions">spynnaker.pyNN.exceptions module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.spynnaker_external_device_plugin_manager">spynnaker.pyNN.spynnaker_external_device_plugin_manager module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.spynnaker_simulator_interface">spynnaker.pyNN.spynnaker_simulator_interface module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN">Module contents</a></li>
 </ul>
 </li>

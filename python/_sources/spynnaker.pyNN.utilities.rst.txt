@@ -77,14 +77,6 @@ spynnaker.pyNN.utilities.running\_stats module
    :undoc-members:
    :show-inheritance:
 
-spynnaker.pyNN.utilities.spynnaker\_failed\_state module
---------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.utilities.spynnaker_failed_state
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 spynnaker.pyNN.utilities.struct module
 --------------------------------------
 

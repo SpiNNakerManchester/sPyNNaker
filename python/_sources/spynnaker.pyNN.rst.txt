@@ -42,14 +42,6 @@ spynnaker.pyNN.spynnaker\_external\_device\_plugin\_manager module
    :undoc-members:
    :show-inheritance:
 
-spynnaker.pyNN.spynnaker\_simulator\_interface module
------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.spynnaker_simulator_interface
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

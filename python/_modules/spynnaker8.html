@@ -69,9 +69,10 @@
     <span class="n">Space</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span><span class="p">,</span> <span class="n">Cuboid</span><span class="p">,</span> <span class="n">Sphere</span><span class="p">,</span> <span class="n">RandomStructure</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">distance</span> <span class="k">as</span> <span class="n">_pynn_distance</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigurationException</span><span class="p">,</span> <span class="n">SimulatorNotSetupException</span><span class="p">,</span>
+    <span class="n">SimulatorShutdownException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.failed_state</span> <span class="kn">import</span> <span class="n">FAILED_STATE_MSG</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 
 <span class="c1"># connections</span>
@@ -385,7 +386,6 @@
             <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error forcing previous simulation to clear&quot;</span><span class="p">)</span>
-            <span class="n">globals_variables</span><span class="o">.</span><span class="n">unset_simulator</span><span class="p">()</span>
 
     <span class="c1"># add default label if needed</span>
     <span class="k">if</span> <span class="n">graph_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -421,7 +421,7 @@
 
 <span class="sd">    :rtype: str</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
+    <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_last_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
 
 
 <div class="viewcode-block" id="Projection"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.Projection">[docs]</a><span class="k">def</span> <span class="nf">Projection</span><span class="p">(</span>
@@ -487,12 +487,20 @@
 <span class="sd">    :param _: was named compatible_output, which we don&#39;t care about,</span>
 <span class="sd">        so is a non-existent parameter</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">simulator</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">SimulatorShutdownException</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Second call to end ignored&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">except</span> <span class="n">SimulatorNotSetupException</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Calling end before setup makes no sense ignoring!&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="ow">in</span> \
-            <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">write_on_end</span><span class="p">:</span>
+            <span class="n">simulator</span><span class="o">.</span><span class="n">write_on_end</span><span class="p">:</span>
         <span class="n">io</span> <span class="o">=</span> <span class="n">get_io</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">population</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">io</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
-    <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">write_on_end</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+    <span class="n">simulator</span><span class="o">.</span><span class="n">write_on_end</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">simulator</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="record_v"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.record_v">[docs]</a><span class="k">def</span> <span class="nf">record_v</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
@@ -574,8 +582,7 @@
 <span class="sd">    :param ~pyNN.random.NumpyRNG rng: random number generator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;connect&quot;</span><span class="p">](</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></div>
 
 
@@ -588,8 +595,7 @@
 <span class="sd">    :param int n: n neurons</span>
 <span class="sd">    :rtype: ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;create&quot;</span><span class="p">](</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></div>
 
 
@@ -607,8 +613,7 @@
 
 <span class="sd">    :return: returns the current time</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_current_time&quot;</span><span class="p">]()</span></div>
 
 
@@ -619,8 +624,7 @@
 <span class="sd">    :return: returns the min delay of the simulation</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_min_delay&quot;</span><span class="p">]()</span></div>
 
 
@@ -631,8 +635,7 @@
 <span class="sd">    :return: returns the max delay of the simulation</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_max_delay&quot;</span><span class="p">]()</span></div>
 
 
@@ -642,8 +645,7 @@
 <span class="sd">    :return: get the time step of the simulation (in ms)</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_time_step&quot;</span><span class="p">]())</span></div>
 
 
@@ -655,8 +657,7 @@
 <span class="sd">        ~spynnaker.pyNN.models.populations.PopulationView</span>
 <span class="sd">    :param initial_values: the params and their values to change</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="n">pynn_common</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">)</span></div>
 
 
@@ -669,8 +670,7 @@
 <span class="sd">    :return: the number of MPI processes</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;num_processes&quot;</span><span class="p">]()</span></div>
 
 
@@ -683,8 +683,7 @@
 <span class="sd">    :return: MPI rank</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;rank&quot;</span><span class="p">]()</span></div>
 
 
@@ -707,8 +706,7 @@
 <span class="sd">    :return: neo object</span>
 <span class="sd">    :rtype: ~neo.core.Block</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;record&quot;</span><span class="p">](</span><span class="n">variables</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span>
                             <span class="n">annotations</span><span class="p">)</span></div>
 
@@ -722,8 +720,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">annotations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">annotations</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">](</span><span class="n">annotations</span><span class="p">)</span></div>
 
 
@@ -736,8 +733,7 @@
 <span class="sd">    :return: the actual simulation time that the simulation stopped at</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">](</span><span class="n">simtime</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">)</span></div>
 
 
@@ -753,8 +749,7 @@
 <span class="sd">    :return: the actual simulation time that the simulation stopped at</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;run_until&quot;</span><span class="p">](</span><span class="n">tstop</span><span class="p">)</span></div>
 
 
@@ -764,8 +759,7 @@
 <span class="sd">    :return: the machine object</span>
 <span class="sd">    :rtype: ~spinn_machine.Machine</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">has_simulator</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">FAILED_STATE_MSG</span><span class="p">)</span>
+    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine</span>
 </pre></div>
 

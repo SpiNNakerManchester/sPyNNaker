@@ -54,7 +54,6 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
@@ -64,21 +63,16 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">CommandSender</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">unset_simulator</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_algorithms</span><span class="p">,</span> <span class="n">model_binaries</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.config_setup</span> <span class="kn">import</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">,</span> <span class="n">reset_configs</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.spynnaker_simulator_interface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpynnakerSimulatorInterface</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.extracted_data</span> <span class="kn">import</span> <span class="n">ExtractedData</span>
 <span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span>
-        <span class="n">AbstractSpinnakerBase</span><span class="p">,</span> <span class="n">SpynnakerSimulatorInterface</span><span class="p">,</span>
-        <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Main interface for neural code.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -379,8 +373,7 @@
             <span class="n">population</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">turn_off_machine</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="p">,</span> <span class="n">clear_tags</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span>
-        <span class="n">unset_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run the model created.</span>

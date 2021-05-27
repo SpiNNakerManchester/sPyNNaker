@@ -930,93 +930,6 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 </dd></dl>
 
 </section>
-<section id="module-spynnaker.pyNN.utilities.spynnaker_failed_state">
-<span id="spynnaker-pynn-utilities-spynnaker-failed-state-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_failed_state module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.spynnaker_failed_state.</span></span><span class="sig-name descname"><span class="pre">SpynnakerFailedState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a>, <a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.FailedState" title="(in SpiNNFrontEndCommon v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.FailedState</span></code></a></p>
-<p>Marks the simulation as failed.</p>
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.dt">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.dt" title="Permalink to this definition">¶</a></dt>
-<dd><p>The timestep, in milliseconds.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time">
-<span class="sig-name descname"><span class="pre">get_current_time</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.get_current_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.has_reset_last">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">has_reset_last</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.has_reset_last" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.max_delay">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_delay</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.max_delay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.min_delay">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">min_delay</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.min_delay" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.mpi_rank">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mpi_rank</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.mpi_rank" title="Permalink to this definition">¶</a></dt>
-<dd><p>The MPI rank of the controller node.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.name">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the simulator. Used to ensure PyNN recording neo            blocks are correctly labelled.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.num_processes">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_processes</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.num_processes" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of MPI worker processes.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.recorders">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">recorders</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.recorders" title="Permalink to this definition">¶</a></dt>
-<dd><p>The recorders, used by the PyNN state object.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.segment_counter">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">segment_counter</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.segment_counter" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of the current recording segment being generated.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core">
-<span class="sig-name descname"><span class="pre">set_number_of_neurons_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.set_number_of_neurons_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.t">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.t" title="Permalink to this definition">¶</a></dt>
-<dd><p>The current simulation time, in milliseconds.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.write_on_end">
-<span class="sig-name descname"><span class="pre">write_on_end</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.write_on_end" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</section>
 <section id="module-spynnaker.pyNN.utilities.struct">
 <span id="spynnaker-pynn-utilities-struct-module"></span><h2>spynnaker.pyNN.utilities.struct module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.struct" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -1436,7 +1349,6 @@ regardless of whether they were recording or not.</p></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_compare">spynnaker.pyNN.utilities.neo_compare module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.neo_convertor">spynnaker.pyNN.utilities.neo_convertor module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.variable_cache">spynnaker.pyNN.utilities.variable_cache module</a></li>
