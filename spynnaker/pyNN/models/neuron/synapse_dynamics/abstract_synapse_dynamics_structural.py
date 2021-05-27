@@ -139,3 +139,11 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         :param int max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
+
+    @abstractmethod
+    def get_max_rewires_per_ts(self, machine_time_step):
+        """ Get the max number of rewires per timestep
+
+        :param float machine_time_step: The machine time step
+        :rtype: int
+        """

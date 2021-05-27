@@ -23,9 +23,9 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
 from spynnaker.pyNN.utilities.constants import (
-    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB)
+    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB, REWIRING)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
@@ -34,7 +34,8 @@ _DEFAULT_UNITS = {
     SPIKES: "spikes",
     MEMBRANE_POTENTIAL: "mV",
     GSYN_EXCIT: "uS",
-    GSYN_INHIB: "uS"}
+    GSYN_INHIB: "uS",
+    REWIRING: "ms"}
 
 
 class Recorder(object):
@@ -278,12 +279,43 @@ class Recorder(object):
         if sim.use_virtual_board:
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the list will be empty")
+                "truly ran, hence the spike list will be empty")
             return numpy.zeros((0, 2))
 
         # assuming we got here, everything is OK, so we should go get the
         # spikes
         return self.__vertex.get_spikes(sim.placements, sim.buffer_manager)
+
+    def get_events(self, variable):
+        """ How to get rewiring events (of a post-population) from recorder
+
+        :return: the rewires (event times, values) from the underlying vertex
+        :rtype: ~numpy.ndarray
+        """
+
+        # check we're in a state where we can get rewires
+        if not isinstance(self.__vertex, AbstractEventRecordable):
+            raise ConfigurationException(
+                "This population has not got the capability to record rewires")
+        if not self.__vertex.is_recording(REWIRING):
+            raise ConfigurationException(
+                "This population has not been set to record rewires")
+
+        sim = get_simulator()
+        if not sim.has_ran:
+            logger.warning(
+                "The simulation has not yet run, therefore rewires cannot "
+                "be retrieved, hence the list will be empty")
+            return numpy.zeros((0, 4))
+        if sim.use_virtual_board:
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the rewires list will be empty")
+            return numpy.zeros((0, 4))
+
+        return self.__vertex.get_events(
+            variable, sim.placements, sim.buffer_manager,
+            sim.machine_time_step)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -439,6 +471,14 @@ class Recorder(object):
                     sampling_interval=self.__spike_sampling_interval,
                     indexes=view_indexes,
                     label=self.__population.label)
+            elif variable == REWIRING:
+                self.__read_in_event(
+                    segment=segment,
+                    block=block,
+                    event_array=self.get_events(variable),
+                    variable=variable,
+                    recording_start_time=self._recording_start_time,
+                    label=self.__population.label)
             else:
                 (data, data_indexes, sampling_interval) = \
                     self.get_recorded_matrix(variable)
@@ -495,6 +535,14 @@ class Recorder(object):
                     sampling_interval=variable_cache.sampling_interval,
                     indexes=view_indexes,
                     label=data_cache.label)
+            elif variable == REWIRING:
+                self.__read_in_event(
+                    segment=segment,
+                    block=block,
+                    event_array=variable_cache.data,
+                    variable=variable,
+                    recording_start_time=data_cache.recording_start_time,
+                    label=self.__population.label)
             else:
                 self.__read_in_signal(
                     segment=segment,
@@ -667,6 +715,63 @@ class Recorder(object):
         data_array.shape = (data_array.shape[0], data_array.shape[1])
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
+
+    def __read_in_event(
+            self, segment, block, event_array, variable, recording_start_time,
+            label):
+        """ Reads in a data item that is an event (i.e. rewiring form/elim)\
+            and saves this data to the segment.
+
+        :param ~neo.core.Segment segment: Segment to add data to
+        :param ~neo.core.Block block: neo block
+        :param ~numpy.ndarray signal_array: the raw "event" data
+        :param str variable: the variable name
+        :param recording_start_time: when recording started
+        :type recording_start_time: float or int
+        :param str label: human readable label
+        """
+        # pylint: disable=too-many-arguments, no-member
+        t_start = recording_start_time * quantities.ms
+
+        formation_times = []
+        formation_labels = []
+        formation_annotations = dict()
+        elimination_times = []
+        elimination_labels = []
+        elimination_annotations = dict()
+
+        for i in range(len(event_array)):
+            event_time = t_start + event_array[i][0] * quantities.ms
+            pre_id = int(event_array[i][1])
+            post_id = int(event_array[i][2])
+            if event_array[i][3] == 1:
+                formation_times.append(event_time)
+                formation_labels.append(
+                    str(pre_id)+"_"+str(post_id)+"_formation")
+            else:
+                elimination_times.append(event_time)
+                elimination_labels.append(
+                    str(pre_id)+"_"+str(post_id)+"_elimination")
+
+        formation_event_array = neo.Event(
+            times=formation_times,
+            labels=formation_labels,
+            units="ms",
+            name=variable+"_form",
+            description="Synapse formation events",
+            array_annotations=formation_annotations)
+
+        elimination_event_array = neo.Event(
+            times=elimination_times,
+            labels=elimination_labels,
+            units="ms",
+            name=variable+"_elim",
+            description="Synapse elimination events",
+            array_annotations=elimination_annotations)
+
+        segment.events.append(formation_event_array)
+
+        segment.events.append(elimination_event_array)
 
     @staticmethod
     def __get_channel_index(ids, block):
