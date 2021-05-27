@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as p
+from spinnman.exceptions import SpiNNManCoresNotInStateException
 from spynnaker8 import RandomDistribution
 import functools
 from spinnaker_testbase import BaseTestCase
@@ -159,10 +160,31 @@ def check_fixed_total(n, total, conns):
     assert(len(conns) == total)
 
 
+def run_bad_normal_clipping():
+    p.setup(timestep=1.0)
+
+    pop_1 = p.Population(4, p.IF_curr_exp(), label="pop_1")
+    input = p.Population(4, p.SpikeSourceArray(spike_times=[0]), label="input")
+
+    delays = p.RandomDistribution(
+        "normal_clipped", mu=20, sigma=1, low=1, high=6)
+
+    p.Projection(input, pop_1, p.AllToAllConnector(),
+                 synapse_type=p.StaticSynapse(weight=5, delay=delays))
+
+    p.run(10)
+
+    p.end()
+
+
 class TestSynapticExpander(BaseTestCase):
 
     def test_script(self):
         self.runsafe(run_script)
+
+    def test_bad_normal_clipping(self):
+        with self.assertRaises(SpiNNManCoresNotInStateException):
+            run_bad_normal_clipping()
 
 
 if __name__ == "__main__":
