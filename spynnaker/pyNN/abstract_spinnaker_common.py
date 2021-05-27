@@ -16,7 +16,6 @@
 import logging
 import math
 import os
-from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -26,21 +25,16 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSpiNNakerCommon(
-        AbstractSpinnakerBase, SpynnakerSimulatorInterface,
-        metaclass=AbstractBase):
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
     __slots__ = [
@@ -342,7 +336,6 @@ class AbstractSpiNNakerCommon(
 
         super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        unset_simulator(self)
 
     def run(self, run_time, sync_time=0.0):
         """ Run the model created.
