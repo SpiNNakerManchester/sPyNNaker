@@ -55,6 +55,10 @@ state_t neuron_model_state_update(
     neuron->U_membrane = (neuron->g_D * neuron->V + soma_input_this_timestep) /
                             (neuron->g_L + neuron->g_D + neuron->g_som);
 
+//    REAL du = (-neuron->g_L * neuron->U_membrane) + neuron->g_D * (neuron->V - neuron->U_membrane) + soma_input_this_timestep - (neuron->g_som * neuron->U_membrane);
+//
+//    neuron->U_membrane += du;
+
     // neuron->U_membrane += ((neuron->g_D * (dendrite_input_this_timestep - neuron->U_membrane)) -
     //                         (neuron->g_L * neuron->U_membrane) +
     //                         (soma_input_this_timestep - (neuron->g_som * neuron->U_membrane)));

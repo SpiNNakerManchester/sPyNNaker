@@ -52,9 +52,9 @@ state_t neuron_model_state_update(
 
     neuron->U_membrane = (neuron->g_B * neuron->Vb + neuron->g_A * neuron->Va) /
                            (neuron->g_L + neuron->g_B + neuron->g_A);
-    // neuron->U_membrane += ((neuron->g_B * (basal_dendrite_input_this_timestep - neuron->U_membrane)) +
-    //                        (neuron->g_A * (apical_dendrite_input_this_timestep - neuron->U_membrane)) -
-    //                        (neuron->g_L * neuron->U_membrane));
+//    REAL du = (-neuron->g_L * neuron->U_membrane) + neuron->g_B * (neuron->Vb - neuron->U_membrane) + neuron->g_A * (neuron->Va - neuron->U_membrane);
+//
+//    neuron->U_membrane += du;
 
     //io_printf(IO_BUF, "va %k, vb %k, u %k\n", apical_dendrite_input_this_timestep, basal_dendrite_input_this_timestep, neuron->U_membrane);
 
