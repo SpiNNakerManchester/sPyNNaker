@@ -6588,6 +6588,7 @@
     <includes id="partner_8h" name="partner.h" local="yes" imported="no">partner_selection/partner.h</includes>
     <includes id="elimination_8h" name="elimination.h" local="yes" imported="no">elimination/elimination.h</includes>
     <includes id="formation_8h" name="formation.h" local="yes" imported="no">formation/formation.h</includes>
+    <class kind="struct">structural_recording_values_t</class>
     <member kind="function">
       <type>void</type>
       <name>print_post_to_pre_entry</name>
@@ -6599,8 +6600,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>adba45d439e3c65751b2508e6ae744e15</anchor>
-      <arglist>(address_t sdram_sp_address)</arglist>
+      <anchor>ad4efac9c7152c9f89d5c7ae05fb7ab53</anchor>
+      <arglist>(address_t sdram_sp_address, uint32_t *recording_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6693,6 +6694,13 @@
       <anchor>abe30d6dd9444f9a17ed9128f6682fa03</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>rewiring_recording_index</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a4a10759c0e9d46f40f5bdce22d00d454</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics.h</name>
@@ -6703,8 +6711,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
       <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>adba45d439e3c65751b2508e6ae744e15</anchor>
-      <arglist>(address_t sdram_sp_address)</arglist>
+      <anchor>ad4efac9c7152c9f89d5c7ae05fb7ab53</anchor>
+      <arglist>(address_t sdram_sp_address, uint32_t *recording_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6758,8 +6766,8 @@
       <type>bool</type>
       <name>synaptogenesis_dynamics_initialise</name>
       <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>adba45d439e3c65751b2508e6ae744e15</anchor>
-      <arglist>(address_t sdram_sp_address)</arglist>
+      <anchor>ad4efac9c7152c9f89d5c7ae05fb7ab53</anchor>
+      <arglist>(address_t sdram_sp_address, uint32_t *recording_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -12007,6 +12015,11 @@
       <anchor>a06c22d077ef52c561ae4d0ea9f64d7ff</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>structural_recording_values_t</name>
+    <filename>topographic__map__impl_8c.html</filename>
+    <anchor>structstructural__recording__values__t</anchor>
   </compound>
   <compound kind="struct">
     <name>synapse_param_t</name>

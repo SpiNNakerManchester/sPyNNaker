@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['filter_5finfo_2eh_2729',['filter_info.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html',1,'']]],
-  ['formation_2eh_2730',['formation.h',['../formation_8h.html',1,'']]],
-  ['formation_5fdistance_5fdependent_5fimpl_2ec_2731',['formation_distance_dependent_impl.c',['../formation__distance__dependent__impl_8c.html',1,'']]],
-  ['formation_5fdistance_5fdependent_5fimpl_2eh_2732',['formation_distance_dependent_impl.h',['../formation__distance__dependent__impl_8h.html',1,'']]]
+  ['filter_5finfo_2eh_2732',['filter_info.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html',1,'']]],
+  ['formation_2eh_2733',['formation.h',['../formation_8h.html',1,'']]],
+  ['formation_5fdistance_5fdependent_5fimpl_2ec_2734',['formation_distance_dependent_impl.c',['../formation__distance__dependent__impl_8c.html',1,'']]],
+  ['formation_5fdistance_5fdependent_5fimpl_2eh_2735',['formation_distance_dependent_impl.h',['../formation__distance__dependent__impl_8h.html',1,'']]]
 ];

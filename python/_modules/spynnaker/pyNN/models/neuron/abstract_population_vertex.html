@@ -64,7 +64,8 @@
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">NeuronRecorder</span><span class="p">)</span>
+    <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">AbstractEventRecordable</span><span class="p">,</span>
+    <span class="n">NeuronRecorder</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
     <span class="n">AbstractPopulationSettable</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">)</span>
@@ -84,7 +85,7 @@
 <span class="k">class</span> <span class="nc">AbstractPopulationVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">,</span>
         <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span>
-        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
+        <span class="n">AbstractEventRecordable</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">AbstractCanReset</span><span class="p">):</span>
@@ -183,7 +184,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span> <span class="o">=</span> <span class="n">NeuronRecorder</span><span class="p">(</span>
             <span class="n">recordable_variables</span><span class="p">,</span> <span class="n">record_data_types</span><span class="p">,</span> <span class="p">[</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">],</span>
             <span class="n">n_neurons</span><span class="p">,</span> <span class="p">[</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">PACKETS</span><span class="p">],</span>
-            <span class="p">{</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">PACKETS</span><span class="p">:</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">PACKETS_TYPE</span><span class="p">})</span>
+            <span class="p">{</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">PACKETS</span><span class="p">:</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">PACKETS_TYPE</span><span class="p">},</span>
+            <span class="p">[</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">],</span>
+            <span class="p">{</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING_TYPE</span><span class="p">})</span>
 
         <span class="c1"># Set up synapse handling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span> <span class="o">=</span> <span class="n">SynapticManager</span><span class="p">(</span>
@@ -285,12 +288,30 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span>
             <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="AbstractPopulationVertex.is_recording_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_events">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">is_recording_events</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_recording_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.set_recording_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_recording_events">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">set_recording_events</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_recording_events</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span>
+            <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AbstractPopulationVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
             <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_events">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">get_events</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
+            <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recordable_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -303,9 +324,9 @@
 <div class="viewcode-block" id="AbstractPopulationVertex.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">set_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">set_recording</span><span class="p">(</span>
-            <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
+            <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
@@ -322,6 +343,10 @@
 <div class="viewcode-block" id="AbstractPopulationVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span><span class="s2">&quot;spikes&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_events_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_events_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">get_events_sampling_interval</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_events_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPopulationInitializable</span><span class="o">.</span><span class="n">initialize</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -481,6 +506,8 @@
     <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variable_index</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
@@ -491,6 +518,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span>
             <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.clear_event_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_event_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">clear_event_recording</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">clear_event_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span>
+            <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_clear_recording_region</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">recording_region_id</span><span class="p">):</span>

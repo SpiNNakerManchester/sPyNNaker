@@ -82,9 +82,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:adba45d439e3c65751b2508e6ae744e15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#adba45d439e3c65751b2508e6ae744e15">synaptogenesis_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address)</td></tr>
-<tr class="memdesc:adba45d439e3c65751b2508e6ae744e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="synaptogenesis__dynamics_8h.html#adba45d439e3c65751b2508e6ae744e15">More...</a><br /></td></tr>
-<tr class="separator:adba45d439e3c65751b2508e6ae744e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#ad4efac9c7152c9f89d5c7ae05fb7ab53">synaptogenesis_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address, uint32_t *recording_regions_used)</td></tr>
+<tr class="memdesc:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="synaptogenesis__dynamics_8h.html#ad4efac9c7152c9f89d5c7ae05fb7ab53">More...</a><br /></td></tr>
+<tr class="separator:ad4efac9c7152c9f89d5c7ae05fb7ab53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#a5cdd3772a85bf8d042932b9ec4e57125">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *synaptic_row, uint32_t *n_bytes)</td></tr>
 <tr class="memdesc:a5cdd3772a85bf8d042932b9ec4e57125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger the process of synaptic rewiring.  <a href="synaptogenesis__dynamics_8h.html#a5cdd3772a85bf8d042932b9ec4e57125">More...</a><br /></td></tr>
 <tr class="separator:a5cdd3772a85bf8d042932b9ec4e57125"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -111,8 +111,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 <p class="definition">Definition in file <a class="el" href="synaptogenesis__dynamics_8h_source.html">synaptogenesis_dynamics.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="adba45d439e3c65751b2508e6ae744e15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adba45d439e3c65751b2508e6ae744e15">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_initialise()</h2>
+<a id="ad4efac9c7152c9f89d5c7ae05fb7ab53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4efac9c7152c9f89d5c7ae05fb7ab53">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -121,8 +121,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
           <td class="memname">bool synaptogenesis_dynamics_initialise </td>
           <td>(</td>
           <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
-          <td class="paramname"><em>sdram_sp_address</em></td><td>)</td>
+          <td class="paramname"><em>sdram_sp_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>recording_regions_used</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -136,7 +146,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether we were successful. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00131">131</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00149">149</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -190,7 +200,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if a row is to be transferred, false otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00189">189</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00213">213</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -230,7 +240,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00311">311</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00384">384</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -253,7 +263,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 <p>Get the period of rewiring. </p>
 <dl class="section return"><dt>Returns</dt><dd>Based on <a class="el" href="synaptogenesis__dynamics_8h.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a" title="Get whether rewiring is attempted multiple times per timestep or after a number of timesteps.">synaptogenesis_is_fast()</a>, this can either be how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00318">318</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00391">391</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -276,7 +286,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 <p>Get whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
 <dl class="section return"><dt>Returns</dt><dd>true if the result of <a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e" title="Get the period of rewiring.">synaptogenesis_rewiring_period()</a> is the number of attempts to try per timestep. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00322">322</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00395">395</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -315,14 +325,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00326">326</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00399">399</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 27 2021 08:48:57 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu May 27 2021 13:13:56 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

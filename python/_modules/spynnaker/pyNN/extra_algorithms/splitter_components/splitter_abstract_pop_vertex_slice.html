@@ -67,10 +67,13 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPopulationVertex</span><span class="p">,</span> <span class="n">PopulationMachineVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">bit_field_utilities</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SplitterAbstractPopulationVertexSlice</span><span class="p">(</span>
@@ -156,6 +159,12 @@
 <span class="sd">        :return: the variable sdram used by the neuron recorder</span>
 <span class="sd">        :rtype: VariableSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+            <span class="n">machine_ts</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
+            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="n">s_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">(</span><span class="n">machine_ts</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">set_max_rewires_per_ts</span><span class="p">(</span>
+                <span class="n">max_rewires_per_ts</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span>\
             <span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>

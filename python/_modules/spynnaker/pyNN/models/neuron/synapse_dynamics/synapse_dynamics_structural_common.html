@@ -506,6 +506,16 @@
                 <span class="s2">&quot;The initial delay </span><span class="si">{}</span><span class="s2"> is bigger than </span><span class="si">{}</span><span class="s2">.  This is not&quot;</span>
                 <span class="s2">&quot; supported in the current implementation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_max_rewires_per_ts"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_max_rewires_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+        <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">&lt;</span>
+                <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
+            <span class="c1"># fast rewiring, so need to set max_rewires_per_ts</span>
+            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">max_rewires_per_ts</span></div>
 </pre></div>
 
             <div class="clearer"></div>
