@@ -9568,6 +9568,13 @@
     <includes id="generator__types_8h" name="generator_types.h" local="no" imported="no">synapse_expander/generator_types.h</includes>
     <class kind="struct">normal_clipped_params</class>
     <class kind="struct">param_generator_normal_clipped</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>MAX_REDRAWS</name>
+      <anchorfile>param__generator__normal__clipped_8h.html</anchorfile>
+      <anchor>a47fa28c0ff86570b51eb712e1c37a9bd</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static void *</type>
       <name>param_generator_normal_clipped_initialize</name>
