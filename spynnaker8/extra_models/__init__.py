@@ -61,4 +61,3 @@ __all__ = [
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
-
