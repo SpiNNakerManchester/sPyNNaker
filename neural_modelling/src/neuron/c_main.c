@@ -95,7 +95,7 @@ typedef enum callback_priorities {
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 4
+#define NUMBER_OF_REGIONS_TO_RECORD 5
 
 // Globals
 
@@ -247,7 +247,7 @@ static bool initialise(void) {
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
+            STRUCTURAL_DYNAMICS_REGION, ds_regions), &n_regions_used)) {
         return false;
     }
 

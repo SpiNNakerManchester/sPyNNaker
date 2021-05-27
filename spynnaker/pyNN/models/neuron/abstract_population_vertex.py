@@ -26,7 +26,8 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
+    NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractContainsUnits)
@@ -46,7 +47,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
+        AbstractEventRecordable, AbstractProvidesOutgoingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
@@ -146,7 +147,9 @@ class AbstractPopulationVertex(
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
             n_neurons, [NeuronRecorder.PACKETS],
-            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE})
+            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
+            [NeuronRecorder.REWIRING],
+            {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -266,12 +269,30 @@ class AbstractPopulationVertex(
         self.set_recording(
             NeuronRecorder.SPIKES, new_state, sampling_interval, indexes)
 
+    @overrides(AbstractEventRecordable.is_recording_events)
+    def is_recording_events(self, variable):
+        return self.__neuron_recorder.is_recording(variable)
+
+    @overrides(AbstractEventRecordable.set_recording_events)
+    def set_recording_events(
+            self, variable, new_state=True, sampling_interval=None,
+            indexes=None):
+        self.set_recording(
+            variable, new_state, sampling_interval, indexes)
+
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, placements, self,
             NeuronRecorder.SPIKES, machine_time_step)
+
+    @overrides(AbstractEventRecordable.get_events)
+    def get_events(
+            self, variable, placements, buffer_manager, machine_time_step):
+        return self.__neuron_recorder.get_events(
+            self.label, buffer_manager, placements, self,
+            variable, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -284,9 +305,9 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.set_recording)
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
-        self.__change_requires_mapping = not self.is_recording(variable)
         self.__neuron_recorder.set_recording(
             variable, new_state, sampling_interval, indexes)
+        self.__change_requires_mapping = not self.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
@@ -303,6 +324,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
         return self.__neuron_recorder.get_neuron_sampling_interval("spikes")
+
+    @overrides(AbstractEventRecordable.get_events_sampling_interval)
+    def get_events_sampling_interval(self, variable):
+        return self.__neuron_recorder.get_neuron_sampling_interval(variable)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value, selector=None):
@@ -462,6 +487,8 @@ class AbstractPopulationVertex(
     def clear_recording(self, variable, buffer_manager, placements):
         if variable == NeuronRecorder.SPIKES:
             index = len(self.__neuron_impl.get_recordable_variables())
+        elif variable == NeuronRecorder.REWIRING:
+            index = len(self.__neuron_impl.get_recordable_variables()) + 1
         else:
             index = (
                 self.__neuron_impl.get_recordable_variable_index(variable))
@@ -472,6 +499,12 @@ class AbstractPopulationVertex(
         self._clear_recording_region(
             buffer_manager, placements,
             len(self.__neuron_impl.get_recordable_variables()))
+
+    @overrides(AbstractEventRecordable.clear_event_recording)
+    def clear_event_recording(self, buffer_manager, placements):
+        self._clear_recording_region(
+            buffer_manager, placements,
+            len(self.__neuron_impl.get_recordable_variables()) + 1)
 
     def _clear_recording_region(
             self, buffer_manager, placements, recording_region_id):

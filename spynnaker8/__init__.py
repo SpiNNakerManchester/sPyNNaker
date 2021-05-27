@@ -31,9 +31,10 @@ from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
 from spinn_utilities.log import FormatAdapter
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.exceptions import (
+    ConfigurationException, SimulatorNotSetupException,
+    SimulatorShutdownException)
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
@@ -354,7 +355,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
             globals_variables.get_simulator().clear()
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
-            globals_variables.unset_simulator()
 
     # add default label if needed
     if graph_label is None:
@@ -390,7 +390,7 @@ def name():
 
     :rtype: str
     """
-    return globals_variables.get_simulator().name
+    return globals_variables.get_last_simulator().name
 
 
 def Projection(
@@ -456,12 +456,20 @@ def end(_=True):
     :param _: was named compatible_output, which we don't care about,
         so is a non-existent parameter
     """
+    try:
+        simulator = globals_variables.get_simulator()
+    except SimulatorShutdownException:
+        logger.warning("Second call to end ignored")
+        return
+    except SimulatorNotSetupException:
+        logger.exception("Calling end before setup makes no sense ignoring!")
+        return
     for (population, variables, filename) in \
-            globals_variables.get_simulator().write_on_end:
+            simulator.write_on_end:
         io = get_io(filename)
         population.write_data(io, variables)
-    globals_variables.get_simulator().write_on_end = []
-    globals_variables.get_simulator().stop()
+    simulator.write_on_end = []
+    simulator.stop()
 
 
 def record_v(source, filename):
@@ -543,8 +551,7 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param ~pyNN.random.NumpyRNG rng: random number generator
     """
     # pylint: disable=too-many-arguments
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 
 
@@ -557,8 +564,7 @@ def create(cellclass, cellparams=None, n=1):
     :param int n: n neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["create"](cellclass, cellparams, n)
 
 
@@ -576,8 +582,7 @@ def get_current_time():
 
     :return: returns the current time
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["get_current_time"]()
 
 
@@ -588,8 +593,7 @@ def get_min_delay():
     :return: returns the min delay of the simulation
     :rtype: int
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["get_min_delay"]()
 
 
@@ -600,8 +604,7 @@ def get_max_delay():
     :return: returns the max delay of the simulation
     :rtype: int
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["get_max_delay"]()
 
 
@@ -611,8 +614,7 @@ def get_time_step():
     :return: get the time step of the simulation (in ms)
     :rtype: float
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return float(__pynn["get_time_step"]())
 
 
@@ -624,8 +626,7 @@ def initialize(cells, **initial_values):
         ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     pynn_common.initialize(cells, **initial_values)
 
 
@@ -638,8 +639,7 @@ def num_processes():
     :return: the number of MPI processes
     :rtype: int
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["num_processes"]()
 
 
@@ -652,8 +652,7 @@ def rank():
     :return: MPI rank
     :rtype: int
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["rank"]()
 
 
@@ -676,8 +675,7 @@ def record(variables, source, filename, sampling_interval=None,
     :return: neo object
     :rtype: ~neo.core.Block
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["record"](variables, source, filename, sampling_interval,
                             annotations)
 
@@ -691,8 +689,7 @@ def reset(annotations=None):
     """
     if annotations is None:
         annotations = {}
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     __pynn["reset"](annotations)
 
 
@@ -705,8 +702,7 @@ def run(simtime, callbacks=None):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["run"](simtime, callbacks=callbacks)
 
 
@@ -722,8 +718,7 @@ def run_until(tstop):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return __pynn["run_until"](tstop)
 
 
@@ -733,6 +728,5 @@ def get_machine():
     :return: the machine object
     :rtype: ~spinn_machine.Machine
     """
-    if not globals_variables.has_simulator():
-        raise ConfigurationException(FAILED_STATE_MSG)
+    globals_variables.check_simulator()
     return globals_variables.get_simulator().machine
