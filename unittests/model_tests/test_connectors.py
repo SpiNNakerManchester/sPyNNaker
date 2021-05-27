@@ -94,10 +94,10 @@ def test_connectors(
         connector = create_connector()
         synapse_info = SynapseInformation(
             connector=None, pre_population=MockPopulation(n_pre, "Pre"),
-            post_population=MockPopulation(n_post, "Post"), prepop_is_view=False,
-            postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, is_virtual_machine=False, weights=weight,
-            delays=delay)
+            post_population=MockPopulation(n_post, "Post"),
+            prepop_is_view=False, postpop_is_view=False, rng=None,
+            synapse_dynamics=None, synapse_type=None,
+            is_virtual_machine=False, weights=weight, delays=delay)
         connector.set_projection_information(
             machine_time_step=1000, synapse_info=synapse_info)
 
