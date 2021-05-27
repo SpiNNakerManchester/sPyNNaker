@@ -39,6 +39,10 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
