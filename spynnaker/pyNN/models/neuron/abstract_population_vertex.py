@@ -269,10 +269,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractEventRecordable.get_events)
     def get_events(
-            self, variable, placements, buffer_manager, machine_time_step):
+            self, variable, placements, buffer_manager):
         return self.__neuron_recorder.get_events(
-            self.label, buffer_manager, placements, self,
-            variable, machine_time_step)
+            self.label, buffer_manager, placements, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):

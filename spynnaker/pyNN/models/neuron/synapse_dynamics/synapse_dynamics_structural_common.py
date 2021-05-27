@@ -469,12 +469,12 @@ class SynapseDynamicsStructuralCommon(
                 " supported in the current implementation".format(
                     self.initial_delay, max_delay_ms))
 
-    def get_max_rewires_per_ts(self, machine_time_step):
+    def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
             # fast rewiring, so need to set max_rewires_per_ts
-            max_rewires_per_ts = int(machine_time_step / (
+            max_rewires_per_ts = int(machine_time_step() / (
                 self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts

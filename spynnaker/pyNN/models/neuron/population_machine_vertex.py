@@ -415,8 +415,7 @@ class PopulationMachineVertex(
         # the maximum rewires that could happend per timestep
         s_dynamics = self._app_vertex.synapse_manager.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
-            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(
-                machine_time_step)
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
             self._app_vertex.neuron_recorder.set_max_rewires_per_ts(
                 max_rewires_per_ts)
 

@@ -314,8 +314,7 @@ class Recorder(object):
             return numpy.zeros((0, 4))
 
         return self.__vertex.get_events(
-            variable, sim.placements, sim.buffer_manager,
-            sim.machine_time_step)
+            variable, sim.placements, sim.buffer_manager)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
