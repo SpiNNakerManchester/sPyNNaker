@@ -49,7 +49,6 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
-from unittests.mocks import MockSimulator
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
 from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
@@ -210,7 +209,7 @@ def test_write_data_spec():
 
 
 def test_set_synapse_dynamics():
-    MockSimulator.setup()
+    p.setup(1.0)
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
