@@ -28,6 +28,11 @@
 #include <synapse_expander/generator_types.h>
 
 /**
+ * \brief The maximum number of redraws performed before giving up
+ */
+#define MAX_REDRAWS 1000
+
+/**
  * \brief The parameters that can be copied in from SDRAM
  */
 struct normal_clipped_params {
@@ -98,9 +103,19 @@ static void param_generator_normal_clipped_generate(
     // if outside the given range
     struct param_generator_normal_clipped *obj = generator;
     for (uint32_t i = 0; i < n_indices; i++) {
+        uint32_t n_draws = 0;
         do {
             accum value = rng_normal(obj->rng);
             values[i] = obj->params.mu + (value * obj->params.sigma);
-        } while (values[i] < obj->params.low || values[i] > obj->params.high);
+            n_draws++;
+        } while ((values[i] < obj->params.low || values[i] > obj->params.high)
+                && (n_draws < MAX_REDRAWS));
+        if (n_draws == MAX_REDRAWS) {
+            log_error("Maximum number of redraws (%u) exceeded on clipped normal "
+                    "distribution with mu=%k, sigma=%k, low=%k, high=%k",
+                    n_draws, obj->params.mu, obj->params.sigma, obj->params.low,
+                    obj->params.high);
+            rt_error(RTE_SWERR);
+        }
     }
 }
