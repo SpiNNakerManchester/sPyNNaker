@@ -32,8 +32,8 @@ from pyNN.space import (
 from pyNN.space import distance as _pynn_distance
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException, SimmulatorNotSetupException,
-    SimmulatorShutdownException)
+    ConfigurationException, SimulatorNotSetupException,
+    SimulatorShutdownException)
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
@@ -451,10 +451,10 @@ def end(_=True):
     """
     try:
         simulator = globals_variables.get_simulator()
-    except SimmulatorShutdownException:
+    except SimulatorShutdownException:
         logger.warning("Second call to end ignored")
         return
-    except SimmulatorNotSetupException:
+    except SimulatorNotSetupException:
         logger.exception("Calling end before setup makes no sense ignoring!")
         return
     for (population, variables, filename) in \
