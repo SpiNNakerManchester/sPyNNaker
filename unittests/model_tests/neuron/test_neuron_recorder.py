@@ -25,7 +25,7 @@ def test_simple_record():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [])
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
     assert(frozenset(["v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
@@ -42,7 +42,7 @@ def test_recording_variables():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [])
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
