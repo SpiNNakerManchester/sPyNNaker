@@ -67,7 +67,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 50; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
     if (neuron->V_membrane > 9.k){
         v_mem_error = neuron->V_membrane - 9.k;
@@ -108,16 +108,16 @@ state_t neuron_model_state_update(
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
         if (time % 1000 == 0 || time % 1000 == 1){
             neuron->syn_state[syn_ind].z_bar = 0.k;
-            neuron->syn_state[syn_ind].z_bar_inp = 0.k;
+//            neuron->syn_state[syn_ind].z_bar_inp = 0.k;
         }
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
-    			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
+    			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC;
 //    			+ (1 - neuron->exp_TC) *
-    			+
-    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+//    			+
+//    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -173,7 +173,7 @@ state_t neuron_model_state_update(
 //            printed_variables = false;
 //        }
     	// reset input (can't have more than one spike per timestep
-        neuron->syn_state[syn_ind].z_bar_inp = 0;
+//        neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 
     	// decrease timestep counter preventing rapid updates

@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 50  # 250   # around 415 with only 3 in syn_state
+SYNAPSES_PER_NEURON = 100  # 250   # around 415 with only 3 in syn_state
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
@@ -100,7 +100,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
                 DataType.S1615, # delta_w
-                DataType.S1615, # z_bar_old
+                # DataType.S1615, # z_bar_old
                 DataType.S1615, # z_bar
                 # DataType.S1615, # ep_a
                 # DataType.S1615, # e_bar
@@ -172,7 +172,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = 0
-            state_variables[Z_BAR_OLD+str(n)] = 0
+            # state_variables[Z_BAR_OLD+str(n)] = 0
             state_variables[Z_BAR+str(n)] = 0
             # state_variables[EP_A+str(n)] = 0
             # state_variables[E_BAR+str(n)] = 0
@@ -210,7 +210,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         # create synaptic state - init all state to zero
         for n in range(SYNAPSES_PER_NEURON):
             eprop_syn_init = [state_variables[DELTA_W+str(n)],
-                              state_variables[Z_BAR_OLD+str(n)],
+                              # state_variables[Z_BAR_OLD+str(n)],
                               state_variables[Z_BAR+str(n)],
 #                               state_variables[EP_A+str(n)],
 #                               state_variables[E_BAR+str(n)],
@@ -240,7 +240,8 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         # Read the data
         (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        _l, delta_w, z_bar_old, z_bar, update_ready
+        _l, delta_w, #z_bar_old,
+         z_bar, update_ready
          # _w_fb
          ) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
@@ -252,7 +253,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
 
         for n in range(SYNAPSES_PER_NEURON):
             state_variables[DELTA_W+str(n)] = delta_w[n]
-            state_variables[Z_BAR_OLD+str(n)] = z_bar_old[n]
+            # state_variables[Z_BAR_OLD+str(n)] = z_bar_old[n]
             state_variables[Z_BAR+str(n)] = z_bar[n]
             # state_variables[EP_A+str(n)] = ep_a[n]
             # state_variables[E_BAR+str(n)] = e_bar[n]

@@ -4,12 +4,12 @@
 #include "neuron_model.h"
 #include "random.h"
 
-#define SYNAPSES_PER_NEURON 50
+#define SYNAPSES_PER_NEURON 100
 
 
 typedef struct eprop_syn_state_t {
 	REAL delta_w; // weight change to apply
-	REAL z_bar_inp;
+//	REAL z_bar_inp; // now all in z_bar
 	REAL z_bar; // low-pass filtered spike train
 //	REAL el_a; // adaptive component of eligibility vector
 //	REAL e_bar; // low-pass filtered eligibility trace

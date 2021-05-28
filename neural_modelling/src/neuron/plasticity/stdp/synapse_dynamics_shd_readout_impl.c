@@ -380,7 +380,7 @@ bool synapse_dynamics_process_plastic_synapses(
         }
 
         neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp += 1024; // !!!! Check what units this is in - same as weight? !!!!
+        neuron->syn_state[syn_ind_from_delay].z_bar += 1024; // !!!! Check what units this is in - same as weight? !!!!
 
 
         // Create update state from the plastic synaptic word
