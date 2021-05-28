@@ -425,7 +425,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
             // Go through typical weight update process to clip to limits
             final_state = eprop_plasticity_update(current_state,
-                neuron->syn_state[syn_ind_from_delay].delta_w);
+                neuron->syn_state[syn_ind_from_delay].delta_w * global_parameters->eta);
 
             // reset delta_w as weight change has now been applied
             neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;

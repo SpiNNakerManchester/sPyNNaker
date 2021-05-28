@@ -37,6 +37,11 @@ state_t neuron_model_state_update(
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 	use(dummy);
 
+//	if (time < 2){
+//	        io_printf(IO_BUF, "sizeof synapse state: %k %u\n\n", sizeof(neuron->syn_state[0]),
+//                                                                 sizeof(neuron->syn_state[0]));
+//	}
+
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
 //		REAL total_exc = 0;
@@ -62,7 +67,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 256; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 50; //todo should this be fixed?
 
     if (neuron->V_membrane > 9.k){
         v_mem_error = neuron->V_membrane - 9.k;
@@ -81,8 +86,8 @@ state_t neuron_model_state_update(
 //    if(v_mem_error < -1.k){
 //        v_mem_error = -1.k;
 //    }
-    neuron->L = v_mem_error*0.01k;
-    for (uint32_t n_ind=0; n_ind < 10; n_ind++){
+    neuron->L = 0.k;//v_mem_error*0.01k;
+    for (uint32_t n_ind=0; n_ind < 20; n_ind++){
         if (n_ind == (uint32_t)dummy){
             neuron->L += learning_signal[n_ind];// * neuron->w_fb[n_ind];
         }
@@ -173,6 +178,7 @@ state_t neuron_model_state_update(
 
     	// decrease timestep counter preventing rapid updates
 //    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	if (time % 1000 == 999){
         neuron->syn_state[syn_ind].update_ready -= 1;
 //    	}
 

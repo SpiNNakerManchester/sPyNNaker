@@ -23,4 +23,4 @@ from .synapse_type_eprop_shd import SynapseTypeEPropSHD
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
            "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeEPropAdaoptive", "SynapseTypeEPropSHD"]
+           "SynapseTypeEPropAdaptive", "SynapseTypeEPropSHD"]

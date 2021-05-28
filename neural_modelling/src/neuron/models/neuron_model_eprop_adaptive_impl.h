@@ -89,7 +89,7 @@ typedef struct neuron_t {
     REAL neuron_rate;
     REAL v_mem_lr;
     REAL firing_lr;
-    REAL w_fb[10]; // feedback weight
+    REAL w_fb[20]; // feedback weight
 
     // array of synaptic states - peak fan-in of 250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];

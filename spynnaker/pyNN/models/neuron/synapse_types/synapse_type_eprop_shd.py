@@ -46,7 +46,7 @@ class SynapseTypeEPropSHD(AbstractSynapseType):
             isyn_inh, 
 #             isyn_inh2
             ):
-        super(SynapseTypeEPropAdaptive, self).__init__(
+        super(SynapseTypeEPropSHD, self).__init__(
             [DataType.U032,    # decay_E
             DataType.U032,    # init_E
 #              DataType.U032,    # decay_E2

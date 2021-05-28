@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 256  # 250   # around 415 with only 3 in syn_state
+SYNAPSES_PER_NEURON = 50  # 250   # around 415 with only 3 in syn_state
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
@@ -139,7 +139,7 @@ class NeuronModelLeakyIntegrateAndFireSHDReadout(AbstractNeuronModel):
         self._eta = eta
 
         self._window_size = window_size
-        self._update_ready = window_size
+        self._update_ready = window_size #/ 1000
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):

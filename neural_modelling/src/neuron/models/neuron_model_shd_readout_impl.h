@@ -4,7 +4,7 @@
 #include "neuron_model.h"
 #include "random.h"
 
-#define SYNAPSES_PER_NEURON 256
+#define SYNAPSES_PER_NEURON 50
 
 
 typedef struct eprop_syn_state_t {

@@ -176,7 +176,7 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
     new_learning_signal = v_mem_error * neuron->v_mem_lr;//0.k;// v_mem_error * 50.k;//0.01k;// + (reg_learning_signal);
-    for (uint32_t syn_ind=0; syn_ind < 10; syn_ind++){
+    for (uint32_t syn_ind=0; syn_ind < 20; syn_ind++){
         new_learning_signal += (learning_signal[syn_ind] * neuron->w_fb[syn_ind]);
     }
 //    new_learning_signal = reg_learning_signal;
@@ -290,7 +290,8 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+//    			local_eta *
+    			neuron->L * neuron->syn_state[syn_ind].e_bar;
 //    	if (v_mem_error < 0.k){
 //    	    this_dt_weight_change += v_mem_error * local_eta * 0.01k;//neuron->v_mem_lr;
 //    	}
@@ -374,10 +375,11 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	if (v_mem_error < 0.k){
-    	    this_dt_weight_change += v_mem_error * local_eta * 0.01k;//neuron->v_mem_lr;
-    	}
+//    			local_eta *
+    			neuron->L * neuron->syn_state[syn_ind].e_bar;
+//    	if (v_mem_error < 0.k){
+//    	    this_dt_weight_change += v_mem_error * local_eta * 0.01k;//neuron->v_mem_lr;
+//    	}
 //    	this_dt_weight_change += v_mem_error * neuron->v_mem_lr;
 //    	this_dt_weight_change += firing_reg * neuron->firing_lr;
     	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)

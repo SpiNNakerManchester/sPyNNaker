@@ -318,7 +318,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                                            global_parameters->target_V[target_ind]);
 //    }
 //    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-    if (neuron_index == 9){
+    if (neuron_index == 19){
 //        if (!printed_values){
 //            io_printf(IO_BUF, "%d Printing learning values: accumulated_softmax %k\n", time, accumulated_softmax);
 //        }
@@ -327,7 +327,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            norm_rescale = 8.75k;
 //        }
         // Normalise errors and exp
-        for (uint32_t n_ind=0; n_ind < 10; n_ind++){
+        for (uint32_t n_ind=0; n_ind < 20; n_ind++){
 //            if (norm_rescale > 0){
 //                output_errors[n_ind] -= min_v_mem;
 //                output_errors[n_ind] /= (max_v_mem - min_v_mem) * 0.05k;
@@ -339,7 +339,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             accumulated_softmax += output_errors[n_ind];
         }
         // Calculate error
-        for (uint32_t n_ind=0; n_ind < 10; n_ind++){  // set to 20 when english and german
+        for (uint32_t n_ind=0; n_ind < 20; n_ind++){  // set to 20 when english and german
 //            if (!printed_values){
 //                io_printf(IO_BUF, "output:%d, error:%k, ", n_ind, output_errors[n_ind]);
 //            }
@@ -402,7 +402,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        			global_parameters->target_V[target_ind];
 //                    learning_signal[neuron_index];
 //                    neuron->syn_state[neuron_index*69].delta_w;
-        			neuron->syn_state[neuron_index*20].delta_w;
+        			neuron->syn_state[neuron_index*2].delta_w;
 //        			exc_input_values[0];
 
     recorded_variable_values[V_RECORDING_INDEX] = result;

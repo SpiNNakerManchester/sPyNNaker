@@ -184,7 +184,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,   #  firing_lr
             # DataType.S1615,   #  w_fb
             ]
-        datatype_list.extend([DataType.S1615] * 10)  # w_fb
+        datatype_list.extend([DataType.S1615] * 20)  # w_fb
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
@@ -270,7 +270,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[V_MEM_LR] = self.__v_mem_lr
         parameters[FIRING_LR] = self.__firing_lr
 #         print('w_fb: ', self.__w_fb)
-        for n in range(10):
+        for n in range(20):
             parameters[W_FB+str(n)] = self.__w_fb[n]#.next()
 
 
@@ -345,7 +345,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[V_MEM_LR],
                 parameters[FIRING_LR]
                 ]
-        for n in range(10):
+        for n in range(20):
             feedback_weight = [parameters[W_FB+str(n)]]
             values.extend(feedback_weight)
 

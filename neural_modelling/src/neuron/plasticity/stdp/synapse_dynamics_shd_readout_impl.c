@@ -418,7 +418,7 @@ bool synapse_dynamics_process_plastic_synapses(
             neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-            neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;
+            neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;// / 1000;
 
         } else {
             if (PRINT_PLASTICITY){
@@ -446,15 +446,27 @@ bool synapse_dynamics_process_plastic_synapses(
 //        io_printf(IO_BUF, "u acc:%u, rb:%u, syn:%u\n", accumulation, ring_buffers[ring_buffer_index], synapse_structure_get_final_weight(final_state));
 //        io_printf(IO_BUF, "k acc:%k, rb:%k, syn:%k\n", accumulation, ring_buffers[ring_buffer_index], synapse_structure_get_final_weight(final_state));
         // overflow check
-        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
-            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
-            accumulation = ring_buffers[ring_buffer_index];
+//        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+//            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
+//            accumulation = ring_buffers[ring_buffer_index];
+//            plastic_saturation_count++;
+//        }
+//        // underflow check
+//        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+//            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
+//            accumulation = ring_buffers[ring_buffer_index];
+//            plastic_saturation_count++;
+//        }
+
+        bool neg_sat_test = (accumulation < 0);
+        bool neg_check_1 = (ring_buffers[ring_buffer_index] < 0);
+        bool neg_check_2 = (synapse_structure_get_final_weight(final_state) < 0);
+        if (neg_sat_test && !neg_check_1 && !neg_check_2) {
+            accumulation = 0x8000 - 1;
             plastic_saturation_count++;
         }
-        // underflow check
-        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
-            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
-            accumulation = ring_buffers[ring_buffer_index];
+        if (!neg_sat_test && neg_check_1 && neg_check_2) {
+            accumulation = 0x8000;
             plastic_saturation_count++;
         }
 
