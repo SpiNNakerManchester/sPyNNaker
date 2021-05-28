@@ -54,10 +54,10 @@ class StepCurrentSource(AbstractCurrentSource):
         self.__parameters['times'] = self.__times
         self.__parameters['amplitudes'] = self.__amplitudes
 
-    def set_parameters(self, parameters):
+    def set_parameters(self, **parameters):
         """ Set the current source parameters
 
-        :param dict(str, Any) parameters: the parameters to set
+        :param parameters: the parameters to set
         """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
@@ -65,6 +65,15 @@ class StepCurrentSource(AbstractCurrentSource):
                 msg = "{} is not a parameter of {}".format(key, self)
                 raise SpynnakerException(msg)
             else:
+                if key == 'times':
+                    sim = get_simulator()
+                    machine_ts = sim.machine_time_step
+                    convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+                    self.__times = [
+                        value[i] * convert_ms for i in range(len(value))]
+                    value = self.__times
+                else:
+                    self.__amplitudes = value
                 self.__parameters[key] = value
 
     @property

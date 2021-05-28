@@ -44,10 +44,10 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         cells.inject(self)
 
     @abstractmethod
-    def set_parameters(self, parameters):
+    def set_parameters(self, **parameters):
         """ Set the current source parameters
 
-        :param dict(str, Any) parameters: the parameters to set
+        :param parameters: the parameters to set
         """
 
     @abstractproperty

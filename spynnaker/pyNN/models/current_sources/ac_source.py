@@ -69,10 +69,10 @@ class ACSource(AbstractCurrentSource):
         self.__parameters['times'] = times
         self.__parameters['amplitudes'] = amplitudes
 
-    def set_parameters(self, parameters):
+    def set_parameters(self, **parameters):
         """ Set the current source parameters
 
-        :param dict(str, Any) parameters: the parameters to set
+        :param parameters: the parameters to set
         """
         for key, value in parameters.items():
             if key not in self.__local_parameters.keys():

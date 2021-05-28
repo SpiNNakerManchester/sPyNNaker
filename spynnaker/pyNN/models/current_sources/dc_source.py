@@ -55,10 +55,10 @@ class DCSource(AbstractCurrentSource):
         self.__parameters['start'] = self.__start * time_convert_ms
         self.__parameters['stop'] = self.__stop * time_convert_ms
 
-    def set_parameters(self, parameters):
+    def set_parameters(self, **parameters):
         """ Set the current source parameters
 
-        :param dict(str, Any) parameters: the parameters to set
+        :param parameters: the parameters to set
         """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():

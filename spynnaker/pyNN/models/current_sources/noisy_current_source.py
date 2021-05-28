@@ -77,10 +77,10 @@ class NoisyCurrentSource(AbstractCurrentSource):
         self.__parameters['seed'] = utility_calls.create_mars_kiss_seeds(
             self.__rng)
 
-    def set_parameters(self, parameters):
+    def set_parameters(self, **parameters):
         """ Set the current source parameters
 
-        :param dict(str, Any) parameters: the parameters to set
+        :param parameters: the parameters to set
         """
         for key, value in parameters.items():
             if key not in self.__parameters.keys():
