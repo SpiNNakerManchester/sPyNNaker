@@ -123,8 +123,7 @@ class SplitterAbstractPopulationVertexSlice(
         """
         s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
-            machine_ts = get_simulator().machine_time_step
-            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(machine_ts)
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
             self._governed_app_vertex.neuron_recorder.set_max_rewires_per_ts(
                 max_rewires_per_ts)
 

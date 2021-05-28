@@ -141,9 +141,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_max_rewires_per_ts(self, machine_time_step):
+    def get_max_rewires_per_ts(self):
         """ Get the max number of rewires per timestep
 
-        :param float machine_time_step: The machine time step
         :rtype: int
         """
