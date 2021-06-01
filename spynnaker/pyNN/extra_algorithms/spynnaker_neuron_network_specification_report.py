@@ -78,7 +78,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         file_to_output = os.path.join(report_folder, self._GRAPH_NAME)
         try:
             if (application_graph.n_vertices +
-                application_graph.n_outgoing_edge_partitions) > CUTOFF:
+                    application_graph.n_outgoing_edge_partitions) > CUTOFF:
                 dot_diagram.render(file_to_output, view=False,
                                    format=self._GRAPH_FORMAT_LARGE)
             else:
