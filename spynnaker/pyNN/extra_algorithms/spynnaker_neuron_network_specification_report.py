@@ -31,7 +31,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     _GRAPH_TITLE = "The graph of the network in graphical form"
     _GRAPH_NAME = "network_graph.gv"
     _NODE_LABEL = "{} ({} neurons)"
-    _GRAPH_FORMAT_NORMAL = "png"
+    _GRAPH_FORMAT = "png"
     _GRAPH_FORMAT_LARGE = "svg"
 
     @staticmethod
@@ -83,7 +83,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                                    format=self._GRAPH_FORMAT_LARGE)
             else:
                 dot_diagram.render(file_to_output, view=False,
-                                   format=self._GRAPH_FORMAT_NORMAL)
+                                   format=self._GRAPH_FORMAT)
         except exeNotFoundExn:
             logger.exception("could not render diagram in {}", file_to_output)
         progress.update()
