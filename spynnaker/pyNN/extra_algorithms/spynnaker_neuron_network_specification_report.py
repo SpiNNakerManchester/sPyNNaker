@@ -20,6 +20,8 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 logger = FormatAdapter(logging.getLogger(__name__))
 
+CUTOFF = 100
+
 
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """ Produces a report describing the graph created from the neural \
@@ -29,7 +31,8 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     _GRAPH_TITLE = "The graph of the network in graphical form"
     _GRAPH_NAME = "network_graph.gv"
     _NODE_LABEL = "{} ({} neurons)"
-    _GRAPH_FORMAT = "png"
+    _GRAPH_FORMAT_NORMAL = "png"
+    _GRAPH_FORMAT_LARGE = "svg"
 
     @staticmethod
     def _get_diagram(label):
@@ -74,8 +77,13 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # write dot file and generate pdf
         file_to_output = os.path.join(report_folder, self._GRAPH_NAME)
         try:
-            dot_diagram.render(file_to_output, view=False,
-                               format=self._GRAPH_FORMAT)
+            if (application_graph.n_vertices +
+                application_graph.n_outgoing_edge_partitions) > CUTOFF:
+                dot_diagram.render(file_to_output, view=False,
+                                   format=self._GRAPH_FORMAT_LARGE)
+            else:
+                dot_diagram.render(file_to_output, view=False,
+                                   format=self._GRAPH_FORMAT_NORMAL)
         except exeNotFoundExn:
             logger.exception("could not render diagram in {}", file_to_output)
         progress.update()
