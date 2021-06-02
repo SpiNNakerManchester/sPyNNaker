@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 import os
+from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -32,7 +33,6 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     _GRAPH_NAME = "network_graph.gv"
     _NODE_LABEL = "{} ({} neurons)"
     _GRAPH_FORMAT = "png"
-    _GRAPH_FORMAT_LARGE = "svg"
 
     @staticmethod
     def _get_diagram(label):
@@ -61,6 +61,16 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # create holders for data
         dot_diagram, exeNotFoundExn = self._get_diagram(self._GRAPH_TITLE)
 
+        graph_format = get_config_str("Reports", "network_graph_format")
+        if graph_format is None:
+            if (application_graph.n_vertices +
+                    application_graph.n_outgoing_edge_partitions) > CUTOFF:
+                logger.warning(
+                    "cfg write_network_graph ignored as network_graph_format "
+                    "is None and the network is big")
+                return
+            else:
+                graph_format = self._GRAPH_FORMAT
         # build progress bar for the vertices, edges, and rendering
         progress = ProgressBar(
             application_graph.n_vertices +
@@ -77,13 +87,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # write dot file and generate pdf
         file_to_output = os.path.join(report_folder, self._GRAPH_NAME)
         try:
-            if (application_graph.n_vertices +
-                    application_graph.n_outgoing_edge_partitions) > CUTOFF:
-                dot_diagram.render(file_to_output, view=False,
-                                   format=self._GRAPH_FORMAT_LARGE)
-            else:
-                dot_diagram.render(file_to_output, view=False,
-                                   format=self._GRAPH_FORMAT)
+            dot_diagram.render(file_to_output, view=False, format=graph_format)
         except exeNotFoundExn:
             logger.exception("could not render diagram in {}", file_to_output)
         progress.update()
