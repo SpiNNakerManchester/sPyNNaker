@@ -106,7 +106,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
 
                 DataType.S1615,   # V
                 DataType.S1615,   # V*
-                DataType.S1615,   # (g_D + g_L) / g_D, plasticity rate multiplier
+                DataType.S1615,   # g_D / (g_D + g_L), plasticity rate multiplier
 
                 DataType.S1615,   # g_L
                 DataType.S1615,   # tau_L
@@ -190,7 +190,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
 
                 state_variables[V],
                 state_variables[V_STAR],
-                (parameters[G_D] + parameters[G_L]) / parameters[G_D],
+                parameters[G_D] / (parameters[G_D] + parameters[G_L]),
 
                 parameters[G_L],
                 parameters[TAU_L],

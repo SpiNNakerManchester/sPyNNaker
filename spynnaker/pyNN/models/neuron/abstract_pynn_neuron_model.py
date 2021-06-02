@@ -26,7 +26,7 @@ _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "incoming_spike_buffer_size": None, "in_partitions": None,
     "out_partitions": None, "packet_compressor": None,
-    "atoms_per_core": None
+    "atoms_per_core": None, "input_pop": False
 }
 
 
@@ -59,11 +59,11 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
             in_partitions, out_partitions, packet_compressor,
-            atoms_per_core):
+            atoms_per_core, input_pop):
 
         max_atoms = self.get_max_atoms_per_core() if atoms_per_core is None else atoms_per_core
         
         return PyNNPartitionVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, self.__model, self, incoming_spike_buffer_size,
-            in_partitions, out_partitions, packet_compressor)
+            in_partitions, out_partitions, packet_compressor, input_pop)

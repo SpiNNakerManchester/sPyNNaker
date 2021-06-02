@@ -302,7 +302,7 @@ static void timer_callback(uint timer_count, uint unused) {
             (rate_values[i++] << 24) | (rate_values[i++] << 16) | (rate_values[i++] << 8) | (rate_values[i++]);
 
         while (!spin1_send_mc_packet(sending_key, value_to_send, WITH_PAYLOAD)) {
-                spin1_delay_us(3);
+                spin1_delay_us(1);
             }
         spin1_delay_us(2);
     }

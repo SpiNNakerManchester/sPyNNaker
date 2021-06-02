@@ -289,7 +289,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
-    register REAL real_rate = out_rate(convert_rate_to_input(rate));
+    register REAL real_rate = convert_rate_to_input(rate);
 
     //io_printf(IO_BUF, "plast rate %k\n", real_rate);
 
@@ -314,7 +314,7 @@ bool synapse_dynamics_process_plastic_synapses(
         //io_printf(IO_BUF, "index %d\n", index);
 
         //io_printf(IO_BUF, "plast in row %k\n", *plastic_words);
-        
+
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, 0);

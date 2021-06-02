@@ -143,7 +143,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "__change_requires_mapping",
         "_recordables",
         "__mem_offset",
-        "__packet_compressor"]
+        "__packet_compressor",
+        "__input_pop"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -155,8 +156,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 packet_compressor, population_table_type=None, synapse_io=None,
-                 synapse_rescale = False):
+                 packet_compressor, input_pop=False, population_table_type=None, synapse_io=None,
+                 synapse_rescale=False):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -174,6 +175,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         self._slice_list = None
         self.__mem_offset = mem_offset
         self.__packet_compressor = packet_compressor
+        self.__input_pop = input_pop
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -251,7 +253,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # size in bytes
         self.__max_row_info = dict()
 
-        # A map of synapse information for each machine pre vertex to index
+        # A map of synapse information for each machine pre vertex to indexinput_pop=False
         self.__synapse_indices = dict()
 
         # Set up for profiling
@@ -286,7 +288,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
             pass
 
         # Otherwise, the dynamics must be equal
-        elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
+        elif not synapse_dynamics.is_sameinput_pop_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")
@@ -372,7 +374,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         neuron_suffix, extension = os.path.splitext(
             self._connected_app_vertices[0].get_binary_file_name())
         compressor = "_compressor" if self.__packet_compressor else ""
-        return (dynamics + neuron_suffix + synapse_suffix + compressor + extension)
+        input_suffix = "_input" if self.__input_pop and self._synapse_index == 1 else ""
+        return (dynamics + neuron_suffix + synapse_suffix + compressor + input_suffix + extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

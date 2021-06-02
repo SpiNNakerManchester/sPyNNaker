@@ -85,7 +85,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
             in_partitions, out_partitions, packet_compressor,
-            atoms_per_core):
+            atoms_per_core, input_pop):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"

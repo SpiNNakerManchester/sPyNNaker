@@ -109,7 +109,7 @@ class NeuronModelPyramidalRate(AbstractNeuronModel, AbstractIsRateBased):
                 DataType.S1615,   # v_A
                 DataType.S1615,   # V_B
                 DataType.S1615,   # V*
-                DataType.S1615,   # (g_A + g_B + g_L) / g_B, plasticity rate multiplier
+                DataType.S1615,   # g_B / (g_A + g_B + g_L), plasticity rate multiplier
 
                 DataType.S1615,   # g_L
                 DataType.S1615,   # tau_L
@@ -197,7 +197,7 @@ class NeuronModelPyramidalRate(AbstractNeuronModel, AbstractIsRateBased):
                 state_variables[Va],
                 state_variables[Vb],
                 state_variables[V_STAR],
-                (parameters[G_A] + parameters[G_B] + parameters[G_L]) / parameters[G_B],
+                parameters[G_B] / (parameters[G_A] + parameters[G_B] + parameters[G_L]),
 
                 parameters[G_L],
                 parameters[TAU_L],

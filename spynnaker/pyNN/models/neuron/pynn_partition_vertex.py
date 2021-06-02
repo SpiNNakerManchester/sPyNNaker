@@ -46,7 +46,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
-                 incoming_partitions, outgoing_partitions, packet_compressor=None):
+                 incoming_partitions, outgoing_partitions, packet_compressor=None, input_pop=False):
 
         self._n_atoms = n_neurons
 
@@ -111,7 +111,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                             label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
                                             max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                            self._n_syn_types, mem_offset, self._packet_compressor[index])
+                                            self._n_syn_types, mem_offset, self._packet_compressor[index],
+                                            input_pop)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)

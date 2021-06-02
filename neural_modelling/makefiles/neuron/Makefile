@@ -21,6 +21,7 @@ MODELS = Static_synapse_Pyramidal_rate \
 		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity \
 		 Plastic_synapse_Two_comp_rate_stdp_mad_Bern_plasticity \
 		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity_compressor \
+		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity_compressor_input \
 		 Plastic_synapse_Two_comp_rate_stdp_mad_Bern_plasticity_compressor \
 		 Plastic_synapse_Two_comp_rate_no_teach_stdp_mad_Bern_plasticity \
 		 Two_comp_rate \

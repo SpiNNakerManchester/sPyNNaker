@@ -340,6 +340,7 @@ bool synapse_dynamics_process_plastic_synapses(
     return true;
 }
 
+// UNUSED
 void synapse_dynamics_process_post_synaptic_event(index_t neuron_index, REAL *rates) {
 
     // Add post-event

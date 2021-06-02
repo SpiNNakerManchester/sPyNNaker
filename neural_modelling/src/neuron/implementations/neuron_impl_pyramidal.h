@@ -442,8 +442,8 @@ static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index)
     
     post_events_update(&postsynaptic_rates[neuron_index],
         neuron->U_rest - neuron->Va,
-        set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) -
-        set_spike_source_rate(neuron->Vb));
+        set_spike_source_rate(neuron->U_membrane) -
+        set_spike_source_rate(neuron->Vb * neuron->plasticity_rate_multiplier));
 
 }
 

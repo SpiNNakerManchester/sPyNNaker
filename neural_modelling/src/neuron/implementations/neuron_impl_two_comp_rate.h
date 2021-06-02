@@ -489,8 +489,8 @@ static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index)
     neuron_pointer_t neuron = &neuron_array[neuron_index];
     
     post_events_update(&postsynaptic_rates[neuron_index],
-        set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier) -
-        set_spike_source_rate(neuron->V));
+        set_spike_source_rate(neuron->U_membrane) -
+        set_spike_source_rate(neuron->V * neuron->plasticity_rate_multiplier));
 
 }
 
