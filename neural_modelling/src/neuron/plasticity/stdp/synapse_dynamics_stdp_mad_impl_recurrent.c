@@ -17,8 +17,10 @@
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
+#include <neuron/models/neuron_model.h>
 #include <neuron/models/neuron_model_lif_v_hist_impl.h>
 
+extern neuron_pointer_t neuron_array;
 
 #ifndef print_plasticity
 #define print_plasticity false
@@ -365,7 +367,7 @@ bool synapse_dynamics_process_plastic_synapses(
 //        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
-        delay_dendritic = 20; // SD 2ms! //10; // SD 1.0 ms back propo time at 0.1 ms time step
+        delay_dendritic = 10; // SD 2ms! //10; // SD 1.0 ms back propo time at 0.1 ms time step
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
