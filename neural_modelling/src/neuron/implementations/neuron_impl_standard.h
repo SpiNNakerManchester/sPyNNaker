@@ -252,6 +252,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         	// Teacher didn't fire neuron - input spikes did
         	 neuron_model_set_v_hist(neuron);
         }
+
+        // Flush any synaptic input
+        flush_synaptic_input(synapse_type);
+
     }
 
     // Shape the existing input according to the included rule

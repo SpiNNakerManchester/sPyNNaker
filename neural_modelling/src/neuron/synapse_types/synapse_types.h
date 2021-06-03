@@ -61,4 +61,8 @@ static void synapse_types_print_parameters(
 //! \return Nothing
 static void synapse_types_print_input(synapse_param_pointer_t parameters);
 
+
+// Enable operating on synaptic input on spike
+static void flush_synaptic_input(synapse_param_pointer_t parameters);
+
 #endif // _SYNAPSE_TYPES_H_
