@@ -29,7 +29,6 @@ from pacman.utilities import utility_calls
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
