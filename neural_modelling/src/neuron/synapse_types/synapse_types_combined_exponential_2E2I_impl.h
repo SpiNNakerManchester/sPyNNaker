@@ -280,5 +280,11 @@ typedef struct bi_exp_params{
  	log_debug("inh2_b_response  = %11.4k\n", parameter->inh2_b_response);
  }
 
+
+ static inline void flush_synaptic_input(synapse_param_pointer_t parameter){
+	 parameter->exc_a_response =  0.0k;
+	 parameter->exc_b_response = 0.0k;
+ }
+
  #endif // _DIFF_SYNAPSE_H_
 

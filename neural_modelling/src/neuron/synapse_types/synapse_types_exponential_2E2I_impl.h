@@ -186,4 +186,10 @@ static inline void synapse_types_print_parameters(
               parameter->inh.synaptic_input_value);
 }
 
+static inline void flush_synaptic_input(synapse_param_pointer_t parameter){
+	 parameter->exc_a_response =  0.0k;
+	 parameter->exc_b_response = 0.0k;
+}
+
+
 #endif  // _SYNAPSE_TYPES_EXPONENTIAL_2E2I_IMPL_H_
