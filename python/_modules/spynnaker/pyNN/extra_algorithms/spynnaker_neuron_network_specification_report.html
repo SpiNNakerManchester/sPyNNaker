@@ -52,11 +52,14 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_str</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+<span class="n">CUTOFF</span> <span class="o">=</span> <span class="mi">100</span>
 
 
 <span class="k">class</span> <span class="nc">SpYNNakerNeuronGraphNetworkSpecificationReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -96,6 +99,16 @@
         <span class="c1"># create holders for data</span>
         <span class="n">dot_diagram</span><span class="p">,</span> <span class="n">exeNotFoundExn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_diagram</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_TITLE</span><span class="p">)</span>
 
+        <span class="n">graph_format</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;network_graph_format&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">graph_format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">application_graph</span><span class="o">.</span><span class="n">n_vertices</span> <span class="o">+</span>
+                    <span class="n">application_graph</span><span class="o">.</span><span class="n">n_outgoing_edge_partitions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">CUTOFF</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;cfg write_network_graph ignored as network_graph_format &quot;</span>
+                    <span class="s2">&quot;is None and the network is big&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">graph_format</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_FORMAT</span>
         <span class="c1"># build progress bar for the vertices, edges, and rendering</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="n">application_graph</span><span class="o">.</span><span class="n">n_vertices</span> <span class="o">+</span>
@@ -112,8 +125,7 @@
         <span class="c1"># write dot file and generate pdf</span>
         <span class="n">file_to_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_NAME</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">dot_diagram</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">file_to_output</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                               <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_FORMAT</span><span class="p">)</span>
+            <span class="n">dot_diagram</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">file_to_output</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">graph_format</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">exeNotFoundExn</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;could not render diagram in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_to_output</span><span class="p">)</span>
         <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
