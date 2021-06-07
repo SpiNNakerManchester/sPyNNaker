@@ -224,7 +224,8 @@ static bool current_source_impl_initialise(address_t cs_address) {
             log_error("Unable to allocate DC source parameters - out of DTCM");
             return false;
         }
-        spin1_memcpy(noisy_current_source[n_noisy], &cs_address[next], sizeof(noisy_current_sources_t));
+        spin1_memcpy(noisy_current_source[n_noisy], &cs_address[next],
+                sizeof(noisy_current_sources_t));
         next += sizeof(noisy_current_sources_t) / 4;
     }
 
@@ -260,7 +261,8 @@ static REAL current_source_get_offset(uint32_t time, uint32_t neuron_index) {
                     }
                     current_offset += ac_cs_amp_last[cs_index];
 //                    // Alternating current source between start and stop
-//                    if ((time >= ac_source[cs_index]->start) && (time < ac_source[cs_index]->stop)) {
+//                    if ((time >= ac_source[cs_index]->start) &&
+//                            (time < ac_source[cs_index]->stop)) {
 //                        // calculate c_off = offset + amplitude * sin((t/freq) + phase)
 //                        REAL time_value = (REAL) time - (REAL) ac_source[cs_index]->start;
 //                        REAL sin_value = sink((time_value * ac_source[cs_index]->frequency) +
@@ -278,12 +280,12 @@ static REAL current_source_get_offset(uint32_t time, uint32_t neuron_index) {
                     }
                     current_offset += step_cs_amp_last[cs_index];
                 } else if (cs_id == 4) {  // NoisyCurrentSource
-                    // Noisy current source, i.e. select offset each time based on normal distribution
+                    // Noisy current source, i.e. select offset each time from normal distribution
                     if ((time >= noisy_current_source[cs_index]->start) &&
                             (time < noisy_current_source[cs_index]->stop)) {
                         // Pick a normally-distributed value based on the mean and SD provided
-                        REAL random_value =
-                                norminv_urt(mars_kiss64_seed(noisy_current_source[cs_index]->seed));
+                        REAL random_value = norminv_urt(
+                                mars_kiss64_seed(noisy_current_source[cs_index]->seed));
                         current_offset += noisy_current_source[cs_index]->mean + (
                                 noisy_current_source[cs_index]->stdev * random_value);
                     }
