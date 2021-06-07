@@ -16,10 +16,11 @@
 import csa
 import sys
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
-from unittests.mocks import MockSynapseInfo, MockPopulation
+from unittests.mocks import MockPopulation
 from pacman.model.graphs.common.slice import Slice
 import spynnaker8
 from unittest import SkipTest
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 def test_csa_one_to_one_connector():
@@ -27,15 +28,18 @@ def test_csa_one_to_one_connector():
     connector = CSAConnector(csa.oneToOne)
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
-    connector.set_projection_information(1000.0, mock_synapse_info)
+    synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weight,
+            delays=delay)
+    connector.set_projection_information(1000.0, synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [pre_vertex_slice], [post_vertex_slice], pre_vertex_slice,
-        post_vertex_slice, 0, mock_synapse_info)
+        post_vertex_slice, 0, synapse_info)
     assert(len(block) > 0)
     assert(all(item["source"] == item["target"] for item in block))
     assert(all(item["weight"] == 1.0 for item in block))
@@ -48,9 +52,12 @@ def test_csa_from_list_connector():
     connector = CSAConnector(conn_list)
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
+    mock_synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weight,
+            delays=delay)
     connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -71,9 +78,12 @@ def test_csa_random_connector():
     connector = CSAConnector(csa.random(0.05))
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
+    mock_synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weight,
+            delays=delay)
     connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -94,9 +104,13 @@ def test_csa_block_connector():
             csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
         weight = 1.0
         delay = 2.0
-        mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                            MockPopulation(10, "post"),
-                                            weight, delay)
+        mock_synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weight,
+            delays=delay)
+
         connector.set_projection_information(1000.0, mock_synapse_info)
         pre_vertex_slice = Slice(0, 10)
         post_vertex_slice = Slice(0, 10)
