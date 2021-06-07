@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.populations import Population
 
 
 class MockPopulation(object):
@@ -23,57 +24,14 @@ class MockPopulation(object):
         self._label = label
 
     @property
+    @overrides(Population.size)
     def size(self):
         return self._size
 
     @property
+    @overrides(Population.label)
     def label(self):
         return self.label
 
     def __repr__(self):
         return "Population {}".format(self._label)
-
-
-class MockSynapseInfo(object):
-
-    def __init__(self, pre_population, post_population, weights, delays):
-        self._pre_population = pre_population
-        self._post_population = post_population
-        self._weights = weights
-        self._delays = delays
-
-    @property
-    def pre_population(self):
-        return self._pre_population
-
-    @property
-    def post_population(self):
-        return self._post_population
-
-    @property
-    def n_pre_neurons(self):
-        return self._pre_population.size
-
-    @property
-    def n_post_neurons(self):
-        return self._post_population.size
-
-    @property
-    def weights(self):
-        return self._weights
-
-    @property
-    def delays(self):
-        return self._delays
-
-
-class MockRNG(object):
-
-    def __init__(self):
-        self._rng = numpy.random.RandomState()
-
-    def next(self, n):
-        return self._rng.uniform(size=n)
-
-    def __getattr__(self, name):
-        return getattr(self._rng, name)
