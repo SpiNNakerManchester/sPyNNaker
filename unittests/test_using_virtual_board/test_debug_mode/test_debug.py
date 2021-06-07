@@ -76,8 +76,8 @@ class TestDebug(BaseTestCase):
             # write_data_speed_up_report not on a virtual board
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
             SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
-            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME + "." +
-            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_FORMAT,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME
+            + ".svg",
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")

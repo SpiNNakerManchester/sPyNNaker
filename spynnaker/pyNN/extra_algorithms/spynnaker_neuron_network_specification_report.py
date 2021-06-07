@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 import os
+from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.globals_variables import (
@@ -21,6 +22,8 @@ from spinn_front_end_common.utilities.globals_variables import (
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 logger = FormatAdapter(logging.getLogger(__name__))
+
+CUTOFF = 100
 
 
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
@@ -60,6 +63,16 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # create holders for data
         dot_diagram, exeNotFoundExn = self._get_diagram(self._GRAPH_TITLE)
 
+        graph_format = get_config_str("Reports", "network_graph_format")
+        if graph_format is None:
+            if (application_graph.n_vertices +
+                    application_graph.n_outgoing_edge_partitions) > CUTOFF:
+                logger.warning(
+                    "cfg write_network_graph ignored as network_graph_format "
+                    "is None and the network is big")
+                return
+            else:
+                graph_format = self._GRAPH_FORMAT
         # build progress bar for the vertices, edges, and rendering
         progress = ProgressBar(
             application_graph.n_vertices +
@@ -77,8 +90,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         file_to_output = os.path.join(
             report_default_directory(), self._GRAPH_NAME)
         try:
-            dot_diagram.render(file_to_output, view=False,
-                               format=self._GRAPH_FORMAT)
+            dot_diagram.render(file_to_output, view=False, format=graph_format)
         except exeNotFoundExn:
             logger.exception("could not render diagram in {}", file_to_output)
         progress.update()
