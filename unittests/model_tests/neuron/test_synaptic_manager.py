@@ -23,15 +23,14 @@ import pytest
 
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
-from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
+from spinnman.model import CPUInfo
+from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement, Placements
-from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import (
-    MachineGraph, SimpleMachineVertex, MachineEdge)
+from pacman.model.graphs.machine import (MachineGraph, MachineEdge)
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
-from pacman.model.graphs.application import ApplicationVertex, ApplicationGraph
+from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
@@ -42,7 +41,7 @@ from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine, OneToOneConnector, AllToAllConnector,
+    OneToOneConnector, AllToAllConnector,
     FromListConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -66,42 +65,26 @@ from spynnaker.pyNN.models.utility_models.delays import (
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterDelayVertexSlice, AbstractSpynnakerSplitterDelay)
+from pacman_test_objects import SimpleTestVertex
 from unittests.mocks import MockPopulation
 import spynnaker8
-
-
-# pylint: disable=unused-argument
-class MockSynapseIO(object):
-    def get_block_n_bytes(self, max_row_length, n_rows):
-        return 4
-
-
-class MockMasterPopulationTable(object):
-    def __init__(self, key_to_entry_map):
-        self._key_to_entry_map = key_to_entry_map
-
-    def extract_synaptic_matrix_data_location(
-            self, key, master_pop_table_address, transceiver, x, y):
-        return self._key_to_entry_map[key]
-
-
-class MockCPUInfo(object):
-    @property
-    def user(self):
-        return [0, 0, 0, 0]
 
 
 class MockTransceiverRawData(object):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
+    @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
-        return MockCPUInfo()
+        bs = bytearray(128)
+        return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
 
-    def read_memory(self, x, y, base_address, length):
+    @overrides(Transceiver.read_memory)
+    def read_memory(self, x, y, base_address, length, cpu=0):
         return self._data_to_read[base_address:base_address + length]
 
-    def read_word(self, x, y, base_address):
+    @overrides(Transceiver.read_word)
+    def read_word(self, x, y, base_address, cpu=0):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
@@ -111,46 +94,11 @@ class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
         super().__init__("mock splitter")
 
 
-class SimpleApplicationVertex(ApplicationVertex, LegacyPartitionerAPI):
-    def __init__(self, n_atoms, label=None):
-        super().__init__(label=label)
-        self._n_atoms = n_atoms
-
-    @property
-    @overrides(LegacyPartitionerAPI.n_atoms)
-    def n_atoms(self):
-        return self._n_atoms
-
-    @property
-    def size(self):
-        return self._n_atoms
-
-    @overrides(LegacyPartitionerAPI.create_machine_vertex)
-    def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
-        return SimpleMachineVertex(
-            resources_required, label, constraints, self, vertex_slice)
-
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        return ResourceContainer()
-
-    def add_delays(self, *args, **kwargs):
-        pass
-
-
-def say_false(self, weights, delays):
-    return False
-
-
 def test_write_data_spec():
     spynnaker8.setup()
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
-    # UGLY but the mock transceiver NEED generate_on_machine to be False
-    AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
     load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
@@ -158,7 +106,7 @@ def test_write_data_spec():
 
     placements = Placements()
     pre_app_population = MockPopulation(10, "mock pop pre")
-    pre_app_vertex = SimpleApplicationVertex(10, label="pre")
+    pre_app_vertex = SimpleTestVertex(10, label="pre")
     pre_app_vertex.splitter = MockSplitter()
     pre_app_vertex.splitter._called = True
     pre_vertex_slice = Slice(0, 9)
@@ -167,7 +115,7 @@ def test_write_data_spec():
     pre_vertex = pre_app_vertex.create_machine_vertex(
         pre_vertex_slice, None)
     placements.add_placement(Placement(pre_vertex, 0, 0, 1))
-    post_app_vertex = SimpleApplicationVertex(10, label="post")
+    post_app_vertex = SimpleTestVertex(10, label="post")
     post_app_vertex.splitter = MockSplitter()
     post_app_vertex.splitter._called = True
     post_vertex_slice = Slice(0, 9)
@@ -511,11 +459,11 @@ def test_pop_based_master_pop_table_standard(
     # a single vertex
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
-    pre_app_vertex = SimpleApplicationVertex(1000)
+    pre_app_vertex = SimpleTestVertex(1000)
     pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
-    post_app_vertex = SimpleApplicationVertex(100)
+    post_app_vertex = SimpleTestVertex(100)
     post_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(post_app_vertex)
     post_mac_vertex = post_app_vertex.create_machine_vertex(

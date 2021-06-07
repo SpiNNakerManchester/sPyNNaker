@@ -18,7 +18,8 @@ import pytest
 from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
-from unittests.mocks import MockSynapseInfo, MockPopulation
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from unittests.mocks import MockPopulation
 import spynnaker8
 
 
@@ -73,11 +74,14 @@ def test_connector(
     # Check weights and delays are used or ignored as expected
     pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "Pre"),
-                                        MockPopulation(10, "Post"),
-                                        weights, delays)
+    synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weights,
+            delays=delays)
     block = connector.create_synaptic_block(
-        [pre_slice], [post_slice], pre_slice, post_slice, 1, mock_synapse_info)
+        [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
 
@@ -115,9 +119,12 @@ def test_connector_split():
     connector = MockFromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(n_sources, "Pre"),
-                                        MockPopulation(n_targets, "Post"),
-                                        weight, delay)
+    synapse_info = SynapseInformation(
+        connector=None, pre_population=MockPopulation(n_sources, "Pre"),
+        post_population=MockPopulation(n_targets, "Post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics=None, synapse_type=None, is_virtual_machine=False,
+        weights=weight, delays=delay)
     has_block = set()
     try:
         # Check each connection is in the right place
@@ -125,7 +132,7 @@ def test_connector_split():
             for post_slice in post_slices:
                 block = connector.create_synaptic_block(
                     pre_slices, post_slices, pre_slice, post_slice, 1,
-                    mock_synapse_info)
+                    synapse_info)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
                 for target in block["target"]:
