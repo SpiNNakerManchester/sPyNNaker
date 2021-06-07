@@ -13,17 +13,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceSpikePair)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceAdditive)
-import spynnaker8
+import os
+from spinn_utilities.config_holder import (
+    clear_cfg_files, set_cfg_files)
+from spinn_front_end_common.interface.config_setup import add_spinnaker_cfg
+
+CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
-def test_get_max_synapses():
-    spynnaker8.setup()
-    d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),
-                            weight_dependence=WeightDependenceAdditive(),
-                            pad_to_length=258)
-    assert d.get_max_synapses(256) <= 256
+def reset_configs():
+    """
+    Resets the configs so only the local default config is included.
+
+    """
+    clear_cfg_files()
+    add_spynnaker_cfg()
+
+
+def add_spynnaker_cfg():
+    """
+    Add the local cfg and all dependent cfg files.
+    """
+    add_spinnaker_cfg()  # This add its dependencies too
+    set_cfg_files(
+        configfile=CONFIG_FILE_NAME,
+        default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))

@@ -271,19 +271,20 @@ class RetinaPayload(Enum):
         return self._n_payload_bytes
 
 
+class MUNICH_MODES(Enum):
+    """types of modes supported by this protocol"""
+    RESET_TO_DEFAULT = 0
+    PUSH_BOT = 1
+    SPOMNIBOT = 2
+    BALL_BALANCER = 3
+    MY_ORO_BOTICS = 4
+    FREE = 5
+
+
 class MunichIoSpiNNakerLinkProtocol(object):
     """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
-
-    class MODES(Enum):
-        """types of modes supported by this protocol"""
-        RESET_TO_DEFAULT = 0
-        PUSH_BOT = 1
-        SPOMNIBOT = 2
-        BALL_BALANCER = 3
-        MY_ORO_BOTICS = 4
-        FREE = 5
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
@@ -297,7 +298,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """
         :param mode: The mode of operation of the protocol
         :type modes:
-            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
+            ~spynnaker.pyNN.protocols.MUNICH_MODES
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
         :param int uart_id: The ID of the UART when needed
@@ -320,7 +321,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def mode(self):
         """
-        :rtype: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
+        :rtype: ~spynnaker.pyNN.protocols.MUNICH_MODES
         """
         return self.__mode
 
@@ -649,7 +650,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=payload, time=time)
 
     def _check_for_pushbot_mode(self):
-        if self.__mode is not self.MODES.PUSH_BOT:
+        if self.__mode is not MUNICH_MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
                 "message is invalid for mode {}".format(self.__mode))

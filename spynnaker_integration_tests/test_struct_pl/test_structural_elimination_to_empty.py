@@ -12,14 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sqlite3
-from spinn_front_end_common.utilities import globals_variables
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 
 
-def structural_without_stdp():
+def structural_eliminate_to_empty():
     p.setup(1.0)
     stim = p.Population(9, p.SpikeSourceArray(range(10)), label="stim")
 
@@ -38,39 +35,37 @@ def structural_without_stdp():
             f_rew=1000, initial_weight=4.0, initial_delay=3.0,
             s_max=9, seed=0, weight=0.0, delay=1.0))
 
+    pop.record("rewiring")
+
     p.run(1000)
 
     # Get the final connections
     conns = list(proj.get(["weight", "delay"], "list"))
 
-    num_rewires = None
+    rewiring = pop.get_data("rewiring")
 
-    report_dir = globals_variables.run_report_directory()
-    prov_file = os.path.join(
-            report_dir, "provenance_data", "provenance.sqlite3")
-    with sqlite3.connect(prov_file) as prov_db:
-        prov_db.row_factory = sqlite3.Row
-        rows = list(prov_db.execute(
-            "SELECT the_value FROM provenance_view "
-            "WHERE source_name LIKE '%pop%' "
-            "AND description_name = 'Number_of_rewires' LIMIT 1"))
-    for row in rows:
-        num_rewires = row["the_value"]
+    formation_events = rewiring.segments[0].events[0]
+    elimination_events = rewiring.segments[0].events[1]
+
+    num_forms = len(formation_events.times)
+    num_elims = len(elimination_events.times)
+
+    first_elim = elimination_events.labels[0]
 
     p.end()
 
-    print('num_rewires ', num_rewires)
-
     # These should have no connections since all should be eliminated
     assert(len(conns) == 0)
-    assert(num_rewires == 81)
+    assert(num_elims == 81)
+    assert(num_forms == 0)
+    assert(first_elim == "7_5_elimination")
 
 
-class TestStructuralWithoutSTDP(BaseTestCase):
+class TestStructuralEliminateToEmpty(BaseTestCase):
 
-    def test_structural_without_stdp(self):
-        self.runsafe(structural_without_stdp)
+    def test_structural_eliminate_to_empty(self):
+        self.runsafe(structural_eliminate_to_empty)
 
 
 if __name__ == "__main__":
-    structural_without_stdp()
+    structural_eliminate_to_empty()

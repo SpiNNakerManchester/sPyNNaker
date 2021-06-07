@@ -15,7 +15,7 @@
 
 import random
 import time
-from spinn_front_end_common.utilities.globals_variables import config
+from spinn_utilities.config_holder import get_config_bool
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -64,13 +64,12 @@ class TestBigConnection(BaseTestCase):
             report_file)
 
     def report_file(self):
-        the_config = config()
-        if the_config.getboolean("Java", "use_java"):
+        if get_config_bool("Java", "use_java"):
             style = "java_"
         else:
             style = "python_"
-        if the_config.getboolean("Machine", "enable_advanced_monitor_support"):
+        if get_config_bool("Machine", "enable_advanced_monitor_support"):
             style += "advanced"
         else:
             style += "simple"
-        return "{}_test_big_connection".format()
+        return "{}_test_big_connection".format(style)

@@ -25,6 +25,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractRewritesDataSpecification)
@@ -32,8 +33,7 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
-from spinn_front_end_common.utilities import (
-    helpful_functions, globals_variables)
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -253,10 +253,8 @@ class SpikeSourcePoissonVertex(
         self.__rng = numpy.random.RandomState(seed)
         self.__rate_change = numpy.zeros(n_neurons)
 
-        # get config from simulator
-        config = globals_variables.get_simulator().config
-        self.__n_profile_samples = helpful_functions.read_config_int(
-            config, "Reports", "n_profile_samples")
+        self.__n_profile_samples = get_config_int(
+            "Reports", "n_profile_samples")
 
         # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
