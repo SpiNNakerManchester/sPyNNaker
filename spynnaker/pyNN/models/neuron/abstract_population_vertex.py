@@ -34,6 +34,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
+from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from .synaptic_manager import SynapticManager
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
@@ -72,7 +73,8 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "__initial_state_variables",
         "__has_run",
-        "__current_sources"]
+        "__current_sources",
+        "__current_source_id_list"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -161,8 +163,9 @@ class AbstractPopulationVertex(
         self.__change_requires_data_generation = False
         self.__has_run = False
 
-        # Current source for this vertex
-        self.__current_sources = [None] * self.__n_atoms
+        # Current sources for this vertex
+        self.__current_sources = []
+        self.__current_source_id_list = dict()
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
@@ -251,11 +254,12 @@ class AbstractPopulationVertex(
             the slice of atoms.
         :return: The SDRAM required for the current source region
         """
-        sdram_usage = vertex_slice.n_atoms * BYTES_PER_WORD
-        for n in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            if self.__current_sources[n] is not None:
-                sdram_usage += (
-                    self.__current_sources[n].get_sdram_usage_in_bytes())
+        # First part is the array showing if each source is active at neuron
+        sdram_usage = (1 + ((2 + vertex_slice.n_atoms) * len(
+            self.__current_sources))) * BYTES_PER_WORD
+        # Then everywhere there is a current source, add the usage for that
+        for current_source in self.__current_sources:
+            sdram_usage += (current_source.get_sdram_usage_in_bytes())
 
         return sdram_usage
 
@@ -564,19 +568,8 @@ class AbstractPopulationVertex(
         """ Inject method from population to set up current source
 
         """
-        # Check that this type of current source has not already been used
-        for n in range(self.__n_atoms):
-            if current_source != self.__current_sources[n]:
-                if (self.__current_sources[n] is not None and
-                        (current_source.current_source_id ==
-                         self.__current_sources[n].current_source_id)):
-                    raise NotImplementedError(
-                        "Injecting two current sources of the same type "
-                        "into the same Population is not yet implemented")
-
-        for n in range(self.__n_atoms):
-            if n in neuron_list:
-                self.__current_sources[n] = current_source
+        self.__current_sources.append(current_source)
+        self.__current_source_id_list[current_source] = neuron_list
 
     @property
     def current_sources(self):
@@ -584,6 +577,13 @@ class AbstractPopulationVertex(
 
         """
         return self.__current_sources
+
+    @property
+    def current_source_id_list(self):
+        """ Current source ID list needs to be available to machine vertex
+
+        """
+        return self.__current_source_id_list
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)

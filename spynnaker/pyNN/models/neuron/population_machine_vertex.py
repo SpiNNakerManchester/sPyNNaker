@@ -438,9 +438,8 @@ class PopulationMachineVertex(
             spec, key, POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the current source parameters
-        if self._app_vertex.current_sources is not None:
-            self._write_current_source_parameters(
-                spec, POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value)
+        self._write_current_source_parameters(
+            spec, POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -625,6 +624,9 @@ class PopulationMachineVertex(
         n_atoms = self.vertex_slice.n_atoms
         lo_atom = self.vertex_slice.lo_atom
         hi_atom = self.vertex_slice.hi_atom
+        current_sources = self.app_vertex.current_sources
+        current_source_id_list = self.app_vertex.current_source_id_list
+        n_current_sources = len(current_sources)
         spec.comment(
             "\nWriting Current Source Parameters for {} Neurons:\n".format(
                 n_atoms))
@@ -632,42 +634,60 @@ class PopulationMachineVertex(
         # Set the focus to the memory region:
         spec.switch_write_focus(region_id)
 
-        # Now write the ID value associated with the set current_source for
-        # each neuron
-        current_sources = self.app_vertex.current_sources
-        for n in range(lo_atom, hi_atom + 1):
-            if current_sources[n] is None:
-                spec.write_value(0)
-            else:
-                spec.write_value(current_sources[n].current_source_id)
+        # Write the number of sources
+        spec.write_value(n_current_sources)
 
-        # Generally speaking the parameters are single-valued dicts
-        for n in range(lo_atom, hi_atom + 1):
-            if current_sources[n] is not None:
-                cs_data_types = current_sources[n].get_parameter_types
-                cs_id = current_sources[n].current_source_id
-                for key, value in current_sources[n].get_parameters.items():
-                    # StepCurrentSource, ACSource currently handled with arrays
-                    if ((cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value)
-                            or (cs_id == CurrentSourceIDs.AC_SOURCE.value)):
-                        n_params = len(current_sources[n].get_parameters[key])
-                        spec.write_value(n_params)
-                        for n_p in range(n_params):
+        # Sort the current sources into current_source_id order
+        current_sources = sorted(
+            current_sources, key=lambda x: x.current_source_id)
+
+        cs_index_array = [0, 0, 0, 0, 0]
+        for current_source in current_sources:
+            # Write the ID of the current source
+            cs_id = current_source.current_source_id
+            spec.write_value(cs_id)
+
+            spec.write_value(cs_index_array[cs_id])
+            cs_index_array[cs_id] += 1
+
+            # Only write IDs that are on this core
+            n_neuron_ids = 0
+            id_list = []
+            for n in range(lo_atom, hi_atom + 1):
+                if (n in current_source_id_list[current_source]):
+                    id_list.append(n)
+                    n_neuron_ids += 1
+
+            spec.write_value(n_neuron_ids)
+
+            for n in id_list:
+                spec.write_value(n - lo_atom)
+
+        for current_source in current_sources:
+            cs_data_types = current_source.get_parameter_types
+            cs_id = current_source.current_source_id
+            for key, value in current_source.get_parameters.items():
+                # StepCurrentSource, ACSource currently handled with arrays
+                if ((cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value)
+                        or (cs_id == CurrentSourceIDs.AC_SOURCE.value)):
+                    n_params = len(current_source.get_parameters[key])
+                    spec.write_value(n_params)
+                    for n_p in range(n_params):
+                        value_convert = convert_to(
+                            value[n_p], cs_data_types[key]).view("uint32")
+                        spec.write_value(data=value_convert)
+                # DCSource, NoisyCurrentSource have single-valued params
+                else:
+                    if hasattr(value, "__getitem__"):
+                        for m in range(len(value)):
                             value_convert = convert_to(
-                                value[n_p], cs_data_types[key]).view("uint32")
+                                value[m],
+                                cs_data_types[key]).view("uint32")
                             spec.write_value(data=value_convert)
-                    # DCSource, NoisyCurrentSource have single-valued params
                     else:
-                        if hasattr(value, "__getitem__"):
-                            for m in range(len(value)):
-                                value_convert = convert_to(
-                                    value[m],
-                                    cs_data_types[key]).view("uint32")
-                                spec.write_value(data=value_convert)
-                        else:
-                            value_convert = convert_to(
-                                value, cs_data_types[key]).view("uint32")
-                            spec.write_value(data=value_convert)
+                        value_convert = convert_to(
+                            value, cs_data_types[key]).view("uint32")
+                        spec.write_value(data=value_convert)
 
     @overrides(AbstractSynapseExpandable.gen_on_machine)
     def gen_on_machine(self):

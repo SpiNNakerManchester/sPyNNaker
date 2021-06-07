@@ -25,6 +25,7 @@ class CurrentSourceIDs(Enum):
     AC_SOURCE = 2
     STEP_CURRENT_SOURCE = 3
     NOISY_CURRENT_SOURCE = 4
+    N_SOURCES = 4
 
 
 class AbstractCurrentSource(object, metaclass=AbstractBase):
