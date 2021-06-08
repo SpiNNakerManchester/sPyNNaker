@@ -138,7 +138,7 @@ static inline bool initialise_synapse_regions(
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            regions.structural_dynamics, ds_regions)), n_recording_regions_used) {
+            regions.structural_dynamics, ds_regions), n_recording_regions_used)) {
         return false;
     }
 
