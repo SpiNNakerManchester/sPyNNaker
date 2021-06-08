@@ -553,8 +553,7 @@ class SynapticMatrixApp(object):
             self.__max_row_info.delayed_max_n_synapses, pre_vertex_slices,
             post_slices, pre_vertex_slice, self.__post_vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-            self.__app_edge.post_vertex.splitter.max_support_delay(),
-            globals_variables.get_simulator().machine_time_step)
+            self.__app_edge.post_vertex.splitter.max_support_delay())
 
     def __write_on_chip_delay_data(self, pre_vertex_slices, pre_vertex_slice):
         """ Write data for delayed on-chip generation
@@ -575,8 +574,7 @@ class SynapticMatrixApp(object):
                 self.__max_row_info.delayed_max_n_synapses, pre_vertex_slices,
                 post_slices, pre_vertex_slice, self.__post_vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-                self.__app_edge.post_vertex.splitter.max_support_delay(),
-                globals_variables.get_simulator().machine_time_step)
+                self.__app_edge.post_vertex.splitter.max_support_delay())
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(

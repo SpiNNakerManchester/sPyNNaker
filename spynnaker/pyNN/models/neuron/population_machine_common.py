@@ -122,14 +122,11 @@ class PopulationMachineCommon(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    def _write_common_data_spec(
-            self, spec, machine_time_step, time_scale_factor, rec_regions):
+    def _write_common_data_spec(self, spec, rec_regions):
         """ Write the data specification for the common regions
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param int machine_time_step: The time step of the simulation
-        :param int time_scale_factor: The time scaling of the simulation
         :param list(int) rec_regions:
             A list of sizes of each recording region (including empty ones)
         """
@@ -138,8 +135,7 @@ class PopulationMachineCommon(
             region=self.__regions.system, size=SIMULATION_N_BYTES,
             label='System')
         spec.switch_write_focus(self.__regions.system)
-        spec.write_array(get_simulation_header_array(
-            self.__binary_file_name, machine_time_step, time_scale_factor))
+        spec.write_array(get_simulation_header_array(self.__binary_file_name))
 
         # Reserve memory for provenance
         self.reserve_provenance_data_region(spec)

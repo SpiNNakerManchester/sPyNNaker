@@ -22,7 +22,10 @@ import pytest
 
 from spinn_machine import SDRAM
 from spinn_machine.virtual_machine import virtual_machine
+from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config, set_config
+from spinnman.model import CPUInfo
+from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
 from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
@@ -52,29 +55,25 @@ from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
 from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import reset_configs
 import spynnaker8 as p
-
-
-class MockCPUInfo(object):
-    @property
-    def user(self):
-        return [0, 0, 0, 0]
 
 
 class MockTransceiverRawData(object):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
+    @overrides(Transceiver.get_cpu_information_from_core)
     def get_cpu_information_from_core(self, x, y, p):
-        return MockCPUInfo()
+        bs = bytearray(128)
+        return CPUInfo(x=1, y=2, p=3, cpu_data=bytes(bs), offset=0)
 
-    def read_memory(self, x, y, base_address, length):
+    @overrides(Transceiver.read_memory)
+    def read_memory(self, x, y, base_address, length, cpu=0):
         return self._data_to_read[base_address:base_address + length]
 
-    def read_word(self, x, y, base_address):
+    @overrides(Transceiver.read_word)
+    def read_word(self, x, y, base_address, cpu=0):
         datum, = struct.unpack("<I", self.read_memory(x, y, base_address, 4))
         return datum
 
@@ -84,8 +83,6 @@ def say_false(self, weights, delays):
 
 
 def test_write_data_spec():
-    # UGLY but the mock transceiver NEED generate_on_machine to be False
-    AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
     machine = virtual_machine(2, 2)
     p.setup(1.0)
     load_config()

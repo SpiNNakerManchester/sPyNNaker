@@ -171,8 +171,7 @@ class DelayExtensionVertex(
     def add_generator_data(
             self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
             post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, max_delay_per_stage,
-            machine_time_step):
+            synapse_information, max_stage, max_delay_per_stage):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
@@ -197,16 +196,13 @@ class DelayExtensionVertex(
             ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
             The maximum delay stage
-        :param int machine_time_step: sim machine time step
-        :param int max_delay_per_stage: max delay per stage
         """
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, post_slices,
                 pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, max_delay_per_stage,
-                machine_time_step))
+                synapse_information, max_stage, max_delay_per_stage))
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

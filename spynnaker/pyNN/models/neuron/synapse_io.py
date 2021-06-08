@@ -15,9 +15,9 @@
 
 import numpy
 
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms, machine_time_step_per_ms)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -132,9 +132,7 @@ def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
     :param int post_vertex_max_delay_ticks: post vertex max delay
     :rtype: int
     """
-    machine_time_step = globals_variables.get_simulator().machine_time_step
-    return post_vertex_max_delay_ticks * (
-        machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
+    return post_vertex_max_delay_ticks * machine_time_step_ms()
 
 
 def get_max_row_info(
@@ -295,13 +293,11 @@ def get_synapses(
     # pylint: disable=too-many-arguments, too-many-locals
     # pylint: disable=assignment-from-no-return
     # Get delays in timesteps
-    machine_time_step = globals_variables.get_simulator().machine_time_step
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(
-        connections["delay"] * (
-            MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
+        connections["delay"] * machine_time_step_per_ms())
 
     # Scale weights
     connections["weight"] = (connections["weight"] * weight_scales[
@@ -671,9 +667,7 @@ def _rescale_connections(
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
-    machine_time_step = globals_variables.get_simulator().machine_time_step
-    connections["delay"] /= (
-            MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+    connections["delay"] /= machine_time_step_per_ms()
     # Undo the weight scaling
     connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections

@@ -22,9 +22,8 @@ from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, machine_time_step_ms, machine_time_step_per_ms)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.abstract_models import (
@@ -88,7 +87,6 @@ class Projection(object):
                 "cells.".format(__version__))
 
         sim = get_simulator()
-        machine_time_step = sim.machine_time_step
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False
@@ -147,10 +145,9 @@ class Projection(object):
         if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
                 and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(
-                numpy.rint(
-                    numpy.array(synapse_dynamics.delay) *
-                    (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
-                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+                numpy.rint(numpy.array(synapse_dynamics.delay) *
+                           machine_time_step_per_ms()) *
+                machine_time_step_ms())
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -166,8 +163,7 @@ class Projection(object):
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
-        connector.set_projection_information(
-            machine_time_step, self.__synapse_information)
+        connector.set_projection_information(self.__synapse_information)
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)

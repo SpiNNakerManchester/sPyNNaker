@@ -264,23 +264,17 @@ class PopulationMachineVertex(
         return ids
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "routing_info",
-            "data_n_time_steps"
+            "routing_info", "data_n_time_steps"
         })
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, data_n_time_steps):
+            self, spec, placement, routing_info, data_n_time_steps):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
         """
@@ -289,16 +283,15 @@ class PopulationMachineVertex(
             self.vertex_slice, data_n_time_steps)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice, data_n_time_steps))
-        self._write_common_data_spec(
-            spec, machine_time_step, time_scale_factor, rec_regions)
+        self._write_common_data_spec(spec, rec_regions)
 
         self._write_neuron_data_spec(
             spec, routing_info, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
-            spec, machine_time_step, routing_info,
-            self.__ring_buffer_shifts, self.__weight_scales,
-            self.__all_syn_block_sz, self.__structural_sz)
+            spec, routing_info, self.__ring_buffer_shifts,
+            self.__weight_scales, self.__all_syn_block_sz,
+            self.__structural_sz)
 
         # End the writing of this specification:
         spec.end_specification()

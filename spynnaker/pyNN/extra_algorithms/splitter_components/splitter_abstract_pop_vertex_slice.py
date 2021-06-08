@@ -36,6 +36,8 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
     exact_sdram_for_bit_field_builder_region)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 
 class SplitterAbstractPopulationVertexSlice(
@@ -146,6 +148,11 @@ class SplitterAbstractPopulationVertexSlice(
         :return: the variable sdram used by the neuron recorder
         :rtype: VariableSDRAM
         """
+        s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
+        if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
+            self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
+                max_rewires_per_ts)
 
         return (
             self._governed_app_vertex.get_neuron_variable_sdram(vertex_slice) +

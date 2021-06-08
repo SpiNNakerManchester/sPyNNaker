@@ -20,7 +20,6 @@ import scipy.stats
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.resources import (
@@ -33,10 +32,11 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from .spike_source_poisson_machine_vertex import (
@@ -422,11 +422,9 @@ class SpikeSourcePoissonVertex(
             if isinstance(machine_vertex, AbstractRewritesDataSpecification):
                 machine_vertex.set_reload_required(True)
 
-    def max_spikes_per_ts(self, machine_time_step):
-        """
-        :param int machine_time_step:
-        """
-        ts_per_second = MICRO_TO_SECOND_CONVERSION / float(machine_time_step)
+    def max_spikes_per_ts(self):
+        ts_per_second = (MICRO_TO_SECOND_CONVERSION /
+                         machine_time_step())
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -438,28 +436,20 @@ class SpikeSourcePoissonVertex(
             float(self.__max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
-    def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
+    def get_recording_sdram_usage(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
         """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self.max_spikes_per_ts(machine_time_step))
+            vertex_slice.n_atoms, self.max_spikes_per_ts())
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
 
-    @inject_items({
-        "machine_time_step": "MachineTimeStep"
-    })
-    @overrides(
-        LegacyPartitionerAPI.get_resources_used_by_atoms,
-        additional_arguments={"machine_time_step"}
-    )
-    def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
+    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
         """
         # pylint: disable=arguments-differ
         poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
@@ -473,8 +463,7 @@ class SpikeSourcePoissonVertex(
             profile_utils.get_profile_region_size(self.__n_profile_samples) +
             sdram_sz)
 
-        recording = self.get_recording_sdram_usage(
-            vertex_slice, machine_time_step)
+        recording = self.get_recording_sdram_usage(vertex_slice)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
@@ -532,7 +521,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return machine_time_step()
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
@@ -558,11 +547,11 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed[vertex_slice] = seed
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, self, machine_time_step)
+            placements, self)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

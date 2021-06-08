@@ -15,7 +15,6 @@
 
 import numpy
 
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
@@ -379,8 +378,7 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-            self.__app_edge.post_vertex.splitter.max_support_delay(),
-            globals_variables.get_simulator().machine_time_step)
+            self.__app_edge.post_vertex.splitter.max_support_delay())
 
     def __write_on_chip_delay_data(self):
         """ Write data for delayed on-chip generation
@@ -397,8 +395,7 @@ class SynapticMatrix(object):
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-                self.__app_edge.post_vertex.splitter.max_support_delay(),
-                globals_variables.get_simulator().machine_time_step)
+                self.__app_edge.post_vertex.splitter.max_support_delay())
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(

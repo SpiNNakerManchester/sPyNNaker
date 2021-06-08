@@ -154,14 +154,12 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, machine_time_step, routing_info,
-            ring_buffer_shifts, weight_scales, all_syn_block_sz,
-            structural_sz):
+            self, spec, routing_info, ring_buffer_shifts, weight_scales,
+            all_syn_block_sz, structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param int machine_time_step: The time step of the simulation
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             The routing information to read the key from
         :param list(int) ring_buffer_shifts:
@@ -191,8 +189,7 @@ class PopulationMachineSynapses(
                 size=synapse_dynamics_sz, label='synapseDynamicsParams',
                 reference=self._synapse_references.synapse_dynamics)
             synapse_dynamics.write_parameters(
-                spec, self._synapse_regions.synapse_dynamics,
-                machine_time_step, weight_scales)
+                spec, self._synapse_regions.synapse_dynamics, weight_scales)
         elif self._synapse_references.synapse_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -206,8 +203,8 @@ class PopulationMachineSynapses(
                 reference=self._synapse_references.structural_dynamics)
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
-                machine_time_step, weight_scales, self._app_vertex,
-                self._vertex_slice, routing_info, self._synaptic_matrices)
+                weight_scales, self._app_vertex, self._vertex_slice,
+                routing_info, self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(

@@ -168,10 +168,11 @@ static bool initialise(void) {
     uint32_t row_max_n_words;
     bool clear_input_buffer_of_late_packets;
     weight_t *ring_buffers;
+    uint32_t n_rec_regions_used = 0;
     if (!initialise_synapse_regions(
             ds_regions, SYNAPSE_REGIONS, &n_neurons, &n_synapse_types,
             &ring_buffers, &row_max_n_words, &incoming_spike_buffer_size,
-            &clear_input_buffer_of_late_packets)) {
+            &clear_input_buffer_of_late_packets, &n_rec_regions_used)) {
         return false;
     }
 
@@ -183,8 +184,8 @@ static bool initialise(void) {
 
     if (!spike_processing_fast_initialise(
             row_max_n_words, incoming_spike_buffer_size,
-            clear_input_buffer_of_late_packets, 0, MC, *sdram_config,
-            *key_config, ring_buffers)) {
+            clear_input_buffer_of_late_packets, n_rec_regions_used, MC,
+            *sdram_config, *key_config, ring_buffers)) {
         return false;
     }
 

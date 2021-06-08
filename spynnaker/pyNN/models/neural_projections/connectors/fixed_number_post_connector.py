@@ -83,8 +83,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__post_connector_seed = dict()
         self._rng = rng
 
-    def set_projection_information(self, machine_time_step, synapse_info):
-        super().set_projection_information(machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
         if (not self.__with_replacement and
                 self.__n_post > synapse_info.n_post_neurons):
             raise SpynnakerException(

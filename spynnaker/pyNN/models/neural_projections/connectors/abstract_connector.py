@@ -22,8 +22,8 @@ from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
@@ -91,13 +91,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         self.__space = space
 
-    def set_projection_information(self, machine_time_step, synapse_info):
+    def set_projection_information(self, synapse_info):
         """ sets a connectors projection info
-        :param int machine_time_step: machine time step
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
+        self.__min_delay = machine_time_step_ms()
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

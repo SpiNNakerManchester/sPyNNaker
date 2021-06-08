@@ -90,6 +90,9 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \param[out] clear_input_buffer_of_late_packets: Pointer to receive whether
 //!                                                 to clear the input buffer
 //!                                                 each time step
+//! \param[in/out] n_recording_regions_used: Pointer to variable which starts
+//!                                          as the next recording region to use
+//!                                          and is updated with regions used here
 //! \return a boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,
@@ -97,7 +100,8 @@ static inline bool initialise_synapse_regions(
         uint32_t *n_synapse_types, weight_t **ring_buffers,
         uint32_t *row_max_n_words,
         uint32_t *incoming_spike_buffer_size,
-        bool *clear_input_buffer_of_late_packets) {
+        bool *clear_input_buffer_of_late_packets,
+        uint32_t *n_recording_regions_used) {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     if (!synapses_initialise(
@@ -134,7 +138,7 @@ static inline bool initialise_synapse_regions(
 
     // Set up structural plasticity dynamics
     if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
-            regions.structural_dynamics, ds_regions))) {
+            regions.structural_dynamics, ds_regions)), n_recording_regions_used) {
         return false;
     }
 

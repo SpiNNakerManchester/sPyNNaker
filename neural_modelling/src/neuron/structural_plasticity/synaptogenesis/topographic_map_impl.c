@@ -29,6 +29,7 @@
 #include <debug.h>
 #include <stdfix-full-iso.h>
 #include <circular_buffer.h>
+#include <recording.h>
 
 #include <neuron/synapse_row.h>
 
@@ -41,6 +42,12 @@
 #include "partner_selection/partner.h"
 #include "elimination/elimination.h"
 #include "formation/formation.h"
+
+// define values used in recording
+#define ELIM_FLAG 0
+#define FORM_FLAG 1
+#define ID_SHIFT 1
+#define PRE_ID_SHIFT 9
 
 //-----------------------------------------------------------------------------
 // Structures and global data                                                 |
@@ -71,6 +78,18 @@ static circular_buffer current_state_queue;
 //! synaptogenesis_dynamics_rewire() moves states from here to
 //! ::current_state_queue
 static circular_buffer free_states;
+
+//! The recording region for the structural events
+uint32_t rewiring_recording_index;
+
+//! Struct for structural recording data
+typedef struct structural_recording_values_t {
+    uint32_t time;
+    uint32_t value;
+} structural_recording_values_t;
+
+structural_recording_values_t structural_recording_values;
+
 
 //! Timer callbacks since last rewiring
 static uint32_t last_rewiring_time = 0;
@@ -131,7 +150,8 @@ static inline current_state_t *_alloc_state(void) {
 // Initialisation                                                             |
 //-----------------------------------------------------------------------------
 
-bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
+bool synaptogenesis_dynamics_initialise(
+        address_t sdram_sp_address, uint32_t *recording_regions_used) {
     log_debug("SR init.");
 
     uint8_t *data = sp_structs_read_in_common(
@@ -142,7 +162,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    log_debug("Rewiring period %u, fast=%u, n_states=%u",
+    log_info("Rewiring period %u, fast=%u, n_states=%u",
             rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
@@ -185,6 +205,11 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
         elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
+
+    rewiring_recording_index = *recording_regions_used;
+    *recording_regions_used = rewiring_recording_index + 1;
+
+    log_info("The rewiring_recording_index is %u", rewiring_recording_index);
 
     return true;
 }
@@ -270,6 +295,7 @@ static inline bool row_restructure(
         uint32_t time, synaptic_row_t restrict row,
         current_state_t *restrict current_state) {
     // the selected pre- and postsynaptic IDs are in current_state
+
     if (current_state->element_exists) {
         // find the offset of the neuron in the current row
         if (!synapse_dynamics_find_neuron(
@@ -279,9 +305,25 @@ static inline bool row_restructure(
             log_debug("Post neuron %u not in row", current_state->post_syn_id);
             return false;
         }
-        return synaptogenesis_elimination_rule(current_state,
+
+        if (synaptogenesis_elimination_rule(current_state,
                 elimination_params[current_state->post_to_pre.pop_index],
-                time, row);
+                time, row)) {
+            // Create recorded value
+            // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
+            uint32_t pre_id = current_state->key_atom_info->lo_atom + current_state->pre_syn_id;
+            uint32_t id = current_state->post_syn_id;
+            uint32_t record_value = ELIM_FLAG | (id << ID_SHIFT) | (pre_id << PRE_ID_SHIFT);
+            structural_recording_values.time = time;
+            structural_recording_values.value = record_value;
+            recording_record(rewiring_recording_index, &structural_recording_values,
+                    sizeof(structural_recording_values_t));
+
+            return true;
+        } else {
+            return false;
+        }
+
     } else {
         // Can't form if the row is full
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
@@ -292,20 +334,52 @@ static inline bool row_restructure(
         } else {
             if (current_state->with_replacement) {
                 // A synapse can be added anywhere on the current row, so just do it
-                return synaptogenesis_formation_rule(current_state,
-                        formation_params[current_state->post_to_pre.pop_index], time, row);
+                if (synaptogenesis_formation_rule(current_state,
+                        formation_params[current_state->post_to_pre.pop_index], time, row)) {
+                    // Create recorded value
+                    // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
+                    uint32_t pre_id = current_state->key_atom_info->lo_atom
+                            + current_state->pre_syn_id;
+                    uint32_t id = current_state->post_syn_id;
+                    uint32_t record_value = FORM_FLAG | (id << ID_SHIFT) |
+                            (pre_id << PRE_ID_SHIFT);
+                    structural_recording_values.time = time;
+                    structural_recording_values.value = record_value;
+                    recording_record(rewiring_recording_index, &structural_recording_values,
+                            sizeof(structural_recording_values_t));
+
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
                 // A synapse cannot be added if one exists between the current pair of neurons
                 if (!synapse_dynamics_find_neuron(
                       current_state->post_syn_id, row,
                       &(current_state->weight), &(current_state->delay),
                       &(current_state->offset), &(current_state->synapse_type))) {
-                return synaptogenesis_formation_rule(current_state,
-                    formation_params[current_state->post_to_pre.pop_index], time, row);
-                } else {
-                    log_debug("Post neuron %u already in row", current_state->post_syn_id);
-                    return false;
-                }
+                    if (synaptogenesis_formation_rule(current_state,
+                            formation_params[current_state->post_to_pre.pop_index], time, row)) {
+                        // Create recorded value
+                        // (bottom bit: add/remove, next 8: local id, remainder: pre global id)
+                        uint32_t pre_id = current_state->key_atom_info->lo_atom
+                                + current_state->pre_syn_id;
+                        uint32_t id = current_state->post_syn_id;
+                        uint32_t record_value = FORM_FLAG | (id << ID_SHIFT) |
+                                (pre_id << PRE_ID_SHIFT);
+                        structural_recording_values.time = time;
+                        structural_recording_values.value = record_value;
+                        recording_record(rewiring_recording_index, &structural_recording_values,
+                                sizeof(structural_recording_values_t));
+
+                        return true;
+                    } else {
+                        return false;
+                    }
+        		} else {
+        		    log_debug("Post neuron %u already in row", current_state->post_syn_id);
+        		    return false;
+        		}
             }
         }
     }

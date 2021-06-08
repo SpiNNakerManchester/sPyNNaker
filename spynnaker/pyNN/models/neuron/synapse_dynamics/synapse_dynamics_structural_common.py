@@ -22,6 +22,8 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -84,7 +86,7 @@ class SynapseDynamicsStructuralCommon(
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
-            self, spec, region, machine_time_step, weight_scales, app_vertex,
+            self, spec, region, weight_scales, app_vertex,
             vertex_slice, routing_info, synaptic_matrices):
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -95,14 +97,13 @@ class SynapseDynamicsStructuralCommon(
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
-            spec, app_vertex, vertex_slice, machine_time_step,
+            spec, app_vertex, vertex_slice,
             len(structural_projections))
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, machine_time_step,
-            vertex_slice)
+            weight_scales, synaptic_matrices, vertex_slice)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -146,8 +147,7 @@ class SynapseDynamicsStructuralCommon(
         return structural_projections
 
     def __write_common_rewiring_data(
-            self, spec, app_vertex, vertex_slice, machine_time_step,
-            n_pre_pops):
+            self, spec, app_vertex, vertex_slice, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -156,25 +156,24 @@ class SynapseDynamicsStructuralCommon(
             The application vertex being generated
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the target vertex to generate for
-        :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
         :return: None
         :rtype: None
         """
         spec.comment("Writing common rewiring data")
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(data=int(
-                machine_time_step / (
+                machine_time_step() / (
                     self.p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(data=int((
                 self.p_rew * MICRO_TO_SECOND_CONVERSION) /
-                float(machine_time_step)))
+                machine_time_step()))
         # write s_max
         spec.write_value(data=int(self.s_max))
         # write total number of atoms in the application vertex
@@ -197,8 +196,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, machine_time_step,
-            post_vertex_slice):
+            weight_scales, synaptic_matrices, post_vertex_slice):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -214,7 +212,6 @@ class SynapseDynamicsStructuralCommon(
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
-        :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
@@ -240,7 +237,9 @@ class SynapseDynamicsStructuralCommon(
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
-            delay_scale = 1000.0 / machine_time_step
+            delay_scale = (
+                    MICRO_TO_MILLISECOND_CONVERSION /
+                    machine_time_step())
             if isinstance(dynamics.initial_delay, collections.Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
@@ -268,7 +267,6 @@ class SynapseDynamicsStructuralCommon(
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
                     app_edge, synapse_info, machine_edge))
-
         return pop_index
 
     def __write_post_to_pre_table(
@@ -436,3 +434,13 @@ class SynapseDynamicsStructuralCommon(
                 "The initial delay {} is bigger than {}.  This is not"
                 " supported in the current implementation".format(
                     self.initial_delay, max_delay_ms))
+
+    def get_max_rewires_per_ts(self):
+        max_rewires_per_ts = 1
+        if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
+            # fast rewiring, so need to set max_rewires_per_ts
+            max_rewires_per_ts = int(machine_time_step() / (
+                self.p_rew * MICRO_TO_SECOND_CONVERSION))
+
+        return max_rewires_per_ts

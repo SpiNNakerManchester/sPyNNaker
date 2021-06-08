@@ -31,6 +31,8 @@
 
 // Further includes
 #include <debug.h>
+#include <bit_field.h>
+#include <recording.h>
 
 //! Indices for recording of words
 enum word_recording_indices {

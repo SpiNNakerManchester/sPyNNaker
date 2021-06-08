@@ -86,7 +86,7 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")

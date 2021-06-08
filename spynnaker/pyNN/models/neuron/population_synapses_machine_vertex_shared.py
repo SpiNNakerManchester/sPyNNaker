@@ -52,23 +52,15 @@ class PopulationSynapsesMachineVertexShared(
         self.__synapse_references = synapse_references
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "machine_time_step", "time_scale_factor", "routing_info",
-            "data_n_time_steps"
-        })
+        additional_arguments={"routing_info", "data_n_time_steps"})
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, data_n_time_steps):
+            self, spec, placement, routing_info, data_n_time_steps):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
         :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
@@ -77,8 +69,7 @@ class PopulationSynapsesMachineVertexShared(
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
             self.vertex_slice, data_n_time_steps)
-        self._write_common_data_spec(
-            spec, machine_time_step, time_scale_factor, rec_regions)
+        self._write_common_data_spec(spec, rec_regions)
 
         # Write references to shared regions
         for reg, ref in zip(self.SYNAPSE_REGIONS, self.__synapse_references):

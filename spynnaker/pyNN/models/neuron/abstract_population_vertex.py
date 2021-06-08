@@ -42,10 +42,12 @@ from spinn_front_end_common.interface.buffer_management\
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
+    NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
@@ -82,7 +84,7 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
+        AbstractEventRecordable, AbstractProvidesOutgoingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
@@ -214,6 +216,8 @@ class AbstractPopulationVertex(
             [], {}, [],
             n_neurons, [NeuronRecorder.PACKETS],
             {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
+            [NeuronRecorder.REWIRING],
+            {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE},
             offset=len(neuron_recordable_variables))
 
         # bool for if state has changed.
@@ -412,12 +416,28 @@ class AbstractPopulationVertex(
         self.set_recording(
             NeuronRecorder.SPIKES, new_state, sampling_interval, indexes)
 
+    @overrides(AbstractEventRecordable.is_recording_events)
+    def is_recording_events(self, variable):
+        return self.__neuron_recorder.is_recording(variable)
+
+    @overrides(AbstractEventRecordable.set_recording_events)
+    def set_recording_events(
+            self, variable, new_state=True, sampling_interval=None,
+            indexes=None):
+        self.set_recording(
+            variable, new_state, sampling_interval, indexes)
+
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, placements, self,
-            NeuronRecorder.SPIKES, machine_time_step)
+            NeuronRecorder.SPIKES)
+
+    @overrides(AbstractEventRecordable.get_events)
+    def get_events(
+            self, variable, placements, buffer_manager):
+        return self.__neuron_recorder.get_events(
+            self.label, buffer_manager, placements, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -446,7 +466,6 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.set_recording)
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
-        self.__change_requires_mapping = not self.is_recording(variable)
         if self.__neuron_recorder.is_recordable(variable):
             self.__neuron_recorder.set_recording(
                 variable, new_state, sampling_interval, indexes)
@@ -455,10 +474,11 @@ class AbstractPopulationVertex(
                 variable, new_state, sampling_interval, indexes)
         else:
             self.__raise_var_not_supported(variable)
+        self.__change_requires_mapping = not self.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, buffer_manager):
         # pylint: disable=too-many-arguments
         if self.__neuron_recorder.is_recordable(variable):
             return self.__neuron_recorder.get_matrix_data(
@@ -483,6 +503,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
         return self.__neuron_recorder.get_neuron_sampling_interval("spikes")
+
+    @overrides(AbstractEventRecordable.get_events_sampling_interval)
+    def get_events_sampling_interval(self, variable):
+        return self.__neuron_recorder.get_neuron_sampling_interval(variable)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value, selector=None):
@@ -632,6 +656,8 @@ class AbstractPopulationVertex(
     def clear_recording(self, variable, buffer_manager, placements):
         if variable == NeuronRecorder.SPIKES:
             index = len(self.__neuron_impl.get_recordable_variables())
+        elif variable == NeuronRecorder.REWIRING:
+            index = len(self.__neuron_impl.get_recordable_variables()) + 1
         else:
             index = (
                 self.__neuron_impl.get_recordable_variable_index(variable))
@@ -642,6 +668,12 @@ class AbstractPopulationVertex(
         self._clear_recording_region(
             buffer_manager, placements,
             len(self.__neuron_impl.get_recordable_variables()))
+
+    @overrides(AbstractEventRecordable.clear_event_recording)
+    def clear_event_recording(self, buffer_manager, placements):
+        self._clear_recording_region(
+            buffer_manager, placements,
+            len(self.__neuron_impl.get_recordable_variables()) + 1)
 
     def _clear_recording_region(
             self, buffer_manager, placements, recording_region_id):
@@ -727,7 +759,7 @@ class AbstractPopulationVertex(
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
-            machine_timestep, n_synapses_in, sigma):
+            n_synapses_in, sigma):
         """ Provides expected upper bound on accumulated values in a ring\
             buffer element.
 
@@ -751,7 +783,7 @@ class AbstractPopulationVertex(
         :rtype: float
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -804,7 +836,6 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :rtype: list(int)
         """
-        machine_timestep = globals_variables.get_simulator().machine_time_step
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
@@ -814,7 +845,7 @@ class AbstractPopulationVertex(
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
@@ -852,8 +883,7 @@ class AbstractPopulationVertex(
                 rate = pre_vertex.max_spikes_per_second()
                 if rate != 0:
                     spikes_per_second = rate
-                spikes_per_tick = \
-                    pre_vertex.max_spikes_per_ts(machine_timestep)
+                spikes_per_tick = pre_vertex.max_spikes_per_ts()
             rate_stats[synapse_type].add_items(
                 spikes_per_second, 0, n_connections)
             total_weights[synapse_type] += spikes_per_tick * (
@@ -873,8 +903,7 @@ class AbstractPopulationVertex(
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
-                        machine_timestep, stats.n_items,
-                        self.__ring_buffer_sigma),
+                        stats.n_items, self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
@@ -1162,6 +1191,10 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
+        if isinstance(self.__synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
+            self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
+                self.__synapse_dynamics.get_max_rewires_per_ts())
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_neuron_constant_sdram(self, vertex_slice, neuron_regions):
