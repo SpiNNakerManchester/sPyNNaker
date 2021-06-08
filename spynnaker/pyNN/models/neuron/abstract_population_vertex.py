@@ -211,7 +211,7 @@ class AbstractPopulationVertex(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
             neuron_recordable_variables, record_data_types,
-            [NeuronRecorder.SPIKES], n_neurons, [], {})
+            [NeuronRecorder.SPIKES], n_neurons, [], {}, [], {})
         self.__synapse_recorder = NeuronRecorder(
             [], {}, [],
             n_neurons, [NeuronRecorder.PACKETS],
