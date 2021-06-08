@@ -289,7 +289,11 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
         to be called before any other function
 
-    :param float timestep: the time step of the simulations
+    :param timestep:
+        the time step of the simulations in micro seconds
+        if None the cfg value is used
+    :type timestep:
+        float or None
     :param min_delay: the min delay of the simulation
     :type min_delay: float or str
     :param max_delay: the max delay of the simulation

@@ -98,8 +98,7 @@ def test_connectors(
             prepop_is_view=False, postpop_is_view=False, rng=None,
             synapse_dynamics=None, synapse_type=None,
             is_virtual_machine=False, weights=weight, delays=delay)
-        connector.set_projection_information(
-            machine_time_step=1000, synapse_info=synapse_info)
+        connector.set_projection_information(synapse_info=synapse_info)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]

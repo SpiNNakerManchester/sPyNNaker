@@ -40,14 +40,13 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec, region, machine_time_step, weight_scales,
-            machine_graph, machine_vertex, routing_info, synaptic_matrices):
+            self, spec, region, weight_scales, machine_graph, machine_vertex,
+            routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
         :param int region: region ID
-        :param float machine_time_step: The simulation time step
         :param list(float) weight_scales: Weight scaling for each synapse type
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
@@ -142,9 +141,8 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_max_rewires_per_ts(self, machine_time_step):
+    def get_max_rewires_per_ts(self):
         """ Get the max number of rewires per timestep
 
-        :param float machine_time_step: The machine time step
         :rtype: int
         """

@@ -370,8 +370,6 @@ class PopulationMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
@@ -381,17 +379,13 @@ class PopulationMachineVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor",
             "application_graph", "machine_graph", "routing_info",
             "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            application_graph, machine_graph, routing_info, data_n_time_steps,
-            n_key_map):
+            self, spec, placement, application_graph, machine_graph,
+            routing_info, data_n_time_steps, n_key_map):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
         :param application_graph: (injected)
         :param machine_graph: (injected)
         :param routing_info: (injected)
@@ -417,14 +411,13 @@ class PopulationMachineVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.__binary_file_name, machine_time_step, time_scale_factor))
+            self.__binary_file_name))
 
         # If the dynamics are structural the neuron recorder needs to know
         # the maximum rewires that could happend per timestep
         s_dynamics = self._app_vertex.synapse_manager.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
-            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts(
-                machine_time_step)
+            max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
             self._app_vertex.neuron_recorder.set_max_rewires_per_ts(
                 max_rewires_per_ts)
 
@@ -452,7 +445,7 @@ class PopulationMachineVertex(
         # allow the synaptic matrix to write its data spec-able data
         self._app_vertex.synapse_manager.write_data_spec(
             spec, self._app_vertex, self.vertex_slice, self, machine_graph,
-            application_graph, routing_info, weight_scale, machine_time_step)
+            application_graph, routing_info, weight_scale)
         self.set_on_chip_generatable_area(
             self._app_vertex.synapse_manager.host_written_matrix_size(
                 self.vertex_slice),

@@ -20,8 +20,9 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -75,7 +76,7 @@ class EIEIOSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, placements,
-                   application_vertex, base_key_function, machine_time_step):
+                   application_vertex, base_key_function):
         """ Get the recorded spikes from the object
 
         :param str label:
@@ -88,8 +89,6 @@ class EIEIOSpikeRecorder(object):
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param int machine_time_step:
-            the time step of the simulation, in microseconds
         :param base_key_function:
         :type base_key_function:
             callable(~pacman.model.graphs.machine.MachineVertex,int)
@@ -100,7 +99,6 @@ class EIEIOSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
-        ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
         vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
@@ -124,8 +122,8 @@ class EIEIOSpikeRecorder(object):
                 if data_missing:
                     missing.append(placement)
                 self._process_spike_data(
-                    vertex_slice, raw_spike_data, ms_per_tick,
-                    base_key_function(vertex), results)
+                    vertex_slice, raw_spike_data, base_key_function(vertex),
+                    results)
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -138,12 +136,10 @@ class EIEIOSpikeRecorder(object):
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     @staticmethod
-    def _process_spike_data(
-            vertex_slice, spike_data, ms_per_tick, base_key, results):
+    def _process_spike_data(vertex_slice, spike_data, base_key, results):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param bytearray spike_data:
-        :param int ms_per_tick:
         :param int base_key:
         :param list(~numpy.ndarray) results:
         """
@@ -151,7 +147,7 @@ class EIEIOSpikeRecorder(object):
         offset = 0
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= ms_per_tick
+            time *= machine_time_step_ms()
             data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(

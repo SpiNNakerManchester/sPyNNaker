@@ -65,8 +65,7 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_events(
-            self, variable, placements, buffer_manager, machine_time_step):
+    def get_events(self, variable, placements, buffer_manager):
         """ Get the recorded events from the object
 
         :param str variable: The variable to get the event data for
@@ -75,8 +74,6 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int machine_time_step:
-            the time step of the simulation, in microseconds
         :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
