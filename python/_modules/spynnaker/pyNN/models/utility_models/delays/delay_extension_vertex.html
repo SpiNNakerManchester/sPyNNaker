@@ -205,8 +205,7 @@
 <div class="viewcode-block" id="DelayExtensionVertex.add_generator_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_generator_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_delayed_row_n_synapses</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>
             <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add delays for a connection to be generated</span>
 
 <span class="sd">        :param int max_row_n_synapses:</span>
@@ -232,15 +231,13 @@
 <span class="sd">        :param int max_stage:</span>
 <span class="sd">            The maximum delay stage</span>
 <span class="sd">        :param int machine_time_step: sim machine time step</span>
-<span class="sd">        :param int max_delay_per_stage: max delay per stage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span><span class="p">[</span><span class="n">pre_vertex_slice</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">DelayGeneratorData</span><span class="p">(</span>
                 <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_delayed_row_n_synapses</span><span class="p">,</span>
                 <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span>
                 <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-                <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="p">))</span></div>
+                <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="DelayExtensionVertex.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>

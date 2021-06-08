@@ -54,7 +54,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.common.slice</span> <span class="kn">import</span> <span class="n">Slice</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
@@ -170,8 +169,7 @@
             <span class="n">n_delay_stages</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_io</span><span class="o">.</span><span class="n">get_max_row_info</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="p">,</span>
-            <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
 
         <span class="c1"># These are set directly later</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="kc">None</span>
@@ -350,8 +348,7 @@
             <span class="n">is_app_key</span> <span class="ow">and</span> <span class="n">is_delay_app_key</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_edges</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapticMatrixApp.write_matrix"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">write_matrix</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">single_synapses</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">single_addr</span><span class="p">,</span> <span class="n">single_synapses</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a synaptic matrix from host</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -362,7 +359,6 @@
 <span class="sd">            The address in the &quot;direct&quot; or &quot;single&quot; matrix to start at</span>
 <span class="sd">        :param list(int) single_synapses:</span>
 <span class="sd">            A list of &quot;direct&quot; or &quot;single&quot; synapses to write to</span>
-<span class="sd">        :param float machine_time_step: the simulation machine time step</span>
 <span class="sd">        :return: The updated block_addr and single_addr</span>
 <span class="sd">        :rtype: tuple(int, int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -372,7 +368,7 @@
 
             <span class="c1"># Get a synaptic matrix for each machine edge</span>
             <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_matrix</span><span class="p">(</span><span class="n">m_edge</span><span class="p">)</span>
-            <span class="n">row_data</span><span class="p">,</span> <span class="n">delay_row_data</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">row_data</span><span class="p">,</span> <span class="n">delay_row_data</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__update_connection_holders</span><span class="p">(</span><span class="n">row_data</span><span class="p">,</span> <span class="n">delay_row_data</span><span class="p">,</span> <span class="n">m_edge</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_app_keys</span><span class="p">:</span>
@@ -497,14 +493,12 @@
 
         <span class="k">return</span> <span class="n">block_addr</span>
 
-<div class="viewcode-block" id="SynapticMatrixApp.write_on_chip_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_on_chip_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_on_chip_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">generator_data</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrixApp.write_on_chip_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.write_on_chip_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_on_chip_matrix_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator_data</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Prepare to write a matrix using an on-chip generator</span>
 
 <span class="sd">        :param list(GeneratorData) generator_data: List of data to add to</span>
 <span class="sd">        :param int block_addr:</span>
 <span class="sd">            The address in the synaptic matrix region to start writing at</span>
-<span class="sd">        :param float machine_time_step: the sim machine time step</span>
 <span class="sd">        :return: The updated block address</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -540,8 +534,7 @@
             <span class="c1"># generate since it is still doing it in chunks, so less local</span>
             <span class="c1"># memory is needed.</span>
             <span class="n">generator_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">get_generator_data</span><span class="p">(</span>
-                <span class="n">syn_mat_offset</span><span class="p">,</span> <span class="n">d_mat_offset</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="p">))</span>
+                <span class="n">syn_mat_offset</span><span class="p">,</span> <span class="n">d_mat_offset</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">block_addr</span></div>
 
     <span class="k">def</span> <span class="nf">__reserve_app_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">):</span>
@@ -739,7 +732,6 @@
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pre_slice</span> <span class="o">=</span> <span class="n">Slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -749,7 +741,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
+                <span class="kc">False</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_delayed_block</span><span class="p">(</span>
@@ -758,7 +750,7 @@
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_io</span><span class="o">.</span><span class="n">convert_to_connections</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
                 <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
 
         <span class="k">return</span> <span class="n">connections</span>

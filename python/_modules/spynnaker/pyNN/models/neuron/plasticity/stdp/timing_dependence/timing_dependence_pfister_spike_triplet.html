@@ -52,15 +52,15 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_exp_lut_array</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractTimingDependence</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseStructureWeightOnly</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 
 
 <span class="k">class</span> <span class="nc">TimingDependencePfisterSpikeTriplet</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
@@ -103,8 +103,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span> <span class="o">=</span> <span class="n">SynapseStructureWeightOnly</span><span class="p">()</span>
 
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_plus_data</span> <span class="o">=</span> <span class="n">get_exp_lut_array</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_plus</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_minus_data</span> <span class="o">=</span> <span class="n">get_exp_lut_array</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_minus</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_x_data</span> <span class="o">=</span> <span class="n">get_exp_lut_array</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_x</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -210,7 +209,7 @@
         <span class="k">return</span> <span class="mi">2</span>
 
 <div class="viewcode-block" id="TimingDependencePfisterSpikeTriplet.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependencePfisterSpikeTriplet.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
 
         <span class="c1"># Write lookup tables</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__tau_plus_data</span><span class="p">)</span>

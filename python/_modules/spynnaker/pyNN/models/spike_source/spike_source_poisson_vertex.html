@@ -58,7 +58,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">LegacyPartitionerAPI</span>
-<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="p">(</span>
@@ -71,10 +70,11 @@
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">MultiSpikeRecorder</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.spike_source_poisson_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
@@ -440,11 +440,9 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
                 <span class="n">machine_vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.max_spikes_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ts_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.max_spikes_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ts_per_second</span> <span class="o">=</span> <span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span>
+                         <span class="n">machine_time_step</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span><span class="p">)</span> <span class="o">/</span> <span class="n">ts_per_second</span> <span class="o">&lt;</span> \
                 <span class="n">SLOW_RATE_PER_TICK_CUTOFF</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
@@ -456,28 +454,20 @@
             <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span><span class="p">)</span> <span class="o">/</span> <span class="n">ts_per_second</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_spikes_per_ts</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.0</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_sdram_usage"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_recording_sdram_usage">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_sdram_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_recording_sdram_usage"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_recording_sdram_usage">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_sdram_usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">))</span>
+            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">())</span>
         <span class="n">constant_sdram</span> <span class="o">=</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
             <span class="n">variable_sdram</span><span class="o">.</span><span class="n">per_timestep</span> <span class="o">*</span> <span class="n">OVERFLOW_TIMESTEPS_FOR_SDRAM</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">variable_sdram</span> <span class="o">+</span> <span class="n">constant_sdram</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_resources_used_by_atoms">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span>
-    <span class="p">})</span>
-    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">,</span>
-        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;machine_time_step&quot;</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_resources_used_by_atoms">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">poisson_params_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
@@ -489,8 +479,7 @@
             <span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_data_constant_size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">))</span>
 
-        <span class="n">recording</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recording_sdram_usage</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">recording</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recording_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="c1"># build resources as i currently know</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ResourceContainer</span><span class="p">(</span>
             <span class="n">sdram</span><span class="o">=</span><span class="n">recording</span> <span class="o">+</span> <span class="n">other</span><span class="p">,</span>
@@ -547,7 +536,7 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span></div>
+        <span class="k">return</span> <span class="n">machine_time_step</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_dtcm_usage_for_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_dtcm_usage_for_atoms">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_dtcm_usage_for_atoms</span><span class="p">():</span>
@@ -573,11 +562,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span>
             <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span></div>
+            <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>

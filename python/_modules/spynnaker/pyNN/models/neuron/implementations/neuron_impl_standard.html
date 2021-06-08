@@ -57,8 +57,9 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.input_types</span> <span class="kn">import</span> <span class="n">InputTypeConductance</span>
 <span class="kn">from</span> <span class="nn">.abstract_neuron_impl</span> <span class="kn">import</span> <span class="n">AbstractNeuronImpl</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step</span><span class="p">)</span>
 
 <span class="c1"># The size of the n_steps_per_timestep parameter</span>
 <span class="n">_N_STEPS_PER_TIMESTEP_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
@@ -225,7 +226,7 @@
 <div class="viewcode-block" id="NeuronImplStandard.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">get_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="c1"># Work out the time step per step</span>
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">machine_time_step</span><span class="p">()</span>
         <span class="n">ts</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span>
         <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)]</span>
         <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>

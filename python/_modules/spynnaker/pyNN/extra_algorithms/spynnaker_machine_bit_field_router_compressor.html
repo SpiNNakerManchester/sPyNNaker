@@ -84,12 +84,9 @@
 <div class="viewcode-block" id="AbstractMachineBitFieldRouterCompressor.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="p">,</span>
             <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">write_compressor_iobuf</span><span class="p">,</span>
-            <span class="n">produce_report</span><span class="p">,</span> <span class="n">default_report_folder</span><span class="p">,</span> <span class="n">target_length</span><span class="p">,</span>
-            <span class="n">routing_infos</span><span class="p">,</span> <span class="n">time_to_try_for_each_iteration</span><span class="p">,</span> <span class="n">use_timer_cut_off</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">threshold_percentage</span><span class="p">,</span>
-            <span class="n">retry_count</span><span class="p">,</span> <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
-            <span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">default_report_folder</span><span class="p">,</span>
+            <span class="n">routing_infos</span><span class="p">,</span> <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
+            <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; entrance for routing table compression with bit field</span>
 
 <span class="sd">        :param routing_tables: routing tables</span>
@@ -106,21 +103,10 @@
 <span class="sd">        :param executable_finder: where are binaries are located</span>
 <span class="sd">        :type executable_finder:</span>
 <span class="sd">            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder</span>
-<span class="sd">        :param bool write_compressor_iobuf: flag saying if read iobuf</span>
-<span class="sd">        :param bool produce_report:</span>
 <span class="sd">        :param str default_report_folder:</span>
-<span class="sd">        :param int target_length:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
-<span class="sd">        :param int threshold_percentage:</span>
-<span class="sd">            the percentage of bitfields to do on chip before its considered</span>
-<span class="sd">            a success</span>
-<span class="sd">        :param retry_count:</span>
-<span class="sd">            Number of times that the sorters should set of the compressions</span>
-<span class="sd">            again. None for as much as needed</span>
 <span class="sd">        :type retry_count: int or None</span>
 <span class="sd">        :param bool read_algorithm_iobuf: flag saying if read iobuf</span>
-<span class="sd">        :param bool compress_as_much_as_possible:</span>
-<span class="sd">            flag asking if should compress as much as possible</span>
 <span class="sd">        :param bool read_expander_iobuf: reads the synaptic expander iobuf.</span>
 <span class="sd">        :rtype:</span>
 <span class="sd">            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
@@ -135,17 +121,8 @@
                 <span class="n">provenance_file_path</span><span class="o">=</span><span class="n">provenance_file_path</span><span class="p">,</span>
                 <span class="n">machine_graph</span><span class="o">=</span><span class="n">machine_graph</span><span class="p">,</span>
                 <span class="n">placements</span><span class="o">=</span><span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="o">=</span><span class="n">executable_finder</span><span class="p">,</span>
-                <span class="n">write_compressor_iobuf</span><span class="o">=</span><span class="n">write_compressor_iobuf</span><span class="p">,</span>
-                <span class="n">produce_report</span><span class="o">=</span><span class="n">produce_report</span><span class="p">,</span>
                 <span class="n">default_report_folder</span><span class="o">=</span><span class="n">default_report_folder</span><span class="p">,</span>
-                <span class="n">target_length</span><span class="o">=</span><span class="n">target_length</span><span class="p">,</span> <span class="n">routing_infos</span><span class="o">=</span><span class="n">routing_infos</span><span class="p">,</span>
-                <span class="n">time_to_try_for_each_iteration</span><span class="o">=</span><span class="n">time_to_try_for_each_iteration</span><span class="p">,</span>
-                <span class="n">use_timer_cut_off</span><span class="o">=</span><span class="n">use_timer_cut_off</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="o">=</span><span class="n">machine_time_step</span><span class="p">,</span>
-                <span class="n">time_scale_factor</span><span class="o">=</span><span class="n">time_scale_factor</span><span class="p">,</span>
-                <span class="n">threshold_percentage</span><span class="o">=</span><span class="n">threshold_percentage</span><span class="p">,</span>
-                <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span><span class="p">,</span>
-                <span class="n">compress_as_much_as_possible</span><span class="o">=</span><span class="n">compress_as_much_as_possible</span><span class="p">,</span>
+                <span class="n">routing_infos</span><span class="o">=</span><span class="n">routing_infos</span><span class="p">,</span>
                 <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">,</span>
                 <span class="n">provenance_data_objects</span><span class="o">=</span><span class="n">provenance_data_objects</span><span class="p">)</span>
 

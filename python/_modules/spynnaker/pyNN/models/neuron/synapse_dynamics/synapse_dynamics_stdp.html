@@ -289,11 +289,10 @@
             <span class="n">n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">size</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsSTDP.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsSTDP.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>  <span class="n">weight_scales</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :param list(float) weight_scales:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing Plastic Parameters&quot;</span><span class="p">)</span>
@@ -305,13 +304,11 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span><span class="p">))</span>
 
         <span class="c1"># Write timing dependence parameters to region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
 
         <span class="c1"># Write weight dependence information to region</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span></div>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_n_header_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -174,19 +174,11 @@
             <span class="s2">&quot;the number of neurons per core.  Please increase the timer_tic &quot;</span>
             <span class="s2">&quot;or time_scale_factor or decrease the number of neurons per core.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MachineMunichMotorDevice.generate_data_specification"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span>
-    <span class="p">})</span>
+<div class="viewcode-block" id="MachineMunichMotorDevice.generate_data_specification"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
-        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span>
-        <span class="p">})</span>
-    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;routing_info&quot;</span><span class="p">})</span>
+    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
 
         <span class="c1"># reserve regions</span>
@@ -198,8 +190,7 @@
         <span class="c1"># handle simulation data</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SYSTEM_REGION</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">(),</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">time_scale_factor</span><span class="p">))</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">()))</span>
 
         <span class="c1"># Get the key</span>
         <span class="n">edge_key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>

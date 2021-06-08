@@ -258,22 +258,16 @@
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;routing_infos&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">})</span>
+        <span class="s2">&quot;routing_infos&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_infos&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">})</span>
+            <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_infos&quot;</span><span class="p">})</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
-<span class="sd">        :param int machine_time_step: machine time step of the sim.</span>
-<span class="sd">        :param int time_scale_factor: the time scale factor of the sim.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
 
@@ -305,9 +299,7 @@
         <span class="c1"># reserve region for provenance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_setup_info</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
-            <span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_setup_info</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">())</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for Delay Extension Instance ***</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -356,18 +348,15 @@
         <span class="c1"># End-of-Spec:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_setup_info</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">binary_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_setup_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">binary_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param int machine_time_step:v the machine time step</span>
-<span class="sd">        :param int time_scale_factor: the time scale factor</span>
 <span class="sd">        :param str binary_name: the binary name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write this to the system region (to be picked up by the simulation):</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
-            <span class="n">binary_name</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">))</span>
+            <span class="n">binary_name</span><span class="p">))</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.write_delay_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.write_delay_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_delay_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">):</span>

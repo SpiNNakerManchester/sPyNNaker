@@ -54,9 +54,9 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step_ms</span><span class="p">,</span> <span class="n">machine_time_step_per_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapseRowTooBigException</span>
@@ -174,16 +174,14 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="SynapseIORowBased.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay supported by the synapse representation \</span>
 <span class="sd">            before extensions are required, or None if any delay is supported</span>
 
-<span class="sd">        :param int machine_time_step: The time step of the simulation</span>
 <span class="sd">        :param int post_vertex_max_delay_ticks: post vertex max delay</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">post_vertex_max_delay_ticks</span> <span class="o">*</span> <span class="p">(</span>
-            <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">post_vertex_max_delay_ticks</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_n_words</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">):</span>
@@ -229,7 +227,7 @@
 
 <div class="viewcode-block" id="SynapseIORowBased.get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_max_row_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
-            <span class="n">population_table</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">):</span>
+            <span class="n">population_table</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the information about the maximum lengths of delayed and\</span>
 <span class="sd">            undelayed rows in bytes (including header), words (without header)\</span>
 <span class="sd">            and number of synapses</span>
@@ -242,8 +240,6 @@
 <span class="sd">            The number of delay stages on the edge</span>
 <span class="sd">        :param MasterPopTableAsBinarySearch population_table:</span>
 <span class="sd">            The population table to be used</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">            The time step of the simulation</span>
 <span class="sd">        :param ProjectionApplicationEdge in_edge:</span>
 <span class="sd">            The incoming edge on which the synapse information is held</span>
 <span class="sd">        :rtype: MaxRowInfo</span>
@@ -251,7 +247,6 @@
 <span class="sd">            If the synapse information can&#39;t be represented</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_delay_supported</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
-            <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
         <span class="n">max_delay</span> <span class="o">=</span> <span class="n">max_delay_supported</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">pad_to_length</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">pad_to_length</span>
@@ -383,8 +378,7 @@
 
 <div class="viewcode-block" id="SynapseIORowBased.get_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.get_synapses">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_edge</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
+            <span class="n">machine_edge</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">gen_undelayed</span><span class="p">,</span> <span class="n">gen_delayed</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the synapses as an array of words for non-delayed synapses and\</span>
 <span class="sd">            an array of words for delayed synapses. This is used to prepare\</span>
 <span class="sd">            information for *deployment to SpiNNaker*.</span>
@@ -399,7 +393,6 @@
 <span class="sd">            The scaling of the weights for each synapse type</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:</span>
 <span class="sd">            The incoming machine edge that the synapses are on</span>
-<span class="sd">        :param int machine_time_step: The machine time step of the sim.</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">        :param MaxRowInfo max_row_info:</span>
 <span class="sd">            The maximum row information for the synapses</span>
@@ -426,10 +419,9 @@
         <span class="c1"># pylint: disable=assignment-from-no-return</span>
         <span class="c1"># Get delays in timesteps</span>
         <span class="n">max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span>
-            <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">max_delay</span> <span class="o">*=</span> <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">max_delay</span> <span class="o">*=</span> <span class="n">machine_time_step_per_ms</span><span class="p">()</span>
 
         <span class="c1"># Get the actual connections</span>
         <span class="n">app_edge</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">app_edge</span>
@@ -443,8 +435,7 @@
 
         <span class="c1"># Convert delays to timesteps</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-            <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
-                <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">))</span>
+            <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_per_ms</span><span class="p">())</span>
 
         <span class="c1"># Scale weights</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight_scales</span><span class="p">[</span>
@@ -518,18 +509,16 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_rescale_connections</span><span class="p">(</span>
-            <span class="n">connections</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="n">connections</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Scale the connection data into machine values</span>
 
 <span class="sd">        :param ~numpy.ndarray connections: The connections to be rescaled</span>
-<span class="sd">        :param int machine_time_step: The time step of the simulation</span>
 <span class="sd">        :param list(float) weight_scales: The weight scale of each synapse type</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The synapse information of the connections</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Return the delays values to milliseconds</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="p">(</span>
-                <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">machine_time_step_per_ms</span><span class="p">()</span>
         <span class="c1"># Undo the weight scaling</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">connections</span>
@@ -537,7 +526,7 @@
 <div class="viewcode-block" id="SynapseIORowBased.convert_to_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.convert_to_connections">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
+            <span class="n">delayed</span><span class="p">,</span> <span class="n">post_vertex_max_delay_ticks</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the synapses for a given projection synapse information\</span>
 <span class="sd">            object out of the given data and convert to connection data</span>
 
@@ -555,8 +544,6 @@
 <span class="sd">            The weight scaling of each synapse type</span>
 <span class="sd">        :param bytearray data:</span>
 <span class="sd">            The raw data containing the synapses</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">            The time step of the simulation</span>
 <span class="sd">        :param bool delayed: True if the data should be considered delayed</span>
 <span class="sd">        :param int post_vertex_max_delay_ticks:</span>
 <span class="sd">            max delayed ticks supported from post vertex</span>
@@ -592,7 +579,7 @@
 
         <span class="c1"># Return the connections after appropriate scaling</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rescale_connections</span><span class="p">(</span>
-            <span class="n">connections</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+            <span class="n">connections</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapseIORowBased.read_all_synapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.SynapseIORowBased.read_all_synapses">[docs]</a>    <span class="k">def</span> <span class="nf">read_all_synapses</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delayed_data</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span>
@@ -619,7 +606,6 @@
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
         <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="n">post_vertex_slice</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="n">post_splitter</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span>
@@ -628,13 +614,12 @@
         <span class="n">delayed_max_row_length</span> <span class="o">=</span> <span class="n">max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span>
         <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_connections</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">max_row_length</span><span class="p">,</span>
-            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">delayed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">delayed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="o">=</span><span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
         <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convert_to_connections</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">delayed_max_row_length</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">delayed_data</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">delayed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">delayed_data</span><span class="p">,</span>  <span class="n">delayed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">post_vertex_max_delay_ticks</span><span class="o">=</span><span class="n">post_vertex_max_delay_ticks</span><span class="p">))</span>
 
         <span class="c1"># Join the connections into a single list and return it</span>

@@ -100,7 +100,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSpikeRecordable.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded spikes from the object</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
@@ -108,8 +108,6 @@
 <span class="sd">        :param buffer_manager: the buffer manager object</span>
 <span class="sd">        :type buffer_manager:</span>
 <span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">            the time step of the simulation, in microseconds</span>
 <span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)</span>
 <span class="sd">            ordered by time, one element per event</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>

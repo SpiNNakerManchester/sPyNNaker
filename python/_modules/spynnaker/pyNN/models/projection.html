@@ -60,9 +60,8 @@
 <span class="kn">from</span> <span class="nn">pyNN.recording.files</span> <span class="kn">import</span> <span class="n">StandardTextFile</span>
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">Space</span> <span class="k">as</span> <span class="n">PyNNSpace</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_simulator</span><span class="p">,</span> <span class="n">machine_time_step_ms</span><span class="p">,</span> <span class="n">machine_time_step_per_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -124,7 +123,6 @@
                 <span class="s2">&quot;cells.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">))</span>
 
         <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="n">machine_time_step</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__host_based_synapse_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_retrieved_synaptic_list_from_machine</span> <span class="o">=</span> <span class="kc">False</span>
@@ -183,10 +181,9 @@
         <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">))</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="nb">str</span><span class="p">))):</span>
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>
-                    <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">))</span> <span class="o">*</span>
-                <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>
+                           <span class="n">machine_time_step_per_ms</span><span class="p">())</span> <span class="o">*</span>
+                <span class="n">machine_time_step_ms</span><span class="p">())</span>
 
         <span class="c1"># set the plasticity dynamics for the post pop (allows plastic stuff</span>
         <span class="c1">#  when needed)</span>
@@ -202,8 +199,7 @@
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
 
         <span class="c1"># Set projection information in connector</span>
-        <span class="n">connector</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">(</span>
-            <span class="n">machine_time_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
+        <span class="n">connector</span><span class="o">.</span><span class="n">set_projection_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
 
         <span class="c1"># Find out if there is an existing edge between the populations</span>
         <span class="n">edge_to_merge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_edge</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">)</span>

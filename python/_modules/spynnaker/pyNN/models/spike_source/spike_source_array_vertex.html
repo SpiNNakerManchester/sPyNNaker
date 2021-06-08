@@ -60,7 +60,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_simulator</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">EIEIOSpikeRecorder</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
@@ -140,7 +141,7 @@
 
 <span class="sd">        :param iterable(int spike_times:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">current_time</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -158,7 +159,7 @@
 
 <span class="sd">        :param iterable(iterable(int) spike_times:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">current_time</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">neuron_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
             <span class="n">id_times</span> <span class="o">=</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">neuron_id</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">id_times</span><span class="p">)):</span>
@@ -205,17 +206,16 @@
 
 <div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span></div>
+        <span class="k">return</span> <span class="n">machine_time_step</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
             <span class="k">lambda</span> <span class="n">vertex</span><span class="p">:</span>
                 <span class="n">vertex</span><span class="o">.</span><span class="n">virtual_key</span>
                 <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">virtual_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">)</span></div>
+                <span class="k">else</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpikeSourceArrayVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>

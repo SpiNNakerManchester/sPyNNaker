@@ -60,9 +60,10 @@
 <span class="kn">from</span> <span class="nn">pacman.model.resources.variable_sdram</span> <span class="kn">import</span> <span class="n">VariableSDRAM</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">)</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management.recording_utilities</span> \
     <span class="kn">import</span> <span class="p">(</span>
         <span class="n">get_recording_header_array</span><span class="p">,</span> <span class="n">get_recording_header_size</span><span class="p">,</span>
@@ -92,9 +93,7 @@
 <span class="sd">    :return: Sampling interval in microseconds</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span>
-            <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">step</span>
+    <span class="k">return</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
 
 
 <span class="k">class</span> <span class="nc">NeuronRecorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -438,8 +437,8 @@
             <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+            <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read spikes mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
@@ -453,7 +452,6 @@
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str variable:</span>
-<span class="sd">        :param int machine_time_step: microseconds</span>
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -474,7 +472,6 @@
             <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
-            <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
             <span class="n">neurons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
             <span class="n">neurons_recording</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">neurons_recording</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -499,7 +496,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">record_raw</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">ms_per_tick</span><span class="p">)</span>
+                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
                 <span class="n">spikes</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
                 <span class="n">bits</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                     <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_bytes</span> <span class="o">*</span> <span class="mi">8</span><span class="p">))</span>
@@ -528,7 +525,7 @@
 
 <div class="viewcode-block" id="NeuronRecorder.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read events mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
@@ -542,14 +539,13 @@
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str variable:</span>
-<span class="sd">        :param int machine_time_step: microseconds</span>
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int,int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rewires</span><span class="p">(</span>
                 <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-                <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+                <span class="n">variable</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Unspecified event variable</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -558,8 +554,8 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_rewires</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+            <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read rewires mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
@@ -573,7 +569,6 @@
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str variable:</span>
-<span class="sd">        :param int machine_time_step: microseconds</span>
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int,int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -592,7 +587,6 @@
             <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
-            <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
             <span class="n">neurons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
                 <span class="nb">range</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">neurons_recording</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons</span><span class="p">)</span>
@@ -618,7 +612,7 @@
                 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">record_raw</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">ms_per_tick</span><span class="p">)</span>
+                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
                 <span class="n">rewires_raw</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
                 <span class="n">rew_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rewires_raw</span><span class="p">)</span>
                 <span class="c1"># rewires is 0 (elimination) or 1 (formation) in the first bit</span>
@@ -776,9 +770,7 @@
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
 
-        <span class="n">step</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span>
-            <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
         <span class="n">rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_interval</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="o">!=</span> <span class="n">rate</span> <span class="o">*</span> <span class="n">step</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;sampling_interval </span><span class="si">{}</span><span class="s2"> is not an an integer multiple of the &quot;</span>\

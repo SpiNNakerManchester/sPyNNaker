@@ -58,8 +58,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">helpful_functions</span><span class="p">,</span> <span class="n">globals_variables</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">helpful_functions</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span>
     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
@@ -76,6 +75,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractHasProfileData</span><span class="p">,</span> <span class="n">profile_utils</span><span class="p">)</span>
@@ -268,8 +269,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">max_rate</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.max_spikes_per_ts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.max_spikes_per_ts">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractMaxSpikes</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">max_spikes_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.reload_required"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.reload_required">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstMachineTimeStep&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">reload_required</span><span class="p">,</span>
@@ -284,20 +285,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="n">new_value</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.regenerate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
         <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstMachineTimeStep&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">})</span>
+            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">})</span>
     <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>
             <span class="n">first_machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
 <span class="sd">        :param int first_machine_time_step:</span>
@@ -310,19 +308,15 @@
         <span class="c1"># write parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_parameters</span><span class="p">(</span>
             <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="o">=</span><span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="o">=</span><span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">routing_info</span><span class="o">=</span><span class="n">routing_info</span><span class="p">)</span>
 
         <span class="c1"># write rates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
 
         <span class="c1"># end spec</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">,</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
         <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span><span class="p">,</span>
         <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
@@ -331,16 +325,14 @@
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="s2">&quot;first_machine_time_step&quot;</span>
+            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_machine_time_step&quot;</span>
         <span class="p">}</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>
+            <span class="n">first_machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param int time_scale_factor:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        :param int data_n_time_steps:</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
@@ -357,25 +349,22 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SYSTEM_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">(),</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">time_scale_factor</span><span class="p">))</span>
+            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">()))</span>
 
         <span class="c1"># write recording data</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_recording_sdram_usage</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">get_recording_sdram_usage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">recorded_region_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">sdram</span><span class="o">.</span><span class="n">get_total_sdram</span><span class="p">(</span><span class="n">data_n_time_steps</span><span class="p">)]</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_header_array</span><span class="p">(</span>
             <span class="n">recorded_region_sizes</span><span class="p">))</span>
 
         <span class="c1"># write parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">)</span>
 
         <span class="c1"># write rates</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
 
         <span class="c1"># write profile data</span>
         <span class="n">profile_utils</span><span class="o">.</span><span class="n">write_profile_region_data</span><span class="p">(</span>
@@ -393,12 +382,11 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_write_poisson_rates</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generate Rate data for Poisson spike sources</span>
 
 <span class="sd">        :param ~data_specification.DataSpecification spec:</span>
 <span class="sd">            the data specification writer</span>
-<span class="sd">        :param int machine_time_step: the time between timer tick updates.</span>
 <span class="sd">        :param int first_machine_time_step:</span>
 <span class="sd">            First machine time step to start from the correct index</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -426,15 +414,14 @@
         <span class="n">rate_change</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">rate_change</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">as_slice</span><span class="p">]</span>
 
         <span class="c1"># Convert start times to start time steps</span>
-        <span class="n">starts_scaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_ms_to_n_timesteps</span><span class="p">(</span>
-            <span class="n">starts</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">starts_scaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_ms_to_n_timesteps</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span>
 
         <span class="c1"># Convert durations to end time steps, using the maximum for &quot;None&quot;</span>
         <span class="c1"># duration (which means &quot;until the end&quot;)</span>
         <span class="n">no_duration</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
         <span class="n">durations_filtered</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">no_duration</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">durations</span><span class="p">)</span>
         <span class="n">ends_scaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_ms_to_n_timesteps</span><span class="p">(</span>
-            <span class="n">durations_filtered</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span> <span class="o">+</span> <span class="n">starts_scaled</span>
+            <span class="n">durations_filtered</span><span class="p">)</span> <span class="o">+</span> <span class="n">starts_scaled</span>
         <span class="n">ends_scaled</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">no_duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MAX_TIMESTEP</span><span class="p">,</span> <span class="n">ends_scaled</span><span class="p">))</span>
 
@@ -446,9 +433,8 @@
              <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">starts_split</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
 
         <span class="c1"># Compute the spikes per tick for each rate for each atom</span>
-        <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">*</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span> <span class="o">/</span>
-                                   <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
-
+        <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="n">rates</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
         <span class="c1"># Determine the properties of the sources</span>
         <span class="n">is_fast_source</span> <span class="o">=</span> <span class="n">spikes_per_tick</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SLOW_RATE_PER_TICK_CUTOFF</span>
         <span class="n">is_faster_source</span> <span class="o">=</span> <span class="n">spikes_per_tick</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAST_RATE_PER_TICK_CUTOFF</span>
@@ -504,8 +490,7 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">core_data_split</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])])</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">final_data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_poisson_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_poisson_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generate Parameter data for Poisson spike sources</span>
 
 <span class="sd">        :param ~data_specification.DataSpecification spec:</span>
@@ -513,7 +498,6 @@
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">        :param int machine_time_step: the time between timer tick updates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Parameters for </span><span class="si">{}</span><span class="s2"> poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -547,12 +531,12 @@
 
         <span class="c1"># Write the number of seconds per timestep (unsigned long fract)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span> <span class="o">/</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span>
             <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">)</span>
 
         <span class="c1"># Write the number of timesteps per second (integer)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-            <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+            <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">()))</span>
 
         <span class="c1"># Write the slow-rate-per-tick-cutoff (accum)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
@@ -631,16 +615,10 @@
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;PoissonRates&#39;</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_convert_ms_to_n_timesteps</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_convert_ms_to_n_timesteps</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span>
             <span class="n">value</span> <span class="o">*</span> <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span>
-                     <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_convert_n_timesteps_to_ms</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">value</span> <span class="o">/</span> <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span>
-                     <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+                     <span class="n">machine_time_step</span><span class="p">()))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.poisson_param_region_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.poisson_param_region_address">[docs]</a>    <span class="k">def</span> <span class="nf">poisson_param_region_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
@@ -709,12 +687,11 @@
             <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">slow_elements</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">isi</span><span class="p">[</span><span class="n">slow_elements</span><span class="p">]</span>
 
             <span class="c1"># Convert spikes per tick to rates</span>
-            <span class="n">machine_time_step</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">rates</span><span class="o">.</span><span class="n">set_value_by_id</span><span class="p">(</span>
                 <span class="n">i</span><span class="p">,</span>
                 <span class="n">spikes_per_tick</span> <span class="o">*</span>
-                <span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+                <span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span>
+                 <span class="n">machine_time_step</span><span class="p">()))</span>
 
             <span class="c1"># Store the updated time until next spike so that it can be</span>
             <span class="c1"># rewritten when the parameters are loaded</span>

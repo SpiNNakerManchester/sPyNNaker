@@ -64,6 +64,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProjectionApplicationEdge</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
@@ -129,14 +131,13 @@
 <div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_structural_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">,</span>
                <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
 <span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param int machine_time_step: the duration of a machine time step (ms)</span>
 <span class="sd">        :param weight_scales: scaling the weights</span>
 <span class="sd">        :type weight_scales: ~numpy.ndarray or list(float)</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
@@ -158,12 +159,12 @@
 
         <span class="c1"># Write the common part of the rewiring data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_common_rewiring_data</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">structural_edges</span><span class="p">))</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">structural_edges</span><span class="p">))</span>
 
         <span class="c1"># Write the pre-population info</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_prepopulation_info</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">machine_edges_by_app</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">)</span>
 
         <span class="c1"># Write the post-to-pre table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_post_to_pre_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">)</span>
@@ -222,31 +223,30 @@
         <span class="k">return</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">machine_edges</span>
 
     <span class="k">def</span> <span class="nf">__write_common_rewiring_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">n_pre_pops</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">n_pre_pops</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the non-sub-population synapse parameters to the spec.</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            the data spec</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">            the vertex for which data specs are being prepared</span>
-<span class="sd">        :param int machine_time_step: the duration of a machine time step (ms)</span>
 <span class="sd">        :param int n_pre_pops: the number of pre-populations</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">&lt;</span>
-                <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
+                <span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
             <span class="c1"># Fast rewiring</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span>
-                <span class="n">machine_time_step</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Slow rewiring</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span> <span class="o">/</span>
-                <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+                <span class="n">machine_time_step</span><span class="p">()))</span>
         <span class="c1"># write s_max</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s_max</span><span class="p">))</span>
         <span class="c1"># write total number of atoms in the application vertex</span>
@@ -271,8 +271,7 @@
 
     <span class="k">def</span> <span class="nf">__write_prepopulation_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">machine_edges_by_app</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
@@ -287,7 +286,6 @@
 <span class="sd">        :param RoutingInfo routing_info:</span>
 <span class="sd">        :param dict(AbstractSynapseType,float) weight_scales:</span>
 <span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
-<span class="sd">        :param int machine_time_step:</span>
 <span class="sd">        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -304,7 +302,9 @@
             <span class="n">self_connected</span> <span class="o">=</span> <span class="n">machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span> <span class="o">==</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">self_connected</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
             <span class="c1"># Delay</span>
-            <span class="n">delay_scale</span> <span class="o">=</span> <span class="mf">1000.0</span> <span class="o">/</span> <span class="n">machine_time_step</span>
+            <span class="n">delay_scale</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span>
+                    <span class="n">machine_time_step</span><span class="p">())</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">dynamics</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">delay_scale</span><span class="p">),</span>
                                  <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
@@ -507,12 +507,12 @@
                 <span class="s2">&quot; supported in the current implementation&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">initial_delay</span><span class="p">,</span> <span class="n">max_delay_ms</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_max_rewires_per_ts"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_max_rewires_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_max_rewires_per_ts"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_max_rewires_per_ts">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">&lt;</span>
-                <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
+                <span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
             <span class="c1"># fast rewiring, so need to set max_rewires_per_ts</span>
-            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">p_rew</span> <span class="o">*</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">max_rewires_per_ts</span></div>

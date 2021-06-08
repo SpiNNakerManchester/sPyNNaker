@@ -108,7 +108,9 @@
 <span class="sd">        :type n_chips_required: int or None</span>
 <span class="sd">        :param n_boards_required:</span>
 <span class="sd">        :type n_boards_required: int or None</span>
-<span class="sd">        :param int timestep:</span>
+<span class="sd">        :param timestep:</span>
+<span class="sd">            machine_time_step but in milli seconds. If None uses the cfg value</span>
+<span class="sd">        :type timestep: float or None</span>
 <span class="sd">        :param float max_delay:</span>
 <span class="sd">        :param float min_delay:</span>
 <span class="sd">        :param str hostname:</span>
@@ -178,16 +180,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_extra_inputs</span><span class="p">({</span><span class="s1">&#39;UserDefinedMaxDelay&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span><span class="p">})</span>
 
         <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;CreateAtomToEventIdMapping&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">get_config_bool</span><span class="p">(</span>
-                <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;create_routing_info_to_neuron_id_mapping&quot;</span><span class="p">)</span>
-        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;WriteBitFieldGeneratorIOBUF&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_bit_field_iobuf&quot;</span><span class="p">)</span>
-        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_report&quot;</span><span class="p">)</span>
-        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldSummaryReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">get_config_bool</span><span class="p">(</span>
-                <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_summary_report&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;SynapticExpanderReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_extra_mapping_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -227,18 +219,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_up_machine_specifics</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting time scale factor to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting time scale factor to &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
 
         <span class="c1"># get the machine time step</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Setting machine time step to </span><span class="si">{}</span><span class="s2"> micro-seconds.&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting machine time step to &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;micro-seconds.&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param float timestep:</span>
-<span class="sd">        :param int min_delay:</span>
-<span class="sd">       :param float time_scale_factor:</span>
+<span class="sd">        :param timestep: machine_time_Step in milli seconds</span>
+<span class="sd">        :type timestep: float or None</span>
+<span class="sd">        :tpye min_delay: int or None</span>
+<span class="sd">        :type time_scale_factor: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Get the standard values</span>
@@ -251,17 +245,15 @@
 
         <span class="c1"># Sort out the minimum delay</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="p">(</span><span class="n">min_delay</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span> <span class="o">&lt;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">):</span>
+                <span class="n">min_delay</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Pacman does not support min delays below </span><span class="si">{}</span><span class="s2"> ms with the &quot;</span>
-                <span class="s2">&quot;current machine time step&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">constants</span><span class="o">.</span><span class="n">MIN_SUPPORTED_DELAY</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">))</span>
+                <span class="sa">f</span><span class="s2">&quot;Pacman does not support min delays below &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constants</span><span class="o">.</span><span class="n">MIN_SUPPORTED_DELAY</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;ms with the current machine time step&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="n">min_delay</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span>
 
         <span class="c1"># Sort out the time scale factor if not user specified</span>
         <span class="c1"># (including config)</span>
@@ -278,8 +270,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
 
         <span class="c1"># Check the combination of machine time step and time scale factor</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">&lt;</span>
-                <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span>
                     <span class="s2">&quot;Mode&quot;</span><span class="p">,</span> <span class="s2">&quot;violate_1ms_wall_clock_restriction&quot;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
@@ -451,12 +442,9 @@
         <span class="c1"># build data structure for holding data</span>
         <span class="n">mother_lode</span> <span class="o">=</span> <span class="n">ExtractedData</span><span class="p">()</span>
 
-        <span class="c1"># acquire data objects from front end</span>
-        <span class="n">using_monitors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_run_outputs</span><span class="p">[</span><span class="s2">&quot;UsingAdvancedMonitorSupport&quot;</span><span class="p">]</span>
-
         <span class="c1"># if using extra monitor functionality, locate extra data items</span>
         <span class="n">receivers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">using_monitors</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;enable_advanced_monitor_support&quot;</span><span class="p">):</span>
             <span class="n">receivers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_receivers_from_projections</span><span class="p">(</span>
                 <span class="n">projection_to_attribute_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span>

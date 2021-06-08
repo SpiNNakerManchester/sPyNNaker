@@ -61,7 +61,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">recording_utils</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources.variable_sdram</span> <span class="kn">import</span> <span class="n">VariableSDRAM</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step_ms</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_TWO_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;II&quot;</span><span class="p">)</span>
@@ -116,7 +118,7 @@
 
 <div class="viewcode-block" id="MultiSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        :param buffer_manager: the buffer manager object</span>
@@ -127,7 +129,6 @@
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
-<span class="sd">        :param int machine_time_step: microseconds</span>
 <span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)</span>
 <span class="sd">            ordered by time, one element per event</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
@@ -135,7 +136,6 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">spike_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 
         <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
@@ -151,7 +151,7 @@
             <span class="k">if</span> <span class="n">data_missing</span><span class="p">:</span>
                 <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_spike_data</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ms_per_tick</span><span class="p">,</span>
+                <span class="n">vertex_slice</span><span class="p">,</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">)),</span>
                 <span class="n">neuron_param_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">)</span>
 
@@ -171,11 +171,9 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_process_spike_data</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ms_per_tick</span><span class="p">,</span> <span class="n">n_words</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span>
-            <span class="n">spike_times</span><span class="p">):</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_words</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :param int ms_per_tick:</span>
 <span class="sd">        :param int n_words:</span>
 <span class="sd">        :param bytearray raw_data:</span>
 <span class="sd">        :param list(~numpy.ndarray) spike_ids:</span>
@@ -196,7 +194,7 @@
             <span class="n">bits</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                 <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_bytes_per_block</span> <span class="o">*</span> <span class="mi">8</span><span class="p">))</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bits</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">times</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="n">time</span> <span class="o">*</span> <span class="n">ms_per_tick</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="n">time</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()],</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
             <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span> <span class="o">+</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
             <span class="n">spike_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>

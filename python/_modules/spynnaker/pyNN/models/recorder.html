@@ -288,7 +288,7 @@
             <span class="c1"># data</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">no_machine_time_steps</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span>
-                <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
+                <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span>
             <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="n">results</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span></div>
@@ -322,8 +322,7 @@
 
         <span class="c1"># assuming we got here, everything is OK, so we should go get the</span>
         <span class="c1"># spikes</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.get_events"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; How to get rewiring events (of a post-population) from recorder</span>
@@ -353,8 +352,7 @@
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
-            <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span></div>
+            <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.turn_off_all_recording"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>

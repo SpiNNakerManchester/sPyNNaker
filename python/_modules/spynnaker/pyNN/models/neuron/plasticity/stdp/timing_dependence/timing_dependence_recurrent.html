@@ -55,7 +55,9 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step_per_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_timing_dependence</span> <span class="kn">import</span> <span class="n">AbstractTimingDependence</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseStructureWeightAccumulator</span><span class="p">)</span>
@@ -187,7 +189,7 @@
         <span class="k">return</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="TimingDependenceRecurrent.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
 
         <span class="c1"># Write parameters</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span><span class="p">,</span>
@@ -196,12 +198,10 @@
                          <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
 
         <span class="c1"># Convert mean times into machine timesteps</span>
-        <span class="n">mean_pre_timesteps</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span><span class="p">)</span> <span class="o">*</span>
-            <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
-        <span class="n">mean_post_timesteps</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span><span class="p">)</span> <span class="o">*</span>
-            <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+        <span class="n">time_step_per_ms</span> <span class="o">=</span> <span class="n">machine_time_step_per_ms</span><span class="p">()</span>
+
+        <span class="n">mean_pre_timesteps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span> <span class="o">*</span> <span class="n">time_step_per_ms</span><span class="p">)</span>
+        <span class="n">mean_post_timesteps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span> <span class="o">*</span> <span class="n">time_step_per_ms</span><span class="p">)</span>
 
         <span class="c1"># Write lookup tables</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_exp_dist_lut</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mean_pre_timesteps</span><span class="p">)</span>

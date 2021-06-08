@@ -78,14 +78,13 @@
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
 <span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param float machine_time_step: The simulation time step</span>
 <span class="sd">        :param list(float) weight_scales: Weight scaling for each synapse type</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            The machine graph</span>
@@ -180,10 +179,9 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_max_rewires_per_ts"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_max_rewires_per_ts">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_max_rewires_per_ts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the max number of rewires per timestep</span>
 
-<span class="sd">        :param float machine_time_step: The machine time step</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>

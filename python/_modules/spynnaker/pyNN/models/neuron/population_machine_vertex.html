@@ -406,8 +406,6 @@
         <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
 
 <div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;TimeScaleFactor&quot;</span><span class="p">,</span>
         <span class="s2">&quot;application_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
@@ -417,17 +415,13 @@
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">,</span>
             <span class="s2">&quot;application_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span>
             <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;n_key_map&quot;</span>
         <span class="p">})</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span>
-            <span class="n">n_key_map</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param machine_time_step: (injected)</span>
-<span class="sd">        :param time_scale_factor: (injected)</span>
 <span class="sd">        :param application_graph: (injected)</span>
 <span class="sd">        :param machine_graph: (injected)</span>
 <span class="sd">        :param routing_info: (injected)</span>
@@ -453,14 +447,13 @@
         <span class="c1"># Write the setup region</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__binary_file_name</span><span class="p">))</span>
 
         <span class="c1"># If the dynamics are structural the neuron recorder needs to know</span>
         <span class="c1"># the maximum rewires that could happend per timestep</span>
         <span class="n">s_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
-            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="n">s_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">(</span>
-                <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="n">s_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">set_max_rewires_per_ts</span><span class="p">(</span>
                 <span class="n">max_rewires_per_ts</span><span class="p">)</span>
 
@@ -484,7 +477,7 @@
         <span class="c1"># allow the synaptic matrix to write its data spec-able data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">write_data_spec</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_on_chip_generatable_area</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">host_written_matrix_size</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">),</span>

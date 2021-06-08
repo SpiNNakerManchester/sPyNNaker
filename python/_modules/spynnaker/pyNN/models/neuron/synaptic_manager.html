@@ -61,6 +61,8 @@
     <span class="n">get_config_float</span><span class="p">,</span> <span class="n">get_config_int</span><span class="p">,</span> <span class="n">get_config_bool</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractMaxSpikes</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_io</span> <span class="kn">import</span> <span class="n">SynapseIORowBased</span>
@@ -425,8 +427,8 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_ring_buffer_expected_upper_bound</span><span class="p">(</span>
-            <span class="n">weight_mean</span><span class="p">,</span> <span class="n">weight_std_dev</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
-            <span class="n">machine_timestep</span><span class="p">,</span> <span class="n">n_synapses_in</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+            <span class="n">weight_mean</span><span class="p">,</span> <span class="n">weight_std_dev</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">n_synapses_in</span><span class="p">,</span>
+            <span class="n">sigma</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Provides expected upper bound on accumulated values in a ring\</span>
 <span class="sd">            buffer element.</span>
 
@@ -442,7 +444,6 @@
 <span class="sd">            microSiemens as required)</span>
 <span class="sd">        :param float weight_std_dev: SD of weight distribution</span>
 <span class="sd">        :param float spikes_per_second: Maximum expected Poisson rate in Hz</span>
-<span class="sd">        :param int machine_timestep: in us</span>
 <span class="sd">        :param int n_synapses_in: No of connected synapses</span>
 <span class="sd">        :param float sigma: How many SD above the mean to go for upper bound;</span>
 <span class="sd">            a good starting choice is 5.0. Given length of simulation we can</span>
@@ -450,7 +451,9 @@
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># E[ number of spikes ] in a timestep</span>
-        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_timestep</span>
+        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="p">(</span><span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span>
+                            <span class="n">machine_time_step</span><span class="p">())</span>
+
         <span class="n">average_spikes_per_timestep</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">n_synapses_in</span> <span class="o">*</span> <span class="n">spikes_per_second</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_per_second</span><span class="p">)</span>
 
@@ -496,14 +499,12 @@
                 <span class="p">(</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">poisson_variance</span> <span class="o">+</span> <span class="n">weight_variance</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">_get_ring_buffer_to_input_left_shifts</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_timestep</span><span class="p">,</span>
-            <span class="n">weight_scale</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the scaling of the ring buffer to provide as much accuracy as\</span>
 <span class="sd">            possible without too much overflow</span>
 
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        :param int machine_timestep:</span>
 <span class="sd">        :param float weight_scale:</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -515,7 +516,9 @@
         <span class="n">biggest_weight</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
         <span class="n">weights_signed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">rate_stats</span> <span class="o">=</span> <span class="p">[</span><span class="n">RunningStats</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)]</span>
-        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_timestep</span>
+        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span>
+                <span class="n">machine_time_step</span><span class="p">())</span>
 
         <span class="n">synapse_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
@@ -561,7 +564,7 @@
                 <span class="k">if</span> <span class="n">rate</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">spikes_per_second</span> <span class="o">=</span> <span class="n">rate</span>
                 <span class="n">spikes_per_tick</span> <span class="o">=</span> \
-                    <span class="n">pre_vertex</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">(</span><span class="n">machine_timestep</span><span class="p">)</span>
+                    <span class="n">pre_vertex</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">()</span>
             <span class="n">rate_stats</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span><span class="o">.</span><span class="n">add_items</span><span class="p">(</span>
                 <span class="n">spikes_per_second</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">)</span>
             <span class="n">total_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span> <span class="o">+=</span> <span class="n">spikes_per_tick</span> <span class="o">*</span> <span class="p">(</span>
@@ -581,8 +584,7 @@
                 <span class="n">max_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_ring_buffer_expected_upper_bound</span><span class="p">(</span>
                         <span class="n">stats</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">standard_deviation</span><span class="p">,</span> <span class="n">rates</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
-                        <span class="n">machine_timestep</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">n_items</span><span class="p">,</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_sigma</span><span class="p">),</span>
+                        <span class="n">stats</span><span class="o">.</span><span class="n">n_items</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_sigma</span><span class="p">),</span>
                     <span class="n">total_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">])</span>
                 <span class="n">max_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
                     <span class="n">max_weights</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">],</span> <span class="n">biggest_weight</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">])</span>
@@ -619,28 +621,24 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">16</span> <span class="o">-</span> <span class="p">(</span><span class="n">ring_buffer_to_input_left_shift</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">__update_ring_buffer_shifts_and_weight_scales</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">weight_scale</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the ring buffer shifts and weight scales for this vertex</span>
 
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        :param float machine_time_step:</span>
 <span class="sd">        :param float weight_scale:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">_get_ring_buffer_to_input_left_shifts</span><span class="p">(</span>
-                    <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-                    <span class="n">weight_scale</span><span class="p">)</span>
+                    <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__get_weight_scale</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">*</span> <span class="n">weight_scale</span>
                 <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">])</span>
 
 <div class="viewcode-block" id="SynapticManager.write_data_spec"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapticManager.write_data_spec">[docs]</a>    <span class="k">def</span> <span class="nf">write_data_spec</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">,</span>
-            <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">            The data specification to write to</span>
@@ -657,9 +655,7 @@
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">            How messages are routed</span>
 <span class="sd">        :param float weight_scale: How to scale the weights of the synapses</span>
-<span class="sd">        :param float machine_time_step:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># Reserve the memory</span>
         <span class="n">in_edges</span> <span class="o">=</span> <span class="n">application_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
             <span class="n">application_vertex</span><span class="p">)</span>
@@ -670,7 +666,7 @@
             <span class="n">machine_vertex</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__update_ring_buffer_shifts_and_weight_scales</span><span class="p">(</span>
-            <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">)</span>
+            <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_synapse_params_region</span><span class="p">)</span>
         <span class="c1"># write the bool for deleting packets that were too late for a timer</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span><span class="p">))</span>
@@ -679,19 +675,18 @@
 
         <span class="n">gen_data</span> <span class="o">=</span> <span class="n">matrices</span><span class="o">.</span><span class="n">write_synaptic_matrix_and_master_population_table</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
                 <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synapse_dynamics_region</span><span class="p">,</span>
-                <span class="n">machine_time_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
                           <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">(</span>
-                    <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct_dynamics_region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
-                    <span class="n">routing_info</span><span class="p">,</span> <span class="n">matrices</span><span class="p">)</span>
+                    <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct_dynamics_region</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span>
+                    <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">matrices</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_on_machine_data_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">gen_data</span><span class="p">)</span></div>
 
