@@ -262,18 +262,16 @@ class AbstractPopulationVertex(
             variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, placements, self,
-            NeuronRecorder.SPIKES, machine_time_step)
+            NeuronRecorder.SPIKES)
 
     @overrides(AbstractEventRecordable.get_events)
     def get_events(
-            self, variable, placements, buffer_manager, machine_time_step):
+            self, variable, placements, buffer_manager):
         return self.__neuron_recorder.get_events(
-            self.label, buffer_manager, placements, self,
-            variable, machine_time_step)
+            self.label, buffer_manager, placements, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -291,8 +289,8 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = not self.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, buffer_manager):
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, placements, self, variable,

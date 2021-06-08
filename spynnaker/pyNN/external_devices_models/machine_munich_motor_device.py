@@ -136,19 +136,11 @@ class MachineMunichMotorDevice(
             "the number of neurons per core.  Please increase the timer_tic "
             "or time_scale_factor or decrease the number of neurons per core.")
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"
-    })
+    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "machine_time_step", "time_scale_factor"
-        })
-    def generate_data_specification(
-            self, spec, placement, routing_info,
-            machine_time_step, time_scale_factor):
+        additional_arguments={"routing_info"})
+    def generate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -160,8 +152,7 @@ class MachineMunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self._SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            placement.vertex.get_binary_file_name()))
 
         # Get the key
         edge_key = routing_info.get_first_key_from_pre_vertex(

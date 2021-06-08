@@ -27,17 +27,12 @@
                 <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-            <parameter>
                 <param_name>user_max_delay</param_name>
                 <param_type>UserDefinedMaxDelay</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>app_graph</param_name>
-            <param_name>machine_time_step</param_name>
             <param_name>user_max_delay</param_name>
             <token part="MAIN">SplitterObjectsAllocated</token>
         </required_inputs>
@@ -94,15 +89,7 @@
                 <param_name>executable_targets</param_name>
                 <param_type>ExecutableTargets</param_type>
             </parameter>
-            <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
-                <param_name>retry_count</param_name>
-                <param_type>RouterCompressorBitFieldRetryCount</param_type>
-            </parameter>
-            <parameter>
+             <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>Transceiver</param_type>
             </parameter>
@@ -119,16 +106,8 @@
                 <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -139,36 +118,12 @@
                 <param_type>Placements</param_type>
             </parameter>
             <parameter>
-                <param_name>produce_report</param_name>
-                <param_type>RouterBitfieldCompressionReport</param_type>
-            </parameter>
-            <parameter>
                 <param_name>default_report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>RoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_to_try_for_each_iteration</param_name>
-                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_scale_factor</param_name>
-                <param_type>TimeScaleFactor</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -182,7 +137,6 @@
         <required_inputs>
             <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -190,21 +144,12 @@
             <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>produce_report</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
-            <param_name>retry_count</param_name>
-            <param_name>time_to_try_for_each_iteration</param_name>
-            <param_name>use_timer_cut_off</param_name>
-            <param_name>machine_time_step</param_name>
-            <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
@@ -226,14 +171,6 @@
                 <param_type>ExecutableTargets</param_type>
             </parameter>
             <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
-                <param_name>retry_count</param_name>
-                <param_type>RouterCompressorBitFieldRetryCount</param_type>
-            </parameter>
-            <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>Transceiver</param_type>
             </parameter>
@@ -250,16 +187,8 @@
                 <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -270,36 +199,12 @@
                 <param_type>Placements</param_type>
             </parameter>
             <parameter>
-                <param_name>produce_report</param_name>
-                <param_type>RouterBitfieldCompressionReport</param_type>
-            </parameter>
-            <parameter>
                 <param_name>default_report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>RoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_to_try_for_each_iteration</param_name>
-                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_scale_factor</param_name>
-                <param_type>TimeScaleFactor</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -313,7 +218,6 @@
         <required_inputs>
             <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -321,21 +225,12 @@
             <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>produce_report</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
-            <param_name>retry_count</param_name>
-            <param_name>time_to_try_for_each_iteration</param_name>
-            <param_name>use_timer_cut_off</param_name>
-            <param_name>machine_time_step</param_name>
-            <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
@@ -360,14 +255,6 @@
                 <param_type>ExecutableTargets</param_type>
             </parameter>
             <parameter>
-                <param_name>threshold_percentage</param_name>
-                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
-            </parameter>
-            <parameter>
-                <param_name>retry_count</param_name>
-                <param_type>RouterCompressorBitFieldRetryCount</param_type>
-            </parameter>
-            <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>Transceiver</param_type>
             </parameter>
@@ -384,16 +271,8 @@
                 <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
-                <param_name>compress_as_much_as_possible</param_name>
-                <param_type>CompressionAsFarAsPos</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>write_compressor_iobuf</param_name>
-                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -404,36 +283,12 @@
                 <param_type>Placements</param_type>
             </parameter>
             <parameter>
-                <param_name>produce_report</param_name>
-                <param_type>RouterBitfieldCompressionReport</param_type>
-            </parameter>
-            <parameter>
                 <param_name>default_report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>target_length</param_name>
-                <param_type>CompressionTargetSize</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_infos</param_name>
                 <param_type>RoutingInfos</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_to_try_for_each_iteration</param_name>
-                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
-            </parameter>
-            <parameter>
-                <param_name>use_timer_cut_off</param_name>
-                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
-            </parameter>
-            <parameter>
-                <param_name>machine_time_step</param_name>
-                <param_type>MachineTimeStep</param_type>
-            </parameter>
-            <parameter>
-                <param_name>time_scale_factor</param_name>
-                <param_type>TimeScaleFactor</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -442,7 +297,6 @@
         </input_definitions>
         <required_inputs>
             <param_name>executable_finder</param_name>
-            <param_name>write_compressor_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
@@ -450,22 +304,13 @@
             <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>produce_report</param_name>
             <param_name>default_report_folder</param_name>
-            <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
-            <param_name>threshold_percentage</param_name>
-            <param_name>retry_count</param_name>
-            <param_name>time_to_try_for_each_iteration</param_name>
-            <param_name>use_timer_cut_off</param_name>
-            <param_name>machine_time_step</param_name>
-            <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
             <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
-            <param_name>compress_as_much_as_possible</param_name>
             <param_name>provenance_data_objects</param_name>
         </optional_inputs>
         <outputs>
@@ -498,14 +343,6 @@
                 <param_type>Placements</param_type>
             </parameter>
             <parameter>
-                <param_name>write_bit_field_generator_iobuf</param_name>
-                <param_type>WriteBitFieldGeneratorIOBUF</param_type>
-            </parameter>
-            <parameter>
-                <param_name>generating_bitfield_report</param_name>
-                <param_type>GenerateBitFieldReport</param_type>
-            </parameter>
-            <parameter>
                 <param_name>default_report_folder</param_name>
                 <param_type>ReportFolder</param_type>
             </parameter>
@@ -517,10 +354,6 @@
                 <param_name>routing_infos</param_name>
                 <param_type>RoutingInfos</param_type>
             </parameter>
-            <parameter>
-                <param_name>generating_bit_field_summary_report</param_name>
-                <param_type>GenerateBitFieldSummaryReport</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>app_graph</param_name>
@@ -528,9 +361,6 @@
             <param_name>executable_finder</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
-            <param_name>write_bit_field_generator_iobuf</param_name>
-            <param_name>generating_bitfield_report</param_name>
-            <param_name>generating_bit_field_summary_report</param_name>
             <param_name>default_report_folder</param_name>
             <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
@@ -573,10 +403,6 @@
                 <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
-                <param_name>write_text_specs</param_name>
-                <param_type>WriteTextSpecsFlag</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine</param_name>
                 <param_type>ExtendedMachine</param_type>
             </parameter>
@@ -589,7 +415,6 @@
             <param_name>placements</param_name>
             <param_name>hostname</param_name>
             <param_name>report_default_directory</param_name>
-            <param_name>write_text_specs</param_name>
             <param_name>machine</param_name>
             <param_name>data_n_timesteps</param_name>
         </required_inputs>
