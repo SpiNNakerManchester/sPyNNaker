@@ -148,7 +148,7 @@ class SplitterAbstractPopulationVertexSlice(
         :return: the variable sdram used by the neuron recorder
         :rtype: VariableSDRAM
         """
-        s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
+        s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
             max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
             self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
