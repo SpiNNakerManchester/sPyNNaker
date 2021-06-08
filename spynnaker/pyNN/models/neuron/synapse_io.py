@@ -16,9 +16,9 @@
 import math
 import numpy
 
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms, machine_time_step_per_ms)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -136,16 +136,14 @@ class SynapseIORowBased(object):
     __slots__ = []
 
     def get_maximum_delay_supported_in_ms(
-            self, machine_time_step, post_vertex_max_delay_ticks):
+            self, post_vertex_max_delay_ticks):
         """ Get the maximum delay supported by the synapse representation \
             before extensions are required, or None if any delay is supported
 
-        :param int machine_time_step: The time step of the simulation
         :param int post_vertex_max_delay_ticks: post vertex max delay
         :rtype: int
         """
-        return post_vertex_max_delay_ticks * (
-            machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
+        return post_vertex_max_delay_ticks * machine_time_step_ms()
 
     @staticmethod
     def _n_words(n_bytes):
@@ -191,7 +189,7 @@ class SynapseIORowBased(object):
 
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
-            population_table, machine_time_step, in_edge):
+            population_table, in_edge):
         """ Get the information about the maximum lengths of delayed and\
             undelayed rows in bytes (including header), words (without header)\
             and number of synapses
@@ -204,8 +202,6 @@ class SynapseIORowBased(object):
             The number of delay stages on the edge
         :param MasterPopTableAsBinarySearch population_table:
             The population table to be used
-        :param int machine_time_step:
-            The time step of the simulation
         :param ProjectionApplicationEdge in_edge:
             The incoming edge on which the synapse information is held
         :rtype: MaxRowInfo
@@ -213,7 +209,6 @@ class SynapseIORowBased(object):
             If the synapse information can't be represented
         """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
-            machine_time_step,
             in_edge.post_vertex.splitter.max_support_delay())
         max_delay = max_delay_supported * (n_delay_stages + 1)
         pad_to_length = synapse_info.synapse_dynamics.pad_to_length
@@ -345,8 +340,7 @@ class SynapseIORowBased(object):
 
     def get_synapses(
             self, synapse_info, n_delay_stages, n_synapse_types, weight_scales,
-            machine_edge, max_row_info, gen_undelayed, gen_delayed,
-            machine_time_step, app_edge):
+            machine_edge, max_row_info, gen_undelayed, gen_delayed, app_edge):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses. This is used to prepare\
             information for *deployment to SpiNNaker*.
@@ -361,7 +355,6 @@ class SynapseIORowBased(object):
             The scaling of the weights for each synapse type
         :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
             The incoming machine edge that the synapses are on
-        :param int machine_time_step: The machine time step of the sim.
         :param ProjectionApplicationEdge app_edge:
         :param MaxRowInfo max_row_info:
             The maximum row information for the synapses
@@ -388,10 +381,9 @@ class SynapseIORowBased(object):
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(
-            machine_time_step,
             app_edge.post_vertex.splitter.max_support_delay())
         if max_delay is not None:
-            max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+            max_delay *= machine_time_step_per_ms()
 
         # Get the actual connections
         app_edge = machine_edge.app_edge
@@ -405,8 +397,7 @@ class SynapseIORowBased(object):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * (
-                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
+            connections["delay"] * machine_time_step_per_ms())
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
@@ -480,18 +471,16 @@ class SynapseIORowBased(object):
 
     @staticmethod
     def _rescale_connections(
-            connections, machine_time_step, weight_scales, synapse_info):
+            connections, weight_scales, synapse_info):
         """ Scale the connection data into machine values
 
         :param ~numpy.ndarray connections: The connections to be rescaled
-        :param int machine_time_step: The time step of the simulation
         :param list(float) weight_scales: The weight scale of each synapse type
         :param SynapseInformation synapse_info:
             The synapse information of the connections
         """
         # Return the delays values to milliseconds
-        connections["delay"] /= (
-                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
+        connections["delay"] /= machine_time_step_per_ms()
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
         return connections
@@ -499,7 +488,7 @@ class SynapseIORowBased(object):
     def convert_to_connections(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, n_synapse_types, weight_scales, data,
-            machine_time_step, delayed, post_vertex_max_delay_ticks):
+            delayed, post_vertex_max_delay_ticks):
         """ Read the synapses for a given projection synapse information\
             object out of the given data and convert to connection data
 
@@ -517,8 +506,6 @@ class SynapseIORowBased(object):
             The weight scaling of each synapse type
         :param bytearray data:
             The raw data containing the synapses
-        :param int machine_time_step:
-            The time step of the simulation
         :param bool delayed: True if the data should be considered delayed
         :param int post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
@@ -554,7 +541,7 @@ class SynapseIORowBased(object):
 
         # Return the connections after appropriate scaling
         return self._rescale_connections(
-            connections, machine_time_step, weight_scales, synapse_info)
+            connections, weight_scales, synapse_info)
 
     def read_all_synapses(
             self, data, delayed_data, synapse_info, n_synapse_types,
@@ -581,7 +568,6 @@ class SynapseIORowBased(object):
         :rtype: ~numpy.ndarray
         """
         connections = []
-        machine_time_step = globals_variables.get_simulator().machine_time_step
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         post_splitter = machine_edge.post_vertex.app_vertex.splitter
@@ -590,13 +576,12 @@ class SynapseIORowBased(object):
         delayed_max_row_length = max_row_info.delayed_max_words
         connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
-            n_synapse_types, weight_scales, data, machine_time_step,
-            delayed=False,
+            n_synapse_types, weight_scales, data, delayed=False,
             post_vertex_max_delay_ticks=post_vertex_max_delay_ticks))
         connections.append(self.convert_to_connections(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             delayed_max_row_length, n_synapse_types, weight_scales,
-            delayed_data, machine_time_step, delayed=True,
+            delayed_data,  delayed=True,
             post_vertex_max_delay_ticks=post_vertex_max_delay_ticks))
 
         # Join the connections into a single list and return it

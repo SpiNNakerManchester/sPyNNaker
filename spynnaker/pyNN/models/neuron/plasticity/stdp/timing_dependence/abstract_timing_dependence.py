@@ -58,11 +58,10 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:
         :param weight_scales: (unused?)
         :type weight_scales: dict(SynapseInformation, float)
         """

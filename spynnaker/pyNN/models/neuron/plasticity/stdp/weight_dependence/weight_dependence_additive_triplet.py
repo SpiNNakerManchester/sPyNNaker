@@ -116,7 +116,7 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
 
         # Loop through each synapse type's weight scale
         for w in weight_scales:

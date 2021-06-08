@@ -95,14 +95,12 @@ class MockSplitter(SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
 
 
 def test_write_data_spec():
-    spynnaker8.setup()
+    spynnaker8.setup(timestep=1)
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
     load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
-
-    machine_time_step = 1000.0
 
     placements = Placements()
     pre_app_population = MockPopulation(10, "mock pop pre")
@@ -138,26 +136,26 @@ def test_write_data_spec():
         one_to_one_connector_1, pre_app_population, post_app_population,
         False, False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
     one_to_one_connector_1.set_projection_information(
-        machine_time_step, direct_synapse_information_1)
+        direct_synapse_information_1)
     one_to_one_connector_2 = OneToOneConnector(None)
     direct_synapse_information_2 = SynapseInformation(
         one_to_one_connector_2, pre_app_population, post_app_population,
         False, False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
     one_to_one_connector_2.set_projection_information(
-        machine_time_step, direct_synapse_information_2)
+        direct_synapse_information_2)
     all_to_all_connector = AllToAllConnector(False)
     all_to_all_synapse_information = SynapseInformation(
         all_to_all_connector, pre_app_population, post_app_population,
         False, False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
     all_to_all_connector.set_projection_information(
-        machine_time_step, all_to_all_synapse_information)
+        all_to_all_synapse_information)
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
     from_list_connector = FromListConnector(conn_list=from_list_list)
     from_list_synapse_information = SynapseInformation(
         from_list_connector, pre_app_population, post_app_population,
         False, False, None, SynapseDynamicsStatic(), 0, True)
     from_list_connector.set_projection_information(
-        machine_time_step, from_list_synapse_information)
+        from_list_synapse_information)
     app_edge = ProjectionApplicationEdge(
         pre_app_vertex, post_app_vertex, direct_synapse_information_1)
     app_edge.add_synapse_information(direct_synapse_information_2)
@@ -212,7 +210,7 @@ def test_write_data_spec():
         spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_vertex,
-        graph, app_graph, routing_info, 1.0, machine_time_step)
+        graph, app_graph, routing_info, 1.0)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -558,7 +556,7 @@ def test_pop_based_master_pop_table_standard(
         spikes_per_second=100.0, drop_late_spikes=True)
     synaptic_manager.write_data_spec(
         spec, post_app_vertex, post_vertex_slice, post_mac_vertex,
-        mac_graph, app_graph, routing_info, 1.0, 1000.0)
+        mac_graph, app_graph, routing_info, 1.0)
     spec.end_specification()
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

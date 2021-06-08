@@ -236,6 +236,7 @@ def variable_rate_100us():
     p.run(run_time)
 
     spikes = pop.get_data("spikes").segments[0].spiketrains
+    p.end()
 
     n_spikes = dict()
     for i in range(len(spikes)):

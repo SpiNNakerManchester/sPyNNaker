@@ -34,7 +34,7 @@ def test_csa_one_to_one_connector():
             postpop_is_view=False, rng=None, synapse_dynamics=None,
             synapse_type=None, is_virtual_machine=False, weights=weight,
             delays=delay)
-    connector.set_projection_information(1000.0, synapse_info)
+    connector.set_projection_information(synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -58,7 +58,7 @@ def test_csa_from_list_connector():
             postpop_is_view=False, rng=None, synapse_dynamics=None,
             synapse_type=None, is_virtual_machine=False, weights=weight,
             delays=delay)
-    connector.set_projection_information(1000.0, mock_synapse_info)
+    connector.set_projection_information(mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -84,7 +84,7 @@ def test_csa_random_connector():
             postpop_is_view=False, rng=None, synapse_dynamics=None,
             synapse_type=None, is_virtual_machine=False, weights=weight,
             delays=delay)
-    connector.set_projection_information(1000.0, mock_synapse_info)
+    connector.set_projection_information(mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -111,7 +111,7 @@ def test_csa_block_connector():
             synapse_type=None, is_virtual_machine=False, weights=weight,
             delays=delay)
 
-        connector.set_projection_information(1000.0, mock_synapse_info)
+        connector.set_projection_information(mock_synapse_info)
         pre_vertex_slice = Slice(0, 10)
         post_vertex_slice = Slice(0, 10)
         block = connector.create_synaptic_block(

@@ -22,9 +22,10 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
+    BYTES_PER_WORD, BITS_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
@@ -54,9 +55,7 @@ def get_sampling_interval(sampling_rate):
     :return: Sampling interval in microseconds
     :rtype: float
     """
-    step = (globals_variables.get_simulator().machine_time_step /
-            MICRO_TO_MILLISECOND_CONVERSION)
-    return sampling_rate * step
+    return sampling_rate * machine_time_step_ms()
 
 
 class NeuronRecorder(object):
@@ -400,8 +399,8 @@ class NeuronRecorder(object):
             sampling_rate, data_type, variable, n_machine_time_steps)
 
     def get_spikes(
-            self, label, buffer_manager, placements,
-            application_vertex, variable, machine_time_step):
+            self, label, buffer_manager, placements, application_vertex,
+            variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -415,7 +414,6 @@ class NeuronRecorder(object):
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
-        :param int machine_time_step: microseconds
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
@@ -436,7 +434,6 @@ class NeuronRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
             neurons = list(self._neurons_recording(variable, vertex_slice))
             neurons_recording = len(neurons)
             if neurons_recording == 0:
@@ -461,7 +458,7 @@ class NeuronRecorder(object):
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * float(ms_per_tick)
+                record_time = raw_data[:, 0] * machine_time_step_ms()
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
@@ -490,7 +487,7 @@ class NeuronRecorder(object):
 
     def get_events(
             self, label, buffer_manager, placements,
-            application_vertex, variable, machine_time_step):
+            application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -504,14 +501,13 @@ class NeuronRecorder(object):
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
-        :param int machine_time_step: microseconds
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
         if variable == self.REWIRING:
             return self._get_rewires(
                 label, buffer_manager, placements, application_vertex,
-                variable, machine_time_step)
+                variable)
         else:
             # Unspecified event variable
             msg = (
@@ -520,8 +516,8 @@ class NeuronRecorder(object):
             raise ConfigurationException(msg)
 
     def _get_rewires(
-            self, label, buffer_manager, placements,
-            application_vertex, variable, machine_time_step):
+            self, label, buffer_manager, placements, application_vertex,
+            variable):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -535,7 +531,6 @@ class NeuronRecorder(object):
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
-        :param int machine_time_step: microseconds
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
@@ -554,7 +549,6 @@ class NeuronRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
             neurons = list(
                 range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
             neurons_recording = len(neurons)
@@ -580,7 +574,7 @@ class NeuronRecorder(object):
                 raw_data = record_raw
 
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * float(ms_per_tick)
+                record_time = raw_data[:, 0] * machine_time_step_ms()
                 rewires_raw = raw_data[:, 1:]
                 rew_length = len(rewires_raw)
                 # rewires is 0 (elimination) or 1 (formation) in the first bit
@@ -738,9 +732,7 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = (
-            globals_variables.get_simulator().machine_time_step /
-            MICRO_TO_MILLISECOND_CONVERSION)
+        step = machine_time_step_ms()
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\

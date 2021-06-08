@@ -16,12 +16,13 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     float_to_fixed, get_exp_lut_array)
 
@@ -54,9 +55,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step
-        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
-        self.__tau_data = get_exp_lut_array(ts, self.__tau)
+        self.__tau_data = get_exp_lut_array(
+            machine_time_step_ms(), self.__tau)
 
     @property
     def alpha(self):
@@ -137,7 +137,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
 
         # Write alpha to spec
         fixed_point_alpha = float_to_fixed(self.__alpha)

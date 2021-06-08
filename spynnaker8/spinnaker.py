@@ -197,7 +197,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the machine time step
         :rtype: float
         """
-        return self.machine_time_step / float(MICRO_TO_MILLISECOND_CONVERSION)
+        return self.machine_time_step_ms
 
     @dt.setter
     def dt(self, new_value):
@@ -214,8 +214,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return (
-            self._current_run_timesteps * (self.machine_time_step / 1000.0))
+        return self._current_run_timesteps * self.machine_time_step_ms
 
     @property
     def segment_counter(self):

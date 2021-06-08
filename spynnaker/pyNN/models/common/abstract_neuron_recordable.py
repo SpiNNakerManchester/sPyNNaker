@@ -70,8 +70,8 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, buffer_manager):
         """ Get the recorded data
 
         :param str variable: PyNN name of the variable
@@ -80,7 +80,6 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         :param buffer_manager:
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int machine_time_step: microseconds
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """
