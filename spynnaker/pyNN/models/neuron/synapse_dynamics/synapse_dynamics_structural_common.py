@@ -26,6 +26,8 @@ from pacman.exceptions import PacmanInvalidParameterException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge)
 from .abstract_synapse_dynamics_structural import (
@@ -91,14 +93,13 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters,
                extend_doc=False)
     def write_structural_parameters(
-            self, spec, region, machine_time_step, weight_scales,
-            machine_graph, machine_vertex, routing_info, synaptic_matrices):
+            self, spec, region, weight_scales, machine_graph, machine_vertex,
+            routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
         :param int region: region ID
-        :param int machine_time_step: the duration of a machine time step (ms)
         :param weight_scales: scaling the weights
         :type weight_scales: ~numpy.ndarray or list(float)
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
@@ -120,12 +121,12 @@ class SynapseDynamicsStructuralCommon(
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
-            spec, machine_vertex, machine_time_step, len(structural_edges))
+            spec, machine_vertex, len(structural_edges))
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, machine_vertex, structural_edges, machine_edges_by_app,
-            routing_info, weight_scales, synaptic_matrices, machine_time_step)
+            routing_info, weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(spec, pop_index, machine_vertex)
@@ -184,31 +185,30 @@ class SynapseDynamicsStructuralCommon(
         return structural_edges, machine_edges
 
     def __write_common_rewiring_data(
-            self, spec, machine_vertex, machine_time_step, n_pre_pops):
+            self, spec, machine_vertex, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
-        :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
         :return: None
         :rtype: None
         """
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(data=int(
-                machine_time_step / (
+                machine_time_step() / (
                     self.p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(data=int((
                 self.p_rew * MICRO_TO_SECOND_CONVERSION) /
-                float(machine_time_step)))
+                machine_time_step()))
         # write s_max
         spec.write_value(data=int(self.s_max))
         # write total number of atoms in the application vertex
@@ -233,8 +233,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_prepopulation_info(
             self, spec, machine_vertex, structural_edges, machine_edges_by_app,
-            routing_info, weight_scales, synaptic_matrices,
-            machine_time_step):
+            routing_info, weight_scales, synaptic_matrices):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
@@ -249,7 +248,6 @@ class SynapseDynamicsStructuralCommon(
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
-        :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         pop_index = dict()
@@ -266,7 +264,9 @@ class SynapseDynamicsStructuralCommon(
             self_connected = machine_vertex.app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
-            delay_scale = 1000.0 / machine_time_step
+            delay_scale = (
+                    MICRO_TO_MILLISECOND_CONVERSION /
+                    machine_time_step())
             if isinstance(dynamics.initial_delay, collections.Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
@@ -469,12 +469,12 @@ class SynapseDynamicsStructuralCommon(
                 " supported in the current implementation".format(
                     self.initial_delay, max_delay_ms))
 
-    def get_max_rewires_per_ts(self, machine_time_step):
+    def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
+                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
             # fast rewiring, so need to set max_rewires_per_ts
-            max_rewires_per_ts = int(machine_time_step / (
+            max_rewires_per_ts = int(machine_time_step() / (
                 self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts

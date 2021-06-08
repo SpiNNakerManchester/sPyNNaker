@@ -66,11 +66,10 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step: (unused?)
         :param iterable(float) weight_scales:
         :param int n_weight_terms:
        """
