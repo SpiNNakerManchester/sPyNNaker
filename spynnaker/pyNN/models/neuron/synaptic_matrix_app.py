@@ -16,7 +16,6 @@ import numpy
 
 from pacman.model.graphs.common.slice import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from .synaptic_matrix import SynapticMatrix

@@ -23,7 +23,7 @@ import pytest
 from spinn_machine import SDRAM
 from spinn_machine.virtual_machine import virtual_machine
 from spinn_utilities.overrides import overrides
-from spinn_utilities.config_holder import load_config, set_config
+from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
