@@ -1193,7 +1193,7 @@ class AbstractPopulationVertex(
         """
         if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
-            self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
+            self.__synapse_recorder.set_max_rewires_per_ts(
                 self.__synapse_dynamics.get_max_rewires_per_ts())
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
