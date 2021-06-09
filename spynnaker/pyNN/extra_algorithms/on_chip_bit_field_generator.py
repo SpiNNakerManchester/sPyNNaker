@@ -129,6 +129,7 @@ class OnChipBitFieldGenerator(object):
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             executable_finder,
+            get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
