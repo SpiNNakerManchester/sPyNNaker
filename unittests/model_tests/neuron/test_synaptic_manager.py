@@ -56,6 +56,8 @@ from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
 from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
 from spynnaker.pyNN.config_setup import reset_configs
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
 import spynnaker8 as p
 
 
@@ -83,10 +85,12 @@ def say_false(self, weights, delays):
 
 
 def test_write_data_spec():
+    # UGLY but the mock transceiver NEED generate_on_machine to be False
+    AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
+    reset_configs()
     machine = virtual_machine(2, 2)
     p.setup(1.0)
     load_config()
-    set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
@@ -116,7 +120,7 @@ def test_write_data_spec():
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph, 1000, 16.0)
+        delay_adder.__call__(app_graph, 16.0)
         partitioner = SpynnakerSplitterPartitioner()
         machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
@@ -423,7 +427,7 @@ def test_pop_based_master_pop_table_standard(
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph, 1000, 16.0)
+        delay_adder.__call__(app_graph, 16.0)
         partitioner = SpynnakerSplitterPartitioner()
         machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
