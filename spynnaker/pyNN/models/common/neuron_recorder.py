@@ -617,7 +617,7 @@ class NeuronRecorder(object):
             return self.__sampling_rates[variable] > 0
         except KeyError:
             if (variable in self.__events_per_core_recording or
-                    variable in self.__per_timestep_variables):
+                    variable in self.__per_timestep_recording):
                 return True
         return False
 
