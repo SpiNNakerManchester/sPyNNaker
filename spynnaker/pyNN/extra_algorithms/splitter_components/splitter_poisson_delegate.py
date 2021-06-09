@@ -32,7 +32,7 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
         one-to-one connected to a single Population
     """
 
-    """ Message to display on error """
+    # Message to display on error
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the SplitterPoissonDelegate as"
         " the only vertex supported by this splitter is a "
