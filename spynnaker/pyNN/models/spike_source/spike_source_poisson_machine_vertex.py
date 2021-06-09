@@ -578,7 +578,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=self.vertex_slice.n_atoms)
 
         # Write the maximum spikes per tick
-        spec.write_value(data=self.max_spikes_per_ts(machine_time_step))
+        spec.write_value(data=self.max_spikes_per_ts())
 
         # Write the random seed (4 words), generated randomly!
         for value in self._app_vertex.kiss_seed(self.vertex_slice):
