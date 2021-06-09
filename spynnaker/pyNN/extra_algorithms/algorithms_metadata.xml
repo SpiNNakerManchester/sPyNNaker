@@ -352,6 +352,7 @@
             <parameter>
                 <param_name>hostname</param_name>
                 <param_type>IPAddress</param_type>
+            </parameter>
             <parameter>
                 <param_name>machine</param_name>
                 <param_type>MemoryExtendedMachine</param_type>
