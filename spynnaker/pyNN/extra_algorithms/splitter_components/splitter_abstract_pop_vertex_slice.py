@@ -96,7 +96,7 @@ class SplitterAbstractPopulationVertexSlice(
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
         return super(SplitterAbstractPopulationVertexSlice, self)\
-            .create_machine_vertices(self, resource_tracker, machine_graph)
+            .create_machine_vertices(resource_tracker, machine_graph)
 
     @overrides(AbstractSplitterSlice.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
