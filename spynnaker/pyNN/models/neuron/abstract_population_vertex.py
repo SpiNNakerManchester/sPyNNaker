@@ -218,7 +218,7 @@ class AbstractPopulationVertex(
             {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
             [NeuronRecorder.REWIRING],
             {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE},
-            offset=len(neuron_recordable_variables))
+            offset=len(self.__neuron_recorder.get_recordable_variables()))
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -418,7 +418,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractEventRecordable.is_recording_events)
     def is_recording_events(self, variable):
-        return self.__neuron_recorder.is_recording(variable)
+        return self.__synapse_recorder.is_recording(variable)
 
     @overrides(AbstractEventRecordable.set_recording_events)
     def set_recording_events(
@@ -436,7 +436,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractEventRecordable.get_events)
     def get_events(
             self, variable, placements, buffer_manager):
-        return self.__neuron_recorder.get_events(
+        return self.__synapse_recorder.get_events(
             self.label, buffer_manager, placements, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)

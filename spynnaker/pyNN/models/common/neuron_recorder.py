@@ -113,6 +113,9 @@ class NeuronRecorder(object):
     #: max_rewires
     MAX_REWIRES = "max_rewires"
 
+    #: number of words per rewiring entry
+    REWIRING_N_WORDS = 2
+
     #: rewiring: shift values to decode recorded value
     _PRE_ID_SHIFT = 9
     _POST_ID_SHIFT = 1
@@ -148,20 +151,18 @@ class NeuronRecorder(object):
         self.__events_per_ts = dict()
         self.__events_per_ts[self.MAX_REWIRES] = 0  # record('all')
 
-        self.__region_ids = dict()
-        region_id = offset
-        for region_id, variable in enumerate(itertools.chain(
-                allowed_variables, bitfield_variables), start=offset):
+        # Get info on variables like these
+        for variable in itertools.chain(allowed_variables, bitfield_variables):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
+
+        # Get region ids for all variables
+        self.__region_ids = dict()
+        for region_id, variable in enumerate(itertools.chain(
+                    allowed_variables, bitfield_variables,
+                    events_per_core_variables, per_timestep_variables),
+                start=offset):
             self.__region_ids[variable] = region_id
-        event_region_id = region_id
-        for event_region_id, variable in enumerate(
-                events_per_core_variables, start=region_id + 1):
-            self.__region_ids[variable] = event_region_id
-        for ts_region_id, variable in enumerate(
-                per_timestep_variables, start=event_region_id + 1):
-            self.__region_ids[variable] = ts_region_id
 
     def _count_recording_per_slice(
             self, variable, vertex_slice):
@@ -541,10 +542,6 @@ class NeuronRecorder(object):
             if neurons_recording == 0:
                 continue
 
-            # Read the rewiring data
-            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
-            n_words_with_timestamp = n_words + 1
-
             # for buffering output info is taken form the buffer manager
             region = self.__region_ids[variable]
             record_raw, data_missing = buffer_manager.get_data_by_placement(
@@ -555,7 +552,7 @@ class NeuronRecorder(object):
             if len(record_raw) > 0:
                 raw_data = (
                     numpy.asarray(record_raw, dtype="uint8").view(
-                        dtype="<i4")).reshape([-1, n_words_with_timestamp])
+                        dtype="<i4")).reshape([-1, self.REWIRING_N_WORDS])
             else:
                 raw_data = record_raw
 
