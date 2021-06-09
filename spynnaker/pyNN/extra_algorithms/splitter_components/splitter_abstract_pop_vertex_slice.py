@@ -89,6 +89,8 @@ class SplitterAbstractPopulationVertexSlice(
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+        app_vertex.synapse_recorder.add_region_offset(
+            len(app_vertex.neuron_recorder.get_recordable_variables()))
 
     @overrides(AbstractSplitterSlice.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):

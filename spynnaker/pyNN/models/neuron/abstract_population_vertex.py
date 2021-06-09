@@ -217,8 +217,7 @@ class AbstractPopulationVertex(
             n_neurons, [NeuronRecorder.PACKETS],
             {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE},
             [NeuronRecorder.REWIRING],
-            {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE},
-            offset=len(self.__neuron_recorder.get_recordable_variables()))
+            {NeuronRecorder.REWIRING: NeuronRecorder.REWIRING_TYPE})
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
