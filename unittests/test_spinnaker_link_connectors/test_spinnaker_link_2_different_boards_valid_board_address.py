@@ -50,6 +50,8 @@ def do_run():
 
 class SpinnakerLink2DifferentBoardsValidBoardAddressTest(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_spinnaker_link_2_different_boards_valid_board_address(self):
         do_run()
 

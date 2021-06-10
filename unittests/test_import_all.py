@@ -20,6 +20,8 @@ import spinn_utilities.package_loader as package_loader
 
 class ImportAllModule(unittest.TestCase):
 
+    # NO unittest_setup() as part way through spynnaker is imported
+
     def test_import_all(self):
         if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
             package_loader.load_module("spynnaker", remove_pyc_files=False)

@@ -14,20 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
 import spynnaker8  # noqa: F401
 
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
+    def setUp(cls):
         spynnaker8.setup()
-
-    @classmethod
-    def tearDownClass(cls):
-        globals_variables.unset_simulator()
 
     def test_no_spikes(self):
         v = SpikeSourceArrayVertex(

@@ -16,11 +16,12 @@
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from unittests.mocks import MockPopulation
-import spynnaker8
+
 
 
 @pytest.mark.parametrize(
@@ -52,7 +53,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    spynnaker8.setup()
+    unittest_setup()
     connector = FromListConnector(clist, column_names=column_names)
     if expected_clist is not None:
         assert(numpy.array_equal(connector.conn_list, expected_clist))
@@ -102,7 +103,7 @@ class MockFromListConnector(FromListConnector):
 
 
 def test_connector_split():
-    spynnaker8.setup()
+    unittest_setup()
     n_sources = 1000
     n_targets = 1000
     n_connections = 10000
@@ -152,6 +153,7 @@ def test_connector_split():
 
 
 def test_could_connect():
+    unittest_setup()
     connector = FromListConnector(
         [[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8], [4, 1], [5, 0],
          [6, 2], [4, 8]])

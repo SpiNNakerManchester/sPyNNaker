@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.defaults import (
     defaults, default_parameters, default_initial_values)
 from testfixtures.logcapture import LogCapture
@@ -22,6 +23,7 @@ import re
 
 
 def test_nothing():
+    unittest_setup()
     @defaults
     class _AClass(object):
         def __init__(self, param_1=1, param_2=2, param_3=3):
@@ -32,6 +34,7 @@ def test_nothing():
 
 
 def test_parameters():
+    unittest_setup()
     @defaults
     class _AClass(object):
 
@@ -43,6 +46,7 @@ def test_parameters():
 
 
 def test_state_variables():
+    unittest_setup()
     @defaults
     class _AClass(object):
 
@@ -54,6 +58,7 @@ def test_state_variables():
 
 
 def test_both():
+    unittest_setup()
     @defaults
     class _AClass(object):
 
@@ -76,6 +81,7 @@ def test_both():
 
 
 def test_abstract():
+    unittest_setup()
     class BaseClass(object, metaclass=AbstractBase):
 
         @abstractproperty
@@ -103,6 +109,7 @@ def test_abstract():
 
 
 def test_setting_state_variables():
+    unittest_setup()
 
     @defaults
     class _AClass(object):

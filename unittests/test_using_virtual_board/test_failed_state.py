@@ -15,9 +15,12 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
+from spinn_front_end_common.utilities.globals_variables import unset_simulator
 
 
 class TestFailedState(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_double_end(self):
         sim.setup(1.0)
@@ -25,4 +28,5 @@ class TestFailedState(BaseTestCase):
         sim.end()
 
     def test_only_end(self):
+        unset_simulator()
         sim.end()

@@ -36,7 +36,6 @@ from spinn_utilities.config_holder import set_config, load_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spynnaker.pyNN.config_setup import reset_configs
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
@@ -267,7 +266,6 @@ def test_write_data_spec():
         assert all(list_delays == connections_4["delay"])
     finally:
         shutil.rmtree(report_folder, ignore_errors=True)
-        reset_configs()
 
 
 def test_set_synapse_dynamics():
