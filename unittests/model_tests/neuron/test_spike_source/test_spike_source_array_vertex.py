@@ -16,7 +16,7 @@
 import unittest
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
-import spynnaker8
+import spynnaker8  # noqa: F401
 
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):

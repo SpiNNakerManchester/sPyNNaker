@@ -23,6 +23,8 @@ from spinn_utilities.config_holder import (
     get_config_float, get_config_int, get_config_bool)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
@@ -387,8 +389,8 @@ class SynapticManager(object):
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
-            weight_mean, weight_std_dev, spikes_per_second,
-            machine_timestep, n_synapses_in, sigma):
+            weight_mean, weight_std_dev, spikes_per_second, n_synapses_in,
+            sigma):
         """ Provides expected upper bound on accumulated values in a ring\
             buffer element.
 
@@ -404,7 +406,6 @@ class SynapticManager(object):
             microSiemens as required)
         :param float weight_std_dev: SD of weight distribution
         :param float spikes_per_second: Maximum expected Poisson rate in Hz
-        :param int machine_timestep: in us
         :param int n_synapses_in: No of connected synapses
         :param float sigma: How many SD above the mean to go for upper bound;
             a good starting choice is 5.0. Given length of simulation we can
@@ -412,7 +413,9 @@ class SynapticManager(object):
         :rtype: float
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = (MICRO_TO_SECOND_CONVERSION /
+                            machine_time_step())
+
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -458,14 +461,12 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, machine_vertex, machine_graph, machine_timestep,
-            weight_scale):
+            self, machine_vertex, machine_graph, weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
 
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
         """
@@ -477,7 +478,9 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        steps_per_second = (
+                MICRO_TO_SECOND_CONVERSION /
+                machine_time_step())
 
         synapse_map = dict()
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
@@ -523,7 +526,7 @@ class SynapticManager(object):
                 if rate != 0:
                     spikes_per_second = rate
                 spikes_per_tick = \
-                    pre_vertex.max_spikes_per_ts(machine_timestep)
+                    pre_vertex.max_spikes_per_ts()
             rate_stats[synapse_type].add_items(
                 spikes_per_second, 0, n_connections)
             total_weights[synapse_type] += spikes_per_tick * (
@@ -543,8 +546,7 @@ class SynapticManager(object):
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
-                        machine_timestep, stats.n_items,
-                        self.__ring_buffer_sigma),
+                        stats.n_items, self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
@@ -581,28 +583,24 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def __update_ring_buffer_shifts_and_weight_scales(
-            self, machine_vertex, machine_graph, machine_time_step,
-            weight_scale):
+            self, machine_vertex, machine_graph, weight_scale):
         """ Update the ring buffer shifts and weight scales for this vertex
 
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        :param float machine_time_step:
         :param float weight_scale:
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    machine_vertex, machine_graph, machine_time_step,
-                    weight_scale)
+                    machine_vertex, machine_graph, weight_scale)
             self.__weight_scales = numpy.array([
                 self.__get_weight_scale(r) * weight_scale
                 for r in self.__ring_buffer_shifts])
 
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            machine_graph, application_graph, routing_info, weight_scale,
-            machine_time_step):
+            machine_graph, application_graph, routing_info, weight_scale):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -619,9 +617,7 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param float machine_time_step:
         """
-
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
@@ -632,7 +628,7 @@ class SynapticManager(object):
             machine_vertex)
 
         self.__update_ring_buffer_shifts_and_weight_scales(
-            machine_vertex, machine_graph, machine_time_step, weight_scale)
+            machine_vertex, machine_graph, weight_scale)
         spec.switch_write_focus(self._synapse_params_region)
         # write the bool for deleting packets that were too late for a timer
         spec.write_value(int(self.__drop_late_spikes))
@@ -641,19 +637,18 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph, machine_time_step)
+            routing_info, machine_graph)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
                 spec, self._synapse_dynamics_region,
-                machine_time_step, self.__weight_scales)
+                self.__weight_scales)
 
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, self._struct_dynamics_region, machine_time_step,
-                    self.__weight_scales, machine_graph, machine_vertex,
-                    routing_info, matrices)
+                    spec, self._struct_dynamics_region, self.__weight_scales,
+                    machine_graph, machine_vertex, routing_info, matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
 

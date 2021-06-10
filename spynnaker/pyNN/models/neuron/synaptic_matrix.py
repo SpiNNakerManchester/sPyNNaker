@@ -15,7 +15,6 @@
 
 import numpy
 
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
@@ -168,10 +167,9 @@ class SynapticMatrix(object):
             not self.__synapse_info.postpop_is_view)
         return is_direct, next_addr
 
-    def get_row_data(self, machine_time_step):
+    def get_row_data(self):
         """ Generate the row data for a synaptic matrix from the description
 
-        :param float machine_time_step: the sim machine time step.
         :return: The data and the delayed data
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
@@ -186,7 +184,7 @@ class SynapticMatrix(object):
             self.__machine_edge, self.__max_row_info,
             self.__routing_info is not None,
             self.__delay_routing_info is not None,
-            machine_time_step, self.__app_edge)
+            self.__app_edge)
 
         if self.__app_edge.delay_edge is not None:
             pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
@@ -406,20 +404,18 @@ class SynapticMatrix(object):
         return block_addr, self.__delay_syn_mat_offset
 
     def get_generator_data(
-            self, syn_mat_offset, d_mat_offset, max_delay_per_stage,
-            machine_time_step):
+            self, syn_mat_offset, d_mat_offset, max_delay_per_stage):
         """ Get the generator data for this matrix
 
         :param int syn_mat_offset:
             The synaptic matrix offset to write the data to
-        :param float machine_time_step: the sim's machine time step.
         :param int d_mat_offset:
             The synaptic matrix offset to write the delayed data to
         :param int max_delay_per_stage: around of timer ticks each delay stage
             holds.
         :rtype: GeneratorData
         """
-        self.__write_on_chip_delay_data(max_delay_per_stage, machine_time_step)
+        self.__write_on_chip_delay_data(max_delay_per_stage)
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -431,13 +427,11 @@ class SynapticMatrix(object):
             self.__machine_edge.pre_vertex.vertex_slice,
             self.__machine_edge.post_vertex.vertex_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-            max_delay_per_stage, machine_time_step)
+            max_delay_per_stage)
 
-    def __write_on_chip_delay_data(
-            self, max_delay_per_stage, machine_time_step):
+    def __write_on_chip_delay_data(self, max_delay_per_stage):
         """ Write data for delayed on-chip generation
 
-        :param machine_time_step: sim machine time step
         :param max_delay_per_stage: max delay supported by psot vertex
         """
         # If delay edge exists, tell this about the data too, so it can
@@ -452,7 +446,7 @@ class SynapticMatrix(object):
                 self.__machine_edge.pre_vertex.vertex_slice,
                 self.__machine_edge.post_vertex.vertex_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-                max_delay_per_stage, machine_time_step)
+                max_delay_per_stage)
         elif self.__max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay machine edge for {}".format(
@@ -511,7 +505,6 @@ class SynapticMatrix(object):
         """
         pre_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_slice = self.__machine_edge.post_vertex.vertex_slice
-        machine_time_step = globals_variables.get_simulator().machine_time_step
         connections = list()
 
         if self.__syn_mat_offset is not None:
@@ -526,7 +519,7 @@ class SynapticMatrix(object):
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
-                machine_time_step, False, splitter.max_support_delay()))
+                False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
             block = self.__get_delayed_block(
@@ -536,7 +529,7 @@ class SynapticMatrix(object):
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,
-                machine_time_step, True, splitter.max_support_delay()))
+                True, splitter.max_support_delay()))
 
         return connections
 

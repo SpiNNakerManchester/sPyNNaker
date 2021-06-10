@@ -269,11 +269,10 @@ class SynapseDynamicsSTDP(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
         return size
 
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region,  weight_scales):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param int region: region ID
-        :param int machine_time_step:
         :param list(float) weight_scales:
         """
         spec.comment("Writing Plastic Parameters")
@@ -285,13 +284,11 @@ class SynapseDynamicsSTDP(
         spec.write_value(int(self.__backprop_delay))
 
         # Write timing dependence parameters to region
-        self.__timing_dependence.write_parameters(
-            spec, machine_time_step, weight_scales)
+        self.__timing_dependence.write_parameters(spec, weight_scales)
 
         # Write weight dependence information to region
         self.__weight_dependence.write_parameters(
-            spec, machine_time_step, weight_scales,
-            self.__timing_dependence.n_weight_terms)
+            spec, weight_scales, self.__timing_dependence.n_weight_terms)
 
     @property
     def _n_header_bytes(self):

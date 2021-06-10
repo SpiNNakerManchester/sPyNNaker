@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
 
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
@@ -34,7 +34,6 @@ class DelaySupportAdder(object):
     """ adds delay extension vertices into the APP graph as needed
 
     :param ApplicationGraph app_graph: the app graph
-    :param int machine_time_step: the machine time step
     :param int user_max_delay: the user defined max delay
     :rtype: None
     """
@@ -72,13 +71,12 @@ class DelaySupportAdder(object):
         self._delay_post_edge_map = dict()
         self._delay_pre_edges = list()
 
-    def __call__(self, app_graph, machine_time_step, user_max_delay):
+    def __call__(self, app_graph, user_max_delay):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
             the app graph
-        :param int machine_time_step: the machine time step
         :param int user_max_delay: the user defined max delay
         """
 
@@ -97,8 +95,7 @@ class DelaySupportAdder(object):
                     synapse_infos = app_edge.synapse_information
                     (max_delay_needed, post_vertex_max_delay,
                      need_delay_extension) = self._check_delay_values(
-                        app_edge, user_max_delay, machine_time_step,
-                        synapse_infos)
+                        app_edge, user_max_delay, synapse_infos)
 
                     # if we need a delay, add it to the app graph.
                     if need_delay_extension:
@@ -200,13 +197,12 @@ class DelaySupportAdder(object):
         return delay_app_vertex
 
     def _check_delay_values(
-            self, app_edge, user_max_delay, machine_time_step, synapse_infos):
+            self, app_edge, user_max_delay, synapse_infos):
         """ checks the delay required from the user defined max, the max delay\
             supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed app edge
         :param int user_max_delay: user max delay of the sim.
-        :param int machine_time_step: machine time step of the sim.
         :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
         :return:tuple of max_delay_needed, post_vertex_max_delay, bool.
         """
@@ -231,7 +227,7 @@ class DelaySupportAdder(object):
 
         post_vertex_max_delay = (
                 app_edge.post_vertex.splitter.max_support_delay() *
-                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+                machine_time_step_ms())
 
         # if does not need a delay extension, run away
         if post_vertex_max_delay >= max_delay_needed:
@@ -248,8 +244,7 @@ class DelaySupportAdder(object):
         total_supported_delay = (
             post_vertex_max_delay +
             (DelayExtensionVertex.get_max_delay_ticks_supported(
-                post_vertex_max_delay) *
-             (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)))
+                post_vertex_max_delay) * machine_time_step_ms()))
         if total_supported_delay < max_delay_needed:
             raise DelayExtensionException(
                 self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(
