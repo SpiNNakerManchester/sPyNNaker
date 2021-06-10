@@ -32,7 +32,7 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationGraph
 from pacman.model.partitioner_splitters import SplitterSliceLegacy
-from spinn_utilities.config_holder import set_config, load_config
+from spinn_utilities.config_holder import set_config
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
@@ -98,7 +98,6 @@ def test_write_data_spec():
     # Add an sdram so max SDRAM is high enough
     SDRAM(10000)
 
-    load_config()
     set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
     placements = Placements()
