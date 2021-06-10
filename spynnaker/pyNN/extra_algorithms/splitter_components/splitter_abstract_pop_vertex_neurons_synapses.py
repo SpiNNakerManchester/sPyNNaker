@@ -86,8 +86,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__poisson_edges",
         # The maximum delay supported
         "__max_delay",
+        # The user-set maximum delay, for reset
+        "__user_max_delay",
         # Whether to allow delay extensions to be created
         "__allow_delay_extension",
+        # The user-set allowing of delay extensions
+        "__user_allow_delay_extension",
         # The fixed slices the vertices are divided into
         "__slices",
         # The next synapse core to use for an incoming machine edge
@@ -126,7 +130,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         AbstractSpynnakerSplitterDelay.__init__(self)
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
+        self.__user_max_delay = max_delay
         self.__allow_delay_extension = allow_delay_extension
+        self.__user_allow_delay_extension = allow_delay_extension
         self.__slices = None
         self.__next_synapse_index = 0
 
@@ -525,6 +531,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__neuron_vertices = None
         self.__synapse_vertices = None
         self.__synapse_verts_by_neuron = None
+        self.__max_delay = self.__user_max_delay
+        self.__allow_delay_extension = self.__user_allow_delay_extension
 
     @property
     def __synapse_references(self):
