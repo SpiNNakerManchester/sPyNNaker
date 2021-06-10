@@ -467,7 +467,7 @@ def test_pop_based_master_pop_table_standard(
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
     pre_app_vertex = SimpleTestVertex(
-        n_pre_neurons, max_atoms=neurons_per_core)
+        n_pre_neurons, max_atoms_per_core=neurons_per_core)
     pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
