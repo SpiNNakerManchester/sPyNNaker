@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import math
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
@@ -23,6 +24,8 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -98,15 +101,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __init__(self, n_synapse_vertices=1,
                  max_delay=None,
-                 allow_delay_extension=True):
+                 allow_delay_extension=None):
         """
 
         :param int n_synapse_vertices:
             The number of synapse cores per neuron core
-        :param int max_delay:
-            The maximum delay supported by each synapse core
-        :param bool allow_delay_extension:
-            Whether delay extensions are allowed in the network
+        :param max_delay:
+            The maximum delay supported by each synapse core; by default this
+            is computed based on the number of atoms per core, the number of
+            synapse types, and the space available for delays on the core
+        :type max_delay: int or None
+        :param allow_delay_extension:
+            Whether delay extensions are allowed in the network. If max_delay
+            is provided, this will default to True.  If max_delay is not
+            provided, and this is given as None, it will be computed based on
+            whether delay extensions should be needed.
+        :type allow_delay_extension: bool or None
         """
         super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
             self.SPLITTER_NAME)
@@ -116,6 +126,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__allow_delay_extension = allow_delay_extension
         self.__slices = None
         self.__next_synapse_index = 0
+
+        if (self.__max_delay is not None and
+                self.__allow_delay_extension is None):
+            self.__allow_delay_extension = True
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -661,9 +675,28 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if self.__max_delay is not None:
             return self.__max_delay
 
-        n_atom_bits = get_n_bits(self._governed_app_vertex.n_atoms)
-        n_delay_bits = MAX_RING_BUFFER_BITS - n_atom_bits
-        self.__max_delay = 2 ** n_delay_bits
+        # Find the maximum delay from incoming synapses
+        app_vertex = self._governed_app_vertex
+        max_delay_ms = 0
+        for proj in app_vertex.incoming_projections:
+            s_info = proj._synapse_information
+            proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
+                s_info.connector, s_info)
+            max_delay_ms = max(max_delay_ms, proj_max_delay)
+        max_delay_steps = math.ceil(max_delay_ms / machine_time_step_ms())
+        max_delay_bits = get_n_bits(max_delay_steps)
+
+        # Find the maximum possible delay
+        n_atom_bits = get_n_bits(app_vertex.get_max_atoms_per_core())
+        n_synapse_bits = get_n_bits(
+            app_vertex.neuron_impl.get_n_synapse_types())
+        n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
+
+        # Pick the smallest between the two, so that not too many bits are used
+        max_delay_bits = min(n_delay_bits, max_delay_bits)
+        self.__max_delay = 2 ** max_delay_bits
+        if self.__allow_delay_extension is None:
+            self.__allow_delay_extension = max_delay_bits > n_delay_bits
         return self.__max_delay
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
@@ -672,4 +705,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self):
+        if self.__allow_delay_extension is None:
+            self.__get_max_delay
         return self.__allow_delay_extension
