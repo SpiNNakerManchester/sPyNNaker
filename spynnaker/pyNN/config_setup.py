@@ -16,25 +16,43 @@
 import os
 from spinn_utilities.config_holder import (
     clear_cfg_files, set_cfg_files)
-from spinn_front_end_common.interface.config_setup import add_spinnaker_cfg
+from spinn_front_end_common.interface.config_setup import (
+    add_default_cfg, add_spinnaker_cfg)
+from spinn_front_end_common.utilities.globals_variables import unset_simulator
 
 CONFIG_FILE_NAME = "spynnaker.cfg"
 
 
-def reset_configs():
+def setup_configs():
     """
-    Resets the configs so only the local default config is included.
+    Sets up the configs including the users cfg file
+
+    Clears out any previous read configs but does not load the new configs
+    so a warning is generated if a config is used before setup is called.
 
     """
-    clear_cfg_files()
-    add_spynnaker_cfg()
-
-
-def add_spynnaker_cfg():
-    """
-    Add the local cfg and all dependent cfg files.
-    """
+    clear_cfg_files(False)
     add_spinnaker_cfg()  # This add its dependencies too
     set_cfg_files(
         configfile=CONFIG_FILE_NAME,
         default=os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
+
+
+def unittest_setup():
+    """
+    Does all the steps that may be required before a unittest
+
+    Resets the configs so only the local default configs are included.
+    The user cfg is NOT included!
+
+    Unsets any previous simulators and tempdirs
+
+    .. note::
+         This file should only be called from Spynnaker tests
+         that do not call sim.setup
+
+    """
+    unset_simulator()
+    clear_cfg_files(True)
+    add_spinnaker_cfg()  # This add its dependencies too
+    add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
