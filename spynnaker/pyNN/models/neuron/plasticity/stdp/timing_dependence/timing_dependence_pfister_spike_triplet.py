@@ -193,7 +193,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.minimum_delta)
     def minimum_delta(self, max_stdp_spike_delta):
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = machine_time_step_ms()
 
         # The minimums for potentiation
         min_decayed_r1 = get_min_lut_value(self.__tau_plus_data)

@@ -25,8 +25,6 @@ from spinn_utilities.config_holder import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
