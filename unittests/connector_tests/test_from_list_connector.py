@@ -23,7 +23,6 @@ from spynnaker.pyNN.models.neural_projections import SynapseInformation
 from unittests.mocks import MockPopulation
 
 
-
 @pytest.mark.parametrize(
     "clist, column_names, weights, delays, expected_clist, expected_weights, "
     "expected_delays, expected_extra_parameters, "

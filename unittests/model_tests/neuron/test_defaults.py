@@ -24,6 +24,7 @@ import re
 
 def test_nothing():
     unittest_setup()
+
     @defaults
     class _AClass(object):
         def __init__(self, param_1=1, param_2=2, param_3=3):
@@ -35,6 +36,7 @@ def test_nothing():
 
 def test_parameters():
     unittest_setup()
+
     @defaults
     class _AClass(object):
 
@@ -47,6 +49,7 @@ def test_parameters():
 
 def test_state_variables():
     unittest_setup()
+
     @defaults
     class _AClass(object):
 
@@ -59,6 +62,7 @@ def test_state_variables():
 
 def test_both():
     unittest_setup()
+
     @defaults
     class _AClass(object):
 
@@ -82,6 +86,7 @@ def test_both():
 
 def test_abstract():
     unittest_setup()
+
     class BaseClass(object, metaclass=AbstractBase):
 
         @abstractproperty

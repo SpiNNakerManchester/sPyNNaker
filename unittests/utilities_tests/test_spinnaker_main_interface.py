@@ -22,6 +22,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN.config_setup import unittest_setup
 
+
 class Close_Once(object):
 
     __slots__ = ["closed"]
