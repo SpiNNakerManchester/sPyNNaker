@@ -15,14 +15,12 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
 from pacman.exceptions import PacmanConfigurationException
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SpynnakerSplitterSliceLegacy)
+from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
@@ -59,14 +57,14 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
                 return True
         return False
 
-    @overrides(SplitterSliceLegacy.set_governed_app_vertex)
+    @overrides(SpynnakerSplitterSliceLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(SplitterSliceLegacy.create_machine_vertices)
+    @overrides(SpynnakerSplitterSliceLegacy.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
