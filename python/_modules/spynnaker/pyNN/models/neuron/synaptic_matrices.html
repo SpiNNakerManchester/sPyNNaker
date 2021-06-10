@@ -448,7 +448,7 @@
         <span class="k">return</span> <span class="n">_AppKeyInfo</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">new_mask</span><span class="p">,</span> <span class="n">core_mask</span><span class="p">,</span> <span class="n">mask_size</span><span class="p">,</span>
                            <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">n_stages</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__check_key_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">slices</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__check_key_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">slices</span><span class="p">,</span> <span class="n">delay_stages</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Check if a list of slices cover all n_atoms without any gaps</span>
 
 <span class="sd">        :param int n_atoms: The total number of atoms expected</span>
@@ -472,10 +472,12 @@
                     <span class="n">n_atoms_per_core</span> <span class="o">!=</span> <span class="n">s</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="n">next_high</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">n_atoms_per_core</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">n_atoms</span>
+            <span class="k">if</span> <span class="n">n_atoms_per_core</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">n_atoms_per_core</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">n_atoms</span>
 
         <span class="c1"># If the number of atoms per core is too big, this can&#39;t be done</span>
-        <span class="k">if</span> <span class="n">n_atoms_per_core</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_n_neurons_per_core</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">n_atoms_per_core</span> <span class="o">*</span> <span class="n">delay_stages</span><span class="p">)</span> <span class="o">&gt;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_n_neurons_per_core</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
@@ -567,7 +569,8 @@
             <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_key_slices</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">):</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_app_key_and_mask</span><span class="p">(</span>
