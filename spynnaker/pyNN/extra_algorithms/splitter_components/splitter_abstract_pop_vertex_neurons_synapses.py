@@ -35,6 +35,7 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
 from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -322,13 +323,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 vertex_slice, app_vertex.incoming_projections)
         dynamics_sz = self._governed_app_vertex.get_synapse_dynamics_size(
             vertex_slice)
-        # Need a minimum size to make it possible to reference
-        if structural_sz == 0:
-            structural_sz = 4
-        if dynamics_sz == 0:
-            dynamics_sz = 4
         all_syn_block_sz = app_vertex.get_synapses_size(
                     vertex_slice, app_vertex.incoming_projections)
+        # Need a minimum size to make it possible to reference
+        structural_sz = max(structural_sz, BYTES_PER_WORD)
+        dynamics_sz = max(dynamics_sz, BYTES_PER_WORD)
+        all_syn_block_sz = max(all_syn_block_sz, BYTES_PER_WORD)
         shared_sdram = self.__shared_synapse_sdram(
             independent_synapse_sdram, proj_dependent_sdram,
             all_syn_block_sz, structural_sz, dynamics_sz)
@@ -577,7 +577,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             .synaptic_matrix, all_syn_block_sz)
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.direct_matrix,
-            self._governed_app_vertex.all_single_syn_size)
+            max(self._governed_app_vertex.all_single_syn_size, BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .structural_dynamics, structural_sz)
@@ -637,10 +637,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.synapse_params,
-            app_vertex.get_synapse_params_size())
+            max(app_vertex.get_synapse_params_size(), BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_builder, exact_sdram_for_bit_field_builder_region())
+            .bitfield_builder,
+            max(exact_sdram_for_bit_field_builder_region(), BYTES_PER_WORD))
         return sdram
 
     def __proj_dependent_synapse_sdram(self, incoming_projections):
@@ -654,20 +655,23 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.pop_table,
-            MasterPopTableAsBinarySearch.get_master_population_table_size(
-                incoming_projections))
+            max(MasterPopTableAsBinarySearch.get_master_population_table_size(
+                    incoming_projections), BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .connection_builder,
-            app_vertex.get_synapse_expander_size(incoming_projections))
+            max(app_vertex.get_synapse_expander_size(incoming_projections),
+                BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .bitfield_filter,
-            get_estimated_sdram_for_bit_field_region(incoming_projections))
+            max(get_estimated_sdram_for_bit_field_region(incoming_projections),
+                BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .bitfield_key_map,
-            get_estimated_sdram_for_key_region(incoming_projections))
+            max(get_estimated_sdram_for_key_region(incoming_projections),
+                BYTES_PER_WORD))
         return sdram
 
     @property
