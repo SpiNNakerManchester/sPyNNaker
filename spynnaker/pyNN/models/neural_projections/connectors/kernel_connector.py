@@ -310,9 +310,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 numpy.array(all_delays), numpy.array(all_weights))
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        AbstractConnector.set_projection_information(self, synapse_info)
         # now we want to tell the synapse_info about weights and delays
         if self._krn_weights is not None:
             synapse_info.weights = self._krn_weights.flatten()
