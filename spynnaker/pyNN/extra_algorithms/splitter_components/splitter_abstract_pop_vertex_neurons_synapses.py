@@ -24,6 +24,8 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
+from pacman.utilities.algorithm_utilities.\
+    partition_algorithm_utilities import get_remaining_constraints
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms)
 from spynnaker.pyNN.models.neuron import (
@@ -143,6 +145,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def create_machine_vertices(self, resource_tracker, machine_graph):
         app_vertex = self._governed_app_vertex
         label = app_vertex.label
+        constraints = get_remaining_constraints(app_vertex)
 
         # Structural plasticity can only be run on a single synapse core
         if (isinstance(app_vertex.synapse_dynamics,
@@ -188,7 +191,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex, neuron_resources = self.__add_neuron_core(
                 vertex_slice, label, index, rb_shifts, weight_scales,
-                machine_graph)
+                machine_graph, constraints)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -200,14 +203,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse_references, syn_label = self.__add_lead_synapse_core(
                 vertex_slice, independent_synapse_sdram, proj_dependent_sdram,
                 label, rb_shifts, weight_scales, all_resources, machine_graph,
-                synapse_vertices, neuron_vertex)
+                synapse_vertices, neuron_vertex, constraints)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
                     all_resources, machine_graph, synapse_vertices,
-                    neuron_vertex)
+                    neuron_vertex, constraints)
 
             # Add resources for Poisson vertices
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -254,7 +257,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, label, index, rb_shifts, weight_scales,
-            machine_graph):
+            machine_graph, constraints):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -268,6 +271,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The scale to apply to weights to encode them in the 16-bit synapses
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph to add the core to
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            Constraints to add
         :return: The neuron vertex created and the resources used
         :rtype: tuple(PopulationNeuronsMachineVertex, \
                       ~pacman.model.resources.ResourceContainer)
@@ -277,8 +282,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_label = "{}_Neurons:{}-{}".format(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
-            neuron_resources, neuron_label, None, app_vertex, vertex_slice,
-            index, rb_shifts, weight_scales)
+            neuron_resources, neuron_label, constraints, app_vertex,
+            vertex_slice, index, rb_shifts, weight_scales)
         machine_graph.add_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
@@ -287,7 +292,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_lead_synapse_core(
             self, vertex_slice, independent_synapse_sdram,
             proj_dependent_sdram, label, rb_shifts, weight_scales,
-            all_resources, machine_graph, synapse_vertices, neuron_vertex):
+            all_resources, machine_graph, synapse_vertices, neuron_vertex,
+            constraints):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
@@ -313,6 +319,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A list to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            Constraints to add
         :return: References to the synapse regions that can be used by a shared
             synapse core, and the basic label for the synapse cores
         :rtype: tuple(SynapseRegions, str)
@@ -340,7 +348,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         lead_synapse_resources = self.__get_synapse_resources(
             vertex_slice, shared_sdram)
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
-            lead_synapse_resources, "{}(0)".format(syn_label), None,
+            lead_synapse_resources, "{}(0)".format(syn_label), constraints,
             app_vertex, vertex_slice, rb_shifts, weight_scales,
             all_syn_block_sz, structural_sz, synapse_references)
         all_resources.append(lead_synapse_resources)
@@ -356,7 +364,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_shared_synapse_core(
             self, syn_label, i, vertex_slice, synapse_references,
             all_resources, machine_graph, synapse_vertices,
-            neuron_vertex):
+            neuron_vertex, constraints):
         """ Add a second or subsequent synapse core.  This will reference the
             synaptic data generated by the lead synapse core.
 
@@ -375,12 +383,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             A list to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex the synapses will feed into
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            Constraints to add
         """
         app_vertex = self._governed_app_vertex
         synapse_label = "{}({})".format(syn_label, i)
         synapse_resources = self.__get_synapse_resources(vertex_slice)
         synapse_vertex = PopulationSynapsesMachineVertexShared(
-            synapse_resources, synapse_label, None, app_vertex,
+            synapse_resources, synapse_label, constraints, app_vertex,
             vertex_slice, synapse_references)
         all_resources.append(synapse_resources)
         machine_graph.add_vertex(synapse_vertex)
