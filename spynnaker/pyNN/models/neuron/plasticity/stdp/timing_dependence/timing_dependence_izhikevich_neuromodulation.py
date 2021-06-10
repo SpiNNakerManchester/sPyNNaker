@@ -102,9 +102,8 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-
         # Pair rule requires no pre-synaptic trace when only the nearest
-        # Neighbours are considered and, a single 16-bit R1 trace
+        # neighbours are considered and, a single 16-bit R1 trace
         return 2
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
@@ -112,14 +111,14 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         lut_array_words = (
             len(self.__tau_plus_data) + len(self.__tau_minus_data) +
             len(self.__tau_c_data) + len(self.__tau_d_data))
-        return (lut_array_words * BYTES_PER_WORD) + 4  # not sure about this
+        return (lut_array_words * BYTES_PER_WORD) + 4
 
     @property
     def n_weight_terms(self):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
@@ -137,24 +136,6 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
     @property
     def synaptic_structure(self):
         return self.__synapse_structure
-
-#     @overrides(AbstractTimingDependence.get_provenance_data)
-#     def get_provenance_data(self, pre_population_label,
-#                             post_population_label):
-#         prov_data = list()
-#         prov_data.append(plasticity_helpers.get_lut_provenance(
-#             pre_population_label, post_population_label, "IzhikevicRule",
-#             "tau_plus_last_entry", "tau_plus", self.__tau_plus_data))
-#         prov_data.append(plasticity_helpers.get_lut_provenance(
-#             pre_population_label, post_population_label, "IzhikevichRule",
-#             "tau_minus_last_entry", "tau_minus", self.__tau_minus_data))
-#         prov_data.append(plasticity_helpers.get_lut_provenance(
-#             pre_population_label, post_population_label, "IzhikevichRule",
-#             "tau_c_last_entry", "tau_c", self.__tau_c_data))
-#         prov_data.append(plasticity_helpers.get_lut_provenance(
-#             pre_population_label, post_population_label, "IzhikevichRule",
-#             "tau_d_last_entry", "tau_d", self.__tau_d_data))
-#         return prov_data
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
