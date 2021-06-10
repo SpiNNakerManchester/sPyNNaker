@@ -20,7 +20,6 @@ import tempfile
 from tempfile import mkdtemp
 import numpy
 import pytest
-import sys
 
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
