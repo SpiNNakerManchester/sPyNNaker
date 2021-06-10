@@ -87,9 +87,8 @@ class FromListConnector(AbstractConnector):
         self.conn_list = conn_list
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        AbstractConnector.set_projection_information(self, synapse_info)
         # now we want to tell the synapse_info about weights and delays
         if self.__weights is not None:
             synapse_info.weights = self.__weights.flatten()
