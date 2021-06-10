@@ -106,7 +106,7 @@ class SynapseDynamicsStatic(
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
-            ((connections["delay"].astype("uint32") & 0xF) <<
+            (connections["delay"].astype("uint32") <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
