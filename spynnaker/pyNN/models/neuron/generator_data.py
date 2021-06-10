@@ -17,6 +17,8 @@ import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF
@@ -27,7 +29,6 @@ class GeneratorData(object):
     """
     __slots__ = [
         "__delayed_synaptic_matrix_offset",
-        "__machine_time_step",
         "__max_delayed_row_n_synapses",
         "__max_delayed_row_n_words",
         "__max_row_n_synapses",
@@ -48,7 +49,7 @@ class GeneratorData(object):
             max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
             max_delayed_row_n_synapses, pre_slices, post_slices,
             pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage,  max_delay_per_stage, machine_time_step):
+            max_stage,  max_delay_per_stage):
         self.__synaptic_matrix_offset = synaptic_matrix_offset
         self.__delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self.__max_row_n_words = max_row_n_words
@@ -62,7 +63,6 @@ class GeneratorData(object):
         self.__synapse_information = synapse_information
         self.__max_stage = max_stage
         self.__max_delay_per_stage = max_delay_per_stage
-        self.__machine_time_step = machine_time_step
 
         # Offsets are used in words in the generator, but only
         # if the values are valid
@@ -109,7 +109,8 @@ class GeneratorData(object):
             self.__max_stage,
             self.__max_delay_per_stage,
             DataType.S1615.encode_as_int(
-                MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
+                MICRO_TO_MILLISECOND_CONVERSION /
+                machine_time_step()),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

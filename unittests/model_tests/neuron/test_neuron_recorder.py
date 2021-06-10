@@ -13,17 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from data_specification.enums import DataType
-from unittests.mocks import MockSimulator
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker8.spinnaker import Spynnaker8FailedState
 
 
 def test_simple_record():
-    simulator = MockSimulator()
-    globals_variables.set_failed_state(Spynnaker8FailedState())
-    globals_variables.set_simulator(simulator)
-
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {
@@ -32,7 +25,7 @@ def test_simple_record():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [])
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
     assert(frozenset(["v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
@@ -41,10 +34,6 @@ def test_simple_record():
 
 
 def test_recording_variables():
-    simulator = MockSimulator()
-    globals_variables.set_failed_state(Spynnaker8FailedState())
-    globals_variables.set_simulator(simulator)
-
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {
@@ -53,7 +42,7 @@ def test_recording_variables():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100, [], [])
+    nr = NeuronRecorder(recordables, data_types, [], 100, [], [], [], [])
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)

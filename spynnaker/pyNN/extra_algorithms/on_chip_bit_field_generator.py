@@ -16,6 +16,7 @@
 from collections import defaultdict
 import os
 import struct
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -89,9 +90,8 @@ class OnChipBitFieldGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver, write_bit_field_generator_iobuf,
-            generating_bitfield_report, default_report_folder, machine_graph,
-            routing_infos, generating_bit_field_summary_report):
+            provenance_file_path, transceiver, default_report_folder,
+            machine_graph, routing_infos):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -104,15 +104,11 @@ class OnChipBitFieldGenerator(object):
             the path to where provenance data items are written
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param bool write_bit_field_generator_iobuf: flag for report
-        :param bool generating_bitfield_report: flag for report
         :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
             the key to edge map
-        :param bool generating_bit_field_summary_report:
-            whether to make summary report
         """
         self.__txrx = transceiver
         self.__placements = placements
@@ -135,17 +131,17 @@ class OnChipBitFieldGenerator(object):
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
-            write_bit_field_generator_iobuf, self.__check_for_success,
-            [CPUState.FINISHED], False,
+            get_config_bool("Reports", "write_bit_field_iobuf"),
+            self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()
 
         # read in bit fields for debugging purposes
-        if generating_bitfield_report:
+        if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
                 default_report_folder, self._BIT_FIELD_REPORT_FILENAME))
-        if generating_bit_field_summary_report:
+        if get_config_bool("Reports", "generate_bit_field_summary_report"):
             self._summary_report_bit_fields(app_graph, os.path.join(
                 default_report_folder,
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))

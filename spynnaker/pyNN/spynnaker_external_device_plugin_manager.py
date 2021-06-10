@@ -306,11 +306,3 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_application_vertex(vertex):
         get_simulator().add_application_vertex(vertex)
-
-    @staticmethod
-    def machine_time_step():
-        return get_simulator().machine_time_step
-
-    @staticmethod
-    def time_scale_factor():
-        return get_simulator().time_scale_factor

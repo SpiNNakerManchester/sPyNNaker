@@ -206,7 +206,7 @@ class SynapticMatrices(object):
 
     def write_synaptic_matrix_and_master_population_table(
             self, spec, machine_vertex, all_syn_block_sz, weight_scales,
-            routing_info, machine_graph, machine_time_step):
+            routing_info, machine_graph):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
@@ -221,7 +221,6 @@ class SynapticMatrices(object):
             The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
-        :param float machine_time_step: sim machine time step
         :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
@@ -271,8 +270,7 @@ class SynapticMatrices(object):
                     generate_on_machine.append(app_matrix)
                 else:
                     block_addr, single_addr = app_matrix.write_matrix(
-                        spec, block_addr, single_addr, single_synapses,
-                        machine_time_step)
+                        spec, block_addr, single_addr, single_synapses)
 
         self.__host_generated_block_addr = block_addr
 
@@ -281,7 +279,7 @@ class SynapticMatrices(object):
         generator_data = list()
         for app_matrix in generate_on_machine:
             block_addr = app_matrix.write_on_chip_matrix_data(
-                generator_data, block_addr, machine_time_step)
+                generator_data, block_addr)
             self.__gen_on_machine = True
 
         self.__on_chip_generated_block_addr = block_addr

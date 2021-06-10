@@ -15,11 +15,15 @@
 
 import os
 import unittest
-import pacman.operations.algorithm_reports.reports as reports_names
-from pacman.operations.algorithm_reports.network_specification import (
+import spinn_front_end_common.utilities.report_functions.reports as \
+    reports_names
+from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
 from spinn_front_end_common.utilities import globals_variables
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_neuron_network_specification_report import \
+    SpYNNakerNeuronGraphNetworkSpecificationReport
 import spynnaker8 as sim
 
 
@@ -70,6 +74,9 @@ class TestDebug(BaseTestCase):
             # BoardChipReport.AREA_CODE_REPORT_NAME,
             # write_data_speed_up_report not on a virtual board
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
+            SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME
+            + ".svg",
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
