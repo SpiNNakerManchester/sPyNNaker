@@ -18,11 +18,9 @@ import sys
 import unittest
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
+from spynnaker.pyNN.config_setup import reset_configs
 
 
 class Close_Once(object):
@@ -41,10 +39,8 @@ class Close_Once(object):
 
 class TestSpinnakerMainInterface(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        # Normally this is done by spinnaker.py during import
-        globals_variables._failed_state = SpynnakerFailedState("test")
+    def setUp(self):
+        reset_configs()
 
     def test_min_init(self):
         class_file = sys.modules[self.__module__].__file__

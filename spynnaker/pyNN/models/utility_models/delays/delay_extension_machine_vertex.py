@@ -71,67 +71,16 @@ class DelayExtensionMachineVertex(
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
-    COUNT_SATURATION_ERROR_MESSAGE = (
-        "The delay extension {} has dropped {} packets because during "
-        "certain time steps a neuron was asked to spike more than 256 times. "
-        "This causes a saturation on the count tracker which is a uint8. "
-        "Reduce the packet rates, or modify the delay extension to have "
-        "larger counters.")
-
     COUNT_SATURATION_NAME = "saturation_count"
-
-    INVALID_NEURON_IDS_ERROR_MESSAGE = (
-        "The delay extension {} has dropped {} packets because their "
-        "neuron id was not valid. This is likely a routing issue. "
-        "Please fix and try again")
-
     INVALID_NEURON_ID_COUNT_NAME = "invalid_neuron_count"
-
-    PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE = (
-        "The delay extension {} has dropped {} packets due to the packet "
-        "key being invalid. This is likely a routing issue. "
-        "Please fix and try again")
-
     INVALID_KEY_COUNT_NAME = "invalid_key_count"
-
     N_PACKETS_RECEIVED_NAME = "Number_of_packets_received"
-
     N_PACKETS_PROCESSED_NAME = "Number_of_packets_processed"
-
-    MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE = (
-        "The delay extension {} on {}, {}, {} only processed {} of {}"
-        " received packets.  This could indicate a fault.")
-
     MISMATCH_ADDED_FROM_PROCESSED_NAME = (
         "Number_of_packets_added_to_delay_slot")
-
-    MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE = (
-        "The delay extension {} on {}, {}, {} only added {} of {} processed "
-        "packets.  This could indicate a routing or filtering fault")
-
     N_PACKETS_SENT_NAME = "Number_of_packets_sent"
-
     INPUT_BUFFER_LOST_NAME = "Times_the_input_buffer_lost_packets"
-
-    INPUT_BUFFER_LOST_ERROR_MESSAGE = (
-        "The input buffer for {} on {}, {}, {} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
-
     N_LATE_SPIKES_NAME = "Number_of_late_spikes"
-    N_LATE_SPIKES_MESSAGE_DROP = (
-        "{} packets from {} on {}, {}, {} were dropped from the input buffer, "
-        "because they arrived too late to be processed in a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-    N_LATE_SPIKES_MESSAGE_NO_DROP = (
-        "{} packets from {} on {}, {}, {} arrived too late to be processed in"
-        " a given time step. "
-        "Try increasing the time_scale_factor located within the "
-        ".spynnaker.cfg file or in the pynn.setup() method.")
-
     DELAYED_FOR_TRAFFIC_NAME = "Number_of_times_delayed_to_spread_traffic"
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
@@ -174,114 +123,88 @@ class DelayExtensionMachineVertex(
         return self.__resources
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        # pylint: disable=too-many-locals
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        provenance_data = self._get_remaining_provenance_data_items(
-            provenance_data)
-
-        n_packets_received = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_RECEIVED.value]
-        n_packets_processed = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_PROCESSED.value]
-        n_packets_added = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_ADDED.value]
-        n_packets_sent = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_PACKETS_SENT.value]
-        n_buffer_overflows = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BUFFER_OVERFLOWS.value]
-        n_delays = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_DELAYS.value]
-        n_times_tdma_fell_behind = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_TIMES_TDMA_FELL_BEHIND.value]
-        n_saturation = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_LOST_DUE_TO_COUNT_SATURATION.value]
-        n_packets_invalid_neuron = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_WITH_INVALID_NEURON_IDS.value]
-        n_packets_invalid_keys = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            N_PACKETS_DROPPED_DUE_TO_INVALID_KEY.value]
-        n_late_packets = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES.value]
-        max_background_queued = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.MAX_BACKGROUND_QUEUED.value]
-        n_background_overloads = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_BACKGROUND_OVERLOADS.value]
-
-        label, x, y, p, names = self._get_placement_details(placement)
+               parse_extra_provenance_items)
+    def parse_extra_provenance_items(self, label, names, provenance_data):
+        (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
+         n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
+         max_bg, n_bg_overloads) = provenance_data
 
         # translate into provenance data items
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.COUNT_SATURATION_NAME),
-            n_saturation, report=n_saturation != 0,
-            message=self.COUNT_SATURATION_ERROR_MESSAGE.format(
-                label, n_saturation)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
-            n_packets_invalid_neuron, report=n_packets_invalid_neuron != 0,
-            message=self.INVALID_NEURON_IDS_ERROR_MESSAGE.format(
-                label, n_packets_invalid_neuron)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.INVALID_NEURON_ID_COUNT_NAME),
-            n_packets_invalid_keys, n_packets_invalid_keys != 0,
-            self.PACKETS_DROPPED_FROM_INVALID_KEY_ERROR_MESSAGE.format(
-                label, n_packets_invalid_keys)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_RECEIVED_NAME),
-            n_packets_received))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_PROCESSED_NAME),
-            n_packets_processed, n_packets_received != n_packets_processed,
-            self.MISMATCH_PROCESSED_FROM_RECEIVED_ERROR_MESSAGE.format(
-                label, x, y, p, n_packets_processed, n_packets_received)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.MISMATCH_ADDED_FROM_PROCESSED_NAME),
-            n_packets_added, n_packets_added != n_packets_processed,
-            self.MISMATCH_ADDED_FROM_PROCESSED_ERROR_MESSAGE.format(
-                label, x, y, p, n_packets_added, n_packets_processed)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.N_PACKETS_SENT_NAME), n_packets_sent))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.INPUT_BUFFER_LOST_NAME),
-            n_buffer_overflows,
-            report=n_buffer_overflows > 0,
-            message=self.INPUT_BUFFER_LOST_ERROR_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.DELAYED_FOR_TRAFFIC_NAME), n_delays))
-        provenance_items.append(
-            self._app_vertex.get_tdma_provenance_item(
-                names, x, y, p, n_times_tdma_fell_behind))
+        yield ProvenanceDataItem(
+            names + [self.COUNT_SATURATION_NAME],
+            n_sat, (n_sat != 0),
+            f"The delay extension {label} has dropped {n_sat} packets because "
+            "during certain time steps a neuron was asked to spike more than "
+            "256 times. This causes a saturation on the count tracker which "
+            "is a uint8. Reduce the packet rates, or modify the delay "
+            "extension to have larger counters.")
+        yield ProvenanceDataItem(
+            names + [self.INVALID_NEURON_ID_COUNT_NAME],
+            n_bad_neuron, (n_bad_neuron != 0),
+            f"The delay extension {label} has dropped {n_bad_neuron} packets "
+            "because their neuron id was not valid. This is likely a routing "
+            "issue. Please fix and try again")
+        yield ProvenanceDataItem(
+            names + [self.INVALID_KEY_COUNT_NAME],
+            n_bad_keys, (n_bad_keys != 0),
+            f"The delay extension {label} has dropped {n_bad_keys} packets "
+            "due to the packet key being invalid. This is likely a routing "
+            "issue. Please fix and try again")
+        yield ProvenanceDataItem(
+            names + [self.N_PACKETS_RECEIVED_NAME], n_received)
+        yield ProvenanceDataItem(
+            names + [self.N_PACKETS_PROCESSED_NAME],
+            n_processed, (n_received != n_processed),
+            f"The delay extension {label} only processed {n_processed} of "
+            f"{n_received} received packets.  This could indicate a fault.")
+        yield ProvenanceDataItem(
+            names + [self.MISMATCH_ADDED_FROM_PROCESSED_NAME],
+            n_added, (n_added != n_processed),
+            f"The delay extension {label} only added {n_added} of "
+            f"{n_processed} processed packets.  This could indicate a "
+            "routing or filtering fault")
+        yield ProvenanceDataItem(
+            names + [self.N_PACKETS_SENT_NAME], n_sent)
+        yield ProvenanceDataItem(
+            names + [self.INPUT_BUFFER_LOST_NAME],
+            n_overflows, (n_overflows > 0),
+            f"The input buffer for {label} lost packets on {n_overflows} "
+            "occasions. This is often a sign that the system is running "
+            "too quickly for the number of neurons per core.  Please "
+            "increase the timer_tic or time_scale_factor or decrease the "
+            "number of neurons per core.")
+        yield ProvenanceDataItem(
+            names + [self.DELAYED_FOR_TRAFFIC_NAME], n_delays)
+        yield self._app_vertex.get_tdma_provenance_item(
+            names, label, n_tdma_behind)
+
         late_message = (
-            self.N_LATE_SPIKES_MESSAGE_DROP
-            if self._app_vertex.drop_late_spikes
-            else self.N_LATE_SPIKES_MESSAGE_NO_DROP)
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.N_LATE_SPIKES_NAME),
-            n_late_packets, report=n_late_packets > 0,
-            message=late_message.format(n_late_packets, label, x, y, p)))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.BACKGROUND_MAX_QUEUED_NAME),
-            max_background_queued, report=max_background_queued > 1,
-            message=(
-                "A maximum of {} background tasks were queued on {} on"
-                " {}, {}, {}.  Try increasing the time_scale_factor located"
-                " within the .spynnaker.cfg file or in the pynn.setup()"
-                " method.".format(max_background_queued, label, x, y, p))))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.BACKGROUND_OVERLOADS_NAME),
-            n_background_overloads, report=n_background_overloads > 0,
-            message=(
-                "On {} on {}, {}, {}, the background queue overloaded {}"
-                " times.  Try increasing the time_scale_factor located within"
-                " the .spynnaker.cfg file or in the pynn.setup() method."
-                .format(label, x, y, p, n_background_overloads))))
-        return provenance_items
+            f"On {label}, {n_late_spikes} packets were dropped from the "
+            "input buffer, because they arrived too late to be processed in "
+            "a given time step. Try increasing the time_scale_factor located "
+            "within the .spynnaker.cfg file or in the pynn.setup() method."
+            if self._app_vertex.drop_late_spikes else
+            f"On {label}, {n_late_spikes} packets arrived too late to be "
+            "processed in a given time step. Try increasing the "
+            "time_scale_factor located within the .spynnaker.cfg file or in "
+            "the pynn.setup() method.")
+        yield ProvenanceDataItem(
+            names + [self.N_LATE_SPIKES_NAME],
+            n_late_spikes, report=(n_late_spikes > 0),
+            message=late_message)
+
+        yield ProvenanceDataItem(
+            names + [self.BACKGROUND_MAX_QUEUED_NAME],
+            max_bg, (max_bg > 1),
+            f"On {label}, a maximum of {max_bg} background tasks were queued. "
+            "Try increasing the time_scale_factor located within the "
+            ".spynnaker.cfg file or in the pynn.setup() method.")
+        yield ProvenanceDataItem(
+            names + [self.BACKGROUND_OVERLOADS_NAME],
+            n_bg_overloads, (n_bg_overloads > 0),
+            f"On {label}, the background queue overloaded {n_bg_overloads} "
+            "times. Try increasing the time_scale_factor located within the "
+            ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
@@ -297,22 +220,16 @@ class DelayExtensionMachineVertex(
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"})
+        "routing_infos": "MemoryRoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_graph", "routing_infos", "machine_time_step",
-            "time_scale_factor"})
+            "machine_graph", "routing_infos"})
     def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos,
-            machine_time_step, time_scale_factor):
+            self, spec, placement, machine_graph, routing_infos):
         """
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        :param int machine_time_step: machine time step of the sim.
-        :param int time_scale_factor: the time scale factor of the sim.
         """
         # pylint: disable=arguments-differ
 
@@ -344,9 +261,7 @@ class DelayExtensionMachineVertex(
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
-        self._write_setup_info(
-            spec, machine_time_step, time_scale_factor,
-            vertex.get_binary_file_name())
+        self._write_setup_info(spec, vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -395,18 +310,15 @@ class DelayExtensionMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(
-            self, spec, machine_time_step, time_scale_factor, binary_name):
+    def _write_setup_info(self, spec, binary_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:v the machine time step
-        :param int time_scale_factor: the time scale factor
         :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            binary_name, machine_time_step, time_scale_factor))
+            binary_name))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask):

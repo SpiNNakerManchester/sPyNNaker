@@ -31,10 +31,9 @@ class AbstractMaxSpikes(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def max_spikes_per_ts(self, machine_time_step):
+    def max_spikes_per_ts(self):
         """ Get maximum expected number of spikes per timestep
 
-        :param int machine_time_step: The timestime used in ms
         :rtype: int
         """
 

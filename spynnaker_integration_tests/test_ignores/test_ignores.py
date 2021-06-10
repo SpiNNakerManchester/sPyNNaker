@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from unittest import SkipTest
-from spinn_machine.ignores import IgnoreChip, IgnoreCore, IgnoreLink
+from spinn_utilities.config_holder import set_config
 from spinnman.processes.get_machine_process import GetMachineProcess
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as sim
@@ -23,18 +23,21 @@ import spynnaker8 as sim
 def hacked_receive_chip_info(self, scp_read_chip_info_response):
     chip_info = scp_read_chip_info_response.chip_info
     self._chip_info[chip_info.x, chip_info.y] = chip_info
+
     # Hack to test ignores
     if (chip_info.x == 8 and chip_info.y == 4):
-        self._ignore_cores.add(
-            IgnoreCore(2, 2, -10, chip_info.ethernet_ip_address))
-        self._ignore_cores.add(
-            IgnoreCore(2, 2, -9, chip_info.ethernet_ip_address))
-        self._ignore_cores.add(
-            IgnoreCore(2, 2, 4, chip_info.ethernet_ip_address))
-        self._ignore_chips.add(
-            IgnoreChip(3, 3, chip_info.ethernet_ip_address))
-        self._ignore_links.add(
-            IgnoreLink(4, 4, 1, chip_info.ethernet_ip_address))
+        # hack the config to include an actual ip address used
+        set_config("Machine", "down_cores",
+                   f"3,0,-4:99,99,2:2,2,-19:3,3,4,127.0.0.1:"
+                   f"2,2,-10,{chip_info.ethernet_ip_address}:"
+                   f"2,2,-9,{chip_info.ethernet_ip_address}:"
+                   f"2,2,4,{chip_info.ethernet_ip_address}")
+        set_config("Machine", "down_chips",
+                   f"6,7:3,3,127.0.0.1:"
+                   f"3,3,{chip_info.ethernet_ip_address}")
+        set_config("Machine", "down_links",
+                   f"3,3,4,127.0.0.1:5,5,2:"
+                   f"4,4,1,{chip_info.ethernet_ip_address}")
 
 
 class TestAllow(BaseTestCase):
@@ -49,7 +52,7 @@ class TestAllow(BaseTestCase):
         machine = sim.get_machine()
         sim.end()
 
-        # down_chips = 3,3:127.0.0.1
+        # global 3,3 should exists
         three_zero = machine.get_chip_at(3, 0)
         if three_zero is None:
             raise SkipTest("Unexpected but not impossible missing chip")

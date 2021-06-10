@@ -12,11 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 import os
+from spinn_utilities.config_holder import get_config_str
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+logger = FormatAdapter(logging.getLogger(__name__))
+
+CUTOFF = 100
 
 
 class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
@@ -27,12 +32,13 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     _GRAPH_TITLE = "The graph of the network in graphical form"
     _GRAPH_NAME = "network_graph.gv"
     _NODE_LABEL = "{} ({} neurons)"
+    _GRAPH_FORMAT = "png"
 
     @staticmethod
     def _get_diagram(label):
         """
         :param str label:
-        :rtype: ~graphviz.Digraph
+        :rtype: tuple(~graphviz.Digraph, type)
         """
         # pylint: disable=import-error
         try:
@@ -42,7 +48,8 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                 "graphviz is required to use this report. "
                 "Please install graphviz if you want to use this report."
                 ) from e
-        return graphviz.Digraph(comment=label)
+        return (graphviz.Digraph(comment=label),
+                graphviz.backend.ExecutableNotFound)
 
     def __call__(self, report_folder, application_graph):
         """
@@ -52,8 +59,18 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
             the app graph
         """
         # create holders for data
-        dot_diagram = self._get_diagram(self._GRAPH_TITLE)
+        dot_diagram, exeNotFoundExn = self._get_diagram(self._GRAPH_TITLE)
 
+        graph_format = get_config_str("Reports", "network_graph_format")
+        if graph_format is None:
+            if (application_graph.n_vertices +
+                    application_graph.n_outgoing_edge_partitions) > CUTOFF:
+                logger.warning(
+                    "cfg write_network_graph ignored as network_graph_format "
+                    "is None and the network is big")
+                return
+            else:
+                graph_format = self._GRAPH_FORMAT
         # build progress bar for the vertices, edges, and rendering
         progress = ProgressBar(
             application_graph.n_vertices +
@@ -69,7 +86,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         # write dot file and generate pdf
         file_to_output = os.path.join(report_folder, self._GRAPH_NAME)
-        dot_diagram.render(file_to_output, view=False)
+        try:
+            dot_diagram.render(file_to_output, view=False, format=graph_format)
+        except exeNotFoundExn:
+            logger.exception("could not render diagram in {}", file_to_output)
         progress.update()
         progress.end()
 

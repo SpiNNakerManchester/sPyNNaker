@@ -70,12 +70,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region, weight_scales):
         """ Write the synapse parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param int region: region ID
-        :param int machine_time_step:
         :param list(float) weight_scales:
         """
 
@@ -128,9 +127,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param str pre_population_label:
         :param str post_population_label:
+        :rtype:
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument
-        return list()
+        return []
 
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses

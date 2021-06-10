@@ -68,12 +68,6 @@ class MachineMunichMotorDevice(
 
     #: The name of the provenance item saying that packets were lost.
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    _INPUT_BUFFER_FULL_MESSAGE = (
-        "The input buffer for {} on {}, {}, {} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
 
     def __init__(
             self, speed, sample_time, update_time, delay_time,
@@ -127,44 +121,26 @@ class MachineMunichMotorDevice(
     def _n_additional_data_items(self):
         return self._PROVENANCE_ELEMENTS
 
-    @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        # get prov data
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        # get system level prov
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        # get left over prov
-        provenance_data = self._get_remaining_provenance_data_items(
-            provenance_data)
-        # stuff for making prov data items
-        label, x, y, p, names = self._get_placement_details(placement)
+    @overrides(
+        ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
+    def parse_extra_provenance_items(
+            self, label, names, provenance_data):
+        n_buffer_overflows, = provenance_data
 
-        # get the only app level prov item
-        n_buffer_overflows = provenance_data[0]
+        yield ProvenanceDataItem(
+            names + [self.INPUT_BUFFER_FULL_NAME], n_buffer_overflows,
+            (n_buffer_overflows > 0),
+            f"The input buffer for {label} lost packets on "
+            f"{n_buffer_overflows} occasions. "
+            "This is often a sign that the system is running too quickly for "
+            "the number of neurons per core.  Please increase the timer_tic "
+            "or time_scale_factor or decrease the number of neurons per core.")
 
-        # build it
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
-            n_buffer_overflows, report=n_buffer_overflows > 0,
-            message=self._INPUT_BUFFER_FULL_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows)))
-        return provenance_items
-
-    @inject_items({
-        "routing_info": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"
-    })
+    @inject_items({"routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "machine_time_step", "time_scale_factor"
-        })
-    def generate_data_specification(
-            self, spec, placement, routing_info,
-            machine_time_step, time_scale_factor):
+        additional_arguments={"routing_info"})
+    def generate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -176,8 +152,7 @@ class MachineMunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self._SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            placement.vertex.get_binary_file_name()))
 
         # Get the key
         edge_key = routing_info.get_first_key_from_pre_vertex(

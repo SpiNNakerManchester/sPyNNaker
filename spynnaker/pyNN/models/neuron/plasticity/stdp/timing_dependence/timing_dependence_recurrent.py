@@ -17,7 +17,9 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_per_ms)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
@@ -37,6 +39,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         "__synapse_structure",
         "__a_plus",
         "__a_minus"]
+    __PARAM_NAMES = (
+        'accumulator_depression', 'accumulator_potentiation',
+        'mean_pre_window', 'mean_post_window', 'dual_fsm')
 
     default_parameters = {
         'accumulator_depression': -6, 'accumulator_potentiation': 6,
@@ -146,7 +151,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
 
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
@@ -155,12 +160,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        mean_pre_timesteps = (
-            float(self.__mean_pre_window) *
-            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
-        mean_post_timesteps = (
-            float(self.__mean_post_window) *
-            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
+        time_step_per_ms = machine_time_step_per_ms()
+
+        mean_pre_timesteps = float(self.__mean_pre_window * time_step_per_ms)
+        mean_post_timesteps = float(self.__mean_post_window * time_step_per_ms)
 
         # Write lookup tables
         self._write_exp_dist_lut(spec, mean_pre_timesteps)
@@ -187,8 +190,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['accumulator_depression', 'accumulator_potentiation',
-                'mean_pre_window', 'mean_post_window', 'dual_fsm']
+        return self.__PARAM_NAMES
 
     @overrides(AbstractTimingDependence.minimum_delta)
     def minimum_delta(self, max_stdp_spike_delta):

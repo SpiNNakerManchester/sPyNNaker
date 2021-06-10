@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array, get_min_lut_value)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -35,7 +35,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         "__tau_plus_data",
         "__a_plus",
         "__a_minus"]
-
+    __PARAM_NAMES = ('tau_plus', 'tau_minus')
     default_parameters = {'tau_plus': 20.0, 'tau_minus': 20.0}
 
     def __init__(self, tau_plus=default_parameters['tau_plus'],
@@ -54,8 +54,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step
-        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
+        ts = machine_time_step_ms()
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 
@@ -139,7 +138,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(self, spec, weight_scales):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
@@ -154,7 +153,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus']
+        return self.__PARAM_NAMES
 
     @overrides(AbstractTimingDependence.minimum_delta)
     def minimum_delta(self, max_stdp_spike_delta):

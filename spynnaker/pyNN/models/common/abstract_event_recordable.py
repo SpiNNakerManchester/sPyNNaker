@@ -19,38 +19,41 @@ from pacman.model.graphs.application import ApplicationVertex
 
 
 @require_subclass(ApplicationVertex)
-class AbstractSpikeRecordable(object, metaclass=AbstractBase):
-    """ Indicates that spikes can be recorded from this object.
+class AbstractEventRecordable(object, metaclass=AbstractBase):
+    """ Indicates that events can be recorded from this object.
     """
 
     __slots__ = ()
 
     @abstractmethod
-    def is_recording_spikes(self):
-        """ Determine if spikes are being recorded
+    def is_recording_events(self, variable):
+        """ Determine if events are being recorded
 
-        :return: True if spikes are being recorded, False otherwise
+        :param str variable: The variable to check
+        :return: True if events are recorded for the variable, False otherwise
         :rtype: bool
         """
 
     @abstractmethod
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
-        """ Set spikes to being recorded. \
+    def set_recording_events(
+            self, variable, new_state=True, sampling_interval=None,
+            indexes=None):
+        """ Set events to being recorded. \
             If `new_state` is false all other parameters are ignored.
 
-        :param bool new_state: Set if the spikes are recording or not
-        :param sampling_interval: The interval at which spikes are recorded.
+        :param str variable: The variable to set recording
+        :param bool new_state: Set if the events are recording or not
+        :param sampling_interval: The interval at which events are recorded.
             Must be a whole multiple of the timestep.
             None will be taken as the timestep.
         :type sampling_interval: int or None
-        :param indexes: The indexes of the neurons that will record spikes.
+        :param indexes: The indexes of the neurons that will record events.
             If None the assumption is all neurons are recording
         :type indexes: list(int) or None
         """
 
     @abstractmethod
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_event_recording(self, buffer_manager, placements):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
@@ -62,9 +65,10 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_spikes(self, placements, buffer_manager):
-        """ Get the recorded spikes from the object
+    def get_events(self, variable, placements, buffer_manager):
+        """ Get the recorded events from the object
 
+        :param str variable: The variable to get the event data for
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param buffer_manager: the buffer manager object
@@ -76,9 +80,10 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_spikes_sampling_interval(self):
-        """ Return the current sampling interval for spikes
+    def get_events_sampling_interval(self, variable):
+        """ Return the current sampling interval for events
 
+        :param str variable: The variable to get the sampling interval for
         :return: Sampling interval in microseconds
         :rtype: float
         """

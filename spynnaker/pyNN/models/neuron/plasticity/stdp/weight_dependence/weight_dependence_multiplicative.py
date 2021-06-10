@@ -29,6 +29,7 @@ class WeightDependenceMultiplicative(
     __slots__ = [
         "__w_max",
         "__w_min"]
+    __PARAM_NAMES = ('w_min', 'w_max', 'A_plus', 'A_minus')
 
     def __init__(self, w_min=0.0, w_max=1.0):
         """
@@ -85,7 +86,7 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
@@ -116,4 +117,4 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A_plus', 'A_minus']
+        return self.__PARAM_NAMES

@@ -25,7 +25,8 @@ from spinn_utilities.config_holder import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
-
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -567,8 +568,7 @@ class SynapticManager(object):
 
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            machine_graph, application_graph, routing_info, weight_scale,
-            machine_time_step):
+            machine_graph, application_graph, routing_info, weight_scale):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
@@ -585,9 +585,7 @@ class SynapticManager(object):
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             How messages are routed
         :param float weight_scale: How to scale the weights of the synapses
-        :param float machine_time_step:
         """
-
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
@@ -614,19 +612,18 @@ class SynapticManager(object):
 
         gen_data = matrices.write_synaptic_matrix_and_master_population_table(
             spec, machine_vertex, all_syn_block_sz, self.__weight_scales,
-            routing_info, machine_graph, machine_time_step)
+            routing_info, machine_graph)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
                 spec, self._synapse_dynamics_region,
-                machine_time_step, self.__weight_scales)
+                self.__weight_scales)
 
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, self._struct_dynamics_region, machine_time_step,
-                    self.__weight_scales, machine_graph, machine_vertex,
-                    routing_info, matrices)
+                    spec, self._struct_dynamics_region, self.__weight_scales,
+                    machine_graph, machine_vertex, routing_info, matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
 

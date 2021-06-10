@@ -27,10 +27,10 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
         :param str post_population_label: label of post.
         :return: the provenance data of the weight dependency
         :rtype:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument
-        return list()
+        return []
 
     @abstractmethod
     def get_parameter_names(self):
@@ -66,11 +66,10 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step: (unused?)
         :param iterable(float) weight_scales:
         :param int n_weight_terms:
        """

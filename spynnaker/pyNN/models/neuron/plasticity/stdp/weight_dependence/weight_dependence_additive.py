@@ -30,6 +30,7 @@ class WeightDependenceAdditive(
     __slots__ = [
         "__w_max",
         "__w_min"]
+    __PARAM_NAMES = ('w_min', 'w_max', 'A_plus', 'A_minus')
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
@@ -85,7 +86,7 @@ class WeightDependenceAdditive(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, weight_scales, n_weight_terms):
         # Loop through each synapse type's weight scale
         for w in weight_scales:
 
@@ -121,4 +122,4 @@ class WeightDependenceAdditive(
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A_plus', 'A_minus']
+        return self.__PARAM_NAMES

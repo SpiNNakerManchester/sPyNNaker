@@ -16,7 +16,6 @@
 import logging
 import math
 import os
-from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -26,21 +25,16 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-class AbstractSpiNNakerCommon(
-        AbstractSpinnakerBase, SpynnakerSimulatorInterface,
-        metaclass=AbstractBase):
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
     __slots__ = [
@@ -76,7 +70,9 @@ class AbstractSpiNNakerCommon(
         :type n_chips_required: int or None
         :param n_boards_required:
         :type n_boards_required: int or None
-        :param int timestep:
+        :param timestep:
+            machine_time_step but in milli seconds. If None uses the cfg value
+        :type timestep: float or None
         :param float max_delay:
         :param float min_delay:
         :param str hostname:
@@ -146,16 +142,6 @@ class AbstractSpiNNakerCommon(
         self.update_extra_inputs({'UserDefinedMaxDelay': self.__max_delay})
 
         extra_mapping_inputs = dict()
-        extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
-            get_config_bool(
-                "Database", "create_routing_info_to_neuron_id_mapping")
-        extra_mapping_inputs["WriteBitFieldGeneratorIOBUF"] = \
-            get_config_bool("Reports", "write_bit_field_iobuf")
-        extra_mapping_inputs["GenerateBitFieldReport"] = \
-            get_config_bool("Reports", "generate_bit_field_report")
-        extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
-            get_config_bool(
-                "Reports", "generate_bit_field_summary_report")
         extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
             get_config_bool("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
@@ -172,17 +158,16 @@ class AbstractSpiNNakerCommon(
         extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
-        if get_config_bool("Reports", "draw_network_graph"):
+        if get_config_bool("Reports", "write_network_graph"):
             extra_mapping_algorithms.append(
-                "SpYNNakerConnectionHolderGenerator")
-            extra_mapping_algorithms.append(
-                "PreAllocateForBitFieldRouterCompressor")
-            extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
         if get_config_bool("Reports", "reports_enabled"):
             if get_config_bool("Reports", "write_synaptic_report"):
-                extra_algorithms_pre_run.append("SynapticMatrixReport")
+                logger.exception(
+                    "write_synaptic_report ignored due to https://github.com/"
+                    "SpiNNakerManchester/sPyNNaker/issues/1081")
+                # extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
@@ -196,18 +181,20 @@ class AbstractSpiNNakerCommon(
         self._set_up_timings(timestep, min_delay, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
-        logger.info("Setting time scale factor to {}.",
-                    self.time_scale_factor)
+        logger.info(f'Setting time scale factor to '
+                    f'{self.time_scale_factor}.')
 
         # get the machine time step
-        logger.info("Setting machine time step to {} micro-seconds.",
-                    self.machine_time_step)
+        logger.info(f'Setting machine time step to '
+                    f'{self.machine_time_step} '
+                    f'micro-seconds.')
 
     def _set_up_timings(self, timestep, min_delay, time_scale_factor):
         """
-        :param float timestep:
-        :param int min_delay:
-       :param float time_scale_factor:
+        :param timestep: machine_time_Step in milli seconds
+        :type timestep: float or None
+        :tpye min_delay: int or None
+        :type time_scale_factor: int or None
         """
 
         # Get the standard values
@@ -220,17 +207,15 @@ class AbstractSpiNNakerCommon(
 
         # Sort out the minimum delay
         if (min_delay is not None and
-                (min_delay * MICRO_TO_MILLISECOND_CONVERSION) <
-                self.machine_time_step):
+                min_delay < self.machine_time_step_ms):
             raise ConfigurationException(
-                "Pacman does not support min delays below {} ms with the "
-                "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
+                f"Pacman does not support min delays below "
+                f"{constants.MIN_SUPPORTED_DELAY * self.machine_time_step} "
+                f"ms with the current machine time step")
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = (
-                self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
+            self.__min_delay = self.machine_time_step_ms
 
         # Sort out the time scale factor if not user specified
         # (including config)
@@ -247,8 +232,7 @@ class AbstractSpiNNakerCommon(
                     self.time_scale_factor, CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if (self.machine_time_step * self.time_scale_factor <
-                MICRO_TO_MILLISECOND_CONVERSION):
+        if (self.machine_time_step_ms * self.time_scale_factor < 1):
             if not get_config_bool(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
@@ -343,7 +327,6 @@ class AbstractSpiNNakerCommon(
 
         super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        unset_simulator(self)
 
     def run(self, run_time, sync_time=0.0):
         """ Run the model created.
@@ -421,12 +404,9 @@ class AbstractSpiNNakerCommon(
         # build data structure for holding data
         mother_lode = ExtractedData()
 
-        # acquire data objects from front end
-        using_monitors = self._last_run_outputs["UsingAdvancedMonitorSupport"]
-
         # if using extra monitor functionality, locate extra data items
         receivers = list()
-        if using_monitors:
+        if get_config_bool("Machine", "enable_advanced_monitor_support"):
             receivers = self._locate_receivers_from_projections(
                 projection_to_attribute_map.keys(),
                 self.get_generated_output(
