@@ -310,7 +310,7 @@ static void neuron_impl_do_timestep_update(
             input_type_convert_inhibitory_input_to_current(
                     inh_input_values, input_types, soma_voltage);
 
-            uint32_t external_bias = additional_input_get_input_value_as_current(
+            input_t external_bias = additional_input_get_input_value_as_current(
                     additional_inputs, soma_voltage);
 
             // update neuron parameters
