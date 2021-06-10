@@ -97,8 +97,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "your vertex and try again.")
 
     def __init__(self, n_synapse_vertices=1,
-                 max_delay=(AbstractSpynnakerSplitterDelay
-                            .MAX_SUPPORTED_DELAY_TICS),
+                 max_delay=None,
                  allow_delay_extension=True):
         """
 
@@ -144,13 +143,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
-                get_n_bits(self.__max_delay)) > MAX_RING_BUFFER_BITS:
+                get_n_bits(self.__get_max_delay)) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
                 "The combination of the number of neurons per core ({}), "
                 "the number of synapse types ({}), and the maximum delay per "
                 "core ({}) will require too much DTCM.  Please reduce one or "
                 "more of these values.".format(
-                    atoms_per_core, n_synapse_types, self.__max_delay))
+                    atoms_per_core, n_synapse_types, self.__get_max_delay))
 
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
@@ -657,9 +656,19 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             get_estimated_sdram_for_key_region(incoming_projections))
         return sdram
 
+    @property
+    def __get_max_delay(self):
+        if self.__max_delay is not None:
+            return self.__max_delay
+
+        n_atom_bits = get_n_bits(self._governed_app_vertex.n_atoms)
+        n_delay_bits = MAX_RING_BUFFER_BITS - n_atom_bits
+        self.__max_delay = 2 ** n_delay_bits
+        return self.__max_delay
+
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
-        return self.__max_delay
+        return self.__get_max_delay
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self):
