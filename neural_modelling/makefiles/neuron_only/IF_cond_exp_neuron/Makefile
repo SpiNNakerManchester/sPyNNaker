@@ -22,4 +22,4 @@ NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
 THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
 
-include ../neural_build.mk
+include ../neuron_build.mk
