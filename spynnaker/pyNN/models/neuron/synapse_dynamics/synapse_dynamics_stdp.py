@@ -442,9 +442,8 @@ class SynapseDynamicsSTDP(
         connections["target"] = (
             (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = pp_half_words
-        connections["delay"] = (data_fixed >> (
-            n_neuron_id_bits + n_synapse_type_bits)) & 0xF
-        connections["delay"][connections["delay"] == 0] = 16
+        connections["delay"] = data_fixed >> (
+            n_neuron_id_bits + n_synapse_type_bits)
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)

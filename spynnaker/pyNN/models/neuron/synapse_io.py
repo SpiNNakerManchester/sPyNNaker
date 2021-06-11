@@ -483,6 +483,10 @@ def convert_to_connections(
         return numpy.zeros(
             0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
+    # Convert 0 delays to max delays
+    connections["delay"][connections["delay"] == 0] = (
+        post_vertex_max_delay_ticks)
+
     # Return the connections after appropriate scaling
     return _rescale_connections(connections, weight_scales, synapse_info)
 
