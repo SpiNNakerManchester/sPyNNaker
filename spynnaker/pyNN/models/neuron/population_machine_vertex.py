@@ -479,6 +479,8 @@ class PopulationMachineVertex(
         # reserve the neuron parameters data region
         self._reserve_neuron_params_data_region(spec)
 
+        self._reserve_current_source_params_data_region(spec)
+
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
@@ -565,10 +567,9 @@ class PopulationMachineVertex(
         """
         params_size = self._app_vertex.\
             get_sdram_usage_for_current_source_params(self.vertex_slice)
-        if params_size:
-            spec.reserve_memory_region(
-                region=POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value,
-                size=params_size, label='CurrentSourceParams')
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.CURRENT_SOURCE_PARAMS.value,
+            size=params_size, label='CurrentSourceParams')
 
     def _write_neuron_parameters(self, spec, key, region_id):
 
@@ -617,12 +618,23 @@ class PopulationMachineVertex(
         n_atoms = self.vertex_slice.n_atoms
         lo_atom = self.vertex_slice.lo_atom
         hi_atom = self.vertex_slice.hi_atom
-        current_sources = self.app_vertex.current_sources
-        current_source_id_list = self.app_vertex.current_source_id_list
-        n_current_sources = len(current_sources)
+
         spec.comment(
             "\nWriting Current Source Parameters for {} Neurons:\n".format(
                 n_atoms))
+
+        # Get the current sources from the app vertex
+        app_current_sources = self.app_vertex.current_sources
+        current_source_id_list = self.app_vertex.current_source_id_list
+
+        # Work out which current sources are on this core
+        current_sources = []
+        for app_current_source in app_current_sources:
+            for n in range(lo_atom, hi_atom + 1):
+                if (n in current_source_id_list[app_current_source]):
+                    current_sources.append(app_current_source)
+
+        n_current_sources = len(current_sources)
 
         # Set the focus to the memory region:
         spec.switch_write_focus(region_id)

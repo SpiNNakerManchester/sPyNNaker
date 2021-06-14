@@ -123,4 +123,5 @@ class NoisyCurrentSource(AbstractCurrentSource):
 
         :rtype: int
         """
-        return (len(self.__parameters) + 4) * BYTES_PER_WORD
+        # 3 because the seed parameter has length 4
+        return (len(self.__parameters) + 3) * BYTES_PER_WORD

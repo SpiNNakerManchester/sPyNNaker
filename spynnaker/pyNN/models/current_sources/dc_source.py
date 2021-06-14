@@ -101,4 +101,4 @@ class DCSource(AbstractCurrentSource):
 
         :rtype: int
         """
-        return (len(self.__parameters) + 1) * BYTES_PER_WORD
+        return len(self.__parameters) * BYTES_PER_WORD

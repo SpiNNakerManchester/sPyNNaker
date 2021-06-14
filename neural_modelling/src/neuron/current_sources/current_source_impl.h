@@ -130,8 +130,8 @@ static bool current_source_impl_initialise(address_t cs_address) {
         uint32_t struct_size = (n_ids + 3) * sizeof(uint32_t);
         current_source[ncs] = spin1_malloc(struct_size);
         if (current_source[ncs] == NULL) {
-            log_error("Unable to allocate current source IDs"
-                    "- Out of DTCM");
+            log_error("Unable to allocate %u of %u current source IDs - Out of DTCM",
+                    ncs, n_current_sources);
             return false;
         }
         spin1_memcpy(current_source[ncs], &cs_address[next], struct_size);
@@ -149,6 +149,9 @@ static bool current_source_impl_initialise(address_t cs_address) {
 
         next += (n_ids + 3);
     }
+
+    log_info("Initialising current sources: n_dc %u n_ac %u n_step %u n_noisy %u\n",
+            n_dc_sources, n_ac_sources, n_step_current_sources, n_noisy_current_sources);
 
     // Initialise DC sources
     dc_source = spin1_malloc(n_dc_sources * sizeof(uint32_t*));
@@ -195,6 +198,14 @@ static bool current_source_impl_initialise(address_t cs_address) {
     step_cs_amps = spin1_malloc(n_step_current_sources * sizeof(uint32_t*));
     step_cs_amp_last = spin1_malloc(n_step_current_sources * sizeof(REAL));
     step_cs_index = spin1_malloc(n_step_current_sources * sizeof(uint32_t));
+    if (step_cs_amp_last == NULL) {
+        log_error("Unable to allocate step current source amp last - out of DTCM");
+        return false;
+    }
+    if (step_cs_index == NULL) {
+        log_error("Unable to allocate step current source index - out of DTCM");
+        return false;
+    }
     for (uint32_t n_step=0; n_step < n_step_current_sources; n_step++) {
         uint32_t arr_len = (uint32_t) cs_address[next];
         uint32_t struct_size = (arr_len + 1) * sizeof(uint32_t);

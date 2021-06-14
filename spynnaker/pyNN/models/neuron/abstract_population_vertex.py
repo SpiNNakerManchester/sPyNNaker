@@ -34,6 +34,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
+from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
 from .synaptic_manager import SynapticManager
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
@@ -253,12 +254,30 @@ class AbstractPopulationVertex(
             the slice of atoms.
         :return: The SDRAM required for the current source region
         """
-        # First part is the array showing if each source is active at neuron
-        sdram_usage = (1 + ((2 + vertex_slice.n_atoms) * len(
-            self.__current_sources))) * BYTES_PER_WORD
-        # Then everywhere there is a current source, add the usage for that
+        # Firstly get the current sources active on the vertex_slice
+        current_sources = []
+        current_source_id_list = []
+        lo_atom = vertex_slice.lo_atom
+        hi_atom = vertex_slice.hi_atom
         for current_source in self.__current_sources:
-            sdram_usage += (current_source.get_sdram_usage_in_bytes())
+            id_list = []
+            for n in range(lo_atom, hi_atom + 1):
+                if (n in self.__current_source_id_list[current_source]):
+                    id_list.append(n)
+
+            if len(id_list):
+                current_sources.append(current_source)
+                current_source_id_list.append(id_list)
+
+        # First part is the number of current sources
+        sdram_usage = BYTES_PER_WORD
+        # Then everywhere there is a current source, add the usage for that
+        for current_source, current_source_ids in zip(
+                current_sources, current_source_id_list):
+            # Usage for list of IDs for this current source on this vertex
+            sdram_usage += (3 + len(current_source_ids)) * BYTES_PER_WORD
+            # Usage for the parameters of the current source itself
+            sdram_usage += current_source.get_sdram_usage_in_bytes()
 
         return sdram_usage
 

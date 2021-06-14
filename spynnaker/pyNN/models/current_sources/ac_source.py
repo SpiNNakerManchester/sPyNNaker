@@ -131,8 +131,15 @@ class ACSource(AbstractCurrentSource):
 
         :rtype: int
         """
-        return (((len(
-            self.__parameters['times']) + 1) * 2) + 1) * BYTES_PER_WORD
+        # The parameters themselves take up this amount of space
+        # ((len(times) + length_val)) * 2) + ID
+        sdram_for_parameters = ((
+            len(self.__parameters['times']) + 1) * 2) * BYTES_PER_WORD
+
+        # For each_source there is the last amplitude holder and index
+        sdram_for_on_core_calcs = 2 * BYTES_PER_WORD
+
+        return sdram_for_parameters + sdram_for_on_core_calcs
 
     def _get_params(self, start, stop, amplitude, offset, frequency, phase):
         """ Convert provided parameters into arrays.
