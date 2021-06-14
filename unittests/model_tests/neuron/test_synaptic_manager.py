@@ -426,35 +426,44 @@ def test_set_synapse_dynamics():
 
 
 @pytest.mark.parametrize(
-    "undelayed_indices_connected,delayed_indices_connected, expect_app_keys", [
+    "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
+    "neurons_per_core,expect_app_keys,max_delay", [
         # Only undelayed, all edges exist
-        (set(range(10)), None, True),
+        (set(range(10)), None, 1000, 100, True, None),
         # Only delayed, all edges exist
-        (None, set(range(10)), True),
+        (None, set(range(10)), 1000, 100, True, 20),
         # All undelayed and delayed edges exist
-        (set(range(10)), set(range(10)), True),
+        (set(range(10)), set(range(10)), 1000, 100, True, 20),
         # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ({0, 1, 2, 3, 4}, None, False),
+        ({0, 1, 2, 3, 4}, None, 1000, 100, False, None),
         # Only delayed, some edges are filtered (app keys shouldn't work)
-        (None, {5, 6, 7, 8, 9}, False),
+        (None, {5, 6, 7, 8, 9}, 1000, 100, False, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
-        ({3, 4, 5, 6, 7}, set(range(10)), False),
+        ({3, 4, 5, 6, 7}, set(range(10)), 1000, 100, False, 20),
         # Both delayed and undelayed, some delayed edges don't exist
-        (set(range(10)), {4, 5, 6, 7}, False)
+        (set(range(10)), {4, 5, 6, 7}, 1000, 100, False, 20),
+        # Should work but number of neurons don't work out
+        (set(range(5)), None, 10000, 2048, False, None),
+        # Should work but number of cores doesn't work out
+        (set(range(2000)), None, 10000, 5, False, None),
+        # Should work but number of neurons with delays don't work out
+        (None, set(range(4)), 1024, 256, False, 144)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
-        expect_app_keys):
+        n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     spynnaker8.setup(1.0)
+
     # Add an sdram so max SDRAM is high enough
-    SDRAM(4000000)
+    SDRAM(128000000)
 
     # Make simple source and target, where the source has 1000 atoms
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
     app_graph = ApplicationGraph("Test")
     mac_graph = MachineGraph("Test", app_graph)
-    pre_app_vertex = SimpleTestVertex(1000)
+    pre_app_vertex = SimpleTestVertex(
+        n_pre_neurons, max_atoms_per_core=neurons_per_core)
     pre_app_vertex.splitter = MockSplitter()
     app_graph.add_vertex(pre_app_vertex)
     post_vertex_slice = Slice(0, 99)
@@ -466,8 +475,9 @@ def test_pop_based_master_pop_table_standard(
     mac_graph.add_vertex(post_mac_vertex)
 
     # Create the pre-machine-vertices
-    for i in range(10):
-        pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
+    for lo in range(0, n_pre_neurons, neurons_per_core):
+        pre_mac_slice = Slice(
+            lo, min(lo + neurons_per_core - 1, n_pre_neurons - 1))
         pre_mac_vertex = pre_app_vertex.create_machine_vertex(
             pre_mac_slice, None)
         mac_graph.add_vertex(pre_mac_vertex)
@@ -475,13 +485,12 @@ def test_pop_based_master_pop_table_standard(
     # Add delays if needed
     if delayed_indices_connected:
         pre_app_delay_vertex = DelayExtensionVertex(
-            1000, 16.0, 4, pre_app_vertex)
-        pre_app_delay_vertex.set_new_n_delay_stages_and_delay_per_stage(
-            16, 20)
+            n_pre_neurons, 16.0, max_delay, pre_app_vertex)
         app_graph.add_vertex(pre_app_delay_vertex)
 
-        for i in range(10):
-            pre_mac_slice = Slice(i * 100, ((i + 1) * 100) - 1)
+        for lo in range(0, n_pre_neurons, neurons_per_core):
+            pre_mac_slice = Slice(
+                lo, min(lo + neurons_per_core - 1, n_pre_neurons - 1))
             pre_mac_vertex = DelayExtensionMachineVertex(
                 None, "", [], pre_app_delay_vertex, pre_mac_slice)
             mac_graph.add_vertex(pre_mac_vertex)
@@ -501,7 +510,7 @@ def test_pop_based_master_pop_table_standard(
     if delayed_indices_connected:
         delays.append(20)
     connections = [(i, j, 0, delays[i % len(delays)])
-                   for i in range(1000) for j in range(100)]
+                   for i in range(n_pre_neurons) for j in range(100)]
     connector = FromListConnector(connections)
     synapse_dynamics = SynapseDynamicsStatic()
     synapse_info = SynapseInformation(
