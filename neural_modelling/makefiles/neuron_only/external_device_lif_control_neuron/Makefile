@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_curr_exp_neuron\
-         IZK_curr_exp_neuron\
-         IF_cond_exp_neuron\
-         external_device_lif_control_neuron
+APP = external_device_lif_control_neuron
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_external_devices.h
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+include ../neuron_build.mk
