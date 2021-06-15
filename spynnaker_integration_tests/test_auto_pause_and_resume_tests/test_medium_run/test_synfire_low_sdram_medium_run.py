@@ -24,7 +24,7 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
 runtime = 3000
-neurons_per_core = 44
+neurons_per_core = 55
 synfire_run = SynfireRunner()
 
 
