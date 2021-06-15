@@ -13,18 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = synapses\
-         synapses_stdp_mad_pair_additive\
-         synapses_stdp_mad_pair_multiplicative\
-         synapses_stdp_mad_nearest_pair_additive\
-         synapses_stdp_mad_nearest_pair_multiplicative\
-         synapses_structural_random_distance_weight\
-         synapses_structural_last_neuron_distance_weight\
-         synapses_stdp_mad_pair_additive_structural_random_distance_weight\
-         synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight
+APP = $(notdir $(CURDIR))
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_mad_stdp.c
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.c
+TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.h
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+include ../synapse_build.mk
