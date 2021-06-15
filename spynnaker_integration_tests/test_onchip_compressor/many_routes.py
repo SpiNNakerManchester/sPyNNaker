@@ -54,8 +54,10 @@ def do_run():
 
     sources = []
     for s in range(n_source):
-        sources.append(sim.Population(n_neurons, sim.IF_curr_exp(),
-                                      label="source_{}".format(s)))
+        sources.append(sim.Population(
+            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s)),
+            additional_parameters={
+                "splitter": SplitterAbstractPopulationVertexSlice()})
     targets = []
     for t in range(n_target):
         pop = sim.Population(
