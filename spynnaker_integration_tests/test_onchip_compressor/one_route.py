@@ -16,6 +16,8 @@ import math
 from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SplitterAbstractPopulationVertexSlice)
 
 
 def find_good_chip(machine, n_target):
@@ -52,12 +54,14 @@ def do_one_run():
 
     sources = []
     for s in range(n_source):
-        sources.append(sim.Population(n_neurons, sim.IF_curr_exp(),
-                                      label="source_{}".format(s)))
+        sources.append(sim.Population(
+            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s)))
     targets = []
     for t in range(n_target):
-        pop = sim.Population(n_neurons, sim.IF_curr_exp(),
-                             label="target_{}".format(t))
+        pop = sim.Population(
+            n_neurons, sim.IF_curr_exp(), label="target_{}".format(t),
+            additional_parameters={
+                "splitter": SplitterAbstractPopulationVertexSlice()})
         pop.add_placement_constraint(x=target_x, y=target_y)
         targets.append(pop)
 
