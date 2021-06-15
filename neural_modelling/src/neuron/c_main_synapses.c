@@ -134,8 +134,6 @@ void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
-        spike_processing_fast_pause(time);
-
         // Pause common functions
         common_pause(recording_flags);
 

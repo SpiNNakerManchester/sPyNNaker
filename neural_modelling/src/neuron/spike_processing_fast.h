@@ -104,9 +104,4 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires);
 void spike_processing_fast_store_provenance(
         struct spike_processing_fast_provenance *prov);
 
-//! \brief Called to tell the spike processing that the time step to record
-//!        final data.
-//! \param[in] The time step that has just finished.
-void spike_processing_fast_pause(uint32_t time);
-
 #endif // _SPIKE_PROCESSING_FAST_H_

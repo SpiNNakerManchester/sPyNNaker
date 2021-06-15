@@ -118,10 +118,6 @@ static struct key_config key_config;
 //! The ring buffers to use
 static weight_t *ring_buffers;
 
-//! Whether recording data should be written in the next time step.  Needed
-//! because some things are recorded for time step t in time step t + 1.
-static bool write_data_next = false;
-
 //! \brief Determine if this is the end of the time step
 //! \return True if end of time step
 static inline bool is_end_of_time_step(void) {
@@ -390,19 +386,15 @@ static inline bool prepare_timestep(uint32_t time) {
     log_debug("Start of time step %d, timer = %d, loading with %d",
             time, timer, time_until_stop);
 
-    if (write_data_next) {
+    // Store recording data from last time step
+    store_data(time);
 
-        // Store recording data from last time step
-        store_data(time - 1);
-
-        // Clear the buffer if needed
-        if (clear_input_buffers_of_late_packets) {
-            in_spikes_clear();
-        }
+    // Clear the buffer if needed
+    if (clear_input_buffers_of_late_packets) {
+        in_spikes_clear();
     }
     p_per_ts_struct.packets_this_time_step = 0;
     spikes_processed_this_time_step = 0;
-    write_data_next = true;
 
     synapses_flush_ring_buffers(time);
     spin1_mode_restore(cspr);
@@ -530,11 +522,6 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             process_current_row(time, dma_in_progress);
         }
     }
-}
-
-void spike_processing_fast_pause(uint32_t time) {
-    store_data(time - 1);
-    write_data_next = false;
 }
 
 //! \brief Called when a multicast packet is received
