@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
+import logging
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
@@ -38,6 +39,7 @@ from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -59,6 +61,8 @@ from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
+
+logger = logging.getLogger(__name__)
 
 # The maximum number of bits for the ring buffer index that are likely to
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
@@ -194,6 +198,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
+            # Find the maximum number of cores on any chip available
+            max_crs = resource_tracker.get_maximum_cores_available_on_a_chip()
+            if max_crs < (self.__n_synapse_vertices + 1):
+                raise ConfigurationException(
+                    "No chips remaining with enough cores for"
+                    f" {self.__n_synapse_vertices} synapse cores and a neuron"
+                    " core")
+            max_crs -= self.__n_synapse_vertices + 1
+
             # Create the neuron vertex for the slice
             neuron_vertex, neuron_resources = self.__add_neuron_core(
                 vertex_slice, label, index, rb_shifts, weight_scales,
@@ -218,15 +231,32 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     all_resources, machine_graph, synapse_vertices,
                     neuron_vertex, constraints)
 
-            # Add resources for Poisson vertices
+            # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
-            for poisson_vertex in poisson_vertices:
-                all_resources.append(poisson_vertex.resources_required)
+            remaining_poisson_vertices = list()
+            added_poisson_vertices = list()
+            for poisson_vertex, poisson_edge in poisson_vertices:
+                if max_crs <= 0:
+                    remaining_poisson_vertices.append(poisson_vertex)
+                    self.__add_poisson_multicast(
+                        poisson_vertex, synapse_vertices, machine_graph,
+                        poisson_edge)
+                else:
+                    all_resources.append(poisson_vertex.resources_required)
+                    added_poisson_vertices.append(poisson_vertex)
+                    max_crs -= 1
+
+            if remaining_poisson_vertices:
+                logger.warn(
+                    f"Vertex {label} is using multicast for"
+                    f" {len(remaining_poisson_vertices)} one-to-one Poisson"
+                    " sources as not enough cores exist to put them on the"
+                    " same chip")
 
             # Create an SDRAM edge partition
             sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
                 label, vertex_slice.lo_atom, vertex_slice.hi_atom)
-            source_vertices = poisson_vertices + synapse_vertices
+            source_vertices = added_poisson_vertices + synapse_vertices
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
                 SYNAPSE_SDRAM_PARTITION_ID, sdram_label, source_vertices)
             machine_graph.add_outgoing_edge_partition(sdram_partition)
@@ -260,6 +290,25 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             resource_tracker.allocate_group_resources(all_resources)
 
         return True
+
+    def __add_poisson_multicast(
+            self, poisson_vertex, synapse_vertices, machine_graph, app_edge):
+        """ Add an edge from a one-to-one Poisson source to one of the
+            synapse vertices using multicast
+
+        :param MachineVertex poisson_vertex:
+            The Poisson machine vertex to use as a source
+        :param list(MachineVertex) synapse_vertices:
+            The list of synapse vertices that can be used as targets
+        :param MachineGraph machine_graph: The machine graph to add the edge to
+        :param ProjectionEdge app_edge: The application edge of the connection
+        """
+        post_vertex = synapse_vertices[self.__next_synapse_index]
+        self.__next_synapse_index = (
+            (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+        edge = MachineEdge(poisson_vertex, post_vertex, app_edge=app_edge,
+                           label=f"Machine edge for {app_edge.label}")
+        machine_graph.add_edge(edge, SPIKE_PARTITION_ID)
 
     def __add_neuron_core(
             self, vertex_slice, label, index, rb_shifts, weight_scales,
@@ -456,7 +505,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                         vertex_slice, resources, label=poisson_label)
                     machine_graph.add_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
-                        poisson_m_vertex)
+                        (poisson_m_vertex, proj._projection_edge))
 
                 # Keep track of edges that have been used for this
                 self.__poisson_edges.add(proj._projection_edge)
