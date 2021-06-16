@@ -13,20 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_curr_exp_neuron\
-         IZK_curr_exp_neuron\
-         IF_cond_exp_neuron\
-         IZK_cond_exp_neuron\
-         IF_curr_exp_ca2_adaptive_neuron\
-         IF_curr_exp_dual_neuron\
-         IF_curr_exp_sEMD_neuron\
-         IF_curr_delta_neuron\
-         IF_curr_alpha_neuron\
-         IF_cond_exp_stoc_neuron\
-         external_device_lif_control_neuron
+APP = $(notdir $(CURDIR))
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_semd_impl.h
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+include ../neuron_build.mk

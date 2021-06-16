@@ -18,6 +18,9 @@ MODELS = synapses\
          synapses_stdp_mad_pair_multiplicative\
          synapses_stdp_mad_nearest_pair_additive\
          synapses_stdp_mad_nearest_pair_multiplicative\
+         synapses_stdp_mad_recurrent_dual_fsm_multiplicative\
+         synapses_stdp_mad_pfister_triplet_additive\
+         synapses_stdp_mad_vogels_2011_additive\
          synapses_structural_random_distance_weight\
          synapses_structural_last_neuron_distance_weight\
          synapses_stdp_mad_pair_additive_structural_random_distance_weight\
