@@ -325,7 +325,8 @@ class PopulationSynapsesMachineVertexCommon(
             f"On {label}, the transfer of synaptic inputs to SDRAM did not end"
             " before the next timer tick started"
             f" {prov.n_transfer_timer_overruns} times with a maximum overrun"
-            f" of {prov.max_transfer_timer_overrun}.")
+            f" of {prov.max_transfer_timer_overrun}.  Try increasing "
+            " transfer_overhead_clocks in your .spynnaker.cfg file.")
         yield ProvenanceDataItem(
             names + [self.N_SKIPPED_TIME_STEPS], prov.n_skipped_time_steps,
             prov.n_skipped_time_steps > 0,
