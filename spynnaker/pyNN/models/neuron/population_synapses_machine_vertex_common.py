@@ -204,7 +204,6 @@ class PopulationSynapsesMachineVertexCommon(
             The generator of the specification to write
         """
         send_size = self.__sdram_partition.get_sdram_size_of_region_for(self)
-        n_send_cores = len(self.__sdram_partition.pre_vertices)
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
