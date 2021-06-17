@@ -50,9 +50,6 @@ typedef struct dma_buffer {
 //! Mask to apply to perform modulo on the DMA buffer index
 #define DMA_BUFFER_MOD_MASK 0x1
 
-//! The extra overhead to add to the transfer time
-#define TRANSFER_OVERHEAD_CLOCKS 100
-
 //! The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
 
@@ -96,6 +93,9 @@ static uint32_t max_spikes_processed = 0;
 
 //! The number of times the transfer ran to the next time step
 static uint32_t transfer_timer_overruns = 0;
+
+//! The maximum overrun of the timer tick
+static uint32_t max_transfer_timer_overrun = 0;
 
 //! The number of times the timer tick was skipped entirely
 static uint32_t skipped_time_steps = 0;
@@ -180,9 +180,13 @@ static inline void process_end_of_time_step(uint32_t time) {
     transfer_buffers(time);
     wait_for_dma_to_complete();
 
-    uint32_t end = tc[T1_COUNT];
-    if (end > clocks_to_transfer) {
+    // uint32_t end = tc[T1_COUNT];
+    if (tc[T1_MASK_INT]) {
         transfer_timer_overruns++;
+        uint32_t diff = tc[T1_LOAD] - tc[T1_COUNT];
+        if (diff > max_transfer_timer_overrun) {
+            max_transfer_timer_overrun = diff;
+        }
     }
 
     spin1_mode_restore(cspr);
@@ -351,7 +355,8 @@ static inline void measure_transfer_time(void) {
     tc[T2_CONTROL] = 0x82;
     transfer_buffers(0);
     wait_for_dma_to_complete();
-    clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT]) + TRANSFER_OVERHEAD_CLOCKS;
+    clocks_to_transfer = (0xFFFFFFFF - tc[T2_COUNT])
+            + sdram_inputs.time_for_transfer_overhead;
     tc[T2_CONTROL] = 0;
     log_info("Transfer of %u bytes to 0x%08x took %u cycles",
             sdram_inputs.size_in_bytes, sdram_inputs.address, clocks_to_transfer);
@@ -602,4 +607,5 @@ void spike_processing_fast_store_provenance(
     prov->max_spikes_received = max_spikes_received;
     prov->n_transfer_timer_overruns = transfer_timer_overruns;
     prov->n_skipped_time_steps = skipped_time_steps;
+    prov->max_transfer_timer_overrun = max_transfer_timer_overrun;
 }

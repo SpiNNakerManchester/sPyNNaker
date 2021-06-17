@@ -17,12 +17,12 @@ import ctypes
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
-from spynnaker.pyNN.utilities.utility_calls import get_time_to_write_us
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
@@ -34,9 +34,6 @@ SDRAM_PARAMS_SIZE = 3 * BYTES_PER_WORD
 # Size of the Key config params = 1 work for key + 1 word for mask
 #  + 1 word for spike mask + 1 word for self connection boolean
 KEY_CONFIG_SIZE = 4 * BYTES_PER_WORD
-
-# Overhead in time to write, which includes the clearing of input spikes
-TIME_TO_CLEAR_SPIKES = 50
 
 
 class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
@@ -61,7 +58,9 @@ class SpikeProcessingFastProvenance(ctypes.LittleEndianStructure):
         # The number of times the transfer time over ran
         ("n_transfer_timer_overruns", ctypes.c_uint32),
         # The number of times a time step was skipped entirely
-        ("n_skipped_time_steps", ctypes.c_uint32)
+        ("n_skipped_time_steps", ctypes.c_uint32),
+        # The maximum overrun of a transfer
+        ("max_transfer_timer_overrun", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -83,6 +82,7 @@ class PopulationSynapsesMachineVertexCommon(
     MAX_SPIKES_PROCESSED = "Max_spikes_processed_in_time_step"
     N_TRANSFER_TIMER_OVERRUNS = "Times_the_transfer_did_not_complete_in_time"
     N_SKIPPED_TIME_STEPS = "Times_a_time_step_was_skipped"
+    MAX_TRANSFER_TIMER_OVERRUNS = "Max_transfer_overrn"
 
     __slots__ = [
         "__sdram_partition",
@@ -212,8 +212,8 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(send_size)
-        spec.write_value(TIME_TO_CLEAR_SPIKES +
-                         get_time_to_write_us(send_size, n_send_cores))
+        spec.write_value(get_config_int(
+            "Simulation", "transfer_overhead_clocks"))
 
     def _write_key_spec(self, spec, routing_info):
         """ Write key config region
@@ -324,7 +324,8 @@ class PopulationSynapsesMachineVertexCommon(
             prov.n_transfer_timer_overruns, prov.n_transfer_timer_overruns > 0,
             f"On {label}, the transfer of synaptic inputs to SDRAM did not end"
             " before the next timer tick started"
-            f" {prov.n_transfer_timer_overruns} times.")
+            f" {prov.n_transfer_timer_overruns} times with a maximum overrun"
+            f" of {prov.max_transfer_timer_overrun}.")
         yield ProvenanceDataItem(
             names + [self.N_SKIPPED_TIME_STEPS], prov.n_skipped_time_steps,
             prov.n_skipped_time_steps > 0,
@@ -332,3 +333,6 @@ class PopulationSynapsesMachineVertexCommon(
             f" {prov.n_skipped_time_steps} time steps.  Try increasing the "
             "time_scale_factor located within the .spynnaker.cfg file or in "
             "the pynn.setup() method.")
+        yield ProvenanceDataItem(
+            names + [self.MAX_TRANSFER_TIMER_OVERRUNS],
+            prov.max_transfer_timer_overrun)

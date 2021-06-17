@@ -32,7 +32,7 @@ struct sdram_config {
     //! The size of the input data to be transferred
     uint32_t size_in_bytes;
     //! The time of the transfer in us
-    uint32_t time_for_transfer;
+    uint32_t time_for_transfer_overhead;
 };
 
 //! The key and mask being used to send spikes from neurons processed on this
@@ -70,6 +70,8 @@ struct spike_processing_fast_provenance {
     uint32_t n_transfer_timer_overruns;
     //! The number of times a time step was skipped entirely
     uint32_t n_skipped_time_steps;
+    //! The maximum additional time taken to transfer
+    uint32_t max_transfer_timer_overrun;
 
 };
 
