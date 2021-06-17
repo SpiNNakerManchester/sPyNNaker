@@ -759,7 +759,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         max_delay_bits = get_n_bits(max_delay_steps)
 
         # Find the maximum possible delay
-        n_atom_bits = get_n_bits(app_vertex.get_max_atoms_per_core())
+        n_atom_bits = get_n_bits(min(
+            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms))
         n_synapse_bits = get_n_bits(
             app_vertex.neuron_impl.get_n_synapse_types())
         n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
