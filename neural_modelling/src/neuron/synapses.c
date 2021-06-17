@@ -296,6 +296,7 @@ bool synapses_initialise(
     if (ring_buffers == NULL) {
         log_error("Could not allocate %u entries for ring buffers",
                 ring_buffer_size);
+        return false;
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
