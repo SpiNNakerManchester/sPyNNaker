@@ -17,9 +17,10 @@ import pytest
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spinnaker_testbase import BaseTestCase
 
 
-def test_mission_impossible():
+def mission_impossible():
     sim.setup(0.1, time_scale_factor=1)
 
     # Can't do that many neurons and delays together
@@ -31,7 +32,7 @@ def test_mission_impossible():
         sim.run(100)
 
 
-def test_mission_impossible_2():
+def mission_impossible_2():
     sim.setup(0.1, time_scale_factor=1)
 
     # Can't do structural on multiple synapse cores
@@ -47,3 +48,12 @@ def test_mission_impossible_2():
 
     with pytest.raises(SynapticConfigurationException):
         sim.run(100)
+
+
+class TestSplitImpossible(BaseTestCase):
+
+    def test_mission_impossible(self):
+        self.runsafe(mission_impossible)
+
+    def test_mission_impossible_2(self):
+        self.runsafe(mission_impossible_2)
