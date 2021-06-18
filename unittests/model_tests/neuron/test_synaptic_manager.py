@@ -373,35 +373,42 @@ def test_set_synapse_dynamics():
 
 
 @pytest.mark.parametrize(
-    "undelayed_indices_connected,delayed_indices_connected,expect_app_keys", [
+    "undelayed_indices_connected,delayed_indices_connected,n_pre_neurons,"
+    "neurons_per_core,expect_app_keys,max_delay", [
         # Only undelayed, all edges exist
-        (range(10), [], True),
+        (range(10), [], 1000, 100, True, None),
         # Only delayed, all edges exist
-        ([], range(10), True),
+        ([], range(10), 1000, 100, True, 20),
         # All undelayed and delayed edges exist
-        (range(10), range(10), True),
+        (range(10), range(10), 1000, 100, True, 20),
         # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ([0, 1, 2, 3, 4], [], False),
+        ([0, 1, 2, 3, 4], [], 1000, 100, False, None),
         # Only delayed, some edges are filtered (app keys shouldn't work)
-        ([], [5, 6, 7, 8, 9], False),
+        ([], [5, 6, 7, 8, 9], 1000, 100, False, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), True),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 20),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], True)
+        (range(10), [4, 5, 6, 7], 1000, 100, True, 20),
+        # Should work but number of neurons don't work out
+        (range(5), [], 10000, 2048, False, None),
+        # Should work but number of cores doesn't work out
+        (range(2000), [], 10000, 5, False, None),
+        # Should work but number of neurons with delays don't work out
+        ([], range(4), 1024, 256, False, 144)
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
-        expect_app_keys):
-    machine = virtual_machine(2, 2)
+        n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
+    machine = virtual_machine(12, 12)
 
     # Build a from list connector with the delays we want
     connections = []
-    connections.extend([(i * 100 + j, j, 0, 10)
+    connections.extend([(i * neurons_per_core + j, j, 0, 10)
                         for i in undelayed_indices_connected
                         for j in range(100)])
-    connections.extend([(i * 100 + j, j, 0, 20)
+    connections.extend([(i * neurons_per_core + j, j, 0, max_delay)
                         for i in delayed_indices_connected
                         for j in range(100)])
 
@@ -409,13 +416,13 @@ def test_pop_based_master_pop_table_standard(
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
     p.setup(1.0)
-    p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
-    pre_pop = p.Population(
-        1000, p.IF_curr_exp(), label="Pre",
-        additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
     post_pop = p.Population(
         100, p.IF_curr_exp(), label="Post",
+        additional_parameters={
+            "splitter": SplitterAbstractPopulationVertexSlice()})
+    p.IF_curr_exp.set_model_max_atoms_per_core(neurons_per_core)
+    pre_pop = p.Population(
+        n_pre_neurons, p.IF_curr_exp(), label="Pre",
         additional_parameters={
             "splitter": SplitterAbstractPopulationVertexSlice()})
     p.Projection(

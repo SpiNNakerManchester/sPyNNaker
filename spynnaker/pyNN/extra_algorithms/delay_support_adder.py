@@ -239,7 +239,7 @@ class DelaySupportAdder(object):
         # extension. coz we dont do more than 1 at the moment
         ext_provided_ms = (DelayExtensionVertex.get_max_delay_ticks_supported(
                 max_delay_steps) * machine_time_step_ms())
-        total_delay_ms = ext_provided_ms
+        total_delay_ms = ext_provided_ms + max_delay_ms
         if total_delay_ms < max_delay_needed_ms:
             raise DelayExtensionException(
                 self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(

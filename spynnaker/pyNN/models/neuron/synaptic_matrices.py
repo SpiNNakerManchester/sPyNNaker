@@ -468,7 +468,7 @@ class SynapticMatrices(object):
         return _AppKeyInfo(key, new_mask, core_mask, mask_size,
                            keys[0][1].n_atoms * n_stages)
 
-    def __check_key_slices(self, n_atoms, slices):
+    def __check_key_slices(self, n_atoms, slices, delay_stages=1):
         """ Check if a list of slices cover all n_atoms without any gaps
 
         :param int n_atoms: The total number of atoms expected
@@ -492,10 +492,12 @@ class SynapticMatrices(object):
                     n_atoms_per_core != s.n_atoms):
                 return None
             next_high = s.hi_atom + 1
-            n_atoms_per_core = s.n_atoms
+            if n_atoms_per_core is None:
+                n_atoms_per_core = s.n_atoms
 
         # If the number of atoms per core is too big, this can't be done
-        if n_atoms_per_core > self.__poptable.max_n_neurons_per_core:
+        if ((n_atoms_per_core * delay_stages) >
+                self.__poptable.max_n_neurons_per_core):
             return False
         return True
 
@@ -587,7 +589,8 @@ class SynapticMatrices(object):
             keys.append((rinfo.first_key, vertex_slice))
 
         if not self.__check_key_slices(
-                app_edge.pre_vertex.n_atoms, pre_slices):
+                app_edge.pre_vertex.n_atoms, pre_slices,
+                app_edge.n_delay_stages):
             return None
 
         return self.__get_app_key_and_mask(
