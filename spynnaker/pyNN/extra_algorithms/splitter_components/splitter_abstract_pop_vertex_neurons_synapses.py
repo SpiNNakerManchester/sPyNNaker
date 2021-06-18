@@ -242,7 +242,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                         poisson_vertex, synapse_vertices, machine_graph,
                         poisson_edge)
                 else:
-                    all_resources.append(poisson_vertex.resources_required)
+                    all_resources.append(
+                        (poisson_vertex.resources_required, []))
                     added_poisson_vertices.append(poisson_vertex)
                     max_crs -= 1
 
@@ -284,10 +285,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 cpu_cycles=neuron_resources.cpu_cycles,
                 iptags=neuron_resources.iptags,
                 reverse_iptags=neuron_resources.reverse_iptags)
-            all_resources.append(neuron_resources_plus)
+            all_resources.append((neuron_resources_plus, constraints))
 
             # Allocate all the resources to ensure they all fit
-            resource_tracker.allocate_group_resources(all_resources)
+            resource_tracker.allocate_constrained_group_resources(
+                all_resources)
 
         return True
 
@@ -406,7 +408,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             lead_synapse_resources, "{}(0)".format(syn_label), constraints,
             app_vertex, vertex_slice, rb_shifts, weight_scales,
             all_syn_block_sz, structural_sz, synapse_references)
-        all_resources.append(lead_synapse_resources)
+        all_resources.append((lead_synapse_resources, constraints))
         machine_graph.add_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)
@@ -447,7 +449,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         synapse_vertex = PopulationSynapsesMachineVertexShared(
             synapse_resources, synapse_label, constraints, app_vertex,
             vertex_slice, synapse_references)
-        all_resources.append(synapse_resources)
+        all_resources.append((synapse_resources, constraints))
         machine_graph.add_vertex(synapse_vertex)
         self.__synapse_vertices.append(synapse_vertex)
         synapse_vertices.append(synapse_vertex)
