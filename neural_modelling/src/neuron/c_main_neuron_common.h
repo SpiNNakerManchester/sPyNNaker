@@ -45,10 +45,10 @@ struct neuron_regions {
 //! Declare that time exists
 extern uint32_t time;
 
-//! Earliest time in a timestep that any neuron has sent a spike
+//! Latest time in a timestep that any neuron has sent a spike
 extern uint32_t latest_send_time;
 
-//! Latest time in a timestep that any neuron has sent a spike
+//! Earliest time in a timestep that any neuron has sent a spike
 extern uint32_t earliest_send_time;
 
 //! \brief Callback to store neuron provenance data (format: neuron_provenance).

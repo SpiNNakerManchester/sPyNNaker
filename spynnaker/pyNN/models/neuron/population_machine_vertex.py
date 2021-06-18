@@ -84,7 +84,7 @@ class PopulationMachineVertex(
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
     SPIKES_PROCESSED = "how many spikes were processed"
-    N_RE_WIRES_NAME = "Number_of_rewires"
+    N_REWIRES_NAME = "Number_of_rewires"
     N_LATE_SPIKES_NAME = "Number_of_late_spikes"
     MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
@@ -342,7 +342,7 @@ class PopulationMachineVertex(
             names + [self.SPIKES_PROCESSED],
             prov.n_spikes_processed)
         yield ProvenanceDataItem(
-            names + [self.N_RE_WIRES_NAME], prov.n_rewires)
+            names + [self.N_REWIRES_NAME], prov.n_rewires)
 
         late_message = (
             f"On {label}, {prov.n_late_packets} packets were dropped "

@@ -33,10 +33,10 @@ key_t key;
 //! by the data region, then this model should not have a key.
 bool use_key;
 
-//! Earliest time in a timestep that any neuron has sent a spike
+//! Latest time in a timestep that any neuron has sent a spike
 uint32_t latest_send_time = 0xFFFFFFFF;
 
-//! Latest time in a timestep that any neuron has sent a spike
+//! Earliest time in a timestep that any neuron has sent a spike
 uint32_t earliest_send_time = 0;
 
 //! The number of neurons on the core
@@ -71,6 +71,9 @@ struct neuron_parameters {
 static bool neuron_load_neuron_parameters(void) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
+    // Note the "next" is 0 here because we are using a saved address
+    // which has already accounted for the position of the data within
+    // the region being read.
     neuron_impl_load_neuron_parameters(saved_params_address, 0, n_neurons);
     return true;
 }

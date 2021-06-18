@@ -33,7 +33,7 @@
  * @image html spynnaker_c_code_flow.png
  */
 
-#include "c_main_neuron.h"
+#include "c_main_neuron_common.h"
 #include "c_main_common.h"
 #include "profile_tags.h"
 #include "dma_common.h"

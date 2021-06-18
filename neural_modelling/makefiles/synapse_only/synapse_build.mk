@@ -177,28 +177,28 @@ include $(SPINN_DIRS)/make/local.mk
 
 FEC_OPT = $(OTIME)
 
-# Synapse build rules
-SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
+# Extra compile options
+DO_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
 
 $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(DO_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/direct_synapses.o: $(MODIFIED_DIR)neuron/direct_synapses.c
 	#direct_synapses.c
 	-mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(DO_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/spike_processing_fast.o: $(MODIFIED_DIR)neuron/spike_processing_fast.c
 	#spike_processing_fast.c
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(DO_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
 	#population_table/population_table_binary_search_impl.c
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(DO_COMPILE) -o $@ $<
 
 SYNGEN_INCLUDES:=
 ifeq ($(SYNGEN_ENABLED), 1)
@@ -227,14 +227,14 @@ ifeq ($(STDP_ENABLED), 1)
 
 else
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
-	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
+    # SYNAPTOGENESIS_DYNAMICS_O without stdp
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
+	$(DO_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
-	# SYNAPSE_DYNAMICS_O Synapese
+    # SYNAPSE_DYNAMICS_O without stdp
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(DO_COMPILE) -o $@ $<
 
 endif
 

@@ -224,7 +224,8 @@ def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
     :param ProjectionApplicationEdge in_edge: The incoming edge
     :param int n_synapses: The number of synapses for the number of words
     :raises SynapseRowTooBigException:
-        If the given row is too big.  The exception will detail the
+        If the given row is too big; the exception will detail the maximum
+        number of synapses that are supported.
     """
     if n_words == 0:
         return 0

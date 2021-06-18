@@ -152,13 +152,10 @@ include $(SPINN_DIRS)/make/local.mk
 
 FEC_OPT = $(OTIME)
 
-# Synapse build rules
-SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS)
-
 $(BUILD_DIR)neuron/c_main_neurons.o: $(MODIFIED_DIR)neuron/c_main_neurons.c
 	#c_main.c
 	-@mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)

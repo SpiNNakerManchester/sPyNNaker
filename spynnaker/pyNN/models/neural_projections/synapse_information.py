@@ -200,7 +200,7 @@ class SynapseInformation(object):
         return connector_gen and synapse_gen
 
     def may_use_direct_matrix(self):
-        """ Do the properties of the synaptic information all it to use the
+        """ Do the properties of the synaptic information allow it to use the
             direct matrix?
 
         :rtype: bool

@@ -33,8 +33,8 @@
  * @image html spynnaker_c_code_flow.png
  */
 
-#include "c_main_neuron.h"
-#include "c_main_synapse.h"
+#include "c_main_neuron_common.h"
+#include "c_main_synapse_common.h"
 #include "c_main_common.h"
 #include "regions.h"
 #include "profile_tags.h"
@@ -113,10 +113,10 @@ static uint32_t n_background_overloads = 0;
 //! The maximum number of background tasks queued
 static uint32_t max_backgrounds_queued = 0;
 
-//! The number of neurons in the simulation
+//! The number of neurons on this core
 static uint32_t n_neurons;
 
-//! The number of synapse types in the simulation
+//! The number of synapse types on this core
 static uint32_t n_synapse_types;
 
 //! The ring buffers to be used in the simulation

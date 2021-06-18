@@ -33,7 +33,7 @@
  * @image html spynnaker_c_code_flow.png
  */
 
-#include "c_main_synapse.h"
+#include "c_main_synapse_common.h"
 #include "c_main_common.h"
 #include "spike_processing_fast.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
