@@ -32,6 +32,8 @@ def before_run(nNeurons):
 
 class Test_celltype(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_before_run(self):
         nNeurons = 20  # number of neurons in each population
         celltype = before_run(nNeurons)

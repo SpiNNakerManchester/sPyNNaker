@@ -21,6 +21,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestPopulation(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_depricated(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp())
