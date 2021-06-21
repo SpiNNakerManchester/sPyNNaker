@@ -18,6 +18,7 @@ import numpy
 import pytest
 import random
 from pacman.model.graphs.common import Slice
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
     FixedProbabilityConnector, IndexBasedProbabilityConnector)
@@ -84,7 +85,7 @@ def delay(request):
 
 def test_connectors(
         n_pre, n_post, n_in_slice, create_connector, weight, delay):
-
+    unittest_setup()
     max_target = 0
     max_source = 0
     max_row_length = None

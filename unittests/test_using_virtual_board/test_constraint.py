@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestConstraint(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_placement_constraint(self):
         """
         test the get_placements call.

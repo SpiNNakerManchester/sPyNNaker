@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestOneToOneConnector(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def check_weights(self, projection, sources, destinations):
         weights = projection.get(["weight"], "list")
         last_source = -1

@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestProps(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_props(self):
         p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 

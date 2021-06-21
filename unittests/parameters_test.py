@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp_base import IFCondExpBase
 import spynnaker8 as p
 
 
 class TestParameters(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_class_default_parameters(self):
         self.assertEqual(IFCondExpBase.default_parameters,

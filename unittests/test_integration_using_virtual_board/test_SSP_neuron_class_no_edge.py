@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class SSPNeuronClassNoEdgeTest(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         sim.setup()
 

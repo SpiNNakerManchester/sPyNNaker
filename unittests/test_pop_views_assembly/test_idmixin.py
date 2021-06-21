@@ -24,6 +24,8 @@ LABEL = "pop_1"
 
 class TestIDMixin(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_cells(self):
         sim.setup(timestep=1.0)
         pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
