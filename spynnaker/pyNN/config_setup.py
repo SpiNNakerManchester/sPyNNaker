@@ -18,7 +18,8 @@ from spinn_utilities.config_holder import (
     clear_cfg_files, set_cfg_files)
 from spinn_front_end_common.interface.config_setup import (
     add_default_cfg, add_spinnaker_cfg)
-from spinn_front_end_common.utilities.globals_variables import unset_simulator
+from spinn_front_end_common.utilities.globals_variables import (
+    setup_for_unittest)
 
 CONFIG_FILE_NAME = "spynnaker.cfg"
 
@@ -52,7 +53,7 @@ def unittest_setup():
          that do not call sim.setup
 
     """
-    unset_simulator()
+    setup_for_unittest()
     clear_cfg_files(True)
     add_spinnaker_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME))
