@@ -21,6 +21,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestRanged(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_uniform(self):
         # Need to do setup to get a pynn version
         p.setup(10)

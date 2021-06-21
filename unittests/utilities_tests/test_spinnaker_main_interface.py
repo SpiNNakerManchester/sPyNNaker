@@ -20,7 +20,7 @@ from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spynnaker.pyNN.config_setup import reset_configs
+from spynnaker.pyNN.config_setup import unittest_setup
 
 
 class Close_Once(object):
@@ -40,7 +40,7 @@ class Close_Once(object):
 class TestSpinnakerMainInterface(unittest.TestCase):
 
     def setUp(self):
-        reset_configs()
+        unittest_setup()
 
     def test_min_init(self):
         class_file = sys.modules[self.__module__].__file__

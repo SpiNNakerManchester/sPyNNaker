@@ -15,12 +15,16 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.config_setup import unittest_setup
 
 WEIGHT = 5
 DELAY = 2
 
 
 class TestIndexBasedProbabilityConnector(BaseTestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def check_weights(self, projection, n, expression, allow_self_connections):
         weights = projection.get(["weight"], "list")
