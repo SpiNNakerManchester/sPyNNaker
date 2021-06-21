@@ -97,6 +97,8 @@ def do_run(nNeurons):
 
 class ParamsSetAsList(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         nNeurons = 225  # number of neurons in each population
         do_run(nNeurons)

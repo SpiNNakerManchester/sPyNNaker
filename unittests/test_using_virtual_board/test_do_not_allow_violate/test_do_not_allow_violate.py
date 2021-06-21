@@ -23,6 +23,8 @@ class TestDoNotAllowViolate(BaseTestCase):
     Tests that running too fast needs to be specifically allowed
     """
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_do_not_allow_violate(self):
         with self.assertRaises(ConfigurationException):
             sim.setup()   # remember pynn default is 0.1

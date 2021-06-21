@@ -44,6 +44,9 @@ def do_run(nNeurons):
 
 
 class OnePopLifExample(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         nNeurons = 255  # number of neurons in each population
         do_run(nNeurons)
