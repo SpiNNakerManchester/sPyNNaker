@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class SynfireIfCurrExp(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         p.setup()
         p.Population(10, p.SpikeSourceArray, {'spike_times': [100, 200]},

@@ -62,6 +62,7 @@ def trim_spikes(spikes, indexes):
 class TestGetting(BaseTestCase):
     def setUp(self):
         """ Save the real methods that we mock out """
+        # NO unittest_setup() as sim.setup is called
         self.__get_spikes = Recorder.get_spikes
         self.__get_recorded_matrix = Recorder.get_recorded_matrix
 

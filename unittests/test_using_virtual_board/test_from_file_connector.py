@@ -25,6 +25,8 @@ DELAY = 2
 
 class TestFromFileConnector(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def check_weights(
             self, projection, aslist, w_index, d_index, sources, destinations):
         from_pro = projection.get(["weight", "delay"], "list")

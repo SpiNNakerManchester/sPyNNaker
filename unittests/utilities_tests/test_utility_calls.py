@@ -17,11 +17,15 @@ import os
 import shutil
 import unittest
 from pyNN.random import RandomDistribution
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker8 import setup
 
 
 class TestUtilityCalls(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
+
     def test_check_directory_exists(self):
         utility_calls.check_directory_exists_and_create_if_not(os.path.dirname(
             os.path.realpath(__file__)))
@@ -44,7 +48,6 @@ class TestUtilityCalls(unittest.TestCase):
         os.rmdir(test_dir)
 
     def test_convert_param_to_numpy_random_distribution(self):
-        setup(1.0)
         random = RandomDistribution("uniform", [0, 1])
         single_value = utility_calls.convert_param_to_numpy(random, 1)
         multi_value = utility_calls.convert_param_to_numpy(random, 10)

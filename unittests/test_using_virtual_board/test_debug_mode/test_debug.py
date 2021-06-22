@@ -31,6 +31,9 @@ class TestDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
+
+    # NO unittest_setup() as sim.setup is called
+
     def debug(self):
         reports = [
             # write_energy_report does not happen on a virtual machine

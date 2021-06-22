@@ -43,12 +43,12 @@ def hacked_receive_chip_info(self, scp_read_chip_info_response):
 class TestAllow(BaseTestCase):
 
     def test_with_actual_ip_address(self):
+        sim.setup(timestep=1.0, n_boards_required=6)
         self.assert_not_spin_three()
 
         # Hack in to set the ignores with used ipaddress
         GetMachineProcess._receive_chip_info = hacked_receive_chip_info
 
-        sim.setup(timestep=1.0, n_boards_required=6)
         machine = sim.get_machine()
         sim.end()
 

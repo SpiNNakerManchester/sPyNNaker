@@ -28,6 +28,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
 import spynnaker8
 
+# No unittest_setup as sim.setup must be called before SynapseDynamicsStatic
+
 
 @pytest.mark.parametrize(
     "dynamics_class,timing,weight,size,exception,max_size",

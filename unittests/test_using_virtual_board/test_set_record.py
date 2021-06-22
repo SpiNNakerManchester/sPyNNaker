@@ -19,6 +19,9 @@ from spinnaker_testbase import BaseTestCase
 
 
 class TestSetRecord(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
+
     def test_set_spikes(self):
         sim.setup(timestep=1)
         if_curr = sim.Population(1, sim.IF_curr_exp())

@@ -19,6 +19,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestPopulation(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_model_fail_to_set_synpase_param(self):
         n_neurons = 5
         value = 5
