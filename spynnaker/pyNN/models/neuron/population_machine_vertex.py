@@ -628,11 +628,11 @@ class PopulationMachineVertex(
         current_source_id_list = self.app_vertex.current_source_id_list
 
         # Work out which current sources are on this core
-        current_sources = []
+        current_sources = set()
         for app_current_source in app_current_sources:
             for n in range(lo_atom, hi_atom + 1):
                 if (n in current_source_id_list[app_current_source]):
-                    current_sources.append(app_current_source)
+                    current_sources.add(app_current_source)
 
         n_current_sources = len(current_sources)
 
