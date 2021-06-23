@@ -21,6 +21,8 @@ from spinnaker_testbase import BaseTestCase
 
 class TestConstraint(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_radial_some(self):
         sim.setup(timestep=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)

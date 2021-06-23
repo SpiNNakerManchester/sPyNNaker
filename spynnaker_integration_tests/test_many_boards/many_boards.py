@@ -79,9 +79,9 @@ class ManyBoards(BaseTestCase):
             style, self.n_boards, self.n_neurons, self.simtime)
 
     def do_run(self):
+        self.setup()
         report_file = self.report_file()
         t_before = time.time()
-        self.setup()
         sim.run(self.simtime)
         t_after_machine = time.time()
         for pop in self._pops:
