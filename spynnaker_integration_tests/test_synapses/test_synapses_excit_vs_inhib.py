@@ -23,7 +23,7 @@ from spinnaker_testbase import BaseTestCase
 class TestSynapsesExcitVsInhib(BaseTestCase):
 
     def do_run(self):
-        p.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
+        p.setup(timestep=1.0, min_delay=1.0)
 
         cell_params = {'i_offset': .1, 'tau_refrac': 3.0, 'v_rest': -65.0,
                        'v_thresh': -51.0, 'tau_syn_E': 2.0,
