@@ -419,11 +419,23 @@ class FromListConnector(AbstractConnector):
         return self.__extra_parameter_names
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
-        return any((_pre_slice.lo_atom <= self.__sources) &
-                   (self.__sources <= _pre_slice.hi_atom) &
-                   (_post_slice.lo_atom <= self.__targets) &
-                   (self.__targets <= _post_slice.hi_atom))
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+        pre_slices = \
+            src_machine_vertex.app_vertex.splitter.get_out_going_slices()[0]
+        post_slices = \
+            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()[0]
+        self._split_connections(pre_slices, post_slices)
+        if not self.__split_conn_list:
+            return False
+        pre_high = src_machine_vertex.vertex_slice.hi_atom
+        post_high = dest_machine_vertex.vertex_slice.hi_atom
+        return len(self.__split_conn_list[pre_high, post_high]) > 0
+
+        #return any((_pre_slice.lo_atom <= self.__sources) &
+        #           (self.__sources <= _pre_slice) &
+        #           (_post_slice.lo_atom <= self.__targets) &
+        #           (self.__targets <= _post_slice.hi_atom))
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """
