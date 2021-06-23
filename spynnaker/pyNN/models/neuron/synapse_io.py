@@ -387,8 +387,8 @@ class SynapseIORowBased(object):
 
         # Get the actual connections
         app_edge = machine_edge.app_edge
-        pre_slices = app_edge.pre_vertex.vertex_slices
-        post_slices = app_edge.post_vertex.vertex_slices
+        pre_slices = app_edge.pre_vertex.splitter.get_out_going_slices()[0]
+        post_slices = app_edge.post_vertex.splitter.get_in_coming_slices()[0]
         pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = machine_edge.post_vertex.vertex_slice
         connections = synapse_info.connector.create_synaptic_block(
