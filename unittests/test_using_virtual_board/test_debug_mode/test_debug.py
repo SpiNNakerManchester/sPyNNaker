@@ -19,7 +19,8 @@ import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import \
@@ -90,11 +91,9 @@ class TestDebug(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5))
         sim.run(1000)
         pop.get_data("v")
-        report_directory = globals_variables.get_simulator().\
-            _report_default_directory
         sim.end()
 
-        found = os.listdir(report_directory)
+        found = os.listdir(report_default_directory())
         print(found)
         for report in reports:
             self.assertIn(report, found)
