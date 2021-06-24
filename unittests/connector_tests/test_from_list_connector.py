@@ -169,7 +169,7 @@ class MockAppVertex(object):
         self.splitter = MockSplitter(slices)
 
 
-class MockMachieVertex(object):
+class MockMachineVertex(object):
 
     def __init__(self, slice, slices):
         self.vertex_slice = slice
@@ -184,9 +184,9 @@ def test_could_connect():
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     for pre_slice in pre_slices:
-        pre_vertex = MockMachieVertex(pre_slice, pre_slices)
+        pre_vertex = MockMachineVertex(pre_slice, pre_slices)
         for post_slice in post_slices:
-            post_vertex = MockMachieVertex(post_slice, post_slices)
+            post_vertex = MockMachineVertex(post_slice, post_slices)
             count = connector.get_n_connections(
                 pre_slices, post_slices, pre_slice.hi_atom,
                 post_slice.hi_atom)
