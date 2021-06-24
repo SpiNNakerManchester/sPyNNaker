@@ -15,8 +15,7 @@
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
-from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
-    SplitterOneToOneLegacy)
+from pacman.model.partitioner_splitters import SplitterExternalDevice
 from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
 from spynnaker.pyNN.models.abstract_models import (
@@ -89,7 +88,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SplitterOneToOneLegacy()
+        app_vertex.splitter = SplitterExternalDevice()
 
     @staticmethod
     def external_fpga_link_heuristic(app_vertex):
@@ -98,7 +97,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SplitterOneToOneLegacy()
+        app_vertex.splitter = SplitterExternalDevice()
 
     @staticmethod
     def spike_source_array_heuristic(app_vertex):
