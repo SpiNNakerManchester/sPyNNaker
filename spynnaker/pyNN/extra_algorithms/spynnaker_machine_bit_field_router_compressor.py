@@ -45,9 +45,8 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
 
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
-            provenance_file_path, machine_graph,
-            placements, executable_finder, default_report_folder,
-            routing_infos, executable_targets, read_expander_iobuf,
+            machine_graph, placements, executable_finder, routing_infos,
+            executable_targets, read_expander_iobuf,
             provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -57,7 +56,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
         :param ~spinn_machine.Machine machine: spinnMachine instance
         :param int app_id: app id of the application
-        :param str provenance_file_path: file path for prov data
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             machine graph
         :param ~pacman.model.placements.Placements placements:
@@ -65,7 +63,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         :param executable_finder: where are binaries are located
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param str default_report_folder:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         :type retry_count: int or None
         :param bool read_algorithm_iobuf: flag saying if read iobuf
@@ -80,10 +77,8 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             machine_bit_field_router_compressor(
                 routing_tables=routing_tables, transceiver=transceiver,
                 machine=machine, app_id=app_id,
-                provenance_file_path=provenance_file_path,
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
-                default_report_folder=default_report_folder,
                 routing_infos=routing_infos,
                 executable_targets=executable_targets,
                 provenance_data_objects=provenance_data_objects)
@@ -94,8 +89,8 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
 
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
-            expander_chip_cores, transceiver, provenance_file_path,
-            executable_finder, True, read_expander_iobuf)
+            expander_chip_cores, transceiver, executable_finder, True,
+            read_expander_iobuf)
 
         return prov_items
 
@@ -148,14 +143,13 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
     @classmethod
     def _rerun_synaptic_cores(
             cls, synaptic_expander_rerun_cores, transceiver,
-            provenance_file_path, executable_finder, needs_sync_barrier,
+            executable_finder, needs_sync_barrier,
             read_expander_iobuf):
         """ reruns the synaptic expander
 
         :param ~.ExecutableTargets synaptic_expander_rerun_cores:
             the cores to rerun the synaptic matrix generator for
         :param ~.Transceiver transceiver: spinnman instance
-        :param str provenance_file_path: prov file path
         :param ~.ExecutableFinder executable_finder:
             finder of binary file paths
         :param bool needs_sync_barrier:
@@ -166,7 +160,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, read_expander_iobuf,
+                executable_finder, read_expander_iobuf,
                 None, [CPUState.FINISHED], needs_sync_barrier,
                 cls._RERUN_IOBUF_NAME_PATTERN)
 
