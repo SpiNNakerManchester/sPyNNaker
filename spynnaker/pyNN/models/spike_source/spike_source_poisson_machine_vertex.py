@@ -279,13 +279,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.end_specification()
 
     @inject_items({
-<<<<<<< HEAD
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "routing_info": "RoutingInfos",
-=======
-        "routing_info": "MemoryRoutingInfos",
->>>>>>> refs/remotes/origin/master
         "data_n_time_steps": "DataNTimeSteps",
         "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
