@@ -55,6 +55,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_str</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">report_default_directory</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
@@ -89,7 +91,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">graphviz</span><span class="o">.</span><span class="n">Digraph</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="n">label</span><span class="p">),</span>
                 <span class="n">graphviz</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">ExecutableNotFound</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpYNNakerNeuronGraphNetworkSpecificationReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_folder</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">):</span>
+<div class="viewcode-block" id="SpYNNakerNeuronGraphNetworkSpecificationReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerNeuronGraphNetworkSpecificationReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str report_folder: the report folder to put figure into</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph \</span>
@@ -123,7 +125,8 @@
             <span class="n">application_graph</span><span class="p">,</span> <span class="n">dot_diagram</span><span class="p">,</span> <span class="n">vertex_ids</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
 
         <span class="c1"># write dot file and generate pdf</span>
-        <span class="n">file_to_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_NAME</span><span class="p">)</span>
+        <span class="n">file_to_output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">report_default_directory</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GRAPH_NAME</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">dot_diagram</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">file_to_output</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">graph_format</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">exeNotFoundExn</span><span class="p">:</span>

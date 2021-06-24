@@ -83,9 +83,8 @@
 
 <div class="viewcode-block" id="AbstractMachineBitFieldRouterCompressor.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="p">,</span>
-            <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">default_report_folder</span><span class="p">,</span>
-            <span class="n">routing_infos</span><span class="p">,</span> <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
+            <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
             <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; entrance for routing table compression with bit field</span>
 
@@ -95,7 +94,6 @@
 <span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance</span>
 <span class="sd">        :param ~spinn_machine.Machine machine: spinnMachine instance</span>
 <span class="sd">        :param int app_id: app id of the application</span>
-<span class="sd">        :param str provenance_file_path: file path for prov data</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            machine graph</span>
 <span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
@@ -103,7 +101,6 @@
 <span class="sd">        :param executable_finder: where are binaries are located</span>
 <span class="sd">        :type executable_finder:</span>
 <span class="sd">            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder</span>
-<span class="sd">        :param str default_report_folder:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
 <span class="sd">        :type retry_count: int or None</span>
 <span class="sd">        :param bool read_algorithm_iobuf: flag saying if read iobuf</span>
@@ -118,10 +115,8 @@
             <span class="n">machine_bit_field_router_compressor</span><span class="p">(</span>
                 <span class="n">routing_tables</span><span class="o">=</span><span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
                 <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="o">=</span><span class="n">app_id</span><span class="p">,</span>
-                <span class="n">provenance_file_path</span><span class="o">=</span><span class="n">provenance_file_path</span><span class="p">,</span>
                 <span class="n">machine_graph</span><span class="o">=</span><span class="n">machine_graph</span><span class="p">,</span>
                 <span class="n">placements</span><span class="o">=</span><span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="o">=</span><span class="n">executable_finder</span><span class="p">,</span>
-                <span class="n">default_report_folder</span><span class="o">=</span><span class="n">default_report_folder</span><span class="p">,</span>
                 <span class="n">routing_infos</span><span class="o">=</span><span class="n">routing_infos</span><span class="p">,</span>
                 <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">,</span>
                 <span class="n">provenance_data_objects</span><span class="o">=</span><span class="n">provenance_data_objects</span><span class="p">)</span>
@@ -132,8 +127,8 @@
 
         <span class="c1"># just rerun the synaptic expander for safety purposes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rerun_synaptic_cores</span><span class="p">(</span>
-            <span class="n">expander_chip_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">,</span>
-            <span class="n">executable_finder</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">)</span>
+            <span class="n">expander_chip_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">read_expander_iobuf</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">prov_items</span></div>
 
@@ -186,14 +181,13 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_rerun_synaptic_cores</span><span class="p">(</span>
             <span class="bp">cls</span><span class="p">,</span> <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
-            <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
+            <span class="n">executable_finder</span><span class="p">,</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
             <span class="n">read_expander_iobuf</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; reruns the synaptic expander</span>
 
 <span class="sd">        :param ~.ExecutableTargets synaptic_expander_rerun_cores:</span>
 <span class="sd">            the cores to rerun the synaptic matrix generator for</span>
 <span class="sd">        :param ~.Transceiver transceiver: spinnman instance</span>
-<span class="sd">        :param str provenance_file_path: prov file path</span>
 <span class="sd">        :param ~.ExecutableFinder executable_finder:</span>
 <span class="sd">            finder of binary file paths</span>
 <span class="sd">        :param bool needs_sync_barrier:</span>
@@ -204,7 +198,7 @@
             <span class="n">expander_app_id</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">app_id_tracker</span><span class="o">.</span><span class="n">get_new_id</span><span class="p">()</span>
             <span class="n">run_system_application</span><span class="p">(</span>
                 <span class="n">synaptic_expander_rerun_cores</span><span class="p">,</span> <span class="n">expander_app_id</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
-                <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
+                <span class="n">executable_finder</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">],</span> <span class="n">needs_sync_barrier</span><span class="p">,</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_RERUN_IOBUF_NAME_PATTERN</span><span class="p">)</span>
 

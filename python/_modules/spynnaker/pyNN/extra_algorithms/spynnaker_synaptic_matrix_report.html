@@ -56,6 +56,8 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">report_default_directory</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
 
@@ -68,10 +70,9 @@
     <span class="sd">&quot;&quot;&quot; Generate the synaptic matrices for reporting purposes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SpYNNakerSynapticMatrixReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report_folder</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">dsg_targets</span><span class="p">):</span>
+<div class="viewcode-block" id="SpYNNakerSynapticMatrixReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.SpYNNakerSynapticMatrixReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">dsg_targets</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Convert synaptic matrix for every application edge.</span>
 
-<span class="sd">        :param str report_folder: where to write the report</span>
 <span class="sd">        :param connection_holder: where the synaptic matrices are stored</span>
 <span class="sd">            (possibly after retrieval from the machine)</span>
 <span class="sd">        :type connection_holder:</span>
@@ -90,7 +91,7 @@
                 <span class="s2">&quot;connection holder data to be generated&quot;</span><span class="p">)</span>
 
         <span class="c1"># generate folder for synaptic reports</span>
-        <span class="n">top_level_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_folder</span><span class="p">,</span> <span class="n">_DIRNAME</span><span class="p">)</span>
+        <span class="n">top_level_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_default_directory</span><span class="p">(),</span> <span class="n">_DIRNAME</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">top_level_folder</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">top_level_folder</span><span class="p">)</span>
 

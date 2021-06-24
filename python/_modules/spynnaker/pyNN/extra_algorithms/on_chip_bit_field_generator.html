@@ -64,6 +64,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">n_word_struct</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">report_default_directory</span><span class="p">)</span>
 
 <span class="n">_THREE_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;III&quot;</span><span class="p">)</span>
 <span class="c1"># bits in a word</span>
@@ -128,8 +130,7 @@
 
 <div class="viewcode-block" id="OnChipBitFieldGenerator.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.OnChipBitFieldGenerator.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span>
-            <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">default_report_folder</span><span class="p">,</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">):</span>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Loads and runs the bit field generator on chip.</span>
 
 <span class="sd">        :param ~pacman.model.placements.Placements placements: placements</span>
@@ -138,11 +139,8 @@
 <span class="sd">        :param executable_finder: the executable finder</span>
 <span class="sd">        :type executable_finder:</span>
 <span class="sd">            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder</span>
-<span class="sd">        :param str provenance_file_path:</span>
-<span class="sd">            the path to where provenance data items are written</span>
 <span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
 <span class="sd">            the SpiNNMan instance</span>
-<span class="sd">        :param str default_report_folder: the file path for reports</span>
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
 <span class="sd">            the machine graph</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
@@ -168,7 +166,7 @@
         <span class="c1"># run app</span>
         <span class="n">system_control_logic</span><span class="o">.</span><span class="n">run_system_application</span><span class="p">(</span>
             <span class="n">expander_cores</span><span class="p">,</span> <span class="n">bit_field_app_id</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
-            <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span>
+            <span class="n">executable_finder</span><span class="p">,</span>
             <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_bit_field_iobuf&quot;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__check_for_success</span><span class="p">,</span> <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">],</span> <span class="kc">False</span><span class="p">,</span>
             <span class="s2">&quot;bit_field_expander_on_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
@@ -178,10 +176,9 @@
         <span class="c1"># read in bit fields for debugging purposes</span>
         <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_report&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_full_report_bit_fields</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">default_report_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BIT_FIELD_REPORT_FILENAME</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_summary_report&quot;</span><span class="p">):</span>
+                <span class="n">report_default_directory</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_BIT_FIELD_REPORT_FILENAME</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_summary_report_bit_fields</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">default_report_folder</span><span class="p">,</span>
+                <span class="n">report_default_directory</span><span class="p">(),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_BIT_FIELD_SUMMARY_REPORT_FILENAME</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_summary_report_bit_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
