@@ -433,11 +433,6 @@ class FromListConnector(AbstractConnector):
         post_hi = dest_machine_vertex.vertex_slice.hi_atom
         return (pre_hi, post_hi) in self.__split_conn_list
 
-        #return any((_pre_slice.lo_atom <= self.__sources) &
-        #           (self.__sources <= _pre_slice) &
-        #           (_post_slice.lo_atom <= self.__targets) &
-        #           (self.__targets <= _post_slice.hi_atom))
-
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """
         :param AbstractStaticSynapseDynamics synapse_type:
