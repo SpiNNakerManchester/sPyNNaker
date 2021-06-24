@@ -53,10 +53,6 @@
                 <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -69,7 +65,6 @@
             <param_name>extract_iobuf</param_name>
             <param_name>placements</param_name>
             <param_name>transceiver</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>executable_finder</param_name>
             <token part="DSGDataLoaded">DataLoaded</token>
         </required_inputs>
@@ -102,10 +97,6 @@
                 <param_type>APPID</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -116,10 +107,6 @@
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>Placements</param_type>
-            </parameter>
-            <parameter>
-                <param_name>default_report_folder</param_name>
-                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -141,10 +128,8 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>default_report_folder</param_name>
             <param_name>routing_infos</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
@@ -183,10 +168,6 @@
                 <param_type>APPID</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -197,10 +178,6 @@
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>Placements</param_type>
-            </parameter>
-            <parameter>
-                <param_name>default_report_folder</param_name>
-                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -222,10 +199,8 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>default_report_folder</param_name>
             <param_name>routing_infos</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
@@ -267,10 +242,6 @@
                 <param_type>APPID</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>executable_finder</param_name>
                 <param_type>ExecutableFinder</param_type>
             </parameter>
@@ -281,10 +252,6 @@
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>Placements</param_type>
-            </parameter>
-            <parameter>
-                <param_name>default_report_folder</param_name>
-                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
@@ -301,10 +268,8 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>default_report_folder</param_name>
             <param_name>routing_infos</param_name>
             <param_name>executable_targets</param_name>
             <param_name>read_expander_iobuf</param_name>
@@ -331,20 +296,12 @@
                 <param_type>ExecutableFinder</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_file_path</param_name>
-                <param_type>SystemProvenanceFilePath</param_type>
-            </parameter>
-            <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>Placements</param_type>
-            </parameter>
-            <parameter>
-                <param_name>default_report_folder</param_name>
-                <param_type>ReportFolder</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
@@ -359,9 +316,7 @@
             <param_name>app_graph</param_name>
             <param_name>placements</param_name>
             <param_name>executable_finder</param_name>
-            <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
-            <param_name>default_report_folder</param_name>
             <param_name>machine_graph</param_name>
             <param_name>routing_infos</param_name>
             <token part="SynapseDataExpanded">DataLoaded</token>
@@ -399,10 +354,6 @@
                 <param_type>IPAddress</param_type>
             </parameter>
             <parameter>
-                <param_name>report_default_directory</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
                 <param_name>machine</param_name>
                 <param_type>ExtendedMachine</param_type>
             </parameter>
@@ -414,7 +365,6 @@
         <required_inputs>
             <param_name>placements</param_name>
             <param_name>hostname</param_name>
-            <param_name>report_default_directory</param_name>
             <param_name>machine</param_name>
             <param_name>data_n_timesteps</param_name>
         </required_inputs>
@@ -428,10 +378,6 @@
         <python_class>SpYNNakerSynapticMatrixReport</python_class>
         <input_definitions>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
                 <param_name>connection_holder</param_name>
                 <param_type>ConnectionHolders</param_type>
             </parameter>
@@ -441,7 +387,6 @@
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>report_folder</param_name>
             <param_name>connection_holder</param_name>
             <param_name>dsg_targets</param_name>
         </required_inputs>
@@ -454,13 +399,8 @@
                 <param_name>provenance_items</param_name>
                 <param_type>PlacementsProvenanceItems</param_type>
             </parameter>
-            <parameter>
-                <param_name>report_default_directory</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>report_default_directory</param_name>
             <param_name>provenance_items</param_name>
         </required_inputs>
     </algorithm>
@@ -485,16 +425,11 @@
         <python_class>SpYNNakerNeuronGraphNetworkSpecificationReport</python_class>
         <input_definitions>
             <parameter>
-                <param_name>report_folder</param_name>
-                <param_type>ReportFolder</param_type>
-            </parameter>
-            <parameter>
                 <param_name>application_graph</param_name>
                 <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>report_folder</param_name>
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>

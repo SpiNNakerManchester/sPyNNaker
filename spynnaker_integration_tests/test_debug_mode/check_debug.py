@@ -104,7 +104,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         sim.end()
 
-        report_directory = globals_variables.run_report_directory()
+        report_directory = globals_variables.report_default_directory()
         found = os.listdir(report_directory)
         for report in reports:
             self.assertIn(report, found)

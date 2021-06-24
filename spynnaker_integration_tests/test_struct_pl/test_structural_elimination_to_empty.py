@@ -43,7 +43,6 @@ def structural_eliminate_to_empty():
     conns = list(proj.get(["weight", "delay"], "list"))
 
     rewiring = pop.get_data("rewiring")
-
     formation_events = rewiring.segments[0].events[0]
     elimination_events = rewiring.segments[0].events[1]
 
