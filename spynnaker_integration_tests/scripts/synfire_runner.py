@@ -279,7 +279,6 @@ class SynfireRunner(object):
         self._input_spikes_recorded_7 = []
         self._weights = []
         self._delays = []
-        self._default_report_folder = None
 
     @staticmethod
     def __verify_parameters(
@@ -478,13 +477,7 @@ class SynfireRunner(object):
 
         p.run(run_times[-1])
 
-        self._default_report_folder = \
-            p.globals_variables.get_simulator()._report_default_directory
-
         return results
-
-    def get_default_report_folder(self):
-        return self._default_report_folder
 
     def get_output_pop_gsyn_exc_neo(self):
         return self._recorded_gsyn_exc_list[0]
