@@ -387,7 +387,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
         neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp += 1024k; // !!!! Check what units this is in - same as weight? !!!!
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp += 1024.k * (1.k - neuron->exp_TC); // !!!! Check what units this is in - same as weight? !!!!
 
 //        io_printf(IO_BUF, "%k for %u @ t=%u\n", neuron->syn_state[syn_ind_from_delay].z_bar_inp,
 //                                                syn_ind_from_delay, time);

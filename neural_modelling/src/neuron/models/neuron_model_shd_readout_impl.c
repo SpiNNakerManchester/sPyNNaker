@@ -33,8 +33,8 @@ state_t neuron_model_state_update(
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
 		input_t external_bias, neuron_pointer_t neuron, REAL dummy) {
 
-	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
-	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+//	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
+//	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 	use(dummy);
 
 //	if (time < 2){
@@ -57,7 +57,7 @@ state_t neuron_model_state_update(
 //		}
         // Get the input in nA
         input_t input_this_timestep =
-                exc_input[0] + exc_input[1] + neuron->I_offset;
+                exc_input[0] + neuron->I_offset;
 
         _lif_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep);
@@ -67,7 +67,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 190; //todo should this be fixed?
 
     if (neuron->V_membrane > 9.k){
         v_mem_error = neuron->V_membrane - 9.k;
@@ -144,7 +144,8 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    			local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
+//    			local_eta *
+    			neuron->L * neuron->syn_state[syn_ind].z_bar;
 //    	this_dt_weight_change += v_mem_error * 0.01k;
 
 //        if (time % 51 == 0 && syn_ind % 19 == 0){

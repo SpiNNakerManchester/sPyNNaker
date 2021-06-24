@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # constants
-SYNAPSES_PER_NEURON = 100  # 250   # around 415 with only 3 in syn_state
+SYNAPSES_PER_NEURON = 190  # 250   # around 415 with only 3 in syn_state
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0

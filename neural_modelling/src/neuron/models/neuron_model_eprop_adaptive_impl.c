@@ -256,7 +256,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-//    			+ (1 - neuron->exp_TC) *
+//    			+ (1.k - neuron->exp_TC) *
     			+
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
@@ -345,7 +345,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-//    			+ (1 - neuron->exp_TC) *
+//    			+ (1.k - neuron->exp_TC) *
     			+
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 

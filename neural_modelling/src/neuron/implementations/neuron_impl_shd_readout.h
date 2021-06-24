@@ -47,7 +47,7 @@ static additional_input_pointer_t additional_input_array;
 static threshold_type_pointer_t threshold_type_array;
 
 //! Global parameters for the neurons
-static global_neuron_params_pointer_t global_parameters;
+global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
@@ -320,14 +320,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    recorded_variable_values[V_RECORDING_INDEX] = voltage;
     if (neuron_index == 19){
 //        if (!printed_values){
-//            io_printf(IO_BUF, "%d Printing learning values: accumulated_softmax %k\n", time, accumulated_softmax);
+//            io_printf(IO_BUF, "%d Printing learning values: max_v %k\n", time, max_v_mem);
 //        }
-        REAL norm_rescale = max_v_mem - 8.75k;
+        REAL norm_rescale = max_v_mem - 8.k;
 //        if (norm_rescale > 8.75k){
 //            norm_rescale = 8.75k;
 //        }
         // Normalise errors and exp
         for (uint32_t n_ind=0; n_ind < 20; n_ind++){
+//            if (!printed_values){
+//                io_printf(IO_BUF, "output:%d, error:%k, resscale:%k\n", n_ind, output_errors[n_ind], norm_rescale);
+//            }
 //            if (norm_rescale > 0){
 //                output_errors[n_ind] -= min_v_mem;
 //                output_errors[n_ind] /= (max_v_mem - min_v_mem) * 0.05k;
@@ -341,7 +344,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         // Calculate error
         for (uint32_t n_ind=0; n_ind < 20; n_ind++){  // set to 20 when english and german
 //            if (!printed_values){
-//                io_printf(IO_BUF, "output:%d, error:%k, ", n_ind, output_errors[n_ind]);
+//                io_printf(IO_BUF, "output:%d, error:%k, sm:%k", n_ind, output_errors[n_ind], accumulated_softmax);
 //            }
             if (accumulated_softmax > 0.k){ // because overflow and e^-x=0
                 output_errors[n_ind] /= accumulated_softmax;
@@ -358,7 +361,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             }
             learning_signal[n_ind] = output_errors[n_ind] - correct_output;
 //            if (!printed_values){
-//                io_printf(IO_BUF, "corr:%k, L:%k\n", correct_output, learning_signal[n_ind]);
+//                io_printf(IO_BUF, " corr:%k, L:%k\n", correct_output, learning_signal[n_ind]);
 //            }
             // Send error (learning signal) as packet with payload
             while (!spin1_send_mc_packet(
@@ -396,13 +399,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //                                    *exc_input_values;
 //                                    neuron->syn_state[neuron_index*5].delta_w;
 //                                    neuron->syn_state[neuron_index*5].update_ready;
+//        			                  exc_input_values[1];
 
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
 //                    learning_signal[neuron_index];
 //                    neuron->syn_state[neuron_index*69].delta_w;
-        			neuron->syn_state[neuron_index*2].delta_w;
+        			neuron->syn_state[neuron_index*2].delta_w * global_parameters->eta;
 //        			exc_input_values[0];
 
     recorded_variable_values[V_RECORDING_INDEX] = result;
