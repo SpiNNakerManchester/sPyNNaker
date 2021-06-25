@@ -34,15 +34,10 @@ endif
 # Set logging levels
 ifeq ($(SPYNNAKER_DEBUG), DEBUG)
     NEURON_DEBUG = LOG_DEBUG
-    SYNAPSE_DEBUG = LOG_DEBUG
 endif
 
 ifndef NEURON_DEBUG
     NEURON_DEBUG = LOG_INFO
-endif
-
-ifndef SYNAPSE_DEBUG
-    SYNAPSE_DEBUG = LOG_INFO
 endif
 
 # Add source directory
