@@ -308,7 +308,7 @@ static inline void start_dma_loop(void) {
 
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
+//! \param[in] unused: Only specified to match API
 static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     p_per_ts_struct.packets_this_time_step += 1;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
@@ -319,7 +319,7 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
+//! \param[in] payload: the payload of the packet. The count.
 static void multicast_packet_pl_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
     log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
