@@ -80,8 +80,6 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \brief Read data to set up synapse processing
 //! \param[in] ds_regions: Pointer to region position data
 //! \param[in] regions: The indices of the regions to be read
-//! \param[out] n_neruons: Pointer to receive the number of neurons
-//! \param[out] n_synapse_types: Pointer to receive the number of synapse types
 //! \param[out] ring_buffers: The ring buffers that will be used
 //! \param[out] row_max_n_words: Pointer to receive the maximum number of words
 //!                              in a synaptic row
@@ -96,17 +94,18 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
 //! \return a boolean indicating success (True) or failure (False)
 static inline bool initialise_synapse_regions(
         data_specification_metadata_t *ds_regions,
-        struct synapse_regions regions, uint32_t *n_neurons,
-        uint32_t *n_synapse_types, weight_t **ring_buffers,
+        struct synapse_regions regions, weight_t **ring_buffers,
         uint32_t *row_max_n_words,
         uint32_t *incoming_spike_buffer_size,
         bool *clear_input_buffer_of_late_packets,
         uint32_t *n_recording_regions_used) {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
     if (!synapses_initialise(
             data_specification_get_region(regions.synapse_params, ds_regions),
-            n_neurons, n_synapse_types, ring_buffers,
+            &n_neurons, &n_synapse_types, ring_buffers,
             &ring_buffer_to_input_buffer_left_shifts,
             clear_input_buffer_of_late_packets,
             incoming_spike_buffer_size)) {
@@ -131,8 +130,7 @@ static inline bool initialise_synapse_regions(
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(regions.synapse_dynamics, ds_regions),
-            *n_neurons, *n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts)) {
+            n_neurons, n_synapse_types, ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }
 
