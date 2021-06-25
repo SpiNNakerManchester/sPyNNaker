@@ -108,6 +108,8 @@ def do_run():
 
 class TestCreatePoissons(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         do_run()
 

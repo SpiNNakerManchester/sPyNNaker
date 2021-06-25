@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
     DEFAULT_MAX_ATOMS_PER_CORE, AbstractPyNNNeuronModel)
@@ -42,6 +43,7 @@ class _MyOtherNeuronModel(_MyNeuronModelImpl):
 
 
 def test_max_atoms_per_core():
+    unittest_setup()
     _MyPyNNModelImpl.set_model_max_atoms_per_core(100)
     _MyNeuronModelImpl.set_model_max_atoms_per_core(20)
     _MyOtherNeuronModel.set_model_max_atoms_per_core(50)
@@ -51,6 +53,7 @@ def test_max_atoms_per_core():
 
 
 def test_reset_max_atoms_per_core():
+    unittest_setup()
     _MyNeuronModelImpl.set_model_max_atoms_per_core(20)
     _MyNeuronModelImpl.set_model_max_atoms_per_core()
     _MyPyNNModelImpl.set_model_max_atoms_per_core(100)
@@ -61,6 +64,7 @@ def test_reset_max_atoms_per_core():
 
 
 def test_defaults():
+    unittest_setup()
     assert(_MyPyNNModelImpl.default_initial_values == {"svar": 2.0})
     assert(_MyPyNNModelImpl.default_parameters == {"param": 1.0})
     assert(_MyPyNNModelImpl.default_initial_values == {"svar": 2.0})

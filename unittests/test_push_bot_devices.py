@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
 
 
 class Test(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def _test_device_enum(self, enum_class):
         for item in enum_class:
