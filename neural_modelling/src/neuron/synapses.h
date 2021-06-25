@@ -87,10 +87,6 @@ bool synapses_initialise(
         bool* clear_input_buffers_of_late_packets_init,
         uint32_t *incoming_spike_buffer_size);
 
-//! \brief Do all the synapse processing for a timestep.
-//! \param[in] time: the current simulation time
-void synapses_do_timestep_update(timer_t time);
-
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
