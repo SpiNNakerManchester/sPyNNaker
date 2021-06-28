@@ -16,6 +16,7 @@
 from pacman.model.graphs.application import ApplicationFPGAVertex
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
+from pacman.model.graphs.application import FPGAConnection
 
 
 class ArbitraryFPGADevice(
@@ -35,5 +36,5 @@ class ArbitraryFPGADevice(
         :type label: str or None
         """
         # pylint: disable=too-many-arguments
-        super().__init__(
-            n_neurons, fpga_id, fpga_link_id, board_address, label)
+        conn = FPGAConnection(fpga_id, fpga_link_id, board_address)
+        super().__init__(n_neurons, [conn], conn, label)
