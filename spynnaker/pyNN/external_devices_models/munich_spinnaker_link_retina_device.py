@@ -118,8 +118,7 @@ class MunichRetinaDevice(
 
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            max_atoms_per_core=fixed_n_neurons, label=label,
-            board_address=board_address)
+            label=label, board_address=board_address)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -139,8 +138,7 @@ class MunichRetinaDevice(
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
-        key_set_payload = (self._virtual_chip_x << 24 |
-                           self._virtual_chip_y << 16)
+        key_set_payload = (1 << 24) if self.__is_right else 0
 
         commands.append(MultiCastCommand(
             key=key_set_command, payload=key_set_payload, repeat=5,
