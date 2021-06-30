@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.require_subclass import require_subclass
 from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
@@ -25,9 +26,6 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
     """ Indicates a class (a \
         :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
         that has may need to run the SYNAPSE_EXPANDER aplx
-
-    Cores that do not use the synapse_manager should not implement this
-    API even though their app vertex may hold a synapse_manager.
 
     .. note::
         This is *not* implemented by the
@@ -49,13 +47,18 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
+    @abstractproperty
+    def connection_generator_region(self):
+        """ The region containing the parameters of synaptic expansion
+
+        :rtype: int
+
+        :rtype: bool
+        """
+
     @abstractmethod
     def read_generated_connection_holders(self, transceiver, placement):
         """ Fill in the connection holders
-
-        .. note::
-            The typical implementation for this method will be to ask the
-            app_vertex's synapse_manager
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How the data is to be read

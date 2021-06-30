@@ -21,17 +21,13 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, graph, vertex, n_neurons):
+            self, incoming_projections, n_neurons):
         """ Get the size of the structural parameters
 
         Note: At the Application level this will be an estimate.
 
-        :param graph: Graph at same level as vertex.
-        :type graph: ~pacman.model.graphs.application.ApplicationGraph or
-            ~pacman.model.graphs.machine.MachineGraph
-        :param vertex: Vertex at the same level as the graph
-        :type vertex: ~pacman.model.graphs.application.ApplicationVertex or
-            ~pacman.model.graphs.machine.MachineVertex
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections that target the vertex in question
         :param int n_neurons:
         :return: the size of the parameters, in bytes
         :rtype: int
@@ -40,7 +36,7 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec, region, weight_scales, machine_graph, machine_vertex,
+            self, spec, region, weight_scales, app_vertex, vertex_slice,
             routing_info, synaptic_matrices):
         """ Write structural plasticity parameters
 
@@ -48,10 +44,10 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
             The data specification to write to
         :param int region: region ID
         :param list(float) weight_scales: Weight scaling for each synapse type
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The machine graph
-        :param AbstractPopulationVertex machine_vertex:
-            The machine vertex
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+            The target application vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the target vertex to generate for
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             Routing information for all edges
         :param SynapticMatrices synaptic_matrices:

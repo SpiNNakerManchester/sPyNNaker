@@ -90,6 +90,10 @@ typedef struct structural_recording_values_t {
 
 structural_recording_values_t structural_recording_values;
 
+
+//! Timer callbacks since last rewiring
+static uint32_t last_rewiring_time = 0;
+
 void print_post_to_pre_entry(void) {
     uint32_t n_elements =
             rewiring_data.s_max * rewiring_data.machine_no_atoms;
@@ -349,11 +353,11 @@ static inline bool row_restructure(
                     return false;
                 }
             } else {
-        	    // A synapse cannot be added if one exists between the current pair of neurons
-        	    if (!synapse_dynamics_find_neuron(
-        	            current_state->post_syn_id, row,
-						&(current_state->weight), &(current_state->delay),
-						&(current_state->offset), &(current_state->synapse_type))) {
+                // A synapse cannot be added if one exists between the current pair of neurons
+                if (!synapse_dynamics_find_neuron(
+                      current_state->post_syn_id, row,
+                      &(current_state->weight), &(current_state->delay),
+                      &(current_state->offset), &(current_state->synapse_type))) {
                     if (synaptogenesis_formation_rule(current_state,
                             formation_params[current_state->post_to_pre.pop_index], time, row)) {
                         // Create recorded value
@@ -388,14 +392,20 @@ bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row) {
     return return_value;
 }
 
-int32_t synaptogenesis_rewiring_period(void) {
-    return rewiring_data.p_rew;
-}
-
-bool synaptogenesis_is_fast(void) {
-    return rewiring_data.fast == 1;
-}
-
 void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     partner_spike_received(time, spike);
+}
+
+uint32_t synaptogenesis_n_updates(void) {
+    if (rewiring_data.fast) {
+        return rewiring_data.p_rew;
+    }
+
+    last_rewiring_time++;
+    if (last_rewiring_time >= rewiring_data.p_rew) {
+        last_rewiring_time = 0;
+        return 1;
+    }
+
+    return 0;
 }

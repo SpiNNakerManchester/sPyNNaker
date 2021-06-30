@@ -33,7 +33,7 @@ class RangedDictVertexSlice(object):
         self.__vertex_slice = vertex_slice
 
     def __getitem__(self, key):
-        if not isinstance(key, "str"):
+        if not isinstance(key, str):
             raise KeyError("Key must be a string")
         return _RangedListVertexSlice(
             self.__ranged_dict[key], self.__vertex_slice)

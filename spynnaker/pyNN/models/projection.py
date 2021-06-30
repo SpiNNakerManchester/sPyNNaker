@@ -37,6 +37,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic)
 from spynnaker._version import __version__
 from spynnaker.pyNN.models.populations import Population, PopulationView
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -182,9 +184,6 @@ class Projection(object):
         # add projection to the SpiNNaker control system
         sim.add_projection(self)
 
-        # reset the ring buffer shifts
-        post_vertex.reset_ring_buffer_shifts()
-
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None
@@ -196,6 +195,15 @@ class Projection(object):
 
             self.__synapse_information.add_pre_run_connection_holder(
                 connection_holder)
+
+        # If the target is a population, add to the list of incoming
+        # projections
+        if isinstance(post_vertex, AbstractPopulationVertex):
+            post_vertex.add_incoming_projection(self)
+
+        # If the source is a poisson, add to the list of outgoing projections
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            pre_vertex.add_outgoing_projection(self)
 
     @staticmethod
     def __check_population(param, connector):
