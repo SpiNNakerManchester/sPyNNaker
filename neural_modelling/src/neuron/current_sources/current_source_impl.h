@@ -103,6 +103,10 @@ static uint32_t n_ac_sources;
 static uint32_t n_step_current_sources;
 static uint32_t n_noisy_current_sources;
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
 // Not sure if this is needed or not when initialising...
 static void current_source_initialise_counters(void) {
     n_dc_sources = 0;
@@ -111,6 +115,7 @@ static void current_source_initialise_counters(void) {
     n_noisy_current_sources = 0;
 }
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Initialise the particular implementation of the data
 //! \param[in] cs_address: The address to start reading data from
 //! \return True if successful
@@ -256,6 +261,7 @@ static bool current_source_impl_initialise(address_t cs_address) {
 
 }
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 static REAL current_source_get_offset(uint32_t time, uint32_t neuron_index) {
     // Could simply just have the different cases in here
     // TODO: use an enum or something like that instead for the IDs

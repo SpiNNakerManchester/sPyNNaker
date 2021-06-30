@@ -1,0 +1,121 @@
+# Copyright (c) 2017-2020The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import ctypes
+from spinn_utilities.abstract_base import abstractproperty
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+
+
+class SynapseProvenance(ctypes.LittleEndianStructure):
+    """ Provenance items from synapse processing
+    """
+    _fields_ = [
+        # A count of presynaptic events.
+        ("n_pre_synaptic_events", ctypes.c_uint32),
+        # A count of synaptic saturations.
+        ("n_saturations", ctypes.c_uint32),
+        # The number of STDP weight saturations.
+        ("n_plastic_saturations", ctypes.c_uint32),
+        # The number of searches of the population table that hit nothing
+        ("n_ghost_searches", ctypes.c_uint32),
+        # The number of bitfields that couldn't fit in DTCM
+        ("n_failed_bitfield_reads", ctypes.c_uint32),
+        # The number of population table hits on INVALID entries
+        ("n_invalid_pop_table_hits", ctypes.c_uint32),
+        # The number of spikes that didn't transfer empty rows
+        ("n_filtered_by_bitfield", ctypes.c_uint32)
+    ]
+
+    N_ITEMS = len(_fields_)
+
+
+class PopulationMachineSynapsesProvenance(object):
+    """ Mix-in to add synapse provenance gathering without other synapse things
+    """
+
+    # This MUST stay empty to allow mixing with other things with slots
+    __slots__ = []
+
+    TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
+    SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
+    SATURATED_PLASTIC_WEIGHTS_NAME = (
+        "Times_plastic_synaptic_weights_have_saturated")
+    GHOST_SEARCHES = "Number of failed pop table searches"
+    BIT_FIELDS_NOT_READ = "N bit fields not able to be read into DTCM"
+    INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
+    BIT_FIELD_FILTERED_PACKETS = \
+        "How many packets were filtered by the bitfield filterer."
+
+    @abstractproperty
+    def _app_vertex(self):
+        """ The application vertex of the machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: AbstractPopulationVertex
+        """
+
+    def _parse_synapse_provenance(self, label, names, provenance_data):
+        """ Extract and yield synapse provenance
+
+        :param str label: The label of the node
+        :param list(str) names: The hierarchy of names for the provenance data
+        :param list(int) provenance_data: A list of data items to interpret
+        :return: a list of provenance data items
+        :rtype: iterator of ProvenanceDataItem
+        """
+        synapse_prov = SynapseProvenance(*provenance_data)
+
+        yield ProvenanceDataItem(
+            names + [self.TOTAL_PRE_SYNAPTIC_EVENT_NAME],
+            synapse_prov.n_pre_synaptic_events)
+        yield ProvenanceDataItem(
+            names + [self.SATURATION_COUNT_NAME],
+            synapse_prov.n_saturations, synapse_prov.n_saturations > 0,
+            f"The weights from the synapses for {label} saturated "
+            f"{synapse_prov.n_saturations} times. If this causes issues you "
+            "can increase the spikes_per_second and / or ring_buffer_sigma "
+            "values located within the .spynnaker.cfg file.")
+        yield ProvenanceDataItem(
+            names + [self.SATURATED_PLASTIC_WEIGHTS_NAME],
+            synapse_prov.n_plastic_saturations,
+            synapse_prov.n_plastic_saturations > 0,
+            f"The weights from the plastic synapses for {label} saturated "
+            f"{synapse_prov.n_plastic_saturations} times. If this causes "
+            "issues increase the spikes_per_second and / or ring_buffer_sigma"
+            " values located within the .spynnaker.cfg file.")
+        yield ProvenanceDataItem(
+            names + [self.GHOST_SEARCHES], synapse_prov.n_ghost_searches,
+            synapse_prov.n_ghost_searches > 0,
+            f"The number of failed population table searches for {label} was "
+            f"{synapse_prov.n_ghost_searches}. If this number is large "
+            "relative to the  predicted incoming spike rate, try increasing "
+            " source and target neurons per core")
+        yield ProvenanceDataItem(
+            names + [self.BIT_FIELDS_NOT_READ],
+            synapse_prov.n_failed_bitfield_reads, False,
+            f"On {label}, the filter for stopping redundant DMAs couldn't be "
+            f"fully filled in; it failed to read "
+            f"{synapse_prov.n_failed_bitfield_reads} entries. "
+            "Try reducing neurons per core.")
+        yield ProvenanceDataItem(
+            names + [self.INVALID_MASTER_POP_HITS],
+            synapse_prov.n_invalid_pop_table_hits,
+            synapse_prov.n_invalid_pop_table_hits > 0,
+            f"On {label}, there were {synapse_prov.n_invalid_pop_table_hits} "
+            "keys received that had no master pop entry for them. This is an "
+            "error, which most likely stems from bad routing.")
+        yield ProvenanceDataItem(
+            names + [self.BIT_FIELD_FILTERED_PACKETS],
+            synapse_prov.n_filtered_by_bitfield)

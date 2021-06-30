@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from enum import Enum
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_KB)
 
@@ -58,27 +57,6 @@ SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 #: the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
-
-class POPULATION_BASED_REGIONS(Enum):
-    """Regions for populations."""
-    SYSTEM = 0
-    NEURON_PARAMS = 1
-    CURRENT_SOURCE_PARAMS = 2
-    SYNAPSE_PARAMS = 3
-    POPULATION_TABLE = 4
-    SYNAPTIC_MATRIX = 5
-    SYNAPSE_DYNAMICS = 6
-    STRUCTURAL_DYNAMICS = 7
-    NEURON_RECORDING = 8
-    PROVENANCE_DATA = 9
-    PROFILING = 10
-    CONNECTOR_BUILDER = 11
-    DIRECT_MATRIX = 12
-    BIT_FIELD_FILTER = 13
-    BIT_FIELD_BUILDER = 14
-    BIT_FIELD_KEY_MAP = 15
-
-
 #: The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
 
@@ -94,3 +72,9 @@ LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"
 
 #: The maximum row length of the master population table
 POP_TABLE_MAX_ROW_LENGTH = 256
+
+#: The name of the partition for Synaptic SDRAM
+SYNAPSE_SDRAM_PARTITION_ID = "SDRAM Synaptic Inputs"
+
+#: The conservative amount of write bandwidth available on a chip
+WRITE_BANDWIDTH_BYTES_PER_SECOND = 250 * 1024 * 1024
