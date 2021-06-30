@@ -289,9 +289,9 @@ static inline uint8_t *sp_structs_read_in_common(
 
     for (uint32_t i=0; i < n_elements; i++){
         log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
-                i, post_to_pre_table[i]->pop_index,
-                post_to_pre_table[i]->sub_pop_index,
-                post_to_pre_table[i]->neuron_index);
+                i, (*post_to_pre_table)[i].pop_index,
+                (*post_to_pre_table)[i].sub_pop_index,
+                (*post_to_pre_table)[i].neuron_index);
     }
     data += n_elements * sizeof(post_to_pre_entry);
     return (uint8_t *) data;

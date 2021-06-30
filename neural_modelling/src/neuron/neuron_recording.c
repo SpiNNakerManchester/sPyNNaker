@@ -89,11 +89,6 @@ static void reset_record_counter(void) {
     }
 }
 
-//! \brief wrapper to recording finalise
-void neuron_recording_finalise(void) {
-    recording_finalise();
-}
-
 //! \brief the number of bytes used in bitfield recording for n_neurons
 //! \param[in] n_neurons: The number of neurons to create a bitfield for
 //! \return the size of the bitfield data structure for the number of neurons
@@ -185,7 +180,6 @@ static bool neuron_recording_read_in_elements(
 }
 
 bool neuron_recording_reset(uint32_t n_neurons) {
-    recording_reset();
     if (!neuron_recording_read_in_elements(reset_address, n_neurons)) {
         log_error("failed to reread in the new elements after reset");
         return false;
@@ -283,15 +277,10 @@ typedef struct neuron_recording_header {
 } neuron_recording_header_t;
 
 bool neuron_recording_initialise(
-        void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons, uint32_t *n_rec_regions_used) {
+        void *recording_address, uint32_t n_neurons,
+        uint32_t *n_rec_regions_used) {
     // boot up the basic recording
     void *data_addr = recording_address;
-    bool success = recording_initialize(&data_addr, recording_flags);
-    if (!success) {
-        log_error("failed to init basic recording.");
-        return false;
-    }
 
     // Verify the number of recording and bitfield elements
     neuron_recording_header_t *header = data_addr;

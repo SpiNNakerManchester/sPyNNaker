@@ -19,11 +19,11 @@ Synfirechain-like example
 import pytest
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
-from pacman.exceptions import PacmanPartitionException
+from pacman.exceptions import PacmanException
 
 n_neurons = 200  # number of neurons in each population
 runtime = 3000
-neurons_per_core = n_neurons / 2
+neurons_per_core = 1
 synfire_run = SynfireRunner()
 
 
@@ -33,7 +33,7 @@ class TestTooLow(BaseTestCase):
     """
 
     def test_too_low(self):
-        with pytest.raises(PacmanPartitionException):
+        with pytest.raises(PacmanException):
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])
 

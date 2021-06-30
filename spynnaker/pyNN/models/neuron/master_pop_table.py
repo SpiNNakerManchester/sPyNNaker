@@ -16,11 +16,9 @@ import math
 import numpy
 import ctypes
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.constants import (
-    POPULATION_BASED_REGIONS, POP_TABLE_MAX_ROW_LENGTH)
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.utilities.bit_field_utilities import BIT_IN_A_WORD
 
 # Scale factor for an address; allows more addresses to be represented, but
@@ -148,6 +146,9 @@ _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
 
+# Number of times to multiply for delays
+_DELAY_SCALE = 2
+
 # A ctypes pointer to a uint32
 _UINT32_PTR = ctypes.POINTER(ctypes.c_uint32)
 
@@ -243,10 +244,34 @@ class _MasterPopEntry(object):
     @property
     def mask(self):
         """
-        :return: the mask of the key for this master pop entry
+        :return: the mask of the key for this entry
         :rtype: int
         """
         return self.__mask
+
+    @property
+    def core_mask(self):
+        """
+        :return: the mask of the key once shifted to get the source core ID
+        :rtype: int
+        """
+        return self.__core_mask
+
+    @property
+    def core_shift(self):
+        """
+        :return: the shift of the key to get the source core ID
+        :rtype: int
+        """
+        return self.__core_shift
+
+    @property
+    def n_neurons(self):
+        """
+        :return: the number of neurons per source core
+        :rtype: int
+        """
+        return self.__n_neurons
 
     @property
     def addresses_and_row_lengths(self):
@@ -310,57 +335,51 @@ class MasterPopTableAsBinarySearch(object):
         "__entries",
         "__n_addresses"]
 
-    MAX_ROW_LENGTH_ERROR_MSG = (
-        "Only rows of up to {} entries are allowed".format(
-            POP_TABLE_MAX_ROW_LENGTH))
-
-    OUT_OF_RANGE_ERROR_MESSAGE = (
-        "Address {} is out of range for this population table!")
-
-    # Over-scale of estimate for safety
-    UPPER_BOUND_FUDGE = 2
-
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
 
-    def get_master_population_table_size(self, in_edges):
+    @staticmethod
+    def get_master_population_table_size(incoming_projections):
         """ Get the size of the master population table in SDRAM.
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge) \
-                in_edges:
-            The edges arriving at the vertex that are to be handled by this
-            table
+        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+            The projections arriving at the vertex that are to be handled by
+            this table
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
+        # There will be an address list entry for each incoming projection
+        n_entries = len(incoming_projections)
 
-        # Entry for each edge - but don't know the edges yet, so
-        # assume multiple entries for each edge
+        # Count the pre-machine-vertices
         n_vertices = 0
-        n_entries = 0
-        for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionApplicationEdge):
-                slices, is_exact = (
-                    in_edge.pre_vertex.splitter.get_out_going_slices())
-                if is_exact:
-                    n_vertices += len(slices)
-                    n_entries += len(in_edge.synapse_information)
-                else:
-                    n_vertices += len(slices) * self.UPPER_BOUND_FUDGE
-                    n_entries += (
-                        len(in_edge.synapse_information) *
-                        self.UPPER_BOUND_FUDGE)
+        seen_edges = set()
+        for proj in incoming_projections:
+            in_edge = proj._projection_edge
 
-        # Multiply by 2 to get an upper bound
+            # If we haven't seen this edge before, add it in
+            if in_edge not in seen_edges:
+                seen_edges.add(in_edge)
+                vertex = in_edge.pre_vertex
+                n_cores = len(vertex.splitter.get_out_going_slices()[0])
+
+                # If there are also delays, double it
+                if in_edge.n_delay_stages:
+                    n_cores *= _DELAY_SCALE
+
+                n_vertices += n_cores
+
         return (
             _BASE_SIZE_BYTES +
             (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
-    def get_allowed_row_length(self, row_length):
-        """
+    @staticmethod
+    def get_allowed_row_length(row_length):
+        """ Get the next allowed row length
+
         :param int row_length: the row length being considered
         :return: the row length available
         :rtype: int
@@ -369,10 +388,13 @@ class MasterPopTableAsBinarySearch(object):
 
         if row_length > POP_TABLE_MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                POP_TABLE_MAX_ROW_LENGTH, self.MAX_ROW_LENGTH_ERROR_MSG)
+                POP_TABLE_MAX_ROW_LENGTH,
+                "Only rows of up to {} entries are allowed".format(
+                    POP_TABLE_MAX_ROW_LENGTH))
         return row_length
 
-    def get_next_allowed_address(self, next_address):
+    @staticmethod
+    def get_next_allowed_address(next_address):
         """ Get the next allowed address.
 
         :param int next_address: The next address that would be used
@@ -384,7 +406,7 @@ class MasterPopTableAsBinarySearch(object):
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
         if addr_scaled > _MAX_ADDRESS:
             raise SynapticConfigurationException(
-                self.OUT_OF_RANGE_ERROR_MESSAGE.format(
+                "Address {} is out of range for this population table!".format(
                     hex(addr_scaled * _ADDRESS_SCALE)))
         return addr_scaled * _ADDRESS_SCALE
 
@@ -470,20 +492,6 @@ class MasterPopTableAsBinarySearch(object):
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
             If a bad address is used.
         """
-
-        # pylint: disable=too-many-arguments, arguments-differ
-        if key_and_mask.key not in self.__entries:
-            if self.__n_addresses > _MAX_ADDRESS_START:
-                raise SynapticConfigurationException(
-                    "The table already contains {} entries;"
-                    " adding another is too many".format(self.__n_addresses))
-            self.__entries[key_and_mask.key] = _MasterPopEntry(
-                key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons)
-            # Need to add an extra "address" for the extra_info if needed
-            if core_mask != 0:
-                self.__n_addresses += 1
-
         # if not single, scale the address
         start_addr = block_start_addr
         if not is_single:
@@ -497,13 +505,64 @@ class MasterPopTableAsBinarySearch(object):
                     "Address {} is too big for this table".format(
                         block_start_addr))
         row_length = self.get_allowed_row_length(row_length)
-        index = self.__entries[key_and_mask.key].append(
-            start_addr, row_length - 1, is_single)
+
+        entry = self.__add_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+        index = entry.append(start_addr, row_length - 1, is_single)
         self.__n_addresses += 1
         return index
 
-    def add_invalid_entry(
+    def add_invalid_machine_entry(self, key_and_mask):
+        """ Add an entry to the table from a machine vertex that doesn't point
+            to anywhere.  Used to keep indices in synchronisation between e.g.
+            normal and delay entries and between entries on different cores.
+
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            a key_and_mask object used as part of describing
+            an edge that will require being received to be stored in the
+            master pop table; the whole edge will become multiple calls to
+            this function
+        :return: The index of the added entry
+        :rtype: int
+        """
+        return self.__add_invalid_entry(key_and_mask, 0, 0, 0)
+
+    def add_invalid_application_entry(
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
+        """ Add an entry to the table from an application vertex that doesn't
+            point to anywhere.  Used to keep indices in synchronisation between
+            e.g. normal and delay entries and between entries on different
+            cores.
+
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            a key_and_mask object used as part of describing
+            an edge that will require being received to be stored in the
+            master pop table; the whole edge will become multiple calls to
+            this function
+        :param int core_mask:
+            Mask for the part of the key that identifies the core
+        :param int core_shift: The shift of the mask to get to the core_mask
+        :param int n_neurons:
+            The number of neurons in each machine vertex (bar the last)
+        :return: The index of the added entry
+        :rtype: int
+        """
+        # If there are too many neurons per core, fail
+        if n_neurons > _MAX_N_NEURONS:
+            raise SynapticConfigurationException(
+                "The parameter n_neurons of {} is too big (maximum {})".format(
+                    n_neurons, _MAX_N_NEURONS))
+
+        # If the core mask is too big, fail
+        if core_mask > _MAX_CORE_MASK:
+            raise SynapticConfigurationException(
+                "The core mask of {} is too big (maximum {})".format(
+                    core_mask, _MAX_CORE_MASK))
+        return self.__add_invalid_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+
+    def __add_invalid_entry(
+            self, key_and_mask, core_mask, core_shift, n_neurons):
         """ Add an entry to the table that doesn't point to anywhere.  Used
             to keep indices in synchronisation between e.g. normal and delay
             entries and between entries on different cores.
@@ -521,24 +580,51 @@ class MasterPopTableAsBinarySearch(object):
         :return: The index of the added entry
         :rtype: int
         """
-        if key_and_mask.key not in self.__entries:
-            self.__entries[key_and_mask.key] = _MasterPopEntry(
-                key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
-                n_neurons)
-            # Need to add an extra "address" for the extra_info if needed
-            if core_mask != 0:
-                self.__n_addresses += 1
-        index = self.__entries[key_and_mask.key].append_invalid()
+        entry = self.__add_entry(
+            key_and_mask, core_mask, core_shift, n_neurons)
+        index = entry.append_invalid()
         self.__n_addresses += 1
         return index
 
-    def finish_master_pop_table(self, spec, master_pop_table_region):
+    def __add_entry(self, key_and_mask, core_mask, core_shift, n_neurons):
+        if self.__n_addresses >= _MAX_ADDRESS_START:
+            raise SynapticConfigurationException(
+                "The table already contains {} entries;"
+                " adding another is too many".format(self.__n_addresses))
+        if key_and_mask.key not in self.__entries:
+            entry = _MasterPopEntry(
+                key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
+                n_neurons)
+            self.__entries[key_and_mask.key] = entry
+            # Need to add an extra "address" for the extra_info if needed
+            if core_mask != 0:
+                self.__n_addresses += 1
+            return entry
+        entry = self.__entries[key_and_mask.key]
+        if (key_and_mask.mask != entry.mask or
+                core_mask != entry.core_mask or
+                core_shift != entry.core_shift or
+                n_neurons != entry.n_neurons):
+            raise SynapticConfigurationException(
+                "Existing entry for key {} doesn't match one being added:"
+                " Existing mask: {} core_mask: {} core_shift: {}"
+                " n_neurons: {}"
+                " Adding mask: {} core_mask: {} core_shift: {}"
+                " n_neurons: {}".format(
+                    key_and_mask.key, entry.mask, entry.core_mask,
+                    entry.core_shift, entry.n_neurons, key_and_mask.mask,
+                    core_mask, core_shift, n_neurons))
+        return entry
+
+    def finish_master_pop_table(self, spec, region, ref):
         """ Complete the master pop table in the data specification.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data specification to write the master pop entry to
-        :param int master_pop_table_region:
+        :param int region:
             the region to which the master pop table is being stored
+        :param ref:
+            the reference to use for the region, or None if not referenceable
         """
         # sort entries by key
         entries = sorted(
@@ -552,9 +638,9 @@ class MasterPopTableAsBinarySearch(object):
             n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
             self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            size=master_pop_table_sz, label='PopTable')
-        spec.switch_write_focus(region=master_pop_table_region)
+            region=region, size=master_pop_table_sz, label='PopTable',
+            reference=ref)
+        spec.switch_write_focus(region=region)
 
         # write no master pop entries and the address list size
         spec.write_value(n_entries)
