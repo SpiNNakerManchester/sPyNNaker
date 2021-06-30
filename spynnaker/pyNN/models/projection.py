@@ -497,20 +497,6 @@ class Projection(object):
 
     # -----------------------------------------------------------------
 
-    def __len__(self):
-        """
-        .. warning::
-            Not implemented.
-        """
-        _we_dont_do_this_now()
-
-    def __iter__(self):
-        """
-        .. warning::
-            Not implemented.
-        """
-        _we_dont_do_this_now()
-
     def set(self, **attributes):  # @UnusedVariable
         # pylint: disable=unused-argument
         """
