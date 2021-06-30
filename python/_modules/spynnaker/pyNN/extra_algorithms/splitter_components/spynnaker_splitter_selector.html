@@ -62,6 +62,7 @@
 <span class="kn">from</span> <span class="nn">.splitter_abstract_pop_vertex_slice</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SplitterAbstractPopulationVertexSlice</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.spynnaker_splitter_slice_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterSliceLegacy</span>
+<span class="kn">from</span> <span class="nn">.splitter_poisson_delegate</span> <span class="kn">import</span> <span class="n">SplitterPoissonDelegate</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.spike_source.spike_source_array_vertex</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpikeSourceArrayVertex</span><span class="p">)</span>
@@ -154,7 +155,8 @@
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:</span>
 <span class="sd">            app vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">SpynnakerSplitterSliceLegacy</span><span class="p">()</span></div>
+        <span class="c1"># app_vertex.splitter = SpynnakerSplitterSliceLegacy()</span>
+        <span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">SplitterPoissonDelegate</span><span class="p">()</span></div>
 </pre></div>
 
             <div class="clearer"></div>

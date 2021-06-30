@@ -78,47 +78,64 @@ $(function() {
 <p>Operations on synapses.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="neuron-typedefs_8h_source.html">common/neuron-typedefs.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="neuron_8h_source.html">neuron.h</a>&quot;</code><br />
 </div>
 <p><a href="synapses_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a3f256864c3f363b43d3b44c939841742"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a3f256864c3f363b43d3b44c939841742">synapses_get_ring_buffer_index</a> (uint32_t simulation_timestep, uint32_t synapse_type_index, uint32_t neuron_index, uint32_t <a class="el" href="synapses_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>)</td></tr>
-<tr class="memdesc:a3f256864c3f363b43d3b44c939841742"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index of the ring buffer for a given timestep, synapse type and neuron index.  <a href="synapses_8h.html#a3f256864c3f363b43d3b44c939841742">More...</a><br /></td></tr>
-<tr class="separator:a3f256864c3f363b43d3b44c939841742"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26a09bf4d0cc9d60690e8a17d5c967cd"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a26a09bf4d0cc9d60690e8a17d5c967cd">synapses_get_ring_buffer_index_combined</a> (uint32_t simulation_timestep, uint32_t combined_synapse_neuron_index, uint32_t <a class="el" href="synapses_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>)</td></tr>
-<tr class="memdesc:a26a09bf4d0cc9d60690e8a17d5c967cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index of the ring buffer for a given timestep and combined synapse type and neuron index (as stored in a synapse row)  <a href="synapses_8h.html#a26a09bf4d0cc9d60690e8a17d5c967cd">More...</a><br /></td></tr>
-<tr class="separator:a26a09bf4d0cc9d60690e8a17d5c967cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7151e725b13e2e92e35e95997d41194"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ac7151e725b13e2e92e35e95997d41194">synapses_convert_weight_to_input</a> (weight_t weight, uint32_t left_shift)</td></tr>
-<tr class="memdesc:ac7151e725b13e2e92e35e95997d41194"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a weight stored in a synapse row to an input.  <a href="synapses_8h.html#ac7151e725b13e2e92e35e95997d41194">More...</a><br /></td></tr>
-<tr class="separator:ac7151e725b13e2e92e35e95997d41194"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ad92bb519344d001dba972cdd0be5f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">synapses_print_weight</a> (weight_t weight, uint32_t left_shift)</td></tr>
 <tr class="memdesc:aa1ad92bb519344d001dba972cdd0be5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the weight of a synapse.  <a href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">More...</a><br /></td></tr>
 <tr class="separator:aa1ad92bb519344d001dba972cdd0be5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb7de7af1598c0248a5ac78921afadef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#afb7de7af1598c0248a5ac78921afadef">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init)</td></tr>
-<tr class="memdesc:afb7de7af1598c0248a5ac78921afadef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#afb7de7af1598c0248a5ac78921afadef">More...</a><br /></td></tr>
-<tr class="separator:afb7de7af1598c0248a5ac78921afadef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
-<tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing for a timestep.  <a href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
-<tr class="separator:ad88a7e6b3773f1e0f334b7410f182987"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab86f19d1020a1bcb82decd7fa71e4075"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ab86f19d1020a1bcb82decd7fa71e4075">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t *<a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t *<a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, weight_t **<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init, uint32_t *incoming_spike_buffer_size)</td></tr>
+<tr class="memdesc:ab86f19d1020a1bcb82decd7fa71e4075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#ab86f19d1020a1bcb82decd7fa71e4075">More...</a><br /></td></tr>
+<tr class="separator:ab86f19d1020a1bcb82decd7fa71e4075"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> row, bool *write_back)</td></tr>
 <tr class="memdesc:aa1ceab23dea834d6189f496b5133d983"><td class="mdescLeft">&#160;</td><td class="mdescRight">process a synaptic row  <a href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">More...</a><br /></td></tr>
 <tr class="separator:aa1ceab23dea834d6189f496b5133d983"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">synapses_get_pre_synaptic_events</a> (void)</td></tr>
 <tr class="memdesc:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0  <a href="synapses_8h.html#aa95d63df3a6fbedaaf3a0d36f824df35">More...</a><br /></td></tr>
 <tr class="separator:aa95d63df3a6fbedaaf3a0d36f824df35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71374045de8f83cde4a8a44bbd421ffd"><td class="memItemLeft" align="right" valign="top"><a id="a71374045de8f83cde4a8a44bbd421ffd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a71374045de8f83cde4a8a44bbd421ffd">synapses_flush_ring_buffers</a> (void)</td></tr>
-<tr class="memdesc:a71374045de8f83cde4a8a44bbd421ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">flush the ring buffers <br /></td></tr>
-<tr class="separator:a71374045de8f83cde4a8a44bbd421ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac237268af6684b631aef510cc52fa607"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ac237268af6684b631aef510cc52fa607">synapses_shut_down</a> (void)</td></tr>
-<tr class="memdesc:ac237268af6684b631aef510cc52fa607"><td class="mdescLeft">&#160;</td><td class="mdescRight">allows clearing of DTCM used by synapses  <a href="synapses_8h.html#ac237268af6684b631aef510cc52fa607">More...</a><br /></td></tr>
-<tr class="separator:ac237268af6684b631aef510cc52fa607"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d59593a4844dc703e540f408d22321"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a96d59593a4844dc703e540f408d22321">synapses_resume</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:a96d59593a4844dc703e540f408d22321"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resume processing of synapses after a pause.  <a href="synapses_8h.html#a96d59593a4844dc703e540f408d22321">More...</a><br /></td></tr>
+<tr class="separator:a96d59593a4844dc703e540f408d22321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0eaaa63c7f863ceeb29c428cc67416fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a0eaaa63c7f863ceeb29c428cc67416fe">synapses_flush_ring_buffers</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:a0eaaa63c7f863ceeb29c428cc67416fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the ring buffers to 0 at the given time.  <a href="synapses_8h.html#a0eaaa63c7f863ceeb29c428cc67416fe">More...</a><br /></td></tr>
+<tr class="separator:a0eaaa63c7f863ceeb29c428cc67416fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a></td></tr>
+<tr class="memdesc:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bits needed for the synapse type and index.  <a href="synapses_8h.html#a4cb72a09cb7c84f5c82c07d17bcb0516">More...</a><br /></td></tr>
+<tr class="separator:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3299a10c6a78f6e4f37246ab79a0736"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ac3299a10c6a78f6e4f37246ab79a0736">synapse_type_index_mask</a></td></tr>
+<tr class="memdesc:ac3299a10c6a78f6e4f37246ab79a0736"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to pick out the synapse type and index.  <a href="synapses_8h.html#ac3299a10c6a78f6e4f37246ab79a0736">More...</a><br /></td></tr>
+<tr class="separator:ac3299a10c6a78f6e4f37246ab79a0736"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a840b87d6e981394dff1224fc0b8cd9c3"><td class="memItemLeft" align="right" valign="top"><a id="a840b87d6e981394dff1224fc0b8cd9c3"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a></td></tr>
+<tr class="memdesc:a840b87d6e981394dff1224fc0b8cd9c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bits in the synapse index. <br /></td></tr>
+<tr class="separator:a840b87d6e981394dff1224fc0b8cd9c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84db6c41c7cf03558016d477d8df4d37"><td class="memItemLeft" align="right" valign="top"><a id="a84db6c41c7cf03558016d477d8df4d37"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a></td></tr>
+<tr class="memdesc:a84db6c41c7cf03558016d477d8df4d37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to pick out the synapse index. <br /></td></tr>
+<tr class="separator:a84db6c41c7cf03558016d477d8df4d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af20079aa1e3c31a3efd344176025ce0f"><td class="memItemLeft" align="right" valign="top"><a id="af20079aa1e3c31a3efd344176025ce0f"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a></td></tr>
+<tr class="memdesc:af20079aa1e3c31a3efd344176025ce0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bits in the synapse type. <br /></td></tr>
+<tr class="separator:af20079aa1e3c31a3efd344176025ce0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af786c2a0c6f40c688029991d5b9711a7"><td class="memItemLeft" align="right" valign="top"><a id="af786c2a0c6f40c688029991d5b9711a7"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af786c2a0c6f40c688029991d5b9711a7">synapse_type_mask</a></td></tr>
+<tr class="memdesc:af786c2a0c6f40c688029991d5b9711a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to pick out the synapse type. <br /></td></tr>
+<tr class="separator:af786c2a0c6f40c688029991d5b9711a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab03dd903d4fed6afbcd9648d49beb9ae"><td class="memItemLeft" align="right" valign="top"><a id="ab03dd903d4fed6afbcd9648d49beb9ae"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ab03dd903d4fed6afbcd9648d49beb9ae">synapse_delay_bits</a></td></tr>
+<tr class="memdesc:ab03dd903d4fed6afbcd9648d49beb9ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bits in the delay. <br /></td></tr>
+<tr class="separator:ab03dd903d4fed6afbcd9648d49beb9ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ef4427415ac67eb603a14ca1bb86f83"><td class="memItemLeft" align="right" valign="top"><a id="a2ef4427415ac67eb603a14ca1bb86f83"></a>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a2ef4427415ac67eb603a14ca1bb86f83">synapse_delay_mask</a></td></tr>
+<tr class="memdesc:a2ef4427415ac67eb603a14ca1bb86f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to pick out the delay. <br /></td></tr>
+<tr class="separator:a2ef4427415ac67eb603a14ca1bb86f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b7881a6d9caca38f2050656c652cf26"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">synapses_saturation_count</a></td></tr>
 <tr class="memdesc:a8b7881a6d9caca38f2050656c652cf26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of the number of times the synapses have saturated their weights.  <a href="synapses_8h.html#a8b7881a6d9caca38f2050656c652cf26">More...</a><br /></td></tr>
 <tr class="separator:a8b7881a6d9caca38f2050656c652cf26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -128,178 +145,6 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition in file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a3f256864c3f363b43d3b44c939841742"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3f256864c3f363b43d3b44c939841742">&#9670;&nbsp;</a></span>synapses_get_ring_buffer_index()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> synapses_get_ring_buffer_index </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>simulation_timestep</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_type_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_type_index_bits</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_index_bits</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the index of the ring buffer for a given timestep, synapse type and neuron index. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00039">39</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
-
-</div>
-</div>
-<a id="a26a09bf4d0cc9d60690e8a17d5c967cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26a09bf4d0cc9d60690e8a17d5c967cd">&#9670;&nbsp;</a></span>synapses_get_ring_buffer_index_combined()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> synapses_get_ring_buffer_index_combined </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>simulation_timestep</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>combined_synapse_neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_type_index_bits</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the index of the ring buffer for a given timestep and combined synapse type and neuron index (as stored in a synapse row) </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">combined_synapse_neuron_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00054">54</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
-
-</div>
-</div>
-<a id="ac7151e725b13e2e92e35e95997d41194"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7151e725b13e2e92e35e95997d41194">&#9670;&nbsp;</a></span>synapses_convert_weight_to_input()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> synapses_convert_weight_to_input </td>
-          <td>(</td>
-          <td class="paramtype">weight_t&#160;</td>
-          <td class="paramname"><em>weight</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>left_shift</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Converts a weight stored in a synapse row to an input. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>the weight to convert in synapse-row form </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">left_shift</td><td>the shift to use when decoding </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the actual input weight for the model </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00066">66</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
-
-</div>
-</div>
 <a id="aa1ad92bb519344d001dba972cdd0be5f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa1ad92bb519344d001dba972cdd0be5f">&#9670;&nbsp;</a></span>synapses_print_weight()</h2>
 
@@ -343,12 +188,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00081">81</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8h_source.html#l00059">59</a> of file <a class="el" href="synapses_8h_source.html">synapses.h</a>.</p>
 
 </div>
 </div>
-<a id="afb7de7af1598c0248a5ac78921afadef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb7de7af1598c0248a5ac78921afadef">&#9670;&nbsp;</a></span>synapses_initialise()</h2>
+<a id="ab86f19d1020a1bcb82decd7fa71e4075"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab86f19d1020a1bcb82decd7fa71e4075">&#9670;&nbsp;</a></span>synapses_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,14 +207,20 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">uint32_t *&#160;</td>
           <td class="paramname"><em>n_neurons</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">uint32_t *&#160;</td>
           <td class="paramname"><em>n_synapse_types</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">weight_t **&#160;</td>
+          <td class="paramname"><em>ring_buffers</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -381,7 +232,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool *&#160;</td>
-          <td class="paramname"><em>clear_input_buffers_of_late_packets_init</em>&#160;</td>
+          <td class="paramname"><em>clear_input_buffers_of_late_packets_init</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>incoming_spike_buffer_size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -395,43 +252,18 @@ Variables</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">synapse_params_address</td><td>Synapse configuration in SDRAM </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>Number of neurons to simulate </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_types</td><td>Number of synapse types </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons</td><td>Number of neurons that will be simulated </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_synapse_types</td><td>Number of synapse types that will be simulated </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">ring_buffers</td><td>The ring buffers that will be used </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>Array of shifts to use when converting from ring buffer values to input buffer values </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">clear_input_buffers_of_late_packets</td><td>Inicates whether to clear the input buffers each time step </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">incoming_spike_buffer_size</td><td>The number of spikes to support in the incoming spike circular buffer </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successfully initialised. False otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00243">243</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
-
-</div>
-</div>
-<a id="ad88a7e6b3773f1e0f334b7410f182987"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad88a7e6b3773f1e0f334b7410f182987">&#9670;&nbsp;</a></span>synapses_do_timestep_update()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void synapses_do_timestep_update </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
-          <td class="paramname"><em>time</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Do all the synapse processing for a timestep. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current simulation time </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00314">314</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00255">255</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -478,7 +310,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00345">345</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00342">342</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
@@ -501,36 +333,125 @@ Variables</h2></td></tr>
 <p>returns the counters for plastic and fixed pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
 <dl class="section return"><dt>Returns</dt><dd>the counter for plastic and fixed pre synaptic events or 0 </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00382">382</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00378">378</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
-<a id="ac237268af6684b631aef510cc52fa607"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac237268af6684b631aef510cc52fa607">&#9670;&nbsp;</a></span>synapses_shut_down()</h2>
+<a id="a96d59593a4844dc703e540f408d22321"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96d59593a4844dc703e540f408d22321">&#9670;&nbsp;</a></span>synapses_resume()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool synapses_shut_down </td>
+          <td class="memname">void synapses_resume </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>allows clearing of DTCM used by synapses </p>
-<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise</dd></dl>
-<p>allows clearing of DTCM used by synapses</p>
-<dl class="section return"><dt>Returns</dt><dd>true if successful </dd></dl>
+<p>Resume processing of synapses after a pause. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time at which the simulation is to start </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00395">395</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00383">383</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+
+</div>
+</div>
+<a id="a0eaaa63c7f863ceeb29c428cc67416fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0eaaa63c7f863ceeb29c428cc67416fe">&#9670;&nbsp;</a></span>synapses_flush_ring_buffers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void synapses_flush_ring_buffers </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Reset the ring buffers to 0 at the given time. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the simulated time to reset the buffers at </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00327">327</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a4cb72a09cb7c84f5c82c07d17bcb0516"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cb72a09cb7c84f5c82c07d17bcb0516">&#9670;&nbsp;</a></span>synapse_type_index_bits</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_type_index_bits</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Number of bits needed for the synapse type and index. </p>
+<div class="fragment"><div class="line"><a class="code" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a> + <a class="code" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a></div>
+<div class="ttc" id="asynapses_8c_html_a840b87d6e981394dff1224fc0b8cd9c3"><div class="ttname"><a href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a></div><div class="ttdeci">uint32_t synapse_index_bits</div><div class="ttdoc">Number of bits in the synapse index.</div><div class="ttdef"><b>Definition:</b> <a href="synapses_8c_source.html#l00068">synapses.c:68</a></div></div>
+<div class="ttc" id="asynapses_8c_html_af20079aa1e3c31a3efd344176025ce0f"><div class="ttname"><a href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a></div><div class="ttdeci">uint32_t synapse_type_bits</div><div class="ttdoc">Number of bits in the synapse type.</div><div class="ttdef"><b>Definition:</b> <a href="synapses_8c_source.html#l00072">synapses.c:72</a></div></div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00060">60</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+
+</div>
+</div>
+<a id="ac3299a10c6a78f6e4f37246ab79a0736"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3299a10c6a78f6e4f37246ab79a0736">&#9670;&nbsp;</a></span>synapse_type_index_mask</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_type_index_mask</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Mask to pick out the synapse type and index. </p>
+<div class="fragment"><div class="line"><a class="code" href="synapses_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a> | <a class="code" href="synapses_8c.html#af786c2a0c6f40c688029991d5b9711a7">synapse_type_mask</a></div>
+<div class="ttc" id="asynapses_8c_html_a84db6c41c7cf03558016d477d8df4d37"><div class="ttname"><a href="synapses_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a></div><div class="ttdeci">uint32_t synapse_index_mask</div><div class="ttdoc">Mask to pick out the synapse index.</div><div class="ttdef"><b>Definition:</b> <a href="synapses_8c_source.html#l00070">synapses.c:70</a></div></div>
+<div class="ttc" id="asynapses_8c_html_af786c2a0c6f40c688029991d5b9711a7"><div class="ttname"><a href="synapses_8c.html#af786c2a0c6f40c688029991d5b9711a7">synapse_type_mask</a></div><div class="ttdeci">uint32_t synapse_type_mask</div><div class="ttdoc">Mask to pick out the synapse type.</div><div class="ttdef"><b>Definition:</b> <a href="synapses_8c_source.html#l00074">synapses.c:74</a></div></div>
+</div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00066">66</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+
+</div>
+</div>
 <a id="a8b7881a6d9caca38f2050656c652cf26"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8b7881a6d9caca38f2050656c652cf26">&#9670;&nbsp;</a></span>synapses_saturation_count</h2>
 
@@ -554,14 +475,14 @@ Variables</h2></td></tr>
 <p>Count of the number of times the synapses have saturated their weights. </p>
 <p>Count of the number of times the synapses have saturated their weights. </p>
 
-<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00074">74</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapses_8c_source.html#l00081">81</a> of file <a class="el" href="synapses_8c_source.html">synapses.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:45 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

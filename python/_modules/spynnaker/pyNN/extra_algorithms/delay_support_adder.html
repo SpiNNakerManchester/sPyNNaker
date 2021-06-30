@@ -51,6 +51,7 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
@@ -92,9 +93,9 @@
         <span class="s2">&quot;does not have accepts_edges_from_delay_vertex turned off.&quot;</span><span class="p">)</span>
 
     <span class="n">NOT_SUPPORTED_DELAY_ERROR_MSG</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The maximum delay </span><span class="si">{}</span><span class="s2"> for projection </span><span class="si">{}</span><span class="s2"> is not supported &quot;</span>
-        <span class="s2">&quot;by the splitter </span><span class="si">{}</span><span class="s2"> (max supported delay of the splitter is </span><span class="si">{}</span><span class="s2"> and &quot;</span>
-        <span class="s2">&quot;a delay extension can add </span><span class="si">{}</span><span class="s2"> extra delay). either reduce &quot;</span>
+        <span class="s2">&quot;The maximum delay </span><span class="si">{}</span><span class="s2">ms for projection </span><span class="si">{}</span><span class="s2"> is not supported &quot;</span>
+        <span class="s2">&quot;by the splitter </span><span class="si">{}</span><span class="s2"> (max supported delay of the splitter is </span><span class="si">{}</span><span class="s2">ms and &quot;</span>
+        <span class="s2">&quot;a delay extension can add </span><span class="si">{}</span><span class="s2">ms extra delay). either reduce &quot;</span>
         <span class="s2">&quot;the delay, or use a splitter which supports a larger delay, or &quot;</span>
         <span class="s2">&quot;finally implement the code to allow multiple delay extensions. &quot;</span>
         <span class="s2">&quot;good luck.&quot;</span><span class="p">)</span>
@@ -131,7 +132,7 @@
 
                     <span class="c1"># figure the max delay and if we need a delay extension</span>
                     <span class="n">synapse_infos</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span>
-                    <span class="p">(</span><span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">delay_steps_per_stage</span><span class="p">,</span>
                      <span class="n">need_delay_extension</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_delay_values</span><span class="p">(</span>
                         <span class="n">app_edge</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">,</span> <span class="n">synapse_infos</span><span class="p">)</span>
 
@@ -140,14 +141,8 @@
                         <span class="n">delay_app_vertex</span> <span class="o">=</span> <span class="p">(</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">_create_delay_app_vertex_and_pre_edge</span><span class="p">(</span>
                                 <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
-                                <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span>
-                                <span class="n">max_delay_needed</span><span class="p">))</span>
-
-                        <span class="c1"># update the delay extension for the max delay slots.</span>
-                        <span class="c1"># NOTE do it accumulately. coz else more loops.</span>
-                        <span class="n">delay_app_vertex</span><span class="o">.</span> \
-                            <span class="n">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
-                                <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">max_delay_needed</span><span class="p">)</span>
+                                <span class="n">delay_steps_per_stage</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span>
+                                <span class="n">n_delay_stages</span><span class="p">))</span>
 
                         <span class="c1"># add the edge from the delay extension to the</span>
                         <span class="c1"># dest vertex</span>
@@ -193,8 +188,8 @@
             <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="o">=</span> <span class="n">delay_edge</span>
 
     <span class="k">def</span> <span class="nf">_create_delay_app_vertex_and_pre_edge</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
-            <span class="n">app_graph</span><span class="p">,</span> <span class="n">max_delay_needed</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">app_outgoing_edge_partition</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span>
+            <span class="n">app_graph</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; creates the delay extension app vertex and the edge from the src\</span>
 <span class="sd">            vertex to this delay extension. Adds to the graph, as safe to do\</span>
 <span class="sd">            so.</span>
@@ -202,8 +197,8 @@
 <span class="sd">        :param OutgoingEdgePartition app_outgoing_edge_partition:</span>
 <span class="sd">            the original outgoing edge partition.</span>
 <span class="sd">        :param AppEdge app_edge: the undelayed app edge.</span>
-<span class="sd">        :param int post_vertex_max_delay: delay supported by post vertex.</span>
-<span class="sd">        :param int max_delay_needed: the max delay needed by this app edge.</span>
+<span class="sd">        :param int delay_per_stage: delay for each delay stage</span>
+<span class="sd">        :param int n_delay_stages: the number of delay stages needed</span>
 <span class="sd">        :param ApplicationGraph app_graph: the app graph.</span>
 <span class="sd">        :return: the DelayExtensionAppVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -215,9 +210,8 @@
             <span class="c1"># build delay app vertex</span>
             <span class="n">delay_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
             <span class="n">delay_app_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionVertex</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span>
-                <span class="n">max_delay_needed</span> <span class="o">-</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">delay_name</span><span class="p">)</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">delay_name</span><span class="p">)</span>
 
             <span class="c1"># set trackers</span>
             <span class="n">delay_app_vertex</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="p">(</span>
@@ -232,6 +226,9 @@
                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_to_DelayExtension&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_delay_pre_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">delay_pre_edge</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">delay_app_vertex</span><span class="o">.</span><span class="n">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
+                <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">delay_app_vertex</span>
 
     <span class="k">def</span> <span class="nf">_check_delay_values</span><span class="p">(</span>
@@ -242,17 +239,17 @@
 <span class="sd">        :param ApplicationEdge app_edge: the undelayed app edge</span>
 <span class="sd">        :param int user_max_delay: user max delay of the sim.</span>
 <span class="sd">        :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos</span>
-<span class="sd">        :return:tuple of max_delay_needed, post_vertex_max_delay, bool.</span>
+<span class="sd">        :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># get max delay required</span>
-        <span class="n">max_delay_needed</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+        <span class="n">max_delay_needed_ms</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">synapse_infos</span><span class="p">)</span>
 
         <span class="c1"># check max delay works</span>
-        <span class="k">if</span> <span class="n">max_delay_needed</span> <span class="o">&gt;</span> <span class="n">user_max_delay</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">max_delay_needed_ms</span> <span class="o">&gt;</span> <span class="n">user_max_delay</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</span><span class="p">)</span>
 
         <span class="c1"># get if the post vertex needs a delay extension</span>
@@ -263,13 +260,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">post_splitter</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">))</span>
 
-        <span class="n">post_vertex_max_delay</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span> <span class="o">*</span>
-                <span class="n">machine_time_step_ms</span><span class="p">())</span>
+        <span class="n">max_delay_steps</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
+        <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="n">max_delay_steps</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
 
         <span class="c1"># if does not need a delay extension, run away</span>
-        <span class="k">if</span> <span class="n">post_vertex_max_delay</span> <span class="o">&gt;=</span> <span class="n">max_delay_needed</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">max_delay_ms</span> <span class="o">&gt;=</span> <span class="n">max_delay_needed_ms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_delay_steps</span><span class="p">,</span> <span class="kc">False</span>
 
         <span class="c1"># Check post vertex is ok with getting a delay</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">post_splitter</span><span class="o">.</span><span class="n">accepts_edges_from_delay_vertex</span><span class="p">():</span>
@@ -279,21 +275,19 @@
 
         <span class="c1"># needs a delay extension, check can be supported with 1 delay</span>
         <span class="c1"># extension. coz we dont do more than 1 at the moment</span>
-        <span class="n">total_supported_delay</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">post_vertex_max_delay</span> <span class="o">+</span>
-            <span class="p">(</span><span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">get_max_delay_ticks_supported</span><span class="p">(</span>
-                <span class="n">post_vertex_max_delay</span><span class="p">)</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()))</span>
-        <span class="k">if</span> <span class="n">total_supported_delay</span> <span class="o">&lt;</span> <span class="n">max_delay_needed</span><span class="p">:</span>
+        <span class="n">ext_provided_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">get_max_delay_ticks_supported</span><span class="p">(</span>
+                <span class="n">max_delay_steps</span><span class="p">)</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">())</span>
+        <span class="n">total_delay_ms</span> <span class="o">=</span> <span class="n">ext_provided_ms</span> <span class="o">+</span> <span class="n">max_delay_ms</span>
+        <span class="k">if</span> <span class="n">total_delay_ms</span> <span class="o">&lt;</span> <span class="n">max_delay_needed_ms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">NOT_SUPPORTED_DELAY_ERROR_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
+                    <span class="n">max_delay_needed_ms</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span>
                     <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
-                    <span class="n">post_vertex_max_delay</span><span class="p">,</span>
-                    <span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">get_max_delay_ticks_supported</span><span class="p">(</span>
-                        <span class="n">post_vertex_max_delay</span><span class="p">)))</span>
+                    <span class="n">max_delay_ms</span><span class="p">,</span> <span class="n">ext_provided_ms</span><span class="p">))</span>
 
         <span class="c1"># return data for building delay extensions</span>
-        <span class="k">return</span> <span class="n">max_delay_needed</span><span class="p">,</span> <span class="n">post_vertex_max_delay</span><span class="p">,</span> <span class="kc">True</span>
+        <span class="n">n_stages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_delay_needed_ms</span> <span class="o">/</span> <span class="n">max_delay_ms</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">n_stages</span><span class="p">,</span> <span class="n">max_delay_steps</span><span class="p">,</span> <span class="kc">True</span>
 </pre></div>
 
             <div class="clearer"></div>

@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.extra_algorithms.splitter_components.splitter_poisson_delegate &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_poisson_delegate</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.extra_algorithms.splitter_components.splitter_poisson_delegate</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2020-2021 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters.abstract_splitters</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSplitterCommon</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.spike_source</span> <span class="kn">import</span> <span class="n">SpikeSourcePoissonVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OneToOneConnector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.spynnaker_splitter_slice_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterSliceLegacy</span>
+<span class="kn">from</span> <span class="nn">.abstract_supports_one_to_one_sdram_input</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A splitter for Poisson sources that will ignore sources that are</span>
+<span class="sd">        one-to-one connected to a single Population</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Message to display on error</span>
+    <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the SplitterPoissonDelegate as&quot;</span>
+        <span class="s2">&quot; the only vertex supported by this splitter is a &quot;</span>
+        <span class="s2">&quot;SpikeSourcePoissonVertex. Please use the correct splitter for &quot;</span>
+        <span class="s2">&quot;your vertex and try again.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">send_over_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determine if this vertex is to be sent using SDRAM</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If there is only one outgoing projection, and it is one-to-one</span>
+        <span class="c1"># connected to the target, and the target knows what to do, leave</span>
+        <span class="c1"># it to the target</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
+            <span class="n">connector</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
+                               <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
+        <span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
+        <span class="c1"># If sending over SDRAM, let the target handle this</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># If we passed this part, use the super class</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">(</span>
+            <span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.get_in_coming_slices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_in_coming_slices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_in_coming_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
+            <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
+            <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.get_out_going_slices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_slices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_out_going_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
+            <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
+            <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.extra_algorithms.splitter_components.splitter_poisson_delegate</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+    </div>
+  </body>
+</html>

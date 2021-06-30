@@ -57,6 +57,8 @@
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BITS_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
@@ -68,6 +70,8 @@
 <span class="kn">from</span> <span class="nn">.delay_block</span> <span class="kn">import</span> <span class="n">DelayBlock</span>
 <span class="kn">from</span> <span class="nn">.delay_generator_data</span> <span class="kn">import</span> <span class="n">DelayGeneratorData</span>
 
+<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">8</span>
+
 
 <span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">,</span>
@@ -78,16 +82,14 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__delay_blocks&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_per_stage&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__max_delay_needed_to_support&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_atoms&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_delay_stages&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__source_vertex&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_generator_data&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__n_data_specs&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
 
     <span class="c1"># this maps to what master assumes</span>
-    <span class="n">MAX_TICKS_POSSIBLE_TO_SUPPORT</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">*</span> <span class="mi">16</span>
+    <span class="n">MAX_SLOTS</span> <span class="o">=</span> <span class="mi">8</span>
     <span class="n">SAFETY_FACTOR</span> <span class="o">=</span> <span class="mi">5000</span>
     <span class="n">MAX_DTCM_AVAILABLE</span> <span class="o">=</span> <span class="mi">59756</span> <span class="o">-</span> <span class="n">SAFETY_FACTOR</span>
 
@@ -96,12 +98,12 @@
         <span class="s2">&quot;yet feasible. Please report it to Spinnaker user mail list.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">max_delay_to_support</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
             <span class="n">source_vertex</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int n_neurons: the number of neurons</span>
 <span class="sd">        :param int delay_per_stage: the delay per stage</span>
-<span class="sd">        :param int max_delay_to_support: the max delay this will cover</span>
+<span class="sd">        :param int n_delay_stages: the (initial) number of delay stages needed</span>
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex \</span>
 <span class="sd">                source_vertex:</span>
 <span class="sd">            where messages are coming from</span>
@@ -115,13 +117,9 @@
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__source_vertex</span> <span class="o">=</span> <span class="n">source_vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay_needed_to_support</span> <span class="o">=</span> <span class="n">max_delay_to_support</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">n_delay_stages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span> <span class="o">=</span> <span class="n">delay_per_stage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_data_specs</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay_needed_to_support</span><span class="p">)</span>
 
         <span class="c1"># atom store</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
@@ -142,10 +140,7 @@
 
 <div class="viewcode-block" id="DelayExtensionVertex.get_max_delay_ticks_supported"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_max_delay_ticks_supported">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_max_delay_ticks_supported</span><span class="p">(</span><span class="n">delay_ticks_at_post_vertex</span><span class="p">):</span>
-        <span class="n">max_slots</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
-            <span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">MAX_TICKS_POSSIBLE_TO_SUPPORT</span> <span class="o">/</span>
-            <span class="n">delay_ticks_at_post_vertex</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">max_slots</span> <span class="o">*</span> <span class="n">delay_ticks_at_post_vertex</span></div>
+        <span class="k">return</span> <span class="n">DelayExtensionVertex</span><span class="o">.</span><span class="n">MAX_SLOTS</span> <span class="o">*</span> <span class="n">delay_ticks_at_post_vertex</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasDelayStages</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
@@ -158,18 +153,14 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.set_new_n_delay_stages_and_delay_per_stage">[docs]</a>    <span class="k">def</span> <span class="nf">set_new_n_delay_stages_and_delay_per_stage</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">new_post_vertex_n_delay</span><span class="p">,</span> <span class="n">new_max_delay</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">new_post_vertex_n_delay</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">delay_per_stage</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DelayExtensionException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="n">new_post_vertex_n_delay</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">))</span>
 
-        <span class="n">new_n_stages</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">new_max_delay</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">)</span> <span class="o">/</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">new_n_stages</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">new_n_stages</span></div>
+        <span class="k">if</span> <span class="n">n_delay_stages</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">n_delay_stages</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delay_per_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -230,7 +221,6 @@
 <span class="sd">            ~spynnaker.pyNN.models.neural_projections.SynapseInformation</span>
 <span class="sd">        :param int max_stage:</span>
 <span class="sd">            The maximum delay stage</span>
-<span class="sd">        :param int machine_time_step: sim machine time step</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span><span class="p">[</span><span class="n">pre_vertex_slice</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="n">DelayGeneratorData</span><span class="p">(</span>
@@ -254,6 +244,21 @@
 
 <div class="viewcode-block" id="DelayExtensionVertex.delay_generator_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">delay_generator_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DelayExtensionVertex.delay_params_size"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.delay_params_size">[docs]</a>    <span class="k">def</span> <span class="nf">delay_params_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The size of the delay parameters for a given vertex slice</span>
+
+<span class="sd">        :param Slice slice: The slice to get the size of the parameters for</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_words_per_stage</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">+</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">*</span> <span class="n">n_words_per_stage</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DelayExtensionVertex.get_n_cores"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_n_cores</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
 </pre></div>
 
             <div class="clearer"></div>

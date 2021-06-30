@@ -63,6 +63,8 @@
     <span class="n">machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">MachineBitFieldPairRouterCompressor</span><span class="p">,</span>
         <span class="n">MachineBitFieldOrderedCoveringCompressor</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">write_address_to_user1</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.system_control_logic</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">run_system_application</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
@@ -123,7 +125,8 @@
 
         <span class="c1"># adjust cores to exclude the ones which did not give sdram.</span>
         <span class="n">expander_chip_cores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_expander_rerun_targets</span><span class="p">(</span>
-            <span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
+            <span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+            <span class="n">transceiver</span><span class="p">)</span>
 
         <span class="c1"># just rerun the synaptic expander for safety purposes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rerun_synaptic_cores</span><span class="p">(</span>
@@ -137,11 +140,14 @@
         <span class="s2">&quot;Method to call the specific compressor to use&quot;</span>
 
     <span class="k">def</span> <span class="nf">_locate_expander_rerun_targets</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">bitfield_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">bitfield_targets</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+            <span class="n">transceiver</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; removes host based cores for synaptic matrix regeneration</span>
 
 <span class="sd">        :param ~.ExecutableTargets bitfield_targets: the cores that were used</span>
 <span class="sd">        :param ~.ExecutableFinder executable_finder: way to get binary path</span>
+<span class="sd">        :param ~.Placements placements: placements on machine</span>
+<span class="sd">        :param ~.Transceiver transceiver: spinnman instance</span>
 <span class="sd">        :return: new targets for synaptic expander</span>
 <span class="sd">        :rtype: ~.ExecutableTargets</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -159,6 +165,10 @@
                 <span class="n">expander_executable_path</span><span class="p">,</span>
                 <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
                 <span class="n">executable_type</span><span class="o">=</span><span class="n">ExecutableType</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">)</span>
+            <span class="c1"># Write the region to USER1, as that is the best we can do</span>
+            <span class="n">write_address_to_user1</span><span class="p">(</span>
+                <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">connection_generator_region</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_cores</span>
 
     <span class="nd">@staticmethod</span>

@@ -54,8 +54,6 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">FULL_MASK</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractHasDelayStages</span>
 
 <span class="c1">#: number of elements</span>
 <span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># n words, key, pointer to bitfield</span>
@@ -79,87 +77,63 @@
 <span class="n">BIT_IN_A_WORD</span> <span class="o">=</span> <span class="mf">32.0</span>
 
 
-<div class="viewcode-block" id="get_estimated_sdram_for_bit_field_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<div class="viewcode-block" id="get_estimated_sdram_for_bit_field_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; estimates the SDRAM for the bit field region</span>
 
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
-<span class="sd">        the app graph</span>
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationVertex vertex:</span>
-<span class="sd">        app vertex</span>
+<span class="sd">    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        The projections that target the vertex in question</span>
 <span class="sd">    :return: the estimated number of bytes used by the bit field region</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="n">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-    <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
-            <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
+    <span class="n">seen_app_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+        <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
+        <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_app_edges</span><span class="p">:</span>
+            <span class="n">seen_app_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">app_edge</span><span class="p">)</span>
+            <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
             <span class="n">n_machine_vertices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span>
 
-            <span class="n">slice_atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
-                <span class="n">slice_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-            <span class="n">n_atoms_per_machine_vertex</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">slice_atoms</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
-                <span class="n">n_atoms_per_machine_vertex</span> <span class="o">*=</span> \
-                    <span class="n">incoming_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
-            <span class="n">n_words_for_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                <span class="n">n_atoms_per_machine_vertex</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
+            <span class="n">atoms_per_core</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">)</span>
+            <span class="n">n_words_for_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">atoms_per_core</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
             <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">+</span> <span class="p">(</span>
-                    <span class="n">n_words_for_atoms</span> <span class="o">*</span> <span class="n">n_machine_vertices</span><span class="p">))</span> <span class="o">*</span>
-                <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+                <span class="p">((</span><span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">+</span> <span class="n">n_words_for_atoms</span><span class="p">)</span> <span class="o">*</span>
+                 <span class="n">n_machine_vertices</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+            <span class="c1"># Also add for delay vertices if needed</span>
+            <span class="n">n_words_for_delays</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+                <span class="n">atoms_per_core</span> <span class="o">*</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
+            <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="p">((</span><span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">+</span> <span class="n">n_words_for_delays</span><span class="p">)</span> <span class="o">*</span>
+                 <span class="n">n_machine_vertices</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sdram</span></div>
 
 
-<div class="viewcode-block" id="get_estimated_sdram_for_key_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">app_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<div class="viewcode-block" id="get_estimated_sdram_for_key_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">[docs]</a><span class="k">def</span> <span class="nf">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; gets an estimate of the bitfield builder region</span>
 
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
-<span class="sd">        the app graph</span>
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationVertex vertex:</span>
-<span class="sd">        app vertex</span>
+<span class="sd">    :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        The projections that target the vertex in question</span>
 <span class="sd">    :return: SDRAM needed</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># basic sdram</span>
     <span class="n">sdram</span> <span class="o">=</span> <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-    <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
+    <span class="n">seen_app_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+        <span class="n">in_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
+        <span class="k">if</span> <span class="n">in_edge</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_app_edges</span><span class="p">:</span>
+            <span class="n">seen_app_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
 
-        <span class="c1"># Get the number of likely vertices</span>
-        <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
-        <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+            <span class="c1"># Get the number of likely vertices</span>
+            <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
+            <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span>
+                      <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">:</span>
+                <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span>
+                          <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sdram</span></div>
-
-
-<span class="k">def</span> <span class="nf">_exact_sdram_for_bit_field_region</span><span class="p">(</span>
-        <span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; calculates the correct SDRAM for the bitfield region based off \</span>
-<span class="sd">        the machine graph</span>
-
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        machine graph</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex:</span>
-<span class="sd">        the machine vertex</span>
-<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
-<span class="sd">            n_key_map:</span>
-<span class="sd">        n keys map</span>
-<span class="sd">    :return: SDRAM in bytes</span>
-<span class="sd">    :rtype: int</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">sdram</span> <span class="o">=</span> <span class="n">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-    <span class="k">for</span> <span class="n">incoming_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
-        <span class="n">n_keys</span> <span class="o">=</span> <span class="n">n_key_map</span><span class="o">.</span><span class="n">n_keys_for_partition</span><span class="p">(</span>
-            <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_outgoing_partition_for_edge</span><span class="p">(</span><span class="n">incoming_edge</span><span class="p">))</span>
-        <span class="n">n_words_for_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_keys</span> <span class="o">/</span> <span class="n">BIT_IN_A_WORD</span><span class="p">))</span>
-
-        <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">+</span> <span class="n">n_words_for_atoms</span><span class="p">)</span> <span class="o">*</span>
-            <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">sdram</span>
 
 
 <div class="viewcode-block" id="exact_sdram_for_bit_field_builder_region"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region">[docs]</a><span class="k">def</span> <span class="nf">exact_sdram_for_bit_field_builder_region</span><span class="p">():</span>
@@ -171,61 +145,55 @@
     <span class="k">return</span> <span class="n">N_REGIONS_ADDRESSES</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span></div>
 
 
-<span class="k">def</span> <span class="nf">_exact_sdram_for_bit_field_key_region</span><span class="p">(</span><span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Calculates the exact SDRAM for the bitfield key region</span>
-
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        machine graph</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex</span>
-<span class="sd">    :return: bytes</span>
-<span class="sd">    :rtype: int</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">N_KEYS_DATA_SET_IN_WORDS</span> <span class="o">+</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span> <span class="o">*</span>
-        <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span><span class="p">)</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-
-
 <div class="viewcode-block" id="reserve_bit_field_regions"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">[docs]</a><span class="k">def</span> <span class="nf">reserve_bit_field_regions</span><span class="p">(</span>
-        <span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">bit_field_builder_region</span><span class="p">,</span>
-        <span class="n">bit_filter_region</span><span class="p">,</span> <span class="n">bit_field_key_region</span><span class="p">):</span>
+        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">bit_field_builder_region</span><span class="p">,</span>
+        <span class="n">bit_filter_region</span><span class="p">,</span> <span class="n">bit_field_key_region</span><span class="p">,</span>
+        <span class="n">bit_field_builder_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bit_filter_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bit_field_key_region_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; reserves the regions for the bitfields</span>
 
 <span class="sd">    :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        dsg spec writer</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        machine graph</span>
-<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
-<span class="sd">            n_key_map:</span>
-<span class="sd">        map between partitions and n keys</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex</span>
+<span class="sd">    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        The projections to generate bitfields for</span>
 <span class="sd">    :param int bit_field_builder_region: region id for the builder region</span>
 <span class="sd">    :param int bit_filter_region: region id for the bitfield region</span>
 <span class="sd">    :param int bit_field_key_region: region id for the key map</span>
+<span class="sd">    :param bit_field_builder_region_ref:</span>
+<span class="sd">        Reference to give the region, or None if not referencable</span>
+<span class="sd">    :type bit_field_builder_region_ref: int or None</span>
+<span class="sd">    :param bit_filter_region_ref:</span>
+<span class="sd">        Reference to give the region, or None if not referencable</span>
+<span class="sd">    :type bit_filter_region_ref: int or None</span>
+<span class="sd">    :param bit_field_key_region_ref:</span>
+<span class="sd">        Reference to give the region, or None if not referencable</span>
+<span class="sd">    :type bit_field_key_region_ref: int or None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># reserve the final destination for the bitfields</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
         <span class="n">region</span><span class="o">=</span><span class="n">bit_filter_region</span><span class="p">,</span>
-        <span class="n">size</span><span class="o">=</span><span class="n">_exact_sdram_for_bit_field_region</span><span class="p">(</span>
-            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">),</span>
-        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit_field region&quot;</span><span class="p">)</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">),</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit_field region&quot;</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="n">bit_filter_region_ref</span><span class="p">)</span>
 
     <span class="c1"># reserve region for the bitfield builder</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
         <span class="n">region</span><span class="o">=</span><span class="n">bit_field_builder_region</span><span class="p">,</span>
         <span class="n">size</span><span class="o">=</span><span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">(),</span>
-        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit field builder region&quot;</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit field builder region&quot;</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="n">bit_field_builder_region_ref</span><span class="p">)</span>
 
     <span class="c1"># reserve memory region for the key region</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
         <span class="n">region</span><span class="o">=</span><span class="n">bit_field_key_region</span><span class="p">,</span>
-        <span class="n">size</span><span class="o">=</span><span class="n">_exact_sdram_for_bit_field_key_region</span><span class="p">(</span><span class="n">machine_graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">),</span>
-        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit field key data&quot;</span><span class="p">)</span></div>
+        <span class="n">size</span><span class="o">=</span><span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">),</span>
+        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;bit field key data&quot;</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="n">bit_field_key_region_ref</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="write_bitfield_init_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">[docs]</a><span class="k">def</span> <span class="nf">write_bitfield_init_data</span><span class="p">(</span>
-        <span class="n">spec</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
         <span class="n">bit_field_builder_region</span><span class="p">,</span> <span class="n">master_pop_region_id</span><span class="p">,</span>
         <span class="n">synaptic_matrix_region_id</span><span class="p">,</span> <span class="n">direct_matrix_region_id</span><span class="p">,</span>
         <span class="n">bit_field_region_id</span><span class="p">,</span> <span class="n">bit_field_key_map_region_id</span><span class="p">,</span>
@@ -234,14 +202,11 @@
 
 <span class="sd">    :param ~data_specification.DataSpecificationGenerator spec:</span>
 <span class="sd">        data spec writer</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:</span>
-<span class="sd">        machine vertex</span>
-<span class="sd">    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">        machine graph</span>
+<span class="sd">    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">        The projections to generate bitfields for</span>
+<span class="sd">    :param ~pacman.model.graphs.common.slice vertex_slice:</span>
+<span class="sd">        The slice of the target vertex</span>
 <span class="sd">    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys</span>
-<span class="sd">    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \</span>
-<span class="sd">            n_key_map:</span>
-<span class="sd">        map for edge to n keys</span>
 <span class="sd">    :param int bit_field_builder_region: the region id for the bitfield builder</span>
 <span class="sd">    :param int master_pop_region_id: the region id for the master pop table</span>
 <span class="sd">    :param int synaptic_matrix_region_id: the region id for the synaptic matrix</span>
@@ -269,17 +234,24 @@
 
     <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">bit_field_key_map_region_id</span><span class="p">)</span>
 
+    <span class="c1"># Gather the machine edges that target this core</span>
+    <span class="n">machine_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">seen_app_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+        <span class="n">in_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
+        <span class="k">if</span> <span class="n">in_edge</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_app_edges</span><span class="p">:</span>
+            <span class="n">seen_app_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="o">==</span> <span class="n">vertex_slice</span><span class="p">:</span>
+                    <span class="n">machine_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
+
     <span class="c1"># write n keys max atom map</span>
-    <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)))</span>
+    <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">machine_edges</span><span class="p">))</span>
 
     <span class="c1"># load in key to max atoms map</span>
-    <span class="k">for</span> <span class="n">out_going_partition</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span>\
-            <span class="n">get_multicast_edge_partitions_ending_at_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">):</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-            <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_partition</span><span class="p">(</span><span class="n">out_going_partition</span><span class="p">))</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-            <span class="n">n_key_map</span><span class="o">.</span><span class="n">n_keys_for_partition</span><span class="p">(</span><span class="n">out_going_partition</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_edges</span><span class="p">:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_for_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
     <span class="c1"># ensure if nothing else that n bitfields in bitfield region set to 0</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">bit_field_region_id</span><span class="p">)</span>

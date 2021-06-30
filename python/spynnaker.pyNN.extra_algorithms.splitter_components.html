@@ -95,6 +95,234 @@ raised saying a different splitter is required.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">AbstractSupportsOneToOneSDRAMInput</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A marker interface for a splitter that supports one-to-one input using
+SDRAM.  The splitter is assumed to handle the splitting on any inputs
+that are actually one-to-one, as it will have to create the vertices</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SplitterAbstractPopulationVertexNeuronsSynapses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_synapse_vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_delay_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.partitioner_splitters.abstract_splitters.abstract_splitter_common.AbstractSplitterCommon</span></code>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSupportsOneToOneSDRAMInput</span></code></a></p>
+<p>Splits an AbstractPopulationVertex so that there are separate neuron
+cores each being fed by one or more synapse cores.  Incoming one-to-one
+Poisson cores are also added here if they meet the criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_synapse_vertices</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of synapse cores per neuron core</p></li>
+<li><p><strong>max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The maximum delay supported by each synapse core; by default this
+is computed based on the number of atoms per core, the number of
+synapse types, and the space available for delays on the core</p></li>
+<li><p><strong>allow_delay_extension</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Whether delay extensions are allowed in the network. If max_delay
+is provided, this will default to True.  If max_delay is not
+provided, and this is given as None, it will be computed based on
+whether delay extensions should be needed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.INVALID_POP_ERROR_MESSAGE">
+<span class="sig-name descname"><span class="pre">INVALID_POP_ERROR_MESSAGE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">vertex</span> <span class="pre">{}</span> <span class="pre">cannot</span> <span class="pre">be</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">SplitterAbstractPopVertexNeuronsSynapses</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">only</span> <span class="pre">vertex</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">this</span> <span class="pre">splitter</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">AbstractPopulationVertex.</span> <span class="pre">Please</span> <span class="pre">use</span> <span class="pre">the</span> <span class="pre">correct</span> <span class="pre">splitter</span> <span class="pre">for</span> <span class="pre">your</span> <span class="pre">vertex</span> <span class="pre">and</span> <span class="pre">try</span> <span class="pre">again.'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.INVALID_POP_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.SPLITTER_NAME">
+<span class="sig-name descname"><span class="pre">SPLITTER_NAME</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'SplitterAbstractPopulationVertexNeuronsSynapses'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.SPLITTER_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex">
+<span class="sig-name descname"><span class="pre">accepts_edges_from_delay_vertex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Confirms that the splitter’s vertices can handle spikes coming from a         <code class="xref py py-class docutils literal notranslate"><span class="pre">DelayExtensionMachineVertex</span></code>.</p>
+<p>If this method returns False and the users ask for a delay larger than
+that allowed by <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay" title="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><code class="xref py py-meth docutils literal notranslate"><span class="pre">max_support_delay()</span></code></a>, an exception will be
+raised saying a different splitter is required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.create_machine_vertices">
+<span class="sig-name descname"><span class="pre">create_machine_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.create_machine_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.create_machine_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>method for specific splitter objects to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_tracker</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.utilities.utility_objs/#pacman.utilities.utility_objs.ResourceTracker" title="(in PACMAN v6.0)"><em>ResourceTracker</em></a>) – machine resources</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – machine graph</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if successful, false otherwise</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_slices">
+<span class="sig-name descname"><span class="pre">get_in_coming_slices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A best effort prediction of the slices of the input vertices.</p>
+<p>If this method is called after create_machine_vertices the splitter
+should return the actual slices of the input vertices.
+The second value returned is then always <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If this method is called before create_machine_vertices the splitter
+will have to make an estimate unless the actual slices it will use are
+already known. The second value returned is <code class="docutils literal notranslate"><span class="pre">True</span></code> if and only if
+the slices will not be changed.</p>
+<p>The output vertices are the ones that will serve as source vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/ down stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the slices incoming to this vertex, bool if estimate or exact</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)">Slice</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_vertices">
+<span class="sig-name descname"><span class="pre">get_in_coming_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgoing_edge_partition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_in_coming_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets incoming vertices and their acceptable edge types</p>
+<p>The input vertices are the ones that will serve as dest vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/ down stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v6.0)"><em>ApplicationEdge</em></a>) – app edge</p></li>
+<li><p><strong>outgoing_edge_partition</strong> (<em>OutgoingEdgePartition</em>) – outgoing edge partition</p></li>
+<li><p><strong>src_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – the src machine vertex</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict of keys being machine vertices and values are a list
+of acceptable edge types.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)">MachineVertex</a>,<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(class))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_slices">
+<span class="sig-name descname"><span class="pre">get_out_going_slices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A best effort prediction of the slices of the output vertices.</p>
+<p>If this method is called after create_machine_vertices the splitter
+should return the actual slices of the output vertices.
+The second value returned is then always <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If this method is called before create_machine_vertices the splitter
+will have to make an estimate unless the actual slices it will use are
+already known. The second value returned is <code class="docutils literal notranslate"><span class="pre">True</span></code> if and only if
+the slices will not be changed.</p>
+<p>The output vertices are the ones that will serve as source vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/down-stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of Slices and bool of estimate or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)">Slice</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices">
+<span class="sig-name descname"><span class="pre">get_out_going_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outgoing_edge_partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.get_out_going_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets pre vertices and their acceptable edge types</p>
+<p>The output vertices are the ones that will serve as source vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/ down stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v6.0)"><em>ApplicationEdge</em></a>) – app edge</p></li>
+<li><p><strong>outgoing_edge_partition</strong> (<em>OutgoingEdgePartition</em>) – outgoing edge partition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict of keys being machine vertices and values are a list
+of acceptable edge types.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)">MachineVertex</a>,<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(class))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording">
+<span class="sig-name descname"><span class="pre">machine_vertices_for_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable_to_record</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.machine_vertices_for_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the machine vertices which are recording this variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>variable_to_record</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the variable to get machine verts for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of machine vertices</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)">MachineVertex</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay">
+<span class="sig-name descname"><span class="pre">max_support_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the max amount of delay this post vertex can support.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>max delay supported in ticks</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.reset_called">
+<span class="sig-name descname"><span class="pre">reset_called</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.reset_called"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.reset_called" title="Permalink to this definition">¶</a></dt>
+<dd><p>reset the splitter to be as if it has not operated a splitting yet.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex">
+<span class="sig-name descname"><span class="pre">set_governed_app_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_neurons_synapses.html#SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a app vertex to be governed by this splitter object.             Once set it can’t be reset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>app_vertex</strong> (<em>ApplicationVertex</em>) – the app vertex to govern</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>PacmanConfigurationException</strong> – if the app vertex has already been set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SplitterAbstractPopulationVertexSlice</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.partitioner_splitters.abstract_splitters.abstract_splitter_slice.AbstractSplitterSlice</span></code>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span></code></a></p>
@@ -127,37 +355,6 @@ raised saying a different splitter is required.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.constant_sdram">
-<span class="sig-name descname"><span class="pre">constant_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.constant_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.constant_sdram" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the constant sdram used by the vertex slice.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the atoms to get constant sdram of</p></li>
-<li><p><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app graph</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>ConstantSDRAM</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.cpu_cost">
-<span class="sig-name descname"><span class="pre">cpu_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.cpu_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.cpu_cost" title="Permalink to this definition">¶</a></dt>
-<dd><p>get cpu cost for a slice of atoms</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – slice of atoms</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>CPUCyclesPerTickResourcer</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertex">
 <span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resources</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a machine vertex</p>
@@ -180,15 +377,21 @@ raised saying a different splitter is required.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.dtcm_cost">
-<span class="sig-name descname"><span class="pre">dtcm_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.dtcm_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.dtcm_cost" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the dtcm cost for the slice of atoms</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertices">
+<span class="sig-name descname"><span class="pre">create_machine_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.create_machine_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>method for specific splitter objects to use.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – atom slice for dtcm calc.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_tracker</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.utilities.utility_objs/#pacman.utilities.utility_objs.ResourceTracker" title="(in PACMAN v6.0)"><em>ResourceTracker</em></a>) – machine resources</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – machine graph</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>DTCMResource</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if successful, false otherwise</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -246,21 +449,21 @@ of acceptable edge types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms">
-<span class="sig-name descname"><span class="pre">get_resources_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_resources_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets the resources of a slice of atoms from a given app vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the slice to find the resources of.</p></li>
 <li><p><strong>vertex_slice</strong> – the slice</p></li>
-<li><p><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – app graph</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Resource container.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>ResourceContainer
+Gets the resources of a slice of atoms</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v6.0)">ResourceContainer</a></p>
@@ -269,20 +472,9 @@ of acceptable edge types.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_variable_sdram">
-<span class="sig-name descname"><span class="pre">get_variable_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.get_variable_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_variable_sdram" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the variable sdram from the recorder.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the atom slice for recording sdram</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the variable sdram used by the neuron recorder</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>VariableSDRAM</p>
-</dd>
-</dl>
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.reset_called">
+<span class="sig-name descname"><span class="pre">reset_called</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_slice.html#SplitterAbstractPopulationVertexSlice.reset_called"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.reset_called" title="Permalink to this definition">¶</a></dt>
+<dd><p>reset the splitter to be as if it has not operated a splitting yet.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -361,11 +553,14 @@ of acceptable edge types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.constant_sdram">
-<span class="sig-name descname"><span class="pre">constant_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.constant_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.constant_sdram" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">constant_sdram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.constant_sdram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.constant_sdram" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns the sdram used by the delay extension</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>graph</strong> (<em>ApplicationGraph</em>) – app graph</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<em>ApplicationGraph</em>) – app graph</p></li>
+<li><p><strong>vertex_slice</strong> (<em>Slice</em>) – The slice to get the size of</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>ConstantSDRAM</p>
@@ -389,7 +584,7 @@ of acceptable edge types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex">
-<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>creates a delay extension machine vertex and adds to the tracker.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -603,6 +798,119 @@ of acceptable edge types.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.source_of_delay_vertex">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">source_of_delay_vertex</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.source_of_delay_vertex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SplitterPoissonDelegate</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy" title="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy</span></code></a></p>
+<p>A splitter for Poisson sources that will ignore sources that are
+one-to-one connected to a single Population</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>splitter_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.INVALID_POP_ERROR_MESSAGE">
+<span class="sig-name descname"><span class="pre">INVALID_POP_ERROR_MESSAGE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">vertex</span> <span class="pre">{}</span> <span class="pre">cannot</span> <span class="pre">be</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">the</span> <span class="pre">SplitterPoissonDelegate</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">only</span> <span class="pre">vertex</span> <span class="pre">supported</span> <span class="pre">by</span> <span class="pre">this</span> <span class="pre">splitter</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">SpikeSourcePoissonVertex.</span> <span class="pre">Please</span> <span class="pre">use</span> <span class="pre">the</span> <span class="pre">correct</span> <span class="pre">splitter</span> <span class="pre">for</span> <span class="pre">your</span> <span class="pre">vertex</span> <span class="pre">and</span> <span class="pre">try</span> <span class="pre">again.'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.INVALID_POP_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">
+<span class="sig-name descname"><span class="pre">create_machine_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_poisson_delegate.html#SplitterPoissonDelegate.create_machine_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>method for specific splitter objects to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_tracker</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.utilities.utility_objs/#pacman.utilities.utility_objs.ResourceTracker" title="(in PACMAN v6.0)"><em>ResourceTracker</em></a>) – machine resources</p></li>
+<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – machine graph</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if successful, false otherwise</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_in_coming_slices">
+<span class="sig-name descname"><span class="pre">get_in_coming_slices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_poisson_delegate.html#SplitterPoissonDelegate.get_in_coming_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_in_coming_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A best effort prediction of the slices of the input vertices.</p>
+<p>If this method is called after create_machine_vertices the splitter
+should return the actual slices of the input vertices.
+The second value returned is then always <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If this method is called before create_machine_vertices the splitter
+will have to make an estimate unless the actual slices it will use are
+already known. The second value returned is <code class="docutils literal notranslate"><span class="pre">True</span></code> if and only if
+the slices will not be changed.</p>
+<p>The output vertices are the ones that will serve as source vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/ down stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>the slices incoming to this vertex, bool if estimate or exact</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)">Slice</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_slices">
+<span class="sig-name descname"><span class="pre">get_out_going_slices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_poisson_delegate.html#SplitterPoissonDelegate.get_out_going_slices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_slices" title="Permalink to this definition">¶</a></dt>
+<dd><p>A best effort prediction of the slices of the output vertices.</p>
+<p>If this method is called after create_machine_vertices the splitter
+should return the actual slices of the output vertices.
+The second value returned is then always <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>If this method is called before create_machine_vertices the splitter
+will have to make an estimate unless the actual slices it will use are
+already known. The second value returned is <code class="docutils literal notranslate"><span class="pre">True</span></code> if and only if
+the slices will not be changed.</p>
+<p>The output vertices are the ones that will serve as source vertices
+for external edges.  If more than one set of vertices match this
+description the splitter should use the ones used by the most general
+edge type/down-stream splitter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of Slices and bool of estimate or not</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)">Slice</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.send_over_sdram">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">send_over_sdram</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.send_over_sdram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this vertex is to be sent using SDRAM</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">
+<span class="sig-name descname"><span class="pre">set_governed_app_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_poisson_delegate.html#SplitterPoissonDelegate.set_governed_app_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a app vertex to be governed by this splitter object.             Once set it can’t be reset</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>app_vertex</strong> (<em>ApplicationVertex</em>) – the app vertex to govern</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>PacmanConfigurationException</strong> – if the app vertex has already been set.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

@@ -69,7 +69,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
@@ -80,38 +79,20 @@ $(function() {
 
 <p>This file contains the main function of the application framework, which the application programmer uses to configure and run applications.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="in__spikes_8h_source.html">common/in_spikes.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &quot;c_main_neuron_common.h&quot;</code><br />
+<code>#include &quot;c_main_synapse_common.h&quot;</code><br />
+<code>#include &quot;c_main_common.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="regions_8h_source.html">regions.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="neuron_8h_source.html">neuron.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="synapses_8h_source.html">synapses.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="spike__processing_8h_source.html">spike_processing.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="population__table_8h_source.html">population_table/population_table.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="synapse__dynamics_8h_source.html">plasticity/synapse_dynamics.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="synaptogenesis__dynamics_8h_source.html">structural_plasticity/synaptogenesis_dynamics.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="neuron_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="direct__synapses_8h_source.html">direct_synapses.h</a>&quot;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html">profiler.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html">filter_info.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/tdma__processing_8h.html">tdma_processing.h</a>&gt;</code><br />
+<code>#include &quot;<a class="el" href="spike__processing_8h_source.html">spike_processing.h</a>&quot;</code><br />
 </div>
 <p><a href="c__main_8c_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:structneuron__provenance"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#structneuron__provenance">neuron_provenance</a></td></tr>
-<tr class="memdesc:structneuron__provenance"><td class="mdescLeft">&#160;</td><td class="mdescRight">The provenance information written on application shutdown.  <a href="c__main_8c.html#structneuron__provenance">More...</a><br /></td></tr>
-<tr class="separator:structneuron__provenance"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a9460522d5774f317649cd352ea6112b0"><td class="memItemLeft" align="right" valign="top"><a id="a9460522d5774f317649cd352ea6112b0"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a9460522d5774f317649cd352ea6112b0">NUMBER_OF_REGIONS_TO_RECORD</a>&#160;&#160;&#160;5</td></tr>
-<tr class="memdesc:a9460522d5774f317649cd352ea6112b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of regions that are to be used for recording. <br /></td></tr>
-<tr class="separator:a9460522d5774f317649cd352ea6112b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structcombined__provenance"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#structcombined__provenance">combined_provenance</a></td></tr>
+<tr class="memdesc:structcombined__provenance"><td class="mdescLeft">&#160;</td><td class="mdescRight">The combined provenance from synapses and neurons.  <a href="c__main_8c.html#structcombined__provenance">More...</a><br /></td></tr>
+<tr class="separator:structcombined__provenance"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -123,34 +104,47 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<b>SDP</b> = 1
 , <b>BACKGROUND</b> = 1
+, <b>DMA</b> = -2
+, <b>SDP</b> = 0
+, <br />
+&#160;&#160;<b>TIMER</b> = 0
+, <b>MC</b> = -1
+, <b>DMA</b> = -2
+, <b>TIMER</b> = 0
+, <br />
+&#160;&#160;<b>SDP</b> = 0
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0
+, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
 , <br />
-&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
-, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
  }</td></tr>
-<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback  <a href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
+<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identify the priorities for all tasks.  <a href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
 <tr class="separator:a65b19dabf5283c1ea37df964ca25e964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main_store_provenance_data</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> provenance_region)</td></tr>
-<tr class="memdesc:a1dc4d17392d4c0a6dac7ab12267da487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to store provenance data (format: <a class="el" href="c__main_8c.html#structneuron__provenance" title="The provenance information written on application shutdown.">neuron_provenance</a>).  <a href="c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">More...</a><br /></td></tr>
+<tr class="memdesc:a1dc4d17392d4c0a6dac7ab12267da487"><td class="mdescLeft">&#160;</td><td class="mdescRight">Callback to store provenance data (format: <a class="el" href="structneuron__provenance.html" title="The provenance information provided by neurons.">neuron_provenance</a>).  <a href="c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">More...</a><br /></td></tr>
 <tr class="separator:a1dc4d17392d4c0a6dac7ab12267da487"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc8ec4992e18193766cc267a4968f1d7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">initialise</a> (void)</td></tr>
-<tr class="memdesc:abc8ec4992e18193766cc267a4968f1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the model by reading in the regions and checking recording data.  <a href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">More...</a><br /></td></tr>
-<tr class="separator:abc8ec4992e18193766cc267a4968f1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8967e8eb09363007076f840186a20995"><td class="memItemLeft" align="right" valign="top"><a id="a8967e8eb09363007076f840186a20995"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a8967e8eb09363007076f840186a20995">resume_callback</a> (void)</td></tr>
 <tr class="memdesc:a8967e8eb09363007076f840186a20995"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function to call when resuming a simulation <br /></td></tr>
 <tr class="separator:a8967e8eb09363007076f840186a20995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7877934d7f174e52d11945b3a893b7d7"><td class="memItemLeft" align="right" valign="top"><a id="a7877934d7f174e52d11945b3a893b7d7"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a7877934d7f174e52d11945b3a893b7d7">process_ring_buffers</a> (void)</td></tr>
+<tr class="memdesc:a7877934d7f174e52d11945b3a893b7d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the ring buffers for the next time step. <br /></td></tr>
+<tr class="separator:a7877934d7f174e52d11945b3a893b7d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">background_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> local_time)</td></tr>
-<tr class="memdesc:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background activites called from timer.  <a href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">More...</a><br /></td></tr>
+<tr class="memdesc:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background activities called from timer.  <a href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">More...</a><br /></td></tr>
 <tr class="separator:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a217aea663c8dd444052831cbde49bd62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused)</td></tr>
 <tr class="memdesc:a217aea663c8dd444052831cbde49bd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer interrupt callback.  <a href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">More...</a><br /></td></tr>
 <tr class="separator:a217aea663c8dd444052831cbde49bd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc8ec4992e18193766cc267a4968f1d7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">initialise</a> (void)</td></tr>
+<tr class="memdesc:abc8ec4992e18193766cc267a4968f1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the model by reading in the regions and checking recording data.  <a href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">More...</a><br /></td></tr>
+<tr class="separator:abc8ec4992e18193766cc267a4968f1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14f4f1d4c84183b7bf7108bf930a23c"><td class="memItemLeft" align="right" valign="top"><a id="aa14f4f1d4c84183b7bf7108bf930a23c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main</a> (void)</td></tr>
 <tr class="memdesc:aa14f4f1d4c84183b7bf7108bf930a23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The entry point for this model. <br /></td></tr>
@@ -158,9 +152,20 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__m
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:ae73654f333e4363463ad8c594eca1905"><td class="memItemLeft" align="right" valign="top"><a id="ae73654f333e4363463ad8c594eca1905"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></td></tr>
-<tr class="memdesc:ae73654f333e4363463ad8c594eca1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current timer tick value. <br /></td></tr>
+<tr class="memitem:ac4b08337fb78e995265b4091aeeb3543"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structcommon__regions.html">common_regions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ac4b08337fb78e995265b4091aeeb3543">COMMON_REGIONS</a></td></tr>
+<tr class="memdesc:ac4b08337fb78e995265b4091aeeb3543"><td class="mdescLeft">&#160;</td><td class="mdescRight">From the regions, extract those that are common.  <a href="c__main_8c.html#ac4b08337fb78e995265b4091aeeb3543">More...</a><br /></td></tr>
+<tr class="separator:ac4b08337fb78e995265b4091aeeb3543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8a24477bf90774dbe741f1aa007d394"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structcommon__priorities.html">common_priorities</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ab8a24477bf90774dbe741f1aa007d394">COMMON_PRIORITIES</a></td></tr>
+<tr class="memdesc:ab8a24477bf90774dbe741f1aa007d394"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identify the priorities of the common tasks.  <a href="c__main_8c.html#ab8a24477bf90774dbe741f1aa007d394">More...</a><br /></td></tr>
+<tr class="separator:ab8a24477bf90774dbe741f1aa007d394"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36f1dda69af112b3e9f1fcc7d708aa53"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structneuron__regions.html">neuron_regions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a36f1dda69af112b3e9f1fcc7d708aa53">NEURON_REGIONS</a></td></tr>
+<tr class="memdesc:a36f1dda69af112b3e9f1fcc7d708aa53"><td class="mdescLeft">&#160;</td><td class="mdescRight">From the regions, extract those that are neuron-specific.  <a href="c__main_8c.html#a36f1dda69af112b3e9f1fcc7d708aa53">More...</a><br /></td></tr>
+<tr class="separator:a36f1dda69af112b3e9f1fcc7d708aa53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabee4d4d7d12350e84247cd6af69d388"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structsynapse__regions.html">synapse_regions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aabee4d4d7d12350e84247cd6af69d388">SYNAPSE_REGIONS</a></td></tr>
+<tr class="memdesc:aabee4d4d7d12350e84247cd6af69d388"><td class="mdescLeft">&#160;</td><td class="mdescRight">From the regions, extract those that are synapse-specific.  <a href="c__main_8c.html#aabee4d4d7d12350e84247cd6af69d388">More...</a><br /></td></tr>
+<tr class="separator:aabee4d4d7d12350e84247cd6af69d388"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae73654f333e4363463ad8c594eca1905"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></td></tr>
+<tr class="memdesc:ae73654f333e4363463ad8c594eca1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current timer tick value.  <a href="c__main_8c.html#ae73654f333e4363463ad8c594eca1905">More...</a><br /></td></tr>
 <tr class="separator:ae73654f333e4363463ad8c594eca1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0c27301e134af3ce80814a553601074"><td class="memItemLeft" align="right" valign="top"><a id="ac0c27301e134af3ce80814a553601074"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a></td></tr>
@@ -174,26 +179,10 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a9ee6c18f2c55e2b60ea4194d4722f735">infinite_run</a></td></tr>
 <tr class="memdesc:a9ee6c18f2c55e2b60ea4194d4722f735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if this model should run for infinite time. <br /></td></tr>
 <tr class="separator:a9ee6c18f2c55e2b60ea4194d4722f735"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cb8b41466def0e135ca00facead99b8"><td class="memItemLeft" align="right" valign="top"><a id="a1cb8b41466def0e135ca00facead99b8"></a>
-static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a1cb8b41466def0e135ca00facead99b8">last_rewiring_time</a> = 0</td></tr>
-<tr class="memdesc:a1cb8b41466def0e135ca00facead99b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer callbacks since last rewiring. <br /></td></tr>
-<tr class="separator:a1cb8b41466def0e135ca00facead99b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa08e7ff835bc68c5a91214035f412894"><td class="memItemLeft" align="right" valign="top"><a id="aa08e7ff835bc68c5a91214035f412894"></a>
-static int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa08e7ff835bc68c5a91214035f412894">rewiring_period</a> = 0</td></tr>
-<tr class="memdesc:aa08e7ff835bc68c5a91214035f412894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rewiring period represented as an integer. <br /></td></tr>
-<tr class="separator:aa08e7ff835bc68c5a91214035f412894"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c0ebb4e72cbc1b6f3da884524a78078"><td class="memItemLeft" align="right" valign="top"><a id="a1c0ebb4e72cbc1b6f3da884524a78078"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a1c0ebb4e72cbc1b6f3da884524a78078">rewiring</a> = false</td></tr>
-<tr class="memdesc:a1c0ebb4e72cbc1b6f3da884524a78078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag representing whether rewiring is enabled. <br /></td></tr>
-<tr class="separator:a1c0ebb4e72cbc1b6f3da884524a78078"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a113643d98988bc0d1706e0b21d7b4a4e"><td class="memItemLeft" align="right" valign="top"><a id="a113643d98988bc0d1706e0b21d7b4a4e"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a113643d98988bc0d1706e0b21d7b4a4e">count_rewire_attempts</a> = 0</td></tr>
-<tr class="memdesc:a113643d98988bc0d1706e0b21d7b4a4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count the number of rewiring attempts. <br /></td></tr>
-<tr class="separator:a113643d98988bc0d1706e0b21d7b4a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7368643a28282d8b3429f0fb145aa5db"><td class="memItemLeft" align="right" valign="top"><a id="a7368643a28282d8b3429f0fb145aa5db"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a></td></tr>
-<tr class="memdesc:a7368643a28282d8b3429f0fb145aa5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of neurons on the core. <br /></td></tr>
-<tr class="separator:a7368643a28282d8b3429f0fb145aa5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a97f21dc7fccaac8071bcd29894bccb"><td class="memItemLeft" align="right" valign="top"><a id="a9a97f21dc7fccaac8071bcd29894bccb"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a9a97f21dc7fccaac8071bcd29894bccb">recording_flags</a> = 0</td></tr>
+<tr class="memdesc:a9a97f21dc7fccaac8071bcd29894bccb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The recording flags indicating if anything is recording. <br /></td></tr>
+<tr class="separator:a9a97f21dc7fccaac8071bcd29894bccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa9d9edd5bdfe2c8fedec47a25acfee8"><td class="memItemLeft" align="right" valign="top"><a id="aaa9d9edd5bdfe2c8fedec47a25acfee8"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aaa9d9edd5bdfe2c8fedec47a25acfee8">n_backgrounds_queued</a> = 0</td></tr>
 <tr class="memdesc:aaa9d9edd5bdfe2c8fedec47a25acfee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of background tasks queued / running. <br /></td></tr>
@@ -206,9 +195,10 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ac8502bcf887a00b1f6f9193d43365488">max_backgrounds_queued</a> = 0</td></tr>
 <tr class="memdesc:ac8502bcf887a00b1f6f9193d43365488"><td class="mdescLeft">&#160;</td><td class="mdescRight">The maximum number of background tasks queued. <br /></td></tr>
 <tr class="separator:ac8502bcf887a00b1f6f9193d43365488"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d218df3d38c1fe5b37eb202ddd28700"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a5d218df3d38c1fe5b37eb202ddd28700">global_timer_count</a></td></tr>
-<tr class="memdesc:a5d218df3d38c1fe5b37eb202ddd28700"><td class="mdescLeft">&#160;</td><td class="mdescRight">timer count for tdma of certain models; exported  <a href="c__main_8c.html#a5d218df3d38c1fe5b37eb202ddd28700">More...</a><br /></td></tr>
-<tr class="separator:a5d218df3d38c1fe5b37eb202ddd28700"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d013c2e9d5eddd8472bd57e9b21ff99"><td class="memItemLeft" align="right" valign="top"><a id="a9d013c2e9d5eddd8472bd57e9b21ff99"></a>
+static weight_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a></td></tr>
+<tr class="memdesc:a9d013c2e9d5eddd8472bd57e9b21ff99"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ring buffers to be used in the simulation. <br /></td></tr>
+<tr class="separator:a9d013c2e9d5eddd8472bd57e9b21ff99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains the main function of the application framework, which the application programmer uses to configure and run applications. </p>
@@ -219,120 +209,48 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
  
 <p class="definition">Definition in file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
-<a name="structneuron__provenance" id="structneuron__provenance"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structneuron__provenance">&#9670;&nbsp;</a></span>neuron_provenance</h2>
+<a name="structcombined__provenance" id="structcombined__provenance"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structcombined__provenance">&#9670;&nbsp;</a></span>combined_provenance</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct neuron_provenance</td>
+          <td class="memname">struct combined_provenance</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"><p>The provenance information written on application shutdown. </p>
+<div class="textblock"><p>The combined provenance from synapses and neurons. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00063">63</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00044">44</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="aa5cc7c82313ba8fd9b9300b36b5fbbcf"></a>uint32_t</td>
+<a id="aa89d58865b1e82c11427523e4dafbb37"></a>struct <a class="el" href="structneuron__provenance.html">neuron_provenance</a></td>
 <td class="fieldname">
-n_pre_synaptic_events</td>
-<td class="fielddoc">
-A count of presynaptic events. </td></tr>
-<tr><td class="fieldtype">
-<a id="a97349e60345fc7fda140ab5ba383f661"></a>uint32_t</td>
-<td class="fieldname">
-n_synaptic_weight_saturations</td>
-<td class="fielddoc">
-A count of synaptic saturations. </td></tr>
-<tr><td class="fieldtype">
-<a id="a26034589834a6dbf7abfbef4099f7680"></a>uint32_t</td>
-<td class="fieldname">
-n_input_buffer_overflows</td>
-<td class="fielddoc">
-A count of the times that the synaptic input circular buffers overflowed. </td></tr>
-<tr><td class="fieldtype">
-<a id="a7971d970224cbcc61d40e13ebd0139cb"></a>uint32_t</td>
-<td class="fieldname">
-current_timer_tick</td>
-<td class="fielddoc">
-The current time. </td></tr>
-<tr><td class="fieldtype">
-<a id="a34c76b30af43caf5fc2f6db950458766"></a>uint32_t</td>
-<td class="fieldname">
-n_plastic_synaptic_weight_saturations</td>
-<td class="fielddoc">
-The number of STDP weight saturations. </td></tr>
-<tr><td class="fieldtype">
-<a id="a1f1f613f49d3e1572c5c815021db4126"></a>uint32_t</td>
-<td class="fieldname">
-n_ghost_pop_table_searches</td>
+neuron_provenance</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a700d357cf16a2f95a5303e8d6598f182"></a>uint32_t</td>
+<a id="a24cc1f47ac6debb6d3f73d02d869824b"></a>struct <a class="el" href="structsynapse__provenance.html">synapse_provenance</a></td>
 <td class="fieldname">
-n_failed_bitfield_reads</td>
+synapse_provenance</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a9e407b8da096a0cdbb7c4fd818ff539c"></a>uint32_t</td>
+<a id="ad2701b9e94a297f0fe64d64ab562cbe9"></a>struct <a class="el" href="spike__processing_8h.html#structspike__processing__provenance">spike_processing_provenance</a></td>
 <td class="fieldname">
-n_dmas_complete</td>
+spike_processing_provenance</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a64a1ca226ee320bd5b8a0ad98f82773a"></a>uint32_t</td>
-<td class="fieldname">
-n_spikes_processed</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a40a9268bbfbb52fbcbb529fbbd25efad"></a>uint32_t</td>
-<td class="fieldname">
-n_invalid_master_pop_table_hits</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a1d20029c56a5b105191f627f592455a4"></a>uint32_t</td>
-<td class="fieldname">
-n_filtered_by_bitfield</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="ac525fc32eb7e2f1ef173901fb8dac16d"></a>uint32_t</td>
-<td class="fieldname">
-n_rewires</td>
-<td class="fielddoc">
-The number of rewirings performed. </td></tr>
-<tr><td class="fieldtype">
-<a id="a3c500ac03409919edceeacf3c94877b5"></a>uint32_t</td>
-<td class="fieldname">
-n_packets_dropped_from_lateness</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="ad1b57918342ae367dbdaa556f82e426e"></a>uint32_t</td>
-<td class="fieldname">
-spike_processing_get_max_filled_input_buffer_size</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a9567e9ef2fd91cdd106404ec2e2ed282"></a>uint32_t</td>
-<td class="fieldname">
-n_tdma_mises</td>
-<td class="fielddoc">
-the number of times the TDMA fully missed its slots </td></tr>
-<tr><td class="fieldtype">
-<a id="ab5ee7e0c23a7078a25cce1324aaeba64"></a>uint32_t</td>
+<a id="a9381d8e99b4a3369d547b4acd10c3b3d"></a>uint32_t</td>
 <td class="fieldname">
 max_backgrounds_queued</td>
 <td class="fielddoc">
 Maximum backgrounds queued. </td></tr>
 <tr><td class="fieldtype">
-<a id="ac78a4fc6fd2e44b01c34688b09a76f89"></a>uint32_t</td>
+<a id="ad8a8981effe382266cc0a6387e818005"></a>uint32_t</td>
 <td class="fieldname">
 n_background_queue_overloads</td>
 <td class="fielddoc">
@@ -354,7 +272,7 @@ Background queue overloads. </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>values for the priority for each callback </p>
+<p>Identify the priorities for all tasks. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12"></a>MULTICAST&#160;</td><td class="fielddoc"><p>Multicast packet reception uses the FIQ. </p>
 </td></tr>
@@ -366,7 +284,7 @@ Background queue overloads. </td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00093">93</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00055">55</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -395,7 +313,7 @@ Background queue overloads. </td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Callback to store provenance data (format: <a class="el" href="c__main_8c.html#structneuron__provenance" title="The provenance information written on application shutdown.">neuron_provenance</a>). </p>
+<p>Callback to store provenance data (format: <a class="el" href="structneuron__provenance.html" title="The provenance information provided by neurons.">neuron_provenance</a>). </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">provenance_region</td><td>Where to write the provenance data </td></tr>
@@ -403,38 +321,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00145">145</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
-
-</div>
-</div>
-<a id="abc8ec4992e18193766cc267a4968f1d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc8ec4992e18193766cc267a4968f1d7">&#9670;&nbsp;</a></span>initialise()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool initialise </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialises the model by reading in the regions and checking recording data. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if it successfully initialised, false otherwise </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00177">177</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00121">121</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -464,7 +351,7 @@ Background queue overloads. </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Background activites called from timer. </p>
+<p>Background activities called from timer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir"></td><td class="paramname">timer_count</td><td>the number of times this call back has been executed since start of simulation </td></tr>
@@ -473,7 +360,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00302">302</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00164">164</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
@@ -512,34 +399,175 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00339">339</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00182">182</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="abc8ec4992e18193766cc267a4968f1d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc8ec4992e18193766cc267a4968f1d7">&#9670;&nbsp;</a></span>initialise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool initialise </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialises the model by reading in the regions and checking recording data. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if it successfully initialised, false otherwise </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00238">238</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a5d218df3d38c1fe5b37eb202ddd28700"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d218df3d38c1fe5b37eb202ddd28700">&#9670;&nbsp;</a></span>global_timer_count</h2>
+<a id="ac4b08337fb78e995265b4091aeeb3543"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4b08337fb78e995265b4091aeeb3543">&#9670;&nbsp;</a></span>COMMON_REGIONS</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> global_timer_count</td>
+          <td class="memname">const struct <a class="el" href="structcommon__regions.html">common_regions</a> COMMON_REGIONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .system = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/command__sender__multicast__source_8c.html#a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f">SYSTEM_REGION</a>,</div>
+<div class="line">    .provenance = PROVENANCE_DATA_REGION,</div>
+<div class="line">    .profiler = PROFILER_REGION,</div>
+<div class="line">    .recording = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd">RECORDING_REGION</a></div>
+<div class="line">}</div>
+<div class="ttc" id="acommand__sender__multicast__source_8c_html_a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/command__sender__multicast__source_8c.html#a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f">SYSTEM_REGION</a></div><div class="ttdeci">SYSTEM_REGION</div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd">RECORDING_REGION</a></div><div class="ttdeci">@ RECORDING_REGION</div><div class="ttdoc">general recording data; 15</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00043">regions.h:42</a></div></div>
+</div><!-- fragment -->
+<p>From the regions, extract those that are common. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00001">1</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="ab8a24477bf90774dbe741f1aa007d394"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8a24477bf90774dbe741f1aa007d394">&#9670;&nbsp;</a></span>COMMON_PRIORITIES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="structcommon__priorities.html">common_priorities</a> COMMON_PRIORITIES</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .sdp = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2dad645defae8408de2415f3dc417f69773">SDP</a>,</div>
+<div class="line">    .dma = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2da6537a62f6f155792bb9a320ee2ec4d68">DMA</a>,</div>
+<div class="line">    .timer = <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2da17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a></div>
+<div class="line">}</div>
+<div class="ttc" id="achip__power__monitor_8c_html_a0411cd49bb5b71852cecd93bcbf0ca2da17ba9bae1b8d7e8d6c12d46ec58e0769"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2da17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a></div><div class="ttdeci">TIMER</div></div>
+<div class="ttc" id="achip__power__monitor_8c_html_a0411cd49bb5b71852cecd93bcbf0ca2da6537a62f6f155792bb9a320ee2ec4d68"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2da6537a62f6f155792bb9a320ee2ec4d68">DMA</a></div><div class="ttdeci">DMA</div></div>
+<div class="ttc" id="achip__power__monitor_8c_html_a0411cd49bb5b71852cecd93bcbf0ca2dad645defae8408de2415f3dc417f69773"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/chip__power__monitor_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2dad645defae8408de2415f3dc417f69773">SDP</a></div><div class="ttdeci">SDP</div></div>
+</div><!-- fragment -->
+<p>Identify the priorities of the common tasks. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00001">1</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="a36f1dda69af112b3e9f1fcc7d708aa53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36f1dda69af112b3e9f1fcc7d708aa53">&#9670;&nbsp;</a></span>NEURON_REGIONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="structneuron__regions.html">neuron_regions</a> NEURON_REGIONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .neuron_params = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8">NEURON_PARAMS_REGION</a>,</div>
+<div class="line">    .neuron_recording = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a></div>
+<div class="line">}</div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8">NEURON_PARAMS_REGION</a></div><div class="ttdeci">@ NEURON_PARAMS_REGION</div><div class="ttdoc">neuron parameters; 1</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00028">regions.h:28</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad275180dd412ee1f4d842871435e2440">NEURON_RECORDING_REGION</a></div><div class="ttdeci">@ NEURON_RECORDING_REGION</div><div class="ttdoc">recording; 7</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00034">regions.h:34</a></div></div>
+</div><!-- fragment -->
+<p>From the regions, extract those that are neuron-specific. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00001">1</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="aabee4d4d7d12350e84247cd6af69d388"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabee4d4d7d12350e84247cd6af69d388">&#9670;&nbsp;</a></span>SYNAPSE_REGIONS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="structsynapse__regions.html">synapse_regions</a> SYNAPSE_REGIONS</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    .synapse_params = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80">SYNAPSE_PARAMS_REGION</a>,</div>
+<div class="line">    .direct_matrix = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f">DIRECT_MATRIX_REGION</a>,</div>
+<div class="line">    .synaptic_matrix = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061">SYNAPTIC_MATRIX_REGION</a>,</div>
+<div class="line">    .pop_table = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6aa5d73e2f95ea7659b63a96ada14f5389">POPULATION_TABLE_REGION</a>,</div>
+<div class="line">    .synapse_dynamics = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b">SYNAPSE_DYNAMICS_REGION</a>,</div>
+<div class="line">    .structural_dynamics = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6acd7db540d3cd331b92037b99a0447167">STRUCTURAL_DYNAMICS_REGION</a>,</div>
+<div class="line">    .bitfield_filter = <a class="code" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a34f5ecbcfa6c6469d2e5d1fbbae9a55b">BIT_FIELD_FILTER_REGION</a></div>
+<div class="line">}</div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a34f5ecbcfa6c6469d2e5d1fbbae9a55b"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a34f5ecbcfa6c6469d2e5d1fbbae9a55b">BIT_FIELD_FILTER_REGION</a></div><div class="ttdeci">@ BIT_FIELD_FILTER_REGION</div><div class="ttdoc">bitfield filter; 12</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00039">regions.h:39</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80">SYNAPSE_PARAMS_REGION</a></div><div class="ttdeci">@ SYNAPSE_PARAMS_REGION</div><div class="ttdoc">synapse parameters; 2</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00029">regions.h:29</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f">DIRECT_MATRIX_REGION</a></div><div class="ttdeci">@ DIRECT_MATRIX_REGION</div><div class="ttdoc">direct synaptic matrix; 11</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00038">regions.h:38</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6aa5d73e2f95ea7659b63a96ada14f5389"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6aa5d73e2f95ea7659b63a96ada14f5389">POPULATION_TABLE_REGION</a></div><div class="ttdeci">@ POPULATION_TABLE_REGION</div><div class="ttdoc">master population table; 3</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00030">regions.h:30</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b">SYNAPSE_DYNAMICS_REGION</a></div><div class="ttdeci">@ SYNAPSE_DYNAMICS_REGION</div><div class="ttdoc">synapse dynamics; 5</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00032">regions.h:32</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6acd7db540d3cd331b92037b99a0447167"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6acd7db540d3cd331b92037b99a0447167">STRUCTURAL_DYNAMICS_REGION</a></div><div class="ttdeci">@ STRUCTURAL_DYNAMICS_REGION</div><div class="ttdoc">structural dynamics; 6</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00033">regions.h:33</a></div></div>
+<div class="ttc" id="aregions_8h_html_a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061"><div class="ttname"><a href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061">SYNAPTIC_MATRIX_REGION</a></div><div class="ttdeci">@ SYNAPTIC_MATRIX_REGION</div><div class="ttdoc">synaptic matrix; 4</div><div class="ttdef"><b>Definition:</b> <a href="regions_8h_source.html#l00031">regions.h:31</a></div></div>
+</div><!-- fragment -->
+<p>From the regions, extract those that are synapse-specific. </p>
+
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00001">1</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+
+</div>
+</div>
+<a id="ae73654f333e4363463ad8c594eca1905"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae73654f333e4363463ad8c594eca1905">&#9670;&nbsp;</a></span>time</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t time</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>timer count for tdma of certain models; exported </p>
-<p>setup from c_main </p>
+<p>The current timer tick value. </p>
+<p>Declare that time exists. </p>
 
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00140">140</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00093">93</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

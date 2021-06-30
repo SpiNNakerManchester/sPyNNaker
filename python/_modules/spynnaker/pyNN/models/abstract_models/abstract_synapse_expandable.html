@@ -51,7 +51,8 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.require_subclass</span> <span class="kn">import</span> <span class="n">require_subclass</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine.machine_vertex</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 
@@ -63,9 +64,6 @@
     <span class="sd">&quot;&quot;&quot; Indicates a class (a \</span>
 <span class="sd">        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \</span>
 <span class="sd">        that has may need to run the SYNAPSE_EXPANDER aplx</span>
-
-<span class="sd">    Cores that do not use the synapse_manager should not implement this</span>
-<span class="sd">    API even though their app vertex may hold a synapse_manager.</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        This is *not* implemented by the</span>
@@ -87,13 +85,18 @@
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">connection_generator_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The region containing the parameters of synaptic expansion</span>
+
+<span class="sd">        :rtype: int</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="AbstractSynapseExpandable.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fill in the connection holders</span>
-
-<span class="sd">        .. note::</span>
-<span class="sd">            The typical implementation for this method will be to ask the</span>
-<span class="sd">            app_vertex&#39;s synapse_manager</span>
 
 <span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
 <span class="sd">            How the data is to be read</span>

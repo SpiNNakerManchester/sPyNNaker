@@ -109,7 +109,7 @@
 <span class="sd">        :param AbstractTimingDependence timing_dependence:</span>
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
 <span class="sd">        :param None voltage_dependence: not supported</span>
-<span class="sd">        :param float dendritic_delay_fraction: [0.5, 1.0]</span>
+<span class="sd">        :param float dendritic_delay_fraction: must be 1.0!</span>
 <span class="sd">        :param float weight:</span>
 <span class="sd">        :param delay: Use ``None`` to get the simulator default minimum delay.</span>
 <span class="sd">        :type delay: float or None</span>
@@ -139,9 +139,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="n">backprop_delay</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;dendritic_delay_fraction must be in the interval [0.5, 1.0]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;All delays must be dendritic!&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -363,17 +362,10 @@
         <span class="n">n_neuron_id_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="n">neuron_id_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_neuron_id_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="n">dendritic_delays</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span><span class="p">)</span>
-        <span class="n">axonal_delays</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span><span class="p">))</span>
-
         <span class="c1"># Get the fixed data</span>
         <span class="n">fixed_plastic</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">((</span><span class="n">dendritic_delays</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span> <span class="o">&lt;&lt;</span>
+            <span class="p">(</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span> <span class="o">&lt;&lt;</span>
              <span class="p">(</span><span class="n">n_neuron_id_bits</span> <span class="o">+</span> <span class="n">n_synapse_type_bits</span><span class="p">))</span> <span class="o">|</span>
-            <span class="p">((</span><span class="n">axonal_delays</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span><span class="p">)</span> <span class="o">&lt;&lt;</span>
-             <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="n">n_neuron_id_bits</span> <span class="o">+</span> <span class="n">n_synapse_type_bits</span><span class="p">))</span> <span class="o">|</span>
             <span class="p">(</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span>
              <span class="o">&lt;&lt;</span> <span class="n">n_neuron_id_bits</span><span class="p">)</span> <span class="o">|</span>
             <span class="p">((</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span> <span class="o">-</span>
@@ -488,9 +480,8 @@
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">data_fixed</span> <span class="o">&amp;</span> <span class="n">neuron_id_mask</span><span class="p">)</span> <span class="o">+</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pp_half_words</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data_fixed</span> <span class="o">&gt;&gt;</span> <span class="p">(</span>
-            <span class="n">n_neuron_id_bits</span> <span class="o">+</span> <span class="n">n_synapse_type_bits</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xF</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">][</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span>
+        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_fixed</span> <span class="o">&gt;&gt;</span> <span class="p">(</span>
+            <span class="n">n_neuron_id_bits</span> <span class="o">+</span> <span class="n">n_synapse_type_bits</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">connections</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_weight_mean">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">)</span>
@@ -567,7 +558,7 @@
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_header_bytes</span> <span class="o">//</span> <span class="n">BYTES_PER_SHORT</span><span class="p">,</span>
             <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">(),</span>
-            <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
+            <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span>

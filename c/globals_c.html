@@ -71,9 +71,11 @@ $(function() {
 , <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">bit_field_expander.c</a>
 , <a class="el" href="synapse__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">synapse_expander.c</a>
 , <a class="el" href="delay__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">delay_expander.c</a>
-, <a class="el" href="robot__motor__control_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">robot_motor_control.c</a>
-, <a class="el" href="c__main_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main.c</a>
 , <a class="el" href="spike__source__poisson_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">spike_source_poisson.c</a>
+, <a class="el" href="c__main__synapses_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main_synapses.c</a>
+, <a class="el" href="c__main__neurons_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main_neurons.c</a>
+, <a class="el" href="c__main_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main.c</a>
+, <a class="el" href="robot__motor__control_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">robot_motor_control.c</a>
 </li>
 <li>c_main_store_provenance_data()
 : <a class="el" href="c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487">c_main.c</a>
@@ -81,6 +83,8 @@ $(function() {
 </li>
 <li>callback_priorities
 : <a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">c_main.c</a>
+, <a class="el" href="c__main__neurons_8c.html#a65b19dabf5283c1ea37df964ca25e964">c_main_neurons.c</a>
+, <a class="el" href="c__main__synapses_8c.html#a65b19dabf5283c1ea37df964ca25e964">c_main_synapses.c</a>
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964">spike_source_poisson.c</a>
 </li>
 <li>can_run
@@ -96,8 +100,18 @@ $(function() {
 : <a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a4984f59c2d1880d5dd6b2f81c3bd932b">munich_protocol.h</a>
 </li>
 <li>clear_input_buffers_of_late_packets
-: <a class="el" href="delay__extension_8c.html#a6553b0c9813c830009e32639e34855a2">delay_extension.c</a>
-, <a class="el" href="spike__processing_8c.html#a6553b0c9813c830009e32639e34855a2">spike_processing.c</a>
+: <a class="el" href="spike__processing_8c.html#a6553b0c9813c830009e32639e34855a2">spike_processing.c</a>
+, <a class="el" href="delay__extension_8c.html#a6553b0c9813c830009e32639e34855a2">delay_extension.c</a>
+</li>
+<li>COMMON_PRIORITIES
+: <a class="el" href="c__main_8c.html#ab8a24477bf90774dbe741f1aa007d394">c_main.c</a>
+, <a class="el" href="c__main__neurons_8c.html#ab8a24477bf90774dbe741f1aa007d394">c_main_neurons.c</a>
+, <a class="el" href="c__main__synapses_8c.html#ab8a24477bf90774dbe741f1aa007d394">c_main_synapses.c</a>
+</li>
+<li>COMMON_REGIONS
+: <a class="el" href="c__main_8c.html#ac4b08337fb78e995265b4091aeeb3543">c_main.c</a>
+, <a class="el" href="c__main__neurons_8c.html#ac4b08337fb78e995265b4091aeeb3543">c_main_neurons.c</a>
+, <a class="el" href="c__main__synapses_8c.html#ac4b08337fb78e995265b4091aeeb3543">c_main_synapses.c</a>
 </li>
 <li>CONFIGURE_MASTER_KEY
 : <a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a635089693fa56b24e14b697b004fc204">munich_protocol.h</a>
@@ -187,7 +201,7 @@ $(function() {
 : <a class="el" href="regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6adb65127156b69789622d7edc85785aa9">regions.h</a>
 </li>
 <li>CONSTANT
-: <a class="el" href="param__generator_8c.html#a385c44f6fb256e5716a2302a5b940388a83972670b57415508523b5641bb46116">param_generator.c</a>
+: <a class="el" href="param__generator_8c.html#ac36f475ca5b446f4fde4c9b90bec77c8a83972670b57415508523b5641bb46116">param_generator.c</a>
 </li>
 <li>continue_if_not_different
 : <a class="el" href="robot__motor__control_8c.html#a6526db077be7f7eaa67bf3bf25800eeb">robot_motor_control.c</a>
@@ -201,9 +215,6 @@ $(function() {
 <li>count_input_buffer_packets_late
 : <a class="el" href="delay__extension_8c.html#aec7439b9895311b77cf2ee71500b4206">delay_extension.c</a>
 , <a class="el" href="spike__processing_8c.html#aec7439b9895311b77cf2ee71500b4206">spike_processing.c</a>
-</li>
-<li>count_rewire_attempts
-: <a class="el" href="c__main_8c.html#a113643d98988bc0d1706e0b21d7b4a4e">c_main.c</a>
 </li>
 <li>COUNTER_SATURATION_VALUE
 : <a class="el" href="delay__extension_8c.html#a7857bce08704e7040406ce50c0fd52b7">delay_extension.c</a>
@@ -221,7 +232,7 @@ $(function() {
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:45 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

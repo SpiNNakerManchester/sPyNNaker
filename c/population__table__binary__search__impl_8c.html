@@ -219,9 +219,8 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a1002add104ecafe843ef47eadf096e0d">next_item</a> = 0</td></tr>
 <tr class="memdesc:a1002add104ecafe843ef47eadf096e0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the index for the next item in the <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a> <br /></td></tr>
 <tr class="separator:a1002add104ecafe843ef47eadf096e0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memItemLeft" align="right" valign="top"><a id="aebd5b17aab1bbe44fa564e8786f84d94"></a>
-static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#aebd5b17aab1bbe44fa564e8786f84d94">items_to_go</a> = 0</td></tr>
-<tr class="memdesc:aebd5b17aab1bbe44fa564e8786f84d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of relevant items remaining in the <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a>. <br /></td></tr>
+<tr class="memitem:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#aebd5b17aab1bbe44fa564e8786f84d94">items_to_go</a> = 0</td></tr>
+<tr class="memdesc:aebd5b17aab1bbe44fa564e8786f84d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of addresses from the same spike left to process.  <a href="population__table__binary__search__impl_8c.html#aebd5b17aab1bbe44fa564e8786f84d94">More...</a><br /></td></tr>
 <tr class="separator:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5132d7f50c964c1994dcefe0a008a88"><td class="memItemLeft" align="right" valign="top"><a id="af5132d7f50c964c1994dcefe0a008a88"></a>
 static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#af5132d7f50c964c1994dcefe0a008a88">connectivity_bit_field</a> = <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
@@ -484,7 +483,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a direct row address </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00150">150</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00151">151</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -521,7 +520,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a row address (which is an offset) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00159">159</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00160">160</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -558,7 +557,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a row address </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00166">166</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00167">167</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -596,7 +595,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the row length </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00176">176</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00177">177</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -644,7 +643,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the source core index in the list of source cores </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00184">184</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00185">185</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -692,7 +691,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the base neuron number of this core </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00192">192</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00193">193</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -740,7 +739,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the base bitfield bit index of this core </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00201">201</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00202">202</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -788,7 +787,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the neuron ID </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00209">209</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00210">210</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -843,7 +842,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the source neuron id local to the core </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00220">220</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00221">221</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -874,7 +873,7 @@ data[]</td>
 <p>Prints the master pop table. </p>
 <p>For debugging </p>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00227">227</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00228">228</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -922,7 +921,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>: Whether the key matches the entry </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00262">262</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00263">263</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -983,7 +982,7 @@ data[]</td>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00272">272</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00273">273</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1011,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00293">293</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00294">294</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1060,7 +1059,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a matching entry, False otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00384">384</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00385">385</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1114,7 +1113,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the table was initialised successfully, False otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00411">411</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00412">412</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1161,7 +1160,7 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00471">471</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00472">472</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -1208,11 +1207,30 @@ data[]</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00548">548</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00552">552</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="aebd5b17aab1bbe44fa564e8786f84d94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebd5b17aab1bbe44fa564e8786f84d94">&#9670;&nbsp;</a></span>items_to_go</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t items_to_go = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The number of addresses from the same spike left to process. </p>
+<p>The number of relevant items remaining in the <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a> NOTE: Exported for speed of check </p>
+
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00126">126</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+
+</div>
+</div>
 <a id="a40086bc81cde7081da9ed9b52b6bfaff"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a40086bc81cde7081da9ed9b52b6bfaff">&#9670;&nbsp;</a></span>invalid_master_pop_hits</h2>
 
@@ -1228,14 +1246,14 @@ data[]</td>
 <p>the number of times packet isnt in the master pop table at all! </p>
 <p>the number of times packet isn't in the master pop table at all! </p>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00134">134</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00135">135</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

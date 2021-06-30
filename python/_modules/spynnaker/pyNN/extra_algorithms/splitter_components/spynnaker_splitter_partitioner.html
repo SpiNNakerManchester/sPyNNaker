@@ -53,6 +53,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 <span class="kn">from</span> <span class="nn">pacman.operations.partition_algorithms</span> <span class="kn">import</span> <span class="n">SplitterPartitioner</span>
+<span class="kn">from</span> <span class="nn">data_specification</span> <span class="kn">import</span> <span class="n">ReferenceContext</span>
 
 
 <span class="k">class</span> <span class="nc">SpynnakerSplitterPartitioner</span><span class="p">(</span><span class="n">SplitterPartitioner</span><span class="p">):</span>
@@ -75,9 +76,10 @@
 <span class="sd">        :raise PacmanPartitionException: when it cant partition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># do partitioning in same way</span>
-        <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
-            <span class="n">app_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">plan_n_time_steps</span><span class="p">,</span> <span class="n">pre_allocated_resources</span><span class="p">)</span>
+        <span class="c1"># do partitioning in same way, but in a context of references</span>
+        <span class="k">with</span> <span class="n">ReferenceContext</span><span class="p">():</span>
+            <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+                <span class="n">app_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">plan_n_time_steps</span><span class="p">,</span> <span class="n">pre_allocated_resources</span><span class="p">)</span>
 
         <span class="c1"># return the accepted things</span>
         <span class="k">return</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">chips_used</span></div>

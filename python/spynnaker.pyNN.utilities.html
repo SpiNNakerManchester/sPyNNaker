@@ -116,14 +116,11 @@ bit_field_key, structural region)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_bit_field_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_bit_field_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>estimates the SDRAM for the bit field region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – app vertex</p></li>
-</ul>
+<dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the estimated number of bytes used by the bit field region</p>
@@ -136,14 +133,11 @@ bit_field_key, structural region)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_key_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_key_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_key_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_key_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets an estimate of the bitfield builder region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – app vertex</p></li>
-</ul>
+<dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>SDRAM needed</p>
@@ -156,18 +150,19 @@ bit_field_key, structural region)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">reserve_bit_field_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_key_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#reserve_bit_field_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">reserve_bit_field_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#reserve_bit_field_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>reserves the regions for the bitfields</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – dsg spec writer</p></li>
-<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – machine graph</p></li>
-<li><p><strong>n_key_map</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.AbstractMachinePartitionNKeysMap" title="(in PACMAN v6.0)"><em>AbstractMachinePartitionNKeysMap</em></a>) – map between partitions and n keys</p></li>
-<li><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – machine vertex</p></li>
+<li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
 <li><p><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the builder region</p></li>
 <li><p><strong>bit_filter_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the bitfield region</p></li>
 <li><p><strong>bit_field_key_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – region id for the key map</p></li>
+<li><p><strong>bit_field_builder_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Reference to give the region, or None if not referencable</p></li>
+<li><p><strong>bit_filter_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Reference to give the region, or None if not referencable</p></li>
+<li><p><strong>bit_field_key_region_ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Reference to give the region, or None if not referencable</p></li>
 </ul>
 </dd>
 </dl>
@@ -175,16 +170,15 @@ bit_field_key, structural region)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_key_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes the init data needed for the bitfield generator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data spec writer</p></li>
-<li><p><strong>machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – machine vertex</p></li>
-<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – machine graph</p></li>
+<li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
+<li><p><strong>vertex_slice</strong> (<em>slice</em>) – The slice of the target vertex</p></li>
 <li><p><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v6.0)"><em>RoutingInfo</em></a>) – keys</p></li>
-<li><p><strong>n_key_map</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.AbstractMachinePartitionNKeysMap" title="(in PACMAN v6.0)"><em>AbstractMachinePartitionNKeysMap</em></a>) – map for edge to n keys</p></li>
 <li><p><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bitfield builder</p></li>
 <li><p><strong>master_pop_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the master pop table</p></li>
 <li><p><strong>synaptic_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the synaptic matrix</p></li>
@@ -225,88 +219,6 @@ bit_field_key, structural region)</p>
 <dd><p>The size of each output spike line</p>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">POPULATION_BASED_REGIONS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/constants.html#POPULATION_BASED_REGIONS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
-<p>Regions for populations.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_BUILDER</span></span><em class="property"> <span class="pre">=</span> <span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_FILTER</span></span><em class="property"> <span class="pre">=</span> <span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_KEY_MAP</span></span><em class="property"> <span class="pre">=</span> <span class="pre">14</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER">
-<span class="sig-name descname"><span class="pre">CONNECTOR_BUILDER</span></span><em class="property"> <span class="pre">=</span> <span class="pre">10</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX">
-<span class="sig-name descname"><span class="pre">DIRECT_MATRIX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">11</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_PARAMS">
-<span class="sig-name descname"><span class="pre">NEURON_PARAMS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_PARAMS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING">
-<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"> <span class="pre">=</span> <span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.POPULATION_TABLE">
-<span class="sig-name descname"><span class="pre">POPULATION_TABLE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.POPULATION_TABLE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING">
-<span class="sig-name descname"><span class="pre">PROFILING</span></span><em class="property"> <span class="pre">=</span> <span class="pre">9</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA">
-<span class="sig-name descname"><span class="pre">PROVENANCE_DATA</span></span><em class="property"> <span class="pre">=</span> <span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS">
-<span class="sig-name descname"><span class="pre">STRUCTURAL_DYNAMICS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS">
-<span class="sig-name descname"><span class="pre">SYNAPSE_DYNAMICS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS">
-<span class="sig-name descname"><span class="pre">SYNAPSE_PARAMS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX">
-<span class="sig-name descname"><span class="pre">SYNAPTIC_MATRIX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYSTEM">
-<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYSTEM" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 <dl class="py data">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.POP_TABLE_MAX_ROW_LENGTH">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">POP_TABLE_MAX_ROW_LENGTH</span></span><em class="property"> <span class="pre">=</span> <span class="pre">256</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POP_TABLE_MAX_ROW_LENGTH" title="Permalink to this definition">¶</a></dt>
@@ -320,10 +232,22 @@ bit_field_key, structural region)</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.SYNAPSE_SDRAM_PARTITION_ID">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">SYNAPSE_SDRAM_PARTITION_ID</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'SDRAM</span> <span class="pre">Synaptic</span> <span class="pre">Inputs'</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.SYNAPSE_SDRAM_PARTITION_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the partition for Synaptic SDRAM</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.SYNAPTIC_ROW_HEADER_WORDS">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">SYNAPTIC_ROW_HEADER_WORDS</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.SYNAPTIC_ROW_HEADER_WORDS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Words: 2 for row length and number of rows and 1 for plastic region size
 (which might be 0)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.WRITE_BANDWIDTH_BYTES_PER_SECOND">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">WRITE_BANDWIDTH_BYTES_PER_SECOND</span></span><em class="property"> <span class="pre">=</span> <span class="pre">262144000</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.WRITE_BANDWIDTH_BYTES_PER_SECOND" title="Permalink to this definition">¶</a></dt>
+<dd><p>The conservative amount of write bandwidth available on a chip</p>
 </dd></dl>
 
 </section>
@@ -1155,6 +1079,20 @@ generator for seeds.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_standard_deviation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_standard_deviation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the standard deviation of a RandomDistribution</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_time_to_write_us</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cores</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_time_to_write_us"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine how long a write of a given number of bytes will take in us</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bytes to transfer</p></li>
+<li><p><strong>n_cores</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – How many cores will be writing at the same time</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

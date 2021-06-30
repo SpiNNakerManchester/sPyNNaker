@@ -61,7 +61,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">helpful_functions</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
@@ -88,6 +88,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">,</span> <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 
 
 <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
@@ -110,12 +113,29 @@
             <span class="p">(</span><span class="n">n_rates</span> <span class="o">*</span> <span class="n">PARAMS_WORDS_PER_RATE</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span></div>
 
 
+<div class="viewcode-block" id="get_sdram_edge_params_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.get_sdram_edge_params_bytes">[docs]</a><span class="k">def</span> <span class="nf">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Gets the size of the Poisson SDRAM region in bytes</span>
+<span class="sd">    :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">SDRAM_EDGE_PARAMS_BASE_BYTES</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT</span><span class="p">)</span></div>
+
+
 <span class="c1"># uint32_t n_rates; uint32_t index</span>
 <span class="n">PARAMS_WORDS_PER_NEURON</span> <span class="o">=</span> <span class="mi">2</span>
 
 <span class="c1"># start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,</span>
 <span class="c1"># sqrt_lambda, isi_val, time_to_spike</span>
 <span class="n">PARAMS_WORDS_PER_RATE</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># The size of each weight to be stored for SDRAM transfers</span>
+<span class="n">SDRAM_EDGE_PARAMS_BYTES_PER_WEIGHT</span> <span class="o">=</span> <span class="n">BYTES_PER_SHORT</span>
+
+<span class="c1"># SDRAM edge param base size:</span>
+<span class="c1"># 1. address, 2. size of transfer,</span>
+<span class="c1"># 3. offset to start writing, 4. VLA of weights (not counted here)</span>
+<span class="n">SDRAM_EDGE_PARAMS_BASE_BYTES</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
 <span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
 <span class="n">_FOUR_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;4I&quot;</span><span class="p">)</span>
@@ -126,14 +146,16 @@
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
         <span class="n">AbstractSupportsDatabaseInjection</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
-        <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
+        <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__buffered_sdram_per_timestep&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_recording&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__minimum_buffer_sdram&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__sdram_partition&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS">[docs]</a>    <span class="k">class</span> <span class="nc">POISSON_SPIKE_SOURCE_REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">SYSTEM_REGION</span> <span class="o">=</span> <span class="mi">0</span>
@@ -142,7 +164,8 @@
         <span class="n">SPIKE_HISTORY_REGION</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">PROFILER_REGION</span> <span class="o">=</span> <span class="mi">5</span>
-        <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">6</span></div>
+        <span class="n">TDMA_REGION</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">SDRAM_EDGE_PARAMS</span> <span class="o">=</span> <span class="mi">7</span></div>
 
     <span class="n">PROFILE_TAG_LABELS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;TIMER&quot;</span><span class="p">,</span>
@@ -179,16 +202,17 @@
     <span class="c1"># 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;</span>
     <span class="c1"># 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;</span>
     <span class="c1"># 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;</span>
-    <span class="c1"># 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;</span>
-    <span class="n">PARAMS_BASE_WORDS</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="c1"># 10. uint32_t max_spikes_per_timestep;</span>
+    <span class="c1"># 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;</span>
+    <span class="n">PARAMS_BASE_WORDS</span> <span class="o">=</span> <span class="mi">14</span>
 
     <span class="c1"># Seed offset in parameters and size on bytes</span>
-    <span class="n">SEED_OFFSET_BYTES</span> <span class="o">=</span> <span class="mi">9</span> <span class="o">*</span> <span class="mi">4</span>
+    <span class="n">SEED_OFFSET_BYTES</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">4</span>
     <span class="n">SEED_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">is_recording</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
@@ -196,6 +220,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__is_recording</span> <span class="o">=</span> <span class="n">is_recording</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slice_index</span> <span class="o">=</span> <span class="n">slice_index</span>
+
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.set_sdram_partition"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.set_sdram_partition">[docs]</a>    <span class="k">def</span> <span class="nf">set_sdram_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdram_partition</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="n">sdram_partition</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">resources_required</span><span class="p">)</span>
@@ -376,7 +405,41 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">TDMA_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">generate_tdma_data_specification_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">vertex_slices</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__slice_index</span><span class="p">))</span>
+
+        <span class="c1"># write SDRAM edge parameters</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span><span class="o">.</span><span class="n">get_sdram_size_of_region_for</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span><span class="o">.</span><span class="n">get_sdram_base_address_for</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+            <span class="c1"># Work out the offset into the data to write from, based on the</span>
+            <span class="c1"># synapse type in use</span>
+            <span class="n">synapse_type</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="n">synapse_type</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+
+            <span class="c1"># If we are here, the connector must be one-to-one so create</span>
+            <span class="c1"># the synapses and then store the scaled weights</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">(</span>
+                <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span>
+                <span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">weight_scales</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span><span class="o">.</span><span class="n">edges</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">weight_scales</span><span class="p">)</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">synapse_type</span><span class="p">]</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">weights</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">padding</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span>
+                <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">weights</span><span class="p">,</span> <span class="n">padding</span><span class="p">))</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">))</span>
 
         <span class="c1"># End-of-Spec:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
@@ -552,6 +615,9 @@
         <span class="c1"># Write the number of sources</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
+        <span class="c1"># Write the maximum spikes per tick</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_spikes_per_ts</span><span class="p">())</span>
+
         <span class="c1"># Write the random seed (4 words), generated randomly!</span>
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">kiss_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">):</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
@@ -592,7 +658,12 @@
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;tdma_region&quot;</span><span class="p">,</span>
             <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span><span class="p">)</span>
 
-        <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
+        <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+
+        <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SDRAM_EDGE_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;sdram edge params&quot;</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_reserve_poisson_params_rates_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Allocate space for the Poisson parameters and rates regions as\</span>
@@ -697,6 +768,14 @@
             <span class="c1"># rewritten when the parameters are loaded</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">time_to_spike</span><span class="o">.</span><span class="n">set_value_by_id</span><span class="p">(</span>
                 <span class="n">i</span><span class="p">,</span> <span class="n">time_to_next_spike</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.sdram_requirement"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.sdram_requirement">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SendsSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">sdram_requirement</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sdram_requirement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdram_machine_edge</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sdram_machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span>
+                      <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sdram_machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_bytes_for_transfer</span>
+        <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+            <span class="s2">&quot;Unknown post vertex type in edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdram_machine_edge</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>

@@ -1896,24 +1896,10 @@
     <name>c_main.c</name>
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>c__main_8c.html</filename>
-    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
     <includes id="regions_8h" name="regions.h" local="yes" imported="no">regions.h</includes>
-    <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
-    <includes id="synapses_8h" name="synapses.h" local="yes" imported="no">synapses.h</includes>
-    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
-    <includes id="population__table_8h" name="population_table.h" local="yes" imported="no">population_table/population_table.h</includes>
-    <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
-    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
     <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
-    <includes id="direct__synapses_8h" name="direct_synapses.h" local="yes" imported="no">direct_synapses.h</includes>
-    <class kind="struct">neuron_provenance</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>NUMBER_OF_REGIONS_TO_RECORD</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a9460522d5774f317649cd352ea6112b0</anchor>
-      <arglist></arglist>
-    </member>
+    <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
+    <class kind="struct">combined_provenance</class>
     <member kind="enumeration">
       <type></type>
       <name>callback_priorities</name>
@@ -1952,18 +1938,18 @@
       <anchor>a1dc4d17392d4c0a6dac7ab12267da487</anchor>
       <arglist>(address_t provenance_region)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>initialise</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>abc8ec4992e18193766cc267a4968f1d7</anchor>
-      <arglist>(void)</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
       <name>resume_callback</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>a8967e8eb09363007076f840186a20995</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>process_ring_buffers</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>a7877934d7f174e52d11945b3a893b7d7</anchor>
       <arglist>(void)</arglist>
     </member>
     <member kind="function">
@@ -1980,12 +1966,47 @@
       <anchor>a217aea663c8dd444052831cbde49bd62</anchor>
       <arglist>(uint timer_count, uint unused)</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>initialise</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>abc8ec4992e18193766cc267a4968f1d7</anchor>
+      <arglist>(void)</arglist>
+    </member>
     <member kind="function">
       <type>void</type>
       <name>c_main</name>
       <anchorfile>c__main_8c.html</anchorfile>
       <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
       <arglist>(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_regions</type>
+      <name>COMMON_REGIONS</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ac4b08337fb78e995265b4091aeeb3543</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_priorities</type>
+      <name>COMMON_PRIORITIES</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ab8a24477bf90774dbe741f1aa007d394</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct neuron_regions</type>
+      <name>NEURON_REGIONS</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>a36f1dda69af112b3e9f1fcc7d708aa53</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct synapse_regions</type>
+      <name>SYNAPSE_REGIONS</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>aabee4d4d7d12350e84247cd6af69d388</anchor>
+      <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -2016,38 +2037,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static int32_t</type>
-      <name>last_rewiring_time</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a1cb8b41466def0e135ca00facead99b8</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static int32_t</type>
-      <name>rewiring_period</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>aa08e7ff835bc68c5a91214035f412894</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static bool</type>
-      <name>rewiring</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a1c0ebb4e72cbc1b6f3da884524a78078</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
       <type>static uint32_t</type>
-      <name>count_rewire_attempts</name>
+      <name>recording_flags</name>
       <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a113643d98988bc0d1706e0b21d7b4a4e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>n_neurons</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a7368643a28282d8b3429f0fb145aa5db</anchor>
+      <anchor>a9a97f21dc7fccaac8071bcd29894bccb</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -2071,11 +2064,320 @@
       <anchor>ac8502bcf887a00b1f6f9193d43365488</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable">
-      <type>uint</type>
-      <name>global_timer_count</name>
+    <member kind="variable" static="yes">
+      <type>static weight_t *</type>
+      <name>ring_buffers</name>
       <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a5d218df3d38c1fe5b37eb202ddd28700</anchor>
+      <anchor>a9d013c2e9d5eddd8472bd57e9b21ff99</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>c_main_neurons.c</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>c__main__neurons_8c.html</filename>
+    <includes id="neuron_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
+    <class kind="struct">sdram_config</class>
+    <class kind="struct">neurons_provenance</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>N_SYNAPTIC_BUFFERS</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a6f2bb64a1d2e6a72f6f5a7fd2133bd37</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>callback_priorities</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>MULTICAST</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SDP</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>DMA</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>TIMER</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>regions</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a4c4786354df7358bf12c3c65069dd8b7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>store_provenance_data</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a6a6f18428eca2d03be2d82834e642876</anchor>
+      <arglist>(address_t provenance_region)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>resume_callback</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a8967e8eb09363007076f840186a20995</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>sum</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a5ffff1e601916bbafe975ffd014d063b</anchor>
+      <arglist>(weight_t *syns)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>timer_callback</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a217aea663c8dd444052831cbde49bd62</anchor>
+      <arglist>(uint timer_count, uint unused)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>initialise</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>abc8ec4992e18193766cc267a4968f1d7</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>c_main</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_regions</type>
+      <name>COMMON_REGIONS</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>ac4b08337fb78e995265b4091aeeb3543</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_priorities</type>
+      <name>COMMON_PRIORITIES</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>ab8a24477bf90774dbe741f1aa007d394</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct neuron_regions</type>
+      <name>NEURON_REGIONS</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a36f1dda69af112b3e9f1fcc7d708aa53</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>time</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>ae73654f333e4363463ad8c594eca1905</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>timer_period</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>ac0c27301e134af3ce80814a553601074</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>simulation_ticks</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a2178bb4764f423b1534a9631b0cc6e5e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>infinite_run</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a9ee6c18f2c55e2b60ea4194d4722f735</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>recording_flags</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a9a97f21dc7fccaac8071bcd29894bccb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static struct sdram_config</type>
+      <name>sdram_inputs</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a9f249060c5bd10f51d18ac31811e335a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static weight_t *</type>
+      <name>synaptic_contributions</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a7ec04742355ddb6ef2646f8fe73537f3</anchor>
+      <arglist>[N_SYNAPTIC_BUFFERS]</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>timer_overruns</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>ab906ad7ebd877998e633aab4cea0f532</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static union @7</type>
+      <name>all_synaptic_contributions</name>
+      <anchorfile>c__main__neurons_8c.html</anchorfile>
+      <anchor>a929e7d4597a748597e4570ea31dc44ac</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>c_main_synapses.c</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>c__main__synapses_8c.html</filename>
+    <includes id="spike__processing__fast_8h" name="spike_processing_fast.h" local="yes" imported="no">spike_processing_fast.h</includes>
+    <includes id="synaptogenesis__dynamics_8h" name="synaptogenesis_dynamics.h" local="yes" imported="no">structural_plasticity/synaptogenesis_dynamics.h</includes>
+    <class kind="struct">provenance_data</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>callback_priorities</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>MULTICAST</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SDP</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>DMA</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>TIMER</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>regions</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a4c4786354df7358bf12c3c65069dd8b7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>store_provenance_data</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a6a6f18428eca2d03be2d82834e642876</anchor>
+      <arglist>(address_t provenance_region)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>resume_callback</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a8967e8eb09363007076f840186a20995</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>initialise</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>abc8ec4992e18193766cc267a4968f1d7</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>c_main</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_regions</type>
+      <name>COMMON_REGIONS</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>ac4b08337fb78e995265b4091aeeb3543</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct common_priorities</type>
+      <name>COMMON_PRIORITIES</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>ab8a24477bf90774dbe741f1aa007d394</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>const struct synapse_regions</type>
+      <name>SYNAPSE_REGIONS</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>aabee4d4d7d12350e84247cd6af69d388</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>time</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>ae73654f333e4363463ad8c594eca1905</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>timer_period</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>ac0c27301e134af3ce80814a553601074</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>simulation_ticks</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a2178bb4764f423b1534a9631b0cc6e5e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>infinite_run</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a9ee6c18f2c55e2b60ea4194d4722f735</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>recording_flags</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>a9a97f21dc7fccaac8071bcd29894bccb</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -2203,11 +2505,11 @@
       <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
+      <type>static void</type>
       <name>neuron_impl_do_timestep_update</name>
       <anchorfile>neuron__impl_8h.html</anchorfile>
-      <anchor>a21f9a596a5048838a60fee323e466314</anchor>
-      <arglist>(index_t neuron_index, input_t external_bias)</arglist>
+      <anchor>a5c11520af8e2915ec00d5dc1edcd8b36</anchor>
+      <arglist>(uint32_t timer_count, uint32_t time, uint32_t n_neurons)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -2408,11 +2710,11 @@
       <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static bool</type>
+      <type>static void</type>
       <name>neuron_impl_do_timestep_update</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a21f9a596a5048838a60fee323e466314</anchor>
-      <arglist>(index_t neuron_index, input_t external_bias)</arglist>
+      <anchor>a5c11520af8e2915ec00d5dc1edcd8b36</anchor>
+      <arglist>(uint32_t timer_count, uint32_t time, uint32_t n_neurons)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -2489,13 +2791,6 @@
       <name>n_steps_per_timestep</name>
       <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
       <anchor>adc2145aaa2f8435401d2c077d42c7b91</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint</type>
-      <name>global_timer_count</name>
-      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
-      <anchor>a5d218df3d38c1fe5b37eb202ddd28700</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -2623,13 +2918,6 @@
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a72b0028625c6e3cad1e4176bdba1b44e</anchor>
       <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>neuron_impl_do_timestep_update</name>
-      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
-      <anchor>a21f9a596a5048838a60fee323e466314</anchor>
-      <arglist>(index_t neuron_index, input_t external_bias)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -2916,25 +3204,25 @@
       <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
       <arglist>(const global_neuron_params_t *params)</arglist>
     </member>
-    <member kind="function">
-      <type>state_t</type>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
       <name>neuron_model_state_update</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a452331c36f58a564227b5d2a3a20bd3f</anchor>
+      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
       <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_model_has_spiked</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a49c629814dc187dc38a4b8f0dbebd111</anchor>
+      <anchor>a6d9e95529a2c510cc1010163f9ea89ee</anchor>
       <arglist>(neuron_t *restrict neuron)</arglist>
     </member>
-    <member kind="function">
-      <type>state_t</type>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
       <name>neuron_model_get_membrane_voltage</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a91774a9b87c1875fcb7659fe0f096857</anchor>
+      <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
     <member kind="function">
@@ -2957,40 +3245,12 @@
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__izh__impl_8c.html</filename>
     <includes id="neuron__model__izh__impl_8h" name="neuron_model_izh_impl.h" local="yes" imported="no">neuron_model_izh_impl.h</includes>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>rk2_kernel_midpoint</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>ae9b257f5e4059af3a5fa30730512f2b6</anchor>
-      <arglist>(REAL h, neuron_t *neuron, REAL input_this_timestep)</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
       <name>neuron_model_set_global_neuron_params</name>
       <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
       <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
       <arglist>(const global_neuron_params_t *params)</arglist>
-    </member>
-    <member kind="function">
-      <type>state_t</type>
-      <name>neuron_model_state_update</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a452331c36f58a564227b5d2a3a20bd3f</anchor>
-      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_has_spiked</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a49c629814dc187dc38a4b8f0dbebd111</anchor>
-      <arglist>(neuron_t *restrict neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>state_t</type>
-      <name>neuron_model_get_membrane_voltage</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a91774a9b87c1875fcb7659fe0f096857</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3006,25 +3266,11 @@
       <anchor>a645937167c46b7556757b05250f9864d</anchor>
       <arglist>(const neuron_t *neuron)</arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static const global_neuron_params_t *</type>
+    <member kind="variable">
+      <type>const global_neuron_params_t *</type>
       <name>global_params</name>
       <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
       <anchor>a60d02bd3fd0eb5694bf3d08679d4565d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static const REAL</type>
-      <name>SIMPLE_TQ_OFFSET</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>a2a9449a2c1269d81389014e6c2df9573</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static const REAL</type>
-      <name>MAGIC_MULTIPLIER</name>
-      <anchorfile>neuron__model__izh__impl_8c.html</anchorfile>
-      <anchor>adf9a0e8d9c7ec24f407eee48d6064666</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -3035,46 +3281,46 @@
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
     <class kind="struct">neuron_t</class>
     <class kind="struct">global_neuron_params_t</class>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>rk2_kernel_midpoint</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>ae9b257f5e4059af3a5fa30730512f2b6</anchor>
+      <arglist>(REAL h, neuron_t *neuron, REAL input_this_timestep)</arglist>
+    </member>
+    <member kind="variable">
+      <type>const global_neuron_params_t *</type>
+      <name>global_params</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>a60d02bd3fd0eb5694bf3d08679d4565d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const REAL</type>
+      <name>SIMPLE_TQ_OFFSET</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>a2a9449a2c1269d81389014e6c2df9573</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static const REAL</type>
+      <name>MAGIC_MULTIPLIER</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>adf9a0e8d9c7ec24f407eee48d6064666</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>neuron_model_lif_impl.c</name>
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model__lif__impl_8c.html</filename>
     <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="yes" imported="no">neuron_model_lif_impl.h</includes>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>lif_neuron_closed_form</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>acdc543d115e02324c243ebbfdd303214</anchor>
-      <arglist>(neuron_t *neuron, REAL V_prev, input_t input_this_timestep)</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
       <name>neuron_model_set_global_neuron_params</name>
       <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
       <anchor>a2c709e18b3833cf07131b394b0a9b929</anchor>
       <arglist>(const global_neuron_params_t *params)</arglist>
-    </member>
-    <member kind="function">
-      <type>state_t</type>
-      <name>neuron_model_state_update</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a452331c36f58a564227b5d2a3a20bd3f</anchor>
-      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_model_has_spiked</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a49c629814dc187dc38a4b8f0dbebd111</anchor>
-      <arglist>(neuron_t *restrict neuron)</arglist>
-    </member>
-    <member kind="function">
-      <type>state_t</type>
-      <name>neuron_model_get_membrane_voltage</name>
-      <anchorfile>neuron__model__lif__impl_8c.html</anchorfile>
-      <anchor>a91774a9b87c1875fcb7659fe0f096857</anchor>
-      <arglist>(const neuron_t *neuron)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3098,6 +3344,13 @@
     <includes id="neuron__model_8h" name="neuron_model.h" local="yes" imported="no">neuron_model.h</includes>
     <class kind="struct">neuron_t</class>
     <class kind="struct">global_neuron_params_t</class>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>lif_neuron_closed_form</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>acdc543d115e02324c243ebbfdd303214</anchor>
+      <arglist>(neuron_t *neuron, REAL V_prev, input_t input_this_timestep)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>neuron.c</name>
@@ -3108,40 +3361,33 @@
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">implementations/neuron_impl.h</includes>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
     <class kind="struct">neuron_parameters</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>START_OF_GLOBAL_PARAMETERS</name>
-      <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a0bc6b385c441f8307f938c6c297d8d2a</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>neuron_load_neuron_parameters</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a689028531d4e9bfda09a807e264f7535</anchor>
-      <arglist>(address_t address)</arglist>
+      <anchor>a9f74a3915bdd91fc758c4682c54568a5</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>neuron_resume</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a2511f7541e414899ee44c6260214c6c8</anchor>
-      <arglist>(address_t address)</arglist>
+      <anchor>aab8eb2155951459c0acf8b990dd29e69</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a4fdcd7dcb9b2ef272ba324a7ee58949f</anchor>
-      <arglist>(address_t address, address_t recording_address, uint32_t *n_neurons_value, uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>a787b293eaff911e182c965c07e16e889</anchor>
+      <arglist>(address_t address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>neuron_pause</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a4ac44865a6edf62cd9e8c3349023b792</anchor>
-      <arglist>(address_t address)</arglist>
+      <anchor>a09464219c59d7e79cbd4cf0acb9f96a1</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3152,10 +3398,10 @@
     </member>
     <member kind="function">
       <type>void</type>
-      <name>neuron_add_inputs</name>
+      <name>neuron_transfer</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>abad40a95ed27eb262884dfd9f59b78d6</anchor>
-      <arglist>(index_t synapse_type_index, index_t neuron_index, input_t weights_this_timestep)</arglist>
+      <anchor>ab711f5128ef4a95c71bd123278bde9eb</anchor>
+      <arglist>(weight_t *syns)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3178,18 +3424,32 @@
       <anchor>a7a4c98f25d6221625769999846e97204</anchor>
       <arglist>(uint32_t synapse_type)</arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static key_t</type>
+    <member kind="variable">
+      <type>key_t</type>
       <name>key</name>
       <anchorfile>neuron_8c.html</anchorfile>
       <anchor>ac8861193246fc34d8f29ac9d57b6791a</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static bool</type>
+    <member kind="variable">
+      <type>bool</type>
       <name>use_key</name>
       <anchorfile>neuron_8c.html</anchorfile>
       <anchor>ab9132b5a04a7bdb8ac2e4293c1ec96bf</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>latest_send_time</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>a4e6ef8511daf9c94c849796f98b2a940</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>earliest_send_time</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>adb470808676e08ce78789a18a99da76e</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -3201,9 +3461,30 @@
     </member>
     <member kind="variable" static="yes">
       <type>static uint32_t</type>
-      <name>recording_flags</name>
+      <name>n_neurons_peak</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a9a97f21dc7fccaac8071bcd29894bccb</anchor>
+      <anchor>a6b1b7d48e24674f12efcb5a84266f969</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_synapse_types</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>adedb27b3ece4d4dece0aee776a136427</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t *</type>
+      <name>ring_buffer_to_input_left_shifts</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>ade696d20461dc712b7daafcbcad6ba4b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static address_t</type>
+      <name>saved_params_address</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>a0a022907f7d958b27b03e3e079108327</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -3211,13 +3492,14 @@
     <name>neuron.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>neuron_8h.html</filename>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>a4fdcd7dcb9b2ef272ba324a7ee58949f</anchor>
-      <arglist>(address_t address, address_t recording_address, uint32_t *n_neurons_value, uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>a787b293eaff911e182c965c07e16e889</anchor>
+      <arglist>(address_t address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3230,22 +3512,22 @@
       <type>bool</type>
       <name>neuron_resume</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>a2511f7541e414899ee44c6260214c6c8</anchor>
-      <arglist>(address_t address)</arglist>
+      <anchor>aab8eb2155951459c0acf8b990dd29e69</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
       <name>neuron_pause</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>a4ac44865a6edf62cd9e8c3349023b792</anchor>
-      <arglist>(address_t address)</arglist>
+      <anchor>a09464219c59d7e79cbd4cf0acb9f96a1</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>neuron_add_inputs</name>
+      <name>neuron_transfer</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>abad40a95ed27eb262884dfd9f59b78d6</anchor>
-      <arglist>(index_t synapse_type_index, index_t neuron_index, input_t weights_this_timestep)</arglist>
+      <anchor>ab711f5128ef4a95c71bd123278bde9eb</anchor>
+      <arglist>(weight_t *syns)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3296,13 +3578,6 @@
       <anchor>a48e4d4f21167fadbe5b44ec1707677fe</anchor>
       <arglist>(void)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_recording_finalise</name>
-      <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a2c849acc5ec34882a4c75f0abbfc8cb0</anchor>
-      <arglist>(void)</arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
       <name>bitfield_data_size</name>
@@ -3342,8 +3617,8 @@
       <type>bool</type>
       <name>neuron_recording_initialise</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a9c2d66e23d2a44bedf3689e782dd0495</anchor>
-      <arglist>(void *recording_address, uint32_t *recording_flags, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>acf13eda07e993e65ef639d2b70d4531b</anchor>
+      <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="variable">
       <type>uint8_t **</type>
@@ -3478,15 +3753,8 @@
       <type>bool</type>
       <name>neuron_recording_initialise</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a9c2d66e23d2a44bedf3689e782dd0495</anchor>
-      <arglist>(void *recording_address, uint32_t *recording_flags, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>neuron_recording_finalise</name>
-      <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a2c849acc5ec34882a4c75f0abbfc8cb0</anchor>
-      <arglist>(void)</arglist>
+      <anchor>acf13eda07e993e65ef639d2b70d4531b</anchor>
+      <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="variable">
       <type>uint8_t **</type>
@@ -3746,13 +4014,6 @@
       <arglist>(uint32_t time, index_t neuron_index)</arglist>
     </member>
     <member kind="function">
-      <type>input_t</type>
-      <name>synapse_dynamics_get_intrinsic_bias</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a06ce5830924c098a9668b25c9f09c7cc</anchor>
-      <arglist>(uint32_t time, index_t neuron_index)</arglist>
-    </member>
-    <member kind="function">
       <type>uint32_t</type>
       <name>synapse_dynamics_get_plastic_pre_synaptic_events</name>
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
@@ -3800,48 +4061,6 @@
       <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
       <anchor>aca5fc1011c991013823ad76158bf57f3</anchor>
       <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_index_bits</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_index_bits</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a840b87d6e981394dff1224fc0b8cd9c3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_index_mask</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a84db6c41c7cf03558016d477d8df4d37</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_index_mask</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>ac3299a10c6a78f6e4f37246ab79a0736</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_delay_index_type_bits</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>a6ee98912aaae99284ae103901c4a6879</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_mask</name>
-      <anchorfile>synapse__dynamics__stdp__mad__impl_8c.html</anchorfile>
-      <anchor>af786c2a0c6f40c688029991d5b9711a7</anchor>
-      <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static stdp_params</type>
@@ -5153,13 +5372,6 @@
       <arglist>(uint32_t time, index_t neuron_index)</arglist>
     </member>
     <member kind="function">
-      <type>input_t</type>
-      <name>synapse_dynamics_get_intrinsic_bias</name>
-      <anchorfile>synapse__dynamics_8h.html</anchorfile>
-      <anchor>a06ce5830924c098a9668b25c9f09c7cc</anchor>
-      <arglist>(uint32_t time, index_t neuron_index)</arglist>
-    </member>
-    <member kind="function">
       <type>void</type>
       <name>synapse_dynamics_print_plastic_synapses</name>
       <anchorfile>synapse__dynamics_8h.html</anchorfile>
@@ -5214,6 +5426,7 @@
     <path>/github/workspace/neural_modelling/src/neuron/plasticity/</path>
     <filename>synapse__dynamics__static__impl_8c.html</filename>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">synapse_dynamics.h</includes>
+    <includes id="synapses_8h" name="synapses.h" local="no" imported="no">neuron/synapses.h</includes>
     <member kind="function">
       <type>bool</type>
       <name>synapse_dynamics_initialise</name>
@@ -5234,13 +5447,6 @@
       <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
       <anchor>aed92420010ba63593b139d59263ee80e</anchor>
       <arglist>(synapse_row_plastic_data_t *plastic_region_data, synapse_row_fixed_part_t *fixed_region, weight_t *ring_buffer, uint32_t time)</arglist>
-    </member>
-    <member kind="function">
-      <type>input_t</type>
-      <name>synapse_dynamics_get_intrinsic_bias</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a06ce5830924c098a9668b25c9f09c7cc</anchor>
-      <arglist>(uint32_t time, index_t neuron_index)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -5291,41 +5497,6 @@
       <anchor>aca5fc1011c991013823ad76158bf57f3</anchor>
       <arglist>(synapse_row_fixed_part_t *fixed)</arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_index_bits</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_index_bits</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a840b87d6e981394dff1224fc0b8cd9c3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_index_mask</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a84db6c41c7cf03558016d477d8df4d37</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_bits</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>af20079aa1e3c31a3efd344176025ce0f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>synapse_type_mask</name>
-      <anchorfile>synapse__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>af786c2a0c6f40c688029991d5b9711a7</anchor>
-      <arglist></arglist>
-    </member>
   </compound>
   <compound kind="file">
     <name>population_table.h</name>
@@ -5352,6 +5523,13 @@
       <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a511a4004e5621e6ec83228d4e4f94672</anchor>
       <arglist>(spike_t spike, synaptic_row_t *row_address, size_t *n_bytes_to_transfer)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>population_table_is_next</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>a6af50f83e29bc2f5340724898921df93</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -5386,6 +5564,13 @@
       <name>bit_field_filtered_packets</name>
       <anchorfile>population__table_8h.html</anchorfile>
       <anchor>a442bf46f572f3fc97a52421b7e1a0f87</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>items_to_go</name>
+      <anchorfile>population__table_8h.html</anchorfile>
+      <anchor>aebd5b17aab1bbe44fa564e8786f84d94</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -5610,8 +5795,8 @@
       <anchor>a1002add104ecafe843ef47eadf096e0d</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint16_t</type>
+    <member kind="variable">
+      <type>uint16_t</type>
       <name>items_to_go</name>
       <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
       <anchor>aebd5b17aab1bbe44fa564e8786f84d94</anchor>
@@ -5927,6 +6112,12 @@
       <anchor>a94cb8426c71368d0a24cf95fcc70a3d6ad5b5a1863e094414c5fd530f7b0c42ff</anchor>
       <arglist></arglist>
     </member>
+    <member kind="enumvalue">
+      <name>RECORDING_REGION</name>
+      <anchorfile>regions_8h.html</anchorfile>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a1fcdb0acbaceba25c8b18313a1efbcbd</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>spike_processing.c</name>
@@ -5981,10 +6172,10 @@
       <arglist>(synaptic_row_t *row, size_t *n_bytes_to_transfer, spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static bool</type>
       <name>setup_synaptic_dma_read</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>ac734bb4c991f89df03bcbe00e1f87a9f</anchor>
+      <anchor>a28d3a38d21ac9445175abd0ca06abd04</anchor>
       <arglist>(dma_buffer *current_buffer, uint32_t *n_rewires, uint32_t *n_synapse_processes)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -5996,9 +6187,23 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
+      <name>start_dma_loop</name>
+      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchor>a15c13024e662ea8b6f65f6a7d4e47d6b</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>multicast_packet_received_callback</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a1b6621acb7633134372e8daa1010b072</anchor>
+      <anchor>a626c5a1b73ac86ddd701e51b776359c7</anchor>
+      <arglist>(uint key, uint unused)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>multicast_packet_pl_received_callback</name>
+      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchor>a83647c826b1e101818defc30a3ab2f09</anchor>
       <arglist>(uint key, uint payload)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -6030,46 +6235,11 @@
       <arglist>(size_t row_max_n_words, uint mc_packet_callback_priority, uint user_event_priority, uint incoming_spike_buffer_size, bool clear_input_buffers_of_late_packets_init, uint32_t packets_per_timestep_region)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_buffer_overflows</name>
+      <type>void</type>
+      <name>spike_processing_store_provenance</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a31a23129c986ef03985d6c245cffb7ce</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_dma_complete_count</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>ab28afe0154629d9ab4edf637ea0c2d7c</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_spike_processing_count</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a7bb0724cd581cb5a97d52fe55957fcc7</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_successful_rewires</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>abe273f1e2f87e852b3a8fc94b7029c60</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_n_packets_dropped_from_lateness</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a6d16db10b568334607d2ff3ac4d0f9eb</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_max_filled_input_buffer_size</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a666a463b005baf510746d159f90318e9</anchor>
-      <arglist>(void)</arglist>
+      <anchor>abb96759bd7b125d191bd87e7055da319</anchor>
+      <arglist>(struct spike_processing_provenance *prov)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6177,10 +6347,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static struct @7</type>
+      <type>static struct @8</type>
       <name>p_per_ts_struct</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>a72e1a0b25adf0ccbc7bc9d9f8ac69570</anchor>
+      <anchor>abee386e9b7c91432c51b469b547918cc</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -6197,6 +6367,7 @@
     <filename>spike__processing_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <class kind="struct">spike_processing_provenance</class>
     <member kind="function">
       <type>bool</type>
       <name>spike_processing_initialise</name>
@@ -6205,32 +6376,11 @@
       <arglist>(size_t row_max_n_bytes, uint mc_packet_callback_priority, uint user_event_priority, uint incoming_spike_buffer_size, bool clear_input_buffers_of_late_packets_init, uint32_t packets_per_timestep_region)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_buffer_overflows</name>
+      <type>void</type>
+      <name>spike_processing_store_provenance</name>
       <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>a31a23129c986ef03985d6c245cffb7ce</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_dma_complete_count</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>ab28afe0154629d9ab4edf637ea0c2d7c</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_spike_processing_count</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>a7bb0724cd581cb5a97d52fe55957fcc7</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_successful_rewires</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>abe273f1e2f87e852b3a8fc94b7029c60</anchor>
-      <arglist>(void)</arglist>
+      <anchor>abb96759bd7b125d191bd87e7055da319</anchor>
+      <arglist>(struct spike_processing_provenance *prov)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -6240,25 +6390,43 @@
       <arglist>(int number_of_rewires)</arglist>
     </member>
     <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_n_packets_dropped_from_lateness</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>a6d16db10b568334607d2ff3ac4d0f9eb</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
       <type>void</type>
       <name>spike_processing_clear_input_buffer</name>
       <anchorfile>spike__processing_8h.html</anchorfile>
       <anchor>aa0ddebf0b174a40cd3406916d98f6352</anchor>
       <arglist>(timer_t time)</arglist>
     </member>
+  </compound>
+  <compound kind="file">
+    <name>spike_processing_fast.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>spike__processing__fast_8h.html</filename>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <includes id="in__spikes_8h" name="in_spikes.h" local="no" imported="no">common/in_spikes.h</includes>
+    <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
+    <class kind="struct">sdram_config</class>
+    <class kind="struct">key_config</class>
+    <class kind="struct">spike_processing_fast_provenance</class>
     <member kind="function">
-      <type>uint32_t</type>
-      <name>spike_processing_get_max_filled_input_buffer_size</name>
-      <anchorfile>spike__processing_8h.html</anchorfile>
-      <anchor>a666a463b005baf510746d159f90318e9</anchor>
-      <arglist>(void)</arglist>
+      <type>bool</type>
+      <name>spike_processing_fast_initialise</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a9675fd66449aa60f08c39561c803ccf9</anchor>
+      <arglist>(uint32_t row_max_n_words, uint32_t spike_buffer_size, bool discard_late_packets, uint32_t pkts_per_ts_rec_region, uint32_t multicast_priority, struct sdram_config sdram_inputs_param, struct key_config key_config_param, weight_t *ring_buffers_param)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>spike_processing_fast_time_step_loop</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a3feb6ea173c87c2b68c1606b751dbc47</anchor>
+      <arglist>(uint32_t time, uint32_t n_rewires)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>spike_processing_fast_store_provenance</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a732f158512c578360e7158b13be86f22</anchor>
+      <arglist>(struct spike_processing_fast_provenance *prov)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -6625,25 +6793,18 @@
       <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
-      <type>int32_t</type>
-      <name>synaptogenesis_rewiring_period</name>
-      <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>afa57eee149b8ef2c30e2239c22f0957e</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>synaptogenesis_is_fast</name>
-      <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>a0d2bd7f05bdc3f4c8ce1ccafc16feb4a</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
       <type>void</type>
       <name>synaptogenesis_spike_received</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
       <anchor>a51fae9acd15ca3ad50a61ce734de93c2</anchor>
       <arglist>(uint32_t time, spike_t spike)</arglist>
+    </member>
+    <member kind="function">
+      <type>uint32_t</type>
+      <name>synaptogenesis_n_updates</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a8a0a440cd05af069b57b447a9cc8ca93</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="variable">
       <type>rewiring_data_t</type>
@@ -6701,6 +6862,13 @@
       <anchor>a4a10759c0e9d46f40f5bdce22d00d454</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>last_rewiring_time</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>aa6d38210641f6270b8c8df58e53cd885</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>synaptogenesis_dynamics.h</name>
@@ -6729,25 +6897,18 @@
       <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
-      <type>int32_t</type>
-      <name>synaptogenesis_rewiring_period</name>
-      <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>afa57eee149b8ef2c30e2239c22f0957e</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>synaptogenesis_is_fast</name>
-      <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
-      <anchor>a0d2bd7f05bdc3f4c8ce1ccafc16feb4a</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
       <type>void</type>
       <name>synaptogenesis_spike_received</name>
       <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
       <anchor>a51fae9acd15ca3ad50a61ce734de93c2</anchor>
       <arglist>(uint32_t time, spike_t spike)</arglist>
+    </member>
+    <member kind="function">
+      <type>uint32_t</type>
+      <name>synaptogenesis_n_updates</name>
+      <anchorfile>synaptogenesis__dynamics_8h.html</anchorfile>
+      <anchor>a8a0a440cd05af069b57b447a9cc8ca93</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -6784,25 +6945,18 @@
       <arglist>(uint32_t time, synaptic_row_t row)</arglist>
     </member>
     <member kind="function">
-      <type>int32_t</type>
-      <name>synaptogenesis_rewiring_period</name>
-      <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>afa57eee149b8ef2c30e2239c22f0957e</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>synaptogenesis_is_fast</name>
-      <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
-      <anchor>a0d2bd7f05bdc3f4c8ce1ccafc16feb4a</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
       <type>void</type>
       <name>synaptogenesis_spike_received</name>
       <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
       <anchor>a51fae9acd15ca3ad50a61ce734de93c2</anchor>
       <arglist>(uint32_t time, spike_t spike)</arglist>
+    </member>
+    <member kind="function">
+      <type>uint32_t</type>
+      <name>synaptogenesis_n_updates</name>
+      <anchorfile>synaptogenesis__dynamics__static__impl_8c.html</anchorfile>
+      <anchor>a8a0a440cd05af069b57b447a9cc8ca93</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -6824,20 +6978,6 @@
       <name>SYNAPSE_WEIGHT_BITS</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
       <anchor>a6e5ee3925245f54cf5f6c4312338c25c</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>SYNAPSE_DELAY_BITS</name>
-      <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a28b2156b2573ab59559866710ed97628</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>SYNAPSE_DELAY_MASK</name>
-      <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a9932d3e682ca42eb572c28a676e4e4b7</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -6928,8 +7068,8 @@
       <type>static index_t</type>
       <name>synapse_row_sparse_delay</name>
       <anchorfile>synapse__row_8h.html</anchorfile>
-      <anchor>a8ac4945585bcd95397c6ab7f57e413f7</anchor>
-      <arglist>(uint32_t x, uint32_t synapse_type_index_bits)</arglist>
+      <anchor>aa94acd48786374e44bc977f6fe4baa36</anchor>
+      <arglist>(uint32_t x, uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static weight_t</type>
@@ -6937,6 +7077,41 @@
       <anchorfile>synapse__row_8h.html</anchorfile>
       <anchor>af7eb0b5869f5256cf8a1343860d8aa21</anchor>
       <arglist>(uint32_t x)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static input_t</type>
+      <name>synapse_row_convert_weight_to_input</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>ae4e41ab174db01514418797dd28118e6</anchor>
+      <arglist>(weight_t weight, uint32_t left_shift)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static index_t</type>
+      <name>synapse_row_get_ring_buffer_index</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>ada89d2ef336aea90633c0db125fe5685</anchor>
+      <arglist>(uint32_t simulation_timestep, uint32_t synapse_type_index, uint32_t neuron_index, uint32_t synapse_type_index_bits, uint32_t synapse_index_bits, uint32_t synapse_delay_mask)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static index_t</type>
+      <name>synapse_row_get_ring_buffer_index_time_0</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>afde1da28f9000c4691897c29e64568b7</anchor>
+      <arglist>(uint32_t synapse_type_index, uint32_t neuron_index, uint32_t synapse_index_bits)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static index_t</type>
+      <name>synapse_row_get_first_ring_buffer_index</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>a11682ae0a4ca3bb9004b9c2ee829a49a</anchor>
+      <arglist>(uint32_t simulation_timestep, uint32_t synapse_type_index_bits, int32_t synapse_delay_mask)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static index_t</type>
+      <name>synapse_row_get_ring_buffer_index_combined</name>
+      <anchorfile>synapse__row_8h.html</anchorfile>
+      <anchor>a8e60d389a3182e12627b3eec89a9dee5</anchor>
+      <arglist>(uint32_t simulation_timestep, uint32_t combined_synapse_neuron_index, uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask)</arglist>
     </member>
     <docanchor file="synapse__row_8h.html" title="Synapse Row Representation">row</docanchor>
     <docanchor file="synapse__row_8h.html" title="Data Structure">matrix</docanchor>
@@ -7620,6 +7795,7 @@
     <includes id="spike__processing_8h" name="spike_processing.h" local="yes" imported="no">spike_processing.h</includes>
     <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
+    <class kind="struct">synapse_params</class>
     <member kind="function" static="yes">
       <type>static const char *</type>
       <name>get_type_char</name>
@@ -7642,17 +7818,10 @@
       <arglist>(uint32_t time)</arglist>
     </member>
     <member kind="function" static="yes">
-      <type>static void</type>
-      <name>print_inputs</name>
-      <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a445b2a82a1dd66ace9f61be6d2fc0bdb</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
+      <type>static bool</type>
       <name>process_fixed_synapses</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a1d201e7f33249ba424c34d09b79e2be2</anchor>
+      <anchor>aa1af43227da048950da85c91ca255075</anchor>
       <arglist>(synapse_row_fixed_part_t *fixed_region, uint32_t time)</arglist>
     </member>
     <member kind="function" static="yes">
@@ -7666,14 +7835,14 @@
       <type>bool</type>
       <name>synapses_initialise</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a5b2663443fdda5a87da4b66e49a5d0e4</anchor>
-      <arglist>(address_t synapse_params_address, uint32_t n_neurons_value, uint32_t n_synapse_types_value, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init)</arglist>
+      <anchor>ab503830b173c644185753159821dbc61</anchor>
+      <arglist>(address_t synapse_params_address, uint32_t *n_neurons_out, uint32_t *n_synapse_types_out, weight_t **ring_buffers_out, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init, uint32_t *incoming_spike_buffer_size)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
-      <name>synapses_do_timestep_update</name>
+      <name>synapses_flush_ring_buffers</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>ad88a7e6b3773f1e0f334b7410f182987</anchor>
+      <anchor>a0eaaa63c7f863ceeb29c428cc67416fe</anchor>
       <arglist>(timer_t time)</arglist>
     </member>
     <member kind="function">
@@ -7692,17 +7861,10 @@
     </member>
     <member kind="function">
       <type>void</type>
-      <name>synapses_flush_ring_buffers</name>
+      <name>synapses_resume</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>a71374045de8f83cde4a8a44bbd421ffd</anchor>
-      <arglist>(void)</arglist>
-    </member>
-    <member kind="function">
-      <type>bool</type>
-      <name>synapses_shut_down</name>
-      <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>ac237268af6684b631aef510cc52fa607</anchor>
-      <arglist>(void)</arglist>
+      <anchor>afbe95bd6dfc5b8703f0fc293891b8f64</anchor>
+      <arglist>(uint32_t time)</arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -7740,52 +7902,73 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>ring_buffer_mask</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>acdc93525768ee5da66223113c456855f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
       <type>static uint32_t *</type>
       <name>ring_buffer_to_input_left_shifts</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>ade696d20461dc712b7daafcbcad6ba4b</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_type_index_bits</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_type_index_mask</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>ac3299a10c6a78f6e4f37246ab79a0736</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_index_bits</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a840b87d6e981394dff1224fc0b8cd9c3</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_index_mask</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a84db6c41c7cf03558016d477d8df4d37</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_type_bits</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>af20079aa1e3c31a3efd344176025ce0f</anchor>
       <arglist></arglist>
     </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>synapse_type_mask</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>af786c2a0c6f40c688029991d5b9711a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_delay_bits</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>ab03dd903d4fed6afbcd9648d49beb9ae</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_delay_mask</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>a2ef4427415ac67eb603a14ca1bb86f83</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -7802,28 +7985,6 @@
     <filename>synapses_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
     <includes id="synapse__row_8h" name="synapse_row.h" local="yes" imported="no">synapse_row.h</includes>
-    <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
-    <member kind="function" static="yes">
-      <type>static index_t</type>
-      <name>synapses_get_ring_buffer_index</name>
-      <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>a3f256864c3f363b43d3b44c939841742</anchor>
-      <arglist>(uint32_t simulation_timestep, uint32_t synapse_type_index, uint32_t neuron_index, uint32_t synapse_type_index_bits, uint32_t synapse_index_bits)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static index_t</type>
-      <name>synapses_get_ring_buffer_index_combined</name>
-      <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>a26a09bf4d0cc9d60690e8a17d5c967cd</anchor>
-      <arglist>(uint32_t simulation_timestep, uint32_t combined_synapse_neuron_index, uint32_t synapse_type_index_bits)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static input_t</type>
-      <name>synapses_convert_weight_to_input</name>
-      <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>ac7151e725b13e2e92e35e95997d41194</anchor>
-      <arglist>(weight_t weight, uint32_t left_shift)</arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static void</type>
       <name>synapses_print_weight</name>
@@ -7835,15 +7996,8 @@
       <type>bool</type>
       <name>synapses_initialise</name>
       <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>afb7de7af1598c0248a5ac78921afadef</anchor>
-      <arglist>(address_t synapse_params_address, uint32_t n_neurons, uint32_t n_synapse_types, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>synapses_do_timestep_update</name>
-      <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>ad88a7e6b3773f1e0f334b7410f182987</anchor>
-      <arglist>(timer_t time)</arglist>
+      <anchor>ab86f19d1020a1bcb82decd7fa71e4075</anchor>
+      <arglist>(address_t synapse_params_address, uint32_t *n_neurons, uint32_t *n_synapse_types, weight_t **ring_buffers, uint32_t **ring_buffer_to_input_buffer_left_shifts, bool *clear_input_buffers_of_late_packets_init, uint32_t *incoming_spike_buffer_size)</arglist>
     </member>
     <member kind="function">
       <type>bool</type>
@@ -7861,17 +8015,73 @@
     </member>
     <member kind="function">
       <type>void</type>
-      <name>synapses_flush_ring_buffers</name>
+      <name>synapses_resume</name>
       <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>a71374045de8f83cde4a8a44bbd421ffd</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a96d59593a4844dc703e540f408d22321</anchor>
+      <arglist>(timer_t time)</arglist>
     </member>
     <member kind="function">
-      <type>bool</type>
-      <name>synapses_shut_down</name>
+      <type>void</type>
+      <name>synapses_flush_ring_buffers</name>
       <anchorfile>synapses_8h.html</anchorfile>
-      <anchor>ac237268af6684b631aef510cc52fa607</anchor>
-      <arglist>(void)</arglist>
+      <anchor>a0eaaa63c7f863ceeb29c428cc67416fe</anchor>
+      <arglist>(timer_t time)</arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_index_bits</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_index_mask</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>ac3299a10c6a78f6e4f37246ab79a0736</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_bits</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a840b87d6e981394dff1224fc0b8cd9c3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_mask</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a84db6c41c7cf03558016d477d8df4d37</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_bits</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>af20079aa1e3c31a3efd344176025ce0f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_mask</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>af786c2a0c6f40c688029991d5b9711a7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_delay_bits</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>ab03dd903d4fed6afbcd9648d49beb9ae</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_delay_mask</name>
+      <anchorfile>synapses_8h.html</anchorfile>
+      <anchor>a2ef4427415ac67eb603a14ca1bb86f83</anchor>
+      <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -8234,9 +8444,11 @@
     <includes id="spike__source_2poisson_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
     <class kind="struct">spike_source_t</class>
     <class kind="struct">timed_out_spikes</class>
+    <class kind="struct">rng_seed_t</class>
     <class kind="struct">global_parameters</class>
     <class kind="struct">poisson_extension_provenance</class>
     <class kind="struct">source_info</class>
+    <class kind="struct">sdram_config</class>
     <member kind="define">
       <type>#define</type>
       <name>NUMBER_OF_REGIONS_TO_RECORD</name>
@@ -8307,6 +8519,12 @@
       <anchor>a1b9edddb3735d131c67e9e824f07c402a3ec559988321d901a9631875c4782ba6</anchor>
       <arglist></arglist>
     </member>
+    <member kind="enumvalue">
+      <name>SDRAM_PARAMS_REGION</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a1b9edddb3735d131c67e9e824f07c402a83adee9297ce4e0afe12a39cc55f4562</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="enumeration">
       <type></type>
       <name>callback_priorities</name>
@@ -8337,6 +8555,27 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769</anchor>
       <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>rng</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a62b426a3cc403e96d3f3c71761cf797d</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>n_spikes_poisson_fast</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a8c3e0a714592b78c4c9677d663ae5868</anchor>
+      <arglist>(UFRACT exp_minus_lambda)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static REAL</type>
+      <name>n_steps_until_next</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a45470e19eabdcc8098607930b8aac481</anchor>
+      <arglist>(void)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -8430,6 +8669,13 @@
       <arglist>(data_specification_metadata_t *ds_regions)</arglist>
     </member>
     <member kind="function" static="yes">
+      <type>static void</type>
+      <name>expand_spike_recording_buffer</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a09166600548501c6befb79b410cdc98a</anchor>
+      <arglist>(uint32_t n_spikes)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static bool</type>
       <name>initialize</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -8449,13 +8695,6 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>ad3f5360b39be7e95723ff26506d24fbe</anchor>
       <arglist>(void)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>expand_spike_recording_buffer</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a09166600548501c6befb79b410cdc98a</anchor>
-      <arglist>(uint32_t n_spikes)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -8512,13 +8751,6 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>aa14f4f1d4c84183b7bf7108bf930a23c</anchor>
       <arglist>(void)</arglist>
-    </member>
-    <member kind="variable">
-      <type>uint</type>
-      <name>ticks</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a7fcd6915876e066781399d7b00f1b1f0</anchor>
-      <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
       <type>static global_parameters</type>
@@ -8602,6 +8834,20 @@
       <name>timer_period</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>ac0c27301e134af3ce80814a553601074</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static struct sdram_config *</type>
+      <name>sdram_inputs</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a8bb39ab6e8cf0cf0547ca94315c69ba6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint16_t *</type>
+      <name>input_this_timestep</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a148ad514a3ea3af1eae2a8a354f242c2</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8688,49 +8934,49 @@
     <member kind="enumvalue">
       <name>ONE_TO_ONE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600adaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388adaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>ALL_TO_ALL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a403e4025d2925f132293a50eae7381fe</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388a403e4025d2925f132293a50eae7381fe</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PROBABILITY</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388a8f6a6db47b5476cf11f24317f14ee4a7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_TOTAL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388a8338dcf5840ce1a01a4c26d9c49dc560</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PRE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600aa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388aa667dfec30c43a0320c7bd76b99bd4c7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_POST</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600aa130e7b038fc0ede3b0203931063b116</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388aa130e7b038fc0ede3b0203931063b116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_CONNECTION_GENERATORS</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>abed82baf7f470b522273a3e37c24c600ab1144285d7382feeb4687af0263e2467</anchor>
+      <anchor>a385c44f6fb256e5716a2302a5b940388ab1144285d7382feeb4687af0263e2467</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9121,19 +9367,19 @@
     <member kind="enumvalue">
       <name>STATIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57af14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035daf14f18f5ed2665f8cb095c1363fc9848</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PLASTIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57a08b27fbab7a770bae071d9defb278782</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035da08b27fbab7a770bae071d9defb278782</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_MATRIX_GENERATORS</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>ab04a0655cd1e3bcac5e8f48c18df1a57aba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035daba9a03e4fd023b2837469ea1ff6225a3</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9249,13 +9495,6 @@
       <anchor>a5ac88042b75ba0f76e04ce5c830ec838</anchor>
       <arglist></arglist>
     </member>
-    <member kind="define">
-      <type>#define</type>
-      <name>SYNAPSE_DELAY_MASK</name>
-      <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>a9932d3e682ca42eb572c28a676e4e4b7</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function" static="yes">
       <type>static void *</type>
       <name>matrix_generator_static_initialize</name>
@@ -9274,8 +9513,8 @@
       <type>static uint32_t</type>
       <name>build_static_word</name>
       <anchorfile>matrix__generator__static_8h.html</anchorfile>
-      <anchor>abef0ba0fc1675b818c5385bb2e99aafa</anchor>
-      <arglist>(uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits)</arglist>
+      <anchor>a9668b8739759b825c0adc78440bfa352</anchor>
+      <arglist>(uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t delay_bits)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -9295,13 +9534,6 @@
     <class kind="struct">row_plastic_t</class>
     <class kind="struct">row_fixed_t</class>
     <class kind="struct">matrix_generator_stdp</class>
-    <member kind="define">
-      <type>#define</type>
-      <name>SYNAPSE_DELAY_MASK</name>
-      <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>a9932d3e682ca42eb572c28a676e4e4b7</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="function">
       <type>void *</type>
       <name>matrix_generator_stdp_initialize</name>
@@ -9320,8 +9552,8 @@
       <type>static uint16_t</type>
       <name>build_fixed_plastic_half_word</name>
       <anchorfile>matrix__generator__stdp_8h.html</anchorfile>
-      <anchor>a011bc952ba061982959d524e9fbd68cc</anchor>
-      <arglist>(uint16_t delay, uint32_t type, uint32_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits)</arglist>
+      <anchor>ad136b625e3f52e67d888a50058e43a16</anchor>
+      <arglist>(uint16_t delay, uint32_t type, uint32_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t delay_bits)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -9349,49 +9581,49 @@
     <member kind="enumvalue">
       <name>CONSTANT</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a83972670b57415508523b5641bb46116</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a83972670b57415508523b5641bb46116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>UNIFORM</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a8f44784d154005a214e0fe94119d28ef</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a8f44784d154005a214e0fe94119d28ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a50d1448013c6f17125caee18aa418af7</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a50d1448013c6f17125caee18aa418af7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388ac40cefd2a096660da3f41d6ee6352889</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8ac40cefd2a096660da3f41d6ee6352889</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED_BOUNDARY</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aca06c44d4221f47f9d61534ca1e35752</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8aca06c44d4221f47f9d61534ca1e35752</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8aa6055a3a8ab1aed0594419b51d9ec15e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_PARAM_GENERATORS</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388ab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8ab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9752,7 +9984,6 @@
     <name>synapse_expander.c</name>
     <path>/github/workspace/neural_modelling/src/synapse_expander/</path>
     <filename>synapse__expander_8c.html</filename>
-    <includes id="regions_8h" name="regions.h" local="no" imported="no">neuron/regions.h</includes>
     <includes id="matrix__generator_8h" name="matrix_generator.h" local="yes" imported="no">matrix_generator.h</includes>
     <includes id="connection__generator_8h" name="connection_generator.h" local="yes" imported="no">connection_generator.h</includes>
     <includes id="param__generator_8h" name="param_generator.h" local="yes" imported="no">param_generator.h</includes>
@@ -9770,8 +10001,8 @@
       <type>static bool</type>
       <name>run_synapse_expander</name>
       <anchorfile>synapse__expander_8c.html</anchorfile>
-      <anchor>ab2b96fb3f7cddc88c3b12263c25f0fc1</anchor>
-      <arglist>(address_t params_address, address_t synaptic_matrix_region)</arglist>
+      <anchor>a0698a34460c56bb3c76ceb2824a83934</anchor>
+      <arglist>(data_specification_metadata_t *ds_regions, address_t params_address)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -9994,6 +10225,82 @@
       <name>structural_matrix_region_id</name>
       <anchorfile>bit__field__expander_8c.html</anchorfile>
       <anchor>ae58e2079031afe22e9e02100fab9fbb4</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>combined_provenance</name>
+    <filename>c__main_8c.html</filename>
+    <anchor>structcombined__provenance</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_backgrounds_queued</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>a9381d8e99b4a3369d547b4acd10c3b3d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_background_queue_overloads</name>
+      <anchorfile>c__main_8c.html</anchorfile>
+      <anchor>ad8a8981effe382266cc0a6387e818005</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>common_priorities</name>
+    <filename>structcommon__priorities.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>sdp</name>
+      <anchorfile>structcommon__priorities.html</anchorfile>
+      <anchor>a52f4118b696b363a7df6cfc7c4d18083</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>dma</name>
+      <anchorfile>structcommon__priorities.html</anchorfile>
+      <anchor>a81ff06f46e55f58109477a18f0f54b82</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>timer</name>
+      <anchorfile>structcommon__priorities.html</anchorfile>
+      <anchor>aa95583081515d60e30a8e99c00bb1965</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>common_regions</name>
+    <filename>structcommon__regions.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>system</name>
+      <anchorfile>structcommon__regions.html</anchorfile>
+      <anchor>ad8d25f5ee7bc5843e21f33125eead392</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>provenance</name>
+      <anchorfile>structcommon__regions.html</anchorfile>
+      <anchor>a2012b068acb03a2ff0a818076a53f44f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>profiler</name>
+      <anchorfile>structcommon__regions.html</anchorfile>
+      <anchor>a5fd6980960a99edf8a3a6ee8662b9257</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>recording</name>
+      <anchorfile>structcommon__regions.html</anchorfile>
+      <anchor>a3403d749cb8381c5669d3a46aab208fb</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10301,33 +10608,32 @@
   </compound>
   <compound kind="struct">
     <name>dma_buffer</name>
-    <filename>spike__processing_8c.html</filename>
-    <anchor>structdma__buffer</anchor>
+    <filename>structdma__buffer.html</filename>
     <member kind="variable">
       <type>synaptic_row_t</type>
       <name>sdram_writeback_address</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchorfile>structdma__buffer.html</anchorfile>
       <anchor>a7663f1eea61dda1540ac1a8641040d0b</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>spike_t</type>
       <name>originating_spike</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchorfile>structdma__buffer.html</anchorfile>
       <anchor>a3513c98a97e75598a54b33dcde34a12c</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_bytes_transferred</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchorfile>structdma__buffer.html</anchorfile>
       <anchor>a764511923c4c18e2c1303c4386aaf5e3</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>synaptic_row_t</type>
       <name>row</name>
-      <anchorfile>spike__processing_8c.html</anchorfile>
+      <anchorfile>structdma__buffer.html</anchorfile>
       <anchor>a654a0761ac493ec478a88f2e266be543</anchor>
       <arglist></arglist>
     </member>
@@ -10690,10 +10996,17 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>mars_kiss64_seed_t</type>
+      <type>uint32_t</type>
+      <name>max_spikes_per_tick</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a84009cf1a8334d0129c8b9dedaad4f9b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>rng_seed_t</type>
       <name>spike_source_seed</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a1b27dd1091ed50b78407f2c69fb35582</anchor>
+      <anchor>aec7bae9f7db03e42be908930a8b67c20</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -10849,6 +11162,39 @@
     <name>key_atom_info_t</name>
     <filename>sp__structs_8h.html</filename>
     <anchor>structkey__atom__info__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>key_config</name>
+    <filename>spike__processing__fast_8h.html</filename>
+    <anchor>structkey__config</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>key</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a7a3e5253ffa546cba5f9e83406fa7836</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>mask</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a37c12d1b1228f05b534697bddb055325</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>spike_id_mask</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a0d677725bdacf0d86911fd400fea30b5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>self_connected</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a62e84dad881a32b0dc9621b7404d8405</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="struct">
     <name>master_population_table_entry</name>
@@ -11166,69 +11512,33 @@
   </compound>
   <compound kind="struct">
     <name>neuron_provenance</name>
-    <filename>c__main_8c.html</filename>
-    <anchor>structneuron__provenance</anchor>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_pre_synaptic_events</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>aa5cc7c82313ba8fd9b9300b36b5fbbcf</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_synaptic_weight_saturations</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a97349e60345fc7fda140ab5ba383f661</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_input_buffer_overflows</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a26034589834a6dbf7abfbef4099f7680</anchor>
-      <arglist></arglist>
-    </member>
+    <filename>structneuron__provenance.html</filename>
     <member kind="variable">
       <type>uint32_t</type>
       <name>current_timer_tick</name>
-      <anchorfile>c__main_8c.html</anchorfile>
+      <anchorfile>structneuron__provenance.html</anchorfile>
       <anchor>a7971d970224cbcc61d40e13ebd0139cb</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>n_plastic_synaptic_weight_saturations</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>a34c76b30af43caf5fc2f6db950458766</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>n_rewires</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>ac525fc32eb7e2f1ef173901fb8dac16d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
       <name>n_tdma_mises</name>
-      <anchorfile>c__main_8c.html</anchorfile>
+      <anchorfile>structneuron__provenance.html</anchorfile>
       <anchor>a9567e9ef2fd91cdd106404ec2e2ed282</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>max_backgrounds_queued</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>ab5ee7e0c23a7078a25cce1324aaeba64</anchor>
+      <name>earliest_send</name>
+      <anchorfile>structneuron__provenance.html</anchorfile>
+      <anchor>aac360057b8cb583cfb0ea6cff69b5429</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>n_background_queue_overloads</name>
-      <anchorfile>c__main_8c.html</anchorfile>
-      <anchor>ac78a4fc6fd2e44b01c34688b09a76f89</anchor>
+      <name>latest_send</name>
+      <anchorfile>structneuron__provenance.html</anchorfile>
+      <anchor>afc7ad34d9d4b4447fee327786e0a1078</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -11250,6 +11560,29 @@
       <anchor>aceb45219931c687ba2595c66b9561e18</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>neuron_regions</name>
+    <filename>structneuron__regions.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>neuron_params</name>
+      <anchorfile>structneuron__regions.html</anchorfile>
+      <anchor>a5beccf8bfe6d61fc1ea0b2cc1981c526</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>neuron_recording</name>
+      <anchorfile>structneuron__regions.html</anchorfile>
+      <anchor>a5eb67797af3ac013b128589af3237784</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>neurons_provenance</name>
+    <filename>c__main__neurons_8c.html</filename>
+    <anchor>structneurons__provenance</anchor>
   </compound>
   <compound kind="struct">
     <name>normal_clipped_boundary_params</name>
@@ -11775,6 +12108,11 @@
     <anchor>structpre__trace__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>provenance_data</name>
+    <filename>c__main__synapses_8c.html</filename>
+    <anchor>structprovenance__data</anchor>
+  </compound>
+  <compound kind="struct">
     <name>recording_info_t</name>
     <filename>neuron__recording_8h.html</filename>
     <anchor>structrecording__info__t</anchor>
@@ -11788,6 +12126,11 @@
     <name>rewiring_data_t</name>
     <filename>sp__structs_8h.html</filename>
     <anchor>structrewiring__data__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>rng_seed_t</name>
+    <filename>spike__source__poisson_8c.html</filename>
+    <anchor>structrng__seed__t</anchor>
   </compound>
   <compound kind="struct">
     <name>rng</name>
@@ -11852,6 +12195,81 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>sdram_config</name>
+    <filename>spike__source__poisson_8c.html</filename>
+    <anchor>structsdram__config</anchor>
+    <member kind="variable">
+      <type>uint8_t *</type>
+      <name>address</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a2f51993cda9430f33c933fcddca3c3ed</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>size_in_bytes</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a12258fe85743f525833bd124d9e1fb05</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_neurons</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a6a591c0cd469068deef9515db3a5435d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_synapse_types</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a5aeda4c778a8f079554189f957410c9c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_synapse_cores</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>ac71da842b9ee9030342176197e40ba3b</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_bits</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>ac5dd25085ff51b0365a1a81144c5883d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t *</type>
+      <name>address</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a86b526324ed1f6013de23834e46a28b6</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>time_for_transfer_overhead</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a7c86397a4475d693a4a04a95e5102af1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>offset</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a920cf60511ac965b613682744fae9f62</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint16_t</type>
+      <name>weights</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a0bd97541f14b0a0db1c8da7c5994418f</anchor>
+      <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>single_synaptic_row_t</name>
     <filename>direct__synapses_8c.html</filename>
     <anchor>structsingle__synaptic__row__t</anchor>
@@ -11908,6 +12326,135 @@
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a489d13f6c68c512fda05e069a5383947</anchor>
       <arglist>[]</arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>spike_processing_fast_provenance</name>
+    <filename>spike__processing__fast_8h.html</filename>
+    <anchor>structspike__processing__fast__provenance</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_input_buffer_overflows</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a7c97c1b4f48b14653063932276bff106</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_dmas_complete</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a3e4894fc527364f0d95f4ef67304cec7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_spikes_processed</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>aa11f31317d1d3bc2c53f7471a2fbd338</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_rewires</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a5d9089dc46eecff324a8477701bcc289</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_packets_dropped_from_lateness</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a100355afe9d63e3f034084db0a90fa31</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_filled_input_buffer_size</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a2611b3ece4cf313befe84da703747e8c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_spikes_received</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a941f4ad4a3cf721904fe5e6dacad0e3c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_spikes_processed</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>abcfa89e3a4aa27aadaebb85fbb4529d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_transfer_timer_overruns</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a8c8f48422aa08e54559b1fb06c080d07</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_skipped_time_steps</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>a6d75639156aae9262f4985af1eed3b4f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_transfer_timer_overrun</name>
+      <anchorfile>spike__processing__fast_8h.html</anchorfile>
+      <anchor>ad54eed3177f0c24003d53368aac34005</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>spike_processing_provenance</name>
+    <filename>spike__processing_8h.html</filename>
+    <anchor>structspike__processing__provenance</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_input_buffer_overflows</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>a53b1ff57c5cb526a73417807de4fe804</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_dmas_complete</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>ade12bada94a01219c31fc5a1fe24a5eb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_spikes_processed</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>a209ea3daffb04594e08a5e3a246071f0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_rewires</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>a795ba93fd7814602538d95798bd8cead</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_packets_dropped_from_lateness</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>abd7aef77962476fc8dc244aeeb6ef1cd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_filled_input_buffer_size</name>
+      <anchorfile>spike__processing_8h.html</anchorfile>
+      <anchor>aa20789ed98caa0f3c302e124f6166dc4</anchor>
+      <arglist></arglist>
     </member>
   </compound>
   <compound kind="struct">
@@ -12093,6 +12640,117 @@
       <name>scaling_factor</name>
       <anchorfile>synapse__types__semd__impl_8h.html</anchorfile>
       <anchor>af29469cba3047bb7b6f9b64eb0daf0bf</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>synapse_params</name>
+    <filename>synapses_8c.html</filename>
+    <anchor>structsynapse__params</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>synapse_provenance</name>
+    <filename>structsynapse__provenance.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_pre_synaptic_events</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a8b7c4febfb5b48ff724746939fd5e8b3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_synaptic_weight_saturations</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a6fe3542191d7d2ced6bb0ad19b2b7fde</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_plastic_synaptic_weight_saturations</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a01fa00d445c9550b160386bedbd0ff68</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_ghost_pop_table_searches</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a870bc6cb94b842c5fdb3cc3e83259525</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_failed_bitfield_reads</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a7c2ef481305240d823abc418de53dec1</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_invalid_master_pop_table_hits</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a66ba96fb391b707d23174767cf8c27c5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_filtered_by_bitfield</name>
+      <anchorfile>structsynapse__provenance.html</anchorfile>
+      <anchor>a5ecd8b0730953e302c74d60403925a33</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>synapse_regions</name>
+    <filename>structsynapse__regions.html</filename>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_params</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>ae1bf2e2f2adb01f1790000e94584ddb0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>direct_matrix</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>ad77cc9eef3e62a3b7639207a9c91f956</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>pop_table</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>a0eefb994c142e94d536c0e03f89610d8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synaptic_matrix</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>a5633999e6ac79b130867a1800059b0a0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_dynamics</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>ab1541dadc38b08475e576b020ad452dd</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>structural_dynamics</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>a040c474c7474b3550ba976ca6005cc31</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>bitfield_filter</name>
+      <anchorfile>structsynapse__regions.html</anchorfile>
+      <anchor>a7152d47f1e4518d7b127e37899657ab2</anchor>
       <arglist></arglist>
     </member>
   </compound>

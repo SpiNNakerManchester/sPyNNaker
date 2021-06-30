@@ -50,27 +50,30 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-<span class="kn">import</span> <span class="nn">os</span>
-
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="n">PacmanConfigurationException</span>
-<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.partitioner_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MaxVertexAtomsConstraint</span><span class="p">,</span> <span class="n">FixedVertexAtomsConstraint</span><span class="p">,</span>
     <span class="n">AbstractPartitionerConstraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineEdge</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ResourceContainer</span><span class="p">,</span> <span class="n">ConstantSDRAM</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">)</span>
+    <span class="n">ResourceContainer</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">,</span>
+    <span class="n">MultiRegionSDRAM</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters.abstract_splitters</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSplitterSlice</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPopulationVertex</span><span class="p">,</span> <span class="n">PopulationMachineVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">bit_field_utilities</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.population_machine_vertex</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NeuronProvenance</span><span class="p">,</span> <span class="n">SynapseProvenance</span><span class="p">,</span> <span class="n">MainProvenance</span><span class="p">,</span>
+    <span class="n">SpikeProcessingProvenance</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.master_pop_table</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MasterPopTableAsBinarySearch</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.bit_field_utilities</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">,</span>
+    <span class="n">get_estimated_sdram_for_key_region</span><span class="p">,</span>
+    <span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 
@@ -80,14 +83,27 @@
     <span class="sd">&quot;&quot;&quot; handles the splitting of the AbstractPopulationVertex via slice logic.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># The pre-calculated ring buffer shifts</span>
+        <span class="s2">&quot;__ring_buffer_shifts&quot;</span><span class="p">,</span>
+        <span class="c1"># The pre-calculated weight scales</span>
+        <span class="s2">&quot;__weight_scales&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of all the synapses on a core</span>
+        <span class="s2">&quot;__all_syn_block_sz&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of the structural plasticity data</span>
+        <span class="s2">&quot;__structural_sz&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of the synaptic expander data</span>
+        <span class="s2">&quot;__synapse_expander_sz&quot;</span><span class="p">,</span>
+        <span class="c1"># The size of all the bitfield data</span>
+        <span class="s2">&quot;__bitfield_sz&quot;</span><span class="p">,</span>
+        <span class="c1"># The next index to use for a synapse core</span>
+        <span class="s2">&quot;__next_index&quot;</span>
+    <span class="p">]</span>
 
-    <span class="n">_NEURON_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">=</span> <span class="mi">22</span>
-    <span class="n">_NEURON_BASE_N_CPU_CYCLES</span> <span class="o">=</span> <span class="mi">10</span>
-    <span class="n">_C_MAIN_BASE_N_CPU_CYCLES</span> <span class="o">=</span> <span class="mi">0</span>
-
+    <span class="sd">&quot;&quot;&quot; The name of the splitter &quot;&quot;&quot;</span>
     <span class="n">SPLITTER_NAME</span> <span class="o">=</span> <span class="s2">&quot;SplitterAbstractPopulationVertexSlice&quot;</span>
 
+    <span class="sd">&quot;&quot;&quot; The message to use when the Population is invalid &quot;&quot;&quot;</span>
     <span class="n">INVALID_POP_ERROR_MESSAGE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;The vertex </span><span class="si">{}</span><span class="s2"> cannot be supported by the &quot;</span>
         <span class="s2">&quot;SplitterAbstractPopulationVertexSlice as&quot;</span>
@@ -97,6 +113,13 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SPLITTER_NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_expander_sz</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_sz</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__next_index</span> <span class="o">=</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
@@ -104,6 +127,14 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
+        <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
+        <span class="n">app_vertex</span><span class="o">.</span><span class="n">synapse_recorder</span><span class="o">.</span><span class="n">add_region_offset</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterAbstractPopulationVertexSlice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>\
+            <span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">(</span><span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.get_out_going_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_out_going_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_out_going_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">outgoing_edge_partition</span><span class="p">):</span>
@@ -117,129 +148,199 @@
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">PopulationMachineVertex</span><span class="p">(</span>
-            <span class="n">resources</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">recorded_ids_by_slice</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">),</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">,</span>
-            <span class="n">vertex_slice</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__get_binary_file_name</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">})</span>
-    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">,</span>
-        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;graph&quot;</span><span class="p">])</span>
-    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;  Gets the resources of a slice of atoms from a given app vertex.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_ring_buffer_shifts</span><span class="p">(</span>
+                <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_weight_scales</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__next_index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">PopulationMachineVertex</span><span class="p">(</span>
+            <span class="n">resources</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">,</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__structural_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_resources_used_by_atoms">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">get_resources_used_by_atoms</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_resources_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  Gets the resources of a slice of atoms</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph: app graph</span>
 <span class="sd">        :rtype: ~pacman.model.resources.ResourceContainer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
-        <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="n">constant_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span>
+        <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">constant_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_constant_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">nest</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">REGIONS</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">variable_sdram</span><span class="p">)</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">constant_sdram</span><span class="p">)</span>
 
         <span class="c1"># set resources required from this object</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ResourceContainer</span><span class="p">(</span>
-            <span class="n">sdram</span><span class="o">=</span><span class="n">variable_sdram</span> <span class="o">+</span> <span class="n">constant_sdram</span><span class="p">,</span>
-            <span class="n">dtcm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtcm_cost</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">),</span>
-            <span class="n">cpu_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cpu_cost</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="n">sdram</span><span class="o">=</span><span class="n">sdram</span><span class="p">,</span> <span class="n">dtcm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_dtcm_cost</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">),</span>
+            <span class="n">cpu_cycles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_cpu_cost</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="c1"># return the total resources.</span>
         <span class="k">return</span> <span class="n">container</span></div>
 
-<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.get_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.get_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; returns the variable sdram from the recorder.</span>
+    <span class="k">def</span> <span class="nf">__get_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; returns the variable sdram from the recorders</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            the atom slice for recording sdram</span>
 <span class="sd">        :return: the variable sdram used by the neuron recorder</span>
 <span class="sd">        :rtype: VariableSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+        <span class="n">s_dynamics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="n">max_rewires_per_ts</span> <span class="o">=</span> <span class="n">s_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">set_max_rewires_per_ts</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_recorder</span><span class="o">.</span><span class="n">set_max_rewires_per_ts</span><span class="p">(</span>
                 <span class="n">max_rewires_per_ts</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span>\
-            <span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_neuron_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_synapse_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
-<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.constant_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.constant_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>  <span class="n">graph</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; returns the constant sdram used by the vertex slice.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            the atoms to get constant sdram of</span>
-<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph graph:</span>
-<span class="sd">            app graph</span>
-<span class="sd">        :rtype: ConstantSDRAM</span>
+<span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sdram_requirement</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_static_sdram_usage</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span>
-                <span class="nb">len</span><span class="p">(</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">))</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">n_profile_samples</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span>
-                <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span>
-                <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">ConstantSDRAM</span><span class="p">(</span><span class="n">sdram_requirement</span><span class="p">)</span></div>
+        <span class="n">n_record</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recordables</span><span class="p">)</span> <span class="o">+</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_recordables</span><span class="p">))</span>
+        <span class="n">n_provenance</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">NeuronProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span> <span class="o">+</span> <span class="n">SynapseProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span> <span class="o">+</span>
+            <span class="n">MainProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span> <span class="o">+</span> <span class="n">SpikeProcessingProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">)</span>
+        <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_common_constant_sdram</span><span class="p">(</span>
+            <span class="n">n_record</span><span class="p">,</span> <span class="n">n_provenance</span><span class="p">,</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">COMMON_REGIONS</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_neuron_constant_sdram</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">NEURON_REGIONS</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_synapse_constant_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">sdram</span>
 
-<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.dtcm_cost"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.dtcm_cost">[docs]</a>    <span class="k">def</span> <span class="nf">dtcm_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_synapse_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by synapse parts</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of neurons to get the size of</span>
+
+<span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
+        <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">synapse_params</span><span class="p">,</span>
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_synapse_params_size</span><span class="p">())</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_synapse_dynamics_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">structural_dynamics</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__structural_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">synaptic_matrix</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_size</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">direct_matrix</span><span class="p">,</span>
+            <span class="n">app_vertex</span><span class="o">.</span><span class="n">all_single_syn_size</span><span class="p">)</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">pop_table</span><span class="p">,</span>
+            <span class="n">MasterPopTableAsBinarySearch</span><span class="o">.</span><span class="n">get_master_population_table_size</span><span class="p">(</span>
+                <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">connection_builder</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_expander_size</span><span class="p">())</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_size</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">sdram</span>
+
+    <span class="k">def</span> <span class="nf">__all_syn_block_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Work out how much SDRAM is needed for all the synapses</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of neurons to get the size of</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span>
+        <span class="n">all_syn_block_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_synapses_size</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_syn_block_sz</span>
+        <span class="k">return</span> <span class="n">all_syn_block_sz</span>
+
+    <span class="k">def</span> <span class="nf">__structural_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Work out how much SDRAM is needed by the structural plasticity data</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of neurons to get the size of</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span>
+        <span class="n">structural_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_structural_dynamics_size</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">structural_sz</span>
+        <span class="k">return</span> <span class="n">structural_sz</span>
+
+    <span class="k">def</span> <span class="nf">__synapse_expander_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Work out how much SDRAM is needed for the synapse expander</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_expander_sz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_expander_sz</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_synapse_expander_size</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_expander_sz</span>
+
+    <span class="k">def</span> <span class="nf">__bitfield_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Work out how much SDRAM is needed by the bit fields</span>
+
+<span class="sd">        :rtype: ~pacman.model.resources.MultiRegionSDRAM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_sz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
+            <span class="n">projections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span>
+            <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+                <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_filter</span><span class="p">,</span>
+                <span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span><span class="n">projections</span><span class="p">))</span>
+            <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+                <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_key_map</span><span class="p">,</span>
+                <span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span><span class="n">projections</span><span class="p">))</span>
+            <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+                <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SYNAPSE_REGIONS</span><span class="o">.</span><span class="n">bitfield_builder</span><span class="p">,</span>
+                <span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_sz</span> <span class="o">=</span> <span class="n">sdram</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_sz</span>
+
+    <span class="k">def</span> <span class="nf">__get_dtcm_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; get the dtcm cost for the slice of atoms</span>
 
 <span class="sd">        :param Slice vertex_slice: atom slice for dtcm calc.</span>
 <span class="sd">        :rtype: DTCMResource</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DTCMResource</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span>
-            <span class="n">get_dtcm_usage_in_bytes</span><span class="p">())</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_common_dtcm</span><span class="p">()</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_neuron_dtcm</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_synapse_dtcm</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
-<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.cpu_cost"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.cpu_cost">[docs]</a>    <span class="k">def</span> <span class="nf">cpu_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_cpu_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; get cpu cost for a slice of atoms</span>
 
 <span class="sd">        :param Slice vertex_slice: slice of atoms</span>
 <span class="sd">        :rtype: CPUCyclesPerTickResourcer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_NEURON_BASE_N_CPU_CYCLES</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C_MAIN_BASE_N_CPU_CYCLES</span> <span class="o">+</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NEURON_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span>
-             <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">())</span></div>
-
-    <span class="k">def</span> <span class="nf">__get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; returns the binary name for the machine vertices.</span>
-
-<span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Split binary name into title and extension</span>
-        <span class="n">binary_title</span><span class="p">,</span> <span class="n">binary_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">binary_name</span><span class="p">)</span>
-
-        <span class="c1"># Reunite title and extension and return</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">binary_title</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">synapse_manager</span><span class="o">.</span>
-            <span class="n">vertex_executable_suffix</span> <span class="o">+</span> <span class="n">binary_extension</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_common_cpu</span><span class="p">()</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_neuron_cpu</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">get_synapse_cpu</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.check_supported_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.check_supported_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">check_supported_constraints</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">check_supported_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -248,6 +349,15 @@
             <span class="n">supported_constraints</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">MaxVertexAtomsConstraint</span><span class="p">,</span> <span class="n">FixedVertexAtomsConstraint</span><span class="p">],</span>
             <span class="n">abstract_constraint_type</span><span class="o">=</span><span class="n">AbstractPartitionerConstraint</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.reset_called"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.reset_called">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">reset_called</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">reset_called</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SplitterAbstractPopulationVertexSlice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">reset_called</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__next_index</span> <span class="o">=</span> <span class="mi">0</span></div>
 </pre></div>
 
             <div class="clearer"></div>

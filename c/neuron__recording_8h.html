@@ -130,12 +130,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8h.html#a6ec6bcccf5cf769f8ea0c853ab0577e9">neuron_recording_reset</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads recording data from sdram on reset.  <a href="neuron__recording_8h.html#a6ec6bcccf5cf769f8ea0c853ab0577e9">More...</a><br /></td></tr>
 <tr class="separator:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c2d66e23d2a44bedf3689e782dd0495"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8h.html#a9c2d66e23d2a44bedf3689e782dd0495">neuron_recording_initialise</a> (void *recording_address, uint32_t *<a class="el" href="spike__source__poisson_8c.html#a9a97f21dc7fccaac8071bcd29894bccb">recording_flags</a>, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t *n_rec_regions_used)</td></tr>
-<tr class="memdesc:a9c2d66e23d2a44bedf3689e782dd0495"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets up the recording stuff  <a href="neuron__recording_8h.html#a9c2d66e23d2a44bedf3689e782dd0495">More...</a><br /></td></tr>
-<tr class="separator:a9c2d66e23d2a44bedf3689e782dd0495"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c849acc5ec34882a4c75f0abbfc8cb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8h.html#a2c849acc5ec34882a4c75f0abbfc8cb0">neuron_recording_finalise</a> (void)</td></tr>
-<tr class="memdesc:a2c849acc5ec34882a4c75f0abbfc8cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">finishes recording  <a href="neuron__recording_8h.html#a2c849acc5ec34882a4c75f0abbfc8cb0">More...</a><br /></td></tr>
-<tr class="separator:a2c849acc5ec34882a4c75f0abbfc8cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf13eda07e993e65ef639d2b70d4531b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8h.html#acf13eda07e993e65ef639d2b70d4531b">neuron_recording_initialise</a> (void *recording_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t *n_rec_regions_used)</td></tr>
+<tr class="memdesc:acf13eda07e993e65ef639d2b70d4531b"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets up the recording stuff  <a href="neuron__recording_8h.html#acf13eda07e993e65ef639d2b70d4531b">More...</a><br /></td></tr>
+<tr class="separator:acf13eda07e993e65ef639d2b70d4531b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -724,12 +721,12 @@ values</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool stating if the read was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00187">187</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00182">182</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
-<a id="a9c2d66e23d2a44bedf3689e782dd0495"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c2d66e23d2a44bedf3689e782dd0495">&#9670;&nbsp;</a></span>neuron_recording_initialise()</h2>
+<a id="acf13eda07e993e65ef639d2b70d4531b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf13eda07e993e65ef639d2b70d4531b">&#9670;&nbsp;</a></span>neuron_recording_initialise()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -739,12 +736,6 @@ values</td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>recording_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t *&#160;</td>
-          <td class="paramname"><em>recording_flags</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -770,7 +761,6 @@ values</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>sdram location for the recording data </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">recording_flags</td><td>Output of flags which can be used to check if a channel is enabled for recording </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>the number of neurons to setup for </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">n_rec_regions_used</td><td>Output the number of regions used by neuron recording </td></tr>
   </table>
@@ -778,37 +768,14 @@ values</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool stating if the init was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00285">285</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
-
-</div>
-</div>
-<a id="a2c849acc5ec34882a4c75f0abbfc8cb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c849acc5ec34882a4c75f0abbfc8cb0">&#9670;&nbsp;</a></span>neuron_recording_finalise()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_recording_finalise </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>finishes recording </p>
-<p>finishes recording </p>
-
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00093">93</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00279">279</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

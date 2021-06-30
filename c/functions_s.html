@@ -72,11 +72,17 @@ $(function() {
 <li>scaling_factor
 : <a class="el" href="synapse__types__semd__impl_8h.html#af29469cba3047bb7b6f9b64eb0daf0bf">synapse_param_t</a>
 </li>
+<li>sdp
+: <a class="el" href="structcommon__priorities.html#a52f4118b696b363a7df6cfc7c4d18083">common_priorities</a>
+</li>
 <li>sdram_writeback_address
-: <a class="el" href="spike__processing_8c.html#a7663f1eea61dda1540ac1a8641040d0b">dma_buffer</a>
+: <a class="el" href="structdma__buffer.html#a7663f1eea61dda1540ac1a8641040d0b">dma_buffer</a>
 </li>
 <li>seconds_per_tick
 : <a class="el" href="spike__source__poisson_8c.html#ae0f9eec779642b68ca81ade1b1d1ce10">global_parameters</a>
+</li>
+<li>self_connected
+: <a class="el" href="spike__processing__fast_8h.html#a62e84dad881a32b0dc9621b7404d8405">key_config</a>
 </li>
 <li>set_rate_neuron_id_mask
 : <a class="el" href="spike__source__poisson_8c.html#ab4adadbc1d477b4c51e123cf3a454d26">global_parameters</a>
@@ -89,14 +95,20 @@ $(function() {
 , <a class="el" href="maths_8h.html#ab6d1fb27d517365483fc4a8fcb16b598">int16_lut</a>
 , <a class="el" href="synapse__row_8h.html#a5c73ad1ce7793ac1613afb98920fcf17">synapse_row_plastic_part_t</a>
 </li>
+<li>size_in_bytes
+: <a class="el" href="spike__source__poisson_8c.html#a12258fe85743f525833bd124d9e1fb05">sdram_config</a>
+</li>
 <li>slow_rate_per_tick_cutoff
 : <a class="el" href="spike__source__poisson_8c.html#a8fc7a576f718c19bb241c4c6301fd416">global_parameters</a>
 </li>
 <li>speed
 : <a class="el" href="robot__motor__control_8c.html#ac9ed2b5461fb2fb0b3de7b25ab1e6ed4">motor_control_config_t</a>
 </li>
+<li>spike_id_mask
+: <a class="el" href="spike__processing__fast_8h.html#a0d677725bdacf0d86911fd400fea30b5">key_config</a>
+</li>
 <li>spike_source_seed
-: <a class="el" href="spike__source__poisson_8c.html#a1b27dd1091ed50b78407f2c69fb35582">global_parameters</a>
+: <a class="el" href="spike__source__poisson_8c.html#aec7bae9f7db03e42be908930a8b67c20">global_parameters</a>
 </li>
 <li>sqrt_lambda
 : <a class="el" href="spike__source__poisson_8c.html#a0f76e635e260b47d8e260740166324cd">spike_source_t</a>
@@ -143,11 +155,23 @@ $(function() {
 : <a class="el" href="connection__generator__kernel_8h.html#a844f6edb27780423874a33fe54cbe811">kernel</a>
 , <a class="el" href="param__generator__kernel_8h.html#a1e8efd89a833ec63e2f23a73fbd7c5cf">param_generator_kernel</a>
 </li>
+<li>structural_dynamics
+: <a class="el" href="structsynapse__regions.html#a040c474c7474b3550ba976ca6005cc31">synapse_regions</a>
+</li>
 <li>structural_matrix_region_id
 : <a class="el" href="bit__field__expander_8c.html#ae58e2079031afe22e9e02100fab9fbb4">builder_region_struct</a>
 </li>
 <li>synapse_datum
 : <a class="el" href="direct__synapses_8c.html#a009a320a0562e47977f8f408c72e2859">single_synaptic_row_t</a>
+</li>
+<li>synapse_dynamics
+: <a class="el" href="structsynapse__regions.html#ab1541dadc38b08475e576b020ad452dd">synapse_regions</a>
+</li>
+<li>synapse_index_bits
+: <a class="el" href="spike__source__poisson_8c.html#ac5dd25085ff51b0365a1a81144c5883d">sdram_config</a>
+</li>
+<li>synapse_params
+: <a class="el" href="structsynapse__regions.html#ae1bf2e2f2adb01f1790000e94584ddb0">synapse_regions</a>
 </li>
 <li>synapse_type
 : <a class="el" href="sp__structs_8h.html#a3f02cf224adbd87ab374eff348ac8b3a">current_state_t</a>
@@ -159,14 +183,20 @@ $(function() {
 : <a class="el" href="synapse__types__delta__impl_8h.html#a338e5d451991384eced053db6a2b7942">delta_params_t</a>
 , <a class="el" href="synapse__types__semd__impl_8h.html#ac8b591da2d0dfcbcb814dbf8580cbd56">exp_params_t</a>
 </li>
+<li>synaptic_matrix
+: <a class="el" href="structsynapse__regions.html#a5633999e6ac79b130867a1800059b0a0">synapse_regions</a>
+</li>
 <li>synaptic_matrix_region_id
 : <a class="el" href="bit__field__expander_8c.html#a1eb0a2251b321c5b7dae43b2df8a5148">builder_region_struct</a>
+</li>
+<li>system
+: <a class="el" href="structcommon__regions.html#ad8d25f5ee7bc5843e21f33125eead392">common_regions</a>
 </li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:45 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

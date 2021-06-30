@@ -77,6 +77,7 @@ $(function() {
 <p>General API of a neuron implementation.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="neuron-typedefs_8h_source.html">common/neuron-typedefs.h</a>&gt;</code><br />
+<code>#include &lt;neuron/send_spike.h&gt;</code><br />
 </div>
 <p><a href="neuron__impl_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -91,9 +92,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a72b0028625c6e3cad1e4176bdba1b44e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a72b0028625c6e3cad1e4176bdba1b44e">neuron_impl_load_neuron_parameters</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t next, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:a72b0028625c6e3cad1e4176bdba1b44e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load in the neuron parameters.  <a href="neuron__impl_8h.html#a72b0028625c6e3cad1e4176bdba1b44e">More...</a><br /></td></tr>
 <tr class="separator:a72b0028625c6e3cad1e4176bdba1b44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21f9a596a5048838a60fee323e466314"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a21f9a596a5048838a60fee323e466314">neuron_impl_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> neuron_index, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias)</td></tr>
-<tr class="memdesc:a21f9a596a5048838a60fee323e466314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do the timestep update for the particular implementation.  <a href="neuron__impl_8h.html#a21f9a596a5048838a60fee323e466314">More...</a><br /></td></tr>
-<tr class="separator:a21f9a596a5048838a60fee323e466314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c11520af8e2915ec00d5dc1edcd8b36"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a5c11520af8e2915ec00d5dc1edcd8b36">neuron_impl_do_timestep_update</a> (uint32_t timer_count, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:a5c11520af8e2915ec00d5dc1edcd8b36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do the timestep update for the particular implementation.  <a href="neuron__impl_8h.html#a5c11520af8e2915ec00d5dc1edcd8b36">More...</a><br /></td></tr>
+<tr class="separator:a5c11520af8e2915ec00d5dc1edcd8b36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#af2c8c3ce110bf3e9b4d0dc27f22b4860">neuron_impl_store_neuron_parameters</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t next, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores neuron parameters back into SDRAM.  <a href="neuron__impl_8h.html#af2c8c3ce110bf3e9b4d0dc27f22b4860">More...</a><br /></td></tr>
 <tr class="separator:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -251,8 +252,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a21f9a596a5048838a60fee323e466314"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21f9a596a5048838a60fee323e466314">&#9670;&nbsp;</a></span>neuron_impl_do_timestep_update()</h2>
+<a id="a5c11520af8e2915ec00d5dc1edcd8b36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c11520af8e2915ec00d5dc1edcd8b36">&#9670;&nbsp;</a></span>neuron_impl_do_timestep_update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -261,16 +262,22 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static bool neuron_impl_do_timestep_update </td>
+          <td class="memname">static void neuron_impl_do_timestep_update </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td>
-          <td class="paramname"><em>neuron_index</em>, </td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
-          <td class="paramname"><em>external_bias</em>&#160;</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_neurons</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -289,11 +296,11 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>The index of the neuron to update </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time step of the update </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">external_bias</td><td>External input to be applied to the neuron </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if a spike has occurred </dd></dl>
 
 </div>
 </div>
@@ -373,7 +380,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00522">522</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00519">519</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
 
 </div>
 </div>
@@ -401,7 +408,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00550">550</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00547">547</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
 
 </div>
 </div>
@@ -430,14 +437,14 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The descriptor character (sometimes two characters) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00561">561</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__impl__external__devices_8h_source.html#l00558">558</a> of file <a class="el" href="neuron__impl__external__devices_8h_source.html">neuron_impl_external_devices.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

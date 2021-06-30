@@ -511,11 +511,9 @@
             <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_event</span><span class="p">(</span>
                     <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
                     <span class="n">event_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">),</span>
                     <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
-                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
@@ -575,11 +573,9 @@
             <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_event</span><span class="p">(</span>
                     <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
-                    <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
                     <span class="n">event_array</span><span class="o">=</span><span class="n">variable_cache</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
                     <span class="n">variable</span><span class="o">=</span><span class="n">variable</span><span class="p">,</span>
-                    <span class="n">recording_start_time</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">recording_start_time</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">recording_start_time</span><span class="o">=</span><span class="n">data_cache</span><span class="o">.</span><span class="n">recording_start_time</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_signal</span><span class="p">(</span>
                     <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
@@ -754,18 +750,15 @@
         <span class="n">channel_index</span><span class="o">.</span><span class="n">analogsignals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__read_in_event</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">event_array</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">,</span>
-            <span class="n">label</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">event_array</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">recording_start_time</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Reads in a data item that is an event (i.e. rewiring form/elim)\</span>
 <span class="sd">            and saves this data to the segment.</span>
 
 <span class="sd">        :param ~neo.core.Segment segment: Segment to add data to</span>
-<span class="sd">        :param ~neo.core.Block block: neo block</span>
 <span class="sd">        :param ~numpy.ndarray signal_array: the raw &quot;event&quot; data</span>
 <span class="sd">        :param str variable: the variable name</span>
 <span class="sd">        :param recording_start_time: when recording started</span>
 <span class="sd">        :type recording_start_time: float or int</span>
-<span class="sd">        :param str label: human readable label</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, no-member</span>
         <span class="n">t_start</span> <span class="o">=</span> <span class="n">recording_start_time</span> <span class="o">*</span> <span class="n">quantities</span><span class="o">.</span><span class="n">ms</span>

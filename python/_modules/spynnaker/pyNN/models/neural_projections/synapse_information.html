@@ -53,9 +53,9 @@
 
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span>
+    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
+    <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">SynapseDynamicsStatic</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseInformation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -95,7 +95,7 @@
 <span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
 <span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">            The dynamic behaviour of the synapse</span>
-<span class="sd">        :param AbstractSynapseType synapse_type: The type of the synapse</span>
+<span class="sd">        :param int synapse_type: The type of the synapse</span>
 <span class="sd">        :param bool is_virtual_machine: Whether the machine is virtual</span>
 <span class="sd">        :param weights: The synaptic weights</span>
 <span class="sd">        :type weights: float or list(float) or ~numpy.ndarray(float) or None</span>
@@ -195,7 +195,7 @@
     <span class="k">def</span> <span class="nf">synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The type of the synapse</span>
 
-<span class="sd">        :rtype: AbstractSynapseType</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span>
 
@@ -236,6 +236,18 @@
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span> <span class="ow">and</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span></div>
+
+<div class="viewcode-block" id="SynapseInformation.may_use_direct_matrix"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.may_use_direct_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">may_use_direct_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Do the properties of the synaptic information allow it to use the</span>
+<span class="sd">            direct matrix?</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
+                       <span class="n">SynapseDynamicsStatic</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepop_is_view</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_run_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

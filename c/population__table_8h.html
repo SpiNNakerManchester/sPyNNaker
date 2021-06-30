@@ -93,6 +93,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a511a4004e5621e6ec83228d4e4f94672"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a511a4004e5621e6ec83228d4e4f94672"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">More...</a><br /></td></tr>
 <tr class="separator:a511a4004e5621e6ec83228d4e4f94672"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6af50f83e29bc2f5340724898921df93"><td class="memItemLeft" align="right" valign="top"><a id="a6af50f83e29bc2f5340724898921df93"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">population_table_is_next</a> (void)</td></tr>
+<tr class="memdesc:a6af50f83e29bc2f5340724898921df93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if there are more items with the same key. <br /></td></tr>
+<tr class="separator:a6af50f83e29bc2f5340724898921df93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06008941811a064b8c67dcf3a5846cde"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a06008941811a064b8c67dcf3a5846cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">More...</a><br /></td></tr>
 <tr class="separator:a06008941811a064b8c67dcf3a5846cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -114,6 +118,9 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a442bf46f572f3fc97a52421b7e1a0f87">bit_field_filtered_packets</a></td></tr>
 <tr class="memdesc:a442bf46f572f3fc97a52421b7e1a0f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of packets dropped because the bitfield filter says they don't hit anything. <br /></td></tr>
 <tr class="separator:a442bf46f572f3fc97a52421b7e1a0f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#aebd5b17aab1bbe44fa564e8786f84d94">items_to_go</a></td></tr>
+<tr class="memdesc:aebd5b17aab1bbe44fa564e8786f84d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of addresses from the same spike left to process.  <a href="population__table_8h.html#aebd5b17aab1bbe44fa564e8786f84d94">More...</a><br /></td></tr>
+<tr class="separator:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Master pop(ulation) table API. </p>
@@ -170,7 +177,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the table was initialised successfully, False otherwise </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00411">411</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00412">412</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -199,7 +206,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00293">293</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00294">294</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -246,7 +253,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00471">471</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00472">472</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -293,7 +300,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if there is a row to read, False if not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00548">548</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00552">552</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -321,14 +328,41 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <p>the number of times packet isn't in the master pop table at all! </p>
 <p>the number of times packet isn't in the master pop table at all! </p>
 
-<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00134">134</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00135">135</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
+
+</div>
+</div>
+<a id="aebd5b17aab1bbe44fa564e8786f84d94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebd5b17aab1bbe44fa564e8786f84d94">&#9670;&nbsp;</a></span>items_to_go</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t items_to_go</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The number of addresses from the same spike left to process. </p>
+<p>The number of relevant items remaining in the <a class="el" href="population__table__binary__search__impl_8c.html#a7dca3eb9efb99180a67a18d70e3e7e0d" title="The array of information that points into the synaptic matrix.">address_list</a> NOTE: Exported for speed of check </p>
+
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00126">126</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -59,17 +59,13 @@
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the structural parameters</span>
 
 <span class="sd">        Note: At the Application level this will be an estimate.</span>
 
-<span class="sd">        :param graph: Graph at same level as vertex.</span>
-<span class="sd">        :type graph: ~pacman.model.graphs.application.ApplicationGraph or</span>
-<span class="sd">            ~pacman.model.graphs.machine.MachineGraph</span>
-<span class="sd">        :param vertex: Vertex at the same level as the graph</span>
-<span class="sd">        :type vertex: ~pacman.model.graphs.application.ApplicationVertex or</span>
-<span class="sd">            ~pacman.model.graphs.machine.MachineVertex</span>
+<span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
+<span class="sd">            The projections that target the vertex in question</span>
 <span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :return: the size of the parameters, in bytes</span>
 <span class="sd">        :rtype: int</span>
@@ -78,7 +74,7 @@
 
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
             <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
@@ -86,10 +82,10 @@
 <span class="sd">            The data specification to write to</span>
 <span class="sd">        :param int region: region ID</span>
 <span class="sd">        :param list(float) weight_scales: Weight scaling for each synapse type</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">            The machine graph</span>
-<span class="sd">        :param AbstractPopulationVertex machine_vertex:</span>
-<span class="sd">            The machine vertex</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
+<span class="sd">            The target application vertex</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of the target vertex to generate for</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">            Routing information for all edges</span>
 <span class="sd">        :param SynapticMatrices synaptic_matrices:</span>

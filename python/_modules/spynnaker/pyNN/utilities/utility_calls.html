@@ -68,6 +68,9 @@
     <span class="n">RandomStatsNormalClippedImpl</span><span class="p">,</span> <span class="n">RandomStatsNormalImpl</span><span class="p">,</span>
     <span class="n">RandomStatsPoissonImpl</span><span class="p">,</span> <span class="n">RandomStatsRandIntImpl</span><span class="p">,</span> <span class="n">RandomStatsUniformImpl</span><span class="p">,</span>
     <span class="n">RandomStatsVonmisesImpl</span><span class="p">,</span> <span class="n">RandomStatsBinomialImpl</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">WRITE_BANDWIDTH_BYTES_PER_SECOND</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
@@ -394,6 +397,17 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> moved to </span><span class="si">{}</span><span class="s2">. Please fix your imports. &quot;</span>
                    <span class="s2">&quot;In version 7 this will fail completely.&quot;</span>
                    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_time_to_write_us"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us">[docs]</a><span class="k">def</span> <span class="nf">get_time_to_write_us</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">n_cores</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Determine how long a write of a given number of bytes will take in us</span>
+
+<span class="sd">    :param int n_bytes: The number of bytes to transfer</span>
+<span class="sd">    :param int n_cores: How many cores will be writing at the same time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bandwidth_per_core</span> <span class="o">=</span> <span class="n">WRITE_BANDWIDTH_BYTES_PER_SECOND</span> <span class="o">/</span> <span class="n">n_cores</span>
+    <span class="n">seconds</span> <span class="o">=</span> <span class="n">n_bytes</span> <span class="o">/</span> <span class="n">bandwidth_per_core</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">seconds</span> <span class="o">*</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">))</span></div>
 </pre></div>
 
             <div class="clearer"></div>

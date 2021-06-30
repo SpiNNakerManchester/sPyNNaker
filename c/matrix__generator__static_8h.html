@@ -83,6 +83,7 @@ $(function() {
 <code>#include &lt;<a class="el" href="delay__extension_8h_source.html">delay_extension/delay_extension.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="generator__types_8h_source.html">synapse_expander/generator_types.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/utils_8h.html">utils.h</a>&gt;</code><br />
 </div>
 <p><a href="matrix__generator__static_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -102,10 +103,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a5ac88042b75ba0f76e04ce5c830ec838">SYNAPSE_WEIGHT_MASK</a>&#160;&#160;&#160;0xFFFF</td></tr>
 <tr class="memdesc:a5ac88042b75ba0f76e04ce5c830ec838"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask of a weight before shifting. <br /></td></tr>
 <tr class="separator:a5ac88042b75ba0f76e04ce5c830ec838"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9932d3e682ca42eb572c28a676e4e4b7"><td class="memItemLeft" align="right" valign="top"><a id="a9932d3e682ca42eb572c28a676e4e4b7"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a9932d3e682ca42eb572c28a676e4e4b7">SYNAPSE_DELAY_MASK</a>&#160;&#160;&#160;0xFF</td></tr>
-<tr class="memdesc:a9932d3e682ca42eb572c28a676e4e4b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mask of a delay before shifting. <br /></td></tr>
-<tr class="separator:a9932d3e682ca42eb572c28a676e4e4b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -115,10 +112,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a21c6ce388b821caaa1268c3d6abb9ef1">matrix_generator_static_free</a> (void *generator)</td></tr>
 <tr class="memdesc:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the static synaptic matrix generator.  <a href="matrix__generator__static_8h.html#a21c6ce388b821caaa1268c3d6abb9ef1">More...</a><br /></td></tr>
 <tr class="separator:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa">build_static_word</a> (uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>)</td></tr>
-<tr class="memdesc:abef0ba0fc1675b818c5385bb2e99aafa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a static synaptic word from components.  <a href="matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa">More...</a><br /></td></tr>
-<tr class="separator:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03d500a7b238275b5b5a32fd32ff6f80"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a03d500a7b238275b5b5a32fd32ff6f80">matrix_generator_static_write_row</a> (void *generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</td></tr>
+<tr class="memitem:a9668b8739759b825c0adc78440bfa352"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a9668b8739759b825c0adc78440bfa352">build_static_word</a> (uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8h.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t delay_bits)</td></tr>
+<tr class="memdesc:a9668b8739759b825c0adc78440bfa352"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a static synaptic word from components.  <a href="matrix__generator__static_8h.html#a9668b8739759b825c0adc78440bfa352">More...</a><br /></td></tr>
+<tr class="separator:a9668b8739759b825c0adc78440bfa352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03d500a7b238275b5b5a32fd32ff6f80"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a03d500a7b238275b5b5a32fd32ff6f80">matrix_generator_static_write_row</a> (void *generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t <a class="el" href="synapses_8h.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8h.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage, uint32_t max_delay_per_stage)</td></tr>
 <tr class="memdesc:a03d500a7b238275b5b5a32fd32ff6f80"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate a row of a static synaptic matrix.  <a href="matrix__generator__static_8h.html#a03d500a7b238275b5b5a32fd32ff6f80">More...</a><br /></td></tr>
 <tr class="separator:a03d500a7b238275b5b5a32fd32ff6f80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -140,7 +137,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>The layout of a purely static row of a synaptic matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00062">62</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00058">58</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -205,7 +202,7 @@ the fixed-fixed data within a row </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00035">35</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00036">36</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
@@ -241,12 +238,12 @@ the fixed-fixed data within a row </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00043">43</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00044">44</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
-<a id="abef0ba0fc1675b818c5385bb2e99aafa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abef0ba0fc1675b818c5385bb2e99aafa">&#9670;&nbsp;</a></span>build_static_word()</h2>
+<a id="a9668b8739759b825c0adc78440bfa352"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9668b8739759b825c0adc78440bfa352">&#9670;&nbsp;</a></span>build_static_word()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -288,7 +285,13 @@ the fixed-fixed data within a row </td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>synapse_index_bits</em>&#160;</td>
+          <td class="paramname"><em>synapse_index_bits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>delay_bits</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -312,12 +315,13 @@ the fixed-fixed data within a row </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">post_index</td><td>The core-relative index of the target neuron </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_bits</td><td>The number of bits for the synapse type </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>The number of bits for the target neuron id </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay_bits</td><td>The number of bits for the synaptic delay </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a synaptic word </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00079">79</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00076">76</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
@@ -462,14 +466,14 @@ the fixed-fixed data within a row </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00116">116</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix__generator__static_8h_source.html#l00114">114</a> of file <a class="el" href="matrix__generator__static_8h_source.html">matrix_generator_static.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:45 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

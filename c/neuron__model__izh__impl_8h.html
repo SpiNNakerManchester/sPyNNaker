@@ -68,7 +68,9 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a>  </div>
+<a href="#nested-classes">Data Structures</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">neuron_model_izh_impl.h File Reference</div>  </div>
 </div><!--header-->
@@ -88,6 +90,35 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structglobal__neuron__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a></td></tr>
 <tr class="memdesc:structglobal__neuron__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global neuron parameters for Izhekevich model neuron.  <a href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">More...</a><br /></td></tr>
 <tr class="separator:structglobal__neuron__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#ae9b257f5e4059af3a5fa30730512f2b6">rk2_kernel_midpoint</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> h, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> <a class="el" href="spike__source__poisson_8c.html#a148ad514a3ea3af1eae2a8a354f242c2">input_this_timestep</a>)</td></tr>
+<tr class="memdesc:ae9b257f5e4059af3a5fa30730512f2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Midpoint is best balance between speed and accuracy so far.  <a href="neuron__model__izh__impl_8h.html#ae9b257f5e4059af3a5fa30730512f2b6">More...</a><br /></td></tr>
+<tr class="separator:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3545d7e7c17f9b82780c3d116b08f394"><td class="memItemLeft" align="right" valign="top"><a id="a3545d7e7c17f9b82780c3d116b08f394"></a>
+static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_state_update</b> (uint16_t num_excitatory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *exc_input, uint16_t num_inhibitory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inh_input, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
+<tr class="separator:a3545d7e7c17f9b82780c3d116b08f394"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d9e95529a2c510cc1010163f9ea89ee"><td class="memItemLeft" align="right" valign="top"><a id="a6d9e95529a2c510cc1010163f9ea89ee"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_has_spiked</b> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
+<tr class="separator:a6d9e95529a2c510cc1010163f9ea89ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memItemLeft" align="right" valign="top"><a id="a36ed2fe89ac12da019a6bcee8b6672c9"></a>
+static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_model_get_membrane_voltage</b> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
+<tr class="separator:a36ed2fe89ac12da019a6bcee8b6672c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memItemLeft" align="right" valign="top"><a id="a60d02bd3fd0eb5694bf3d08679d4565d"></a>
+const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#a60d02bd3fd0eb5694bf3d08679d4565d">global_params</a></td></tr>
+<tr class="memdesc:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The global parameters of the Izhekevich neuron model. <br /></td></tr>
+<tr class="separator:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a9449a2c1269d81389014e6c2df9573"><td class="memItemLeft" align="right" valign="top"><a id="a2a9449a2c1269d81389014e6c2df9573"></a>
+static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#a2a9449a2c1269d81389014e6c2df9573">SIMPLE_TQ_OFFSET</a> = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(1.85)</td></tr>
+<tr class="memdesc:a2a9449a2c1269d81389014e6c2df9573"><td class="mdescLeft">&#160;</td><td class="mdescRight">For linear membrane voltages, 1.5 is the correct value. However with actual membrane voltage behaviour and tested over an wide range of use cases 1.85 gives slightly better spike timings. <br /></td></tr>
+<tr class="separator:a2a9449a2c1269d81389014e6c2df9573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf9a0e8d9c7ec24f407eee48d6064666"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#adf9a0e8d9c7ec24f407eee48d6064666">MAGIC_MULTIPLIER</a> = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(0.040008544921875)</td></tr>
+<tr class="memdesc:adf9a0e8d9c7ec24f407eee48d6064666"><td class="mdescLeft">&#160;</td><td class="mdescRight">The original model uses 0.04, but this (1 ULP larger?) gives better numeric stability.  <a href="neuron__model__izh__impl_8h.html#adf9a0e8d9c7ec24f407eee48d6064666">More...</a><br /></td></tr>
+<tr class="separator:adf9a0e8d9c7ec24f407eee48d6064666"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Izhekevich neuron type. </p>
@@ -233,10 +264,93 @@ machine_timestep_ms</td>
 
 </div>
 </div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ae9b257f5e4059af3a5fa30730512f2b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b257f5e4059af3a5fa30730512f2b6">&#9670;&nbsp;</a></span>rk2_kernel_midpoint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void rk2_kernel_midpoint </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>h</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>input_this_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Midpoint is best balance between speed and accuracy so far. </p>
+<p>From ODE solver comparison work, paper shows that Trapezoid version gives better accuracy at small speed cost </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>threshold </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>The model being updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_this_timestep</td><td>the input </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00093">93</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="adf9a0e8d9c7ec24f407eee48d6064666"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf9a0e8d9c7ec24f407eee48d6064666">&#9670;&nbsp;</a></span>MAGIC_MULTIPLIER</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> MAGIC_MULTIPLIER = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(0.040008544921875)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The original model uses 0.04, but this (1 ULP larger?) gives better numeric stability. </p>
+<p>Thanks to Mantas Mikaitis for this! </p>
+
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8h_source.html#l00083">83</a> of file <a class="el" href="neuron__model__izh__impl_8h_source.html">neuron_model_izh_impl.h</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

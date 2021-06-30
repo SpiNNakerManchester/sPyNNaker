@@ -84,21 +84,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#ae9b257f5e4059af3a5fa30730512f2b6">rk2_kernel_midpoint</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> h, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> input_this_timestep)</td></tr>
-<tr class="memdesc:ae9b257f5e4059af3a5fa30730512f2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Midpoint is best balance between speed and accuracy so far.  <a href="neuron__model__izh__impl_8c.html#ae9b257f5e4059af3a5fa30730512f2b6">More...</a><br /></td></tr>
-<tr class="separator:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c709e18b3833cf07131b394b0a9b929"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a2c709e18b3833cf07131b394b0a9b929">neuron_model_set_global_neuron_params</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
 <tr class="memdesc:a2c709e18b3833cf07131b394b0a9b929"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the global neuron parameters  <a href="neuron__model__izh__impl_8c.html#a2c709e18b3833cf07131b394b0a9b929">More...</a><br /></td></tr>
 <tr class="separator:a2c709e18b3833cf07131b394b0a9b929"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a452331c36f58a564227b5d2a3a20bd3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a452331c36f58a564227b5d2a3a20bd3f">neuron_model_state_update</a> (uint16_t num_excitatory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *exc_input, uint16_t num_inhibitory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inh_input, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
-<tr class="memdesc:a452331c36f58a564227b5d2a3a20bd3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">primary function called in timer loop after synaptic updates  <a href="neuron__model__izh__impl_8c.html#a452331c36f58a564227b5d2a3a20bd3f">More...</a><br /></td></tr>
-<tr class="separator:a452331c36f58a564227b5d2a3a20bd3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49c629814dc187dc38a4b8f0dbebd111"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a49c629814dc187dc38a4b8f0dbebd111">neuron_model_has_spiked</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
-<tr class="memdesc:a49c629814dc187dc38a4b8f0dbebd111"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates that the neuron has spiked.  <a href="neuron__model__izh__impl_8c.html#a49c629814dc187dc38a4b8f0dbebd111">More...</a><br /></td></tr>
-<tr class="separator:a49c629814dc187dc38a4b8f0dbebd111"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91774a9b87c1875fcb7659fe0f096857"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a91774a9b87c1875fcb7659fe0f096857">neuron_model_get_membrane_voltage</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
-<tr class="memdesc:a91774a9b87c1875fcb7659fe0f096857"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the neuron membrane voltage for a given neuron parameter set  <a href="neuron__model__izh__impl_8c.html#a91774a9b87c1875fcb7659fe0f096857">More...</a><br /></td></tr>
-<tr class="separator:a91774a9b87c1875fcb7659fe0f096857"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a039b8ee28cccb786e7c67c985e88e3d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a039b8ee28cccb786e7c67c985e88e3d6">neuron_model_print_state_variables</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron)</td></tr>
 <tr class="memdesc:a039b8ee28cccb786e7c67c985e88e3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">printout of state variables i.e. those values that might change  <a href="neuron__model__izh__impl_8c.html#a039b8ee28cccb786e7c67c985e88e3d6">More...</a><br /></td></tr>
 <tr class="separator:a039b8ee28cccb786e7c67c985e88e3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,76 +97,15 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memItemLeft" align="right" valign="top"><a id="a60d02bd3fd0eb5694bf3d08679d4565d"></a>
-static const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a60d02bd3fd0eb5694bf3d08679d4565d">global_params</a></td></tr>
+const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a60d02bd3fd0eb5694bf3d08679d4565d">global_params</a></td></tr>
 <tr class="memdesc:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The global parameters of the Izhekevich neuron model. <br /></td></tr>
 <tr class="separator:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a9449a2c1269d81389014e6c2df9573"><td class="memItemLeft" align="right" valign="top"><a id="a2a9449a2c1269d81389014e6c2df9573"></a>
-static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a2a9449a2c1269d81389014e6c2df9573">SIMPLE_TQ_OFFSET</a> = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(1.85)</td></tr>
-<tr class="memdesc:a2a9449a2c1269d81389014e6c2df9573"><td class="mdescLeft">&#160;</td><td class="mdescRight">For linear membrane voltages, 1.5 is the correct value. However with actual membrane voltage behaviour and tested over an wide range of use cases 1.85 gives slightly better spike timings. <br /></td></tr>
-<tr class="separator:a2a9449a2c1269d81389014e6c2df9573"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf9a0e8d9c7ec24f407eee48d6064666"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#adf9a0e8d9c7ec24f407eee48d6064666">MAGIC_MULTIPLIER</a> = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(0.040008544921875)</td></tr>
-<tr class="memdesc:adf9a0e8d9c7ec24f407eee48d6064666"><td class="mdescLeft">&#160;</td><td class="mdescRight">The original model uses 0.04, but this (1 ULP larger?) gives better numeric stability.  <a href="neuron__model__izh__impl_8c.html#adf9a0e8d9c7ec24f407eee48d6064666">More...</a><br /></td></tr>
-<tr class="separator:adf9a0e8d9c7ec24f407eee48d6064666"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Izhekevich neuron implementation. </p>
 
 <p class="definition">Definition in file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ae9b257f5e4059af3a5fa30730512f2b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9b257f5e4059af3a5fa30730512f2b6">&#9670;&nbsp;</a></span>rk2_kernel_midpoint()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void rk2_kernel_midpoint </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
-          <td class="paramname"><em>h</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
-          <td class="paramname"><em>input_this_timestep</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Midpoint is best balance between speed and accuracy so far. </p>
-<p>From ODE solver comparison work, paper shows that Trapezoid version gives better accuracy at small speed cost </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>threshold </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>The model being updated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">input_this_timestep</td><td>the input </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00069">69</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
-</div>
-</div>
 <a id="a2c709e18b3833cf07131b394b0a9b929"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2c709e18b3833cf07131b394b0a9b929">&#9670;&nbsp;</a></span>neuron_model_set_global_neuron_params()</h2>
 
@@ -203,132 +130,7 @@ static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00091">91</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
-</div>
-</div>
-<a id="a452331c36f58a564227b5d2a3a20bd3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a452331c36f58a564227b5d2a3a20bd3f">&#9670;&nbsp;</a></span>neuron_model_state_update()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> neuron_model_state_update </td>
-          <td>(</td>
-          <td class="paramtype">uint16_t&#160;</td>
-          <td class="paramname"><em>num_excitatory_inputs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td>
-          <td class="paramname"><em>exc_input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint16_t&#160;</td>
-          <td class="paramname"><em>num_inhibitory_inputs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td>
-          <td class="paramname"><em>inh_input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
-          <td class="paramname"><em>external_bias</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict&#160;</td>
-          <td class="paramname"><em>neuron</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>primary function called in timer loop after synaptic updates </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">num_excitatory_inputs</td><td>Number of excitatory receptor types. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">exc_input</td><td>Pointer to array of inputs per receptor type received this timer tick that produce a positive reaction within the neuron in terms of stimulation. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">num_inhibitory_inputs</td><td>Number of inhibitory receptor types. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">inh_input</td><td>Pointer to array of inputs per receptor type received this timer tick that produce a negative reaction within the neuron in terms of stimulation. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">external_bias</td><td>This is the intrinsic plasticity which could be used for ac, noisy input etc etc. (general purpose input) </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>the pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the value to be compared with a threshold value to determine if the neuron has spiked </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00096">96</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
-</div>
-</div>
-<a id="a49c629814dc187dc38a4b8f0dbebd111"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49c629814dc187dc38a4b8f0dbebd111">&#9670;&nbsp;</a></span>neuron_model_has_spiked()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_model_has_spiked </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Indicates that the neuron has spiked. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00120">120</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
-</div>
-</div>
-<a id="a91774a9b87c1875fcb7659fe0f096857"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91774a9b87c1875fcb7659fe0f096857">&#9670;&nbsp;</a></span>neuron_model_get_membrane_voltage()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> neuron_model_get_membrane_voltage </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>get the neuron membrane voltage for a given neuron parameter set </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the membrane voltage for a given neuron with the neuron parameters specified in neuron </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00131">131</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00027">27</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
 
 </div>
 </div>
@@ -356,7 +158,7 @@ static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00135">135</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00032">32</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
 
 </div>
 </div>
@@ -384,42 +186,14 @@ static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00140">140</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="adf9a0e8d9c7ec24f407eee48d6064666"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf9a0e8d9c7ec24f407eee48d6064666">&#9670;&nbsp;</a></span>MAGIC_MULTIPLIER</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> MAGIC_MULTIPLIER = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(0.040008544921875)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The original model uses 0.04, but this (1 ULP larger?) gives better numeric stability. </p>
-<p>Thanks to Mantas Mikaitis for this! </p>
-
-<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00059">59</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__model__izh__impl_8c_source.html#l00037">37</a> of file <a class="el" href="neuron__model__izh__impl_8c_source.html">neuron_model_izh_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jun 24 2021 10:45:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Wed Jun 30 2021 08:55:44 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
