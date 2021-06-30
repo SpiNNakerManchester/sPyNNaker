@@ -215,9 +215,9 @@ class PopulationMachineNeurons(
 
     def _write_current_source_parameters(self, spec):
         # pylint: disable=too-many-arguments
-        n_atoms = self.vertex_slice.n_atoms
-        lo_atom = self.vertex_slice.lo_atom
-        hi_atom = self.vertex_slice.hi_atom
+        n_atoms = self._vertex_slice.n_atoms
+        lo_atom = self._vertex_slice.lo_atom
+        hi_atom = self._vertex_slice.hi_atom
 
         spec.comment(
             "\nWriting Current Source Parameters for {} Neurons:\n".format(
@@ -225,15 +225,15 @@ class PopulationMachineNeurons(
 
         # Reserve and switch to the current source region
         params_size = self._app_vertex.\
-            get_sdram_usage_for_current_source_params(self.vertex_slice)
+            get_sdram_usage_for_current_source_params(self._vertex_slice)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')
         spec.switch_write_focus(self._neuron_regions.current_source_params)
 
         # Get the current sources from the app vertex
-        app_current_sources = self.app_vertex.current_sources
-        current_source_id_list = self.app_vertex.current_source_id_list
+        app_current_sources = self._app_vertex.current_sources
+        current_source_id_list = self._app_vertex.current_source_id_list
 
         # Work out which current sources are on this core
         current_sources = set()
