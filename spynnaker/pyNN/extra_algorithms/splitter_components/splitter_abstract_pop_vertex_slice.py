@@ -121,7 +121,8 @@ class SplitterAbstractPopulationVertexSlice(
         index = self.__next_index
         self.__next_index += 1
         return PopulationMachineVertex(
-           resources, label, remaining_constraints, self._governed_app_vertex,
+            resources, label, remaining_constraints,
+            self._governed_app_vertex,
             vertex_slice, index, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_size(vertex_slice),
             self.__structural_size(vertex_slice))
