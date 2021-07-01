@@ -264,7 +264,7 @@ class PopulationMachineVertex(
         return ids
 
     @inject_items({
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
