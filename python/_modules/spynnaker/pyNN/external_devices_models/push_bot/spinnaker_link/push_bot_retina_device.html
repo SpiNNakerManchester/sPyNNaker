@@ -89,7 +89,7 @@
         <span class="c1"># stores for the injection aspects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.routing_info"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info">[docs]</a>    <span class="nd">@inject</span><span class="p">(</span><span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.routing_info"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info">[docs]</a>    <span class="nd">@inject</span><span class="p">(</span><span class="s2">&quot;RoutingInfos&quot;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">routing_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>

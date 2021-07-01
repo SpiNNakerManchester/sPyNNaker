@@ -129,7 +129,7 @@
     <span class="k">def</span> <span class="nf">source_of_delay_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_other_splitter</span><span class="o">.</span><span class="n">governed_app_vertex</span>
 
-<div class="viewcode-block" id="SplitterDelayVertexSlice.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertices">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;app_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">})</span>
+<div class="viewcode-block" id="SplitterDelayVertexSlice.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertices">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;app_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;ApplicationGraph&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractDependentSplitter</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;app_graph&quot;</span><span class="p">])</span>

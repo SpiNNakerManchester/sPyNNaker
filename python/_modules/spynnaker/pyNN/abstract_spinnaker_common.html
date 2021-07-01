@@ -446,15 +446,15 @@
             <span class="n">receivers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_receivers_from_projections</span><span class="p">(</span>
                 <span class="n">projection_to_attribute_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span>
-                    <span class="s2">&quot;MemoryMCGatherVertexToEthernetConnectedChipMapping&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;VertexToEthernetConnectedChipMapping&quot;</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span>
-                    <span class="s2">&quot;MemoryExtraMonitorToChipMapping&quot;</span><span class="p">))</span>
+                    <span class="s2">&quot;ExtraMonitorToChipMapping&quot;</span><span class="p">))</span>
 
         <span class="c1"># set up the router timeouts to stop packet loss</span>
         <span class="k">for</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">extra_monitor_cores</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">:</span>
             <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_system_routing_tables</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;MemoryExtraMonitorVertices&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;ExtraMonitorVertices&quot;</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
             <span class="n">data_receiver</span><span class="o">.</span><span class="n">set_cores_for_data_streaming</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_monitor_cores</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
@@ -474,7 +474,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_monitor_cores</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
             <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_application_routing_tables</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;MemoryExtraMonitorVertices&quot;</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;ExtraMonitorVertices&quot;</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
 
         <span class="c1"># return data items</span>
