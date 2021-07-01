@@ -28,6 +28,7 @@ from .munich_spinnaker_link_motor_device import MunichMotorDevice
 from .munich_spinnaker_link_retina_device import MunichRetinaDevice
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
+from .spif_retina_device import SPIFRetinaDevice
 
 __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "AbstractEthernetTranslator", "ArbitraryFPGADevice",
@@ -35,4 +36,4 @@ __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
            "MachineMunichMotorDevice",
            "MunichMotorDevice", "MunichRetinaDevice",
-           "ThresholdTypeMulticastDeviceControl"]
+           "ThresholdTypeMulticastDeviceControl", "SPIFRetinaDevice"]

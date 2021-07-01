@@ -32,7 +32,8 @@ from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
+    SPIFRetinaDevice)
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as
     ExternalDeviceSpikeInjector)
@@ -75,7 +76,7 @@ __all__ = [
     # General Devices
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
+    "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice"
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
