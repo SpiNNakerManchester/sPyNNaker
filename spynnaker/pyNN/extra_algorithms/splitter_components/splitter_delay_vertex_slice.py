@@ -91,7 +91,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def source_of_delay_vertex(self):
         return self._other_splitter.governed_app_vertex
 
-    @inject_items({"app_graph": "MemoryApplicationGraph"})
+    @inject_items({"app_graph": "ApplicationGraph"})
     @overrides(
         AbstractDependentSplitter.create_machine_vertices,
         additional_arguments=["app_graph"])
