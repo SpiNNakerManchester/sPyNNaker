@@ -24,7 +24,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -41,11 +41,11 @@
         <input_definitions>
            <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
@@ -73,7 +73,7 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
@@ -81,11 +81,11 @@
             </parameter>
              <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>app_id</param_name>
@@ -97,15 +97,15 @@
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -144,7 +144,7 @@
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
@@ -152,11 +152,11 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>app_id</param_name>
@@ -168,15 +168,15 @@
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -218,7 +218,7 @@
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
-                <param_type>MemoryRoutingTables</param_type>
+                <param_type>RoutingTables</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_targets</param_name>
@@ -226,11 +226,11 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>app_id</param_name>
@@ -242,15 +242,15 @@
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
@@ -284,7 +284,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
@@ -292,19 +292,19 @@
             </parameter>
             <parameter>
                 <param_name>transceiver</param_name>
-                <param_type>MemoryTransceiver</param_type>
+                <param_type>Transceiver</param_type>
             </parameter>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_type>RoutingInfos</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -326,14 +326,14 @@
         <input_definitions>
             <parameter>
                 <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
         </required_inputs>
         <outputs>
-            <param_type>MemoryMachineGraph</param_type>
+            <param_type>MachineGraph</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
@@ -342,7 +342,7 @@
         <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
+                <param_type>Placements</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -350,7 +350,7 @@
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryExtendedMachine</param_type>
+                <param_type>ExtendedMachine</param_type>
             </parameter>
             <parameter>
                 <param_name>data_n_timesteps</param_name>
@@ -405,7 +405,7 @@
         <input_definitions>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -421,7 +421,7 @@
         <input_definitions>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -434,12 +434,12 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>machine</param_name>
-                <param_type>MemoryVirtualMachine</param_type>
-                <param_type>MemoryMachine</param_type>
+                <param_type>VirtualMachine</param_type>
+                <param_type>Machine</param_type>
             </parameter>
             <parameter>
                 <param_name>plan_n_time_steps</param_name>
@@ -447,7 +447,7 @@
             </parameter>
             <parameter>
                 <param_name>pre_allocated_resources</param_name>
-                <param_type>MemoryPreAllocatedResources</param_type>
+                <param_type>PreAllocatedResources</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -461,7 +461,7 @@
             <param_name>pre_allocated_resources</param_name>
         </optional_inputs>
         <outputs>
-            <param_type>MemoryMachineGraph</param_type>
+            <param_type>MachineGraph</param_type>
             <param_type>NChipsRequired</param_type>
             <token>PartitioningDone</token>
         </outputs>
@@ -472,7 +472,7 @@
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -488,7 +488,7 @@
         <input_definitions>
             <parameter>
                 <param_name>application_graph</param_name>
-                <param_type>MemoryApplicationGraph</param_type>
+                <param_type>ApplicationGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
