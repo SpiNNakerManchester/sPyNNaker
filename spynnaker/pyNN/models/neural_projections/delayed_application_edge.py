@@ -16,6 +16,8 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
+from spynnaker.pyNN.models.neural_projections\
+    .projection_application_edge import are_dynamics_structural
 
 
 class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
@@ -95,6 +97,9 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, src_machine_vertex, dest_machine_vertex):
         for synapse_info in self.__synapse_information:
+            # Structual Plasticity can learn connection not originally included
+            if are_dynamics_structural(synapse_info.synapse_dynamics):
+                return True
             if synapse_info.connector.could_connect(
                     synapse_info, src_machine_vertex, dest_machine_vertex):
                 return True

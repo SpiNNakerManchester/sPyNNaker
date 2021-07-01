@@ -12,27 +12,30 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
+    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
+    MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterSlice)
 from pacman.utilities import utility_calls
-from spinn_front_end_common.interface.profiling import profile_utils
-from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT)
-from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
-from spynnaker.pyNN.utilities import bit_field_utilities
+from spynnaker.pyNN.models.neuron.population_machine_vertex import (
+    NeuronProvenance, SynapseProvenance, MainProvenance,
+    SpikeProcessingProvenance)
+from spynnaker.pyNN.models.neuron.master_pop_table import (
+    MasterPopTableAsBinarySearch)
+from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_estimated_sdram_for_bit_field_region,
+    get_estimated_sdram_for_key_region,
+    exact_sdram_for_bit_field_builder_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 
@@ -42,14 +45,27 @@ class SplitterAbstractPopulationVertexSlice(
     """ handles the splitting of the AbstractPopulationVertex via slice logic.
     """
 
-    __slots__ = []
+    __slots__ = [
+        # The pre-calculated ring buffer shifts
+        "__ring_buffer_shifts",
+        # The pre-calculated weight scales
+        "__weight_scales",
+        # The size of all the synapses on a core
+        "__all_syn_block_sz",
+        # The size of the structural plasticity data
+        "__structural_sz",
+        # The size of the synaptic expander data
+        "__synapse_expander_sz",
+        # The size of all the bitfield data
+        "__bitfield_sz",
+        # The next index to use for a synapse core
+        "__next_index"
+    ]
 
-    _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
-    _NEURON_BASE_N_CPU_CYCLES = 10
-    _C_MAIN_BASE_N_CPU_CYCLES = 0
-
+    """ The name of the splitter """
     SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
 
+    """ The message to use when the Population is invalid """
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterAbstractPopulationVertexSlice as"
@@ -59,6 +75,13 @@ class SplitterAbstractPopulationVertexSlice(
 
     def __init__(self):
         super().__init__(self.SPLITTER_NAME)
+        self.__ring_buffer_shifts = None
+        self.__weight_scales = None
+        self.__all_syn_block_sz = dict()
+        self.__structural_sz = dict()
+        self.__synapse_expander_sz = None
+        self.__bitfield_sz = None
+        self.__next_index = 0
 
     @overrides(AbstractSplitterSlice.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -66,6 +89,14 @@ class SplitterAbstractPopulationVertexSlice(
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
+
+    @overrides(AbstractSplitterSlice.create_machine_vertices)
+    def create_machine_vertices(self, resource_tracker, machine_graph):
+        app_vertex = self._governed_app_vertex
+        app_vertex.synapse_recorder.add_region_offset(
+            len(app_vertex.neuron_recorder.get_recordable_variables()))
+        return super(SplitterAbstractPopulationVertexSlice, self)\
+            .create_machine_vertices(resource_tracker, machine_graph)
 
     @overrides(AbstractSplitterSlice.get_out_going_vertices)
     def get_out_going_vertices(self, edge, outgoing_edge_partition):
@@ -79,129 +110,199 @@ class SplitterAbstractPopulationVertexSlice(
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):
-        return PopulationMachineVertex(
-            resources,
-            self._governed_app_vertex.neuron_recorder.recorded_ids_by_slice(
-                vertex_slice),
-            label, remaining_constraints, self._governed_app_vertex,
-            vertex_slice,
-            self._governed_app_vertex.synapse_manager.drop_late_spikes,
-            self.__get_binary_file_name())
 
-    @inject_items({"graph": "MemoryApplicationGraph"})
-    @overrides(
-        AbstractSplitterSlice.get_resources_used_by_atoms,
-        additional_arguments=["graph"])
-    def get_resources_used_by_atoms(self, vertex_slice, graph):
-        """  Gets the resources of a slice of atoms from a given app vertex.
+        if self.__ring_buffer_shifts is None:
+            app_vertex = self._governed_app_vertex
+            self.__ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(
+                app_vertex.incoming_projections)
+            self.__weight_scales = app_vertex.get_weight_scales(
+                self.__ring_buffer_shifts)
+
+        index = self.__next_index
+        self.__next_index += 1
+        return PopulationMachineVertex(
+            resources, label, remaining_constraints, self._governed_app_vertex,
+            vertex_slice, index, self.__ring_buffer_shifts,
+            self.__weight_scales, self.__all_syn_block_size(vertex_slice),
+            self.__structural_size(vertex_slice))
+
+    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
+        """  Gets the resources of a slice of atoms
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
-        :param ~pacman.model.graphs.machine.MachineGraph graph: app graph
         :rtype: ~pacman.model.resources.ResourceContainer
         """
         # pylint: disable=arguments-differ
-        variable_sdram = self.get_variable_sdram(vertex_slice)
-        constant_sdram = self.constant_sdram(vertex_slice, graph)
+        variable_sdram = self.__get_variable_sdram(vertex_slice)
+        constant_sdram = self.__get_constant_sdram(vertex_slice)
+        sdram = MultiRegionSDRAM()
+        sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
+        sdram.merge(constant_sdram)
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variable_sdram + constant_sdram,
-            dtcm=self.dtcm_cost(vertex_slice),
-            cpu_cycles=self.cpu_cost(vertex_slice))
+            sdram=sdram, dtcm=self.__get_dtcm_cost(vertex_slice),
+            cpu_cycles=self.__get_cpu_cost(vertex_slice))
 
         # return the total resources.
         return container
 
-    def get_variable_sdram(self, vertex_slice):
-        """ returns the variable sdram from the recorder.
+    def __get_variable_sdram(self, vertex_slice):
+        """ returns the variable sdram from the recorders
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the atom slice for recording sdram
         :return: the variable sdram used by the neuron recorder
         :rtype: VariableSDRAM
         """
-        s_dynamics = self._governed_app_vertex.synapse_manager.synapse_dynamics
+        s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractSynapseDynamicsStructural):
             max_rewires_per_ts = s_dynamics.get_max_rewires_per_ts()
-            self._governed_app_vertex.neuron_recorder.set_max_rewires_per_ts(
+            self._governed_app_vertex.synapse_recorder.set_max_rewires_per_ts(
                 max_rewires_per_ts)
 
-        return self._governed_app_vertex.neuron_recorder.\
-            get_variable_sdram_usage(vertex_slice)
+        return (
+            self._governed_app_vertex.get_neuron_variable_sdram(vertex_slice) +
+            self._governed_app_vertex.get_synapse_variable_sdram(vertex_slice))
 
-    def constant_sdram(self, vertex_slice,  graph):
+    def __get_constant_sdram(self, vertex_slice):
         """ returns the constant sdram used by the vertex slice.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the atoms to get constant sdram of
-        :param ~pacman.model.graphs.application.ApplicationGraph graph:
-            app graph
-        :rtype: ConstantSDRAM
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
-        sdram_requirement = (
-            SYSTEM_BYTES_REQUIREMENT +
-            self._governed_app_vertex.get_sdram_usage_for_neuron_params(
-                vertex_slice) +
-            self._governed_app_vertex.neuron_recorder.get_static_sdram_usage(
-                vertex_slice) +
-            PopulationMachineVertex.get_provenance_data_size(
-                len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
-            self._governed_app_vertex.synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph, self._governed_app_vertex) +
-            profile_utils.get_profile_region_size(
-                self._governed_app_vertex.n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self._governed_app_vertex) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self._governed_app_vertex) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
-        return ConstantSDRAM(sdram_requirement)
+        n_record = (
+            len(self._governed_app_vertex.neuron_recordables) +
+            len(self._governed_app_vertex.synapse_recordables))
+        n_provenance = (
+            NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
+            MainProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
+        sdram = MultiRegionSDRAM()
+        sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
+            n_record, n_provenance, PopulationMachineVertex.COMMON_REGIONS))
+        sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
+            vertex_slice, PopulationMachineVertex.NEURON_REGIONS))
+        sdram.merge(self.__get_synapse_constant_sdram(vertex_slice))
+        return sdram
 
-    def dtcm_cost(self, vertex_slice):
+    def __get_synapse_constant_sdram(self, vertex_slice):
+
+        """ Get the amount of fixed SDRAM used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
+        """
+        sdram = MultiRegionSDRAM()
+        app_vertex = self._governed_app_vertex
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_params,
+            app_vertex.get_synapse_params_size())
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
+            app_vertex.get_synapse_dynamics_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.structural_dynamics,
+            self.__structural_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
+            self.__all_syn_block_size(vertex_slice))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.direct_matrix,
+            app_vertex.all_single_syn_size)
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.pop_table,
+            MasterPopTableAsBinarySearch.get_master_population_table_size(
+                app_vertex.incoming_projections))
+        sdram.add_cost(
+            PopulationMachineVertex.SYNAPSE_REGIONS.connection_builder,
+            self.__synapse_expander_size())
+        sdram.merge(self.__bitfield_size())
+        return sdram
+
+    def __all_syn_block_size(self, vertex_slice):
+        """ Work out how much SDRAM is needed for all the synapses
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+        :rtype: int
+        """
+        if vertex_slice in self.__all_syn_block_sz:
+            return self.__all_syn_block_sz[vertex_slice]
+        all_syn_block_sz = self._governed_app_vertex.get_synapses_size(
+            vertex_slice, self._governed_app_vertex.incoming_projections)
+        self.__all_syn_block_sz[vertex_slice] = all_syn_block_sz
+        return all_syn_block_sz
+
+    def __structural_size(self, vertex_slice):
+        """ Work out how much SDRAM is needed by the structural plasticity data
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+        :rtype: int
+        """
+        if vertex_slice in self.__structural_sz:
+            return self.__structural_sz[vertex_slice]
+        structural_sz = self._governed_app_vertex.get_structural_dynamics_size(
+            vertex_slice, self._governed_app_vertex.incoming_projections)
+        self.__structural_sz[vertex_slice] = structural_sz
+        return structural_sz
+
+    def __synapse_expander_size(self):
+        """ Work out how much SDRAM is needed for the synapse expander
+
+        :rtype: int
+        """
+        if self.__synapse_expander_sz is None:
+            self.__synapse_expander_sz = \
+                self._governed_app_vertex.get_synapse_expander_size(
+                    self._governed_app_vertex.incoming_projections)
+        return self.__synapse_expander_sz
+
+    def __bitfield_size(self):
+        """ Work out how much SDRAM is needed by the bit fields
+
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
+        """
+        if self.__bitfield_sz is None:
+            sdram = MultiRegionSDRAM()
+            projections = self._governed_app_vertex.incoming_projections
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_filter,
+                get_estimated_sdram_for_bit_field_region(projections))
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_key_map,
+                get_estimated_sdram_for_key_region(projections))
+            sdram.add_cost(
+                PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
+                exact_sdram_for_bit_field_builder_region())
+            self.__bitfield_sz = sdram
+        return self.__bitfield_sz
+
+    def __get_dtcm_cost(self, vertex_slice):
         """ get the dtcm cost for the slice of atoms
 
         :param Slice vertex_slice: atom slice for dtcm calc.
         :rtype: DTCMResource
         """
         return DTCMResource(
-            self._governed_app_vertex.neuron_impl.get_dtcm_usage_in_bytes(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_recorder.get_dtcm_usage_in_bytes(
-                vertex_slice) +
-            self._governed_app_vertex.synapse_manager.
-            get_dtcm_usage_in_bytes())
+            self._governed_app_vertex.get_common_dtcm() +
+            self._governed_app_vertex.get_neuron_dtcm(vertex_slice) +
+            self._governed_app_vertex.get_synapse_dtcm(vertex_slice))
 
-    def cpu_cost(self, vertex_slice):
+    def __get_cpu_cost(self, vertex_slice):
         """ get cpu cost for a slice of atoms
 
         :param Slice vertex_slice: slice of atoms
         :rtype: CPUCyclesPerTickResourcer
         """
         return CPUCyclesPerTickResource(
-            self._NEURON_BASE_N_CPU_CYCLES + self._C_MAIN_BASE_N_CPU_CYCLES +
-            (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
-             vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_recorder.get_n_cpu_cycles(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.neuron_impl.get_n_cpu_cycles(
-                vertex_slice.n_atoms) +
-            self._governed_app_vertex.synapse_manager.get_n_cpu_cycles())
-
-    def __get_binary_file_name(self):
-        """ returns the binary name for the machine vertices.
-
-        :rtype: str
-        """
-
-        # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self._governed_app_vertex.neuron_impl.binary_name)
-
-        # Reunite title and extension and return
-        return (
-            binary_title +
-            self._governed_app_vertex.synapse_manager.
-            vertex_executable_suffix + binary_extension)
+            self._governed_app_vertex.get_common_cpu() +
+            self._governed_app_vertex.get_neuron_cpu(vertex_slice) +
+            self._governed_app_vertex.get_synapse_cpu(vertex_slice))
 
     @overrides(AbstractSplitterSlice.check_supported_constraints)
     def check_supported_constraints(self):
@@ -210,3 +311,12 @@ class SplitterAbstractPopulationVertexSlice(
             supported_constraints=[
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
+
+    @overrides(AbstractSplitterSlice.reset_called)
+    def reset_called(self):
+        super(SplitterAbstractPopulationVertexSlice, self).reset_called()
+        self.__ring_buffer_shifts = None
+        self.__weight_scales = None
+        self.__all_syn_block_sz = dict()
+        self.__structural_sz = dict()
+        self.__next_index = 0

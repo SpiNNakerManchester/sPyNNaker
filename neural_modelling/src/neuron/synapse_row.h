@@ -96,15 +96,6 @@
 #define SYNAPSE_WEIGHT_BITS 16
 #endif
 
-//! how many bits the synapse delay will take
-#ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 4
-#endif
-
-// Create some masks based on the number of bits
-//! the mask for the synapse delay in the row
-#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
-
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 //! Define the type of the weights
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
@@ -229,8 +220,8 @@ static inline index_t synapse_row_sparse_type_index(
 //!     Number of bits for the synapse type and index (depends on type)
 //! \return the delay
 static inline index_t synapse_row_sparse_delay(
-        uint32_t x, uint32_t synapse_type_index_bits) {
-    return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
+        uint32_t x, uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask) {
+    return (x >> synapse_type_index_bits) & synapse_delay_mask;
 }
 
 //! \brief Get the weight from an encoded synapse descriptor
@@ -238,6 +229,75 @@ static inline index_t synapse_row_sparse_delay(
 //! \return the weight
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
     return x >> (32 - SYNAPSE_WEIGHT_BITS);
+}
+
+//! \brief Converts a weight stored in a synapse row to an input
+//! \param[in] weight: the weight to convert in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
+//! \return the actual input weight for the model
+static inline input_t synapse_row_convert_weight_to_input(
+        weight_t weight, uint32_t left_shift) {
+    union {
+        int_k_t input_type;
+        s1615 output_type;
+    } converter;
+
+    converter.input_type = (int_k_t) (weight) << left_shift;
+
+    return converter.output_type;
+}
+
+//! \brief Get the index of the ring buffer for a given timestep, synapse type
+//!     and neuron index
+//! \param[in] simulation_timestep:
+//! \param[in] synapse_type_index:
+//! \param[in] neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \param[in] synapse_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_ring_buffer_index(
+        uint32_t simulation_timestep, uint32_t synapse_type_index,
+        uint32_t neuron_index, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits, uint32_t synapse_delay_mask) {
+    return ((simulation_timestep & synapse_delay_mask) << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
+            | neuron_index;
+}
+
+//! \brief Get the index of the ring buffer for time 0, synapse type
+//!     and neuron index
+//! \param[in] synapse_type_index:
+//! \param[in] neuron_index:
+//! \param[in] synapse_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_ring_buffer_index_time_0(
+        uint32_t synapse_type_index, uint32_t neuron_index,
+        uint32_t synapse_index_bits) {
+    return (synapse_type_index << synapse_index_bits) | neuron_index;
+}
+
+//! \brief Get the index of the first ring buffer for a given timestep
+//! \param[in] simulation_timestep:
+//! \param[in] synapse_type_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_first_ring_buffer_index(
+        uint32_t simulation_timestep, uint32_t synapse_type_index_bits,
+        int32_t synapse_delay_mask) {
+    return (simulation_timestep & synapse_delay_mask) << synapse_type_index_bits;
+}
+
+//! \brief Get the index of the ring buffer for a given timestep and combined
+//!     synapse type and neuron index (as stored in a synapse row)
+//! \param[in] simulation_timestep:
+//! \param[in] combined_synapse_neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \return Index into the ring buffer
+static inline index_t synapse_row_get_ring_buffer_index_combined(
+        uint32_t simulation_timestep,
+        uint32_t combined_synapse_neuron_index,
+        uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask) {
+    return ((simulation_timestep & synapse_delay_mask) << synapse_type_index_bits)
+            | combined_synapse_neuron_index;
 }
 
 #endif  // SYNAPSE_ROW_H

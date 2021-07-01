@@ -473,11 +473,9 @@ class Recorder(object):
             elif variable == REWIRING:
                 self.__read_in_event(
                     segment=segment,
-                    block=block,
                     event_array=self.get_events(variable),
                     variable=variable,
-                    recording_start_time=self._recording_start_time,
-                    label=self.__population.label)
+                    recording_start_time=self._recording_start_time)
             else:
                 (data, data_indexes, sampling_interval) = \
                     self.get_recorded_matrix(variable)
@@ -537,11 +535,9 @@ class Recorder(object):
             elif variable == REWIRING:
                 self.__read_in_event(
                     segment=segment,
-                    block=block,
                     event_array=variable_cache.data,
                     variable=variable,
-                    recording_start_time=data_cache.recording_start_time,
-                    label=self.__population.label)
+                    recording_start_time=data_cache.recording_start_time)
             else:
                 self.__read_in_signal(
                     segment=segment,
@@ -716,18 +712,15 @@ class Recorder(object):
         channel_index.analogsignals.append(data_array)
 
     def __read_in_event(
-            self, segment, block, event_array, variable, recording_start_time,
-            label):
+            self, segment, event_array, variable, recording_start_time):
         """ Reads in a data item that is an event (i.e. rewiring form/elim)\
             and saves this data to the segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
-        :param ~neo.core.Block block: neo block
         :param ~numpy.ndarray signal_array: the raw "event" data
         :param str variable: the variable name
         :param recording_start_time: when recording started
         :type recording_start_time: float or int
-        :param str label: human readable label
         """
         # pylint: disable=too-many-arguments, no-member
         t_start = recording_start_time * quantities.ms

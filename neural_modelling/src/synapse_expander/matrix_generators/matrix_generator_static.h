@@ -25,6 +25,7 @@
 #include <delay_extension/delay_extension.h>
 #include "matrix_generator_common.h"
 #include <synapse_expander/generator_types.h>
+#include <utils.h>
 
 /**
  * \brief How to initialise the static synaptic matrix generator
@@ -53,11 +54,6 @@ static void matrix_generator_static_free(UNUSED void *generator) {
  */
 #define SYNAPSE_WEIGHT_MASK 0xFFFF
 
-/**
- * \brief The mask of a delay before shifting
- */
-#define SYNAPSE_DELAY_MASK 0xFF
-
 //! The layout of a purely static row of a synaptic matrix.
 typedef struct {
     uint32_t plastic_plastic_size;  //!< the plastic-plastic size within a row
@@ -74,18 +70,20 @@ typedef struct {
  * \param[in] post_index: The core-relative index of the target neuron
  * \param[in] synapse_type_bits: The number of bits for the synapse type
  * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \param[in] delay_bits: The number of bits for the synaptic delay
  * \return a synaptic word
  */
 static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
-        uint32_t synapse_index_bits) {
+        uint32_t synapse_index_bits, uint32_t delay_bits) {
     uint32_t synapse_index_mask = (1 << synapse_index_bits) - 1;
     uint32_t synapse_type_mask = (1 << synapse_type_bits) - 1;
+    uint32_t synapse_delay_mask = (1 << delay_bits) - 1;
 
     uint32_t wrd  = post_index & synapse_index_mask;
     wrd |= (type & synapse_type_mask) << synapse_index_bits;
-    wrd |= (delay & SYNAPSE_DELAY_MASK) <<
+    wrd |= (delay & synapse_delay_mask) <<
             (synapse_index_bits + synapse_type_bits);
     wrd |= (weight & SYNAPSE_WEIGHT_MASK) << SYNAPSE_WEIGHT_SHIFT;
     return wrd;
@@ -176,6 +174,15 @@ static void matrix_generator_static_write_row(
         log_debug("write[%u] = 0x%08x", i, write_address[i]);
     }
 
+    uint32_t max_delay_power_2 = max_delay_per_stage;
+    uint32_t log_max_delay = 1;
+    if (max_delay_power_2 != 1) {
+        if (!is_power_of_2(max_delay_power_2)) {
+            max_delay_power_2 = next_power_of_2(max_delay_power_2);
+        }
+        log_max_delay = ilog_2(max_delay_power_2);
+    }
+
 
     // Go through the synapses
     for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
@@ -205,7 +212,7 @@ static void matrix_generator_static_write_row(
         // Build synaptic word
         uint32_t word = build_static_word(
                 weight, delay.delay, synapse_type, post_index, synapse_type_bits,
-                synapse_index_bits);
+                synapse_index_bits, log_max_delay);
 
         // Write the word
         log_debug("Writing word to 0x%08x", &write_address[delay.stage][0]);
