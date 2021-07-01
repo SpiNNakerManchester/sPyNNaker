@@ -18,7 +18,6 @@
 //! \file
 //! \brief STDP core implementation
 //!
-//! "mad" for "Mapping and Debugging"?
 // Spinn_common includes
 #include <static-assert.h>
 
@@ -36,18 +35,18 @@
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <stddef.h>
 
-//! ::synapse_index_bits + number of synapse type bits
-static uint32_t synapse_type_index_bits;
-//! Number of bits to hold the neuron index
-static uint32_t synapse_index_bits;
-//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
-static uint32_t synapse_index_mask;
-//! Mask to extract the type and index (has ::synapse_type_index_bits bits set)
-static uint32_t synapse_type_index_mask;
-//! ::synapse_delay_index_type_bits + number of bits to encode delay
-static uint32_t synapse_delay_index_type_bits;
-//! Mask to extract the synapse type
-static uint32_t synapse_type_mask;
+////! ::synapse_index_bits + number of synapse type bits
+//static uint32_t synapse_type_index_bits;
+////! Number of bits to hold the neuron index
+//static uint32_t synapse_index_bits;
+////! Mask to extract the neuron index (has ::synapse_index_bits bits set)
+//static uint32_t synapse_index_mask;
+////! Mask to extract the type and index (has ::synapse_type_index_bits bits set)
+//static uint32_t synapse_type_index_mask;
+////! ::synapse_delay_index_type_bits + number of bits to encode delay
+//static uint32_t synapse_delay_index_type_bits;
+////! Mask to extract the synapse type
+//static uint32_t synapse_type_mask;
 
 //! The type of configuration parameters in SDRAM (written by host)
 typedef struct stdp_params {
@@ -99,7 +98,9 @@ uint32_t plastic_saturation_count = 0;
 //!
 //! This data is stored in SDRAM in the plastic part of the synaptic matrix
 typedef struct {
+    //! The event time
     uint32_t prev_time;
+    //! The event trace
     pre_trace_t prev_trace;
 } pre_event_history_t;
 
@@ -137,10 +138,8 @@ void synapse_dynamics_print_plastic_synapses(
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     const plastic_synapse_t *plastic_words = plastic_region_data->synapses;
-    const control_t *control_words =
-            synapse_row_plastic_controls(fixed_region);
-    size_t plastic_synapse =
-            synapse_row_num_plastic_controls(fixed_region);
+    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    size_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     log_debug("Plastic region %u synapses\n", plastic_synapse);
 
@@ -162,10 +161,10 @@ void synapse_dynamics_print_plastic_synapses(
         synapses_print_weight(
                 weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                synapse_row_sparse_delay(control_word, synapse_type_index_bits),
+                synapse_row_sparse_delay(control_word, synapse_type_index_bits, synapse_delay_mask),
                 synapse_types_get_type_char(synapse_type),
                 synapse_row_sparse_index(control_word, synapse_index_mask),
-                SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+                synapse_delay_mask, synapse_type_index_bits);
     }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
@@ -183,38 +182,12 @@ bool synapse_dynamics_initialise(
     address = (address_t) &sdram_params[1];
 
     // Call the stdp initialise function
-    bool weight_result = synapse_dynamics_stdp_initialise(
+    bool stdp_result = synapse_dynamics_stdp_initialise(
     		address, n_neurons, n_synapse_types,
 			ring_buffer_to_input_buffer_left_shifts);
-    if (!weight_result) {
+    if (!stdp_result) {
         return false;
     }
-
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    uint32_t log_n_synapse_types = 1;
-    if (n_synapse_types != 1) {
-        if (!is_power_of_2(n_synapse_types)) {
-            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-        }
-        log_n_synapse_types = ilog_2(n_synapse_types_power_2);
-    }
-
-    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
-    synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
-    synapse_index_bits = log_n_neurons;
-    synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_delay_index_type_bits =
-            SYNAPSE_DELAY_BITS + synapse_type_index_bits;
-    synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
     return true;
 }
@@ -295,7 +268,8 @@ bool synapse_dynamics_find_neuron(
         uint32_t control_word = *control_words++;
         if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
             *offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
-            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
+            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits,
+                    synapse_delay_mask);
             *synapse_type = synapse_row_sparse_type(
                     control_word, synapse_index_bits, synapse_type_mask);
             return true;
@@ -329,7 +303,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
 static inline control_t control_conversion(
         uint32_t id, uint32_t delay, uint32_t type) {
     control_t new_control =
-            (delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) << synapse_type_index_bits;
+            (delay & ((1 << synapse_delay_bits) - 1)) << synapse_type_index_bits;
     new_control |= (type & ((1 << synapse_type_index_bits) - 1)) << synapse_index_bits;
     new_control |= id & ((1 << synapse_index_bits) - 1);
     return new_control;

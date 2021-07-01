@@ -16,6 +16,7 @@
 import math
 import pytest
 import numpy
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
@@ -47,6 +48,7 @@ def as_list(request):
 
 
 def test_connection_holder(data_items, fixed_values, as_list):
+    unittest_setup()
     all_values = None
     n_items = 0
     if data_items is not None or fixed_values is not None:
@@ -153,6 +155,7 @@ def test_connection_holder(data_items, fixed_values, as_list):
 
 
 def test_connection_holder_matrix_multiple_items():
+    unittest_setup()
     data_items = ["source", "target", "delay", "weight"]
     connection_holder = ConnectionHolder(
         data_items_to_return=data_items,

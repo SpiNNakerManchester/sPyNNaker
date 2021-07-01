@@ -15,6 +15,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from pacman.operations.partition_algorithms import SplitterPartitioner
+from data_specification import ReferenceContext
 
 
 class SpynnakerSplitterPartitioner(SplitterPartitioner):
@@ -37,9 +38,10 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         :raise PacmanPartitionException: when it cant partition
         """
 
-        # do partitioning in same way
-        machine_graph, chips_used = super().__call__(
-            app_graph, machine, plan_n_time_steps, pre_allocated_resources)
+        # do partitioning in same way, but in a context of references
+        with ReferenceContext():
+            machine_graph, chips_used = super().__call__(
+                app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
         # return the accepted things
         return machine_graph, chips_used

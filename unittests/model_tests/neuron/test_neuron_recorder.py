@@ -13,10 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from data_specification.enums import DataType
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.common import NeuronRecorder
 
 
 def test_simple_record():
+    unittest_setup()
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {
@@ -34,6 +36,7 @@ def test_simple_record():
 
 
 def test_recording_variables():
+    unittest_setup()
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {

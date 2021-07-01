@@ -128,7 +128,7 @@ bool synapse_dynamics_stdp_initialise(
 static inline index_t sparse_axonal_delay(uint32_t x) {
 #if 1
 	// No axonal delay, ever
-    use(x);
+    __use(x);
     return 0;
 #else
     return (x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK;
@@ -152,7 +152,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 	// 16-bits of 32-bit fixed synapse so same functions can be used
 	uint32_t delay_axonal = sparse_axonal_delay(control_word);
 	uint32_t delay_dendritic = synapse_row_sparse_delay(
-			control_word, synapse_type_index_bits);
+			control_word, synapse_type_index_bits, synapse_delay_mask);
 	uint32_t type = synapse_row_sparse_type(
 			control_word, synapse_index_bits, synapse_type_mask);
 	uint32_t index =
@@ -165,9 +165,9 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 			synapse_structure_get_update_state(*plastic_words, type);
 
 	// Convert into ring buffer offset
-	uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+	uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
 			delay_axonal + delay_dendritic + time, type_index,
-			synapse_type_index_bits);
+			synapse_type_index_bits, synapse_delay_mask);
 
 	// Update the synapse state
 	uint32_t post_delay = delay_dendritic;
@@ -182,7 +182,6 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 	// Add weight to ring-buffer entry
 	// **NOTE** Dave suspects that this could be a
 	// potential location for overflow
-
 	uint32_t accumulation = ring_buffers[ring_buffer_index] +
 			synapse_structure_get_final_weight(final_state);
 

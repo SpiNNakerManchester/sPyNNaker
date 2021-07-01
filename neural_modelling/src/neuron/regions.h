@@ -38,5 +38,6 @@ typedef enum neuron_regions_e {
     DIRECT_MATRIX_REGION,       //!< direct synaptic matrix; 11
     BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 12
     BIT_FIELD_BUILDER,          //!< bitfield builder parameters; 13
-    BIT_FIELD_KEY_MAP           //!< bitfield key map; 14
+    BIT_FIELD_KEY_MAP,          //!< bitfield key map; 14
+    RECORDING_REGION            //!< general recording data; 15
 } regions_e;

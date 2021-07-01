@@ -74,7 +74,7 @@ class SynapseDynamicsSTDP(
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
         :param None voltage_dependence: not supported
-        :param float dendritic_delay_fraction: [0.5, 1.0]
+        :param float dendritic_delay_fraction: must be 1.0!
         :param float weight:
         :param delay: Use ``None`` to get the simulator default minimum delay.
         :type delay: float or None
@@ -106,9 +106,8 @@ class SynapseDynamicsSTDP(
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = neuromodulation
 
-        if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
-            raise NotImplementedError(
-                "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
+        if self.__dendritic_delay_fraction != 1.0:
+            raise NotImplementedError("All delays must be dendritic!")
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
@@ -343,17 +342,10 @@ class SynapseDynamicsSTDP(
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
-        dendritic_delays = (
-            connections["delay"] * self.__dendritic_delay_fraction)
-        axonal_delays = (
-            connections["delay"] * (1.0 - self.__dendritic_delay_fraction))
-
         # Get the fixed data
         fixed_plastic = (
-            ((dendritic_delays.astype("uint16") & 0xF) <<
+            (connections["delay"].astype("uint16") <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
-            ((axonal_delays.astype("uint16") & 0xF) <<
-             (4 + n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
@@ -468,9 +460,8 @@ class SynapseDynamicsSTDP(
         connections["target"] = (
             (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = pp_half_words
-        connections["delay"] = (data_fixed >> (
-            n_neuron_id_bits + n_synapse_type_bits)) & 0xF
-        connections["delay"][connections["delay"] == 0] = 16
+        connections["delay"] = data_fixed >> (
+            n_neuron_id_bits + n_synapse_type_bits)
         return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
@@ -547,7 +538,7 @@ class SynapseDynamicsSTDP(
         return numpy.array([
             self._n_header_bytes // BYTES_PER_SHORT,
             synapse_struct.get_n_half_words_per_connection(),
-            synapse_struct.get_weight_half_word()], dtype="uint32")
+            synapse_struct.get_weight_half_word()], dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.

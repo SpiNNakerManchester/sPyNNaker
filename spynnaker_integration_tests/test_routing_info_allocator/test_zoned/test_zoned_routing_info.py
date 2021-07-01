@@ -29,7 +29,6 @@ n_pops = 630
 class TestZonedRoutingInfo(BaseTestCase):
 
     def test_run(self):
-        self.assert_not_spin_three()
         results = do_synfire_npop(
             n_neurons, n_pops=n_pops, neurons_per_core=n_neurons)
         spikes = results

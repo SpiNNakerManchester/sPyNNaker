@@ -268,7 +268,7 @@ bool synapse_dynamics_stdp_initialise(
 
 //---------------------------------------
 static inline index_t sparse_axonal_delay(uint32_t x) {
-    return ((x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK);
+    return ((x >> synapse_delay_bits) & SYNAPSE_AXONAL_DELAY_MASK);
 }
 
 //---------------------------------------
@@ -315,7 +315,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 	// **NOTE** cunningly, control word is just the same as lower
 	// 16-bits of 32-bit fixed synapse so same functions can be used
 	uint32_t delay_dendritic = synapse_row_sparse_delay(control_word,
-		synapse_type_index_bits);
+		synapse_type_index_bits, synapse_delay_mask);
 	uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
 	uint32_t type = synapse_row_sparse_type(
 		control_word, synapse_index_bits, synapse_type_mask);
@@ -325,9 +325,9 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 		synapse_type_index_mask);
 
 	// Convert into ring buffer index
-	uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+	uint32_t ring_buffer_index = synapse_row_get_ring_buffer_index_combined(
 		delay_axonal + delay_dendritic + time, type_index,
-		synapse_type_index_bits);
+		synapse_type_index_bits, synapse_delay_mask);
 
 	// Get state of synapse - weight and eligibility trace.
 	plastic_synapse_t* current_state = plastic_words;

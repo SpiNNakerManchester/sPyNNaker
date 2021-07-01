@@ -57,13 +57,6 @@ void synapse_dynamics_process_neuromodulator_event(
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index);
 
-//! \brief Get the intrinsic bias of the synapses
-//! \param[in] time: The current simulation time
-//! \param[in] neuron_index: Which neuron are we processing
-//! \return The intrinsic bias
-input_t synapse_dynamics_get_intrinsic_bias(
-        uint32_t time, index_t neuron_index);
-
 //! \brief Print the synapse dynamics
 //! \param[in] plastic_region_data: Where the plastic data is
 //! \param[in] fixed_region: Where the fixed data is

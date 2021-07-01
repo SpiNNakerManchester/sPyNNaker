@@ -23,6 +23,8 @@ from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
 import spynnaker8
 
+# NO unittest_setup() as sim.setup is called
+
 
 @pytest.mark.parametrize(
     "clist, column_names, weights, delays, expected_clist, expected_weights, "
