@@ -52,7 +52,7 @@ class PopulationSynapsesMachineVertexShared(
         self.__synapse_references = synapse_references
 
     @inject_items({
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
     })
     @overrides(
