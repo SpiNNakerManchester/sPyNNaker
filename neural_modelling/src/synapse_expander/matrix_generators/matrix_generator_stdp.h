@@ -27,11 +27,7 @@
 #include <delay_extension/delay_extension.h>
 #include "matrix_generator_common.h"
 #include <synapse_expander/generator_types.h>
-
-/**
- * \brief The mask for a delay before shifting
- */
-#define SYNAPSE_DELAY_MASK 0xFF
+#include <utils.h>
 
 //! The layout of the initial plastic synapse part of the row
 typedef struct {
@@ -89,18 +85,20 @@ void matrix_generator_stdp_free(void *generator) {
  * \param[in] post_index: The core-relative index of the target neuron
  * \param[in] synapse_type_bits: The number of bits for the synapse type
  * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \param[in] delay_bits: The number of bits for the synaptic delay
  * \return A half-word fixed-plastic synapse
  */
 static uint16_t build_fixed_plastic_half_word(
         uint16_t delay, uint32_t type,
         uint32_t post_index, uint32_t synapse_type_bits,
-        uint32_t synapse_index_bits) {
+        uint32_t synapse_index_bits, uint32_t delay_bits) {
     uint16_t synapse_index_mask = (1 << synapse_index_bits) - 1;
     uint16_t synapse_type_mask = (1 << synapse_type_bits) - 1;
+    uint16_t delay_mask = (1 << delay_bits) - 1;
 
     uint16_t wrd = post_index & synapse_index_mask;
     wrd |= (type & synapse_type_mask) << synapse_index_bits;
-    wrd |= (delay & SYNAPSE_DELAY_MASK) <<
+    wrd |= (delay & delay_mask) <<
             (synapse_index_bits + synapse_type_bits);
     // wrd |= (delay & SYNAPSE_DELAY_MASK) << synapse_type_bits;
 
@@ -264,6 +262,15 @@ void matrix_generator_stdp_write_row(
         }
     }
 
+    uint32_t max_delay_power_2 = max_delay_per_stage;
+    uint32_t log_max_delay = 1;
+    if (max_delay_power_2 != 1) {
+        if (!is_power_of_2(max_delay_power_2)) {
+            max_delay_power_2 = next_power_of_2(max_delay_power_2);
+        }
+        log_max_delay = ilog_2(max_delay_power_2);
+    }
+
     // Write the fixed-plastic part of the row
     for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
         // Post-neuron index
@@ -275,7 +282,7 @@ void matrix_generator_stdp_write_row(
         // Build synaptic word
         uint16_t fp_half_word = build_fixed_plastic_half_word(
                 delay.delay, synapse_type, post_index, synapse_type_bits,
-                synapse_index_bits);
+                synapse_index_bits, log_max_delay);
 
         // Write the half-word
         *fp_address[delay.stage]++ = fp_half_word;

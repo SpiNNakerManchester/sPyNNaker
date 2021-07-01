@@ -60,6 +60,7 @@ def receive_spikes(label, time, neuron_ids):
 
 
 def do_run():
+    random.seed(0)
 
     # initial call to set up the front end (pynn requirement)
     Frontend.setup(timestep=1.0, min_delay=1.0)

@@ -12,13 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import math
 from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    BITS_PER_WORD, BYTES_PER_WORD, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SIMULATION_N_BYTES)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
@@ -32,8 +31,6 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
-_DELAY_PARAM_HEADER_WORDS = 8
-
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 DELAY_EXPANDER_APLX = "delay_expander.aplx"
@@ -45,6 +42,7 @@ class DelayExtensionMachineVertex(
 
     __slots__ = [
         "__resources",
+        "__slice_index",
         "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
@@ -86,7 +84,7 @@ class DelayExtensionMachineVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     def __init__(self, resources_required, label, constraints=None,
-                 app_vertex=None, vertex_slice=None):
+                 app_vertex=None, vertex_slice=None, slice_index=None):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources required by the vertex
@@ -104,6 +102,7 @@ class DelayExtensionMachineVertex(
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
+        self.__slice_index = slice_index
         self.__resources = resources_required
 
     @property
@@ -240,11 +239,8 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        n_words_per_stage = int(
-            math.ceil(self._vertex_slice.n_atoms / BITS_PER_WORD))
-        delay_params_sz = BYTES_PER_WORD * (
-            _DELAY_PARAM_HEADER_WORDS +
-            (self._app_vertex.n_delay_stages * n_words_per_stage))
+        delay_params_sz = self._app_vertex.delay_params_size(
+            self._vertex_slice)
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -305,7 +301,7 @@ class DelayExtensionMachineVertex(
             self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
-                self._app_vertex.vertex_slices.index(self._vertex_slice)))
+                self.__slice_index))
 
         # End-of-Spec:
         spec.end_specification()

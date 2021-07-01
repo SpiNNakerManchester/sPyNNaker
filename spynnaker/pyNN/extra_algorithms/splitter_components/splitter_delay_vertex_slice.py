@@ -106,9 +106,9 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
                 self.NEED_EXACT_ERROR_MESSAGE)
 
         # create vertices correctly
-        for vertex_slice in pre_slices:
+        for index, vertex_slice in enumerate(pre_slices):
             vertex = self.create_machine_vertex(
-                vertex_slice, resource_tracker,
+                vertex_slice, index, resource_tracker,
                 self.DELAY_EXTENSION_SLICE_LABEL.format(
                     self._other_splitter.governed_app_vertex, vertex_slice),
                 get_remaining_constraints(self._governed_app_vertex),
@@ -138,7 +138,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
-            self, vertex_slice, resource_tracker, label,
+            self, vertex_slice, index, resource_tracker, label,
             remaining_constraints, graph):
         """ creates a delay extension machine vertex and adds to the tracker.
 
@@ -158,7 +158,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
 
         machine_vertex = DelayExtensionMachineVertex(
             resources, label, remaining_constraints,
-            self._governed_app_vertex, vertex_slice)
+            self._governed_app_vertex, vertex_slice, index)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
@@ -170,7 +170,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         :param graph: app graph
         :rtype: ResourceContainer
         """
-        constant_sdram = self.constant_sdram(graph)
+        constant_sdram = self.constant_sdram(graph, vertex_slice)
 
         # set resources required from this object
         container = ResourceContainer(
@@ -181,15 +181,17 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         # return the total resources.
         return container
 
-    def constant_sdram(self, graph):
+    def constant_sdram(self, graph, vertex_slice):
         """ returns the sdram used by the delay extension
 
         :param ApplicationGraph graph: app graph
+        :param Slice vertex_slice: The slice to get the size of
         :rtype: ConstantSDRAM
         """
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
+            self._governed_app_vertex.delay_params_size(vertex_slice) +
             self._governed_app_vertex.tdma_sdram_size_in_bytes +
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +

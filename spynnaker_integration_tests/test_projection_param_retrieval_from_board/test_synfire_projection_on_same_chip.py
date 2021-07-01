@@ -22,7 +22,7 @@ runtimes = [0, 100]  # The zero uis to read data before a run
 neurons_per_core = None
 weight_to_spike = 1.0
 delay = 1
-placement_constraint = (0, 0, 9)
+placement_constraint = (0, 0)
 get_weights = True
 get_delays = True
 

@@ -137,8 +137,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 pre.n_atoms * post.n_atoms / float(n_connections)
                 if pre and post else 0
                 for pre in pre_slices for post in post_slices]
-            self.__synapses_per_edge = self.get_rng_next(
-                self.__num_synapses, prob_connect)
+            # Use the multinomial directly if possible
+            if (hasattr(self._rng, "rng") and
+                    hasattr(self._rng.rng, "multinomial")):
+                self.__synapses_per_edge = self._rng.rng.multinomial(
+                    self.__num_synapses, prob_connect)
+            else:
+                self.__synapses_per_edge = self.get_rng_next(
+                    self.__num_synapses, prob_connect)
             if sum(self.__synapses_per_edge) != self.__num_synapses:
                 raise SpynnakerException("{} of {} synapses generated".format(
                     sum(self.__synapses_per_edge), self.__num_synapses))
@@ -320,29 +326,26 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         if synapse_info.prepop_is_view:
             pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
                 synapse_info.pre_population._indexes, pre_vertex_slice)
+            post_size, post_view_lo, post_view_hi = self._get_connection_param(
+                synapse_info.post_population._indexes, post_vertex_slice)
+
+            # only select the relevant pre- and post-slices
+            view_pre_slices = self._get_view_slices(
+                pre_slices, pre_view_lo, pre_view_hi)
+            view_post_slices = self._get_view_slices(
+                post_slices, post_view_lo, post_view_hi)
         else:
             pre_size = pre_vertex_slice.n_atoms
             pre_view_lo = 0
             pre_view_hi = synapse_info.n_pre_neurons - 1
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        if synapse_info.postpop_is_view:
-            post_size, post_view_lo, post_view_hi = self._get_connection_param(
-                synapse_info.post_population._indexes, post_vertex_slice)
-        else:
             post_size = post_vertex_slice.n_atoms
             post_view_lo = 0
             post_view_hi = synapse_info.n_post_neurons - 1
+            view_pre_slices = pre_slices
+            view_post_slices = post_slices
 
+        params.extend([pre_view_lo, pre_view_hi])
         params.extend([post_view_lo, post_view_hi])
-
-        # only select the relevant pre- and post-slices
-        view_pre_slices = self._get_view_slices(
-            pre_slices, pre_view_lo, pre_view_hi)
-
-        view_post_slices = self._get_view_slices(
-            post_slices, post_view_lo, post_view_hi)
 
         self._update_synapses_per_post_vertex(
             view_pre_slices, view_post_slices)
@@ -354,7 +357,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             pre_size * post_size])
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
-        return numpy.array(params, dtype="uint32")
+        return numpy.array(params, dtype=numpy.uint32)
 
     @property
     @overrides(
