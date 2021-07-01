@@ -18,6 +18,8 @@ import statistics
 from collections import defaultdict
 
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -49,14 +51,13 @@ class RedundantPacketCountReport(object):
         "          The total packets flown in system was {}"
     )
 
-    def __call__(self, provenance_items, report_default_directory):
+    def __call__(self, provenance_items):
         """
         :param provenance_items:
         :type provenance_items:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        :param str report_default_directory:
         """
-        file_name = os.path.join(report_default_directory, self._FILE_NAME)
+        file_name = os.path.join(report_default_directory(), self._FILE_NAME)
 
         try:
             with open(file_name, "w") as f:

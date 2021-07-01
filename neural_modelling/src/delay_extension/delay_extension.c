@@ -226,10 +226,10 @@ static bool read_parameters(struct delay_parameters *params) {
 
     log_info("\t parrot neurons = %u, neuron bit field words = %u,"
             " num delay stages = %u, num delay slots = %u (pot = %u),"
-            " num delay slots mask = %08x",
+            " num delay slots mask = %08x, n delay in a stage = %u",
             num_neurons, neuron_bit_field_words,
             num_delay_stages, num_delay_slots, num_delay_slots_pot,
-            num_delay_slots_mask);
+            num_delay_slots_mask, n_delay_in_a_stage);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage

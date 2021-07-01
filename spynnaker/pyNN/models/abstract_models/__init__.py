@@ -25,10 +25,16 @@ from .abstract_settable import AbstractSettable
 from .abstract_synapse_expandable import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 from .abstract_weight_updatable import AbstractWeightUpdatable
+from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
+from .receives_synaptic_inputs_over_sdram import (
+    ReceivesSynapticInputsOverSDRAM)
+from .has_synapses import HasSynapses
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
            "AbstractMaxSpikes", "AbstractPopulationInitializable",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
            "AbstractSettable", "AbstractSynapseExpandable",
-           "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX"]
+           "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
+           "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
+           "HasSynapses"]

@@ -140,7 +140,7 @@ class AbstractGenerateConnectorOnMachine(
         if numpy.isscalar(values):
             return numpy.array(
                 [DataType.S1615.encode_as_int(values)],
-                dtype="uint32")
+                dtype=numpy.uint32)
 
         if isinstance(values, RandomDistribution):
             parameters = (
@@ -153,7 +153,7 @@ class AbstractGenerateConnectorOnMachine(
             params = [
                 DataType.S1615.encode_as_int(param) for param in parameters]
             params.extend(seed)
-            return numpy.array(params, dtype="uint32")
+            return numpy.array(params, dtype=numpy.uint32)
 
         raise ValueError("Unexpected value {}".format(values))
 

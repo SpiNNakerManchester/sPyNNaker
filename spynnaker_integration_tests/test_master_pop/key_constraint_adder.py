@@ -20,12 +20,15 @@ from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
+from pacman.model.graphs.machine import MulticastEdgePartition
 
 
 class KeyConstraintAdder(object):
 
     def __call__(self, machine_graph):
         for outgoing_partition in machine_graph.outgoing_edge_partitions:
+            if not isinstance(outgoing_partition, MulticastEdgePartition):
+                continue
             mac_vertex = outgoing_partition.pre_vertex
             if isinstance(mac_vertex,
                           ReverseIPTagMulticastSourceMachineVertex):
