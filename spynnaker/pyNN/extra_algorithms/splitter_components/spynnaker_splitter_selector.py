@@ -24,6 +24,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from .splitter_abstract_pop_vertex_slice import (
     SplitterAbstractPopulationVertexSlice)
 from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
@@ -116,4 +117,5 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SpynnakerSplitterSliceLegacy()
+        # app_vertex.splitter = SpynnakerSplitterSliceLegacy()
+        app_vertex.splitter = SplitterPoissonDelegate()
