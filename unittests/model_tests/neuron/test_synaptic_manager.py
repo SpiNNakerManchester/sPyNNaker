@@ -171,7 +171,7 @@ def test_write_data_spec():
 
     app_graph = globals_variables.get_simulator().original_application_graph
     context = {
-        "MemoryApplicationGraph": app_graph
+        "ApplicationGraph": app_graph
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
@@ -486,7 +486,7 @@ def test_pop_based_master_pop_table_standard(
 
     app_graph = globals_variables.get_simulator().original_application_graph
     context = {
-        "MemoryApplicationGraph": app_graph
+        "ApplicationGraph": app_graph
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()

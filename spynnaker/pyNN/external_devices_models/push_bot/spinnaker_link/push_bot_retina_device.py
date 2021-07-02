@@ -51,7 +51,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         # stores for the injection aspects
         self.__new_key_command = None
 
-    @inject("MemoryRoutingInfos")
+    @inject("RoutingInfos")
     def routing_info(self, routing_info):
         key = routing_info.get_first_key_from_pre_vertex(
             list(self.machine_vertices)[0], SPIKE_PARTITION_ID)
