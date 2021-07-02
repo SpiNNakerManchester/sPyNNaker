@@ -13,21 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationFPGAVertex
-from pacman.utilities.constants import BITS_IN_KEY
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
+from pacman.model.graphs.application import ApplicationFPGAVertex
+from pacman.model.graphs.common import Slice
+from pacman.utilities.constants import BITS_IN_KEY
 from pacman.model.graphs.application import FPGAConnection
 from pacman.model.routing_info import BaseKeyAndMask
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.abstract_models import Is2DSource
 import math
 
 
 class SPIFRetinaDevice(
-        ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints):
+        ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
+        Is2DSource):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 
@@ -44,6 +47,21 @@ class SPIFRetinaDevice(
     #: There is 1 bit for polarity in the key
     N_POLARITY_BITS = 1
 
+    __slots__ = [
+        "__width",
+        "__height",
+        "__sub_width",
+        "__sub_height",
+        "__n_squares_per_col",
+        "__n_squares_per_row",
+        "__key_bits",
+        "__fpga_mask",
+        "__fpga_y_shift",
+        "__x_index_shift",
+        "__y_index_shift",
+        "__fpga_next_index",
+        "__machine_vertex_index"]
+
     def __init__(self, base_key, width, height, sub_width, sub_height):
         """
 
@@ -57,6 +75,7 @@ class SPIFRetinaDevice(
             The height of rectangles to split the retina into for efficiency of
             sending
         """
+        # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
@@ -69,9 +88,17 @@ class SPIFRetinaDevice(
                 " each be a power of 2")
         n_sub_squares = self.__n_sub_squares(
             width, height, sub_width, sub_height)
+
+        # Call the super
         super().__init__(
             width * height, self.__incoming_fpgas, self.__outgoing_fpga,
             n_machine_vertices_per_link=n_sub_squares)
+
+        # Store information needed later
+        self.__width = width
+        self.__height = height
+        self.__sub_width = sub_width
+        self.__sub_height = sub_height
 
         # The mask is going to be made up of:
         # | K | P | Y_I | Y_0 | Y_F | X_I | X_0 | X_F |
@@ -88,9 +115,9 @@ class SPIFRetinaDevice(
         y_bits = get_n_bits(height)
 
         self.__n_squares_per_row = int(math.ceil(width / sub_width))
-        n_squares_per_col = int(math.ceil(height / sub_height))
+        self.__n_squares_per_col = int(math.ceil(height / sub_height))
         sub_x_bits = get_n_bits(self.__n_squares_per_row)
-        sub_y_bits = get_n_bits(n_squares_per_col)
+        sub_y_bits = get_n_bits(self.__n_squares_per_col)
         sub_x_mask = (1 << sub_x_bits) - 1
         sub_y_mask = (1 << sub_y_bits) - 1
 
@@ -152,33 +179,57 @@ class SPIFRetinaDevice(
         """
         return None
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        pre = partition.pre_vertex
-
+    def __sub_square(self, vertex):
         # We use every other odd link, so we can work out the "index" of the
         # link in the list as follows, and we can then split the index into
         # x and y components
-        fpga_index = (pre.fpga_link_id - 1) // 2
+        fpga_index = (vertex.fpga_link_id - 1) // 2
         fpga_x_index = fpga_index % self.X_PER_ROW
         fpga_y_index = fpga_index // self.X_PER_ROW
 
         # Work out the machine vertex index
-        v_index = self.__machine_vertex_index.get(pre, None)
+        v_index = self.__machine_vertex_index.get(vertex, None)
         if v_index is None:
             v_index = self.__fpga_next_index[fpga_index]
-            self.__machine_vertex_index[pre] = v_index
+            self.__machine_vertex_index[vertex] = v_index
             self.__fpga_next_index[fpga_index] += 1
         v_x_index = v_index % self.__n_squares_per_row
         v_y_index = v_index // self.__n_squares_per_row
 
+        # Return the information
+        return fpga_x_index, fpga_y_index, v_x_index, v_y_index
+
+    @overrides(AbstractProvidesOutgoingPartitionConstraints.
+               get_outgoing_partition_constraints)
+    def get_outgoing_partition_constraints(self, partition):
+        machine_vertex = partition.pre_vertex
+        fpga_x, fpga_y, x_index, y_index = self.__sub_square(machine_vertex)
+
         # Finally we build the key from the components
         fpga_key = (
             self.__key_bits +
-            (v_y_index << self.__y_index_shift) +
-            (fpga_y_index << self.__fpga_y_shift) +
-            (v_x_index << self.__x_index_shift) +
-            fpga_x_index)
+            (y_index << self.__y_index_shift) +
+            (fpga_y << self.__fpga_y_shift) +
+            (x_index << self.__x_index_shift) +
+            fpga_x)
         return [FixedKeyAndMaskConstraint([
             BaseKeyAndMask(fpga_key, self.__fpga_mask)])]
+
+    @property
+    @overrides(Is2DSource.is_source_2d)
+    def is_source_2d(self):
+        return True
+
+    @property
+    @overrides(Is2DSource.source_dims)
+    def source_dims(self):
+        return self.__width, self.__height
+
+    @overrides(Is2DSource.source_slices)
+    def source_slices(self, machine_vertex):
+        fpga_x, fpga_y, x_index, y_index = self.__sub_square(machine_vertex)
+        x_min = x_index * self.__n_squares_per_row
+        x_max = (x_min + self.__n_squares_per_row) - 1
+        y_min = y_index * self.__n_squares_per_col
+        y_max = (y_min + self.__n_squares_per_col) - 1
+        return Slice(x_min, x_max), fpga_x, Slice(y_min, y_max), fpga_y
