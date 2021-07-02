@@ -12,9 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty,\
-    abstractmethod
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty, abstractmethod)
 
 
 class Is2DSource(object, metaclass=AbstractBase):
@@ -31,22 +30,6 @@ class Is2DSource(object, metaclass=AbstractBase):
     """
 
     __slots__ = []
-
-    @property
-    def source_width_bits(self):
-        """ The number of bits required by the source width
-
-        :rtype: int
-        """
-        return get_n_bits(self.source_width)
-
-    @property
-    def source_height_bits(self):
-        """ The number of bits required by the source width
-
-        :rtype: int
-        """
-        return get_n_bits(self.source_height)
 
     @abstractproperty
     def is_source_2d(self):
