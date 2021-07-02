@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_interfaces import AbstractSlicesConnect
+from pacman.model.partitioner_interfaces import (
+    AbstractSlicesConnect, AbstractVerticesConnect)
 from pacman.operations.partition_algorithms import SplitterPartitioner
 from data_specification import ReferenceContext
 
@@ -56,6 +57,10 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
                 app_edge.could_connect(
                     src_machine_vertex.vertex_slice,
                     dest_machine_vertex.vertex_slice)):
+            return
+        if (isinstance(app_edge, AbstractVerticesConnect) and not
+                app_edge.could_vertices_connect(
+                    src_machine_vertex, dest_machine_vertex)):
             return
 
         # TODO: this only works when the synaptic manager is reengineered to
