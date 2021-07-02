@@ -218,8 +218,8 @@ class DelayExtensionMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos"})
+        "machine_graph": "MachineGraph",
+        "routing_infos": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={

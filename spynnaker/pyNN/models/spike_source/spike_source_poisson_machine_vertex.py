@@ -222,7 +222,7 @@ class SpikeSourcePoissonMachineVertex(
         # pylint: disable=no-value-for-parameter
         return self._is_in_injection_mode()
 
-    @inject_items({"graph": "MemoryMachineGraph"})
+    @inject_items({"graph": "MachineGraph"})
     def _is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
@@ -276,8 +276,8 @@ class SpikeSourcePoissonMachineVertex(
         self.__change_requires_neuron_parameters_reload = new_value
 
     @inject_items({
-        "routing_info": "MemoryRoutingInfos",
-        "graph": "MemoryMachineGraph",
+        "routing_info": "RoutingInfos",
+        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
@@ -308,9 +308,9 @@ class SpikeSourcePoissonMachineVertex(
         spec.end_specification()
 
     @inject_items({
-        "routing_info": "MemoryRoutingInfos",
+        "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "graph": "MemoryMachineGraph",
+        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
