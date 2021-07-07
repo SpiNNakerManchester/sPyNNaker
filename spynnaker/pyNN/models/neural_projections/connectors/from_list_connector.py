@@ -79,7 +79,7 @@ class FromListConnector(AbstractConnector):
         super().__init__(safe, callback, verbose)
 
         self.__column_names = column_names
-        self.__split_conn_list = None
+        self.__split_conn_list = {}
         self.__split_pre_slices = None
         self.__split_post_slices = None
 
@@ -116,13 +116,14 @@ class FromListConnector(AbstractConnector):
         :param list(~pacman.model.graphs.commmon.Slice) post_slices:
         :rtype: bool
         """
-        # If there are no connections, return
-        if not len(self.__sources):
-            return False
-
         # If nothing has changed, use the cache
         if (self.__split_pre_slices == pre_slices and
                 self.__split_post_slices == post_slices):
+            return False
+
+        # If there are no connections, return
+        if not len(self.__sources):
+            self.__split_conn_list = {}
             return False
 
         self.__split_pre_slices = list(pre_slices)
@@ -166,6 +167,7 @@ class FromListConnector(AbstractConnector):
         self.__split_conn_list = {
             pre_post: indices
             for pre_post, indices in zip(pre_post_bins, split_indices)
+            if len(indices) > 0
         }
 
         return True
@@ -244,11 +246,14 @@ class FromListConnector(AbstractConnector):
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        if not len(self.__sources):
-            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
-        indices = self.__split_conn_list[
-            pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
+        pre_hi = pre_vertex_slice.hi_atom
+        post_hi = post_vertex_slice.hi_atom
+        if (pre_hi, post_hi) not in self.__split_conn_list:
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        else:
+            indices = self.__split_conn_list[
+                pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
@@ -296,9 +301,7 @@ class FromListConnector(AbstractConnector):
         :rtype: int
         """
         self._split_connections(pre_slices, post_slices)
-        if not self.__split_conn_list:
-            return 0
-        return len(self.__split_conn_list[pre_hi, post_hi])
+        return (pre_hi, post_hi) in self.__split_conn_list
 
     @conn_list.setter
     def conn_list(self, conn_list):
@@ -419,11 +422,16 @@ class FromListConnector(AbstractConnector):
         return self.__extra_parameter_names
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
-        return any((_pre_slice.lo_atom <= self.__sources) &
-                   (self.__sources <= _pre_slice.hi_atom) &
-                   (_post_slice.lo_atom <= self.__targets) &
-                   (self.__targets <= _post_slice.hi_atom))
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+        pre_slices = \
+            src_machine_vertex.app_vertex.splitter.get_out_going_slices()[0]
+        post_slices = \
+            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()[0]
+        self._split_connections(pre_slices, post_slices)
+        pre_hi = src_machine_vertex.vertex_slice.hi_atom
+        post_hi = dest_machine_vertex.vertex_slice.hi_atom
+        return (pre_hi, post_hi) in self.__split_conn_list
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """

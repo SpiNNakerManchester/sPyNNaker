@@ -95,12 +95,12 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
 
     @overrides(AbstractSlicesConnect.could_connect)
-    def could_connect(self, pre_slice, post_slice):
+    def could_connect(self, src_machine_vertex, dest_machine_vertex):
         for synapse_info in self.__synapse_information:
             # Structual Plasticity can learn connection not originally included
             if are_dynamics_structural(synapse_info.synapse_dynamics):
                 return True
             if synapse_info.connector.could_connect(
-                    synapse_info, pre_slice, post_slice):
+                    synapse_info, src_machine_vertex, dest_machine_vertex):
                 return True
         return False
