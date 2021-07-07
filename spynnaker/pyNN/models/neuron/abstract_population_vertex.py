@@ -18,6 +18,8 @@ import math
 import numpy
 from scipy import special  # @UnresolvedImport
 
+from pyNN.space import Grid2D, Grid3D
+
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
@@ -51,7 +53,7 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
-    HasSynapses)
+    HasSynapses, SupportsStructure)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
@@ -87,7 +89,7 @@ class AbstractPopulationVertex(
         AbstractEventRecordable, AbstractProvidesOutgoingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
-        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
+        ProvidesKeyToAtomMappingImpl, AbstractCanReset, SupportsStructure):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
@@ -114,7 +116,8 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__self_projection"]
+        "__self_projection",
+        "__structure"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -237,6 +240,12 @@ class AbstractPopulationVertex(
         # synapse dynamics per vertex at present
         self.__synapse_dynamics = None
 
+        self.__structure = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
+
     @property
     def synapse_dynamics(self):
         """ The synapse dynamics used by the synapses e.g. plastic or static.
@@ -285,6 +294,13 @@ class AbstractPopulationVertex(
     @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    @overrides(TDMAAwareApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.__n_atoms)
+        return super(AbstractPopulationVertex, self).atoms_shape
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):

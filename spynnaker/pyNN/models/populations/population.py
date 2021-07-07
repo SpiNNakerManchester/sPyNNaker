@@ -34,7 +34,8 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractContainsUnits, AbstractReadParametersBeforeSet,
-    AbstractPopulationInitializable, AbstractPopulationSettable)
+    AbstractPopulationInitializable, AbstractPopulationSettable,
+    SupportsStructure)
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.constants import SPIKES
@@ -116,6 +117,8 @@ class Population(PopulationBase):
         # generation of positions is deferred until needed.
         self.__structure = structure
         self._positions = None
+        if isinstance(self.__vertex, SupportsStructure):
+            self.__vertex.set_structure(structure)
 
         # add objects to the SpiNNaker control class
         sim = get_simulator()
