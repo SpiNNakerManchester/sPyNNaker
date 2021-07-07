@@ -25,10 +25,13 @@ from .splitter_abstract_pop_vertex_neurons_synapses import (
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
+from .splitter_abstract_pop_vertex_fixed import (
+    SplitterAbstractPopulationVertexFixed)
 
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexSlice',
     'SplitterDelayVertexSlice', 'SpynnakerSplitterPartitioner',
     'SpynnakerSplitterSelector', 'SpynnakerSplitterSliceLegacy',
     'SplitterAbstractPopulationVertexNeuronsSynapses',
-    'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput']
+    'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput',
+    'SplitterAbstractPopulationVertexFixed']
