@@ -37,7 +37,8 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
+    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
+    SynapseDynamicsSTDP)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
@@ -165,6 +166,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 "The current implementation of structural plasticity can only"
                 " be run on a single synapse core.  Please ensure the number"
                 " of synapse cores is set to 1")
+
+        # Neuromodulation can only be run on a single synapse core at present
+        if (isinstance(app_vertex.synapse_dynamics, SynapseDynamicsSTDP) and
+                self.__n_synapse_vertices != 1):
+            if (app_vertex.synapse_dynamics.neuromodulation):
+                raise SynapticConfigurationException(
+                    "The current implementation of neuromodulated STDP can"
+                    " only be run on a single synapse core.  Please ensure the"
+                    " number of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
         atoms_per_core = min(
@@ -494,8 +504,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
             pre_vertex = proj._projection_edge.pre_vertex
-            connector = proj._synapse_information.connector
-            if self.__is_direct_poisson_source(pre_vertex, connector):
+            conn = proj._synapse_information.connector
+            dynamics = proj._synapse_information.synapse_dynamics
+            if self.__is_direct_poisson_source(pre_vertex, conn, dynamics):
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
@@ -513,7 +524,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__poisson_edges.add(proj._projection_edge)
         return incoming_direct_poisson
 
-    def __is_direct_poisson_source(self, pre_vertex, connector):
+    def __is_direct_poisson_source(self, pre_vertex, connector, dynamics):
         """ Determine if a given Poisson source can be created by this splitter
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
@@ -521,12 +532,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param ~spynnaker.pyNN.models.neural_projections.connectors\
                 .AbstractConnector:
             The connector in use in the Projection
+        :param ~spynnaker.pyNN.models.neuron.synapse_dynamics\
+                .AbstractSynapseDynamics:
+            The synapse dynamics in use in the Projection
         :rtype: bool
         """
         return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
                 isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
                 len(pre_vertex.outgoing_projections) == 1 and
-                isinstance(connector, OneToOneConnector))
+                isinstance(connector, OneToOneConnector) and
+                isinstance(dynamics, SynapseDynamicsStatic))
 
     def __get_fixed_slices(self):
         """ Get a list of fixed slices from the Application vertex

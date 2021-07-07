@@ -214,6 +214,13 @@ class SynapseDynamicsSTDP(
     def backprop_delay(self, backprop_delay):
         self.__backprop_delay = bool(backprop_delay)
 
+    @property
+    def neuromodulation(self):
+        """
+        :rtype: bool
+        """
+        return self.__neuromodulation
+
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
@@ -251,7 +258,8 @@ class SynapseDynamicsSTDP(
                     "Neuromodulation only uses MultiplicativeWeightDependence"
                     " and IzhikevichNeuromodulation timing dependence")
             else:
-                return ""
+                name = "_stdp_izhikevich_neuromodulation"
+                return name
         name = "_stdp_mad_" + timing_suffix + "_" + weight_suffix
         return name
 

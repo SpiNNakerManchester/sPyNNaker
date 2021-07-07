@@ -209,7 +209,7 @@ bool synaptogenesis_dynamics_initialise(
     rewiring_recording_index = *recording_regions_used;
     *recording_regions_used = rewiring_recording_index + 1;
 
-    log_info("The rewiring_recording_index is %u", rewiring_recording_index);
+//    log_info("The rewiring_recording_index is %u", rewiring_recording_index);
 
     return true;
 }

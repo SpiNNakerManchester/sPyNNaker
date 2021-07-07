@@ -53,7 +53,7 @@ class IZKCurrExpIzhikevichNeuromodulation(AbstractPyNNNeuronModelStandard):
         threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)
 
         super(IZKCurrExpIzhikevichNeuromodulation, self).__init__(
-            model_name="IZK_curr_exp_stdp_izhikevich_neuromodulation",
-            binary="IZK_curr_exp_stdp_izhikevich_neuromodulation.aplx",
+            model_name="IZK_curr_expizkneuromod",
+            binary="IZK_curr_expizkneuromod.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)

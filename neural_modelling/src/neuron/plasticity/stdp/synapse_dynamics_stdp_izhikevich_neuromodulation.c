@@ -18,6 +18,7 @@
 // Include post_events and common
 #include "post_events_with_da.h"
 #include "synapse_dynamics_stdp_common.h"
+#include "stdp_typedefs.h"
 
 #define SMULBB_STDP_FIXED(a, b) (__smulbb(a, b) >> STDP_FIXED_POINT)
 
@@ -310,7 +311,6 @@ void synapse_dynamics_stdp_process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
 		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
 		plastic_synapse_t* plastic_words) {
-
 	// Extract control-word components
 	// **NOTE** cunningly, control word is just the same as lower
 	// 16-bits of 32-bit fixed synapse so same functions can be used

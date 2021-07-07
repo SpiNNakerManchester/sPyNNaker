@@ -24,7 +24,10 @@ MODELS = synapses\
          synapses_structural_random_distance_weight\
          synapses_structural_last_neuron_distance_weight\
          synapses_stdp_mad_pair_additive_structural_random_distance_weight\
-         synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight
+         synapses_stdp_mad_pair_additive_structural_last_neuron_distance_weight\
+         synapses_stdp_izhikevich_neuromodulation\
+         synapses_stdp_izhikevich_neuromodulation_structural_random_distance_weight\
+         synapses_stdp_izhikevich_neuromodulation_structural_last_neuron_distance_weight
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
