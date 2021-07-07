@@ -151,6 +151,31 @@ def test_connector_split():
         raise e
 
 
+class MockSplitter(object):
+
+    def __init__(self, slices):
+        self.slices = slices
+
+    def get_out_going_slices(self):
+        return (self.slices, True)
+
+    def get_in_coming_slices(self):
+        return (self.slices, True)
+
+
+class MockAppVertex(object):
+
+    def __init__(self, slices):
+        self.splitter = MockSplitter(slices)
+
+
+class MockMachineVertex(object):
+
+    def __init__(self, slice, slices):
+        self.vertex_slice = slice
+        self.app_vertex = MockAppVertex(slices)
+
+
 def test_could_connect():
     unittest_setup()
     connector = FromListConnector(
@@ -159,12 +184,14 @@ def test_could_connect():
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     for pre_slice in pre_slices:
+        pre_vertex = MockMachineVertex(pre_slice, pre_slices)
         for post_slice in post_slices:
+            post_vertex = MockMachineVertex(post_slice, post_slices)
             count = connector.get_n_connections(
                 pre_slices, post_slices, pre_slice.hi_atom,
                 post_slice.hi_atom)
             if count:
-                assert(connector.could_connect(None, pre_slice, post_slice))
+                assert(connector.could_connect(None, pre_vertex, post_vertex))
             else:
                 assert(not connector.could_connect(
-                    None, pre_slice, post_slice))
+                    None, pre_vertex, post_vertex))
