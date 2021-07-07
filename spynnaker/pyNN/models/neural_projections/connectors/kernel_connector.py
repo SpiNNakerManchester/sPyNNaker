@@ -472,3 +472,31 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return N_KERNEL_PARAMS * BYTES_PER_WORD
+
+    @overrides(AbstractConnector.could_connect)
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        # If the pre- and post-slices are not 2-dimensional slices, we have
+        # to let them pass
+        if (_pre_slice.shape is None or len(_pre_slice.shape) != 2 or
+                _post_slice.shape is None or len(_post_slice.shape) != 2):
+            return True
+
+        pre_slice_x = _pre_slice.get_slice(0)
+        pre_slice_y = _pre_slice.get_slice(1)
+        post_slice_x = _post_slice.get_slice(0)
+        post_slice_y = _post_slice.get_slice(1)
+
+        min_pre_x = post_slice_x.start - self._hlf_k_w
+        max_pre_x = (post_slice_x.stop + self._hlf_k_w) - 1
+        min_pre_y = post_slice_y.start - self._hlf_k_h
+        max_pre_y = (post_slice_y.stop + self._hlf_k_h) - 1
+
+        # No part of the pre square overlaps the post-square, don't connect
+        if (pre_slice_x.stop <= min_pre_x or
+                pre_slice_x.start > max_pre_x or
+                pre_slice_y.stop <= min_pre_y or
+                pre_slice_y.start > max_pre_y):
+            return False
+
+        # Otherwise, they do
+        return True

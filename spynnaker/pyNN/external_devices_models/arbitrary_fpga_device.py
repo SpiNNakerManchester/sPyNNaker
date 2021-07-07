@@ -17,6 +17,8 @@ from pacman.model.graphs.application import ApplicationFPGAVertex
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from pacman.model.graphs.application import FPGAConnection
+from pacman.model.graphs.common import Slice
+from spinn_utilities.overrides import overrides
 
 
 class ArbitraryFPGADevice(
@@ -38,3 +40,12 @@ class ArbitraryFPGADevice(
         # pylint: disable=too-many-arguments
         conn = FPGAConnection(fpga_id, fpga_link_id, board_address)
         super().__init__(n_neurons, [conn], conn, label)
+
+    @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)
+    def get_incoming_slice_for_link(self, link, index):
+        # There is only one, so the slice is everything
+        return Slice(0, self.n_atoms - 1)
+
+    @overrides(ApplicationFPGAVertex.get_outgoing_slice)
+    def get_outgoing_slice(self):
+        return Slice(0, self.n_atoms - 1)
