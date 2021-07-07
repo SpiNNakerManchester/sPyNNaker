@@ -35,7 +35,7 @@ class AbstractPyNNModel(object, metaclass=AbstractBase):
         :param n_atoms: The new maximum, or None for the largest possible
         :type n_atoms: int or None
         """
-        AbstractPyNNModel._max_atoms_per_core[cls] = int(n_atoms)
+        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
 
     @classmethod
     def get_max_atoms_per_core(cls):

@@ -371,7 +371,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
             raise Exception("{} is not a Vertex type".format(neuron_type))
 
-        if hasattr(neuron_type, "get_max_atoms_per_core"):
+        if (hasattr(neuron_type, "get_max_atoms_per_core") and
+                isinstance(max_permitted, int)):
             previous = neuron_type.get_max_atoms_per_core()
             if previous < max_permitted:
                 logger.warning(
