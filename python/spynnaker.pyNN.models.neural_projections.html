@@ -77,7 +77,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect">
-<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_application_edge.html#DelayAfferentApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_application_edge.html#DelayAfferentApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if there is a chance that one of the indexes in the            pre-slice could connect to at least one of the indexes in the            post-slice.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -87,8 +87,8 @@ but may return a false positives</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
-<li><p><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>src_machine_vertexx</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
+<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -129,7 +129,7 @@ but may return a false positives</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect">
-<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if there is a chance that one of the indexes in the            pre-slice could connect to at least one of the indexes in the            post-slice.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -139,8 +139,8 @@ but may return a false positives</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
-<li><p><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>src_machine_vertexx</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
+<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -231,7 +231,7 @@ This edge may not be fully initialised</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect">
-<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if there is a chance that one of the indexes in the            pre-slice could connect to at least one of the indexes in the            post-slice.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -241,8 +241,8 @@ but may return a false positives</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
-<li><p><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – </p></li>
+<li><p><strong>src_machine_vertexx</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
+<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -669,7 +669,7 @@ may have already been so done)</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>

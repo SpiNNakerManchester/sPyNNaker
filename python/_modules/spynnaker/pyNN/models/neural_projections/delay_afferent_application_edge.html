@@ -68,7 +68,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DelayAfferentApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
+        <span class="n">pre_slice</span> <span class="o">=</span> <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="n">post_slice</span> <span class="o">=</span> <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="k">return</span> <span class="p">((</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">==</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="p">(</span><span class="n">post_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">==</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div>
 </pre></div>
@@ -109,7 +111,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>

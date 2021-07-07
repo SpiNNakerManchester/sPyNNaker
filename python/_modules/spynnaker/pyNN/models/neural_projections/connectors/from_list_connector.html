@@ -117,7 +117,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__column_names</span> <span class="o">=</span> <span class="n">column_names</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__split_pre_slices</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__split_post_slices</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -154,13 +154,14 @@
 <span class="sd">        :param list(~pacman.model.graphs.commmon.Slice) post_slices:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If there are no connections, return</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
         <span class="c1"># If nothing has changed, use the cache</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__split_pre_slices</span> <span class="o">==</span> <span class="n">pre_slices</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__split_post_slices</span> <span class="o">==</span> <span class="n">post_slices</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># If there are no connections, return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__split_pre_slices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">)</span>
@@ -204,6 +205,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">pre_post</span><span class="p">:</span> <span class="n">indices</span>
             <span class="k">for</span> <span class="n">pre_post</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pre_post_bins</span><span class="p">,</span> <span class="n">split_indices</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
         <span class="p">}</span>
 
         <span class="k">return</span> <span class="kc">True</span>
@@ -282,11 +284,14 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">[</span>
-            <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">]</span>
+        <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="n">post_hi</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">[</span>
+                <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">]</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__targets</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
@@ -334,9 +339,7 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">[</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span></div>
 
     <span class="nd">@conn_list</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">conn_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn_list</span><span class="p">):</span>
@@ -457,11 +460,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span></div>
 
 <div class="viewcode-block" id="FromListConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_synapse_info</span><span class="p">,</span> <span class="n">_pre_slice</span><span class="p">,</span> <span class="n">_post_slice</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">((</span><span class="n">_pre_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">)</span> <span class="o">&amp;</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sources</span> <span class="o">&lt;=</span> <span class="n">_pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)</span> <span class="o">&amp;</span>
-                   <span class="p">(</span><span class="n">_post_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__targets</span><span class="p">)</span> <span class="o">&amp;</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&lt;=</span> <span class="n">_post_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span></div>
+    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
+        <span class="n">pre_slices</span> <span class="o">=</span> \
+            <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">post_slices</span> <span class="o">=</span> \
+            <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
+        <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="n">post_hi</span> <span class="o">=</span> <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span></div>
 
     <span class="k">def</span> <span class="nf">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -508,7 +516,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>

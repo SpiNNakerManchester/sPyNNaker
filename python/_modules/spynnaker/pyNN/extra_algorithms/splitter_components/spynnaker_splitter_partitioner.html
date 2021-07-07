@@ -92,8 +92,7 @@
         <span class="c1"># filter off connectivity</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span>
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">could_connect</span><span class="p">(</span>
-                    <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
-                    <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)):</span>
+                    <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">)):</span>
             <span class="k">return</span>
 
         <span class="c1"># TODO: this only works when the synaptic manager is reengineered to</span>
@@ -152,7 +151,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>

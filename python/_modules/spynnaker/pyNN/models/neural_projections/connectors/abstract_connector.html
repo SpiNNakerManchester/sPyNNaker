@@ -689,7 +689,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_synapse_info</span><span class="p">,</span> <span class="n">_pre_slice</span><span class="p">,</span> <span class="n">_post_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if a pre slice and a post slice could connect.</span>
 
@@ -701,9 +702,9 @@
 <span class="sd">            This method should never return a false negative,</span>
 <span class="sd">            but may return a false positives</span>
 
-<span class="sd">        :param ~pacman.model.graphs.common.Slice _pre_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice _post_slice:</span>
-<span class="sd">        :param SynapseInformation _synapse_info:</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertexx:</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Unless we know for sure we must say they could connect</span>
@@ -780,7 +781,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>
