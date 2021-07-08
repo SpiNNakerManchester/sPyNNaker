@@ -23,7 +23,7 @@ class TestSpikeSourceArray(BaseTestCase):
     __name__ = "bOB"
 
     def recording_1_element(self):
-        p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        p.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 200  # number of neurons in each population
         p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / 2)
 
@@ -66,7 +66,7 @@ class TestSpikeSourceArray(BaseTestCase):
         self.runsafe(self.recording_1_element)
 
     def recording_numerous_elements(self, run_zero):
-        p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        p.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 20  # number of neurons in each population
         p.set_number_of_neurons_per_core(p.IF_curr_exp, n_neurons / 2)
         random.seed(12480235)
