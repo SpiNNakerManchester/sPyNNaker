@@ -35,7 +35,7 @@ class TestAllow(BaseTestCase):
     def allow(self):
         try:
             synfire_run.do_run(
-                n_neurons, max_delay=14.4, time_step=0.1,
+                n_neurons, time_step=0.1,
                 neurons_per_core=5, delay=1.7, run_times=[runtime])
 
             spikes = synfire_run.get_output_pop_spikes_numpy()

@@ -25,7 +25,7 @@ delay = 1
 
 
 def do_run():
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+    p.setup(timestep=1.0, min_delay=1.0)
 
     cell_params_lif = {'cm': 0.25,  # nF
                        'i_offset': 0.0, 'tau_m': 20.0, 'tau_refrac': 2.0,

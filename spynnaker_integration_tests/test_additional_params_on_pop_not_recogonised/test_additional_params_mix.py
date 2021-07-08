@@ -20,7 +20,7 @@ from testfixtures import LogCapture
 def a_run():
     n_neurons = 100  # number of neurons in each population
 
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
+    p.setup(timestep=1.0, min_delay=1.0)
     pop = p.Population(
         n_neurons, p.IF_curr_exp(), label='pop_1',
         additional_parameters={
@@ -34,7 +34,7 @@ class PopAdditionParamsTest(BaseTestCase):
     def a_run(self):
         n_neurons = 100  # number of neurons in each population
 
-        p.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
+        p.setup(timestep=1.0, min_delay=1.0)
         with LogCapture() as lc:
             pop = p.Population(
                 n_neurons, p.IF_curr_exp(), label='pop_1',
