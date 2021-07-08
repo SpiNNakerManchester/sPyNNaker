@@ -100,10 +100,7 @@
 <p>adds delay extension vertices into the APP graph as needed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – the app graph</p></li>
-<li><p><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the user defined max delay</p></li>
-</ul>
+<dd class="field-odd"><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – the app graph</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
@@ -120,11 +117,6 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE">
-<span class="sig-name descname"><span class="pre">END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">end</span> <span class="pre">user</span> <span class="pre">entered</span> <span class="pre">a</span> <span class="pre">max</span> <span class="pre">delay</span> <span class="pre">for</span> <span class="pre">which</span> <span class="pre">the</span> <span class="pre">projection</span> <span class="pre">breaks'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG">
 <span class="sig-name descname"><span class="pre">INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG</span></span><em class="property"> <span class="pre">=</span> <span class="pre">'The</span> <span class="pre">app</span> <span class="pre">vertex</span> <span class="pre">{}</span> <span class="pre">with</span> <span class="pre">splitter</span> <span class="pre">{}</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">support</span> <span class="pre">delays</span> <span class="pre">and</span> <span class="pre">yet</span> <span class="pre">requires</span> <span class="pre">a</span> <span class="pre">delay</span> <span class="pre">support</span> <span class="pre">for</span> <span class="pre">edge</span> <span class="pre">{}.</span> <span class="pre">Please</span> <span class="pre">use</span> <span class="pre">a</span> <span class="pre">Splitter</span> <span class="pre">which</span> <span class="pre">utilises</span> <span class="pre">the</span> <span class="pre">AbstractSpynnakerSplitterDelay</span> <span class="pre">interface.'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -136,14 +128,11 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.DelaySupportAdder.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_max_delay</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/delay_support_adder.html#DelaySupportAdder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.DelaySupportAdder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>adds the delay extensions to the app graph, now that all the            splitter objects have been set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – the app graph</p></li>
-<li><p><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the user defined max delay</p></li>
-</ul>
+<dd class="field-odd"><p><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – the app graph</p>
 </dd>
 </dl>
 </dd></dl>

@@ -81,7 +81,6 @@
         <span class="s2">&quot;__id_counter&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__live_spike_recorder&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__min_delay&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__neurons_per_core_set&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_populations&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_projections&quot;</span><span class="p">]</span>
@@ -90,7 +89,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span> <span class="n">database_socket_addresses</span><span class="p">,</span> <span class="n">n_chips_required</span><span class="p">,</span>
-            <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
+            <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
             <span class="n">user_extra_algorithm_xml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_extra_mapping_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">user_extra_algorithms_pre_run</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -107,7 +106,6 @@
 <span class="sd">        :param timestep:</span>
 <span class="sd">            machine_time_step but in milli seconds. If None uses the cfg value</span>
 <span class="sd">        :type timestep: float or None</span>
-<span class="sd">        :param float max_delay:</span>
 <span class="sd">        :param float min_delay:</span>
 <span class="sd">        :param str hostname:</span>
 <span class="sd">        :param user_extra_algorithm_xml_path:</span>
@@ -157,7 +155,6 @@
 
         <span class="c1"># timing parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -175,7 +172,6 @@
             <span class="n">front_end_versions</span><span class="o">=</span><span class="n">versions</span><span class="p">)</span>
 
         <span class="c1"># update inputs needed by the machine level calls.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_extra_inputs</span><span class="p">({</span><span class="s1">&#39;UserDefinedMaxDelay&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span><span class="p">})</span>
 
         <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;SynapticExpanderReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \

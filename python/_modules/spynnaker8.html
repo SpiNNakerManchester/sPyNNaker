@@ -153,9 +153,6 @@
 <span class="c1">#: The timestep to use of &quot;auto&quot; is specified as a timestep</span>
 <span class="n">SPYNNAKER_AUTO_TIMESTEP</span> <span class="o">=</span> <span class="mf">1.0</span>
 
-<span class="c1">#: The number of timesteps of delay to use as max_delay if &quot;auto&quot; is specified</span>
-<span class="n">SPYNNAKER_AUTO_MAX_DELAY</span> <span class="o">=</span> <span class="mi">144</span>
-
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -310,7 +307,7 @@
 
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
           <span class="n">min_delay</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_MIN_DELAY</span><span class="p">,</span>
-          <span class="n">max_delay</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_MAX_DELAY</span><span class="p">,</span>
+          <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">graph_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">database_socket_addresses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_algorithm_xml_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">extra_mapping_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -327,8 +324,8 @@
 <span class="sd">        float or None</span>
 <span class="sd">    :param min_delay: the min delay of the simulation</span>
 <span class="sd">    :type min_delay: float or str</span>
-<span class="sd">    :param max_delay: the max delay of the simulation</span>
-<span class="sd">    :type max_delay: float or str</span>
+<span class="sd">    :param max_delay: Ignored and logs a warning if provided</span>
+<span class="sd">    :type max_delay: float or str or None</span>
 <span class="sd">    :param graph_label: the label for the graph</span>
 <span class="sd">    :type graph_label: str or None</span>
 <span class="sd">    :param database_socket_addresses: the sockets used by external devices</span>
@@ -374,8 +371,9 @@
         <span class="n">timestep</span> <span class="o">=</span> <span class="n">SPYNNAKER_AUTO_TIMESTEP</span>
     <span class="k">if</span> <span class="n">min_delay</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
         <span class="n">min_delay</span> <span class="o">=</span> <span class="n">timestep</span>
-    <span class="k">if</span> <span class="n">max_delay</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-        <span class="n">max_delay</span> <span class="o">=</span> <span class="n">SPYNNAKER_AUTO_MAX_DELAY</span> <span class="o">*</span> <span class="n">timestep</span>
+    <span class="k">if</span> <span class="n">max_delay</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;max_delay is not supported by sPyNNaker so will be ignored&quot;</span><span class="p">)</span>
 
     <span class="c1"># pylint: disable=too-many-arguments, too-many-function-args</span>
     <span class="c1"># setup PyNN common stuff</span>
@@ -405,7 +403,7 @@
         <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="n">extra_post_run_algorithms</span><span class="p">,</span>
         <span class="n">extra_load_algorithms</span><span class="o">=</span><span class="n">extra_load_algorithms</span><span class="p">,</span>
         <span class="n">time_scale_factor</span><span class="o">=</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="n">timestep</span><span class="p">,</span>
-        <span class="n">min_delay</span><span class="o">=</span><span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="o">=</span><span class="n">max_delay</span><span class="p">,</span> <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
+        <span class="n">min_delay</span><span class="o">=</span><span class="n">min_delay</span><span class="p">,</span> <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
         <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
         <span class="n">n_boards_required</span><span class="o">=</span><span class="n">n_boards_required</span><span class="p">)</span>
 
@@ -633,14 +631,16 @@
 
 
 <div class="viewcode-block" id="get_max_delay"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_max_delay">[docs]</a><span class="k">def</span> <span class="nf">get_max_delay</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot; The maximum allowed synaptic delay; delays will be clamped to be at\</span>
-<span class="sd">        most this.</span>
+    <span class="sd">&quot;&quot;&quot; Part of the PyNN api but does not make sense for sPyNNaker as</span>
+<span class="sd">     different Projection, Vertex splitter combination could have different</span>
+<span class="sd">     delays they can support</span>
 
-<span class="sd">    :return: returns the max delay of the simulation</span>
-<span class="sd">    :rtype: int</span>
+<span class="sd">     Most likely value is timestep * 144</span>
+
+<span class="sd">    :raises NotImplementedError: As there is no system wide max_delay</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_max_delay&quot;</span><span class="p">]()</span></div>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+        <span class="s2">&quot;sPyNNaker does not have a system wide max_delay&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_time_step"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_time_step">[docs]</a><span class="k">def</span> <span class="nf">get_time_step</span><span class="p">():</span>
