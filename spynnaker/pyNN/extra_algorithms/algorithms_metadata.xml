@@ -26,14 +26,9 @@
                 <param_name>app_graph</param_name>
                 <param_type>ApplicationGraph</param_type>
             </parameter>
-            <parameter>
-                <param_name>user_max_delay</param_name>
-                <param_type>UserDefinedMaxDelay</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>app_graph</param_name>
-            <param_name>user_max_delay</param_name>
             <token part="MAIN">SplitterObjectsAllocated</token>
         </required_inputs>
         <outputs>

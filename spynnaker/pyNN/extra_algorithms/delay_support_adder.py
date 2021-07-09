@@ -35,7 +35,6 @@ class DelaySupportAdder(object):
     """ adds delay extension vertices into the APP graph as needed
 
     :param ApplicationGraph app_graph: the app graph
-    :param int user_max_delay: the user defined max delay
     :rtype: None
     """
 
@@ -62,9 +61,6 @@ class DelaySupportAdder(object):
         "finally implement the code to allow multiple delay extensions. "
         "good luck.")
 
-    END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE = (
-        "The end user entered a max delay for which the projection breaks")
-
     APP_DELAY_PROGRESS_BAR_TEXT = "Adding delay extensions as required"
 
     def __init__(self):
@@ -72,13 +68,12 @@ class DelaySupportAdder(object):
         self._delay_post_edge_map = dict()
         self._delay_pre_edges = list()
 
-    def __call__(self, app_graph, user_max_delay):
+    def __call__(self, app_graph):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
             the app graph
-        :param int user_max_delay: the user defined max delay
         """
 
         # progress abr and data holders
@@ -96,7 +91,7 @@ class DelaySupportAdder(object):
                     synapse_infos = app_edge.synapse_information
                     (n_delay_stages, delay_steps_per_stage,
                      need_delay_extension) = self._check_delay_values(
-                        app_edge, user_max_delay, synapse_infos)
+                        app_edge, synapse_infos)
 
                     # if we need a delay, add it to the app graph.
                     if need_delay_extension:
@@ -193,13 +188,11 @@ class DelaySupportAdder(object):
                 n_delay_stages, delay_per_stage)
         return delay_app_vertex
 
-    def _check_delay_values(
-            self, app_edge, user_max_delay, synapse_infos):
+    def _check_delay_values(self, app_edge, synapse_infos):
         """ checks the delay required from the user defined max, the max delay\
             supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed app edge
-        :param int user_max_delay: user max delay of the sim.
         :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
         :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
@@ -209,10 +202,6 @@ class DelaySupportAdder(object):
             synapse_info.synapse_dynamics.get_delay_maximum(
                 synapse_info.connector, synapse_info)
             for synapse_info in synapse_infos)
-
-        # check max delay works
-        if max_delay_needed_ms > user_max_delay:
-            logger.warning(self.END_USER_MAX_DELAY_DEFILING_ERROR_MESSAGE)
 
         # get if the post vertex needs a delay extension
         post_splitter = app_edge.post_vertex.splitter

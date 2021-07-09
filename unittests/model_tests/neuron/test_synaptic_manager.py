@@ -175,7 +175,7 @@ def test_write_data_spec():
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph, 16.0)
+        delay_adder.__call__(app_graph)
         partitioner = SpynnakerSplitterPartitioner()
         machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
@@ -490,7 +490,7 @@ def test_pop_based_master_pop_table_standard(
     }
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph, 16.0)
+        delay_adder.__call__(app_graph)
         partitioner = SpynnakerSplitterPartitioner()
         machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
