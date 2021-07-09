@@ -50,7 +50,7 @@ class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
 
         :rtype: ~numpy.ndarray(uint32)
         """
-        return numpy.zeros(0, dtype="uint32")
+        return numpy.zeros(0, dtype=numpy.uint32)
 
     @property
     def gen_matrix_params_size_in_bytes(self):

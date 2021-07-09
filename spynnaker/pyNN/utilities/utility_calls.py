@@ -30,6 +30,9 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_SECOND_CONVERSION)
+from spynnaker.pyNN.utilities.constants import WRITE_BANDWIDTH_BYTES_PER_SECOND
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -42,7 +45,7 @@ N_RANDOM_NUMBERS = 4
 ARBITRARY_Y = 13031301
 MARS_C_MAX = 698769068
 
-FLOAT_GCD_TOLERANCE = 0.0002
+FLOAT_GCD_TOLERANCE = 0.00005
 
 STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
@@ -396,3 +399,14 @@ def moved_in_v6(old_location, new_location):
     logger.warning("File {} moved to {}. Please fix your imports. "
                    "In version 7 this will fail completely."
                    "".format(old_location, new_location))
+
+
+def get_time_to_write_us(n_bytes, n_cores):
+    """ Determine how long a write of a given number of bytes will take in us
+
+    :param int n_bytes: The number of bytes to transfer
+    :param int n_cores: How many cores will be writing at the same time
+    """
+    bandwidth_per_core = WRITE_BANDWIDTH_BYTES_PER_SECOND / n_cores
+    seconds = n_bytes / bandwidth_per_core
+    return int(math.ceil(seconds * MICRO_TO_SECOND_CONVERSION))

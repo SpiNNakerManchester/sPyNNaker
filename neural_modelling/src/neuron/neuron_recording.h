@@ -209,17 +209,12 @@ bool neuron_recording_reset(uint32_t n_neurons);
 
 //! \brief sets up the recording stuff
 //! \param[in] recording_address: sdram location for the recording data
-//! \param[out] recording_flags: Output of flags which can be used to check if
-//!            a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \param[out] n_rec_regions_used: Output the number of regions used by neuron
 //!            recording
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
-        void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons, uint32_t *n_rec_regions_used);
-
-//! \brief finishes recording
-void neuron_recording_finalise(void);
+        void *recording_address, uint32_t n_neurons,
+        uint32_t *n_rec_regions_used);
 
 #endif //_NEURON_RECORDING_H_

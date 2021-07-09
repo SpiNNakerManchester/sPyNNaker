@@ -24,7 +24,7 @@ from spynnaker_integration_tests.scripts import SynfireRunner
 
 n_neurons = 200  # number of neurons in each population
 runtime = 3000
-neurons_per_core = int(n_neurons / 2)
+neurons_per_core = 9
 synfire_run = SynfireRunner()
 
 
@@ -34,7 +34,6 @@ class TestVeryLow(BaseTestCase):
     """
 
     def more_runs(self):
-        self.assert_not_spin_three()
         with LogCapture() as lc:
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])

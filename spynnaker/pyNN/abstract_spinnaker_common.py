@@ -26,7 +26,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import extra_algorithms, model_binaries
-from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, reset_configs
+from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
@@ -49,10 +49,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         "_projections"]
 
     __EXECUTABLE_FINDER = ExecutableFinder()
-
-    @classmethod
-    def extended_config_path(cls):
-        return os.path.join(os.path.dirname(__file__), CONFIG_FILE_NAME)
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -94,6 +90,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :type front_end_versions: list(tuple(str,str)) or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
+
+        setup_configs()
 
         # add model binaries
         self.__EXECUTABLE_FINDER.add_path(
@@ -410,15 +408,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             receivers = self._locate_receivers_from_projections(
                 projection_to_attribute_map.keys(),
                 self.get_generated_output(
-                    "MemoryMCGatherVertexToEthernetConnectedChipMapping"),
+                    "VertexToEthernetConnectedChipMapping"),
                 self.get_generated_output(
-                    "MemoryExtraMonitorToChipMapping"))
+                    "ExtraMonitorToChipMapping"))
 
         # set up the router timeouts to stop packet loss
         for data_receiver, extra_monitor_cores in receivers:
             data_receiver.load_system_routing_tables(
                 self._txrx,
-                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self.get_generated_output("ExtraMonitorVertices"),
                 self._placements)
             data_receiver.set_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
@@ -438,7 +436,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._txrx, list(extra_monitor_cores), self._placements)
             data_receiver.load_application_routing_tables(
                 self._txrx,
-                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self.get_generated_output("ExtraMonitorVertices"),
                 self._placements)
 
         # return data items
@@ -499,6 +497,3 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value
-
-
-reset_configs()

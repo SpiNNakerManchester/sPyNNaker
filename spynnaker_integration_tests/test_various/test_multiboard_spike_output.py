@@ -14,7 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from unittest import SkipTest
 import spynnaker8 as p
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnaker_testbase import BaseTestCase
 
 
@@ -27,10 +29,12 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
         TestMultiBoardSpikeOutput.counts[label] += len(neuron_ids)
 
     def multi_board_spike_output(self):
-        self.assert_not_spin_three()
         TestMultiBoardSpikeOutput.counts = dict()
         p.setup(1.0, n_chips_required=((48 * 2) + 1))
-        machine = p.get_machine()
+        try:
+            machine = p.get_machine()
+        except ConfigurationException as ex:
+            raise SkipTest(ex)
 
         labels = list()
         pops = list()

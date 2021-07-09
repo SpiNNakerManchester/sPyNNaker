@@ -692,7 +692,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return False
 
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
         """
         Checks if a pre slice and a post slice could connect.
 
@@ -704,9 +705,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             This method should never return a false negative,
             but may return a false positives
 
-        :param ~pacman.model.graphs.common.Slice _pre_slice:
-        :param ~pacman.model.graphs.common.Slice _post_slice:
-        :param SynapseInformation _synapse_info:
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertexx:
+        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:
         :rtype: bool
         """
         # Unless we know for sure we must say they could connect

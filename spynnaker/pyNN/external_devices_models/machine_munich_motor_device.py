@@ -136,7 +136,7 @@ class MachineMunichMotorDevice(
             "the number of neurons per core.  Please increase the timer_tic "
             "or time_scale_factor or decrease the number of neurons per core.")
 
-    @inject_items({"routing_info": "MemoryRoutingInfos"})
+    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={"routing_info"})

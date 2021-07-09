@@ -19,6 +19,8 @@ import spynnaker8 as sim
 
 class TestListStandardModules(unittest.TestCase):
 
+    # NO unittest_setup() to make sure call works before setup
+
     def test_check_list(self):
         results = sim.list_standard_models()
         self.assertIn('IF_cond_exp', results)

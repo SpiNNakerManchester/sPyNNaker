@@ -21,56 +21,36 @@
 #define _SYNAPSES_H_
 
 #include <common/neuron-typedefs.h>
+#include <debug.h>
 #include "synapse_row.h"
-#include "neuron.h"
+
+//! \brief Number of bits needed for the synapse type and index
+//! \details
+//! ```
+//! synapse_index_bits + synapse_type_bits
+//! ```
+extern uint32_t synapse_type_index_bits;
+//! \brief Mask to pick out the synapse type and index.
+//! \details
+//! ```
+//! synapse_index_mask | synapse_type_mask
+//! ```
+extern uint32_t synapse_type_index_mask;
+//! Number of bits in the synapse index
+extern uint32_t synapse_index_bits;
+//! Mask to pick out the synapse index.
+extern uint32_t synapse_index_mask;
+//! Number of bits in the synapse type
+extern uint32_t synapse_type_bits;
+//! Mask to pick out the synapse type.
+extern uint32_t synapse_type_mask;
+//! Number of bits in the delay
+extern uint32_t synapse_delay_bits;
+//! Mask to pick out the delay
+extern uint32_t synapse_delay_mask;
 
 //! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;
-
-
-//! \brief Get the index of the ring buffer for a given timestep, synapse type
-//!     and neuron index
-//! \param[in] simulation_timestep:
-//! \param[in] synapse_type_index:
-//! \param[in] neuron_index:
-//! \param[in] synapse_type_index_bits:
-//! \param[in] synapse_index_bits:
-//! \return Index into the ring buffer
-static inline index_t synapses_get_ring_buffer_index(
-        uint32_t simulation_timestep, uint32_t synapse_type_index,
-        uint32_t neuron_index, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits) {
-    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
-            | (synapse_type_index << synapse_index_bits)
-            | neuron_index;
-}
-
-//! \brief Get the index of the ring buffer for a given timestep and combined
-//!     synapse type and neuron index (as stored in a synapse row)
-//! \param[in] simulation_timestep:
-//! \param[in] combined_synapse_neuron_index:
-//! \param[in] synapse_type_index_bits:
-//! \return Index into the ring buffer
-static inline index_t synapses_get_ring_buffer_index_combined(
-        uint32_t simulation_timestep,
-        uint32_t combined_synapse_neuron_index,
-        uint32_t synapse_type_index_bits) {
-    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
-            | combined_synapse_neuron_index;
-}
-
-//! \brief Converts a weight stored in a synapse row to an input
-//! \param[in] weight: the weight to convert in synapse-row form
-//! \param[in] min_weight: the minimum weight to use in the conversion
-//! \return the actual input weight for the model
-static inline input_t synapses_convert_weight_to_input(
-        weight_t weight, REAL min_weight) {
-    // Simply doing weight * min_weight adds unnecessary compiler instructions
-    uint64_t mw = (uint64_t) bitsk(min_weight);
-    uint64_t w = (uint64_t) (weight);
-
-    return kbits((int_k_t) (mw * w));
-}
 
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form
@@ -79,7 +59,7 @@ static inline void synapses_print_weight(
         weight_t weight, REAL min_weight) {
     if (weight != 0) {
         io_printf(IO_BUF, "%12.6k",
-                synapses_convert_weight_to_input(weight, min_weight));
+                synapse_row_convert_weight_to_input(weight, min_weight));
     } else {
         io_printf(IO_BUF, "      ");
     }
@@ -87,20 +67,23 @@ static inline void synapses_print_weight(
 
 //! \brief Initialise the synapse processing
 //! \param[in] synapse_params_address: Synapse configuration in SDRAM
-//! \param[in] n_neurons: Number of neurons to simulate
-//! \param[in] n_synapse_types: Number of synapse types
+//! \param[out] n_neurons: Number of neurons that will be simulated
+//! \param[out] n_synapse_types: Number of synapse types that will be simulated
+//! \param[out] ring_buffers: The ring buffers that will be used
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //!     Array of shifts to use when converting from ring buffer values to input
 //!     buffer values
+//! \param[out] clear_input_buffers_of_late_packets:
+//!     Inicates whether to clear the input buffers each time step
+//! \param[out] incoming_spike_buffer_size:
+//!     The number of spikes to support in the incoming spike circular buffer
 //! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
-        address_t synapse_params_address, uint32_t n_neurons,
-		uint32_t n_synapse_types, REAL **min_weights_out,
-        bool* clear_input_buffers_of_late_packets_init);
-
-//! \brief Do all the synapse processing for a timestep.
-//! \param[in] time: the current simulation time
-void synapses_do_timestep_update(timer_t time);
+        address_t synapse_params_address,
+        uint32_t *n_neurons_out, uint32_t *n_synapse_types_out,
+        weight_t **ring_buffers_out, REAL **min_weights_out,
+        bool* clear_input_buffers_of_late_packets_init,
+        uint32_t *incoming_spike_buffer_size);
 
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
@@ -116,11 +99,12 @@ bool synapses_process_synaptic_row(
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
 
-//! \brief flush the ring buffers
-void synapses_flush_ring_buffers(void);
+//! \brief Resume processing of synapses after a pause
+//! \param[in] time: The time at which the simulation is to start
+void synapses_resume(timer_t time);
 
-//! \brief allows clearing of DTCM used by synapses
-//! \return true if successful, false otherwise
-bool synapses_shut_down(void);
+//! \brief Reset the ring buffers to 0 at the given time
+//! \param[in] time: the simulated time to reset the buffers at
+void synapses_flush_ring_buffers(timer_t time);
 
 #endif // _SYNAPSES_H_

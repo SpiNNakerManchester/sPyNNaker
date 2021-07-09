@@ -122,7 +122,8 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 
 //! The number of relevant items remaining in the ::address_list
-static uint16_t items_to_go = 0;
+//! NOTE: Exported for speed of check
+uint16_t items_to_go = 0;
 
 //! The bitfield map
 static bit_field_t *connectivity_bit_field = NULL;
@@ -487,10 +488,13 @@ bool population_table_get_first_address(
     log_debug("position = %d", position);
 
     master_population_table_entry entry = master_population_table[position];
+
+    #if LOG_LEVEL >= LOG_DEBUG
     if (entry.count == 0) {
         log_debug("Spike %u (= %x): Population found in master population"
                 "table but count is 0", spike, spike);
     }
+    #endif
 
     last_spike = spike;
     next_item = entry.start;

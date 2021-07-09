@@ -14,11 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.protocols import (
     MunichIoSpiNNakerLinkProtocol, MUNICH_MODES, RetinaKey)
 
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_call_each_function(self):
         protocol = MunichIoSpiNNakerLinkProtocol(

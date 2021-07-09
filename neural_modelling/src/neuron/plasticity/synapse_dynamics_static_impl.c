@@ -23,43 +23,14 @@
  * \author Petrut Bogdan
  */
 #include "synapse_dynamics.h"
+#include <neuron/synapses.h>
 #include <debug.h>
 #include <utils.h>
 
-//! ::synapse_index_bits + ::synapse_type_bits
-static uint32_t synapse_type_index_bits;
-//! Number of bits to hold the neuron index
-static uint32_t synapse_index_bits;
-//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
-static uint32_t synapse_index_mask;
-//! Number of bits to hold the synapse type
-static uint32_t synapse_type_bits;
-//! Mask to extract the synapse type (has ::synapse_type_bits bits set)
-static uint32_t synapse_type_mask;
-
 bool synapse_dynamics_initialise(
-        UNUSED address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
+        UNUSED address_t address, UNUSED uint32_t n_neurons,
+        UNUSED uint32_t n_synapse_types,
         UNUSED REAL *min_weights) {
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    synapse_type_bits = 1;
-    if (n_synapse_types != 1) {
-        if (!is_power_of_2(n_synapse_types)) {
-            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-        }
-        synapse_type_bits = ilog_2(n_synapse_types_power_2);
-    }
-    synapse_type_index_bits = log_n_neurons + synapse_type_bits;
-    synapse_index_bits = log_n_neurons;
-    synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_type_mask = (1 << synapse_type_bits) - 1;
     return true;
 }
 
@@ -75,12 +46,6 @@ bool synapse_dynamics_process_plastic_synapses(
         UNUSED weight_t *ring_buffer, UNUSED uint32_t time) {
     log_error("There should be no plastic synapses!");
     return false;
-}
-
-//---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(
-        UNUSED uint32_t time, UNUSED index_t neuron_index) {
-    return ZERO;
 }
 
 void synapse_dynamics_print_plastic_synapses(
@@ -115,7 +80,7 @@ bool synapse_dynamics_find_neuron(
                     fixed_synapse;
             *weight = synapse_row_sparse_weight(synaptic_word);
             *delay = synapse_row_sparse_delay(synaptic_word,
-                    synapse_type_index_bits);
+                    synapse_type_index_bits, synapse_delay_mask);
             *synapse_type = synapse_row_sparse_type(
                     synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
@@ -142,7 +107,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
 static inline uint32_t _fixed_synapse_convert(
         uint32_t id, weight_t weight, uint32_t delay, uint32_t type) {
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
-    new_synapse |= ((delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) <<
+    new_synapse |= ((delay & ((1 << synapse_delay_bits) - 1)) <<
             synapse_type_index_bits);
     new_synapse |= ((type & ((1 << synapse_type_bits) - 1)) <<
             synapse_index_bits);
