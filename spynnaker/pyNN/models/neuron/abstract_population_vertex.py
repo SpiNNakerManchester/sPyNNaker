@@ -818,6 +818,7 @@ class AbstractPopulationVertex(
     def __get_closest_weight(self, value):
         """ Get the best representation of the weight so that both weight and
             1 / w work
+
         :param float value: value to get the closest weight of
         """
         if abs(value) < 1.0:
@@ -825,10 +826,14 @@ class AbstractPopulationVertex(
         return 1 / (
             DataType.S1615.closest_representable_value_above(1 / value))
 
-    def _calculate_min_weights(self, incoming_projections):
+    def __calculate_min_weights(self, incoming_projections):
         """ Calculate the minimum weights required to best represent all the
-            possible weights coming into the specified machine vertex
-        :param list(~.Projection) incoming_projections: a list of incoming proj
+            possible weights coming into this vertex
+
+        :param list(~.Projection) incoming_projections: incoming proj to vertex
+
+        :return: list of minimum weights
+        :rtype: list(float)
         """
         # Initialise to a maximum value
         min_weights = [sys.maxsize for _ in range(
@@ -888,6 +893,7 @@ class AbstractPopulationVertex(
             self, min_weights, weight_scale, incoming_projections):
         """ Warn the user about weights that can't be represented properly
             where possible
+
         :param ~numpy.ndarray min_weights: Minimum weights per synapse type
         :param float weight_scale: The weight_scale from the synapse input_type
         :param list(~.Projection) incoming_projections: A list of incoming proj
@@ -911,6 +917,7 @@ class AbstractPopulationVertex(
             synapse_info):
         """ Warn the user about a weight that can't be represented properly
             where possible
+
         :param float min_weight: Minimum weight value
         :param float weight: weight value being checked
         :param float weight_scale: The weight_scale from the synapse input_type
@@ -925,8 +932,16 @@ class AbstractPopulationVertex(
                 (projection, synapse_info))
 
     def get_min_weights(self, incoming_projections):
+        """ Calculate the minimum weights required to best represent all the
+            possible weights coming into this vertex
+
+        :param list(~.Projection) incoming_projections: incoming proj to vertex
+
+        :return: list of minimum weights
+        :rtype: list(float)
+        """
         if self.__min_weights is None:
-            self.__min_weights = self._calculate_min_weights(
+            self.__min_weights = self.__calculate_min_weights(
                 incoming_projections)
         return self.__min_weights
 
@@ -1284,7 +1299,7 @@ class AbstractPopulationVertex(
     def get_local_provenance_data(self):
         """ Get provenance data items relating to weight representations
 
-        :return: the provenance items
+        :return: a list of the provenance data items
         :rtype:
             iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
