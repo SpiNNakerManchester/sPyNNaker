@@ -23,7 +23,7 @@ from spinnaker_testbase import BaseTestCase
 
 
 def do_run(nNeurons):
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
+    p.setup(timestep=1.0, min_delay=1.0)
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
     cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 10.0,

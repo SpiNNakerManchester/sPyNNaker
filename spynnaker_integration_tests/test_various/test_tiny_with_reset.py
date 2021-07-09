@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 
 
 def do_run():
-    p.setup(timestep=1, min_delay=1, max_delay=15)
+    p.setup(timestep=1, min_delay=1)
 
     spiker = p.Population(1, p.SpikeSourceArray(spike_times=[[0]]),
                           label='inputSSA_1')
