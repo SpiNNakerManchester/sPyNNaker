@@ -1174,7 +1174,6 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_synapse_variable_sdram(self, vertex_slice):
-
         """ Get the amount of SDRAM per timestep used by synapse parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1189,7 +1188,6 @@ class AbstractPopulationVertex(
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
     def get_neuron_constant_sdram(self, vertex_slice, neuron_regions):
-
         """ Get the amount of fixed SDRAM used by neuron parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1284,9 +1282,11 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
-        """ Get provenance data for weights
+        """ Get provenance data items relating to weight representations
 
-        :rtype: list(~ProvenanceDataItem)
+        :return: the provenance items
+        :rtype:
+            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         prov_items = list()
         synapse_names = list(self.__neuron_impl.get_synapse_targets())
