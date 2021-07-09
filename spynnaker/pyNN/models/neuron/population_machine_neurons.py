@@ -19,6 +19,8 @@ from collections import namedtuple
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 
+from pacman.utilities.utility_calls import get_field_based_keys
+
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.abstract_models import (
@@ -156,34 +158,6 @@ class PopulationMachineNeurons(
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
-    def __get_keys(self, key, vertex_slice):
-        """ Translate a vertex slice into keys
-
-        :param int key: The base key
-        :param Slice vertex_slice: The slice to translate
-        """
-
-        # Find the size of field required for each coordinate, and the shift
-        # required to get to this field position (the first field has a shift
-        # of 0)
-        field_sizes = numpy.array([get_n_bits(n) for n in vertex_slice.shape])
-        shifts = numpy.cumsum(field_sizes - field_sizes[0])
-
-        # Convert each atom into x, y coordinates based on shape
-        # This uses numpy.unravel_index, the result of which needs to be
-        # made into an array (it is a list of tuples) and transposed (it
-        # gives the coordinates separately per axis)
-        coords = numpy.array(numpy.unravel_index(
-            numpy.arange(vertex_slice.n_atoms),
-            vertex_slice.shape, order='F')).T
-
-        # We now left shift each coordinate into its field and add them up to
-        # get the key
-        keys = numpy.sum(numpy.left_shift(coords, shifts), axis=1)
-
-        # The final result is the above with the base key added
-        return keys + key
-
     def _write_neuron_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region
 
@@ -219,7 +193,7 @@ class PopulationMachineNeurons(
             keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            keys = self.__get_keys(self._key, self._vertex_slice)
+            keys = get_field_based_keys(self._key, self._vertex_slice)
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
