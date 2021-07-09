@@ -942,11 +942,6 @@ class AbstractPopulationVertex(
             [(1 / w) * weight_scale if w != 0 else 0 for w in min_weights])
         return self.__weight_scales
 
-    # def reset_min_weights(self):
-    #     if self.__min_weights_auto:
-    #         self.__min_weights = None
-    #         self.__weight_scales = None
-
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
@@ -1291,9 +1286,7 @@ class AbstractPopulationVertex(
     def get_local_provenance_data(self):
         """ Get provenance data for weights
 
-        :param str label: The label of the vertex
-        :param list synapse_names: List of the names of the synapses
-        :return: A list of provenance items
+        :rtype: list(~ProvenanceDataItem)
         """
         prov_items = list()
         synapse_names = list(self.__neuron_impl.get_synapse_targets())
