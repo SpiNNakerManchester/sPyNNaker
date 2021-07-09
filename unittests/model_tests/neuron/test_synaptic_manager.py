@@ -272,7 +272,8 @@ def test_set_synapse_dynamics():
     post_app_model = IFCurrExpBase()
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     static = SynapseDynamicsStatic()
@@ -365,7 +366,8 @@ def test_set_synapse_dynamics():
     # Try starting again to get a couple more combinations
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     # STDP followed by structural STDP should result in Structural STDP
@@ -387,7 +389,8 @@ def test_set_synapse_dynamics():
     # One more time!
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
 
     # Static followed by static structural should result in static
@@ -424,7 +427,8 @@ def test_set_synapse_dynamics():
     # OK, just one more, honest
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
-        ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+        ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+        max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
         n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
     post_app_vertex.synapse_dynamics = static_struct
     post_app_vertex.synapse_dynamics = stdp_struct
