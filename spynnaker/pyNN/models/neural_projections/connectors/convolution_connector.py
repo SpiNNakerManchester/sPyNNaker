@@ -22,6 +22,7 @@ from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import (AbstractConnector)
 from spynnaker.pyNN.utilities.neuron_id_encoding import XYEncoder
+from data_specification.enums.data_type import DataType
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -503,7 +504,9 @@ class ConvolutionConnector(AbstractConnector):
 
         wk = 1. / numpy.prod(self.pool_area) if self.pooling else 1.
 
-        klist = self.pack_kernel(self.kernel.flatten() * wk)
+        # klist = self.pack_kernel(self.kernel.flatten() * wk)
+        klist = DataType.S1615.encode_as_numpy_int_array(
+            self.kernel.flatten() * wk)
 
         shapes = [
             shape2word(self.pre_shape[WIDTH], self.pre_shape[HEIGHT]),
@@ -521,11 +524,10 @@ class ConvolutionConnector(AbstractConnector):
         # print(klist)
         # first is for length of data
         # second is for number of pre-starts
-        data = [0, shape2word(pre_end, pre_start),
+        data = [shape2word(pre_end, pre_start),
                 shape2word(post_end, post_start)]
         data.extend(shapes)
         data.extend(klist)
-        data[0] = np.uint32(len(data))
         data.extend(pre2post)
         return data
 

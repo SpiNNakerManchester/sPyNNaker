@@ -20,7 +20,6 @@ from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -188,10 +187,10 @@ class PopulationMachineNeurons(
         # isn't to be used
         if self._key is None:
             spec.write_value(data=0)
-            spec.write_value(data=0)
+            keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            spec.write_value(data=self._key)
+            keys = [self._key + i for i in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
@@ -201,6 +200,9 @@ class PopulationMachineNeurons(
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)
+
+        # Write the keys
+        spec.write_array(keys)
 
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(
@@ -220,11 +222,8 @@ class PopulationMachineNeurons(
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
-        neurons_pre_size = (
-            self._app_vertex.tdma_sdram_size_in_bytes +
-            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self._app_vertex.neuron_impl.get_n_synapse_types() *
-             BYTES_PER_WORD))
+        neurons_pre_size = self._app_vertex.get_neuron_params_position(
+            self._vertex_slice)
         neuron_parameters_sdram_address = (
             neuron_region_sdram_address + neurons_pre_size)
 

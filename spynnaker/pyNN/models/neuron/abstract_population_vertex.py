@@ -135,8 +135,8 @@ class AbstractPopulationVertex(
     _SYNAPSE_BASE_N_CPU_CYCLES = 10
 
     # 5 elements before the start of global parameters
-    # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    # 1. has key, 2. n atoms, 3. n_atoms_peak 4. n_synapse_types
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 4 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -408,6 +408,24 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
+    def get_neuron_params_position(self, vertex_slice):
+        """ Get the position of the neuron parameters themselves within the
+            neuron parameters region
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms.
+        :rtype: int
+        """
+        return (
+            # Parameters global for the neurons
+            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            # The ring buffer shifts
+            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
+            # TDMA parameters
+            self.tdma_sdram_size_in_bytes +
+            # The keys per neuron
+            vertex_slice.n_atoms * BYTES_PER_WORD)
+
     def get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
@@ -416,9 +434,7 @@ class AbstractPopulationVertex(
         :return: The SDRAM required for the neuron region
         """
         return (
-            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
-            self.tdma_sdram_size_in_bytes +
+            self.get_neuron_params_position(vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
