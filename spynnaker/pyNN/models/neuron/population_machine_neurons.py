@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ctypes
-import numpy
 from collections import namedtuple
 
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
