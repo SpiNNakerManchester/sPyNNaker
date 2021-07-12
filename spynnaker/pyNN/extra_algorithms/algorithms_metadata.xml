@@ -31,6 +31,9 @@
             <param_name>app_graph</param_name>
             <token part="MAIN">SplitterObjectsAllocated</token>
         </required_inputs>
+        <optional_inputs>
+            <token part="RESET">SplitterObjectsAllocated</token>
+        </optional_inputs>
         <outputs>
             <token part="DELAYS">SplitterObjectsAllocated</token>
         </outputs>
