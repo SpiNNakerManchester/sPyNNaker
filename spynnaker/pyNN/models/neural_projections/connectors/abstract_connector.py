@@ -704,3 +704,14 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return temp
         raise SpynnakerException(
             "Size of {} must be an int, received {}".format(label, size))
+
+    def validate_connection(self, application_edge, synapse_info):
+        """ Checks that the edge supports the connector.  By default this does
+            nothing i.e. assumes the edge is OK, but can be overridden if the
+            connector has rules that need to be checked.  Returns nothing; it
+            is assumed that an Exception will be raised if anything is wrong.
+
+        :param ApplicationEdge application_edge: The edge of the connection
+        :param SynapseInformation synapse_info: The synaptic information
+        """
+        return
