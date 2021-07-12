@@ -136,7 +136,7 @@ class OnChipBitFieldGenerator(object):
         progress.end()
 
         # read in bit fields for debugging purposes
-        if get_config_bool("Reports", "generate_bit_field_report"):
+        if get_config_bool("Reports", "write_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
                 report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
             self._summary_report_bit_fields(app_graph, os.path.join(
