@@ -182,24 +182,6 @@ class SpynnakerMachineBitFieldOrderedCoveringCompressor(
         return MachineBitFieldOrderedCoveringCompressor()
 
 
-class SpynnakerMachineBitFieldUnorderedRouterCompressor(
-        SpynnakerMachineBitFieldOrderedCoveringCompressor):
-    """ DEPRACATED use SpynnakerMachineBitFieldOrderedCoveringCompressor """
-
-    def __new__(cls, *args, **kwargs):
-        logger.warning(
-            "SpynnakerMachineBitFieldUnorderedRouterCompressor "
-            "algorithm name is deprecated. "
-            "Please use SpynnakerMachineBitFieldOrderedCoveringCompressor "
-            "instead. "
-            "Remove algorithms from your cfg to use defaults")
-        return super().__new__(cls, *args, **kwargs)
-
-    @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)
-    def _compressor_factory(self):
-        return MachineBitFieldOrderedCoveringCompressor()
-
-
 class SpynnakerMachineBitFieldPairRouterCompressor(
         AbstractMachineBitFieldRouterCompressor):
     @overrides(AbstractMachineBitFieldRouterCompressor._compressor_factory)

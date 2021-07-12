@@ -22,8 +22,7 @@ from .spynnaker_data_specification_writer import (
     SpynnakerDataSpecificationWriter)
 from .spynnaker_machine_bit_field_router_compressor import (
     AbstractMachineBitFieldRouterCompressor,
-    SpynnakerMachineBitFieldPairRouterCompressor,
-    SpynnakerMachineBitFieldUnorderedRouterCompressor)
+    SpynnakerMachineBitFieldPairRouterCompressor)
 from .spynnaker_neuron_network_specification_report import (
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
@@ -40,7 +39,6 @@ __all__ = [
     "SpYNNakerConnectionHolderGenerator",
     "SpynnakerDataSpecificationWriter",
     "SpynnakerMachineBitFieldPairRouterCompressor",
-    "SpynnakerMachineBitFieldUnorderedRouterCompressor",
     "SpYNNakerNeuronGraphNetworkSpecificationReport",
     "SpYNNakerSynapticMatrixReport",
     "synapse_expander"]
