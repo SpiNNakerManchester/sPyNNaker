@@ -24,10 +24,9 @@
 #include "../neuron.h"
 
 typedef input_t lc_weight_t;
+
 // Dimensions are needed to be signed due to mapping from pre- to post-synaptic.
 typedef int16_t lc_dim_t;
-// Neuron Ids are not signed, this is compatible with the rest of the tools (?).
-typedef uint32_t lc_neuron_id_t;
 
 // Reduce the number of parameters with the following structs
 typedef struct {
@@ -49,16 +48,20 @@ typedef struct {
     uint32_t row_shift;
 } source_key_info;
 
+// A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
+// and 14 fractional bits to allow 1 to be properly represented
+#define RECIP_FRACT_BITS 14
+
 // One per connector
 typedef struct {
     source_key_info key_info;
     lc_coord_t pre_start;
     lc_shape_t pre_shape;
-    lc_shape_t padding;
-    lc_shape_t strides;
     lc_shape_t kernel;
-    lc_shape_t pool_shape;
-    lc_shape_t pool_strides;
+    lc_shape_t padding;
+    lc_coord_t recip_strides;
+    lc_coord_t recip_pool_strides;
+    uint32_t synapse_type;
     lc_weight_t weights[]; // n_weights = kernel.width * kernel.height
 } connector;
 
@@ -66,13 +69,9 @@ typedef struct {
     lc_coord_t post_start;
     lc_coord_t post_end;
     lc_shape_t post_shape;
-    uint32_t post_use_row_msb;
-    uint32_t post_shift;
     uint32_t n_connectors;
-    uint32_t synapse_type;
     // In SDRAM, below here is the following:
     // connector connectors[n_connectors]
-    // lc_coord_t pre_to_post[n_connectors][pre_shape.width * pre_shape.height]
 } conv_config;
 
 // The main configuration data
@@ -80,9 +79,6 @@ static conv_config config;
 
 // The per-connection data
 static connector** connectors;
-
-// The per-connection pre-to-post table data
-static lc_coord_t **pre_to_post_tables;
 
 //! \brief Load the required data into DTCM.
 bool local_only_impl_initialise(void *address){
@@ -95,18 +91,10 @@ bool local_only_impl_initialise(void *address){
         return false;
     }
 
-    log_info("Post use row as msb = %u", config.post_use_row_msb);
-    log_info("Post shift is %u", config.post_shift);
-
     // Allocate space for connector information and pre-to-post table
     connectors = spin1_malloc(config.n_connectors * sizeof(connectors[0]));
     if (connectors == NULL) {
         log_error("Can't allocate memory for connectors");
-        return false;
-    }
-    pre_to_post_tables = spin1_malloc(config.n_connectors * sizeof(pre_to_post_tables[0]));
-    if (pre_to_post_tables == NULL) {
-        log_error("Can't allocate memory for pre-to-post tables");
         return false;
     }
 
@@ -133,34 +121,31 @@ bool local_only_impl_initialise(void *address){
         conn = (connector *) &conn->weights[n_weights];
     }
 
-    // The first pre_to_post_table comes after the last connector
-    lc_coord_t *table = (lc_coord_t *) conn;
-    for (uint32_t i = 0; i < config.n_connectors; i++) {
-        // Copy the data from SDRAM
-        uint32_t n_elems = connectors[i]->pre_shape.width * connectors[i]->pre_shape.height;
-        uint32_t n_bytes = n_elems * sizeof(table[0]);
-        pre_to_post_tables[i] = spin1_malloc(n_bytes);
-        if (pre_to_post_tables[i] == NULL) {
-            log_error("Can't allocate memory for pre_to_post_table[%u]", i);
-            return false;
-        }
-        spin1_memcpy(pre_to_post_tables[i], table, n_bytes);
-
-        // Move to the next table
-        table = (lc_coord_t *) &table[n_elems];
-    }
-
     return true;
+}
+
+//! \brief Multiply an integer by a 16-bit reciprocal and return the floored
+//!        integer result
+static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
+    int32_t i = integer;
+    int32_t r = recip;
+    return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
 }
 
 //! \brief Do a mapping from pre to post 2D spaces, we use the standard
 //! padding, kernel, strides from Convolutional Neural Networks
 //! because of the way we're looping through the kernel, we divide the kernel
 //! shape by 2.
-static inline lc_coord_t map_pre_to_post(lc_coord_t *pre_to_post, lc_coord_t pre,
-        uint32_t width) {
-    uint32_t index = pre.row * width + pre.col;
-    return pre_to_post[index];
+static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre,
+        int16_t half_kh, int16_t half_kw) {
+    lc_coord_t post = pre;
+    post.col = recip_multiply(post.col, connector->recip_pool_strides.col);
+    post.row = recip_multiply(post.row, connector->recip_pool_strides.row);
+    post.col = post.col - half_kw + connector->padding.width;
+    post.row = post.row - half_kh + connector->padding.height;
+    post.col = recip_multiply(post.col, connector->recip_strides.col);
+    post.row = recip_multiply(post.row, connector->recip_strides.row);
+    return post;
 }
 
 
@@ -169,14 +154,13 @@ static inline lc_coord_t map_pre_to_post(lc_coord_t *pre_to_post, lc_coord_t pre
 //!        the kernel).
 static inline void do_convolution_operation(
         uint32_t time, lc_coord_t pre_coord, connector *connector,
-        lc_coord_t *pre_to_post, uint16_t *ring_buffers) {
-    lc_coord_t post_coord = map_pre_to_post(pre_to_post, pre_coord,
-            connector->pre_shape.width);
+        uint16_t *ring_buffers) {
+    int32_t half_kh = connector->kernel.height / 2;
+    int32_t half_kw = connector->kernel.width / 2;
+    lc_coord_t post_coord = map_pre_to_post(connector, pre_coord, half_kh, half_kw);
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
 
-    int32_t half_kh = connector->kernel.height / 2;
-    int32_t half_kw = connector->kernel.width / 2;
     for (int32_t r = -half_kh, y = 0; r <= half_kh; r++, y++) {
         int32_t tmp_row = post_coord.row + r;
         if ((tmp_row < config.post_start.row) || (tmp_row > config.post_end.row)) {
@@ -192,8 +176,8 @@ static inline void do_convolution_operation(
             // will know how to send the spike correctly
             uint32_t post_index = (y * config.post_shape.width) + x;
             lc_weight_t weight = connector->weights[post_index];
-            uint32_t rb_index = synapse_row_get_ring_buffer_index(time,
-                    config.synapse_type, post_index, synapse_type_index_bits,
+            uint32_t rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                    connector->synapse_type, post_index, synapse_type_index_bits,
                     synapse_index_bits, synapse_delay_mask);
 
             // Add weight to current ring buffer value, avoiding saturation
@@ -208,7 +192,7 @@ static inline void do_convolution_operation(
 }
 
 static inline bool key_to_index_lookup(uint32_t spike, connector **connector,
-        lc_coord_t **pre_to_post, uint32_t *core_local_col, uint32_t *core_local_row) {
+        uint32_t *core_local_col, uint32_t *core_local_row) {
     uint32_t imin = 0;
     uint32_t imax = config.n_connectors;
 
@@ -217,7 +201,6 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **connector,
         source_key_info entry = connectors[imid]->key_info;
         if ((spike & entry.mask) == entry.key) {
             *connector = connectors[imid];
-            *pre_to_post = pre_to_post_tables[imid];
             *core_local_col = (spike & entry.col_mask) >> entry.col_shift;
             *core_local_row = (spike & entry.row_mask) >> entry.row_shift;
             return true;
@@ -242,13 +225,12 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **connector,
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
     connector *connector;
-    lc_coord_t *pre_to_post;
     uint32_t core_local_col;
     uint32_t core_local_row;
 
     // Lookup the spike, and if found, get the appropriate parts
     if (!key_to_index_lookup(
-            spike, &connector, &pre_to_post, &core_local_col, &core_local_row)) {
+            spike, &connector, &core_local_col, &core_local_row)) {
         return;
     }
 
@@ -259,5 +241,5 @@ void local_only_impl_process_spike(
     };
 
     // Compute the convolution
-    do_convolution_operation(time, pre_coord, connector, pre_to_post, ring_buffers);
+    do_convolution_operation(time, pre_coord, connector, ring_buffers);
 }
