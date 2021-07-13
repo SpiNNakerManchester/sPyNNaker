@@ -64,7 +64,7 @@
             <param_name>placements</param_name>
             <param_name>transceiver</param_name>
             <param_name>executable_finder</param_name>
-            <token part="DSGDataLoaded">DataLoaded</token>
+            <token part="DSGAppDataLoaded">DataLoaded</token>
         </required_inputs>
         <outputs>
             <token part="SynapseDataExpanded">DataLoaded</token>
