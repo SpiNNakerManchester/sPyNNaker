@@ -15,29 +15,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import numpy as np
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from pyNN.random import RandomDistribution
-from spynnaker.pyNN.exceptions import SpynnakerException
-from .abstract_connector import (AbstractConnector)
-from spynnaker.pyNN.utilities.neuron_id_encoding import XYEncoder
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, PARAM_TYPE_KERNEL,
+    PARAM_TYPE_CONSTANT_ID, ConnectorIDs)
 from data_specification.enums.data_type import DataType
+from collections.abc import Iterable
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
-HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
-
-CONV_PARAMS = [
-    'pre_w', 'pre_h',
-    'stride_w', 'stride_h'
-    'post_w', 'post_h'
-]
-
-DEC_BITS = 11
-
-
-class ConvolutionKernel(numpy.ndarray):
-    pass
 
 
 def shape2word(sw, sh):
@@ -45,7 +37,7 @@ def shape2word(sw, sh):
         ((numpy.uint32(sh) & 0xFFFF) << 16) | (numpy.uint32(sw) & 0xFFFF))
 
 
-class ConvolutionConnector(AbstractConnector):
+class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
@@ -58,561 +50,381 @@ class ConvolutionConnector(AbstractConnector):
         TODO: ONLY AVERAGE POOLING IS ALLOWED AT THIS POINT!
     """
 
-    def __init__(self, shape_pre, weights_kernel, strides, padding,
-                 pooling=None, pool_stride=None,
-                 most_significant_rows=True,
-                 safe=True, verbose=False, callback=None):
+    __slots__ = [
+        "__kernel_weights",
+        "__strides",
+        "__padding_shape",
+        "__pool_shape",
+        "__pool_stride"
+    ]
+
+    def __init__(self, kernel_weights, kernel_shape=None, strides=None,
+                 padding=None, pool_shape=None, pool_stride=None, safe=True,
+                 verbose=False, callback=None):
         """
-        :param shape_pre:
-            2D shape of the pre population (rows/height, columns/width, e.g.
-            the input image shape)
-        :type shape_pre: list(int) or tuple(int,int)
-        :param weights_kernel:
-            The synaptic strengths, shared by neurons in the post population
-        :type weights_kernel: numpy.ndarray(float, size=(int, int))
-        :param strides: Spatial sampling frequency, jumps between the post
-        neurons. This matches the meaning of standard ML packages
+        :param kernel_weights:
+            The synaptic strengths, shared by neurons in the post population.
+            Can be:
+                * single value: kernel_shape must be provided;
+                                the same value will be used for all weights
+                * simple list: kernel_shape must be provided; the list must
+                               be sized shape width * height
+                * 2D list: If kernel_shape is provided, it must match
+                * numpy.ndarray: As above for simple or 2D list
+                * RandomDistribution: kernel_shape must be provided; weights
+                                      will be drawn from the distribution
+        :type kernel_weights:
+            int or list or 2D-list or numpy.ndarray or RandomDistribution
+        :param kernel_shape:
+            The shape of the kernel if it cannot be determined from
+            kernel_weights. If a single value is provided, a square kernel will
+            be assumed.  If two values are provided, it will be assumed to be
+            (n_rows, n_columns)
+        :type kernel_shape: int or tuple(int,int)
+        :param strides:
+            Spatial sampling frequency, jumps between the post neurons.
+            This matches the meaning of standard ML packages.  If a single
+            value is provided, the same stride will be used for rows and
+            columns.  If two values are provided it will be assumed to be
+            (stride_rows, stride_columns)
         :type strides: int or tuple(int, int)
-        :param padding: How many 'extra pixels' around the pre population will
-        be added, only zero-valued pixels are currently supported
-        :type padding: str or int or tuple(int, int)
-        :param pooling: Area of pooling, only average pooling is supported
-        (and seems to make sense)
-        :type pooling: int or tuple(int, int)
-        :param pool_stride: Jumps between pooling regions
+        :param padding:
+            How many 'extra pixels' around the pre population will be added,
+            only zero-valued pixels are currently supported.  If a single
+            value is provided, the same padding will be used for rows and
+            columns.  If two values are provided it will be assumed to be
+            (padding_rows, padding_columns).  If True, automatic padding will
+            be used based on the kernel shape.  If False or None, no padding
+            will be used.
+        :type padding: bool or int or tuple(int, int) or None
+        :param pool_shape:
+            Area of pooling, only average pooling is supported (and seems to
+            make sense). If a single value is provided, the pooling area will
+            be square.  If two values are provided it will be assumed to be
+            (pooling_rows, pooling_columns).
+        :type pool_shape: int or tuple(int, int)
+        :param pool_stride:
+            Jumps between pooling regions. If a single value is provided, the
+            same stride will be used for rows and columns.  If two values are
+            provided it will be assumed to be (stride_rows, stride_columns)
         :type pool_stride: int or tuple(int, int)
-        :param most_significant_rows: Whether to use rows as the most
-        significant part of neuron id bit fields.
-        :type most_significant_rows: bool
-        :param bool safe:
-        :param bool verbose:
+        :param bool safe: (ignored)
+        :param bool verbose: (ignored)
         :param callable callback: (ignored)
         """
         super(ConvolutionConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
 
-        self.single_pre_to_post_pack = False
-        self.most_significant_rows = most_significant_rows
-        self.pre_shape = self.to_2d_shape(shape_pre)
-        self.pre_size = int(np.prod(self.pre_shape))
-        self.kernel_shape = self.to_2d_shape(weights_kernel.shape)
-        self.kernel = weights_kernel
-        self.strides = self.to_2d_shape(strides)
-        self.padding = self.to_2d_shape(self.decode_padding(padding))
+        self.__decode_kernel(kernel_weights, kernel_shape)
+        self.__decode_padding(padding)
 
-        self.pooling = not (pooling is None)
-        pooling = 0 if pooling is None else pooling
-        self.pool_area = self.to_2d_shape(pooling)
-        self.pool_shape = self.to_2d_shape(shape_pre)
+        if strides is None:
+            strides = (1, 1)
+        self.__strides = self.__to_2d_shape(strides, "strides")
+        self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
+        self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
 
-        if pool_stride is None:
-            if pooling:
-                pool_stride = self.pool_area
-            else:
-                pool_stride = 0
-
-        self.pool_strides = self.to_2d_shape(pool_stride)
-
-        self.post_shape = self.get_post_shape()
-        self.post_size = int(numpy.prod(self.post_shape))
-
-        # Get the kernel size
-        self._kernel_w = self.kernel_shape[WIDTH]
-        self._kernel_h = self.kernel_shape[HEIGHT]
-
-        # The half-value used here indicates the half-way array position
-        self._hlf_k_w = self._kernel_w // 2
-        self._hlf_k_h = self._kernel_h // 2
-
-        # Cache values for the pre and post sizes
-        self._pre_w = self.pre_shape[WIDTH]
-        self._pre_h = self.pre_shape[HEIGHT]
-        self._post_w = self.post_shape[WIDTH]
-        self._post_h = self.post_shape[HEIGHT]
-
-        self._post_start_w = self.padding[WIDTH]
-        self._post_start_h = self.padding[HEIGHT]
-
-        self._post_step_w = self.strides[WIDTH]
-        self._post_step_h = self.strides[HEIGHT]
-
-        # Make sure the supplied values are in the correct format
-        self._krn_weights = self.__get_kernel_vals(weights_kernel)
-        self._krn_delays = self.__get_kernel_vals(1)
-
-        self._shape_common = shape_pre
-        self._common_w = self._shape_common[WIDTH]
-        self._common_h = self._shape_common[HEIGHT]
-        self._shape_pre = self.pre_shape
-        self._shape_post = self.post_shape
-
-        self.requires_spike_mapping = True
-        self.needs_dma_weights = False
-
-        # Create storage for later
-        self._post_as_pre = {}
-
-        self._input_encoder = XYEncoder(
-            self._shape_pre, self.most_significant_rows)
-        self._output_encoder = XYEncoder(
-            self._shape_post, self.most_significant_rows)
-
-        self.conn_list = []
-
-    @staticmethod
-    def to_2d_shape(shape):
+    def __get_kernel_shape(self, shape):
+        if shape is None:
+            raise SynapticConfigurationException(
+                "kernel_shape must be provided")
         if numpy.isscalar(shape):
-            return numpy.asarray([shape, shape], dtype='int')
-        elif len(shape) == 1:
-            return numpy.asarray([shape[0], 1], dtype='int')
-        elif len(shape) == 2:
-            return numpy.asarray(shape, dtype='int')
+            return (shape, shape)
+        if isinstance(shape, tuple) and len(shape) == 2:
+            return shape
+        raise SynapticConfigurationException(f"Unknown kernel_shape: {shape}")
 
-        raise SpynnakerException('The current implementation does not support'
-                                 'more dimensions than 2')
-
-    def decode_padding(self, padding):
-        if isinstance(padding, str):
-            if padding == 'same':
-                return self.kernel_shape // 2
-            elif padding == 'valid':
-                return numpy.asarray([0, 0])
+    def __decode_kernel(self, w, shape):
+        if isinstance(w, int) or isinstance(w, float):
+            shape = self.__get_kernel_shape(shape)
+            self.__kernel_weights = numpy.full(shape, w)
+        elif isinstance(w, Iterable):
+            if all(isinstance(lst, Iterable) for lst in w):
+                # 2D list
+                if not all(len(lst) == len(w[0]) for lst in w):
+                    raise SynapticConfigurationException(
+                        "kernel_weights must be a 2D array with every row the"
+                        " same length")
+                self.__kernel_weights = numpy.array(w)
+            else:
+                # 1D list
+                shape = self.__get_kernel_shape(shape)
+                self.__kernel_weights = numpy.array(w).reshape(shape)
+        elif isinstance(w, RandomDistribution):
+            shape = self.__get_kernel_shape(shape)
+            self.__kernel_weights = numpy.array(
+                w.next(numpy.prod(shape))).reshape(shape)
         else:
-            return numpy.asarray(padding)
-
-    def shapes_are_compatible(self, pre, post):
-        pre_has_structure = True  # PyNN structures are pretty shit
-
-        # pre_has_structure = (not pre.structure is None and
-        #                      isinstance(pre.structure, BaseStructure))
-        # if not pre_has_structure:
-        #     raise SpynnakerException(
-        #         "In Convolution Connector: "
-        #         "Pre-synaptic population {} has no structure "
-        #         "attached to it. Make sure to add one.".format(pre))
-
-        post_has_structure = True  # PyNN structures are pretty shit
-        # post_has_structure = (not post.structure is None and
-        #                       isinstance(post.structure, BaseStructure))
-        # if not post_has_structure:
-        #     raise SpynnakerException(
-        #         "In Convolution Connector: "
-        #         "Post-synaptic population {} has no structure "
-        #         "attached to it. Make sure to add one.".format(post))
-
-        # had to change this because of the new XY encoder :(
-        pre_size_good = pre.size >= numpy.prod(self.pre_shape)
-        post_size_good = post.size >= numpy.prod(self.post_shape)
-
-        return (pre_size_good and post_size_good and
-                pre_has_structure and post_has_structure)
+            raise SynapticConfigurationException(
+                f"Unknown combination of kernel_weights ({w}) and"
+                f" kernel_shape ({shape})")
 
     @staticmethod
-    def calculate_post_shape(shape, kernel_shape,
-                             padding=np.array([0, 0]),
-                             stride=np.array([1, 1]),
-                             pooling=False,
-                             pool_shape=np.array([1, 1]),
-                             pool_stride=np.array([1, 1])):
-        _r, _c = shape[HEIGHT], shape[WIDTH]
-        if pooling:
-            s = (np.asarray([_r, _c]) - (pool_shape - 1))
-            _r, _c = (s // pool_stride) + 1
-
-        s = (np.asarray([_r, _c]) - (np.asarray(kernel_shape) - 1) +
-             2 * padding)
-
-        return np.clip((s // stride), 1, np.inf).astype('int')
-
-    def get_post_shape(self):
-        _r, _c = self.pre_shape[HEIGHT], self.pre_shape[WIDTH]
-        if self.pooling:
-            s = (np.asarray([_r, _c]) - (self.pool_area - 1))
-            self.pool_shape = (s // self.pool_strides) + 1
-            _r, _c = self.pool_shape
-
-        s = (np.asarray([_r, _c]) - (self.kernel_shape - 1) +
-             2 * self.padding)
-        return np.clip((s // self.strides), 1, np.inf).astype('int')
-
-    def __decode_with_field(self, ids, shift):
-        mask = self.__mask(shift)
-        return (np.right_shift(ids, shift),
-                np.bitwise_and(ids, mask))
-
-    def __encode_with_field(self, msb, lsb, shift):
-        mask = self.__mask(shift)
-        return np.bitwise_or(np.left_shift(msb, shift),
-                             np.bitwise_and(lsb, mask))
-
-    def __mask(self, shift):
-        return (1 << shift) - 1
-
-    def __n_bits(self, max_val):
-        return int(np.ceil(np.log2(max_val)))
-
-    @property
-    def is_row_msb(self):
-        return self.most_significant_rows
-
-    @property
-    def is_col_msb(self):
-        return not self.most_significant_rows
-
-    @property
-    def post_shift(self):
-        return self._output_encoder.shift
-
-    def _decode_ids(self, ids, is_pre):
-        enc = self._input_encoder if is_pre else self._output_encoder
-        return enc.decode_ids(ids)
-
-    def _encode_coords(self, rows, cols, is_pre):
-        enc = self._input_encoder if is_pre else self._output_encoder
-        return enc.encode_coords(rows, cols)
-
-    def __to_post_coords(self, post_vertex_slice):
-        """ Get a list of possible post-slice coordinates.
-
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
-        """
-        post = numpy.arange(
-            post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-        return numpy.divmod(post, self._post_w)
-
-    def __map_to_pre_coords(self, post_r, post_c):
-        """ Get a map from post to pre coords.
-
-        :param ~numpy.ndarray post_r: rows
-        :param ~numpy.ndarray post_c: columns
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
-        """
-        a = numpy.asarray([post_r, post_c])
-        return self.padding + a * self.strides
-
-    def __post_as_pre(self, post_vertex_slice):
-        """ Write post coords as pre coords.
-
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
-        """
-        # TODO: When slices become hashable, update this code to use them
-        # directly as the cache index
-        if str(post_vertex_slice) not in self._post_as_pre:
-            post_r, post_c = self.__to_post_coords(post_vertex_slice)
-            self._post_as_pre[str(post_vertex_slice)] = \
-                self.__map_to_pre_coords(post_r, post_c)
-        return self._post_as_pre[str(post_vertex_slice)]
-
-    def pre_as_post(self, pre_r, pre_c):
-        """ Write pre coords as post coords.
-
-        :param int pre_r: row
-        :param int pre_c: column
-        :rtype: tuple(int,int)
-        """
-        _r, _c = pre_r, pre_c
-        coords = np.asarray([_r, _c])
-        if self.pooling:
-            # s = (numpy.asarray([_r, _c]) - (self.pool_area))
-            coords //= self.pool_strides[:, np.newaxis]
-
-        coords = (coords - self.kernel_shape[:, np.newaxis] // 2 +
-                  self.padding[:, np.newaxis])
-        coords //= self.strides[:, np.newaxis]
-        return coords
-
-    def __get_kernel_vals(self, vals):
-        """ Convert kernel values given into the correct format.
-
-        :param vals:
-        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
-            or ConvolutionKernel
-        :rtype: ~numpy.ndarray
-        """
-        if vals is None:
+    def __to_2d_shape(shape, param_name):
+        if shape is None:
             return None
-        krn_size = self._kernel_h * self._kernel_w
-        krn_shape = (self._kernel_h, self._kernel_w)
-        if isinstance(vals, RandomDistribution):
-            return numpy.array(vals.next(krn_size)).reshape(krn_shape)
-        elif numpy.isscalar(vals):
-            return vals * numpy.ones(krn_shape)
-        elif ((isinstance(vals, numpy.ndarray) or
-                isinstance(vals, ConvolutionKernel)) and
-                vals.shape[HEIGHT] == self._kernel_h and
-                vals.shape[WIDTH] == self._kernel_w):
-            return vals.view(ConvolutionKernel)
-        # TODO: make this error more descriptive?
-        raise SpynnakerException(
-            "Error generating KernelConnector values; if you have supplied "
-            "weight and/or delay kernel then ensure they are the same size "
-            "as specified by the shape kernel values.")
+        if numpy.isscalar(shape):
+            return numpy.array([shape, shape], dtype='int')
+        elif len(shape) == 1:
+            return numpy.array([shape[0], 1], dtype='int')
+        elif len(shape) == 2:
+            return numpy.array(shape, dtype='int')
+        raise SynapticConfigurationException(
+            f"{param_name} must be an int or a tuple(int, int)")
 
-    def __compute_statistics(
-            self, weights, delays, pre_vertex_slice, post_vertex_slice):
-        """ Compute the relevant information required for the connections.
+    def __decode_padding(self, padding):
+        if isinstance(padding, (int, Iterable)):
+            self.__padding_shape = self.__to_2d_shape(padding, "padding")
+        elif padding is None or padding is False:
+            self.__padding_shape = numpy.zeros(2, dtype="int")
+        elif padding:
+            self.__padding_shape = self.__kernel_weights.shape // 2
+        else:
+            raise SynapticConfigurationException(
+                f"Unrecognized padding {padding}")
+
+    def get_post_shape(self, shape):
+        """ Get the shape of the post image given the pre-image shape
         """
-        return
+        shape = numpy.array(shape)
+        if self.__pool_shape is not None:
+            post_pool_shape = shape - (self.__pool_shape - 1)
+            shape = (post_pool_shape // self.__pool_stride) + 1
+
+        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        post_shape = (shape - (kernel_shape - 1) +
+                      (2 * self.__padding_shape))
+
+        return numpy.clip(
+            post_shape // self.__strides, 1, numpy.inf).astype('int')
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        pre = application_edge.pre_vertex
+        post = application_edge.post_vertex
+        if len(pre.atoms_shape) != 2 or len(post.atoms_shape) != 2:
+            raise ConfigurationException(
+                "The ConvolutionConnector only works where the Populations"
+                " of a Projection are both 2D.  Please ensure that the"
+                " Populations uses a Grid2D structure.")
+        expected_post_shape = tuple(self.get_post_shape(pre.atoms_shape))
+        if expected_post_shape != post.atoms_shape:
+            raise ConfigurationException(
+                f"With a source population with shape {pre.atoms_shape}, "
+                "for a Convolution connector with the given parameters, "
+                "the post-population must have a shape "
+                f"{expected_post_shape}")
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
+        # All delays are 1 timestep
         return 1
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
+        # All delays are 1 timestep
         return 1
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        return 1
+        w, h = self.__kernel_weights.shape
+        return numpy.clip(w * h, 0, post_vertex_slice.n_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        return 1
+        w, h = self.__kernel_weights.shape
+        return numpy.clip(w * h, 0, synapse_info.n_pre_neurons)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
-        # I think this is overestimated, but not by much
-        n_conns = (
-            self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel weights if user has supplied them
-        if self._krn_weights is not None:
-            return self._get_weight_maximum(self._krn_weights, n_conns,
-                                            synapse_info)
-
-        return self._get_weight_maximum(synapse_info.weights, n_conns,
-                                        synapse_info)
-
-    def __repr__(self):
-        return "ConvolutionConnector(shape_kernel[{},{}])".format(
-            self._kernel_w, self._kernel_h)
+        return numpy.amax(self.__kernel_weights)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
+
+        # TODO: Make this work on host
         block = numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block['weight'] = 0
         block['delay'] = 1
 
         return block
 
-    def _pre_size_max_coord(self):
-        return self._input_encoder.max_coord_size()
+    @overrides(AbstractGenerateConnectorOnMachine.generate_on_machine)
+    def generate_on_machine(self, weights, delays):
+        # TODO: Decide this based on other info
+        return False
 
-    def __get_pre_id_as_post_coord_list(self, pre_slice, post_slice):
-        pre_w, pre_h = self.pre_shape[WIDTH], self.pre_shape[HEIGHT]
-        post_w, post_h = self.post_shape[WIDTH], self.post_shape[HEIGHT]
-        if pre_slice is None:
-            pre_ids = np.arange(0, self._pre_size_max_coord())
-        else:
-            pre_ids = np.arange(pre_slice.lo_atom, pre_slice.hi_atom + 1)
-        pre_rows, pre_cols = self._decode_ids(pre_ids, is_pre=True)
-        post_rows, post_cols = self.pre_as_post(pre_rows, pre_cols)
-
-        unused_pre = np.int8(-127)
-        ids = numpy.where(numpy.logical_or(pre_rows >= pre_h,
-                                           pre_cols >= pre_w))
-        post_rows[ids] = unused_pre
-        post_cols[ids] = unused_pre
-
-        # ids = numpy.where(numpy.logical_or(post_rows >= post_h,
-        #                                    post_cols >= post_w))
-        # post_rows[ids] = unused_pre
-        # post_cols[ids] = unused_pre
-
-        coords = []
-        for post_r, post_c in zip(post_rows, post_cols):
-            post_rc = numpy.uint16(
-                ((numpy.uint16(post_r & 0xFF)) << 8) |
-                (numpy.uint16(post_c & 0xFF))
-            )
-            # print(r * w + c, post_r, post_c, post_rc)
-            # print(numpy.binary_repr(r_8, width=8))
-            # print(numpy.binary_repr(c_8, width=8))
-            # print(numpy.binary_repr(post_r, width=16))
-            # print(numpy.binary_repr(post_c, width=16))
-            # print(numpy.binary_repr(post_rc, width=16))
-            coords.append(post_rc)
-
-        if len(coords) % 2 == 1:
-            coords.append(numpy.uint16(0))
-
-        cs = []
-        for idx in range(0, len(coords), 2):
-            x0, x1 = coords[idx], coords[idx+1]
-            o = numpy.uint32((numpy.uint32(x0) << 16) | numpy.uint32(x1))
-            # print(o)
-            cs.append(o)
-
-        return numpy.hstack(cs)
-
-    @staticmethod
-    def pack_kernel(kernel):
-        n = len(kernel)
-        n = int(numpy.ceil(n / 2.0))
-        pack = numpy.zeros(n, dtype='uint32')
-        scale = float(1 << DEC_BITS)
-        for pidx in range(n):
-            kidx = pidx * 2
-            v0 = numpy.int32(0)
-            v0 = v0 | numpy.int32(numpy.round(kernel[kidx] * scale))
-
-            v1 = numpy.int32(0)
-            if kidx + 1 < len(kernel):
-                v1 = v1 | numpy.int32(numpy.round(kernel[kidx+1] * scale))
-
-            pack[pidx] = numpy.uint32((v0 << 16) | (v1 & 0xFFFF))
-
-            # if kidx + 1 < len(kernel):
-            #     print(kernel[kidx],
-            #           kernel[kidx+1])
-            #     print(numpy.round(kernel[kidx] * scale),
-            #           numpy.round(kernel[kidx+1] * scale))
-            #     print(numpy.int16(numpy.round(kernel[kidx] * scale)),
-            #           numpy.int16(numpy.round(kernel[kidx + 1] * scale)))
-            #     print(numpy.uint32(v0), numpy.uint32(v1))
-            #     print(numpy.binary_repr(v0, 32))
-            #     print(numpy.binary_repr(v1, 32))
-            #     print(numpy.binary_repr(v0 << 16, 32))
-            #     print(numpy.binary_repr(v1 & 0xFFFF, 32))
-            #     print(numpy.binary_repr(pack[pidx], 32))
-            #     print(numpy.uint16(pack[pidx] >> 16),
-            #           numpy.uint16(pack[pidx] & 0xFFFF))
-            #     print(numpy.int16(pack[pidx] >> 16),
-            #           numpy.int16(pack[pidx] & 0xFFFF))
-        # print(kernel)
-        # print(pack)
-
-        return pack
-
-    def get_local_only_data(self, pre_slice=None, post_slice=None):
-        # print(self)
-        pre_start = numpy.uint32(0 if pre_slice is None
-                                 else pre_slice.lo_atom)
-        pre_end = numpy.uint32(self._pre_size_max_coord() if pre_slice is None
-                               else pre_slice.hi_atom + 1)
-
-        post_start = numpy.uint32(0 if post_slice is None
-                                  else post_slice.lo_atom)
-        post_end = numpy.uint32(self.post_size if post_slice is None
-                                else post_slice.hi_atom + 1)
-
-        wk = 1. / numpy.prod(self.pool_area) if self.pooling else 1.
-
-        # klist = self.pack_kernel(self.kernel.flatten() * wk)
-        klist = DataType.S1615.encode_as_numpy_int_array(
-            self.kernel.flatten() * wk)
-
-        shapes = [
-            shape2word(self.pre_shape[WIDTH], self.pre_shape[HEIGHT]),
-            shape2word(self.post_shape[WIDTH], self.post_shape[HEIGHT]),
-            shape2word(self.padding[WIDTH], self.padding[HEIGHT]),
-            shape2word(self.strides[WIDTH], self.strides[HEIGHT]),
-            shape2word(self.kernel_shape[WIDTH], self.kernel_shape[HEIGHT]),
-            shape2word(self.pool_area[WIDTH], self.pool_area[HEIGHT]),
-            shape2word(self.pool_strides[WIDTH], self.pool_strides[HEIGHT]),
-        ]
-
-        pre2post = self.__get_pre_id_as_post_coord_list(pre_slice, post_slice)
-        # print(shapes)
-        # # print(self.kernel.flatten())
-        # print(klist)
-        # first is for length of data
-        # second is for number of pre-starts
-        data = [shape2word(pre_end, pre_start),
-                shape2word(post_end, post_start)]
-        data.extend(shapes)
-        data.extend(klist)
-        data.extend(pre2post)
-        return data
-
-    @property
-    # @overrides(AbstractConnector.get_local_only_info_size)
-    def get_local_only_info_size(self):
-        return len(self.get_local_only_data())
-
-    @property
-    def _kernel_properties(self):
-        """
-        :rtype: list(int)
-        """
-        return []
-
+    @overrides(AbstractGenerateConnectorOnMachine.gen_delays_id)
     def gen_delays_id(self, delays):
-        return 0
+        # Delays are always 1
+        return PARAM_TYPE_CONSTANT_ID
 
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
     def gen_delay_params_size_in_bytes(self, delays):
-        return 0
+        # Delay is always 1 time step
+        return BYTES_PER_WORD
 
+    @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
-        return []
+        # Delay is always 1 time step
+        return numpy.array(
+                [DataType.S1615.encode_as_int(1)], dtype=numpy.uint32)
 
+    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
     def gen_weights_id(self, weights):
-        return 0
+        # Weights are always a kernel
+        return PARAM_TYPE_KERNEL
 
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
     def gen_weight_params_size_in_bytes(self, weights):
-        return 0
+        # Weights are always a kernel
+        return ((N_KERNEL_PARAMS + 1 + self.__kernel_weights.size) *
+                BYTES_PER_WORD)
 
+    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
-        return []
+        properties = self.__get_kernel_properties(machine_edge)
+        properties.append(post_vertex_slice.lo_atom)
+        data = numpy.array(properties, dtype="uint32")
+        values = DataType.S1615.encode_as_numpy_int_array(
+            self.__kernel_weights)
+        return numpy.concatenate((data, values.flatten()))
 
     @property
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
-        return 0
+        return ConnectorIDs.KERNEL_CONNECTOR.value
 
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-        return []
+        return numpy.array(
+            self.__get_kernel_properties(machine_edge), dtype="uint32")
 
     @property
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 0
+        return N_KERNEL_PARAMS * BYTES_PER_WORD
 
-    def get_conv_size_in_bytes(self):
-        return self._kernel_h * self._kernel_w * BYTES_PER_WORD
+    def __get_kernel_properties(self, machine_edge):
+        pre_app_vertex = machine_edge.pre_vertex.app_vertex
+        post_app_vertex = machine_edge.post_vertex.app_vertex
+        pre_shape = pre_app_vertex.atoms_shape
+        post_shape = post_app_vertex.atoms_shape
+        kernel_shape = self.__kernel_weights.shape
+        return [
+            shape2word(*pre_shape),
+            shape2word(*pre_shape),
+            shape2word(*post_shape),
+            shape2word(0, 0),
+            shape2word(0, 0),
+            shape2word(1, 1),
+            shape2word(*self.__strides),
+            shape2word(*kernel_shape)
+        ]
 
     @overrides(AbstractConnector.could_connect)
     def could_connect(self, _synapse_info, _pre_slice, _post_slice):
-        # Filter edge if both are views and outside limits
-        pre_ids = np.array([_pre_slice.lo_atom, _pre_slice.hi_atom])
-        pre_height, pre_width = self.pre_shape
-        pre_rows, pre_cols = self._decode_ids(pre_ids, is_pre=True)
-        # pre_rows[1] = min(pre_height - 1, pre_rows[1])
-        # pre_cols[1] = min(pre_width - 1, pre_cols[1])
+        pre_slice_x = _pre_slice.get_slice(0)
+        pre_slice_y = _pre_slice.get_slice(1)
+        post_slice_x = _post_slice.get_slice(0)
+        post_slice_y = _post_slice.get_slice(1)
 
-        post_ids = np.array([_post_slice.lo_atom, _post_slice.hi_atom])
-        post_height, post_width = self.post_shape
-        post_rows, post_cols = self._decode_ids(post_ids, is_pre=False)
+        # Get ranges allowed in post
+        min_x = post_slice_x.start - self._hlf_k_w
+        max_x = (post_slice_x.stop + self._hlf_k_w) - 1
+        min_y = post_slice_y.start - self._hlf_k_h
+        max_y = (post_slice_y.stop + self._hlf_k_h) - 1
 
-        kheigth, kwidth = self.kernel_shape
-        hkh, hkw = kheigth // 2, kwidth // 2
-        min_post_row, max_post_row = (max(0, post_rows[0] - hkh),
-                                      min(pre_height - 1, post_rows[1] + hkh))
+        # Get pre-coordinates as post-coordinates
+        pre_x_min, pre_y_min, pre_x_max, pre_y_max = self.__pre_as_post(
+            [[pre_slice_x.start, pre_slice_y.start],
+             [pre_slice_x.stop - 1, pre_slice_y.stop - 1]])
 
-        min_post_col, max_post_col = (max(0, post_cols[0] - hkw),
-                                      min(pre_width - 1, post_cols[1] + hkw))
-
-        # one to the left of the other
-        if ((pre_cols[0] > max_post_col) or (min_post_col > pre_cols[1])):
+        # No part of the pre square overlaps the post-square, don't connect
+        if (pre_x_max < min_x or pre_x_min > max_x or
+                pre_y_max < min_y or pre_y_min > max_y):
             return False
 
-        # one starts bellow the other
-        if ((pre_rows[0] > max_post_row) or (min_post_row > pre_rows[1])):
-            return False
-
-        # row0 = max(pre_rows[0], min_post_row)
-        # row1 = min(pre_rows[1], max_post_row)
-        # col0 = max(pre_cols[0], min_post_col)
-        # col1 = min(pre_cols[1], max_post_col)
-        #
-        # dr = row1 - row0
-        # dc = col1 - col0
-        # connect = dr > 0 or dc > 0
-        #
+        # Otherwise, they do
         return True
+
+    def __pre_as_post(self, pre_coords):
+        """ Write pre coords as post coords.
+
+        :param Iterable pre_coords: An iterable of (x, y) coordinates
+        :rtype: numpy.ndarray
+        """
+        coords = numpy.array(pre_coords)
+        if self.__pool_stride is not None:
+            coords //= self.__pool_stride
+
+        kernel_shape = numpy.array(self.__kernel_weights.shape)
+        coords = coords - kernel_shape // 2 + self.__padding_shape
+        coords //= self.__strides
+        return coords
+
+    @property
+    def local_only_n_bytes(self):
+        return (
+            (2 * BYTES_PER_WORD) +
+            (12 * BYTES_PER_SHORT) +
+            BYTES_PER_WORD +
+            (self.__kernel_weights.size * BYTES_PER_WORD))
+
+    def write_local_only_data(
+            self, spec, edge, r_info, synapse_info, weight_scales):
+        # Get info about things
+        pre_start = edge.pre_vertex.vertex_slice.start
+        pre_shape = edge.pre_vertex.vertex_slice.shape
+        kernel_shape = self.__kernel_weights.shape
+        ps_x, ps_y = 1, 1
+        if self.__pool_stride is not None:
+            ps_x, ps_y = self.__pool_stride
+
+        # Write source key info
+        spec.write_value(r_info.first_key)
+        spec.write_value(r_info.first_mask)
+
+        # Write the column and row mask and shifts to extract the column and
+        # row from the incoming spike
+        n_bits_col = get_n_bits(pre_shape[0])
+        col_mask = (1 << n_bits_col) - 1
+        n_bits_row = get_n_bits(pre_shape[1])
+        row_mask = ((1 << n_bits_row) - 1) << n_bits_col
+        spec.write_value(col_mask, dtype=DataType.UINT32)
+        spec.write_value(0)
+        spec.write_value(row_mask, dtype=DataType.UINT32)
+        spec.write_value(n_bits_col)
+
+        # Write remaining connector details
+        spec.write_value(pre_start[0], dtype=DataType.INT16)
+        spec.write_value(pre_start[1], dtype=DataType.INT16)
+        spec.write_value(pre_shape[0], dtype=DataType.INT16)
+        spec.write_value(pre_shape[1], dtype=DataType.INT16)
+        spec.write_value(kernel_shape[0], dtype=DataType.INT16)
+        spec.write_value(kernel_shape[1], dtype=DataType.INT16)
+        spec.write_value(self.__padding_shape[0], dtype=DataType.INT16)
+        spec.write_value(self.__padding_shape[1], dtype=DataType.INT16)
+        spec.write_value(self.__recip(self.__strides[0]), dtype=DataType.INT16)
+        spec.write_value(self.__recip(self.__strides[1]), dtype=DataType.INT16)
+        spec.write_value(self.__recip(ps_x), dtype=DataType.INT16)
+        spec.write_value(self.__recip(ps_y), dtype=DataType.INT16)
+        spec.write_value(synapse_info.synapse_type, dtype=DataType.UINT32)
+        spec.write_array(DataType.S1615.encode_as_numpy_int_array(
+            self.__kernel_weights.flatten() *
+            weight_scales[synapse_info.synapse_type]))
+
+    def __recip(self, v):
+        """ Compute the reciprocal of a number as an signed 1-bit integer,
+            14-bit fractional fixed point number, encoded in an integer
+        """
+        return int(round((1 / v) * (1 << 14)))
