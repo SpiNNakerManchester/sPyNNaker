@@ -33,6 +33,7 @@ from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
+from .convolution_connector import ConvolutionConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
@@ -41,5 +42,5 @@ __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
-           "KernelConnector",
+           "KernelConnector", "ConvolutionConnector",
            "MultapseConnector", "OneToOneConnector", "SmallWorldConnector"]
