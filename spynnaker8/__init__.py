@@ -45,7 +45,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedProbabilityConnector,
     FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
     KernelConnector, MultapseConnector as FixedTotalNumberConnector,
-    OneToOneConnector, SmallWorldConnector)
+    OneToOneConnector, SmallWorldConnector, ConvolutionConnector)
 
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -73,6 +73,10 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import (
         RandomByWeightElimination)
+
+# local-only synapses
+from spynnaker.pyNN.models.neuron.local_only import (
+    LocalOnlyConvolution as Convolution)
 
 # neuron stuff
 # noinspection PyUnresolvedReferences
@@ -131,7 +135,9 @@ __all__ = [
     'FixedNumberPreConnector', 'FixedProbabilityConnector',
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
     'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
-    'SmallWorldConnector',
+    'SmallWorldConnector', 'ConvolutionConnector',
+    # Local-only
+    'Convolution',
     # synapse structures
     'StaticSynapse',
     # plastic stuff
