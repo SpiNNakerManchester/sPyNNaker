@@ -61,6 +61,7 @@ from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -1016,6 +1017,10 @@ class AbstractPopulationVertex(
         """
         if self.__synapse_dynamics is None:
             return 0
+
+        if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
+            return self.__synapse_dynamics.get_parameters_usage_in_bytes(
+                self.__incoming_projections)
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self.__neuron_impl.get_n_synapse_types())
