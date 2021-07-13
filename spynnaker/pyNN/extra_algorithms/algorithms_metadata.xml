@@ -433,5 +433,8 @@
             <token>DataLoaded</token>
             <param_name>application_graph</param_name>
         </required_inputs>
+        <outputs>
+            <token>ConnectionsFinished</token>
+        </outputs>
     </algorithm>
 </algorithms>
