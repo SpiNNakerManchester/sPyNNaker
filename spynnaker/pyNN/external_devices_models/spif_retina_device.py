@@ -138,6 +138,7 @@ class SPIFRetinaDevice(
         # A dictionary to get vertex index from FPGA and slice
         self.__index_by_slice = dict()
 
+    @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
     def atoms_shape(self):
         return (self.__width, self.__height)
