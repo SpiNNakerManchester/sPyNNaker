@@ -131,6 +131,7 @@
             <param_name>routing_infos</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
+            <token>RoutersInitialized</token>
         </required_inputs>
         <optional_inputs>
             <param_name>provenance_data_objects</param_name>
@@ -201,6 +202,7 @@
             <param_name>executable_targets</param_name>
             <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
+            <token>RoutersInitialized</token>
         </required_inputs>
         <optional_inputs>
             <param_name>provenance_data_objects</param_name>
