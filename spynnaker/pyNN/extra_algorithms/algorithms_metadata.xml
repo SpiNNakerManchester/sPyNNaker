@@ -294,6 +294,7 @@
             <param_name>hostname</param_name>
             <param_name>machine</param_name>
             <param_name>data_n_timesteps</param_name>
+            <token>TDMA</token>
         </required_inputs>
         <outputs>
             <param_type>DataSpecificationTargets</param_type>
