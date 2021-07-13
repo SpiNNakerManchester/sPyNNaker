@@ -296,6 +296,9 @@
             <param_name>data_n_timesteps</param_name>
             <token>TDMA</token>
         </required_inputs>
+        <optional_inputs>
+            <token>PartitionsMalloced</token>
+        </optional_inputs>
         <outputs>
             <param_type>DataSpecificationTargets</param_type>
             <param_type>RegionSizes</param_type>
