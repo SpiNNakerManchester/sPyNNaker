@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 
 
 class AbstractStaticSynapseDynamics(
-        AbstractSynapseDynamics, metaclass=AbstractBase):
+        AbstractSDRAMSynapseDynamics, metaclass=AbstractBase):
     """ Dynamics which don't change over time.
     """
     # pylint: disable=too-many-arguments

@@ -26,7 +26,6 @@ from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
@@ -465,7 +464,7 @@ class SynapseDynamicsSTDP(
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
 
-    @overrides(AbstractSynapseDynamics.get_provenance_data)
+    @overrides(AbstractPlasticSynapseDynamics.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         yield from self.__timing_dependence.get_provenance_data(
             pre_population_label, post_population_label)
