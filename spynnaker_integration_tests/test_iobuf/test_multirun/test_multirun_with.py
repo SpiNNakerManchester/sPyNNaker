@@ -62,6 +62,10 @@ class TestIobuffMultirun(BaseTestCase):
         prov_patha = \
             globals_variables.app_provenance_file_path()
         self.assertNotEqual(prov_path, prov_patha)
+
+        placements = globals_variables.get_simulator()._placements
+        machine_verts = list(pop._vertex.machine_vertices)
+        placement = placements.get_placement_of_vertex(machine_verts[0])
         size6 = self.check_size(prov_patha, placement)
         # Should write the same thing again
         self.assertEqual(size1, size6)
