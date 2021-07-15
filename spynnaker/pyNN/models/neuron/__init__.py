@@ -39,4 +39,4 @@ __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
            "PopulationSynapsesMachineVertexLead",
            "PopulationSynapsesMachineVertexShared", "SynapseProvenance",
            "SpikeProcessingProvenance", "SpikeProcessingFastProvenance",
-           "PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance"]
+           "PopulationMachineLocalOnlyCombinedVertex", "LocalOnlyProvenance"]
