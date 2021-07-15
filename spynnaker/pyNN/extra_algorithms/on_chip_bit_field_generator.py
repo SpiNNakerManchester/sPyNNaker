@@ -14,9 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+import logging
 import os
 import struct
 from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -28,6 +30,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
 from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -137,11 +141,16 @@ class OnChipBitFieldGenerator(object):
 
         # read in bit fields for debugging purposes
         if get_config_bool("Reports", "write_bit_field_report"):
+            logger.exception(
+                "write_bit_field_report ignored due to "
+                "https://github.com/SpiNNakerManchester/sPyNNaker/issues/1074")
+            """
             self._full_report_bit_fields(app_graph, os.path.join(
                 report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
             self._summary_report_bit_fields(app_graph, os.path.join(
                 report_default_directory(),
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
+            """
 
     def _summary_report_bit_fields(self, app_graph, file_path):
         """ summary report of the bitfields that were generated
