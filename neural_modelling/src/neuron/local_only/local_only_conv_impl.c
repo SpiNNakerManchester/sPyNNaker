@@ -23,7 +23,7 @@
 #include "../population_table/population_table.h"
 #include "../neuron.h"
 
-typedef input_t lc_weight_t;
+typedef uint16_t lc_weight_t;
 
 // Dimensions are needed to be signed due to mapping from pre- to post-synaptic.
 typedef int16_t lc_dim_t;
@@ -62,7 +62,7 @@ typedef struct {
     lc_coord_t recip_strides;
     lc_coord_t recip_pool_strides;
     uint32_t synapse_type;
-    lc_weight_t weights[]; // n_weights = kernel.width * kernel.height
+    lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
 } connector;
 
 typedef struct {
@@ -116,6 +116,12 @@ bool local_only_impl_initialise(void *address){
         }
         spin1_memcpy(connectors[i], conn, n_bytes);
 
+        log_info("Connector %u: key=0x%08x, mask=0x%08x,"
+                "col_mask=0x%08x, col_shift=%u, row_mask=0x%08x, row_shift=%u",
+                i, connectors[i]->key_info.key, connectors[i]->key_info.mask,
+                connectors[i]->key_info.col_mask, connectors[i]->key_info.col_shift,
+                connectors[i]->key_info.row_mask, connectors[i]->key_info.row_shift);
+
         // Move to the next connector; because it is dynamically sized,
         // this comes after the last weight in the last connector
         conn = (connector *) &conn->weights[n_weights];
@@ -161,12 +167,13 @@ static inline void do_convolution_operation(
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
 
-    for (int32_t r = -half_kh, y = 0; r <= half_kh; r++, y++) {
+    uint32_t k = 0;
+    for (int32_t r = -half_kh; r <= half_kh; r++) {
         int32_t tmp_row = post_coord.row + r;
         if ((tmp_row < config.post_start.row) || (tmp_row > config.post_end.row)) {
             continue;
         }
-        for (int32_t c = -half_kw, x = 0; c <= half_kw; c++, x++) {
+        for (int32_t c = -half_kw; c <= half_kw; c++) {
             int32_t tmp_col = post_coord.col + c;
             if ((tmp_col < config.post_start.col) || (tmp_col > config.post_end.col)) {
                 continue;
@@ -174,11 +181,13 @@ static inline void do_convolution_operation(
 
             // This the neuron id on this core specifically; the neuron
             // will know how to send the spike correctly
-            uint32_t post_index = (y * config.post_shape.width) + x;
-            lc_weight_t weight = connector->weights[post_index];
+            uint32_t post_index = (tmp_row * config.post_shape.width) + tmp_col;
+            lc_weight_t weight = connector->weights[k++];
             uint32_t rb_index = synapse_row_get_ring_buffer_index(time + 1,
                     connector->synapse_type, post_index, synapse_type_index_bits,
                     synapse_index_bits, synapse_delay_mask);
+            log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
+                    rb_index, post_index, tmp_col, tmp_row, weight);
 
             // Add weight to current ring buffer value, avoiding saturation
             uint32_t accumulation = ring_buffers[rb_index] + weight;
@@ -239,6 +248,7 @@ void local_only_impl_process_spike(
             core_local_row + connector->pre_start.row,
             core_local_col + connector->pre_start.col
     };
+    log_debug("Received spike %u = %u, %u", spike, core_local_col, core_local_row);
 
     // Compute the convolution
     do_convolution_operation(time, pre_coord, connector, ring_buffers);
