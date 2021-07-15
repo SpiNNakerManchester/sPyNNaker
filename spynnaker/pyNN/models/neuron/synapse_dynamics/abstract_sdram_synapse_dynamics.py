@@ -77,17 +77,6 @@ class AbstractSDRAMSynapseDynamics(AbstractSynapseDynamics):
         """ The amount each row should pad to, or None if not specified
         """
 
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get the provenance data from this synapse dynamics object
-
-        :param str pre_population_label:
-        :param str post_population_label:
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        # pylint: disable=unused-argument
-        return []
-
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data, max_n_synapses):
         """ Converts per-connection data generated from connections into\
