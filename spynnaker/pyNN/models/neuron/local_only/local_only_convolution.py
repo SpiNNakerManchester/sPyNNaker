@@ -58,7 +58,7 @@ class LocalOnlyConvolution(AbstractLocalOnly):
                     "Only ConvolutionConnector can be used with a synapse type"
                     " of Convolution")
             n_bytes += s_info.connector.local_only_n_bytes
-        return 6 * BYTES_PER_SHORT + BYTES_PER_WORD
+        return (6 * BYTES_PER_SHORT) + BYTES_PER_WORD + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(
@@ -73,24 +73,24 @@ class LocalOnlyConvolution(AbstractLocalOnly):
                 if edge.post_vertex == machine_vertex:
                     r_info = routing_info.get_routing_info_for_edge(edge)
                     edge_info.append((edge, incoming, r_info))
-        edge_info.sort(key=lambda e: e[1].first_key)
+        edge_info.sort(key=lambda e: e[2].first_key)
 
-        size = self.get_parameters_usage_in_bytes(len(edge_info))
+        size = self.get_parameters_usage_in_bytes(incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 
         # Write the common spec
         post_slice = machine_vertex.vertex_slice
-        post_start = numpy.array(post_slice.starts)
+        post_start = numpy.array(post_slice.start)
         post_shape = numpy.array(post_slice.shape)
         post_end = (post_start + post_shape) - 1
-        spec.write_value(post_start[0], dtype=DataType.INT16)
-        spec.write_value(post_start[1], dtype=DataType.INT16)
-        spec.write_value(post_end[0], dtype=DataType.INT16)
-        spec.write_value(post_end[1], dtype=DataType.INT16)
-        spec.write_value(post_shape[0], dtype=DataType.INT16)
-        spec.write_value(post_shape[1], dtype=DataType.INT16)
-        spec.write_value(len(edge_info), dtype=DataType.UINT32)
+        spec.write_value(post_start[0], data_type=DataType.INT16)
+        spec.write_value(post_start[1], data_type=DataType.INT16)
+        spec.write_value(post_end[0], data_type=DataType.INT16)
+        spec.write_value(post_end[1], data_type=DataType.INT16)
+        spec.write_value(post_shape[0], data_type=DataType.INT16)
+        spec.write_value(post_shape[1], data_type=DataType.INT16)
+        spec.write_value(len(edge_info), data_type=DataType.UINT32)
 
         # Write spec for each connector
         for edge, incoming, r_info in edge_info:
