@@ -22,13 +22,20 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from .splitter_abstract_pop_vertex_slice import (
     SplitterAbstractPopulationVertexSlice)
+from .splitter_abstract_pop_vertex_fixed import (
+    SplitterAbstractPopulationVertexFixed)
 from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
+
+
+def _is_multidimensional(app_vertex):
+    return len(app_vertex.atoms_shape) > 1
 
 
 class SpynnakerSplitterSelector(SplitterSelector):
@@ -79,7 +86,10 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
+        if _is_multidimensional(app_vertex):
+            app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+        else:
+            app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
 
     @staticmethod
     def external_spinnaker_link_heuristic(app_vertex):
@@ -107,7 +117,10 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SpynnakerSplitterSliceLegacy()
+        if _is_multidimensional(app_vertex):
+            app_vertex.splitter = SpynnakerSplitterFixedLegacy()
+        else:
+            app_vertex.splitter = SpynnakerSplitterSliceLegacy()
 
     @staticmethod
     def spike_source_poisson_heuristic(app_vertex):
@@ -116,5 +129,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        # app_vertex.splitter = SpynnakerSplitterSliceLegacy()
-        app_vertex.splitter = SplitterPoissonDelegate()
+        if _is_multidimensional(app_vertex):
+            app_vertex.splitter = SpynnakerSplitterFixedLegacy()
+        else:
+            app_vertex.splitter = SplitterPoissonDelegate()
