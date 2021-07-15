@@ -19,6 +19,7 @@
 #include "local_only/local_only_impl.h"
 #include <debug.h>
 #include <circular_buffer.h>
+#include <recording.h>
 #include <spin1_api.h>
 
 struct local_only_config {
@@ -45,14 +46,26 @@ static uint32_t n_spikes_dropped = 0;
 
 static uint32_t max_input_buffer_size = 0;
 
+static uint32_t local_time;
+
 uint32_t synapse_delay_mask;
 
 uint32_t synapse_type_index_bits;
 
 uint32_t synapse_index_bits;
 
+uint32_t p_per_ts_region;
+
+
+//! The number of packets received this time step for recording
+static struct {
+    uint32_t time;
+    uint32_t packets_this_time_step;
+} p_per_ts_struct;
+
+
 static inline void run_next_process_loop(void) {
-    if (spin1_trigger_user_event(0, 0)) {
+    if (spin1_trigger_user_event(local_time, 0)) {
         process_loop_running = true;
     }
 }
@@ -75,6 +88,7 @@ void mc_rcv_callback(uint key, UNUSED uint unused) {
 }
 
 void mc_rcv_payload_callback(uint key, uint n_spikes) {
+    n_spikes_received += 1;
     bool added = false;
     for (uint32_t i = n_spikes; i > 0; i--) {
         added |= circular_buffer_add(input_buffer, key);
@@ -87,12 +101,12 @@ void mc_rcv_payload_callback(uint key, uint n_spikes) {
     }
 }
 
-void process_callback(UNUSED uint unused0, UNUSED uint unused1) {
+void process_callback(uint time, UNUSED uint unused1) {
     uint32_t spike;
     uint32_t cspr = spin1_int_disable();
     while (process_loop_running && circular_buffer_get_next(input_buffer, &spike)) {
         spin1_mode_restore(cspr);
-        // TODO: Call local-only-impl
+        local_only_impl_process_spike(time, spike, ring_buffers);
         cspr = spin1_int_disable();
     }
     process_loop_running = false;
@@ -100,7 +114,7 @@ void process_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
-        uint16_t **ring_buffers_ptr) {
+        uint32_t n_rec_regions_used, uint16_t **ring_buffers_ptr) {
 
     // Set up the implementation
     if (!local_only_impl_initialise(local_only_params_addr)) {
@@ -111,14 +125,24 @@ bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
     struct local_only_config *sdram_config = local_only_addr;
     config = *sdram_config;
 
+    input_buffer = circular_buffer_initialize(config.input_buffer_size);
+    if (input_buffer == NULL) {
+        log_error("Error setting up input buffer of size %u",
+                config.input_buffer_size);
+        return false;
+    }
+    log_info("Created input buffer with %u entries", config.input_buffer_size);
+
     // Make some buffers
     synapse_type_index_bits = config.log_n_neurons + config.log_n_synapse_types;
     synapse_index_bits = config.log_n_neurons;
     uint32_t synapse_delay_bits = config.log_max_delay;
     synapse_delay_mask = (1 << synapse_delay_bits) - 1;
+    log_info("synapse_index_bits = %u, synapse_type_index_bits = %u, "
+            "synapse_delay_mask = %u", synapse_index_bits, synapse_type_index_bits,
+            synapse_delay_bits);
 
-    uint32_t n_ring_buffer_bits =
-            config.log_n_neurons + config.log_n_synapse_types + synapse_delay_bits;
+    uint32_t n_ring_buffer_bits = synapse_type_index_bits + synapse_delay_bits;
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(uint16_t));
@@ -127,10 +151,14 @@ bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
                 ring_buffer_size);
         return false;
     }
+    log_info("Created ring buffer with %u entries at 0x%08x",
+            ring_buffer_size, ring_buffers);
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
     *ring_buffers_ptr = ring_buffers;
+
+    p_per_ts_region = n_rec_regions_used;
 
     spin1_callback_on(MC_PACKET_RECEIVED, mc_rcv_callback, -1);
     spin1_callback_on(MCPL_PACKET_RECEIVED, mc_rcv_payload_callback, -1);
@@ -139,18 +167,20 @@ bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
     return true;
 }
 
-void local_only_clear_input(UNUSED uint32_t time) {
-    uint32_t cspr = spin1_int_disable();
+void local_only_clear_input(uint32_t time) {
+    local_time = time;
     if (n_spikes_received > max_spikes_received) {
         max_spikes_received = n_spikes_received;
     }
+    p_per_ts_struct.packets_this_time_step = n_spikes_received;
+    p_per_ts_struct.time = time;
+    recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
     n_spikes_received = 0;
     uint32_t n_spikes_left = circular_buffer_size(input_buffer);
     n_spikes_dropped += n_spikes_left;
     if (config.clear_input_buffer) {
         circular_buffer_clear(input_buffer);
     }
-    spin1_mode_restore(cspr);
 }
 
 void local_only_store_provenance(struct local_only_provenance *prov) {

@@ -32,11 +32,13 @@ struct local_only_provenance {
  * \param[in] local_only_addr The address from which to read common data
  * \param[in] local_only_params_addr The address from which to read
  *                                   implementation-specific data
+ * \param[in] n_rec_regions_used The number of recording regions used before
+ *                               here
  * \param[out] ring_buffers Pointer to the ring buffers that hold future inputs
  * \return Whether the set up was done or not
  */
 bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
-        uint16_t **ring_buffers);
+        uint32_t n_rec_regions_used, uint16_t **ring_buffers);
 
 /**
  * \brief Clear the spikes for the last time step
