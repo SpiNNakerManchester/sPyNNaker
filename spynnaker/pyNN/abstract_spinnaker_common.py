@@ -340,12 +340,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for projection in self._projections:
             projection._clear_cache()
 
-        if (get_config_bool("Reports", "reports_enabled") and
-                get_config_bool(
-                    "Reports", "write_redundant_packet_count_report") and
+        if (get_config_bool(
+                "Reports", "write_redundant_packet_count_report") and
                 not self._use_virtual_board and run_time is not None and
-                not self._has_ran and get_config_bool(
-                    "Reports", "writeProvenanceData")):
+                not self._has_ran):
             self.extend_extra_post_run_algorithms(
                 ["RedundantPacketCountReport"])
 
