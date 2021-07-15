@@ -161,7 +161,7 @@ void background_callback(uint timer_count, uint local_time) {
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, UNUSED uint unused) {
-    // Disable interrupts to stop DMAs and MC getting in the way of this bit
+    // Disable interrupts to stop MC getting in the way of this bit
     uint32_t state = spin1_int_disable();
 
     // Increment time step
@@ -170,9 +170,8 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     // Clear any outstanding spikes
     local_only_clear_input(time);
 
-    // Next bit without anything but MC
+    // Allow things to interrupt again
     spin1_mode_restore(state);
-    state = spin1_irq_disable();
 
     // Process ring buffers for the inputs from last time step
     process_ring_buffers();
@@ -195,7 +194,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
         time--;
 
         simulation_ready_to_read();
-        spin1_mode_restore(state);
         return;
     }
 
@@ -209,8 +207,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
             max_backgrounds_queued++;
         }
     }
-
-    spin1_mode_restore(state);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -237,7 +233,7 @@ static bool initialise(void) {
     if (!local_only_initialise(
             data_specification_get_region(LOCAL_ONLY_REGION, ds_regions),
             data_specification_get_region(LOCAL_ONLY_PARAMS_REGION, ds_regions),
-            &ring_buffers)) {
+            n_rec_regions_used, &ring_buffers)) {
         return false;
     }
 
