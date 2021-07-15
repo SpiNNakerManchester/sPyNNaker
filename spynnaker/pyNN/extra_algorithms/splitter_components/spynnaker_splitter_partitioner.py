@@ -55,8 +55,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         # filter off connectivity
         if (isinstance(app_edge, AbstractSlicesConnect) and not
                 app_edge.could_connect(
-                    src_machine_vertex.vertex_slice,
-                    dest_machine_vertex.vertex_slice)):
+                    src_machine_vertex, dest_machine_vertex)):
             return
         if (isinstance(app_edge, AbstractVerticesConnect) and not
                 app_edge.could_vertices_connect(

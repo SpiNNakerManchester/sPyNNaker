@@ -29,7 +29,7 @@ class TestIobuffMultirun(BaseTestCase):
         return os.path.getsize(iofile)
 
     def do_run(self):
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         prov_path = globals_variables.app_provenance_file_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)

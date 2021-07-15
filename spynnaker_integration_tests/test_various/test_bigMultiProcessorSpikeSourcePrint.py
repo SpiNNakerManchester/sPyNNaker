@@ -34,7 +34,7 @@ def do_run(nNeurons, neurons_per_core):
                        }
 
     spike_list = {'spike_times': [float(x) for x in range(0, 599, 50)]}
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
+    p.setup(timestep=1.0, min_delay=1.0)
 
     p.set_number_of_neurons_per_core(p.SpikeSourceArray, neurons_per_core)
 

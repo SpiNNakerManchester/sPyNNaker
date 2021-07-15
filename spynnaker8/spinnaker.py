@@ -38,7 +38,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
             extra_algorithm_xml_paths, extra_mapping_inputs,
             extra_mapping_algorithms, extra_pre_run_algorithms,
             extra_post_run_algorithms, extra_load_algorithms,
-            time_scale_factor, min_delay, max_delay, graph_label,
+            time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1,
             hostname=None):
         # pylint: disable=too-many-arguments, too-many-locals
@@ -91,8 +91,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             hostname=hostname, min_delay=min_delay,
-            max_delay=max_delay, timestep=timestep,
-            time_scale_factor=time_scale_factor,
+            timestep=timestep, time_scale_factor=time_scale_factor,
             front_end_versions=front_end_versions)
 
     def run(self, run_time, sync_time=0.0):

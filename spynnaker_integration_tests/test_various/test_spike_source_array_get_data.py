@@ -20,7 +20,7 @@ from spinnaker_testbase import BaseTestCase
 class TestSpikeSourceArrayGetData(BaseTestCase):
 
     def do_run(self):
-        p.setup(timestep=1, min_delay=1, max_delay=15)
+        p.setup(timestep=1, min_delay=1)
 
         population = p.Population(1, p.SpikeSourceArray(spike_times=[[0]]),
                                   label='inputSSA_1')

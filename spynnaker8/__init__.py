@@ -119,9 +119,6 @@ from spynnaker8.spinnaker import SpiNNaker
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
 
-#: The number of timesteps of delay to use as max_delay if "auto" is specified
-SPYNNAKER_AUTO_MAX_DELAY = 144
-
 logger = FormatAdapter(logging.getLogger(__name__))
 
 __all__ = [
@@ -278,7 +275,7 @@ def get_projections_data(projection_data):
 
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           min_delay=_pynn_control.DEFAULT_MIN_DELAY,
-          max_delay=_pynn_control.DEFAULT_MAX_DELAY,
+          max_delay=None,
           graph_label=None,
           database_socket_addresses=None, extra_algorithm_xml_paths=None,
           extra_mapping_inputs=None, extra_mapping_algorithms=None,
@@ -295,8 +292,8 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         float or None
     :param min_delay: the min delay of the simulation
     :type min_delay: float or str
-    :param max_delay: the max delay of the simulation
-    :type max_delay: float or str
+    :param max_delay: Ignored and logs a warning if provided
+    :type max_delay: float or str or None
     :param graph_label: the label for the graph
     :type graph_label: str or None
     :param database_socket_addresses: the sockets used by external devices
@@ -342,8 +339,9 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         timestep = SPYNNAKER_AUTO_TIMESTEP
     if min_delay == "auto":
         min_delay = timestep
-    if max_delay == "auto":
-        max_delay = SPYNNAKER_AUTO_MAX_DELAY * timestep
+    if max_delay:
+        logger.warning(
+            "max_delay is not supported by sPyNNaker so will be ignored")
 
     # pylint: disable=too-many-arguments, too-many-function-args
     # setup PyNN common stuff
@@ -373,7 +371,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         extra_post_run_algorithms=extra_post_run_algorithms,
         extra_load_algorithms=extra_load_algorithms,
         time_scale_factor=time_scale_factor, timestep=timestep,
-        min_delay=min_delay, max_delay=max_delay, graph_label=graph_label,
+        min_delay=min_delay, graph_label=graph_label,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
 
@@ -601,14 +599,16 @@ def get_min_delay():
 
 
 def get_max_delay():
-    """ The maximum allowed synaptic delay; delays will be clamped to be at\
-        most this.
+    """ Part of the PyNN api but does not make sense for sPyNNaker as
+     different Projection, Vertex splitter combination could have different
+     delays they can support
 
-    :return: returns the max delay of the simulation
-    :rtype: int
+     Most likely value is timestep * 144
+
+    :raises NotImplementedError: As there is no system wide max_delay
     """
-    globals_variables.check_simulator()
-    return __pynn["get_max_delay"]()
+    raise NotImplementedError(
+        "sPyNNaker does not have a system wide max_delay")
 
 
 def get_time_step():
