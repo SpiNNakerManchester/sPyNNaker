@@ -449,7 +449,7 @@ class SynapticMatrix(object):
         :param int single_address:
             The base address of the "direct" or "single" matrix region
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         pre_slice = self.__machine_edge.pre_vertex.vertex_slice

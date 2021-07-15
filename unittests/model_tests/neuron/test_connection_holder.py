@@ -70,7 +70,7 @@ def test_connection_holder(data_items, fixed_values, as_list):
         n_post_atoms=2, fixed_values=fixed_values)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)
 
     if as_list:
@@ -162,5 +162,5 @@ def test_connection_holder_matrix_multiple_items():
         as_list=False, n_pre_atoms=2, n_post_atoms=2)
     connections = numpy.array(
         [(0, 0, 1, 10), (0, 0, 2, 20), (0, 1, 3, 30)],
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     connection_holder.add_connections(connections)

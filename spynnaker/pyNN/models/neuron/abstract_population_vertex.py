@@ -60,7 +60,7 @@ from spynnaker.pyNN.utilities.ranged import (
 from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
+    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -988,7 +988,7 @@ class AbstractPopulationVertex(
             self, transceiver, placements, app_edge, synapse_info):
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
-                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
+                0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
         progress = ProgressBar(
             len(self.machine_vertices),
             "Getting synaptic data between {} and {}".format(
