@@ -52,6 +52,7 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
 
     __slots__ = [
         "__kernel_weights",
+        "__encoded_kernel_weights",
         "__strides",
         "__padding_shape",
         "__pool_shape",
@@ -123,6 +124,11 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
         self.__strides = self.__to_2d_shape(strides, "strides")
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
+
+        self.__encoded_kernel_weights = kernel_weights.flatten()
+        if len(self.__encoded_kernel_weights) % 2 != 0:
+            self.__encoded_kernel_weights = numpy.concatenate(
+                (self.__encoded_kernel_weights, [0]))
 
     def __get_kernel_shape(self, shape):
         if shape is None:
@@ -337,15 +343,16 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
         pre_slice_y = _pre_slice.get_slice(1)
         post_slice_x = _post_slice.get_slice(0)
         post_slice_y = _post_slice.get_slice(1)
+        hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
         # Get ranges allowed in post
-        min_x = post_slice_x.start - self._hlf_k_w
-        max_x = (post_slice_x.stop + self._hlf_k_w) - 1
-        min_y = post_slice_y.start - self._hlf_k_h
-        max_y = (post_slice_y.stop + self._hlf_k_h) - 1
+        min_x = post_slice_x.start - hlf_k_w
+        max_x = (post_slice_x.stop + hlf_k_w) - 1
+        min_y = post_slice_y.start - hlf_k_h
+        max_y = (post_slice_y.stop + hlf_k_h) - 1
 
         # Get pre-coordinates as post-coordinates
-        pre_x_min, pre_y_min, pre_x_max, pre_y_max = self.__pre_as_post(
+        (pre_x_min, pre_y_min), (pre_x_max, pre_y_max) = self.__pre_as_post(
             [[pre_slice_x.start, pre_slice_y.start],
              [pre_slice_x.stop - 1, pre_slice_y.stop - 1]])
 
@@ -374,11 +381,15 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
 
     @property
     def local_only_n_bytes(self):
+        n_weights = self.__kernel_weights.size
+        if n_weights % 2 != 0:
+            n_weights += 1
+
         return (
-            (2 * BYTES_PER_WORD) +
+            (6 * BYTES_PER_WORD) +
             (12 * BYTES_PER_SHORT) +
             BYTES_PER_WORD +
-            (self.__kernel_weights.size * BYTES_PER_WORD))
+            (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
             self, spec, edge, r_info, synapse_info, weight_scales):
@@ -391,8 +402,8 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
             ps_x, ps_y = self.__pool_stride
 
         # Write source key info
-        spec.write_value(r_info.first_key)
-        spec.write_value(r_info.first_mask)
+        spec.write_value(r_info.first_key, data_type=DataType.UINT32)
+        spec.write_value(r_info.first_mask, data_type=DataType.UINT32)
 
         # Write the column and row mask and shifts to extract the column and
         # row from the incoming spike
@@ -400,28 +411,31 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
         col_mask = (1 << n_bits_col) - 1
         n_bits_row = get_n_bits(pre_shape[1])
         row_mask = ((1 << n_bits_row) - 1) << n_bits_col
-        spec.write_value(col_mask, dtype=DataType.UINT32)
-        spec.write_value(0)
-        spec.write_value(row_mask, dtype=DataType.UINT32)
-        spec.write_value(n_bits_col)
+        spec.write_value(col_mask, data_type=DataType.UINT32)
+        spec.write_value(0, data_type=DataType.UINT32)
+        spec.write_value(row_mask, data_type=DataType.UINT32)
+        spec.write_value(n_bits_col, data_type=DataType.UINT32)
 
         # Write remaining connector details
-        spec.write_value(pre_start[0], dtype=DataType.INT16)
-        spec.write_value(pre_start[1], dtype=DataType.INT16)
-        spec.write_value(pre_shape[0], dtype=DataType.INT16)
-        spec.write_value(pre_shape[1], dtype=DataType.INT16)
-        spec.write_value(kernel_shape[0], dtype=DataType.INT16)
-        spec.write_value(kernel_shape[1], dtype=DataType.INT16)
-        spec.write_value(self.__padding_shape[0], dtype=DataType.INT16)
-        spec.write_value(self.__padding_shape[1], dtype=DataType.INT16)
-        spec.write_value(self.__recip(self.__strides[0]), dtype=DataType.INT16)
-        spec.write_value(self.__recip(self.__strides[1]), dtype=DataType.INT16)
-        spec.write_value(self.__recip(ps_x), dtype=DataType.INT16)
-        spec.write_value(self.__recip(ps_y), dtype=DataType.INT16)
-        spec.write_value(synapse_info.synapse_type, dtype=DataType.UINT32)
-        spec.write_array(DataType.S1615.encode_as_numpy_int_array(
-            self.__kernel_weights.flatten() *
-            weight_scales[synapse_info.synapse_type]))
+        spec.write_value(pre_start[0], data_type=DataType.INT16)
+        spec.write_value(pre_start[1], data_type=DataType.INT16)
+        spec.write_value(pre_shape[0], data_type=DataType.INT16)
+        spec.write_value(pre_shape[1], data_type=DataType.INT16)
+        spec.write_value(kernel_shape[0], data_type=DataType.INT16)
+        spec.write_value(kernel_shape[1], data_type=DataType.INT16)
+        spec.write_value(self.__padding_shape[0], data_type=DataType.INT16)
+        spec.write_value(self.__padding_shape[1], data_type=DataType.INT16)
+        spec.write_value(self.__recip(self.__strides[0]),
+                         data_type=DataType.INT16)
+        spec.write_value(self.__recip(self.__strides[1]),
+                         data_type=DataType.INT16)
+        spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
+        spec.write_value(self.__recip(ps_y), data_type=DataType.INT16)
+        spec.write_value(synapse_info.synapse_type, data_type=DataType.UINT32)
+        kernel_weights = numpy.round(
+            self.__encoded_kernel_weights *
+            weight_scales[synapse_info.synapse_type]).astype(numpy.uint16)
+        spec.write_array(kernel_weights.view(numpy.uint32))
 
     def __recip(self, v):
         """ Compute the reciprocal of a number as an signed 1-bit integer,
