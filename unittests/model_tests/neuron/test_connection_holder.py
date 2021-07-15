@@ -19,7 +19,7 @@ import numpy
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics)
+    AbstractSDRAMSynapseDynamics)
 
 
 @pytest.fixture(
