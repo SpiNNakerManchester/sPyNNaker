@@ -474,17 +474,20 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return N_KERNEL_PARAMS * BYTES_PER_WORD
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
         # If the pre- and post-slices are not 2-dimensional slices, we have
         # to let them pass
-        if (_pre_slice.shape is None or len(_pre_slice.shape) != 2 or
-                _post_slice.shape is None or len(_post_slice.shape) != 2):
+        pre_slice = src_machine_vertex.vertex_slice
+        post_slice = dest_machine_vertex.vertex_slice
+        if (pre_slice.shape is None or len(pre_slice.shape) != 2 or
+                post_slice.shape is None or len(post_slice.shape) != 2):
             return True
 
-        pre_slice_x = _pre_slice.get_slice(0)
-        pre_slice_y = _pre_slice.get_slice(1)
-        post_slice_x = _post_slice.get_slice(0)
-        post_slice_y = _post_slice.get_slice(1)
+        pre_slice_x = pre_slice.get_slice(0)
+        pre_slice_y = pre_slice.get_slice(1)
+        post_slice_x = post_slice.get_slice(0)
+        post_slice_y = post_slice.get_slice(1)
 
         min_pre_x = post_slice_x.start - self._hlf_k_w
         max_pre_x = (post_slice_x.stop + self._hlf_k_w) - 1

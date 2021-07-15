@@ -338,11 +338,14 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
         ]
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
-        pre_slice_x = _pre_slice.get_slice(0)
-        pre_slice_y = _pre_slice.get_slice(1)
-        post_slice_x = _post_slice.get_slice(0)
-        post_slice_y = _post_slice.get_slice(1)
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+        pre_slice = src_machine_vertex.vertex_slice
+        post_slice = dest_machine_vertex.vertex_slice
+        pre_slice_x = pre_slice.get_slice(0)
+        pre_slice_y = pre_slice.get_slice(1)
+        post_slice_x = post_slice.get_slice(0)
+        post_slice_y = post_slice.get_slice(1)
         hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
         # Get ranges allowed in post
