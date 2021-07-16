@@ -552,29 +552,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
         return self._clip_delays(delays)
 
-    @abstractmethod
-    def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-        """ Create a synaptic block from the data.
-
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param AbstractSynapseType synapse_type:
-        :param SynapseInformation synapse_info:
-        :returns:
-            The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: ~numpy.ndarray
-        """
-
     _CLIPPED_MSG = (
         "The delays in the connector {} from {} to {} was clipped to {} a "
         "total of {} times.  This can be avoided by reducing the timestep "

@@ -21,6 +21,8 @@ from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -28,7 +30,7 @@ _TARGET = 1
 _FIRST_PARAM = 2
 
 
-class FromListConnector(AbstractConnector):
+class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections according to a list.
     """
     __slots__ = [
@@ -241,7 +243,7 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.var(numpy.abs(self.__weights))
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):

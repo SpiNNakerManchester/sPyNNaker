@@ -21,9 +21,6 @@ from spinn_front_end_common.utilities.constants import (
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine import (
-    AbstractGenerateConnectorOnMachine, PARAM_TYPE_KERNEL,
-    PARAM_TYPE_CONSTANT_ID, ConnectorIDs)
 from data_specification.enums.data_type import DataType
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -37,7 +34,7 @@ def shape2word(sw, sh):
         ((numpy.uint32(sh) & 0xFFFF) << 16) | (numpy.uint32(sw) & 0xFFFF))
 
 
-class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
+class ConvolutionConnector(AbstractConnector):
     """
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
@@ -246,96 +243,6 @@ class ConvolutionConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         return numpy.amax(self.__kernel_weights)
-
-    @overrides(AbstractConnector.create_synaptic_block)
-    def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-
-        # TODO: Make this work on host
-        block = numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block['weight'] = 0
-        block['delay'] = 1
-
-        return block
-
-    @overrides(AbstractGenerateConnectorOnMachine.generate_on_machine)
-    def generate_on_machine(self, weights, delays):
-        # TODO: Decide this based on other info
-        return False
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_delays_id)
-    def gen_delays_id(self, delays):
-        # Delays are always 1
-        return PARAM_TYPE_CONSTANT_ID
-
-    @overrides(
-        AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
-    def gen_delay_params_size_in_bytes(self, delays):
-        # Delay is always 1 time step
-        return BYTES_PER_WORD
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
-    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
-        # Delay is always 1 time step
-        return numpy.array(
-                [DataType.S1615.encode_as_int(1)], dtype=numpy.uint32)
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
-    def gen_weights_id(self, weights):
-        # Weights are always a kernel
-        return PARAM_TYPE_KERNEL
-
-    @overrides(
-        AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
-    def gen_weight_params_size_in_bytes(self, weights):
-        # Weights are always a kernel
-        return ((N_KERNEL_PARAMS + 1 + self.__kernel_weights.size) *
-                BYTES_PER_WORD)
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
-    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
-        properties = self.__get_kernel_properties(machine_edge)
-        properties.append(post_vertex_slice.lo_atom)
-        data = numpy.array(properties, dtype="uint32")
-        values = DataType.S1615.encode_as_numpy_int_array(
-            self.__kernel_weights)
-        return numpy.concatenate((data, values.flatten()))
-
-    @property
-    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
-    def gen_connector_id(self):
-        return ConnectorIDs.KERNEL_CONNECTOR.value
-
-    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
-    def gen_connector_params(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-        return numpy.array(
-            self.__get_kernel_properties(machine_edge), dtype="uint32")
-
-    @property
-    @overrides(
-        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
-    def gen_connector_params_size_in_bytes(self):
-        return N_KERNEL_PARAMS * BYTES_PER_WORD
-
-    def __get_kernel_properties(self, machine_edge):
-        pre_app_vertex = machine_edge.pre_vertex.app_vertex
-        post_app_vertex = machine_edge.post_vertex.app_vertex
-        pre_shape = pre_app_vertex.atoms_shape
-        post_shape = post_app_vertex.atoms_shape
-        kernel_shape = self.__kernel_weights.shape
-        return [
-            shape2word(*pre_shape),
-            shape2word(*pre_shape),
-            shape2word(*post_shape),
-            shape2word(0, 0),
-            shape2word(0, 0),
-            shape2word(1, 1),
-            shape2word(*self.__strides),
-            shape2word(*kernel_shape)
-        ]
 
     @overrides(AbstractConnector.could_connect)
     def could_connect(

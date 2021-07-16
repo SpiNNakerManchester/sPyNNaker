@@ -23,6 +23,8 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 _expr_context = SafeEval(
     math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
     numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
@@ -32,6 +34,7 @@ _expr_context = SafeEval(
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost,
                         AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell *i* in the presynaptic population to cell *i* in\
@@ -112,7 +115,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
             synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):

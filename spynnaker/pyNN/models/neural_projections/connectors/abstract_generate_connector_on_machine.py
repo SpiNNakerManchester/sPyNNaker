@@ -17,11 +17,15 @@ from pyNN.random import available_distributions, RandomDistribution
 from enum import Enum
 import numpy
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 # Hash of the constant parameter generator
 PARAM_TYPE_CONSTANT_ID = 0
@@ -71,6 +75,17 @@ class AbstractGenerateConnectorOnMachine(
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
+
+    @overrides(AbstractConnector.validate_connection)
+    def validate_connection(self, application_edge, synapse_info):
+        # If we can't generate on machine, we must be able to generate on host
+        if not self.generate_on_machine(
+                synapse_info.weights, synapse_info.delays):
+            if not isinstance(self, AbstractGenerateConnectorOnHost):
+                raise SynapticConfigurationException(
+                    "The parameters of this connection do not allow it to be"
+                    " generated on the machine, but the connector cannot"
+                    " be generated on host!")
 
     def _generate_lists_on_machine(self, values):
         """ Checks if the connector should generate lists on machine rather\

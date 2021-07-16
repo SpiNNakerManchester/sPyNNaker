@@ -21,6 +21,8 @@ from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -35,7 +37,8 @@ def shape2word(sw, sh):
             (numpy.uint32(sw) & 0xFFFF))
 
 
-class KernelConnector(AbstractGenerateConnectorOnMachine):
+class KernelConnector(AbstractGenerateConnectorOnMachine,
+                      AbstractGenerateConnectorOnHost):
     """
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
@@ -366,7 +369,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return "KernelConnector(shape_kernel[{},{}])".format(
             self._kernel_w, self._kernel_h)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):

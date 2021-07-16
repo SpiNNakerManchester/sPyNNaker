@@ -25,11 +25,14 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 N_GEN_PARAMS = 8
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractGenerateConnectorOnHost,
                         AbstractConnectorSupportsViewsOnMachine):
     """ Create a multapse connector. The size of the source and destination\
         populations are obtained when the projection is connected. The number\
@@ -206,7 +209,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return self._get_weight_maximum(
             synapse_info.weights, self.__num_synapses, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
