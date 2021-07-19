@@ -122,7 +122,7 @@ class ConvolutionConnector(AbstractConnector):
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
 
-        self.__encoded_kernel_weights = kernel_weights.flatten()
+        self.__encoded_kernel_weights = self.__kernel_weights.flatten()
         if len(self.__encoded_kernel_weights) % 2 != 0:
             self.__encoded_kernel_weights = numpy.concatenate(
                 (self.__encoded_kernel_weights, [0]))
