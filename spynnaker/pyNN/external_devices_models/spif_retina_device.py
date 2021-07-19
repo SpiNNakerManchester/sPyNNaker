@@ -304,7 +304,7 @@ class SPIFRetinaDevice(
 
         :rtype: FGPA_Connection
         """
-        return [FPGAConnection(0, 1, None)]
+        return FPGAConnection(0, 1, None)
 
     def __sub_square_bits(self, fpga_link_id):
         # We use every other odd link, so we can work out the "index" of the
