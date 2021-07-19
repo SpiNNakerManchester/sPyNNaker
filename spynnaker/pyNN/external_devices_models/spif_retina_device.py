@@ -97,27 +97,27 @@ class _SPIFRegister(IntEnum):
 
     def cmd(self, payload=None, index=0):
         return MultiCastCommand(
-            _RC_KEY + self.value + index, payload, time=None, repeats=_REPEATS,
+            _RC_KEY + self.value + index, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
 
-def set_field_mask(self, index, mask):
+def set_field_mask(index, mask):
     return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, index)
 
 
-def set_field_shift(self, index, shift):
+def set_field_shift(index, shift):
     return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(shift, index)
 
 
-def set_input_key(self, index, key):
+def set_input_key(index, key):
     return _SPIFRegister.IR_KEY_BASE.cmd(key, index)
 
 
-def set_input_mask(self, index, mask):
+def set_input_mask(index, mask):
     return _SPIFRegister.IR_MASK_BASE.cmd(mask, index)
 
 
-def set_input_route(self, index, route):
+def set_input_route(index, route):
     return _SPIFRegister.IR_ROUTE_BASE.cmd(route, index)
 
 
@@ -133,7 +133,7 @@ class _SpiNNFPGARegister(IntEnum):
 
     def cmd(self, payload=None):
         return MultiCastCommand(
-            _LC_KEY + self.value, payload, time=None, repeats=_REPEATS,
+            _LC_KEY + self.value, payload, time=None, repeat=_REPEATS,
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
 
@@ -367,12 +367,12 @@ class SPIFRetinaDevice(
         # Configure the creation of packets from fields to keys
         so = self.__source_order
         commands = [
-            set_field_mask(so.p_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(so.p_shift(self.__x_bits, self.__y_bits)),
-            set_field_mask(so.x_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(so.x_shift(self.__y_bits)),
-            set_field_mask(so.y_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(so.y_shift(self.__x_bits))
+            set_field_mask(0, so.p_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(0, so.p_shift(self.__x_bits, self.__y_bits)),
+            set_field_mask(1, so.x_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(1, so.x_shift(self.__y_bits)),
+            set_field_mask(2, so.y_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(2, so.y_shift(self.__x_bits))
         ]
 
         # Configure the output routing key
@@ -386,7 +386,7 @@ class SPIFRetinaDevice(
         commands.extend(set_input_route(i, i) for i in range(8))
 
         # Send the start signal
-        commands.extend(_SpiNNFPGARegister.START.cmd())
+        commands.append(_SpiNNFPGARegister.START.cmd())
 
         return commands
 
