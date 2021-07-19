@@ -21,14 +21,125 @@ from pacman.utilities.constants import BITS_IN_KEY
 from pacman.model.graphs.application import FPGAConnection
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
+    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractSendMeMulticastCommandsVertex)
+from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 import math
+from enum import Enum, IntEnum
+
+_REPEATS = 2
+_DELAY_BETWEEN_REPEATS = 1
+
+#: Base key to send packets to SpiNNaker FPGA (add register offset)
+_LC_KEY = 0xFFFFFE00
+
+#: Base key to send packets to SPIF (add register offset)
+_RC_KEY = 0xFFFFFF00
+
+
+class SourceOrder(Enum):
+    """ The order of the source pixels.  Arguments are the functions to
+        calculate the shifts based on the input number of bits for x and y
+        (p is assumed to be 1 bit).  Noqa is used to allow the functions to
+        be aligned against each other.
+    """
+    #     id  PSHIFT(xbits, y_bits)   XSHIFT(ybits)      YSHIFT(xbits)
+    PXY = (1, lambda xb, yb: xb + yb, lambda yb: yb,     lambda xb: 0)      # noqa
+    XPY = (2, lambda xb, yb: yb,      lambda yb: yb + 1, lambda xb: 0)      # noqa
+    XYP = (3, lambda xb, yb: 0,       lambda yb: yb + 1, lambda xb: 1)      # noqa
+    PYX = (4, lambda xb, yb: xb + yb, lambda yb: 0,      lambda xb: xb)     # noqa
+    YPX = (5, lambda xb, yb: xb,      lambda yb: 0,      lambda xb: xb + 1) # noqa
+    YXP = (6, lambda xb, yb: 0,       lambda yb: 1,      lambda xb: xb + 1) # noqa
+
+    def __new__(cls, value, p_shift, x_shift, y_shift):
+        # pylint: disable=protected-access
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj.__p_shift = p_shift
+        obj.__x_shift = x_shift
+        obj.__y_shift = y_shift
+        return obj
+
+    def p_shift(self, x_bits, y_bits):
+        return self.__p_shift(x_bits, y_bits)
+
+    def x_shift(self, y_bits):
+        return self.__x_shift(y_bits)
+
+    def y_shift(self, x_bits):
+        return self.__y_shift(x_bits)
+
+    def p_mask(self, x_bits, y_bits):
+        return 1 << self.__p_shift(x_bits, y_bits)
+
+    def x_mask(self, x_bits, y_bits):
+        return ((1 << x_bits) - 1) << self.x_shift(y_bits)
+
+    def y_mask(self, x_bits, y_bits):
+        return ((1 << y_bits) - 1) << self.y_shift(x_bits)
+
+
+class _SPIFRegister(IntEnum):
+    MP_KEY = 1
+    REPLY_KEY = 2
+    IR_KEY_BASE = 16
+    IR_MASK_BASE = 32
+    IR_ROUTE_BASE = 48
+    OUT_PERIPH_PKT_CNT = 64
+    CONFIG_PKT_CNT = 65
+    DROPPED_PKT_CNT = 66
+    IN_PERIPH_PKT_CNT = 67
+    DIAG_PKT_CNT = 68
+    MP_FLD_MASK_BASE = 80
+    MP_FLD_SHIFT_BASE = 96
+
+    def cmd(self, payload=None, index=0):
+        return MultiCastCommand(
+            _RC_KEY + self.value + index, payload, time=None, repeats=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
+
+
+def set_field_mask(self, index, mask):
+    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, index)
+
+
+def set_field_shift(self, index, shift):
+    return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(shift, index)
+
+
+def set_input_key(self, index, key):
+    return _SPIFRegister.IR_KEY_BASE.cmd(key, index)
+
+
+def set_input_mask(self, index, mask):
+    return _SPIFRegister.IR_MASK_BASE.cmd(mask, index)
+
+
+def set_input_route(self, index, route):
+    return _SPIFRegister.IR_ROUTE_BASE.cmd(route, index)
+
+
+class _SpiNNFPGARegister(IntEnum):
+    P_KEY = 2
+    P_MASK = 3
+    LC_KEY = 12
+    LC_MASK = 13
+    RC_KEY = 14
+    RC_MASK = 15
+    STOP = 16
+    START = 17
+
+    def cmd(self, payload=None):
+        return MultiCastCommand(
+            _LC_KEY + self.value, payload, time=None, repeats=_REPEATS,
+            delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
 
 class SPIFRetinaDevice(
-        ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints):
+        ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
+        AbstractSendMeMulticastCommandsVertex):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 
@@ -45,6 +156,10 @@ class SPIFRetinaDevice(
     #: There is 1 bit for polarity in the key
     N_POLARITY_BITS = 1
 
+    #: The bottom bits are used to determine which link to send the source down
+    #: on SPIF
+    SOURCE_FPGA_MASK = 0x7
+
     __slots__ = [
         "__width",
         "__height",
@@ -58,9 +173,14 @@ class SPIFRetinaDevice(
         "__fpga_y_shift",
         "__x_index_shift",
         "__y_index_shift",
-        "__index_by_slice"]
+        "__index_by_slice",
+        "__base_key",
+        "__source_order",
+        "__x_bits",
+        "__y_bits"]
 
-    def __init__(self, base_key, width, height, sub_width, sub_height):
+    def __init__(self, base_key, width, height, sub_width, sub_height,
+                 source_order):
         """
 
         :param int base_key: The key that is common over the whole vertex
@@ -72,6 +192,7 @@ class SPIFRetinaDevice(
         :param int sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
+        :param SourceOrder source_order: The order of the fields in the source
         """
         # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
@@ -138,6 +259,11 @@ class SPIFRetinaDevice(
         # A dictionary to get vertex index from FPGA and slice
         self.__index_by_slice = dict()
 
+        self.__base_key = base_key
+        self.__source_order = source_order
+        self.__x_bits = x_bits
+        self.__y_bits = y_bits
+
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
     def atoms_shape(self):
@@ -176,9 +302,9 @@ class SPIFRetinaDevice(
     def __outgoing_fpga(self):
         """ Get the outgoing FPGA connection
 
-        :rtype: None
+        :rtype: FGPA_Connection
         """
-        return None
+        return [FPGAConnection(0, 1, None)]
 
     def __sub_square_bits(self, fpga_link_id):
         # We use every other odd link, so we can work out the "index" of the
@@ -212,7 +338,7 @@ class SPIFRetinaDevice(
 
     @overrides(ApplicationFPGAVertex.get_outgoing_slice)
     def get_outgoing_slice(self):
-        return None
+        return Slice(0, 100)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -233,3 +359,43 @@ class SPIFRetinaDevice(
             fpga_x)
         return [FixedKeyAndMaskConstraint([
             BaseKeyAndMask(fpga_key, self.__fpga_mask)])]
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
+    def start_resume_commands(self):
+
+        # Configure the creation of packets from fields to keys
+        so = self.__source_order
+        commands = [
+            set_field_mask(so.p_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(so.p_shift(self.__x_bits, self.__y_bits)),
+            set_field_mask(so.x_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(so.x_shift(self.__y_bits)),
+            set_field_mask(so.y_mask(self.__x_bits, self.__y_bits)),
+            set_field_shift(so.y_shift(self.__x_bits))
+        ]
+
+        # Configure the output routing key
+        commands.append(_SPIFRegister.MP_KEY.cmd(self.__base_key))
+
+        # Configure the links to send packets to the 8 FPGAs using the
+        # lower bits
+        commands.extend(set_input_key(i, i) for i in range(8))
+        commands.extend(set_input_mask(i, self.SOURCE_FPGA_MASK)
+                        for i in range(8))
+        commands.extend(set_input_route(i, i) for i in range(8))
+
+        # Send the start signal
+        commands.extend(_SpiNNFPGARegister.START.cmd())
+
+        return commands
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
+    def pause_stop_commands(self):
+        return [_SpiNNFPGARegister.STOP.cmd()]
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
+    def timed_commands(self):
+        return []
