@@ -389,8 +389,10 @@ class ConvolutionConnector(AbstractConnector):
                 (encoded_kernel_weights, [0]))
         neg_weights = encoded_kernel_weights < 0
         pos_weights = encoded_kernel_weights > 0
-        encoded_kernel_weights[neg_weights] *= weight_scales[neg_synapse_type]
-        encoded_kernel_weights[pos_weights] *= weight_scales[pos_synapse_type]
+        encoded_kernel_weights[neg_weights] *= float(
+            weight_scales[neg_synapse_type])
+        encoded_kernel_weights[pos_weights] *= float(
+            weight_scales[pos_synapse_type])
         kernel_weights = numpy.round(encoded_kernel_weights).astype(
             numpy.int16)
         spec.write_array(kernel_weights.view(numpy.uint32))
