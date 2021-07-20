@@ -357,7 +357,6 @@ class SynapticMatrices(object):
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
 
-
         for proj in incoming_projections:
             app_edge = proj._projection_edge
 
