@@ -68,10 +68,6 @@ class SynapseDynamicsStatic(
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
 
-    @overrides(AbstractStaticSynapseDynamics.are_weights_signed)
-    def are_weights_signed(self):
-        return False
-
     @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return ""

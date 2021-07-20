@@ -33,13 +33,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def are_weights_signed(self):
-        """ Determines if the weights are signed values
-
-        :rtype: bool
-        """
-
-    @abstractmethod
     def get_vertex_executable_suffix(self):
         """ Get the executable suffix for a vertex for this dynamics
 

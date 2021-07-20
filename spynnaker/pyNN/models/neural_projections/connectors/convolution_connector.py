@@ -53,11 +53,15 @@ class ConvolutionConnector(AbstractConnector):
         "__strides",
         "__padding_shape",
         "__pool_shape",
-        "__pool_stride"
+        "__pool_stride",
+        "__positive_receptor_type",
+        "__negative_receptor_type"
     ]
 
     def __init__(self, kernel_weights, kernel_shape=None, strides=None,
-                 padding=None, pool_shape=None, pool_stride=None, safe=True,
+                 padding=None, pool_shape=None, pool_stride=None,
+                 positive_receptor_type="excitatory",
+                 negative_receptor_type="inhibitory", safe=True,
                  verbose=False, callback=None):
         """
         :param kernel_weights:
@@ -106,6 +110,12 @@ class ConvolutionConnector(AbstractConnector):
             same stride will be used for rows and columns.  If two values are
             provided it will be assumed to be (stride_rows, stride_columns)
         :type pool_stride: int or tuple(int, int)
+        :param str positive_receptor_type:
+            The receptor type to add the positive weights to.  By default this
+            is "excitatory".
+        :param str negative_receptor_type:
+            The receptor type to add the negative weights to.  By default this
+            is "inhibitory".
         :param bool safe: (ignored)
         :param bool verbose: (ignored)
         :param callable callback: (ignored)
@@ -122,10 +132,22 @@ class ConvolutionConnector(AbstractConnector):
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
 
-        self.__encoded_kernel_weights = self.__kernel_weights.flatten()
-        if len(self.__encoded_kernel_weights) % 2 != 0:
-            self.__encoded_kernel_weights = numpy.concatenate(
-                (self.__encoded_kernel_weights, [0]))
+        self.__encoded_kernel_weights = None
+
+        self.__positive_receptor_type = positive_receptor_type
+        self.__negative_receptor_type = negative_receptor_type
+
+    @property
+    def positive_receptor_type(self):
+        return self.__positive_receptor_type
+
+    @property
+    def negative_receptor_type(self):
+        return self.__negative_receptor_type
+
+    @property
+    def kernel_weights(self):
+        return self.__kernel_weights
 
     def __get_kernel_shape(self, shape):
         if shape is None:
@@ -217,6 +239,16 @@ class ConvolutionConnector(AbstractConnector):
                 "for a Convolution connector with the given parameters, "
                 "the post-population must have a shape "
                 f"{expected_post_shape}")
+        if post.get_synapse_id_by_target(
+                self.__positive_receptor_type) is None:
+            raise ConfigurationException(
+                "The post population doesn't have a synaptic receptor type of"
+                f" {self.__positive_receptor_type}")
+        if post.get_synapse_id_by_target(
+                self.__negative_receptor_type) is None:
+            raise ConfigurationException(
+                "The post population doesn't have a synaptic receptor type of"
+                f" {self.__negative_receptor_type}")
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
@@ -297,8 +329,7 @@ class ConvolutionConnector(AbstractConnector):
 
         return (
             (6 * BYTES_PER_WORD) +
-            (12 * BYTES_PER_SHORT) +
-            BYTES_PER_WORD +
+            (14 * BYTES_PER_SHORT) +
             (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
@@ -341,10 +372,27 @@ class ConvolutionConnector(AbstractConnector):
                          data_type=DataType.INT16)
         spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
         spec.write_value(self.__recip(ps_y), data_type=DataType.INT16)
-        spec.write_value(synapse_info.synapse_type, data_type=DataType.UINT32)
-        kernel_weights = numpy.round(
-            self.__encoded_kernel_weights *
-            weight_scales[synapse_info.synapse_type]).astype(numpy.uint16)
+
+        # Write synapse information
+        post_app = edge.post_vertex.app_vertex
+        pos_synapse_type = post_app.get_synapse_id_by_target(
+            self.__positive_receptor_type)
+        neg_synapse_type = post_app.get_synapse_id_by_target(
+            self.__negative_receptor_type)
+        spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
+        spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+
+        # Encode weights with weight scaling
+        encoded_kernel_weights = self.__kernel_weights.flatten()
+        if len(encoded_kernel_weights) % 2 != 0:
+            encoded_kernel_weights = numpy.concatenate(
+                (encoded_kernel_weights, [0]))
+        neg_weights = encoded_kernel_weights < 0
+        pos_weights = encoded_kernel_weights > 0
+        encoded_kernel_weights[neg_weights] *= weight_scales[neg_synapse_type]
+        encoded_kernel_weights[pos_weights] *= weight_scales[pos_synapse_type]
+        kernel_weights = numpy.round(encoded_kernel_weights).astype(
+            numpy.int16)
         spec.write_array(kernel_weights.view(numpy.uint32))
 
     def __recip(self, v):

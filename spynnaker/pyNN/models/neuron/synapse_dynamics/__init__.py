@@ -20,6 +20,7 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_supports_signed_weights import AbstractSupportsSignedWeights
 from .pynn_synapse_dynamics import PyNNSynapseDynamics
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
@@ -41,4 +42,5 @@ __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            # Structural plasticity
            "SynapseDynamicsStructuralCommon",
            "SynapseDynamicsStructuralStatic",
-           "SynapseDynamicsStructuralSTDP"]
+           "SynapseDynamicsStructuralSTDP",
+           "AbstractSupportsSignedWeights"]

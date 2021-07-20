@@ -22,10 +22,12 @@ from spinn_front_end_common.utilities.globals_variables import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSupportsSignedWeights)
 from .abstract_local_only import AbstractLocalOnly
 
 
-class LocalOnlyConvolution(AbstractLocalOnly):
+class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
     """
 
@@ -39,10 +41,6 @@ class LocalOnlyConvolution(AbstractLocalOnly):
     @overrides(AbstractLocalOnly.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return "_conv"
-
-    @overrides(AbstractLocalOnly.are_weights_signed)
-    def are_weights_signed(self):
-        return False
 
     @overrides(AbstractLocalOnly.changes_during_run)
     def changes_during_run(self):
@@ -117,3 +115,61 @@ class LocalOnlyConvolution(AbstractLocalOnly):
     def weight(self):
         # We don't have a weight here, it is in the connector
         return 0
+
+    @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
+    def get_positive_synapse_index(self, incoming_projection):
+        post = incoming_projection._projection_edge.post_vertex
+        conn = incoming_projection._synapse_information.connector
+        return post.get_synapse_id_by_target(conn.positive_receptor_type)
+
+    @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
+    def get_negative_synapse_index(self, incoming_projection):
+        post = incoming_projection._projection_edge.post_vertex
+        conn = incoming_projection._synapse_information.connector
+        return post.get_synapse_id_by_target(conn.negative_receptor_type)
+
+    @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
+    def get_maximum_positive_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        # We know the connector doesn't care about the argument
+        max_weight = numpy.amax(conn.kernel_weights)
+        return max_weight if max_weight > 0 else 0
+
+    @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
+    def get_minimum_negative_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        # This is different because the connector happens to support this
+        min_weight = numpy.amin(conn.kernel_weights)
+        return min_weight if min_weight < 0 else 0
+
+    @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
+    def get_mean_positive_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
+        if not len(pos_weights):
+            return 0
+        return numpy.mean(pos_weights)
+
+    @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
+    def get_mean_negative_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
+        if not len(neg_weights):
+            return 0
+        return numpy.mean(neg_weights)
+
+    @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
+    def get_variance_positive_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
+        if not len(pos_weights):
+            return 0
+        return numpy.var(pos_weights)
+
+    @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
+    def get_variance_negative_weight(self, incoming_projection):
+        conn = incoming_projection._synapse_information.connector
+        neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
+        if not len(neg_weights):
+            return 0
+        return numpy.var(neg_weights)

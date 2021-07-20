@@ -60,7 +60,8 @@ from spynnaker.pyNN.utilities.ranged import (
 from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural)
+    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
+    AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -868,77 +869,15 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :rtype: list(int)
         """
-        weight_scale = self.__neuron_impl.get_global_weight_scale()
-        weight_scale_squared = weight_scale * weight_scale
-        n_synapse_types = self.__neuron_impl.get_n_synapse_types()
-        running_totals = [RunningStats() for _ in range(n_synapse_types)]
-        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
-        total_weights = numpy.zeros(n_synapse_types)
-        biggest_weight = numpy.zeros(n_synapse_types)
-        weights_signed = False
-        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
+        stats = _Stats(self.__neuron_impl, self.__spikes_per_second)
 
         for proj in incoming_projections:
-            synapse_info = proj._synapse_information
-            synapse_type = synapse_info.synapse_type
-            synapse_dynamics = synapse_info.synapse_dynamics
-            connector = synapse_info.connector
+            stats.add_projection(proj)
 
-            weight_mean = (
-                synapse_dynamics.get_weight_mean(
-                    connector, synapse_info) * weight_scale)
-            n_connections = \
-                connector.get_n_connections_to_post_vertex_maximum(
-                    synapse_info)
-            weight_variance = synapse_dynamics.get_weight_variance(
-                connector, synapse_info.weights,
-                synapse_info) * weight_scale_squared
-            running_totals[synapse_type].add_items(
-                weight_mean, weight_variance, n_connections)
-
-            delay_variance = synapse_dynamics.get_delay_variance(
-                connector, synapse_info.delays, synapse_info)
-            delay_running_totals[synapse_type].add_items(
-                0.0, delay_variance, n_connections)
-
-            weight_max = (synapse_dynamics.get_weight_maximum(
-                connector, synapse_info) * weight_scale)
-            biggest_weight[synapse_type] = max(
-                biggest_weight[synapse_type], weight_max)
-
-            spikes_per_tick = max(
-                1.0, self.__spikes_per_second / steps_per_second)
-            spikes_per_second = self.__spikes_per_second
-            pre_vertex = proj._projection_edge.pre_vertex
-            if isinstance(pre_vertex, AbstractMaxSpikes):
-                rate = pre_vertex.max_spikes_per_second()
-                if rate != 0:
-                    spikes_per_second = rate
-                spikes_per_tick = pre_vertex.max_spikes_per_ts()
-            rate_stats[synapse_type].add_items(
-                spikes_per_second, 0, n_connections)
-            total_weights[synapse_type] += spikes_per_tick * (
-                weight_max * n_connections)
-
-            if synapse_dynamics.are_weights_signed():
-                weights_signed = True
-
+        n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         max_weights = numpy.zeros(n_synapse_types)
         for synapse_type in range(n_synapse_types):
-            if delay_running_totals[synapse_type].variance == 0.0:
-                max_weights[synapse_type] = max(total_weights[synapse_type],
-                                                biggest_weight[synapse_type])
-            else:
-                stats = running_totals[synapse_type]
-                rates = rate_stats[synapse_type]
-                max_weights[synapse_type] = min(
-                    self._ring_buffer_expected_upper_bound(
-                        stats.mean, stats.standard_deviation, rates.mean,
-                        stats.n_items, self.__ring_buffer_sigma),
-                    total_weights[synapse_type])
-                max_weights[synapse_type] = max(
-                    max_weights[synapse_type], biggest_weight[synapse_type])
+            max_weights[synapse_type] = stats.get_max_weight(synapse_type)
 
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
@@ -951,11 +890,6 @@ class AbstractPopulationVertex(
         max_weight_powers = (
             w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
-
-        # If we have synapse dynamics that uses signed weights,
-        # Add another bit of shift to prevent overflows
-        if weights_signed:
-            max_weight_powers = (m + 1 for m in max_weight_powers)
 
         return list(max_weight_powers)
 
@@ -1326,3 +1260,116 @@ class AbstractPopulationVertex(
         :rtype: list(~spynnaker.pyNN.models.projection.Projection)
         """
         return self.__incoming_projections
+
+
+class _Stats(object):
+    """ Object to keep hold of and process statistics for ring buffer scaling
+    """
+    __slots__ = [
+        "w_scale",
+        "w_scale_sq",
+        "n_synapse_types",
+        "running_totals",
+        "delay_running_totals",
+        "total_weights",
+        "biggest_weight",
+        "rate_stats",
+        "steps_per_second",
+        "default_spikes_per_second"
+    ]
+
+    def __init__(self, neuron_impl, default_spikes_per_second):
+        self.w_scale = neuron_impl.get_global_weight_scale()
+        self.w_scale_sq = self.w_scale ** 2
+        n_synapse_types = neuron_impl.get_n_synapse_types()
+
+        self.running_totals = [
+            RunningStats() for _ in range(n_synapse_types)]
+        self.delay_running_totals = [
+            RunningStats() for _ in range(n_synapse_types)]
+        self.total_weights = numpy.zeros(n_synapse_types)
+        self.biggest_weight = numpy.zeros(n_synapse_types)
+        self.rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+
+        self.steps_per_second = (
+            MICRO_TO_SECOND_CONVERSION / machine_time_step())
+        self.default_spikes_per_second = default_spikes_per_second
+
+    def add_projection(self, proj):
+        s_dynamics = proj._synapse_information.synapse_dynamics
+        if isinstance(s_dynamics, AbstractSupportsSignedWeights):
+            self.__add_signed_projection(proj)
+        else:
+            self.__add_unsigned_projection(proj)
+
+    def __add_signed_projection(self, proj):
+        s_info = proj._synapse_information
+        connector = s_info.connector
+        s_dynamics = s_info.synapse_dynamics
+
+        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
+
+        s_type_pos = s_dynamics.get_positive_synapse_index(proj)
+        w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
+        w_var_pos = s_dynamics.get_variance_positive_weight(proj)
+        w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
+        self.__add_details(
+            proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
+
+        s_type_neg = s_dynamics.get_negative_synapse_index(proj)
+        w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
+        w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
+        w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
+        self.__add_details(
+            proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
+
+    def __add_unsigned_projection(self, proj):
+        s_info = proj._synapse_information
+        s_type = s_info.synapse_type
+        s_dynamics = s_info.synapse_dynamics
+        connector = s_info.connector
+
+        n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
+        w_mean = s_dynamics.get_weight_mean(connector, s_info)
+        w_var = s_dynamics.get_weight_variance(
+            connector, s_info.weights, s_info)
+        w_max = s_dynamics.get_weight_maximum(connector, s_info)
+        d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
+        self.__add_details(proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
+
+    def __add_details(
+            self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
+        self.running_totals[s_type].add_items(
+            w_mean * self.w_scale, w_var * self.w_scale_sq, n_conns)
+        self.biggest_weight[s_type] = max(
+            self.biggest_weight[s_type], w_max * self.w_scale)
+        self.delay_running_totals[s_type].add_items(0.0, d_var, n_conns)
+
+        spikes_per_tick, spikes_per_second = self.__pre_spike_stats(proj)
+        self.rate_stats[s_type].add_items(spikes_per_second, 0, n_conns)
+        self.total_weights[s_type] += spikes_per_tick * (w_max * n_conns)
+
+    def __pre_spike_stats(self, proj):
+        spikes_per_tick = max(
+            1.0, self.default_spikes_per_second / self.steps_per_second)
+        spikes_per_second = self.default_spikes_per_second
+        pre_vertex = proj._projection_edge.pre_vertex
+        if isinstance(pre_vertex, AbstractMaxSpikes):
+            rate = pre_vertex.max_spikes_per_second()
+            if rate != 0:
+                spikes_per_second = rate
+            spikes_per_tick = pre_vertex.max_spikes_per_ts()
+        return spikes_per_tick, spikes_per_second
+
+    def get_max_weight(self, s_type):
+        if self.delay_running_totals[s_type].variance == 0.0:
+            return max(self.total_weights[s_type], self.biggest_weight[s_type])
+
+        stats = self.running_totals[s_type]
+        rates = self.rate_stats[s_type]
+        w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
+            stats.mean, stats.standard_deviation, rates.mean,
+            stats.n_items, self.__ring_buffer_sigma)
+        w_max = min(w_max, stats.total_weights[s_type])
+        w_max = max(w_max, self.biggest_weight[s_type])

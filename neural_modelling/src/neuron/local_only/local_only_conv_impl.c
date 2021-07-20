@@ -23,7 +23,7 @@
 #include "../population_table/population_table.h"
 #include "../neuron.h"
 
-typedef uint16_t lc_weight_t;
+typedef int16_t lc_weight_t;
 
 // Dimensions are needed to be signed due to mapping from pre- to post-synaptic.
 typedef int16_t lc_dim_t;
@@ -61,7 +61,8 @@ typedef struct {
     lc_shape_t padding;
     lc_coord_t recip_strides;
     lc_coord_t recip_pool_strides;
-    uint32_t synapse_type;
+    uint16_t positive_synapse_type;
+    uint16_t negative_synapse_type;
     lc_weight_t weights[]; // n_weights = next_even(kernel.width * kernel.height)
 } connector;
 
@@ -183,9 +184,22 @@ static inline void do_convolution_operation(
             // will know how to send the spike correctly
             uint32_t post_index = (tmp_row * config.post_shape.width) + tmp_col;
             lc_weight_t weight = connector->weights[k++];
-            uint32_t rb_index = synapse_row_get_ring_buffer_index(time + 1,
-                    connector->synapse_type, post_index, synapse_type_index_bits,
-                    synapse_index_bits, synapse_delay_mask);
+            if (weight == 0) {
+                continue;
+            }
+            uint32_t rb_index = 0;
+            if (weight > 0) {
+                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                    connector->positive_synapse_type, post_index,
+                    synapse_type_index_bits, synapse_index_bits,
+                    synapse_delay_mask);
+            } else {
+                rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                    connector->negative_synapse_type, post_index,
+                    synapse_type_index_bits, synapse_index_bits,
+                    synapse_delay_mask);
+                weight = -weight;
+            }
             log_debug("Updating ring_buffers[%u] for post neuron %u = %u, %u, with weight %u",
                     rb_index, post_index, tmp_col, tmp_row, weight);
 
