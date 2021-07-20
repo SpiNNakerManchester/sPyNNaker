@@ -49,7 +49,6 @@ class ConvolutionConnector(AbstractConnector):
 
     __slots__ = [
         "__kernel_weights",
-        "__encoded_kernel_weights",
         "__strides",
         "__padding_shape",
         "__pool_shape",
@@ -132,8 +131,6 @@ class ConvolutionConnector(AbstractConnector):
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
 
-        self.__encoded_kernel_weights = None
-
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
 
@@ -162,7 +159,7 @@ class ConvolutionConnector(AbstractConnector):
     def __decode_kernel(self, w, shape):
         if isinstance(w, int) or isinstance(w, float):
             shape = self.__get_kernel_shape(shape)
-            self.__kernel_weights = numpy.full(shape, w)
+            self.__kernel_weights = numpy.full(shape, w, dtype="float64")
         elif isinstance(w, Iterable):
             if all(isinstance(lst, Iterable) for lst in w):
                 # 2D list
@@ -170,15 +167,16 @@ class ConvolutionConnector(AbstractConnector):
                     raise SynapticConfigurationException(
                         "kernel_weights must be a 2D array with every row the"
                         " same length")
-                self.__kernel_weights = numpy.array(w)
+                self.__kernel_weights = numpy.array(w, dtype="float64")
             else:
                 # 1D list
                 shape = self.__get_kernel_shape(shape)
-                self.__kernel_weights = numpy.array(w).reshape(shape)
+                self.__kernel_weights = numpy.array(
+                    w, dtype="float64").reshape(shape)
         elif isinstance(w, RandomDistribution):
             shape = self.__get_kernel_shape(shape)
             self.__kernel_weights = numpy.array(
-                w.next(numpy.prod(shape))).reshape(shape)
+                w.next(numpy.prod(shape)), dtype="float64").reshape(shape)
         else:
             raise SynapticConfigurationException(
                 f"Unknown combination of kernel_weights ({w}) and"
@@ -389,10 +387,8 @@ class ConvolutionConnector(AbstractConnector):
                 (encoded_kernel_weights, [0]))
         neg_weights = encoded_kernel_weights < 0
         pos_weights = encoded_kernel_weights > 0
-        encoded_kernel_weights[neg_weights] *= float(
-            weight_scales[neg_synapse_type])
-        encoded_kernel_weights[pos_weights] *= float(
-            weight_scales[pos_synapse_type])
+        encoded_kernel_weights[neg_weights] *= weight_scales[neg_synapse_type]
+        encoded_kernel_weights[pos_weights] *= weight_scales[pos_synapse_type]
         kernel_weights = numpy.round(encoded_kernel_weights).astype(
             numpy.int16)
         spec.write_array(kernel_weights.view(numpy.uint32))
