@@ -25,6 +25,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -355,6 +356,8 @@ class SynapticMatrices(object):
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
+
+
         for proj in incoming_projections:
             app_edge = proj._projection_edge
 
@@ -362,8 +365,25 @@ class SynapticMatrices(object):
             if app_edge in in_edges_by_app_edge:
                 continue
 
+            seen_machine_vertices = set()
             # Add all incoming machine edges for this slice
             for machine_edge in app_edge.machine_edges:
+                post_vertex = app_edge.post_vertex
+
+                neuromodulation = False
+                for proj_in in post_vertex.incoming_projections:
+                    dynamics = proj_in._synapse_information.synapse_dynamics
+                    if isinstance(dynamics, SynapseDynamicsSTDP):
+                        neuromodulation = dynamics.neuromodulation
+
+                receptor_type = app_edge.synapse_information[0].receptor_type
+                if neuromodulation and (receptor_type == "reward" or
+                                        receptor_type == "punishment"):
+                    if machine_edge.pre_vertex in seen_machine_vertices:
+                        continue
+
+                    seen_machine_vertices.add(machine_edge.pre_vertex)
+
                 if (machine_edge.post_vertex.vertex_slice ==
                         self.__post_vertex_slice):
                     rinfo = routing_info.get_routing_info_for_edge(
@@ -371,11 +391,28 @@ class SynapticMatrices(object):
                     key_space_tracker.allocate_keys(rinfo)
                     in_edges_by_app_edge[app_edge].add(machine_edge)
 
+            seen_machine_vertices = set()
             # Also go through the delay edges in case an undelayed edge
             # was filtered
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
                 for machine_edge in delay_edge.machine_edges:
+                    post_vertex = app_edge.post_vertex
+
+                    neuromodulation = False
+                    for proj in post_vertex.incoming_projections:
+                        dynamics = proj._synapse_information.synapse_dynamics
+                        if isinstance(dynamics, SynapseDynamicsSTDP):
+                            neuromodulation = dynamics.neuromodulation
+
+                    rec_type = app_edge.synapse_information[0].receptor_type
+                    if neuromodulation and (rec_type == "reward" or
+                                            rec_type == "punishment"):
+                        if machine_edge.pre_vertex in seen_machine_vertices:
+                            continue
+
+                        seen_machine_vertices.add(machine_edge.pre_vertex)
+
                     if (machine_edge.post_vertex.vertex_slice ==
                             self.__post_vertex_slice):
                         rinfo = routing_info.get_routing_info_for_edge(
@@ -387,6 +424,7 @@ class SynapticMatrices(object):
                                 machine_edge.post_vertex))
                         in_edges_by_app_edge[app_edge].add(
                             undelayed_machine_edge)
+
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod

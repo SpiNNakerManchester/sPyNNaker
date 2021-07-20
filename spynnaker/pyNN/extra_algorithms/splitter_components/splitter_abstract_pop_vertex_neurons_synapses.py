@@ -168,13 +168,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " of synapse cores is set to 1")
 
         # Neuromodulation can only be run on a single synapse core at present
-        if (isinstance(app_vertex.synapse_dynamics, SynapseDynamicsSTDP) and
-                self.__n_synapse_vertices != 1):
-            if (app_vertex.synapse_dynamics.neuromodulation):
-                raise SynapticConfigurationException(
-                    "The current implementation of neuromodulated STDP can"
-                    " only be run on a single synapse core.  Please ensure the"
-                    " number of synapse cores is set to 1")
+        # if (isinstance(app_vertex.synapse_dynamics, SynapseDynamicsSTDP) and
+        #         self.__n_synapse_vertices != 1):
+        #     if (app_vertex.synapse_dynamics.neuromodulation):
+        #         raise SynapticConfigurationException(
+        #             "The current implementation of neuromodulated STDP can"
+        #             " only be run on a single synapse core.  Please ensure the"
+        #             " number of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
         atoms_per_core = min(
@@ -579,10 +579,34 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if edge in self.__poisson_edges:
             return {}
 
+        # Work out if there is a neuromodulated edge
+        app_vertex = self._governed_app_vertex
+        neuromodulation = False
+        for proj in app_vertex.incoming_projections:
+            dynamics = proj._synapse_information.synapse_dynamics
+            if isinstance(dynamics, SynapseDynamicsSTDP):
+                neuromodulation = dynamics.neuromodulation
+
+        # If the incoming edge targets the reward or punishment receptors
+        # then it needs to be treated differently
+        receptor_type = edge.synapse_information[0].receptor_type
+        if neuromodulation and (receptor_type == "reward" or
+                                receptor_type == "punishment"):
+            # Increment the vertex index so non-neuromodulated edges work
+            index = self.__next_synapse_index
+            self.__next_synapse_index = (
+                (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+
+            # In this instance, choose to send to all synapse vertices
+            return {self.__synapse_verts_by_neuron[neuron][s_index]:
+                    [MachineEdge] for neuron in self.__neuron_vertices
+                    for s_index in range(self.__n_synapse_vertices)}
+
         # Pick the same synapse vertex index for each neuron vertex
         index = self.__next_synapse_index
         self.__next_synapse_index = (
             (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+
         return {self.__synapse_verts_by_neuron[neuron][index]: [MachineEdge]
                 for neuron in self.__neuron_vertices}
 
@@ -600,6 +624,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_verts_by_neuron = None
         self.__max_delay = self.__user_max_delay
         self.__allow_delay_extension = self.__user_allow_delay_extension
+
+    @property
+    def n_synapse_vertices(self):
+        """ Return the number of synapse vertices per neuron vertex
+
+        :rtype: int
+        """
+        return self.__n_synapse_vertices
 
     @property
     def __synapse_references(self):

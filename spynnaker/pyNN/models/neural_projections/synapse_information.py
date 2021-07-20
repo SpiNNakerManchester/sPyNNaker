@@ -33,6 +33,7 @@ class SynapseInformation(object):
         "__rng",
         "__synapse_dynamics",
         "__synapse_type",
+        "__receptor_type",
         "__is_virtual_machine",
         "__weights",
         "__delays",
@@ -40,8 +41,8 @@ class SynapseInformation(object):
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
-                 synapse_dynamics, synapse_type, is_virtual_machine,
-                 weights=None, delays=None):
+                 synapse_dynamics, synapse_type, receptor_type,
+                 is_virtual_machine, weights=None, delays=None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -58,6 +59,7 @@ class SynapseInformation(object):
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
         :param int synapse_type: The type of the synapse
+        :param str receptor_type: Description of the receptor (e.g. excitatory)
         :param bool is_virtual_machine: Whether the machine is virtual
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
@@ -72,6 +74,7 @@ class SynapseInformation(object):
         self.__rng = (rng or NumpyRNG())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
+        self.__receptor_type = receptor_type
         self.__weights = weights
         self.__delays = delays
         self.__is_virtual_machine = is_virtual_machine
@@ -160,6 +163,14 @@ class SynapseInformation(object):
         :rtype: int
         """
         return self.__synapse_type
+
+    @property
+    def receptor_type(self):
+        """ A string representing the receptor type
+
+        :rtype: str
+        """
+        return self.__receptor_type
 
     @property
     def weights(self):

@@ -16,6 +16,7 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 
 #: number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -90,11 +91,32 @@ def get_estimated_sdram_for_key_region(incoming_projections):
 
             # Get the number of likely vertices
             slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
-            sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                      BYTES_PER_WORD)
-            if in_edge.n_delay_stages:
+
+            # If neuromodulation is turned on on this edge then treat
+            # edges with reward or punishment receptors differently
+            post_vertex = in_edge.post_vertex
+            neuromodulation = False
+            for proj_to_post in post_vertex.incoming_projections:
+                dynamics = proj_to_post._synapse_information.synapse_dynamics
+                if isinstance(dynamics, SynapseDynamicsSTDP):
+                    neuromodulation = dynamics.neuromodulation
+
+            receptor_type = in_edge.synapse_information[0].receptor_type
+            if neuromodulation and (receptor_type == "reward" or
+                                    receptor_type == "punishment"):
+                n_synapse_vertices = post_vertex.splitter.n_synapse_vertices
+                sdram += (n_synapse_vertices * len(slices) *
+                          N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD)
+                if in_edge.n_delay_stages:
+                    sdram += (n_synapse_vertices * len(slices) *
+                              N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                              BYTES_PER_WORD)
+            else:
                 sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                           BYTES_PER_WORD)
+                if in_edge.n_delay_stages:
+                    sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                              BYTES_PER_WORD)
     return sdram
 
 
@@ -203,9 +225,32 @@ def write_bitfield_init_data(
         in_edge = proj._projection_edge
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-            for machine_edge in in_edge.machine_edges:
-                if machine_edge.post_vertex.vertex_slice == vertex_slice:
-                    machine_edges.append(machine_edge)
+
+            # If neuromodulation is turned on on this edge then treat
+            # edges with reward or punishment receptors differently
+            post_vertex = in_edge.post_vertex
+            neuromodulation = False
+            for proj_to_post in post_vertex.incoming_projections:
+                dynamics = proj_to_post._synapse_information.synapse_dynamics
+                if isinstance(dynamics, SynapseDynamicsSTDP):
+                    neuromodulation = dynamics.neuromodulation
+
+            receptor_type = in_edge.synapse_information[0].receptor_type
+            if neuromodulation and (receptor_type == "reward" or
+                                    receptor_type == "punishment"):
+                seen_machine_vertices = set()
+                for machine_edge in in_edge.machine_edges:
+                    if machine_edge.pre_vertex in seen_machine_vertices:
+                        continue
+
+                    seen_machine_vertices.add(machine_edge.pre_vertex)
+
+                    if machine_edge.post_vertex.vertex_slice == vertex_slice:
+                        machine_edges.append(machine_edge)
+            else:
+                for machine_edge in in_edge.machine_edges:
+                    if machine_edge.post_vertex.vertex_slice == vertex_slice:
+                        machine_edges.append(machine_edge)
 
     # write n keys max atom map
     spec.write_value(len(machine_edges))
