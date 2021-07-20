@@ -149,19 +149,19 @@ def test_write_data_spec():
     # one_to_one_connector_1 = OneToOneConnector(None)
     # direct_synapse_information_1 = SynapseInformation(
     #     one_to_one_connector_1, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
+    #     False, False, None, SynapseDynamicsStatic(), 0, None, True, 1.5, 1.0)
     # one_to_one_connector_1.set_projection_information(
     #     direct_synapse_information_1)
     # one_to_one_connector_2 = OneToOneConnector(None)
     # direct_synapse_information_2 = SynapseInformation(
     #     one_to_one_connector_2, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
+    #     False, False, None, SynapseDynamicsStatic(), 1, None, True, 2.5, 2.0)
     # one_to_one_connector_2.set_projection_information(
     #     direct_synapse_information_2)
     # all_to_all_connector = AllToAllConnector(False)
     # all_to_all_synapse_information = SynapseInformation(
     #     all_to_all_connector, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
+    #     False, False, None, SynapseDynamicsStatic(), 0, None, True, 4.5, 4.0)
     # all_to_all_connector.set_projection_information(
     #     all_to_all_synapse_information)
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
