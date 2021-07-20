@@ -167,15 +167,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " be run on a single synapse core.  Please ensure the number"
                 " of synapse cores is set to 1")
 
-        # Neuromodulation can only be run on a single synapse core at present
-        # if (isinstance(app_vertex.synapse_dynamics, SynapseDynamicsSTDP) and
-        #         self.__n_synapse_vertices != 1):
-        #     if (app_vertex.synapse_dynamics.neuromodulation):
-        #         raise SynapticConfigurationException(
-        #             "The current implementation of neuromodulated STDP can"
-        #             " only be run on a single synapse core.  Please ensure the"
-        #             " number of synapse cores is set to 1")
-
         # Do some checks to make sure everything is likely to fit
         atoms_per_core = min(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
