@@ -86,12 +86,12 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         post_start = numpy.array(post_slice.start)
         post_shape = numpy.array(post_slice.shape)
         post_end = (post_start + post_shape) - 1
-        spec.write_value(post_start[0], data_type=DataType.INT16)
         spec.write_value(post_start[1], data_type=DataType.INT16)
-        spec.write_value(post_end[0], data_type=DataType.INT16)
+        spec.write_value(post_start[0], data_type=DataType.INT16)
         spec.write_value(post_end[1], data_type=DataType.INT16)
-        spec.write_value(post_shape[0], data_type=DataType.INT16)
+        spec.write_value(post_end[0], data_type=DataType.INT16)
         spec.write_value(post_shape[1], data_type=DataType.INT16)
+        spec.write_value(post_shape[0], data_type=DataType.INT16)
         spec.write_value(len(edge_info), data_type=DataType.UINT32)
 
         # Write spec for each connector

@@ -356,20 +356,20 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(n_bits_col, data_type=DataType.UINT32)
 
         # Write remaining connector details
-        spec.write_value(pre_start[0], data_type=DataType.INT16)
         spec.write_value(pre_start[1], data_type=DataType.INT16)
-        spec.write_value(pre_shape[0], data_type=DataType.INT16)
+        spec.write_value(pre_start[0], data_type=DataType.INT16)
         spec.write_value(pre_shape[1], data_type=DataType.INT16)
-        spec.write_value(kernel_shape[0], data_type=DataType.INT16)
+        spec.write_value(pre_shape[0], data_type=DataType.INT16)
         spec.write_value(kernel_shape[1], data_type=DataType.INT16)
-        spec.write_value(self.__padding_shape[0], data_type=DataType.INT16)
+        spec.write_value(kernel_shape[0], data_type=DataType.INT16)
         spec.write_value(self.__padding_shape[1], data_type=DataType.INT16)
-        spec.write_value(self.__recip(self.__strides[0]),
-                         data_type=DataType.INT16)
+        spec.write_value(self.__padding_shape[0], data_type=DataType.INT16)
         spec.write_value(self.__recip(self.__strides[1]),
                          data_type=DataType.INT16)
-        spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
+        spec.write_value(self.__recip(self.__strides[0]),
+                         data_type=DataType.INT16)
         spec.write_value(self.__recip(ps_y), data_type=DataType.INT16)
+        spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
 
         # Write synapse information
         post_app = edge.post_vertex.app_vertex

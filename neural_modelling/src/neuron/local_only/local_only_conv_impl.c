@@ -35,8 +35,8 @@ typedef struct {
 } lc_coord_t;
 
 typedef struct {
-    lc_dim_t width;
     lc_dim_t height;
+    lc_dim_t width;
 } lc_shape_t;
 
 typedef struct {
@@ -87,6 +87,10 @@ bool local_only_impl_initialise(void *address){
     conv_config* sdram_config = address;
     config = *sdram_config;
 
+    log_info("post_start = %u, %u, post_end = %u, %u, post_shape = %u, %u",
+            config.post_start.col, config.post_start.row,
+            config.post_end.col, config.post_end.row,
+            config.post_shape.width, config.post_shape.height);
     log_info("num connectors = %u", config.n_connectors);
     if (config.n_connectors == 0) {
         return false;
@@ -168,13 +172,13 @@ static inline void do_convolution_operation(
     log_debug("pre row %d, col %d AS post row %d, col %d",
             pre_coord.row, pre_coord.col, post_coord.row, post_coord.col);
 
-    uint32_t k = 0;
-    for (int32_t r = -half_kh; r <= half_kh; r++) {
+    int32_t kw = connector->kernel.width;
+    for (int32_t r = -half_kh, kr = 0; r <= half_kh; r++, kr++) {
         int32_t tmp_row = post_coord.row + r;
         if ((tmp_row < config.post_start.row) || (tmp_row > config.post_end.row)) {
             continue;
         }
-        for (int32_t c = -half_kw; c <= half_kw; c++) {
+        for (int32_t c = -half_kw, kc = 0; c <= half_kw; c++, kc++) {
             int32_t tmp_col = post_coord.col + c;
             if ((tmp_col < config.post_start.col) || (tmp_col > config.post_end.col)) {
                 continue;
@@ -182,7 +186,10 @@ static inline void do_convolution_operation(
 
             // This the neuron id on this core specifically; the neuron
             // will know how to send the spike correctly
-            uint32_t post_index = (tmp_row * config.post_shape.width) + tmp_col;
+            uint32_t post_index =
+                ((tmp_row - config.post_start.row) * config.post_shape.width)
+                    + (tmp_col - config.post_start.col);
+            uint32_t k = (kr * kw) + kc;
             lc_weight_t weight = connector->weights[k++];
             if (weight == 0) {
                 continue;
@@ -262,7 +269,8 @@ void local_only_impl_process_spike(
             core_local_row + connector->pre_start.row,
             core_local_col + connector->pre_start.col
     };
-    log_debug("Received spike %u = %u, %u", spike, core_local_col, core_local_row);
+    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
+            pre_coord.col, pre_coord.col);
 
     // Compute the convolution
     do_convolution_operation(time, pre_coord, connector, ring_buffers);
