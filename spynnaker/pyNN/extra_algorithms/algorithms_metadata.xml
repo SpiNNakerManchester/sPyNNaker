@@ -254,22 +254,6 @@
             <token part="BitFieldData">DataLoaded</token>
         </outputs>
     </algorithm>
-    <algorithm name="GraphEdgeWeightUpdater">
-        <python_module>spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater</python_module>
-        <python_class>GraphEdgeWeightUpdater</python_class>
-        <input_definitions>
-            <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MachineGraph</param_type>
-            </parameter>
-        </input_definitions>
-        <required_inputs>
-            <param_name>machine_graph</param_name>
-        </required_inputs>
-        <outputs>
-            <param_type>MachineGraph</param_type>
-        </outputs>
-    </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
         <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
