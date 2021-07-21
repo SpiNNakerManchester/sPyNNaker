@@ -48,8 +48,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
             machine_graph, placements, executable_finder, routing_infos,
-            executable_targets, read_expander_iobuf,
-            provenance_data_objects=None):
+            executable_targets, read_expander_iobuf):
         """ entrance for routing table compression with bit field
 
         :param routing_tables: routing tables
@@ -82,8 +81,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
                 routing_infos=routing_infos,
-                executable_targets=executable_targets,
-                provenance_data_objects=provenance_data_objects)
+                executable_targets=executable_targets)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
