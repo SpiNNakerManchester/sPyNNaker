@@ -185,19 +185,20 @@ class NeuronRecorder(object):
         return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
                    for index in self.__indexes[variable])
 
-    def _neurons_recording(self, variable, vertex_slice):
+    def _neurons_recording(self, variable, vertex_slice, atoms_shape):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param tuple(int) atoms_shape:
         :rtype: iterable(int)
         """
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
-            return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            return vertex_slice.get_raster_ids(atoms_shape)
         indexes = self.__indexes[variable]
         return [
-            i for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            i for i in vertex_slice.get_raster_ids(atoms_shape)
             if i in indexes]
 
     def get_neuron_sampling_interval(self, variable):
@@ -326,7 +327,8 @@ class NeuronRecorder(object):
             n_items_per_timestep = 1
             if variable in self.__sampling_rates:
                 neurons = self._neurons_recording(
-                    variable, vertex.vertex_slice)
+                    variable, vertex.vertex_slice,
+                    application_vertex.atoms_shape)
                 n_items_per_timestep = len(neurons)
                 indexes.extend(neurons)
             else:
@@ -352,7 +354,9 @@ class NeuronRecorder(object):
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}", label, region, missing_str)
 
-        return pop_level_data, indexes, sampling_interval
+        indexes = numpy.array(indexes)
+        order = numpy.argsort(indexes)
+        return pop_level_data[:, order], indexes[order], sampling_interval
 
     def get_matrix_data(
             self, label, buffer_manager, placements,
@@ -372,7 +376,7 @@ class NeuronRecorder(object):
         :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
         :param int n_machine_time_steps:
         :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(~numpy.ndarray, list(int), float)
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray, float)
         """
         if variable in self.__bitfield_variables:
             msg = ("Variable {} is not supported by get_matrix_data, use "
@@ -428,7 +432,8 @@ class NeuronRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
-            neurons = list(self._neurons_recording(variable, vertex_slice))
+            neurons = numpy.array(self._neurons_recording(
+                variable, vertex_slice, application_vertex.atoms_shape))
             neurons_recording = len(neurons)
             if neurons_recording == 0:
                 continue
@@ -457,16 +462,10 @@ class NeuronRecorder(object):
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)
-                if self.__indexes[variable] is None:
-                    indices = local_indices + vertex_slice.lo_atom
-                    times = record_time[time_indices].reshape((-1))
-                    spike_ids.extend(indices)
-                    spike_times.extend(times)
-                else:
-                    for time_indice, local in zip(time_indices, local_indices):
-                        if local < neurons_recording:
-                            spike_ids.append(neurons[local])
-                            spike_times.append(record_time[time_indice])
+                indices = neurons[local_indices]
+                times = record_time[time_indices].reshape((-1))
+                spike_ids.extend(indices)
+                spike_times.extend(times)
 
         if len(missing_str) > 0:
             logger.warning(
