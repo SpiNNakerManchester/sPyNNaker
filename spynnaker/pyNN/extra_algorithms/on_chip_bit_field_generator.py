@@ -15,7 +15,6 @@
 
 from collections import defaultdict
 import logging
-import os
 import struct
 from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
@@ -28,8 +27,6 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
