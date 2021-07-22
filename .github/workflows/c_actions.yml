@@ -69,7 +69,7 @@ jobs:
         CFLAGS: -fdiagnostics-color=always
 
     - name: Build C code in DEBUG mode
-      run: make SPYNNAKER_DEBUG=DEBUG
+      run: make clean; make SPYNNAKER_DEBUG=DEBUG
       working-directory: neural_modelling
       env:
         CFLAGS: -fdiagnostics-color=always
