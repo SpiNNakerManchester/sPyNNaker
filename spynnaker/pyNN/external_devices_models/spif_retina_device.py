@@ -360,10 +360,19 @@ class SPIFRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
+        # Make sure everything has stopped
+        commands = [_SpiNNFPGARegister.STOP.cmd()]
+
+        # Clear the counters
+        commands.append(_SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.CONFIG_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.DROPPED_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
 
         # Configure the creation of packets from fields to keys
         so = self.__source_order
-        commands = [
+        commands.extend([
             set_field_mask(0, so.p_mask(self.__x_bits, self.__y_bits)),
             set_field_shift(0, so.p_shift(self.__x_bits, self.__y_bits)),
             set_field_mask(1, so.x_mask(self.__x_bits, self.__y_bits)),
@@ -373,7 +382,7 @@ class SPIFRetinaDevice(
             # These are unused but set them to be sure
             set_field_mask(3, 0),
             set_field_shift(3, 0)
-        ]
+        ])
 
         # Configure the output routing key
         commands.append(_SPIFRegister.MP_KEY.cmd(self.__base_key))
@@ -390,13 +399,6 @@ class SPIFRetinaDevice(
         commands.extend(set_input_key(i, 0) for i in range(8, 16))
         commands.extend(set_input_mask(i, 0) for i in range(8, 16))
         commands.extend(set_input_route(i, 0) for i in range(8, 16))
-
-        # Clear the counters
-        commands.append(_SPIFRegister.OUT_PERIPH_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.CONFIG_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.DROPPED_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
 
         # Send the start signal
         commands.append(_SpiNNFPGARegister.START.cmd())
