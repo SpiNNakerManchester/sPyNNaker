@@ -31,7 +31,6 @@ MODELS = IF_curr_exp \
          IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive \
          IF_curr_exp_stdp_mad_nearest_pair_additive \
          IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
-         IF_curr_exp_stdp_mad_pfister_triplet_additive \
          IF_cond_exp_stdp_mad_nearest_pair_additive \
 	     IF_curr_alpha \
          IF_cond_exp_structural_last_neuron_distance_weight \
@@ -43,6 +42,7 @@ MODELS = IF_curr_exp \
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += IF_curr_alpha_stdp_mad_pair_additive \
+	          IF_curr_exp_stdp_mad_pfister_triplet_additive \
               IF_curr_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
               IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
               IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
