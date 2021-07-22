@@ -369,7 +369,10 @@ class SPIFRetinaDevice(
             set_field_mask(1, so.x_mask(self.__x_bits, self.__y_bits)),
             set_field_shift(1, so.x_shift(self.__y_bits)),
             set_field_mask(2, so.y_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(2, so.y_shift(self.__x_bits))
+            set_field_shift(2, so.y_shift(self.__x_bits)),
+            # These are unused but set them to be sure
+            set_field_mask(3, 0),
+            set_field_shift(3, 0)
         ]
 
         # Configure the output routing key
@@ -377,11 +380,16 @@ class SPIFRetinaDevice(
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
-        commands.extend(set_input_key(i, self.__spif_key(i))
-                        for i in range(15, 0, -2))
+        commands.extend(set_input_key(i, self.__spif_key(15 - (i * 2)))
+                        for i in range(8))
         commands.extend(set_input_mask(i, self.__spif_mask)
                         for i in range(8))
         commands.extend(set_input_route(i, i) for i in range(8))
+
+        # Set the other entries to 0
+        commands.extend(set_input_key(i, 0) for i in range(8, 16))
+        commands.extend(set_input_mask(i, 0) for i in range(8, 16))
+        commands.extend(set_input_route(i, 0) for i in range(8, 16))
 
         # Send the start signal
         commands.append(_SpiNNFPGARegister.START.cmd())
@@ -395,6 +403,7 @@ class SPIFRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
+        # Send the stop signal
         return [_SpiNNFPGARegister.STOP.cmd()]
 
     @property
