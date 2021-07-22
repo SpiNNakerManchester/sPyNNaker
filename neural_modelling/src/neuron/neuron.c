@@ -69,7 +69,6 @@ struct neuron_parameters {
 //!     in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool neuron_load_neuron_parameters(void) {
-    log_debug("loading parameters");
     // call the neuron implementation functions to do the work
     // Note the "next" is 0 here because we are using a saved address
     // which has already accounted for the position of the data within
@@ -84,15 +83,12 @@ bool neuron_resume(void) { // EXPORTED
         return false;
     }
 
-    log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters();
 }
 
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_rec_regions_used) {
-    log_debug("neuron_initialise: starting");
-
     // init the TDMA
     void *data_addr = address;
     tdma_processing_initialise(&data_addr);

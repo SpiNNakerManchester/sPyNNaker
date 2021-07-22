@@ -250,8 +250,6 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
 //!        recording data.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
-    log_debug("Initialise: started");
-
     data_specification_metadata_t *ds_regions;
     if (!initialise_common_regions(
             &timer_period, &simulation_ticks, &infinite_run, &time,
@@ -309,7 +307,6 @@ static bool initialise(void) {
     log_debug("setting timer tick callback for %d microseconds", timer_period);
     spin1_set_timer_tick(timer_period);
 
-    log_debug("Initialise: finished");
     return true;
 }
 

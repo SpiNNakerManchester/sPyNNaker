@@ -227,32 +227,32 @@ static inline uint32_t get_local_neuron_id(
 //! \details For debugging
 static inline void print_master_population_table(void) {
 #if log_level >= LOG_DEBUG
-    log_info("Master_population\n");
+    log_debug("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
-        log_info("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
+        log_debug("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
         int count = entry.count;
         int start = entry.start;
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
+            log_debug("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
                     extra.core_mask, extra.mask_shift, extra.n_neurons, extra.n_words);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
             if (addr.address == INVALID_ADDRESS) {
-                log_info("    index %d: INVALID", j);
+                log_debug("    index %d: INVALID", j);
             } else if (!addr.is_single) {
-                log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
+                log_debug("    index %d: offset: %u, address: 0x%08x, row_length: %u",
                     j, get_offset(addr), get_address(addr), get_row_length(addr));
             } else {
-                log_info("    index %d: offset: %u, address: 0x%08x, single",
+                log_debug("    index %d: offset: %u, address: 0x%08x, single",
                     j, addr.address, get_direct_address(addr));
             }
         }
     }
-    log_info("Population table has %u entries", master_population_table_length);
+    log_debug("Population table has %u entries", master_population_table_length);
 #endif
 }
 
@@ -274,12 +274,12 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
         uint32_t end, filter_info_t *filters) {
 #if LOG_LEVEL >= LOG_DEBUG
     // print out the bit field for debug purposes
-    log_info("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
+    log_debug("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
     uint32_t offset = 0;
     for (uint32_t bf_i = start; bf_i < end; bf_i++) {
         uint32_t n_words = get_bit_field_size(filters[bf_i].n_atoms);
         for (uint32_t i = 0; i < n_words; i++) {
-            log_info("0x%08x", connectivity_bit_field[mp_i][offset + i]);
+            log_debug("0x%08x", connectivity_bit_field[mp_i][offset + i]);
         }
         offset += n_words;
     }
@@ -412,7 +412,6 @@ static inline bool population_table_position_in_the_master_pop_array(
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
-    log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
     master_population_table_length = config->table_length;
@@ -473,7 +472,6 @@ bool population_table_get_first_address(
         spike_t spike, synaptic_row_t *row_address,
         size_t *n_bytes_to_transfer) {
     // locate the position in the binary search / array
-    log_debug("Searching for key %d", spike);
 
     // check we don't have a complete miss
     uint32_t position;
@@ -485,7 +483,6 @@ bool population_table_get_first_address(
                 spike, spike);
         return false;
     }
-    log_debug("position = %d", position);
 
     master_population_table_entry entry = master_population_table[position];
 
@@ -512,10 +509,8 @@ bool population_table_get_first_address(
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
-    log_debug("Checking bit field");
     if (connectivity_bit_field != NULL &&
             connectivity_bit_field[position] != NULL) {
-        log_debug("Can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(

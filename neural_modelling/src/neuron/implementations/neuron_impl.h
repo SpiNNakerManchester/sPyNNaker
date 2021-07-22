@@ -62,16 +62,16 @@ static void neuron_impl_store_neuron_parameters(
 #if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print the inputs to the neurons
 //! \param[in] n_neurons: The number of neurons
-void neuron_impl_print_inputs(uint32_t n_neurons);
+static void neuron_impl_print_inputs(uint32_t n_neurons);
 
 //! \brief Print the synapse parameters of the neurons
 //! \param[in] n_neurons: The number of neurons
-void neuron_impl_print_synapse_parameters(uint32_t n_neurons);
+static void neuron_impl_print_synapse_parameters(uint32_t n_neurons);
 
 //! \brief Get the synapse type character for a synapse type
 //! \param[in] synapse_type: The synapse type
 //! \return The descriptor character (sometimes two characters)
-const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type);
+static const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type);
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 #endif // _NEURON_IMPL_H_
