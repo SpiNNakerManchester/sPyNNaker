@@ -391,6 +391,12 @@ class SPIFRetinaDevice(
         commands.extend(set_input_mask(i, 0) for i in range(8, 16))
         commands.extend(set_input_route(i, 0) for i in range(8, 16))
 
+        # Clear the counters
+        commands.append(_SPIFRegister.CONFIG_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.DROPPED_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
+        commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
+
         # Send the start signal
         commands.append(_SpiNNFPGARegister.START.cmd())
 
