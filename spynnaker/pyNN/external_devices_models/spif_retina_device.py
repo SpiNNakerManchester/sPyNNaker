@@ -156,10 +156,6 @@ class SPIFRetinaDevice(
     #: There is 1 bit for polarity in the key
     N_POLARITY_BITS = 1
 
-    #: The bottom bits are used to determine which link to send the source down
-    #: on SPIF
-    SOURCE_FPGA_MASK = 0x7
-
     __slots__ = [
         "__width",
         "__height",
@@ -170,6 +166,7 @@ class SPIFRetinaDevice(
         "__n_squares_per_row",
         "__key_bits",
         "__fpga_mask",
+        "__spif_mask",
         "__fpga_y_shift",
         "__x_index_shift",
         "__y_index_shift",
@@ -248,12 +245,12 @@ class SPIFRetinaDevice(
         self.__fpga_y_shift = x_bits
         self.__x_index_shift = x_bits - sub_x_bits
         self.__y_index_shift = x_bits + (y_bits - sub_y_bits)
+        self.__spif_mask = (self.Y_MASK << self.__fpga_y_shift) + self.X_MASK
         self.__fpga_mask = (
             (key_mask << key_shift) +
             (sub_y_mask << self.__y_index_shift) +
-            (self.Y_MASK << self.__fpga_y_shift) +
             (sub_x_mask << self.__x_index_shift) +
-            self.X_MASK)
+            self.__spif_mask)
         self.__key_bits = base_key << key_shift
 
         # A dictionary to get vertex index from FPGA and slice
@@ -306,7 +303,7 @@ class SPIFRetinaDevice(
         """
         return FPGAConnection(0, 15, None)
 
-    def __sub_square_bits(self, fpga_link_id):
+    def __fpga_indices(self, fpga_link_id):
         # We use every other odd link, so we can work out the "index" of the
         # link in the list as follows, and we can then split the index into
         # x and y components
@@ -347,7 +344,7 @@ class SPIFRetinaDevice(
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]
-        fpga_x, fpga_y = self.__sub_square_bits(fpga_link_id)
+        fpga_x, fpga_y = self.__fpga_indices(fpga_link_id)
         x_index, y_index = self.__sub_square(index)
 
         # Finally we build the key from the components
@@ -380,8 +377,9 @@ class SPIFRetinaDevice(
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
-        commands.extend(set_input_key(i, i) for i in range(8))
-        commands.extend(set_input_mask(i, self.SOURCE_FPGA_MASK)
+        commands.extend(set_input_key(i, self.__spif_key(i))
+                        for i in range(15, 0, -2))
+        commands.extend(set_input_mask(i, self.__spif_mask)
                         for i in range(8))
         commands.extend(set_input_route(i, i) for i in range(8))
 
@@ -389,6 +387,10 @@ class SPIFRetinaDevice(
         commands.append(_SpiNNFPGARegister.START.cmd())
 
         return commands
+
+    def __spif_key(self, index):
+        x, y = self.__fpga_indices(index)
+        return (y << self.__fpga_y_shift) + x
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
