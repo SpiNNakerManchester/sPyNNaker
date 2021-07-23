@@ -364,14 +364,14 @@ class SynapticMatrices(object):
             if app_edge in in_edges_by_app_edge:
                 continue
 
+            # Is there a neuromodulated edge?
+            post_vertex = app_edge.post_vertex
+            neuromodulation = app_edge.is_neuromodulated(post_vertex)
+            receptor_type = app_edge.synapse_information[0].receptor_type
+
             seen_machine_vertices = set()
             # Add all incoming machine edges for this slice
             for machine_edge in app_edge.machine_edges:
-                # Is there a neuromodulated edge?
-                post_vertex = app_edge.post_vertex
-                neuromodulation = app_edge.is_neuromodulated(post_vertex)
-
-                receptor_type = app_edge.synapse_information[0].receptor_type
                 if neuromodulation and (receptor_type == "reward" or
                                         receptor_type == "punishment"):
                     if machine_edge.pre_vertex in seen_machine_vertices:
@@ -392,12 +392,8 @@ class SynapticMatrices(object):
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
                 for machine_edge in delay_edge.machine_edges:
-                    post_vertex = app_edge.post_vertex
-                    neuromodulation = app_edge.is_neuromodulated(post_vertex)
-
-                    rec_type = app_edge.synapse_information[0].receptor_type
-                    if neuromodulation and (rec_type == "reward" or
-                                            rec_type == "punishment"):
+                    if neuromodulation and (receptor_type == "reward" or
+                                            receptor_type == "punishment"):
                         if machine_edge.pre_vertex in seen_machine_vertices:
                             continue
 
