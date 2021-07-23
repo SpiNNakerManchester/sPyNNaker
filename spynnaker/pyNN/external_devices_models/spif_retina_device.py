@@ -29,6 +29,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 import math
 from enum import IntEnum
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 _REPEATS = 2
 _DELAY_BETWEEN_REPEATS = 1
@@ -38,18 +39,6 @@ _LC_KEY = 0xFFFFFE00
 
 #: Base key to send packets to SPIF (add register offset)
 _RC_KEY = 0xFFFFFF00
-
-#: The standard shift and mask for polarity from SPIF inputs
-_POLARITY_MASK = 0x00008000
-_POLARITY_SHIFT = 15
-
-#: The standard shift and mask for the X coordinate from SPIF inputs
-_X_MASK = 0x7FFF0000
-_X_SHIFT = 16
-
-#: The standard shift and mask for the Y coordinate from SPIF  inputs
-_Y_MASK = 0x00007FFF
-_Y_SHIFT = 0
 
 
 class _SPIFRegister(IntEnum):
@@ -149,9 +138,16 @@ class SPIFRetinaDevice(
         "__source_x_shift",
         "__source_x_mask",
         "__source_y_shift",
-        "__source_y_mask"]
+        "__source_y_mask",
+        "__input_p_mask",
+        "__input_p_shift",
+        "__input_y_mask",
+        "__input_y_shift"
+        "__input_x_mask",
+        "__input_x_shift"]
 
-    def __init__(self, base_key, width, height, sub_width, sub_height):
+    def __init__(self, base_key, width, height, sub_width, sub_height,
+                 input_p_shift, input_x_shift, input_y_shift):
         """
 
         :param int base_key: The key that is common over the whole vertex
@@ -163,6 +159,12 @@ class SPIFRetinaDevice(
         :param int sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
+        :param int input_p_shift:
+            The shift to get the polarity from the input keys sent to SPIF
+        :param int input_x_shift:
+            The shift to get the x coordinate from the input keys sent to SPIF
+        :param int input_y_shift:
+            The shift to get the y coordinate from the input keys sent to SPIF
         """
         # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
@@ -237,11 +239,36 @@ class SPIFRetinaDevice(
         self.__x_bits = x_bits
         self.__y_bits = y_bits
 
-        # Generate the |X|P|Y| shifts and masks for x and y
-        self.__source_x_shift = y_bits + 1
-        self.__source_x_mask = ((1 << x_bits) - 1) << (y_bits + 1)
-        self.__source_y_shift = 0
-        self.__source_y_mask = (1 << y_bits) - 1
+        # Generate the shifts and masks to convert the SPIF Ethernet inputs to
+        # PYX format
+        self.__input_p_mask = 1 << input_p_shift
+        self.__input_p_shift = input_p_shift - (x_bits + y_bits)
+        self.__input_x_mask = ((1 << x_bits) - 1) << input_x_shift
+        self.__input_x_shift = input_x_shift
+        self.__input_y_mask = ((1 << y_bits) - 1) << input_y_shift
+        self.__input_y_shift = input_y_shift - x_bits
+
+        # TODO: Temporary check for negative values; to be removed when left
+        # shift is OK
+        if (self.__input_p_shift < 0 or self.__input_x_shift < 0 or
+                self.__input_y_shift < 0):
+            raise SpynnakerException(
+                f"The current settings of input_p_shift={input_p_shift},"
+                f" input_x_shift={input_x_shift} and"
+                f" input_y_shift={input_y_shift} with size {width} x {height}"
+                " results in negative right shift values"
+                f" (p: {self.__input_p_shift}, x: {self.__input_x_shift},"
+                f" y: {self.__input_y_shift}) which are not currently"
+                " supported")
+
+        # Generate the shifts and masks for this source after SPIF has
+        # converted the input to PYX
+        self.__source_x_shift = 0
+        self.__source_x_mask = (1 << x_bits) - 1
+        self.__source_y_shift = x_bits
+        self.__source_y_mask = ((1 << y_bits) - 1) << x_bits
+
+        # Generate the
 
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
@@ -358,12 +385,12 @@ class SPIFRetinaDevice(
         # Note that the output will still be X | P | Y so this has to be
         # handled in the target
         commands.extend([
-            set_field_mask(0, _POLARITY_MASK),
-            set_field_shift(0, _POLARITY_SHIFT - self.__y_bits),
-            set_field_mask(1, _X_MASK),
-            set_field_shift(1, _X_SHIFT - (self.__y_bits + 1)),
-            set_field_mask(2, _Y_MASK),
-            set_field_shift(2, _Y_SHIFT),
+            set_field_mask(0, self.__input_p_mask),
+            set_field_shift(0, self.__input_p_shift),
+            set_field_mask(1, self.__input_x_mask),
+            set_field_shift(1, self.__input_x_shift),
+            set_field_mask(2, self.__input_y_mask),
+            set_field_shift(2, self.__input_y_shift),
             # These are unused but set them to be sure
             set_field_mask(3, 0),
             set_field_shift(3, 0)
