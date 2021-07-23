@@ -16,7 +16,7 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+# from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 
 #: number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -95,11 +95,7 @@ def get_estimated_sdram_for_key_region(incoming_projections):
             # If neuromodulation is turned on on this edge then treat
             # edges with reward or punishment receptors differently
             post_vertex = in_edge.post_vertex
-            neuromodulation = False
-            for proj_to_post in post_vertex.incoming_projections:
-                dynamics = proj_to_post._synapse_information.synapse_dynamics
-                if isinstance(dynamics, SynapseDynamicsSTDP):
-                    neuromodulation = dynamics.neuromodulation
+            neuromodulation = in_edge.is_neuromodulated(post_vertex)
 
             receptor_type = in_edge.synapse_information[0].receptor_type
             if neuromodulation and (receptor_type == "reward" or
@@ -117,6 +113,7 @@ def get_estimated_sdram_for_key_region(incoming_projections):
                 if in_edge.n_delay_stages:
                     sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                               BYTES_PER_WORD)
+
     return sdram
 
 
@@ -229,11 +226,7 @@ def write_bitfield_init_data(
             # If neuromodulation is turned on on this edge then treat
             # edges with reward or punishment receptors differently
             post_vertex = in_edge.post_vertex
-            neuromodulation = False
-            for proj_to_post in post_vertex.incoming_projections:
-                dynamics = proj_to_post._synapse_information.synapse_dynamics
-                if isinstance(dynamics, SynapseDynamicsSTDP):
-                    neuromodulation = dynamics.neuromodulation
+            neuromodulation = in_edge.is_neuromodulated(post_vertex)
 
             receptor_type = in_edge.synapse_information[0].receptor_type
             if neuromodulation and (receptor_type == "reward" or

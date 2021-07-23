@@ -37,8 +37,7 @@ from spynnaker.pyNN.models.neuron.population_neurons_machine_vertex import (
     SDRAM_PARAMS_SIZE as NEURONS_SDRAM_PARAMS_SIZE, NeuronMainProvenance)
 from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
-    SynapseDynamicsSTDP)
+    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
@@ -572,11 +571,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Work out if there is a neuromodulated edge
         app_vertex = self._governed_app_vertex
-        neuromodulation = False
-        for proj in app_vertex.incoming_projections:
-            dynamics = proj._synapse_information.synapse_dynamics
-            if isinstance(dynamics, SynapseDynamicsSTDP):
-                neuromodulation = dynamics.neuromodulation
+        neuromodulation = edge.is_neuromodulated(app_vertex)
 
         # If the incoming edge targets the reward or punishment receptors
         # then it needs to be treated differently

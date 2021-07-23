@@ -25,7 +25,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+# from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -367,13 +367,9 @@ class SynapticMatrices(object):
             seen_machine_vertices = set()
             # Add all incoming machine edges for this slice
             for machine_edge in app_edge.machine_edges:
+                # Is there a neuromodulated edge?
                 post_vertex = app_edge.post_vertex
-
-                neuromodulation = False
-                for proj_in in post_vertex.incoming_projections:
-                    dynamics = proj_in._synapse_information.synapse_dynamics
-                    if isinstance(dynamics, SynapseDynamicsSTDP):
-                        neuromodulation = dynamics.neuromodulation
+                neuromodulation = app_edge.is_neuromodulated(post_vertex)
 
                 receptor_type = app_edge.synapse_information[0].receptor_type
                 if neuromodulation and (receptor_type == "reward" or
@@ -397,12 +393,7 @@ class SynapticMatrices(object):
             if delay_edge is not None:
                 for machine_edge in delay_edge.machine_edges:
                     post_vertex = app_edge.post_vertex
-
-                    neuromodulation = False
-                    for proj in post_vertex.incoming_projections:
-                        dynamics = proj._synapse_information.synapse_dynamics
-                        if isinstance(dynamics, SynapseDynamicsSTDP):
-                            neuromodulation = dynamics.neuromodulation
+                    neuromodulation = app_edge.is_neuromodulated(post_vertex)
 
                     rec_type = app_edge.synapse_information[0].receptor_type
                     if neuromodulation and (rec_type == "reward" or

@@ -20,6 +20,7 @@ from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 
 _DynamicsStructural = None
+_DynamicsSTDP = None
 
 
 def are_dynamics_structural(synapse_dynamics):
@@ -30,6 +31,16 @@ def are_dynamics_structural(synapse_dynamics):
             AbstractSynapseDynamicsStructural)
         _DynamicsStructural = AbstractSynapseDynamicsStructural
     return isinstance(synapse_dynamics, _DynamicsStructural)
+
+
+def are_dynamics_stdp(synapse_dynamics):
+    global _DynamicsSTDP
+    if _DynamicsSTDP is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            SynapseDynamicsSTDP)
+        _DynamicsSTDP = SynapseDynamicsSTDP
+    return isinstance(synapse_dynamics, _DynamicsSTDP)
 
 
 class ProjectionApplicationEdge(
@@ -47,7 +58,8 @@ class ProjectionApplicationEdge(
         # True if slices have been convered to sorted lists
         "__slices_list_mode",
         "__machine_edges_by_slices",
-        "__filter"
+        "__filter",
+        "__is_neuromodulated"
     ]
 
     def __init__(
@@ -84,6 +96,9 @@ class ProjectionApplicationEdge(
         # By default, allow filtering
         self.__filter = True
 
+        # By default, not neuromodulated
+        self.__is_neuromodulated = None
+
     def add_synapse_information(self, synapse_information):
         """
         :param SynapseInformation synapse_information:
@@ -108,6 +123,19 @@ class ProjectionApplicationEdge(
     @delay_edge.setter
     def delay_edge(self, delay_edge):
         self.__delay_edge = delay_edge
+
+    def is_neuromodulated(self, post_vertex):
+        """ Check if neuromodulation is set on any edge into the post_vertex
+
+        :rtype: bool
+        """
+        if self.__is_neuromodulated is None:
+            for proj in post_vertex.incoming_projections:
+                dynamics = proj._synapse_information.synapse_dynamics
+                if are_dynamics_stdp(dynamics):
+                    self.__is_neuromodulated = dynamics.neuromodulation
+
+        return self.__is_neuromodulated
 
     def set_filter(self, do_filter):
         """ Set the ability to filter or not
