@@ -25,6 +25,10 @@
 #include <common/neuron-typedefs.h>
 #include <neuron/send_spike.h>
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
 //! \brief Initialise the particular implementation of the data
 //! \param[in] n_neurons: The number of neurons
 //! \return True if successful

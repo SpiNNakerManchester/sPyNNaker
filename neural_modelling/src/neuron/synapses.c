@@ -153,10 +153,10 @@ static inline void print_ring_buffers(uint32_t time) {
     log_debug("Ring Buffer at %u", time);
 #if LOG_LEVEL >= LOG_DEBUG
     io_printf(IO_BUF, "----------------------------------------\n");
+    uint32_t n_delay_bits = (1 << synapse_delay_bits);
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
             // Determine if this row can be omitted
-            uint32_t n_delay_bits = (1 << synapse_delay_bits);
             for (uint32_t d = 0; d < n_delay_bits; d++) {
                 if (ring_buffers[synapse_row_get_ring_buffer_index(
                         d + time, t, n, synapse_type_index_bits,
