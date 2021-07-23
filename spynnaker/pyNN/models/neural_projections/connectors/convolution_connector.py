@@ -25,6 +25,7 @@ from data_specification.enums.data_type import DataType
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.abstract_models import GlobalShapeInKeys
 
 N_KERNEL_PARAMS = 8
 
@@ -335,6 +336,9 @@ class ConvolutionConnector(AbstractConnector):
         # Get info about things
         pre_start = edge.pre_vertex.vertex_slice.start
         pre_shape = edge.pre_vertex.vertex_slice.shape
+        if isinstance(edge.pre_vertex.app_vertex, GlobalShapeInKeys):
+            pre_start = (0, 0)
+            pre_shape = edge.pre_vertex.app_vertex.atoms_shape
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:

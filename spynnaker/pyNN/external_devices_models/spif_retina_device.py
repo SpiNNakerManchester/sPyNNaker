@@ -26,6 +26,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.abstract_models import GlobalShapeInKeys
 import math
 from enum import Enum, IntEnum
 
@@ -139,7 +140,7 @@ class _SpiNNFPGARegister(IntEnum):
 
 class SPIFRetinaDevice(
         ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
-        AbstractSendMeMulticastCommandsVertex):
+        AbstractSendMeMulticastCommandsVertex, GlobalShapeInKeys):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 
