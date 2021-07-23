@@ -12,12 +12,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-class GlobalShapeInKeys(object):
-    """ Marker interface to indicate that the keys sent by machine vertices
-        of this application vertex will be "global", meaning that the neuron
-        IDs are directly represented in the key space
+class HasShapeKeyFields(object, metaclass=AbstractBase):
+    """ Indicates a source that has keys in fields for each dimension of the
+        source
     """
-    # No state!
+
     __slots__ = []
+
+    @abstractmethod
+    def get_shape_key_fields(self, machine_vertex):
+        """ Get the fields to be used for each dimension in the shape of the
+            given source machine vertex, as a list of mask-and-shift values
+            in the order of the fields
+
+        :rtype: list(tuple(int, int))
+        """

@@ -26,9 +26,9 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.models.abstract_models import GlobalShapeInKeys
+from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 import math
-from enum import Enum, IntEnum
+from enum import IntEnum
 
 _REPEATS = 2
 _DELAY_BETWEEN_REPEATS = 1
@@ -39,47 +39,17 @@ _LC_KEY = 0xFFFFFE00
 #: Base key to send packets to SPIF (add register offset)
 _RC_KEY = 0xFFFFFF00
 
+#: The standard shift and mask for polarity from SPIF inputs
+_POLARITY_MASK = 0x00008000
+_POLARITY_SHIFT = 15
 
-class SourceOrder(Enum):
-    """ The order of the source pixels.  Arguments are the functions to
-        calculate the shifts based on the input number of bits for x and y
-        (p is assumed to be 1 bit).  Noqa is used to allow the functions to
-        be aligned against each other.
-    """
-    #     id  PSHIFT(xbits, y_bits)   XSHIFT(ybits)      YSHIFT(xbits)
-    PXY = (1, lambda xb, yb: xb + yb, lambda yb: yb,     lambda xb: 0)      # noqa
-    XPY = (2, lambda xb, yb: yb,      lambda yb: yb + 1, lambda xb: 0)      # noqa
-    XYP = (3, lambda xb, yb: 0,       lambda yb: yb + 1, lambda xb: 1)      # noqa
-    PYX = (4, lambda xb, yb: xb + yb, lambda yb: 0,      lambda xb: xb)     # noqa
-    YPX = (5, lambda xb, yb: xb,      lambda yb: 0,      lambda xb: xb + 1) # noqa
-    YXP = (6, lambda xb, yb: 0,       lambda yb: 1,      lambda xb: xb + 1) # noqa
+#: The standard shift and mask for the X coordinate from SPIF inputs
+_X_MASK = 0x7FFF0000
+_X_SHIFT = 16
 
-    def __new__(cls, value, p_shift, x_shift, y_shift):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj.__p_shift = p_shift
-        obj.__x_shift = x_shift
-        obj.__y_shift = y_shift
-        return obj
-
-    def p_shift(self, x_bits, y_bits):
-        return self.__p_shift(x_bits, y_bits)
-
-    def x_shift(self, y_bits):
-        return self.__x_shift(y_bits)
-
-    def y_shift(self, x_bits):
-        return self.__y_shift(x_bits)
-
-    def p_mask(self, x_bits, y_bits):
-        return 1 << self.__p_shift(x_bits, y_bits)
-
-    def x_mask(self, x_bits, y_bits):
-        return ((1 << x_bits) - 1) << self.x_shift(y_bits)
-
-    def y_mask(self, x_bits, y_bits):
-        return ((1 << y_bits) - 1) << self.y_shift(x_bits)
+#: The standard shift and mask for the Y coordinate from SPIF  inputs
+_Y_MASK = 0x00007FFF
+_Y_SHIFT = 0
 
 
 class _SPIFRegister(IntEnum):
@@ -140,7 +110,7 @@ class _SpiNNFPGARegister(IntEnum):
 
 class SPIFRetinaDevice(
         ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
-        AbstractSendMeMulticastCommandsVertex, GlobalShapeInKeys):
+        AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
 
@@ -168,17 +138,20 @@ class SPIFRetinaDevice(
         "__key_bits",
         "__fpga_mask",
         "__spif_mask",
+        "__fpga_x_shift",
         "__fpga_y_shift",
         "__x_index_shift",
         "__y_index_shift",
         "__index_by_slice",
         "__base_key",
-        "__source_order",
         "__x_bits",
-        "__y_bits"]
+        "__y_bits",
+        "__source_x_shift",
+        "__source_x_mask",
+        "__source_y_shift",
+        "__source_y_mask"]
 
-    def __init__(self, base_key, width, height, sub_width, sub_height,
-                 source_order):
+    def __init__(self, base_key, width, height, sub_width, sub_height):
         """
 
         :param int base_key: The key that is common over the whole vertex
@@ -190,7 +163,6 @@ class SPIFRetinaDevice(
         :param int sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
-        :param SourceOrder source_order: The order of the fields in the source
         """
         # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
@@ -243,10 +215,14 @@ class SPIFRetinaDevice(
         n_key_bits = BITS_IN_KEY - key_shift
         key_mask = (1 << n_key_bits) - 1
 
-        self.__fpga_y_shift = x_bits
-        self.__x_index_shift = x_bits - sub_x_bits
-        self.__y_index_shift = x_bits + (y_bits - sub_y_bits)
-        self.__spif_mask = (self.Y_MASK << self.__fpga_y_shift) + self.X_MASK
+        # Format of incoming keys is |X|P|Y|
+        self.__fpga_y_shift = 0
+        self.__fpga_x_shift = y_bits + 1
+        self.__x_index_shift = self.__fpga_x_shift + (x_bits - sub_x_bits)
+        self.__y_index_shift = self.__fpga_y_shift + (y_bits - sub_y_bits)
+        self.__spif_mask = (
+            (self.Y_MASK << self.__fpga_y_shift) +
+            (self.X_MASK << self.__fpga_x_shift))
         self.__fpga_mask = (
             (key_mask << key_shift) +
             (sub_y_mask << self.__y_index_shift) +
@@ -258,9 +234,14 @@ class SPIFRetinaDevice(
         self.__index_by_slice = dict()
 
         self.__base_key = base_key
-        self.__source_order = source_order
         self.__x_bits = x_bits
         self.__y_bits = y_bits
+
+        # Generate the |X|P|Y| shifts and masks for x and y
+        self.__source_x_shift = y_bits + 1
+        self.__source_x_mask = ((1 << x_bits) - 1) << (y_bits + 1)
+        self.__source_y_shift = 0
+        self.__source_y_mask = (1 << y_bits) - 1
 
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
@@ -354,7 +335,7 @@ class SPIFRetinaDevice(
             (y_index << self.__y_index_shift) +
             (fpga_y << self.__fpga_y_shift) +
             (x_index << self.__x_index_shift) +
-            fpga_x)
+            (fpga_x << self.__fpga_x_shift))
         return [FixedKeyAndMaskConstraint([
             BaseKeyAndMask(fpga_key, self.__fpga_mask)])]
 
@@ -371,15 +352,18 @@ class SPIFRetinaDevice(
         commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
         commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
 
-        # Configure the creation of packets from fields to keys
-        so = self.__source_order
+        # Configure the creation of packets from fields to keys using the
+        # "standard" input to SPIF, compressing the space down as much as
+        # possible (the standard input uses the full 32-bits of space).
+        # Note that the output will still be X | P | Y so this has to be
+        # handled in the target
         commands.extend([
-            set_field_mask(0, so.p_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(0, so.p_shift(self.__x_bits, self.__y_bits)),
-            set_field_mask(1, so.x_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(1, so.x_shift(self.__y_bits)),
-            set_field_mask(2, so.y_mask(self.__x_bits, self.__y_bits)),
-            set_field_shift(2, so.y_shift(self.__x_bits)),
+            set_field_mask(0, _POLARITY_MASK),
+            set_field_shift(0, _POLARITY_SHIFT - self.__y_bits),
+            set_field_mask(1, _X_MASK),
+            set_field_shift(1, _X_SHIFT - (self.__y_bits + 1)),
+            set_field_mask(2, _Y_MASK),
+            set_field_shift(2, _Y_SHIFT),
             # These are unused but set them to be sure
             set_field_mask(3, 0),
             set_field_shift(3, 0)
@@ -408,7 +392,7 @@ class SPIFRetinaDevice(
 
     def __spif_key(self, index):
         x, y = self.__fpga_indices(index)
-        return (y << self.__fpga_y_shift) + x
+        return (x << self.__fpga_x_shift) + (y << self.__fpga_y_shift)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
@@ -420,3 +404,8 @@ class SPIFRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
+
+    @overrides(HasShapeKeyFields.get_shape_key_fields)
+    def get_shape_key_fields(self, machine_vertex):
+        return ((self.__source_x_mask, self.__source_x_shift),
+                (self.__source_y_mask, self.__source_y_shift))
