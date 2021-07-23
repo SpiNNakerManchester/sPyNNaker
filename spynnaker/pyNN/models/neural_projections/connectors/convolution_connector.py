@@ -27,13 +27,6 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 
-N_KERNEL_PARAMS = 8
-
-
-def shape2word(sw, sh):
-    return numpy.uint32(
-        ((numpy.uint32(sh) & 0xFFFF) << 16) | (numpy.uint32(sw) & 0xFFFF))
-
 
 class ConvolutionConnector(AbstractConnector):
     """
@@ -328,14 +321,12 @@ class ConvolutionConnector(AbstractConnector):
 
         return (
             (6 * BYTES_PER_WORD) +
-            (14 * BYTES_PER_SHORT) +
+            (12 * BYTES_PER_SHORT) +
             (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
             self, spec, edge, r_info, synapse_info, weight_scales):
         # Get info about things
-        pre_start = edge.pre_vertex.vertex_slice.start
-        pre_shape = edge.pre_vertex.vertex_slice.shape
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
         if self.__pool_stride is not None:
@@ -348,14 +339,17 @@ class ConvolutionConnector(AbstractConnector):
         # Write the column and row mask and shifts to extract the column and
         # row from the incoming spike
         if isinstance(edge.pre_vertex.app_vertex, HasShapeKeyFields):
-            (col_mask, col_shift), (row_mask, row_shift) = \
+            (c_start, c_mask, c_shift), (r_start, r_mask, r_shift) = \
                 edge.pre_vertex.app_vertex.get_shape_key_fields(
                     edge.pre_vertex)
-            spec.write_value(col_mask, data_type=DataType.UINT32)
-            spec.write_value(col_shift, data_type=DataType.UINT32)
-            spec.write_value(row_mask, data_type=DataType.UINT32)
-            spec.write_value(row_shift, data_type=DataType.UINT32)
+            pre_start = (c_start, r_start)
+            spec.write_value(c_mask, data_type=DataType.UINT32)
+            spec.write_value(c_shift, data_type=DataType.UINT32)
+            spec.write_value(r_mask, data_type=DataType.UINT32)
+            spec.write_value(r_shift, data_type=DataType.UINT32)
         else:
+            pre_start = edge.pre_vertex.vertex_slice.start
+            pre_shape = edge.pre_vertex.vertex_slice.shape
             n_bits_col = get_n_bits(pre_shape[0])
             col_mask = (1 << n_bits_col) - 1
             n_bits_row = get_n_bits(pre_shape[1])
@@ -368,8 +362,6 @@ class ConvolutionConnector(AbstractConnector):
         # Write remaining connector details
         spec.write_value(pre_start[1], data_type=DataType.INT16)
         spec.write_value(pre_start[0], data_type=DataType.INT16)
-        spec.write_value(pre_shape[1], data_type=DataType.INT16)
-        spec.write_value(pre_shape[0], data_type=DataType.INT16)
         spec.write_value(kernel_shape[1], data_type=DataType.INT16)
         spec.write_value(kernel_shape[0], data_type=DataType.INT16)
         spec.write_value(self.__padding_shape[1], data_type=DataType.INT16)

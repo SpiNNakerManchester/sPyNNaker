@@ -407,5 +407,5 @@ class SPIFRetinaDevice(
 
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, machine_vertex):
-        return ((self.__source_x_mask, self.__source_x_shift),
-                (self.__source_y_mask, self.__source_y_shift))
+        return ((0, self.__source_x_mask, self.__source_x_shift),
+                (0, self.__source_y_mask, self.__source_y_shift))

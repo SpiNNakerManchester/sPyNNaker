@@ -25,8 +25,8 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
     @abstractmethod
     def get_shape_key_fields(self, machine_vertex):
         """ Get the fields to be used for each dimension in the shape of the
-            given source machine vertex, as a list of mask-and-shift values
+            given source machine vertex, as a list of start, mask, shift values
             in the order of the fields
 
-        :rtype: list(tuple(int, int))
+        :rtype: list(tuple(int, int, int))
         """

@@ -56,7 +56,6 @@ typedef struct {
 typedef struct {
     source_key_info key_info;
     lc_coord_t pre_start;
-    lc_shape_t pre_shape;
     lc_shape_t kernel;
     lc_shape_t padding;
     lc_coord_t recip_strides;
