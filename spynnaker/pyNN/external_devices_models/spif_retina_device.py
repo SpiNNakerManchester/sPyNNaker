@@ -142,7 +142,7 @@ class SPIFRetinaDevice(
         "__input_p_mask",
         "__input_p_shift",
         "__input_y_mask",
-        "__input_y_shift"
+        "__input_y_shift",
         "__input_x_mask",
         "__input_x_shift"]
 
