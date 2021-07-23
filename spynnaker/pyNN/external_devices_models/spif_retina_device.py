@@ -217,9 +217,9 @@ class SPIFRetinaDevice(
         n_key_bits = BITS_IN_KEY - key_shift
         key_mask = (1 << n_key_bits) - 1
 
-        # Format of incoming keys is |X|P|Y|
-        self.__fpga_y_shift = 0
-        self.__fpga_x_shift = y_bits + 1
+        # Format of incoming keys is PYX because we make it so below
+        self.__fpga_y_shift = x_bits
+        self.__fpga_x_shift = 0
         self.__x_index_shift = self.__fpga_x_shift + (x_bits - sub_x_bits)
         self.__y_index_shift = self.__fpga_y_shift + (y_bits - sub_y_bits)
         self.__spif_mask = (
