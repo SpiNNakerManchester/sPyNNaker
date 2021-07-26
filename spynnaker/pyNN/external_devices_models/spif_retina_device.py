@@ -248,19 +248,6 @@ class SPIFRetinaDevice(
         self.__input_y_mask = ((1 << y_bits) - 1) << input_y_shift
         self.__input_y_shift = input_y_shift - x_bits
 
-        # TODO: Temporary check for negative values; to be removed when left
-        # shift is OK
-        if (self.__input_p_shift < 0 or self.__input_x_shift < 0 or
-                self.__input_y_shift < 0):
-            raise SpynnakerException(
-                f"The current settings of input_p_shift={input_p_shift},"
-                f" input_x_shift={input_x_shift} and"
-                f" input_y_shift={input_y_shift} with size {width} x {height}"
-                " results in negative right shift values"
-                f" (p: {self.__input_p_shift}, x: {self.__input_x_shift},"
-                f" y: {self.__input_y_shift}) which are not currently"
-                " supported")
-
         # Generate the shifts and masks for this source after SPIF has
         # converted the input to PYX
         self.__source_x_shift = 0
