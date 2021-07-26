@@ -249,6 +249,7 @@ void local_only_impl_process_spike(
     // Lookup the spike, and if found, get the appropriate parts
     if (!key_to_index_lookup(
             spike, &connector, &core_local_col, &core_local_row)) {
+        log_info("Could not find match for spike 0x%08x", spike);
         return;
     }
 
