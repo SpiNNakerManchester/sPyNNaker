@@ -125,6 +125,9 @@ bool local_only_impl_initialise(void *address){
                 i, connectors[i]->key_info.key, connectors[i]->key_info.mask,
                 connectors[i]->key_info.col_mask, connectors[i]->key_info.col_shift,
                 connectors[i]->key_info.row_mask, connectors[i]->key_info.row_shift);
+        log_info("              pre_start=%u, %u, kernel_shape=%u %u",
+                connectors[i]->pre_start.col, connectors[i]->pre_start.row,
+                connectors[i]->kernel.width, connectors[i]->kernel.height);
 
         // Move to the next connector; because it is dynamically sized,
         // this comes after the last weight in the last connector
@@ -258,7 +261,7 @@ void local_only_impl_process_spike(
             core_local_col + connector->pre_start.col
     };
     log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
-            pre_coord.col, pre_coord.col);
+            pre_coord.col, pre_coord.row);
 
     // Compute the convolution
     do_convolution_operation(time, pre_coord, connector, ring_buffers);
