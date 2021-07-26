@@ -29,7 +29,6 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 import math
 from enum import IntEnum
-from spynnaker.pyNN.exceptions import SpynnakerException
 
 _REPEATS = 2
 _DELAY_BETWEEN_REPEATS = 1
@@ -242,11 +241,14 @@ class SPIFRetinaDevice(
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
         self.__input_p_mask = 1 << input_p_shift
-        self.__input_p_shift = input_p_shift - (x_bits + y_bits)
+        self.__input_p_shift = self.__unsigned(
+            input_p_shift - (x_bits + y_bits))
         self.__input_x_mask = ((1 << x_bits) - 1) << input_x_shift
-        self.__input_x_shift = input_x_shift
+        self.__input_x_shift = self.__unsigned(
+            input_x_shift)
         self.__input_y_mask = ((1 << y_bits) - 1) << input_y_shift
-        self.__input_y_shift = input_y_shift - x_bits
+        self.__input_y_shift = self.__unsigned(
+            input_y_shift - x_bits)
 
         # Generate the shifts and masks for this source after SPIF has
         # converted the input to PYX
@@ -255,7 +257,8 @@ class SPIFRetinaDevice(
         self.__source_y_shift = x_bits
         self.__source_y_mask = ((1 << y_bits) - 1) << x_bits
 
-        # Generate the
+    def __unsigned(self, n):
+        return n & 0xFFFFFFFF
 
     @property
     @overrides(ApplicationFPGAVertex.atoms_shape)
