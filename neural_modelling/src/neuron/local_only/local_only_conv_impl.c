@@ -224,7 +224,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
         uint32_t *core_local_col, uint32_t *core_local_row) {
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
-        if ((spike & c->key_info.key) == c->key_info.mask) {
+        if ((spike & c->key_info.mask) == c->key_info.key) {
             *conn = c;
             *core_local_col = (spike & c->key_info.col_mask) >> c->key_info.col_shift;
             *core_local_row = (spike & c->key_info.row_mask) >> c->key_info.row_shift;
