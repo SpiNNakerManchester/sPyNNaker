@@ -325,7 +325,7 @@ class ConvolutionConnector(AbstractConnector):
             (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
-            self, spec, edge, r_info, synapse_info, weight_scales):
+            self, spec, app_edge, vertex_slice, key, mask, weight_scales):
         # Get info about things
         kernel_shape = self.__kernel_weights.shape
         ps_x, ps_y = 1, 1
@@ -333,26 +333,24 @@ class ConvolutionConnector(AbstractConnector):
             ps_x, ps_y = self.__pool_stride
 
         # Write source key info
-        spec.write_value(r_info.first_key, data_type=DataType.UINT32)
-        spec.write_value(r_info.first_mask, data_type=DataType.UINT32)
+        spec.write_value(key, data_type=DataType.UINT32)
+        spec.write_value(mask, data_type=DataType.UINT32)
 
         # Write the column and row mask and shifts to extract the column and
         # row from the incoming spike
-        if isinstance(edge.pre_vertex.app_vertex, HasShapeKeyFields):
+        if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
             (c_start, c_mask, c_shift), (r_start, r_mask, r_shift) = \
-                edge.pre_vertex.app_vertex.get_shape_key_fields(
-                    edge.pre_vertex)
-            pre_start = (c_start, r_start)
+                app_edge.pre_vertex.get_shape_key_fields(vertex_slice)
+            start = (c_start, r_start)
             spec.write_value(c_mask, data_type=DataType.UINT32)
             spec.write_value(c_shift, data_type=DataType.UINT32)
             spec.write_value(r_mask, data_type=DataType.UINT32)
             spec.write_value(r_shift, data_type=DataType.UINT32)
         else:
-            pre_start = edge.pre_vertex.vertex_slice.start
-            pre_shape = edge.pre_vertex.vertex_slice.shape
-            n_bits_col = get_n_bits(pre_shape[0])
+            start = vertex_slice.start
+            n_bits_col = get_n_bits(vertex_slice.shape[0])
             col_mask = (1 << n_bits_col) - 1
-            n_bits_row = get_n_bits(pre_shape[1])
+            n_bits_row = get_n_bits(vertex_slice.shape[1])
             row_mask = ((1 << n_bits_row) - 1) << n_bits_col
             spec.write_value(col_mask, data_type=DataType.UINT32)
             spec.write_value(0, data_type=DataType.UINT32)
@@ -360,8 +358,8 @@ class ConvolutionConnector(AbstractConnector):
             spec.write_value(n_bits_col, data_type=DataType.UINT32)
 
         # Write remaining connector details
-        spec.write_value(pre_start[1], data_type=DataType.INT16)
-        spec.write_value(pre_start[0], data_type=DataType.INT16)
+        spec.write_value(start[1], data_type=DataType.INT16)
+        spec.write_value(start[0], data_type=DataType.INT16)
         spec.write_value(kernel_shape[1], data_type=DataType.INT16)
         spec.write_value(kernel_shape[0], data_type=DataType.INT16)
         spec.write_value(self.__padding_shape[1], data_type=DataType.INT16)
@@ -374,10 +372,9 @@ class ConvolutionConnector(AbstractConnector):
         spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
 
         # Write synapse information
-        post_app = edge.post_vertex.app_vertex
-        pos_synapse_type = post_app.get_synapse_id_by_target(
+        pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__positive_receptor_type)
-        neg_synapse_type = post_app.get_synapse_id_by_target(
+        neg_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
             self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)

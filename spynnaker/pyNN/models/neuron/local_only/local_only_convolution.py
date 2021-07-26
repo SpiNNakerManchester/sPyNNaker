@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy
+from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -71,11 +72,26 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         edge_info = list()
         for incoming in incoming_projections:
             app_edge = incoming._projection_edge
+            # Keep track of all the same source squares, so they can be
+            # merged; this will make sure the keys line up!
+            edges_for_source = defaultdict(list)
             for edge in app_edge.machine_edges:
                 if edge.post_vertex == machine_vertex:
                     r_info = routing_info.get_routing_info_for_edge(edge)
-                    edge_info.append((edge, incoming, r_info))
-        edge_info.sort(key=lambda e: e[2].first_key)
+                    vertex_slice = edge.pre_vertex.vertex_slice
+                    key = (app_edge.pre_vertex, vertex_slice)
+                    edges_for_source[key].append((edge, r_info))
+
+            # Merge edges with the same source
+            for (_, vertex_slice), edge_list in edges_for_source.items():
+                group_key = edge_list[0][1].first_key
+                group_mask = edge_list[0][1].first_mask
+                for edge, r_info in edge_list:
+                    group_key, group_mask = self.__merge_key_and_mask(
+                        group_key, group_mask, r_info.first_key,
+                        r_info.first_mask)
+                edge_info.append(
+                    (incoming, vertex_slice, group_key, group_mask))
 
         size = self.get_parameters_usage_in_bytes(incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
@@ -94,11 +110,19 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(post_shape[0], data_type=DataType.INT16)
         spec.write_value(len(edge_info), data_type=DataType.UINT32)
 
-        # Write spec for each connector
-        for edge, incoming, r_info in edge_info:
+        # Write spec for each connector, sorted by key
+        edge_info.sort(key=lambda e: e[3])
+        for incoming, vertex_slice, key, mask in edge_info:
             s_info = incoming._synapse_information
+            app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
-                spec, edge, r_info, s_info, weight_scales)
+                spec, app_edge, vertex_slice, key, mask, weight_scales)
+
+    def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
+        new_xs = ~(key_a ^ key_b)
+        mask = mask_a & mask_b & new_xs
+        key = (key_a | key_b) & mask
+        return key, mask
 
     @property
     @overrides(AbstractLocalOnly.delay)

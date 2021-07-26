@@ -23,10 +23,12 @@ class HasShapeKeyFields(object, metaclass=AbstractBase):
     __slots__ = []
 
     @abstractmethod
-    def get_shape_key_fields(self, machine_vertex):
+    def get_shape_key_fields(self, vertex_slice):
         """ Get the fields to be used for each dimension in the shape of the
-            given source machine vertex, as a list of start, mask, shift values
+            given source vertex slice, as a list of start, mask, shift values
             in the order of the fields
+
+        :param Slice vertex_slice: The slice of the source vertex
 
         :rtype: list(tuple(int, int, int))
         """
