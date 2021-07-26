@@ -220,26 +220,15 @@ static inline void do_convolution_operation(
     }
 }
 
-static inline bool key_to_index_lookup(uint32_t spike, connector **connector,
+static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
         uint32_t *core_local_col, uint32_t *core_local_row) {
-    uint32_t imin = 0;
-    uint32_t imax = config.n_connectors;
-
-    while (imin < imax) {
-        uint32_t imid = (imax + imin) >> 1;
-        source_key_info entry = connectors[imid]->key_info;
-        if ((spike & entry.mask) == entry.key) {
-            *connector = connectors[imid];
-            *core_local_col = (spike & entry.col_mask) >> entry.col_shift;
-            *core_local_row = (spike & entry.row_mask) >> entry.row_shift;
+    for (uint32_t i = 0; i < config.n_connectors; i++) {
+        connector *c = connectors[i];
+        if ((spike & c->key_info.key) == c->key_info.mask) {
+            *conn = c;
+            *core_local_col = (spike & c->key_info.col_mask) >> c->key_info.col_shift;
+            *core_local_row = (spike & c->key_info.row_mask) >> c->key_info.row_shift;
             return true;
-        } else if (entry.key < spike) {
-
-            // Entry must be in upper part of the table
-            imin = imid + 1;
-        } else {
-            // Entry must be in lower part of the table
-            imax = imid;
         }
     }
     return false;
