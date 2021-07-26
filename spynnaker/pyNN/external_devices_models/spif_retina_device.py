@@ -112,9 +112,6 @@ class SPIFRetinaDevice(
     #: The number of X values per row
     X_PER_ROW = 4
 
-    #: There is 1 bit for polarity in the key
-    N_POLARITY_BITS = 1
-
     __slots__ = [
         "__width",
         "__height",
@@ -138,15 +135,14 @@ class SPIFRetinaDevice(
         "__source_x_mask",
         "__source_y_shift",
         "__source_y_mask",
-        "__input_p_mask",
-        "__input_p_shift",
         "__input_y_mask",
         "__input_y_shift",
         "__input_x_mask",
-        "__input_x_shift"]
+        "__input_x_shift",
+        "__polarity"]
 
     def __init__(self, base_key, width, height, sub_width, sub_height,
-                 input_p_shift, input_x_shift, input_y_shift):
+                 input_x_shift, input_y_shift):
         """
 
         :param int base_key: The key that is common over the whole vertex
@@ -158,8 +154,6 @@ class SPIFRetinaDevice(
         :param int sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
-        :param int input_p_shift:
-            The shift to get the polarity from the input keys sent to SPIF
         :param int input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
         :param int input_y_shift:
@@ -212,7 +206,7 @@ class SPIFRetinaDevice(
         sub_x_mask = (1 << sub_x_bits) - 1
         sub_y_mask = (1 << sub_y_bits) - 1
 
-        key_shift = y_bits + x_bits + self.N_POLARITY_BITS
+        key_shift = y_bits + x_bits
         n_key_bits = BITS_IN_KEY - key_shift
         key_mask = (1 << n_key_bits) - 1
 
@@ -240,9 +234,6 @@ class SPIFRetinaDevice(
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
-        self.__input_p_mask = 1 << input_p_shift
-        self.__input_p_shift = self.__unsigned(
-            input_p_shift - (x_bits + y_bits))
         self.__input_x_mask = ((1 << x_bits) - 1) << input_x_shift
         self.__input_x_shift = self.__unsigned(
             input_x_shift)
@@ -370,18 +361,15 @@ class SPIFRetinaDevice(
         commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
 
         # Configure the creation of packets from fields to keys using the
-        # "standard" input to SPIF, compressing the space down as much as
-        # possible (the standard input uses the full 32-bits of space).
-        # Note that the output will still be X | P | Y so this has to be
-        # handled in the target
+        # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
         commands.extend([
-            set_field_mask(0, self.__input_p_mask),
-            set_field_shift(0, self.__input_p_shift),
-            set_field_mask(1, self.__input_x_mask),
-            set_field_shift(1, self.__input_x_shift),
-            set_field_mask(2, self.__input_y_mask),
-            set_field_shift(2, self.__input_y_shift),
+            set_field_mask(0, self.__input_x_mask),
+            set_field_shift(0, self.__input_x_shift),
+            set_field_mask(1, self.__input_y_mask),
+            set_field_shift(1, self.__input_y_shift),
             # These are unused but set them to be sure
+            set_field_mask(2, 0),
+            set_field_shift(2, 0),
             set_field_mask(3, 0),
             set_field_shift(3, 0)
         ])
