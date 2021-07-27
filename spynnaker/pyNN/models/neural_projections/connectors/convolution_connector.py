@@ -97,12 +97,12 @@ class ConvolutionConnector(AbstractConnector):
             make sense). If a single value is provided, the pooling area will
             be square.  If two values are provided it will be assumed to be
             (pooling_rows, pooling_columns).
-        :type pool_shape: int or tuple(int, int)
+        :type pool_shape: int or tuple(int, int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
             same stride will be used for rows and columns.  If two values are
             provided it will be assumed to be (stride_rows, stride_columns)
-        :type pool_stride: int or tuple(int, int)
+        :type pool_stride: int or tuple(int, int) or None
         :param str positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
             is "excitatory".
@@ -124,6 +124,8 @@ class ConvolutionConnector(AbstractConnector):
         self.__strides = self.__to_2d_shape(strides, "strides")
         self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
+        if self.__pool_stride is None:
+            self.__pool_stride = self.__pool_shape
 
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
