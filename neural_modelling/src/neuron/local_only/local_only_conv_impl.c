@@ -192,7 +192,7 @@ static inline void do_convolution_operation(
                 ((tmp_row - config.post_start.row) * config.post_shape.width)
                     + (tmp_col - config.post_start.col);
             uint32_t k = (kr * kw) + kc;
-            lc_weight_t weight = connector->weights[k++];
+            lc_weight_t weight = connector->weights[k];
             if (weight == 0) {
                 continue;
             }
