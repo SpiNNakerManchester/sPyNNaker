@@ -127,8 +127,10 @@
             <param_name>routing_infos</param_name>
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
-            <token>RoutersInitialized</token>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutersInitialized</token>
+        </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
             <param_type>RouterCompressorProvenanceItems</param_type>
@@ -191,8 +193,10 @@
             <param_name>executable_targets</param_name>
             <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
-            <token>RoutersInitialized</token>
         </required_inputs>
+        <optional_inputs>
+            <token>RoutersInitialized</token>
+        </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
             <param_type>RouterCompressorProvenanceItems</param_type>
