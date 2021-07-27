@@ -16,33 +16,32 @@ import numpy
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_SHORT, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    ConvolutionConnector)
+    PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
 from .abstract_local_only import AbstractLocalOnly
 
 
-class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
+class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
     """
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
-        if not isinstance(synapse_dynamics, LocalOnlyConvolution):
+        if not isinstance(synapse_dynamics, LocalOnlyPoolDense):
             raise SynapticConfigurationException(
-                "All targets of this Population must have a synapse_type of"
-                " Convolution")
+                "All Projections of this Population must have a synapse_type"
+                " of LocalOnlyPoolDense")
         return synapse_dynamics
 
     @overrides(AbstractLocalOnly.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        return "_conv"
+        return "_pool_dense"
 
     @overrides(AbstractLocalOnly.changes_during_run)
     def changes_during_run(self):
@@ -53,16 +52,16 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         n_bytes = 0
         for incoming in incoming_projections:
             s_info = incoming._synapse_information
-            if not isinstance(s_info.connector, ConvolutionConnector):
+            if not isinstance(s_info.connector, PoolDenseConnector):
                 raise SynapticConfigurationException(
-                    "Only ConvolutionConnector can be used with a synapse type"
-                    " of Convolution")
+                    "Only PoolDenseConnector can be used with a synapse type"
+                    " of PoolDense")
             app_edge = incoming._projection_edge
             n_incoming = len(
                 app_edge.pre_vertex.splitter.get_out_going_slices()[0])
             n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
-        return (6 * BYTES_PER_SHORT) + BYTES_PER_WORD + n_bytes
+        return (2 * BYTES_PER_WORD) + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(
@@ -100,15 +99,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Write the common spec
         post_slice = machine_vertex.vertex_slice
-        post_start = numpy.array(post_slice.start)
-        post_shape = numpy.array(post_slice.shape)
-        post_end = (post_start + post_shape) - 1
-        spec.write_value(post_start[1], data_type=DataType.INT16)
-        spec.write_value(post_start[0], data_type=DataType.INT16)
-        spec.write_value(post_end[1], data_type=DataType.INT16)
-        spec.write_value(post_end[0], data_type=DataType.INT16)
-        spec.write_value(post_shape[1], data_type=DataType.INT16)
-        spec.write_value(post_shape[0], data_type=DataType.INT16)
+        n_post = numpy.prod(post_slice.shape)
+        spec.write_value(n_post, data_type=DataType.UINT32)
         spec.write_value(len(edge_info), data_type=DataType.UINT32)
 
         # Write spec for each connector, sorted by key
@@ -117,7 +109,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
-                spec, app_edge, vertex_slice, key, mask, weight_scales)
+                spec, app_edge, vertex_slice, post_slice, key, mask,
+                weight_scales)
 
     def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
         new_xs = ~(key_a ^ key_b)
@@ -157,20 +150,20 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_maximum_positive_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
         # We know the connector doesn't care about the argument
-        max_weight = numpy.amax(conn.kernel_weights)
+        max_weight = numpy.amax(conn.weights)
         return max_weight if max_weight > 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
     def get_minimum_negative_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
         # This is different because the connector happens to support this
-        min_weight = numpy.amin(conn.kernel_weights)
+        min_weight = numpy.amin(conn.weights)
         return min_weight if min_weight < 0 else 0
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
     def get_mean_positive_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
+        pos_weights = conn.weights[conn.weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.mean(pos_weights)
@@ -178,7 +171,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
     def get_mean_negative_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
+        neg_weights = conn.weights[conn.weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.mean(neg_weights)
@@ -186,7 +179,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
     def get_variance_positive_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
-        pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
+        pos_weights = conn.weights[conn.weights > 0]
         if not len(pos_weights):
             return 0
         return numpy.var(pos_weights)
@@ -194,7 +187,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
     def get_variance_negative_weight(self, incoming_projection):
         conn = incoming_projection._synapse_information.connector
-        neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
+        neg_weights = conn.weights[conn.weights < 0]
         if not len(neg_weights):
             return 0
         return numpy.var(neg_weights)

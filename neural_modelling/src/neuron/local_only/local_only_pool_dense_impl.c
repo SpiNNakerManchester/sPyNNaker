@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020 The University of Sussex, Garibaldi Pineda Garcia
+ * Copyright (c) The University of Sussex, Garibaldi Pineda Garcia,
+ * James Turner, James Knight and Thomas Nowotny
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,244 +15,160 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+//! \file DTCM-only convolutional processing implementation
 
-#include "local_only.h"
-#include "local_only_typedefs.h"
+#include "local_only_impl.h"
 #include <stdlib.h>
-#include <common/neuron-typedefs.h>
 #include <debug.h>
 #include "../population_table/population_table.h"
 #include "../neuron.h"
 
-//! \file DTCM-only convolutional implementation of custom rows
+typedef int16_t lc_weight_t;
 
-// how many 32-bit words will we use for pre/post shapes
-#define LEN_SHAPE_DATA (3)
-#define DEC_BITS (11)
+// Dimensions are needed to be signed due to mapping from pre- to post-synaptic.
+typedef int16_t lc_dim_t;
 
-static uint32_t num_connectors = 0;
-static uint32_t *jumps = NULL;
-static int16_t** weights = NULL;
-static uint32_t n_words = 0;
-static lc_neuron_id_t* pre_starts = NULL;
-static lc_neuron_id_t* pre_ends = NULL;
-static int16_t *pre2post_rc = NULL;
-static lc_neuron_id_t n_post = 0;
-static lc_neuron_id_t post_start = 0; // post start
-static lc_neuron_id_t post_end = 0; // post end
-static post_width = 0;
-static uint32_t post_shift = 0;
-static uint32_t post_use_row_msb = 0;
+// Reduce the number of parameters with the following structs
+typedef struct {
+    lc_dim_t row;
+    lc_dim_t col;
+} lc_coord_t;
 
-//! \brief Do a mapping from pre to post 2D spaces to 1D post after pooling
-static inline lc_dim_t local_only_map_pre_id_to_post_id(lc_dim_t pre){
-    return pre2post_rc[pre];
-}
+typedef struct {
+    lc_dim_t height;
+    lc_dim_t width;
+} lc_shape_t;
 
-lc_weight_t from16_to_32(int16_t v){
-//    return (((int32_t) v) << SHIFT);
-    lc_weight_t v32 = (int32_t)(v);
-//    log_info("value int32 %d", v32);
-//    v32 <<= SHIFT;
-    v32 >>= DEC_BITS;
-//    log_info("value int32 %d, %k", v32, (lc_weight_t)(v32));
-    return (v32);
-}
+typedef struct {
+    uint32_t key;
+    uint32_t mask;
+    uint32_t col_mask;
+    uint32_t col_shift;
+    uint32_t row_mask;
+    uint32_t row_shift;
+} source_key_info;
+
+// A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
+// and 14 fractional bits to allow 1 to be properly represented
+#define RECIP_FRACT_BITS 14
+
+// One per connector
+typedef struct {
+    source_key_info key_info;
+    lc_coord_t pre_start;
+    lc_coord_t pre_in_post_start;
+    lc_coord_t pre_in_post_end;
+    lc_shape_t pre_in_post_shape;
+    lc_coord_t recip_pool_strides;
+    uint16_t positive_synapse_type;
+    uint16_t negative_synapse_type;
+    // n_weights = next_even(pre_in_post_shape * n_post)
+    lc_weight_t weights[];
+} connector;
+
+typedef struct {
+    uint32_t n_post;
+    uint32_t n_connectors;
+    // In SDRAM, below here is the following:
+    // connector connectors[n_connectors]
+} conv_config;
+
+// The main configuration data
+static conv_config config;
+
+// The per-connection data
+static connector** connectors;
 
 //! \brief Load the required data into DTCM.
-bool local_only_initialise(address_t sdram_address){
-    log_info("+++++++++++++++++ POOL-DENSE init ++++++++++++++++++++");
-    log_info("SDRAM address is 0x%08x", sdram_address);
-    if (sdram_address == NULL) {
-        log_error("Invalid local-only address in SDRAM.");
-        return false;
-    }
-    // total incoming local-only connections data size
-    n_words = *((uint32_t*)sdram_address++);
-    log_info("num words %d", n_words);
-    if (n_words == 0) {
+bool local_only_impl_initialise(void *address){
+    log_info("+++++++++++++++++ CONV init ++++++++++++++++++++");
+    conv_config* sdram_config = address;
+    config = *sdram_config;
+
+    log_info("num connectors = %u", config.n_connectors);
+    if (config.n_connectors == 0) {
         return false;
     }
 
-    num_connectors = *((uint32_t*)sdram_address++);
-    if (num_connectors == 0 && n_words > 0) {
-        return false;
-    }
-    log_info("num connectors = %u", num_connectors);
+    log_info("num post = %u", config.n_post);
 
-    post_use_row_msb = *((uint32_t*)sdram_address++);
-    log_info("Post use row as msb = %u", post_use_row_msb);
-
-    post_shift = *((uint32_t*)sdram_address++);
-    log_info("Post shift is %u", post_shift);
-
-    pre_starts = (lc_neuron_id_t *)spin1_malloc(
-                                    num_connectors * sizeof(lc_neuron_id_t));
-    if (pre_starts == NULL) {
-        log_error("Can't allocate memory for pre slices starts.");
+    // Allocate space for connector information and pre-to-post table
+    connectors = spin1_malloc(config.n_connectors * sizeof(connectors[0]));
+    if (connectors == NULL) {
+        log_error("Can't allocate memory for connectors");
         return false;
     }
 
-    pre_ends = (lc_neuron_id_t *)spin1_malloc(
-                                    num_connectors * sizeof(lc_neuron_id_t));
-    if (pre_ends == NULL) {
-        log_error("Can't allocate memory for pre slices ends.");
-        return false;
-    }
+    // The first connector comes after the configuration in SDRAM
+    connector *conn = (connector *) &sdram_config[1];
+    for (uint32_t i = 0; i < config.n_connectors; i++) {
+        log_info("Connector %u: key=0x%08x, mask=0x%08x,"
+                " col_mask=0x%08x, col_shift=%u, row_mask=0x%08x, row_shift=%u",
+                i, conn->key_info.key, conn->key_info.mask,
+                conn->key_info.col_mask, conn->key_info.col_shift,
+                conn->key_info.row_mask, conn->key_info.row_shift);
+        log_info("              pre_start=%u,%u, pre_in_post_start=%u,%u,"
+                 " pre_in_post_end=%u,%u, pre_in_post_shape=%u,%u",
+                 conn->pre_start.col, conn->pre_start.row,
+                 conn->pre_in_post_start.col, conn->pre_in_post_start.row,
+                 conn->pre_in_post_end.col, conn->pre_in_post_end.row,
+                 conn->pre_in_post_shape.width, conn->pre_in_post_shape.height);
 
-    weights = (int16_t **)spin1_malloc(num_connectors * sizeof(int16_t *));
-    if (weights == NULL) {
-        log_error(
-            "Could not initialise dense weights pointer (size = %u)",
-            num_connectors);
-        return false;
-//            rt_error(RTE_SWERR);
-    }
+        // We need the number of weights to calculate the size
+        uint32_t n_weights = conn->pre_in_post_shape.width *
+                conn->pre_in_post_shape.height * config.n_post;
+        if (n_weights & 0x1) {
+            n_weights += 1;
+        }
+        uint32_t n_bytes = sizeof(*conn) + (n_weights * sizeof(conn->weights[0]));
 
-
-    uint32_t n_pre = 0;
-    uint32_t n_pre_weights = 0;
-    uint32_t idx = 0;
-    address_t _address = sdram_address;
-    for (uint32_t conn_idx = 0; conn_idx < num_connectors; conn_idx++) {
-        // how many elements are in a single connector data
-        uint32_t n_elem = *((uint32_t*)_address++);
-
-        log_info("CONNECTOR %u\nNum elem %d", conn_idx, n_elem);
-        log_info("sark_heap_max = %u", sark_heap_max(sark.heap, 0));
-
-        uint32_t start = *((uint32_t*)_address++);
-        pre_starts[conn_idx] = start >> 16;
-        pre_ends[conn_idx] = start & 0xFFFF;
-        log_info("Pre %u start is %u", conn_idx, pre_starts[conn_idx]);
-        log_info("Pre %u end is %u", conn_idx, pre_ends[conn_idx]);
-
-        start = *((uint32_t*)_address++);
-        post_start = start >> 16;
-        post_end = start & 0xFFFF;
-        log_info("Post start %d", post_start);
-        log_info("Post end %d", post_end);
-        n_post = post_end - post_start;
-
-        // shapes are 16-bit uints, hopefully enough for future too?
-        uint16_t *p = ((uint16_t*)(_address));
-        // todo: can this be done with just a single memcpy?
-        // todo: does it matter?
-        uint16_t tmp_width = *((lc_dim_t*)(p++));
-        uint16_t tmp_height = *((lc_dim_t*)(p++));
-        log_info("pre width %u, height %u", tmp_width, tmp_height);
-        n_pre = tmp_width * tmp_height;
-        post_width = *((lc_dim_t*)(p++));
-//        tmp_height = *((lc_dim_t*)(p++));
-//        log_info("post pool width %u, height %u", post_width, tmp_height);
-        log_info("n_pre %u, post_width %u", n_pre, post_width);
-        p++;
-        tmp_width = *((lc_dim_t*)(p++));
-        tmp_height = *((lc_dim_t*)(p++));
-        log_info("weights rows %u, cols %u", tmp_height, tmp_width);
-
-//        uint32_t n_weights = tmp_width * tmp_height;
-        n_pre_weights = tmp_height;//pre_ends[conn_idx] - pre_starts[conn_idx];
-        uint32_t n_weights = n_pre_weights * n_post;
-        log_info("n_pre %u, n_post %u", n_pre_weights, n_post);
-        log_info("Num weights %u", n_weights);
-
-        weights[conn_idx] = (int16_t *)spin1_malloc(n_weights * sizeof(int16_t));
-        if (weights[conn_idx] == NULL) {
-            log_error(
-                "Could not initialise dense layer weights (size = %u)",
-                n_weights);
+        // Copy the data from SDRAM
+        connectors[i] = spin1_malloc(n_bytes);
+        if (connectors[i] == NULL) {
+            log_error("Can't allocate %u bytes for connectors[%u]", n_bytes, i);
             return false;
-    //            rt_error(RTE_SWERR);
         }
+        spin1_memcpy(connectors[i], conn, n_bytes);
 
-        uint32_t *p32 = _address + LEN_SHAPE_DATA;
-//        for (lc_dim_t r=0; r < n_pre_weights; r++) {
-//            for (lc_dim_t c=0; c < n_post; c++) {
-        for (uint32_t w_idx = 0; w_idx < n_weights; w_idx++){
-//                uint32_t w_idx = r * tmp_width + c;
-            uint32_t r = (w_idx) / n_post;
-            uint32_t c = (w_idx) % n_post;
-            // memory addressing trickery - basically interpret bits as something else
-            // get address, then convert pointer, then get contents
-            uint32_t v = 0;
-            if (w_idx % 2 == 0){
-                v = (uint32_t)(p32[w_idx/2] >> 16);
-            } else {
-                v = (uint32_t)(p32[w_idx/2] & 0xFFFF);
-            }
-            uint16_t v16 = (uint16_t)(v);
-            int16_t iv16 = *(int16_t *)(&v16);
-
-            weights[conn_idx][w_idx] = iv16;
-//            weights[conn_idx][w_idx] = ((int32_t)(iv16));
-//            weights[conn_idx][w_idx] >>= DEC_BITS;
-
-//                weights[conn_idx][w_idx] = *( (lc_weight_t *)(&p32[w_idx]) );
-                if ((r == 0 && c == 0) ||
-                    (r == (n_pre_weights - 1) && c == (n_post - 1)))
-                {
-                lc_weight_t w32 = from16_to_32(weights[conn_idx][w_idx]);
-                log_info("w(%d, %d)[%u] = fixed-point %k %u %d",
-                r, c,
-
-                w_idx,
-                w32,
-                v16,
-                weights[conn_idx][w_idx]
-                );
-            }
-//            }
-        }
-        _address = p32 + n_weights/2 + (n_weights % 2);
-
-    }
-
-    log_info("\n");
-    log_info("\n Num pre %d", n_pre);
-    uint32_t *p32 = _address;
-    uint32_t n_translations = *p32++;
-    log_info("num translations %d", n_translations);
-
-    pre2post_rc = (int16_t *)spin1_malloc(2 * n_translations * sizeof(int16_t));
-    if (pre2post_rc == NULL) {
-        log_error(
-            "Could not initialise convolution pre ids to post "
-            "coordinate array (size = %u)",
-            n_translations * 2);
-        return false;
-    }
-
-
-//    int post_lim = n_pre/2 + (n_pre%2 > 0);
-    int post_lim = n_translations;
-    for (size_t idx = 0; idx < post_lim; idx++) {
-        uint32_t idx16 = idx * 2;
-        log_info("data %u :> %u", idx, p32[idx]);
-        pre2post_rc[idx16] = (uint16_t)(p32[idx] >> 16);
-        pre2post_rc[idx16 + 1] = (uint16_t)(p32[idx] & 0xFFFF);
-        log_info("pre to post(r,c) %u => %u",
-            idx16, pre2post_rc[idx16]
-        );
-//        if ((idx16 + 1) == n_pre) {
-//            break;
-//        }
-        log_info("pre to post(r,c) %u => %u",
-            idx16+1, pre2post_rc[idx16+1]
-        );
-
+        // Move to the next connector; because it is dynamically sized,
+        // this comes after the last weight in the last connector
+        conn = (connector *) &conn->weights[n_weights];
     }
 
     return true;
 }
 
-//! \brief Check if we found the correct data in SDRAM
-bool local_only_is_compatible(void){
-    return (n_words > 0);
+//! \brief Multiply an integer by a 16-bit reciprocal and return the floored
+//!        integer result
+static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
+    int32_t i = integer;
+    int32_t r = recip;
+    return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
 }
 
-bool local_only_skip_synapse_timestep(void){
-    return (n_words > 0);
+//! \brief Do a mapping from pre to post 2D spaces, we use the standard
+//! padding, kernel, strides from Convolutional Neural Networks
+//! because of the way we're looping through the kernel, we divide the kernel
+//! shape by 2.
+static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre) {
+    lc_coord_t post = pre;
+    post.col = recip_multiply(post.col, connector->recip_pool_strides.col);
+    post.row = recip_multiply(post.row, connector->recip_pool_strides.row);
+    return post;
+}
+
+static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
+        uint32_t *core_local_col, uint32_t *core_local_row) {
+    for (uint32_t i = 0; i < config.n_connectors; i++) {
+        connector *c = connectors[i];
+        if ((spike & c->key_info.mask) == c->key_info.key) {
+            *conn = c;
+            *core_local_col = (spike & c->key_info.col_mask) >> c->key_info.col_shift;
+            *core_local_row = (spike & c->key_info.row_mask) >> c->key_info.row_shift;
+            return true;
+        }
+    }
+    return false;
 }
 
 //! \brief Process incoming spikes. In this implementation we need to:
@@ -260,48 +177,74 @@ bool local_only_skip_synapse_timestep(void){
 //! 3. Obtain the post-ids and weights which will be reached by the spike/kernel
 //!    combination.
 //! 4. Add the weights to the appropriate current buffers
-void local_only_process_spike(uint32_t key, UNUSED uint32_t payload){
-    synaptic_row_t dummy = 1234;
-    uint32_t conn_jump = 0;
-    size_t pre_id_relative = 0;
-    bool success = false;
+void local_only_impl_process_spike(
+        uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
+    connector *connector;
+    uint32_t core_local_col;
+    uint32_t core_local_row;
 
-    // see if spike key can be found in the population table,
-    // get the number of incoming connector (conn_jump) and the
-    // relative (to slice beginning) pre-synaptic neuron id
-    success = population_table_get_first_address(
-        key, &dummy, &pre_id_relative);
+    // Lookup the spike, and if found, get the appropriate parts
+    if (!key_to_index_lookup(
+            spike, &connector, &core_local_col, &core_local_row)) {
+        return;
+    }
 
-    // if the key was found in the pop table, then add current to
-    // post-synaptic neuron
-    if (success) {
-        conn_jump = pre_id_relative >> 16;
-        pre_id_relative &= 0xFFFF;
+    // compute the population-based coordinates
+    lc_coord_t pre_coord = {
+            core_local_row + connector->pre_start.row,
+            core_local_col + connector->pre_start.col
+    };
+    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
+            pre_coord.col, pre_coord.col);
 
+    // Map to post-space (might end up being the same if no pooling)
+    lc_coord_t post_coord = map_pre_to_post(connector, pre_coord);
 
-        // compute the real pre-syn id (population id)
-        lc_neuron_id_t pre_id = pre_id_relative + pre_starts[conn_jump];
-//        log_info("real pre id %u\n", pre_id);
-//        log_info(
-//            "key %u\tpayload %d\tjump %u\tpre_rel %u\tpre abs %u\tsuccess = %u",
-//            key, payload, conn_jump, pre_id_relative, pre_id, success);
+    // Check if in range
+    if (post_coord.col < connector->pre_in_post_start.col ||
+            post_coord.col > connector->pre_in_post_end.col ||
+            post_coord.row < connector->pre_in_post_start.row ||
+            post_coord.row > connector->pre_in_post_end.row) {
+        return;
+    }
 
-        lc_dim_t row = (local_only_map_pre_id_to_post_id(pre_id) * n_post);
+    // Make the coordinates local
+    post_coord.col -= connector->pre_in_post_start.col;
+    post_coord.row -= connector->pre_in_post_start.row;
 
-        // todo: starts at shapes.start and should also have a cap on end!
-        // add the weight to each of the post neurons
-        for (lc_dim_t i=0; i<n_post; i++) {
-              lc_weight_t w = from16_to_32(weights[conn_jump][row + i]);
-//            log_info("post %u, weight fixed-point s1615 %k",
-//                i, weights[conn_jump][row + i]);
-//            if (pre_id >= post_start) {
-                neuron_add_inputs(
-                    0, // only one synapse type to save space
-                    i,
-                    w
-                );//*payload);
-//            }
+    // Work out where in the weights to start from
+    uint32_t weight_pos = ((post_coord.row * connector->pre_in_post_shape.width) +
+            post_coord.col) * config.n_post;
 
+    // Go through the weights and process them into the ring buffers
+    for (uint32_t post_index = 0, k = weight_pos; post_index < config.n_post;
+            post_index++, k++) {
+        lc_weight_t weight = connector->weights[k];
+        if (weight == 0) {
+            continue;
         }
+        uint32_t rb_index = 0;
+        if (weight > 0) {
+            rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                connector->positive_synapse_type, post_index,
+                synapse_type_index_bits, synapse_index_bits,
+                synapse_delay_mask);
+        } else {
+            rb_index = synapse_row_get_ring_buffer_index(time + 1,
+                connector->negative_synapse_type, post_index,
+                synapse_type_index_bits, synapse_index_bits,
+                synapse_delay_mask);
+            weight = -weight;
+        }
+        log_debug("Updating ring_buffers[%u] for post neuron %u with weight %u",
+                rb_index, post_index, weight);
+
+        // Add weight to current ring buffer value, avoiding saturation
+        uint32_t accumulation = ring_buffers[rb_index] + weight;
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test) {
+            accumulation = sat_test - 1;
+        }
+        ring_buffers[rb_index] = accumulation;
     }
 }

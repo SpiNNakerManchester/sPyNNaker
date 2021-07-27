@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_curr_exp_conv
+MODELS = IF_curr_exp_conv\
+         IF_curr_exp_pool_dense
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
