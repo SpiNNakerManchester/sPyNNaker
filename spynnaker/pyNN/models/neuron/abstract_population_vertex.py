@@ -1297,6 +1297,7 @@ class _Stats(object):
         self.steps_per_second = (
             MICRO_TO_SECOND_CONVERSION / machine_time_step())
         self.default_spikes_per_second = default_spikes_per_second
+        self.ring_buffer_sigma = ring_buffer_sigma
 
     def add_projection(self, proj):
         s_dynamics = proj._synapse_information.synapse_dynamics
@@ -1374,5 +1375,6 @@ class _Stats(object):
         w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)
-        w_max = min(w_max, stats.total_weights[s_type])
+        w_max = min(w_max, self.total_weights[s_type])
         w_max = max(w_max, self.biggest_weight[s_type])
+        return w_max
