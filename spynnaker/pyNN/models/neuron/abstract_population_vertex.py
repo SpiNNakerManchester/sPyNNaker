@@ -869,7 +869,8 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :rtype: list(int)
         """
-        stats = _Stats(self.__neuron_impl, self.__spikes_per_second)
+        stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
+                       self.__ring_buffer_sigma)
 
         for proj in incoming_projections:
             stats.add_projection(proj)
@@ -1275,10 +1276,12 @@ class _Stats(object):
         "biggest_weight",
         "rate_stats",
         "steps_per_second",
-        "default_spikes_per_second"
+        "default_spikes_per_second",
+        "ring_buffer_sigma"
     ]
 
-    def __init__(self, neuron_impl, default_spikes_per_second):
+    def __init__(
+            self, neuron_impl, default_spikes_per_second, ring_buffer_sigma):
         self.w_scale = neuron_impl.get_global_weight_scale()
         self.w_scale_sq = self.w_scale ** 2
         n_synapse_types = neuron_impl.get_n_synapse_types()
@@ -1370,6 +1373,6 @@ class _Stats(object):
         rates = self.rate_stats[s_type]
         w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
-            stats.n_items, self.__ring_buffer_sigma)
+            stats.n_items, self.ring_buffer_sigma)
         w_max = min(w_max, stats.total_weights[s_type])
         w_max = max(w_max, self.biggest_weight[s_type])
