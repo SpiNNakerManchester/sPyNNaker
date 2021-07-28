@@ -34,7 +34,8 @@ _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            maximum, minimum, e=e, pi=pi)
 
 
-class DistanceDependentProbabilityConnector(AbstractGenerateConnectorOnHost):
+class DistanceDependentProbabilityConnector(
+        AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections using a distribution which varies with distance.
     """
 
