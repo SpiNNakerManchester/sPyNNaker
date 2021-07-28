@@ -28,19 +28,23 @@ def do_run():
     # FPGA Retina
     retina_device = p.external_devices.ExternalFPGARetinaDevice
 
-    p.Population(
+    src_1 = p.Population(
         16384, retina_device,
         {'spinnaker_link_id': 0, 'retina_key': 0x5,
          'mode': retina_device.MODE_128,
          'polarity': retina_device.DOWN_POLARITY},
         label='External spinnaker link')
 
-    p.Population(
+    src_2 = p.Population(
         16384, retina_device,
         {'spinnaker_link_id': 0, 'retina_key': 0x5,
          'mode': retina_device.MODE_128,
          'polarity': retina_device.DOWN_POLARITY},
         label='External spinnaker link 2')
+
+    tgt = p.Population(1, p.IF_curr_exp())
+    p.Projection(src_1, tgt, p.AllToAllConnector())
+    p.Projection(src_2, tgt, p.AllToAllConnector())
 
     p.run(1000)
     p.end()
