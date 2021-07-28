@@ -25,7 +25,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     def get_parameters_usage_in_bytes(self, incoming_projections):
         """ Get the size of the parameters in bytes
 
-        :param list(Projection) incoming_projections:
+        :param list(~spynnaker.pyNN.models.projection.Projection)\
+                incoming_projections:
             The projections to get the size of
         :rtype: int
         """
@@ -40,7 +41,8 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
             The specification to write to
         :param int region: region ID to write to
         :param RoutingInfo routing_info: Information about routing keys
-        :param list(Projection) incoming_projections:
+        :param list(~spynnaker.pyNN.models.projection.Projection) \
+                incoming_projections:
             List of projections that target this core
         :param MachineVertex machine_vertex: The machine vertex being targeted
         :param list(float) weight_scales: Scale factors to apply to the weights

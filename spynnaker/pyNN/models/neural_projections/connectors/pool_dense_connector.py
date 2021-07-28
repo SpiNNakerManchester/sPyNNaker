@@ -33,12 +33,6 @@ class PoolDenseConnector(AbstractConnector):
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
     through a (kernel) set of weights and/or delays.
-
-    .. admonition:: TODO
-
-        Should these include `allow_self_connections` and `with_replacement`?
-
-        TODO: ONLY AVERAGE POOLING IS ALLOWED AT THIS POINT!
     """
 
     __slots__ = [
@@ -57,12 +51,12 @@ class PoolDenseConnector(AbstractConnector):
         :param weights:
             The synaptic strengths
             Can be:
-                * single value: the same value will be used for all weights
-                * list: the total number of elements must be
-                        (num after pooling * num post)
-                * numpy.ndarray: As above for list
-                * RandomDistribution: weights will be drawn at random
-        :type kernel_weights:
+            * single value: the same value will be used for all weights
+            * list: the total number of elements must be\
+                    (num after pooling * num post)
+            * numpy.ndarray: As above for list
+            * RandomDistribution: weights will be drawn at random
+        :type weights:
             int or float or list or numpy.ndarray or RandomDistribution
         :param pool_shape:
             Area of pooling, only average pooling is supported (and seems to

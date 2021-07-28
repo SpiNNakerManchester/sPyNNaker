@@ -23,7 +23,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
     def get_positive_synapse_index(self, incoming_projection):
         """ Get the synapse type that positive weights will arrive at
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: int
         """
 
@@ -31,7 +32,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
     def get_negative_synapse_index(self, incoming_projection):
         """ Get the synapse type that negative weights will arrive at
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: int
         """
 
@@ -40,7 +42,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the maximum likely positive weight.
             Note this must be a value >= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: float
         """
 
@@ -49,7 +52,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the minimum likely negative weight.
             Note this must be a value <= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: int
         """
 
@@ -58,7 +62,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the mean of the positive weights.
             Note this must be a value >= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: float
         """
 
@@ -67,7 +72,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the mean of the negative weights.
             Note this must be a value <= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: float
         """
 
@@ -76,7 +82,8 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the variance of the positive weights.
             Note this must be a value >= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: float
         """
 
@@ -85,6 +92,7 @@ class AbstractSupportsSignedWeights(object, metaclass=AbstractBase):
         """ Get the variance of the negative weights.
             Note this must be a value <= 0.
 
-        :param Projection incoming_projection: The projection targeted
+        :param ~spynnaker.pyNN.models.projection.Projection\
+            incoming_projection: The projection targeted
         :rtype: float
         """

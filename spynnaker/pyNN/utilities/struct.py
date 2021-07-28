@@ -72,8 +72,9 @@ class Struct(object):
         :type values:
             list(int or float or list(int) or list(float) or
             ~spinn_utilities.ranged.RangedList)
-        :param int offset: The offset into each of the values where to start
-        :param int array_size: The number of structs to generate
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to get values for
+        :param tuple(int) atoms_shape: The shape of the atoms in the vertex
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Create an array to store values in

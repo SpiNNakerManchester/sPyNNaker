@@ -33,12 +33,6 @@ class ConvolutionConnector(AbstractConnector):
     Where the pre- and post-synaptic populations are considered as a 2D\
     array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
     through a (kernel) set of weights and/or delays.
-
-    .. admonition:: TODO
-
-        Should these include `allow_self_connections` and `with_replacement`?
-
-        TODO: ONLY AVERAGE POOLING IS ALLOWED AT THIS POINT!
     """
 
     __slots__ = [
@@ -60,14 +54,14 @@ class ConvolutionConnector(AbstractConnector):
         :param kernel_weights:
             The synaptic strengths, shared by neurons in the post population.
             Can be:
-                * single value: kernel_shape must be provided;
-                                the same value will be used for all weights
-                * simple list: kernel_shape must be provided; the list must
-                               be sized shape width * height
-                * 2D list: If kernel_shape is provided, it must match
-                * numpy.ndarray: As above for simple or 2D list
-                * RandomDistribution: kernel_shape must be provided; weights
-                                      will be drawn from the distribution
+            * single value: kernel_shape must be provided;\
+                            the same value will be used for all weights
+            * simple list: kernel_shape must be provided; the list must\
+                           be sized shape width * height
+            * 2D list: If kernel_shape is provided, it must match
+            * numpy.ndarray: As above for simple or 2D list
+            * RandomDistribution: kernel_shape must be provided; weights\
+                                  will be drawn from the distribution
         :type kernel_weights:
             int or list or 2D-list or numpy.ndarray or RandomDistribution
         :param kernel_shape:

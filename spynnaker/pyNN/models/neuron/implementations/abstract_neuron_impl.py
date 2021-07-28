@@ -155,6 +155,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
             The holder of the state variables
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to generate parameters for
+        :param tuple(int) atoms_shape: The shape of the atoms in the vertex
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
 
