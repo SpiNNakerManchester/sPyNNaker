@@ -129,8 +129,6 @@ class SPIFRetinaDevice(
         "__y_index_shift",
         "__index_by_slice",
         "__base_key",
-        "__x_bits",
-        "__y_bits",
         "__source_x_shift",
         "__source_x_mask",
         "__source_y_shift",
@@ -229,8 +227,6 @@ class SPIFRetinaDevice(
         self.__index_by_slice = dict()
 
         self.__base_key = base_key
-        self.__x_bits = x_bits
-        self.__y_bits = y_bits
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format

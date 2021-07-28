@@ -56,8 +56,6 @@ class Projection(object):
     """
     # pylint: disable=redefined-builtin
     __slots__ = [
-        "__has_retrieved_synaptic_list_from_machine",
-        "__host_based_synapse_list",
         "__projection_edge",
         "__requires_mapping",
         "__synapse_information",
@@ -88,8 +86,6 @@ class Projection(object):
 
         sim = get_simulator()
         self.__projection_edge = None
-        self.__host_based_synapse_list = None
-        self.__has_retrieved_synaptic_list_from_machine = False
         self.__requires_mapping = True
         self.__label = label
 

@@ -43,6 +43,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_vertex_executable_suffix(self):
         return "_pool_dense"
 
+    @property
     @overrides(AbstractLocalOnly.changes_during_run)
     def changes_during_run(self):
         return False

@@ -21,9 +21,7 @@ class DelayBlock(object):
     """ A block of delays for a vertex.
     """
     __slots__ = [
-        "__delay_block",
-        "__delay_per_stage",
-        "__n_delay_stages"]
+        "__delay_block"]
 
     def __init__(self, n_delay_stages, delay_per_stage, vertex_slice):
         """
@@ -31,8 +29,6 @@ class DelayBlock(object):
         :param int delay_per_stage:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        self.__delay_per_stage = delay_per_stage
-        self.__n_delay_stages = n_delay_stages
         n_words_per_row = int(math.ceil(vertex_slice.n_atoms / 32.0))
         self.__delay_block = numpy.zeros(
             (n_delay_stages, n_words_per_row), dtype="uint32")

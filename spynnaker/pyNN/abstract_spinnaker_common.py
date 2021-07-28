@@ -38,10 +38,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
     __slots__ = [
-        "__command_edge_count",
-        "__edge_count",
         "__id_counter",
-        "__live_spike_recorder",
         "__min_delay",
         "__neurons_per_core_set",
         "_populations",
@@ -98,13 +95,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # pynn population objects
         self._populations = []
         self._projections = []
-        self.__edge_count = 0
         self.__id_counter = 0
-
-        # the number of edges that are associated with commands being sent to
-        # a vertex
-        self.__command_edge_count = 0
-        self.__live_spike_recorder = dict()
 
         # create XML path for where to locate sPyNNaker related functions when
         # using auto pause and resume

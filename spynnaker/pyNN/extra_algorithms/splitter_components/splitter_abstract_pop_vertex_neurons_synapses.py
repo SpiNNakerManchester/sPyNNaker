@@ -16,6 +16,7 @@ import math
 import logging
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
@@ -62,7 +63,7 @@ from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # The maximum number of bits for the ring buffer index that are likely to
 # fit in DTCM (14-bits = 16,384 16-bit ring buffer entries = 32Kb DTCM
@@ -248,7 +249,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     max_crs -= 1
 
             if remaining_poisson_vertices:
-                logger.warn(
+                logger.warning(
                     f"Vertex {label} is using multicast for"
                     f" {len(remaining_poisson_vertices)} one-to-one Poisson"
                     " sources as not enough cores exist to put them on the"

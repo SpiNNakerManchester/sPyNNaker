@@ -25,7 +25,7 @@ class ArrayConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         of the neurons in the pre- and post-populations.
     """
 
-    __slots = [
+    __slots__ = [
         "__array", "__array_dims", "__n_total_connections"]
 
     def __init__(self, array, safe=True, callback=None, verbose=False):

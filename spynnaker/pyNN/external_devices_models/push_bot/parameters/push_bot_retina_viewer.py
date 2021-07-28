@@ -61,7 +61,6 @@ class PushBotRetinaViewer(Thread):
         self.__display_max = display_max
         self.__frame_time_ms = frame_time_ms
         self.__image = None
-        self.__ani = None
 
         # Open socket to receive UDP
         self._init_socket(port)
@@ -140,7 +139,7 @@ class PushBotRetinaViewer(Thread):
             vmax=self.__display_max)
 
         # Play animation
-        self.__ani = self.__animation.FuncAnimation(
+        self.__animation.FuncAnimation(
             fig, (lambda _frame: self._updatefig()),
             interval=self.__frame_time_ms, blit=True)
         self.__pyplot.show()

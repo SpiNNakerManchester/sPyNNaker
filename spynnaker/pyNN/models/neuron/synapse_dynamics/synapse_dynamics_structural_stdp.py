@@ -38,8 +38,6 @@ class SynapseDynamicsStructuralSTDP(
     __slots__ = [
         # Frequency of rewiring (Hz)
         "__f_rew",
-        # Period of rewiring (ms)
-        "__p_rew",
         # Initial weight assigned to a newly formed connection
         "__initial_weight",
         # Delay assigned to a newly formed connection
@@ -50,16 +48,11 @@ class SynapseDynamicsStructuralSTDP(
         "__seed",
         # Holds initial connectivity as defined via connector
         "__connections",
-        # Maximum synaptic row length for created synapses
-        "__actual_row_max_length",
         # The actual type of weights: static through the simulation or those
         # that can be change through STDP
         "__weight_dynamics",
         # Shared RNG seed to be written on all cores
         "__seeds",
-        # Stores the actual SDRAM usage (value obtained only after writing spec
-        # is finished)
-        "__actual_sdram_usage",
         # The RNG used with the seed that is passed in
         "__rng",
         # The partner selection rule
@@ -122,7 +115,6 @@ class SynapseDynamicsStructuralSTDP(
         self.__formation = formation
         self.__elimination = elimination
         self.__f_rew = float(f_rew)
-        self.__p_rew = 1. / self.__f_rew
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
@@ -130,13 +122,8 @@ class SynapseDynamicsStructuralSTDP(
         self.__seed = seed
         self.__connections = dict()
 
-        self.__actual_row_max_length = self.__s_max
-
         self.__rng = numpy.random.RandomState(seed)
         self.__seeds = dict()
-
-        # Addition information -- used for SDRAM usage
-        self.__actual_sdram_usage = dict()
 
     @overrides(SynapseDynamicsSTDP.merge)
     def merge(self, synapse_dynamics):
@@ -183,12 +170,6 @@ class SynapseDynamicsStructuralSTDP(
         return (super().get_vertex_executable_suffix() +
                 SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
                     self))
-
-    @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
-    def get_n_words_for_plastic_connections(self, n_connections):
-        value = super().get_n_words_for_plastic_connections(n_connections)
-        self.__actual_row_max_length = value
-        return value
 
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(

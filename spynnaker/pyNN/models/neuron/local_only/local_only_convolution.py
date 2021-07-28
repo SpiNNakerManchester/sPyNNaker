@@ -44,6 +44,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     def get_vertex_executable_suffix(self):
         return "_conv"
 
+    @property
     @overrides(AbstractLocalOnly.changes_during_run)
     def changes_during_run(self):
         return False
