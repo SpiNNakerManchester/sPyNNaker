@@ -1,0 +1,11 @@
+#MEANFIELD_MODEL_H = $(MEANFIELD_DIR)/meanfield/models/meanfield_model.h
+#CONFIG_H = $(MEANFIELD_DIR)/meanfield/models/config.h
+#MATHSBOX_H = $(MEANFIELD_DIR)/meanfield/models/mathsbox.h
+#MEANFIELD_H = $(MEANFIELD_DIR)/meanfield/meanfield.h
+#MEANFIELD = $(MEANFIELD_DIR)/meanfield/meanfield.c
+#MEANFIELD_RECORDING_H = $(MEANFIELD_DIR)/meanfield/meanfield_recording.h
+#MEANFIELD_RECORDING = $(MEANFIELD_DIR)/meanfield/meanfield_recording.c
+#C_MAINS = $(MEANFIELD_DIR)/meanfield/c_main.c
+
+#TIMING_DEPENDENCE_H = $(MEANFIELD_DIR)/meanfield/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.h
+#WEIGHT_DEPENDENCE_H = $(MEANFIELD_DIR)/meanfield/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h

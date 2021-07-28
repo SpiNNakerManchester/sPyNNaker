@@ -95,6 +95,9 @@ from spynnaker.pyNN.models.spike_source.spike_source_array import (
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.spike_source.spike_source_poisson import (
     SpikeSourcePoisson)
+# noinspection PyUnresolvedReferences
+from spynnaker.pyNN.models.neuron.builds.meanfield_base import (
+    MeanfieldBase as Meanfield)
 
 # pops
 # noinspection PyUnresolvedReferences
