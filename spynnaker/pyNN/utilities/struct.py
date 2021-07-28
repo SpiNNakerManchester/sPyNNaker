@@ -16,7 +16,6 @@
 import numpy
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
-from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
@@ -88,8 +87,12 @@ class Struct(object):
                 data["f" + str(i)] = data_value
             else:
                 indices = vertex_slice.get_raster_ids(atoms_shape)
-                data_value = [convert_to(values[int(j)], data_type)
-                              for j in indices]
+                in_values = [
+                    values[int(j)]
+                    if not isinstance(values[int(j)], RandomDistribution)
+                    else values[int(j)].next() for j in indices]
+                data_value = [convert_to(v, data_type)
+                              for v in in_values]
                 data["f" + str(i)] = data_value
 
         # Pad to whole number of uint32s
