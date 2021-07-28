@@ -142,7 +142,7 @@ class SPIFRetinaDevice(
         "__polarity"]
 
     def __init__(self, base_key, width, height, sub_width, sub_height,
-                 input_x_shift, input_y_shift):
+                 input_x_shift=16, input_y_shift=0):
         """
 
         :param int base_key: The key that is common over the whole vertex

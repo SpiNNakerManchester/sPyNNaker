@@ -32,6 +32,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 
 
 def _is_multidimensional(app_vertex):
@@ -86,7 +87,8 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        if _is_multidimensional(app_vertex):
+        if _is_multidimensional(app_vertex) or isinstance(
+                app_vertex.synapse_dynamics, AbstractLocalOnly):
             app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
         else:
             app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
