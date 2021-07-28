@@ -39,7 +39,7 @@ def do_run():
     src_2 = p.Population(
         16384, retina_device,
         {'spinnaker_link_id': 0, 'board_address': "127.0.4.8",
-         'retina_key': 0x5,
+         'retina_key': 0x6,
          'mode': retina_device.MODE_128,
          'polarity': retina_device.DOWN_POLARITY},
         label='External spinnaker link 2')
