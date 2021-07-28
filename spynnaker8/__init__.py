@@ -134,9 +134,9 @@ __all__ = [
     'FixedNumberPreConnector', 'FixedProbabilityConnector',
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
     'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
-    'SmallWorldConnector', 'ConvolutionConnector',
+    'SmallWorldConnector', 'ConvolutionConnector', 'PoolDenseConnector',
     # Local-only
-    'Convolution',
+    'Convolution', 'PoolDense',
     # synapse structures
     'StaticSynapse',
     # plastic stuff
