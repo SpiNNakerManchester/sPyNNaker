@@ -20,6 +20,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.struct import Struct
+from pacman.model.graphs.common.slice import Slice
 
 
 class AbstractNeuronModel(
@@ -79,11 +80,12 @@ class AbstractNeuronModel(
         return numpy.zeros(0, dtype="uint32")
 
     @overrides(AbstractStandardNeuronComponent.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice, ts):
+    def get_data(
+            self, parameters, state_variables, vertex_slice, atoms_shape, ts):
         super_data = super().get_data(
-            parameters, state_variables, vertex_slice, ts)
+            parameters, state_variables, vertex_slice, atoms_shape, ts)
         values = self.get_global_values(ts)
-        global_data = self.__global_struct.get_data(values)
+        global_data = self.__global_struct.get_data(values, Slice(0, 1), (1,))
         return numpy.concatenate([global_data, super_data])
 
     @overrides(AbstractStandardNeuronComponent.read_data)

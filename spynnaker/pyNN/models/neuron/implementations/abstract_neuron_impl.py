@@ -146,7 +146,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, atoms_shape):
         """ Get the data *to be written to the machine* for this model
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:

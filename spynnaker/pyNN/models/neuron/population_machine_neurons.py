@@ -209,7 +209,7 @@ class PopulationMachineNeurons(
         # Write the neuron parameters
         neuron_data = self._app_vertex.neuron_impl.get_data(
             self._app_vertex.parameters, self._app_vertex.state_variables,
-            self._vertex_slice)
+            self._vertex_slice, self._app_vertex.atoms_shape)
         spec.write_array(neuron_data)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)

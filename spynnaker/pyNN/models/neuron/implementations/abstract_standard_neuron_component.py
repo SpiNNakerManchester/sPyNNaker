@@ -100,7 +100,8 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
             ~spinn_utilities.ranged.RangedList)
         """
 
-    def get_data(self, parameters, state_variables, vertex_slice, ts):
+    def get_data(
+            self, parameters, state_variables, vertex_slice, atoms_shape, ts):
         """ Get the data *to be written to the machine* for this model.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
@@ -112,8 +113,7 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         values = self.get_values(parameters, state_variables, vertex_slice, ts)
-        return self.struct.get_data(
-            values, vertex_slice.lo_atom, vertex_slice.n_atoms)
+        return self.struct.get_data(values, vertex_slice, atoms_shape)
 
     @abstractmethod
     def update_values(self, values, parameters, state_variables):
