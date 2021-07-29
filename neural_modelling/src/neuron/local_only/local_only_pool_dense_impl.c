@@ -42,28 +42,34 @@ typedef struct {
 typedef struct {
     uint32_t key;
     uint32_t mask;
-    uint32_t col_mask;
-    uint32_t col_shift;
-    uint32_t row_mask;
-    uint32_t row_shift;
 } source_key_info;
 
 // A reciprocal of a 16-bit signed integer will have 1 sign bit, 1 integer bit
 // and 14 fractional bits to allow 1 to be properly represented
 #define RECIP_FRACT_BITS 14
 
+// Information about each dimension
+typedef struct {
+    uint32_t mask;
+    uint32_t shift;
+    uint16_t pre_start;
+    uint16_t pre_in_post_start;
+    uint16_t pre_in_post_end;
+    uint16_t pre_in_post_shape;
+    uint16_t recip_pool_stride;
+    uint16_t _PADDING;
+} dimension;
+
 // One per connector
 typedef struct {
     source_key_info key_info;
-    lc_coord_t pre_start;
-    lc_coord_t pre_in_post_start;
-    lc_coord_t pre_in_post_end;
-    lc_shape_t pre_in_post_shape;
-    lc_coord_t recip_pool_strides;
+    uint32_t n_dims;
+    uint32_t n_weights;
     uint16_t positive_synapse_type;
     uint16_t negative_synapse_type;
-    // n_weights = next_even(pre_in_post_shape * n_post)
-    lc_weight_t weights[];
+    dimension dimensions[];
+    // Also follows:
+    // lc_weight_t weights[];
 } connector;
 
 typedef struct {
@@ -78,6 +84,10 @@ static conv_config config;
 
 // The per-connection data
 static connector** connectors;
+
+static lc_weight_t *get_weights(connector *conn) {
+    return (lc_weight_t *) &conn->dimensions[conn->n_dims];
+}
 
 //! \brief Load the required data into DTCM.
 bool local_only_impl_initialise(void *address){
@@ -102,25 +112,11 @@ bool local_only_impl_initialise(void *address){
     // The first connector comes after the configuration in SDRAM
     connector *conn = (connector *) &sdram_config[1];
     for (uint32_t i = 0; i < config.n_connectors; i++) {
-        log_info("Connector %u: key=0x%08x, mask=0x%08x,"
-                " col_mask=0x%08x, col_shift=%u, row_mask=0x%08x, row_shift=%u",
-                i, conn->key_info.key, conn->key_info.mask,
-                conn->key_info.col_mask, conn->key_info.col_shift,
-                conn->key_info.row_mask, conn->key_info.row_shift);
-        log_info("              pre_start=%u,%u, pre_in_post_start=%u,%u,"
-                 " pre_in_post_end=%u,%u, pre_in_post_shape=%u,%u",
-                 conn->pre_start.col, conn->pre_start.row,
-                 conn->pre_in_post_start.col, conn->pre_in_post_start.row,
-                 conn->pre_in_post_end.col, conn->pre_in_post_end.row,
-                 conn->pre_in_post_shape.width, conn->pre_in_post_shape.height);
+        log_info("Connector %u: key=0x%08x, mask=0x%08x",
+                i, conn->key_info.key, conn->key_info.mask);
 
-        // We need the number of weights to calculate the size
-        uint32_t n_weights = conn->pre_in_post_shape.width *
-                conn->pre_in_post_shape.height * config.n_post;
-        if (n_weights & 0x1) {
-            n_weights += 1;
-        }
-        uint32_t n_bytes = sizeof(*conn) + (n_weights * sizeof(conn->weights[0]));
+        uint32_t n_bytes = sizeof(*conn) + (conn->n_weights * sizeof(lc_weight_t)) +
+                (conn->n_dims * sizeof(dimension));
 
         // Copy the data from SDRAM
         connectors[i] = spin1_malloc(n_bytes);
@@ -131,8 +127,10 @@ bool local_only_impl_initialise(void *address){
         spin1_memcpy(connectors[i], conn, n_bytes);
 
         // Move to the next connector; because it is dynamically sized,
-        // this comes after the last weight in the last connector
-        conn = (connector *) &conn->weights[n_weights];
+        // this comes after the last weight in the last connector, which comes
+        // after the last dimension!
+        lc_weight_t* weights = get_weights(conn);
+        conn = (connector *) &weights[connectors[i]->n_weights];
     }
 
     return true;
@@ -146,25 +144,43 @@ static inline int16_t recip_multiply(int16_t integer, int16_t recip) {
     return (int16_t) ((i * r) >> RECIP_FRACT_BITS);
 }
 
-//! \brief Do a mapping from pre to post 2D spaces, we use the standard
-//! padding, kernel, strides from Convolutional Neural Networks
-//! because of the way we're looping through the kernel, we divide the kernel
-//! shape by 2.
-static inline lc_coord_t map_pre_to_post(connector *connector, lc_coord_t pre) {
-    lc_coord_t post = pre;
-    post.col = recip_multiply(post.col, connector->recip_pool_strides.col);
-    post.row = recip_multiply(post.row, connector->recip_pool_strides.row);
-    return post;
-}
-
 static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
-        uint32_t *core_local_col, uint32_t *core_local_row) {
+        lc_weight_t **weights) {
     for (uint32_t i = 0; i < config.n_connectors; i++) {
         connector *c = connectors[i];
         if ((spike & c->key_info.mask) == c->key_info.key) {
             *conn = c;
-            *core_local_col = (spike & c->key_info.col_mask) >> c->key_info.col_shift;
-            *core_local_row = (spike & c->key_info.row_mask) >> c->key_info.row_shift;
+
+            // Now work out the index into the weights from the coordinates
+            uint32_t last_extent = 1;
+            uint32_t index = 0;
+            for (uint32_t j = 0; j < c->n_dims; j++) {
+                dimension *dim = &c->dimensions[j];
+
+                // Get the coordinate for this dimension from the spike
+                uint32_t coord = (spike & dim->mask) >> dim->shift;
+
+                // Work out the position in the global space
+                coord += dim->pre_start;
+
+                // Work out the position after pooling
+                coord = recip_multiply(coord, dim->recip_pool_stride);
+
+                // Check that the coordinate is in range now for this core
+                if (coord < dim->pre_in_post_start || coord > dim->pre_in_post_end) {
+                    return false;
+                }
+
+                // Get the local coordinate after pooling and add into the
+                // final index
+                coord -= dim->pre_in_post_start;
+                index += (coord * last_extent);
+
+                // Remember the shape from this dimension to pass to the next
+                last_extent = dim->pre_in_post_shape;
+            }
+            lc_weight_t *all_weights = get_weights(c);
+            *weights = &all_weights[index];
             return true;
         }
     }
@@ -180,46 +196,16 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
 void local_only_impl_process_spike(
         uint32_t time, uint32_t spike, uint16_t* ring_buffers) {
     connector *connector;
-    uint32_t core_local_col;
-    uint32_t core_local_row;
+    lc_weight_t *weights;
 
     // Lookup the spike, and if found, get the appropriate parts
-    if (!key_to_index_lookup(
-            spike, &connector, &core_local_col, &core_local_row)) {
+    if (!key_to_index_lookup(spike, &connector, &weights)) {
         return;
     }
-
-    // compute the population-based coordinates
-    lc_coord_t pre_coord = {
-            core_local_row + connector->pre_start.row,
-            core_local_col + connector->pre_start.col
-    };
-    log_debug("Received spike %u = %u, %u (Global: %u, %u)", spike, core_local_col, core_local_row,
-            pre_coord.col, pre_coord.col);
-
-    // Map to post-space (might end up being the same if no pooling)
-    lc_coord_t post_coord = map_pre_to_post(connector, pre_coord);
-
-    // Check if in range
-    if (post_coord.col < connector->pre_in_post_start.col ||
-            post_coord.col > connector->pre_in_post_end.col ||
-            post_coord.row < connector->pre_in_post_start.row ||
-            post_coord.row > connector->pre_in_post_end.row) {
-        return;
-    }
-
-    // Make the coordinates local
-    post_coord.col -= connector->pre_in_post_start.col;
-    post_coord.row -= connector->pre_in_post_start.row;
-
-    // Work out where in the weights to start from
-    uint32_t weight_pos = ((post_coord.row * connector->pre_in_post_shape.width) +
-            post_coord.col) * config.n_post;
 
     // Go through the weights and process them into the ring buffers
-    for (uint32_t post_index = 0, k = weight_pos; post_index < config.n_post;
-            post_index++, k++) {
-        lc_weight_t weight = connector->weights[k];
+    for (uint32_t post_index = 0; post_index < config.n_post; post_index++) {
+        lc_weight_t weight = weights[post_index];
         if (weight == 0) {
             continue;
         }

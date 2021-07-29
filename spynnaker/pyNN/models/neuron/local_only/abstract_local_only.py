@@ -22,9 +22,11 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
     """
 
     @abstractmethod
-    def get_parameters_usage_in_bytes(self, incoming_projections):
+    def get_parameters_usage_in_bytes(
+            self, vertex_slice, incoming_projections):
         """ Get the size of the parameters in bytes
 
+        :param Slice vertex_slice: The slice of the vertex to get the size of
         :param list(~spynnaker.pyNN.models.projection.Projection)\
                 incoming_projections:
             The projections to get the size of

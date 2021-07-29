@@ -24,8 +24,16 @@ from .abstract_connector import AbstractConnector
 from data_specification.enums.data_type import DataType
 from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+
+
+_DIMENSION_SIZE = (2 * BYTES_PER_WORD) + (6 * BYTES_PER_SHORT)
+_KEY_INFO_SIZE = 2 * BYTES_PER_WORD
+_CONN_SIZE = _KEY_INFO_SIZE + (2 * BYTES_PER_WORD) + (2 * BYTES_PER_SHORT)
+_DIM_DTYPE = [("mask", "uint32"), ("shift", "uint32"), ("pre_start", "uint16"),
+              ("pre_in_post_start", "uint16"), ("pre_in_post_end", "uint16"),
+              ("pre_in_post_shape", "uint16"), ("recip_pool_stride", "uint16"),
+              ("_PADDING", "uint16")]
 
 
 class PoolDenseConnector(AbstractConnector):
@@ -59,16 +67,17 @@ class PoolDenseConnector(AbstractConnector):
         :type weights:
             int or float or list or numpy.ndarray or RandomDistribution
         :param pool_shape:
-            Area of pooling, only average pooling is supported (and seems to
-            make sense). If a single value is provided, the pooling area will
-            be square.  If two values are provided it will be assumed to be
-            (pooling_rows, pooling_columns).
-        :type pool_shape: int or tuple(int, int) or None
+            Shape of average pooling. If a single value is provided, it will
+            be used for every dimension, otherwise must be the same number of
+            values as there are dimensions in the source.
+        :type pool_shape: int or tuple(int) or None
         :param pool_stride:
             Jumps between pooling regions. If a single value is provided, the
-            same stride will be used for rows and columns.  If two values are
-            provided it will be assumed to be (stride_rows, stride_columns)
-        :type pool_stride: int or tuple(int, int) or None
+            same stride will be used for all dimensions, otherwise must be
+            the same number of values as there are dimensions in the source.
+            If None, and pool_shape is provided, pool_stride will be set to
+            pool_shape.
+        :type pool_stride: int or tuple(int) or None
         :param str positive_receptor_type:
             The receptor type to add the positive weights to.  By default this
             is "excitatory".
@@ -84,8 +93,8 @@ class PoolDenseConnector(AbstractConnector):
 
         self.__weights = weights
 
-        self.__pool_shape = self.__to_2d_shape(pool_shape, "pool_shape")
-        self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
+        self.__pool_shape = pool_shape
+        self.__pool_stride = pool_stride
         if self.__pool_stride is None:
             self.__pool_stride = self.__pool_shape
 
@@ -107,8 +116,8 @@ class PoolDenseConnector(AbstractConnector):
     def __decode_weights(
             self, pre_shape, post_shape, pre_vertex_slice, post_vertex_slice):
         if isinstance(self.__weights, (int, float)):
-            n_weights = self.__get_n_weights(
-                pre_vertex_slice.shape, post_vertex_slice.shape)
+            n_weights = self.__get_n_sub_weights(
+                pre_vertex_slice, post_vertex_slice)
             return numpy.full(n_weights, self.__weights, dtype="float64")
         elif isinstance(self.__weights, Iterable):
             pre_in_post_shape = tuple(self.__get_pre_in_post_shape(pre_shape))
@@ -122,32 +131,32 @@ class PoolDenseConnector(AbstractConnector):
             post_slices = post_vertex_slice.slices
             return all_weights[pip_slices + post_slices].flatten()
         elif isinstance(self.__weights, RandomDistribution):
-            n_weights = self.__get_n_weights(
-                pre_vertex_slice.shape, post_vertex_slice.shape)
+            n_weights = self.__get_n_sub_weights(
+                pre_vertex_slice, post_vertex_slice)
             return numpy.array(self.__weights.next(n_weights), dtype="float64")
         else:
             raise SynapticConfigurationException(
                 f"Unknown weights ({self.__weights})")
 
     @staticmethod
-    def __to_2d_shape(shape, param_name):
+    def __to_nd_shape(shape, n_dims, param_name):
         if shape is None:
             return None
         if numpy.isscalar(shape):
-            return numpy.array([shape, shape], dtype='int')
-        elif len(shape) == 1:
-            return numpy.array([shape[0], 1], dtype='int')
-        elif len(shape) == 2:
+            return numpy.array([shape] * n_dims, dtype='int')
+        elif len(shape) == n_dims:
             return numpy.array(shape, dtype='int')
         raise SynapticConfigurationException(
-            f"{param_name} must be an int or a tuple(int, int)")
+            f"{param_name} must be an int or a tuple(int) with {n_dims}"
+            " dimensions")
 
     @staticmethod
     def get_post_pool_shape(
             pre_shape, pool_shape=None, pool_stride=None):
-        pool_shape = PoolDenseConnector.__to_2d_shape(pool_shape, "pool_shape")
-        pool_stride = PoolDenseConnector.__to_2d_shape(
-            pool_stride, "pool_stride")
+        pool_shape = PoolDenseConnector.__to_nd_shape(
+            pool_shape, len(pre_shape), "pool_shape")
+        pool_stride = PoolDenseConnector.__to_nd_shape(
+            pool_stride, len(pre_shape), "pool_stride")
         if pool_stride is None:
             pool_stride = pool_shape
         shape = numpy.array(pre_shape)
@@ -165,6 +174,12 @@ class PoolDenseConnector(AbstractConnector):
         """
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
+
+    def __get_n_sub_weights(self, pre_vertex_slice, post_vertex_slice):
+        pre_in_post_start = self.__pre_as_post(pre_vertex_slice.start)
+        pre_in_post_end = self.__pre_as_post(pre_vertex_slice.end)
+        return (numpy.prod((pre_in_post_end - pre_in_post_start) + 1) *
+                post_vertex_slice.n_atoms)
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
@@ -234,64 +249,30 @@ class PoolDenseConnector(AbstractConnector):
             coords //= self.__pool_stride
         return coords
 
-    @property
-    def local_only_n_bytes(self):
-        n_weights = self.__weights.size
-        if n_weights % 2 != 0:
-            n_weights += 1
+    def local_only_n_bytes(self, incoming_slices, vertex_slice):
+        n_weights = [self.__get_n_sub_weights(s, vertex_slice)
+                     for s in incoming_slices]
+        n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
+        n_dims = [len(s.shape) for s in incoming_slices]
 
-        return (
-            (6 * BYTES_PER_WORD) +
-            (12 * BYTES_PER_SHORT) +
-            (n_weights * BYTES_PER_SHORT))
+        return ((sum(n_dims) * _DIMENSION_SIZE) +
+                (sum(n_weights) * BYTES_PER_SHORT) +
+                (len(incoming_slices) * _CONN_SIZE))
 
     def write_local_only_data(
             self, spec, app_edge, pre_vertex_slice, post_vertex_slice,
             key, mask, weight_scales):
-        # Get info about things
-        ps_x, ps_y = 1, 1
-        if self.__pool_stride is not None:
-            ps_x, ps_y = self.__pool_stride
-        pre_in_post_start = self.__pre_as_post(pre_vertex_slice.start)
-        pre_in_post_end = self.__pre_as_post(pre_vertex_slice.end)
-        pre_in_post_shape = (pre_in_post_end - pre_in_post_start) + 1
 
         # Write source key info
         spec.write_value(key, data_type=DataType.UINT32)
         spec.write_value(mask, data_type=DataType.UINT32)
 
-        # Write the column and row mask and shifts to extract the column and
-        # row from the incoming spike
-        if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
-            (c_start, c_mask, c_shift), (r_start, r_mask, r_shift) = \
-                app_edge.pre_vertex.get_shape_key_fields(pre_vertex_slice)
-            start = (c_start, r_start)
-            spec.write_value(c_mask, data_type=DataType.UINT32)
-            spec.write_value(c_shift, data_type=DataType.UINT32)
-            spec.write_value(r_mask, data_type=DataType.UINT32)
-            spec.write_value(r_shift, data_type=DataType.UINT32)
-        else:
-            start = pre_vertex_slice.start
-            n_bits_col = get_n_bits(pre_vertex_slice.shape[0])
-            col_mask = (1 << n_bits_col) - 1
-            n_bits_row = get_n_bits(pre_vertex_slice.shape[1])
-            row_mask = ((1 << n_bits_row) - 1) << n_bits_col
-            spec.write_value(col_mask, data_type=DataType.UINT32)
-            spec.write_value(0, data_type=DataType.UINT32)
-            spec.write_value(row_mask, data_type=DataType.UINT32)
-            spec.write_value(n_bits_col, data_type=DataType.UINT32)
-
-        # Write remaining connector details
-        spec.write_value(start[1], data_type=DataType.INT16)
-        spec.write_value(start[0], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_start[1], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_start[0], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_end[1], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_end[0], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_shape[1], data_type=DataType.INT16)
-        spec.write_value(pre_in_post_shape[0], data_type=DataType.INT16)
-        spec.write_value(self.__recip(ps_y), data_type=DataType.INT16)
-        spec.write_value(self.__recip(ps_x), data_type=DataType.INT16)
+        # Write numbers of things
+        n_dims = len(pre_vertex_slice.shape)
+        n_weights = self.__get_n_sub_weights(
+            pre_vertex_slice, post_vertex_slice)
+        spec.write_value(n_dims, data_type=DataType.UINT32)
+        spec.write_value(n_weights, data_type=DataType.UINT32)
 
         # Write synapse information
         pos_synapse_type = app_edge.post_vertex.get_synapse_id_by_target(
@@ -300,6 +281,36 @@ class PoolDenseConnector(AbstractConnector):
             self.__negative_receptor_type)
         spec.write_value(pos_synapse_type, data_type=DataType.UINT16)
         spec.write_value(neg_synapse_type, data_type=DataType.UINT16)
+
+        # Generate the dimension information
+        dim_info = numpy.zeros(n_dims, dtype=_DIM_DTYPE)
+        if self.__pool_stride is not None:
+            stride = self.__to_nd_shape(self.__pool_stride, n_dims, "")
+            dim_info["recip_pool_stride"] = [self.__recip(p) for p in stride]
+        else:
+            dim_info["recip_pool_stride"] = 1
+        if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
+            pre_start_mask_shift = numpy.array(
+                app_edge.pre_vertex.get_shape_key_fields(pre_vertex_slice))
+            dim_info["pre_start"] = pre_start_mask_shift[:, 0]
+            dim_info["mask"] = pre_start_mask_shift[:, 1]
+            dim_info["shift"] = pre_start_mask_shift[:, 2]
+        else:
+            n_bits = numpy.ceil(numpy.log2(
+                pre_vertex_slice.shape)).astype("int")
+            shifts = numpy.concatenate(([0], numpy.cumsum(n_bits[:-1])))
+            masks = numpy.left_shift(numpy.left_shift(1, n_bits) - 1, shifts)
+            dim_info["pre_start"] = pre_vertex_slice.start
+            dim_info["mask"] = masks
+            dim_info["shift"] = shifts
+
+        dim_info["pre_in_post_start"] = self.__pre_as_post(
+            pre_vertex_slice.start)
+        dim_info["pre_in_post_end"] = self.__pre_as_post(
+            pre_vertex_slice.end)
+        dim_info["pre_in_post_shape"] = (
+            dim_info["pre_in_post_end"] - dim_info["pre_in_post_start"] + 1)
+        spec.write_array(dim_info.view(numpy.uint32))
 
         # Work out which weights are for this connection
         weights = self.__decode_weights(

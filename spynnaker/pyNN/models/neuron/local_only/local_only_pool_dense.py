@@ -49,7 +49,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return False
 
     @overrides(AbstractLocalOnly.get_parameters_usage_in_bytes)
-    def get_parameters_usage_in_bytes(self, incoming_projections):
+    def get_parameters_usage_in_bytes(
+            self, vertex_slice, incoming_projections):
         n_bytes = 0
         for incoming in incoming_projections:
             s_info = incoming._synapse_information
@@ -58,9 +59,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     "Only PoolDenseConnector can be used with a synapse type"
                     " of PoolDense")
             app_edge = incoming._projection_edge
-            n_incoming = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
-            n_bytes += s_info.connector.local_only_n_bytes * n_incoming
+            in_slices = app_edge.pre_vertex.splitter.get_out_going_slices()[0]
+            n_bytes += s_info.connector.local_only_n_bytes(
+                in_slices, vertex_slice)
 
         return (2 * BYTES_PER_WORD) + n_bytes
 
@@ -94,7 +95,8 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 edge_info.append(
                     (incoming, vertex_slice, group_key, group_mask))
 
-        size = self.get_parameters_usage_in_bytes(incoming_projections)
+        size = self.get_parameters_usage_in_bytes(
+            machine_vertex.vertex_slice, incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 

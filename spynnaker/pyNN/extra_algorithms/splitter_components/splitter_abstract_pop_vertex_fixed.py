@@ -265,7 +265,7 @@ class SplitterAbstractPopulationVertexFixed(
             sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
                 vertex_slice,
                 PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS))
-            sdram.merge(self.__get_local_only_constant_sdram())
+            sdram.merge(self.__get_local_only_constant_sdram(vertex_slice))
         else:
             sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
                 n_record, n_provenance,
@@ -311,7 +311,7 @@ class SplitterAbstractPopulationVertexFixed(
         sdram.merge(self.__bitfield_size())
         return sdram
 
-    def __get_local_only_constant_sdram(self):
+    def __get_local_only_constant_sdram(self, vertex_slice):
         app_vertex = self._governed_app_vertex
         s_dynamics = app_vertex.synapse_dynamics
         sdram = MultiRegionSDRAM()
@@ -322,7 +322,7 @@ class SplitterAbstractPopulationVertexFixed(
             (PopulationMachineLocalOnlyCombinedVertex.
              REGIONS.LOCAL_ONLY_PARAMS.value),
             s_dynamics.get_parameters_usage_in_bytes(
-                app_vertex.incoming_projections))
+                vertex_slice, app_vertex.incoming_projections))
         return sdram
 
     def __all_syn_block_size(self, vertex_slice):
