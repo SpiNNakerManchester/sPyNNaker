@@ -696,9 +696,10 @@ class AbstractPopulationVertex(
         for post_vertex in self.machine_vertices:
             if isinstance(post_vertex, HasSynapses):
                 post_vertex.clear_connection_cache()
-                post_vertex._app_vertex.reset_min_weights()
+        if self.__change_requires_mapping:
+            self.__reset_min_weights()
 
-    def reset_min_weights(self):
+    def __reset_min_weights(self):
         """ Reset min_weights if set to auto-calculate
         """
         if self.__min_weights_auto:
