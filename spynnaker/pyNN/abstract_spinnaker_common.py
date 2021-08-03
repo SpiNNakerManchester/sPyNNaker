@@ -17,7 +17,8 @@ import logging
 import math
 import os
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_config_str
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (
@@ -30,7 +31,11 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
-
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_machine_bit_field_router_compressor import (
+    SpynnakerMachineBitFieldOrderedCoveringCompressor,
+    SpynnakerMachineBitFieldPairRouterCompressor)
+from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -145,6 +150,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        # TODO raise error is not None
         if extra_post_run_algorithms is None:
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
@@ -493,3 +499,36 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value
+
+    @overrides(AbstractSpinnakerBase._execute_compressor)
+    def _execute_compressor(self):
+        name = get_config_str("Mapping", "compressor")
+
+        if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
+            compressor = SpynnakerMachineBitFieldOrderedCoveringCompressor()
+            provenance = compressor(
+                self._routing_tables, self._txrx, self._machine, self._app_id,
+                self._machine_graph, self._placements, self._executable_finder,
+                self._routing_infos, self._executable_targets,
+                get_config_bool("Reports", "write_expander_iobuf"))
+            return None, provenance
+
+        if name == "SSpynnakerMachineBitFieldPairRouterCompressor":
+            compressor = SpynnakerMachineBitFieldPairRouterCompressor()
+            provenance = compressor(
+                self._routing_tables, self._txrx, self._machine, self._app_id,
+                self._machine_graph, self._placements, self._executable_finder,
+                self._routing_infos, self._executable_targets,
+                get_config_bool("Reports", "write_expander_iobuf"))
+            return None, provenance
+
+        return AbstractSpinnakerBase._execute_compressor(self)
+
+    @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms())
+    def _execute_extra_load_algorithms(self):
+        synapse_expander(
+            self._placements, self._txrx, self._sexecutable_finder,
+            get_config_bool("Reports", "write_expander_iobuf"))
+
+        extra_load_algorithms.append("OnChipBitFieldGenerator")
+        extra_load_algorithms.append("FinishConnectionHolders")
