@@ -35,6 +35,9 @@ from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
     SpynnakerMachineBitFieldOrderedCoveringCompressor,
     SpynnakerMachineBitFieldPairRouterCompressor)
+from spynnaker.pyNN.extra_algorithms import OnChipBitFieldGenerator
+from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
+    finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -513,7 +516,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
             return None, provenance
 
-        if name == "SSpynnakerMachineBitFieldPairRouterCompressor":
+        if name == "SpynnakerMachineBitFieldPairRouterCompressor":
             compressor = SpynnakerMachineBitFieldPairRouterCompressor()
             provenance = compressor(
                 self._routing_tables, self._txrx, self._machine, self._app_id,
@@ -524,11 +527,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         return AbstractSpinnakerBase._execute_compressor(self)
 
-    @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms())
+    @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms)
     def _execute_extra_load_algorithms(self):
         synapse_expander(
-            self._placements, self._txrx, self._sexecutable_finder,
+            self.placements, self._txrx, self._sexecutable_finder,
             get_config_bool("Reports", "write_expander_iobuf"))
 
-        extra_load_algorithms.append("OnChipBitFieldGenerator")
-        extra_load_algorithms.append("FinishConnectionHolders")
+        generator = OnChipBitFieldGenerator()
+        generator(
+            self.placements, self.application_graph, self._executable_finder,
+            self._txrx, self._machine_graph, self._routing_infos)
+
+        finish_connection_holders(self.application_graph)
