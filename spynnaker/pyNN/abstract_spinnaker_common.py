@@ -530,7 +530,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms)
     def _execute_extra_load_algorithms(self):
         synapse_expander(
-            self.placements, self._txrx, self._sexecutable_finder,
+            self.placements, self._txrx, self._executable_finder,
             get_config_bool("Reports", "write_expander_iobuf"))
 
         generator = OnChipBitFieldGenerator()
