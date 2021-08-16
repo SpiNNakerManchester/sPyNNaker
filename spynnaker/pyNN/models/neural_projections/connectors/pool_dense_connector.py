@@ -288,7 +288,7 @@ class PoolDenseConnector(AbstractConnector):
             stride = self.__to_nd_shape(self.__pool_stride, n_dims, "")
             dim_info["recip_pool_stride"] = [self.__recip(p) for p in stride]
         else:
-            dim_info["recip_pool_stride"] = 1
+            dim_info["recip_pool_stride"] = self.__recip(1)
         if isinstance(app_edge.pre_vertex, HasShapeKeyFields):
             pre_start_mask_shift = numpy.array(
                 app_edge.pre_vertex.get_shape_key_fields(pre_vertex_slice))
