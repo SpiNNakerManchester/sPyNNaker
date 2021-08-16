@@ -120,6 +120,8 @@ class ConvolutionConnector(AbstractConnector):
         self.__pool_stride = self.__to_2d_shape(pool_stride, "pool_stride")
         if self.__pool_stride is None:
             self.__pool_stride = self.__pool_shape
+        if self.__pool_shape is not None:
+            self.__kernel_weights /= numpy.prod(self.__pool_shape)
 
         self.__positive_receptor_type = positive_receptor_type
         self.__negative_receptor_type = negative_receptor_type
