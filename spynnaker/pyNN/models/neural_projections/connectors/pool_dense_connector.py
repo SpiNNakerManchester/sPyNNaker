@@ -317,6 +317,12 @@ class PoolDenseConnector(AbstractConnector):
             app_edge.pre_vertex.atoms_shape, app_edge.post_vertex.atoms_shape,
             pre_vertex_slice, post_vertex_slice)
 
+        # Divide weights by pooling area if needed
+        if self.__pool_shape is not None:
+            shape = self.__to_nd_shape(self.__pool_shape, n_dims, "")
+            area = numpy.prod(shape)
+            weights = weights / area
+
         # Encode weights with weight scaling
         if len(weights) % 2 != 0:
             weights = numpy.concatenate((weights, [0]))
