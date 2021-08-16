@@ -180,7 +180,7 @@ static inline bool key_to_index_lookup(uint32_t spike, connector **conn,
                 last_extent = dim->pre_in_post_shape;
             }
             lc_weight_t *all_weights = get_weights(c);
-            *weights = &all_weights[index];
+            *weights = &all_weights[index * config.n_post];
             return true;
         }
     }
