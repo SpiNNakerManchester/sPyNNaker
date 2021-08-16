@@ -112,24 +112,40 @@
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">max_connections_row</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">post_lo</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
         <span class="n">post_hi</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="c1"># Max number per row is required</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__array_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">n_connections_row</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">post_lo</span><span class="p">,</span> <span class="n">post_hi</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__array</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">n_connections</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">n_connections_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="n">n_connections_row</span> <span class="o">&gt;</span> <span class="n">max_connections_row</span><span class="p">:</span>
+                <span class="n">max_connections_row</span> <span class="o">=</span> <span class="n">n_connections_row</span>
 
         <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">n_connections</span>
+            <span class="k">return</span> <span class="n">max_connections_row</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_n_connections_from_pre_vertex_with_delay_maximum</span><span class="p">(</span>
-            <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_total_connections</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span>
-            <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_total_connections</span><span class="p">,</span>
+            <span class="n">max_connections_row</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArrayConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_total_connections</span></div>
+        <span class="c1"># Max number per column is required</span>
+        <span class="n">max_connections_col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__array_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">n_connections_col</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__array_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__array</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">n_connections_col</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="n">n_connections_col</span> <span class="o">&gt;</span> <span class="n">max_connections_col</span><span class="p">:</span>
+                <span class="n">max_connections_col</span> <span class="o">=</span> <span class="n">n_connections_col</span>
+
+        <span class="k">return</span> <span class="n">max_connections_col</span></div>
 
 <div class="viewcode-block" id="ArrayConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.ArrayConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -182,7 +198,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -208,7 +224,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

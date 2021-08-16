@@ -93,6 +93,13 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
 <li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
 or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the model.</p></li>
+<li><p><strong>binary</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the implementation executable.</p></li>
+<li><p><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) – The model of the neuron soma</p></li>
+<li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
+<li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
+<li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -142,6 +149,13 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_e\)</span></p></li>
 <li><p><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>, </em><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.9)"><em>RandomDistribution</em></a><em>
 or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class="math notranslate nohighlight">\(I^{syn}_i\)</span></p></li>
+<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the model.</p></li>
+<li><p><strong>binary</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the implementation executable.</p></li>
+<li><p><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) – The model of the neuron soma</p></li>
+<li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
+<li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
+<li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -423,7 +437,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -456,7 +470,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>

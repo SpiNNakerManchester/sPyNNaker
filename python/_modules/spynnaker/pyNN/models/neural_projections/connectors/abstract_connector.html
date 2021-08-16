@@ -316,7 +316,7 @@
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum number of connections between those from any</span>
+        <span class="sd">&quot;&quot;&quot; Get the maximum number of connections from any</span>
 <span class="sd">            neuron in the pre vertex to the neurons in the post_vertex_slice,</span>
 <span class="sd">            for connections with a delay between min_delay and max_delay</span>
 <span class="sd">            (inclusive) if both specified (otherwise all connections).</span>
@@ -335,7 +335,7 @@
 
 <div class="viewcode-block" id="AbstractConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum number of connections between those to any neuron</span>
+        <span class="sd">&quot;&quot;&quot; Get the maximum number of connections to any neuron</span>
 <span class="sd">            in the post vertex from neurons in the pre vertex.</span>
 
 <span class="sd">        :param SynapseInformation synapse_info:</span>
@@ -755,7 +755,7 @@
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="../../../../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
     </div>
@@ -781,7 +781,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
     </div>
   </body>
 </html>
