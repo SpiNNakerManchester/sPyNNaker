@@ -13,14 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_neuron_model import AbstractNeuronModel
-from .neuron_model_izh import NeuronModelIzh
-from .meanfield_model_eitn import MeanfieldModelEitn
-from .config import Config
-from .mathsbox import Mathsbox
-from .neuron_model_leaky_integrate_and_fire import (
-    NeuronModelLeakyIntegrateAndFire)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
-__all__ = ["AbstractNeuronModel", "NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire",
-           "MeanfieldModelEitn", "Config", "Mathsbox"]
+
+class AbstractInputType(
+        AbstractStandardNeuronComponent, metaclass=AbstractBase):
+    """ Represents a possible input type for a neuron model (e.g., current).
+    """
+    __slots__ = ()
+
+    @abstractmethod
+    def get_global_weight_scale(self):
+        """ Get the global weight scaling value.
+
+        :return: The global weight scaling value
+        :rtype: float
+        """

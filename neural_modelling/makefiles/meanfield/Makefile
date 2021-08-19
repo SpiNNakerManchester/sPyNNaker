@@ -13,14 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_neuron_model import AbstractNeuronModel
-from .neuron_model_izh import NeuronModelIzh
-from .meanfield_model_eitn import MeanfieldModelEitn
-from .config import Config
-from .mathsbox import Mathsbox
-from .neuron_model_leaky_integrate_and_fire import (
-    NeuronModelLeakyIntegrateAndFire)
+MODELS = meanfield_model_cond
+         
+all:
+	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
 
-__all__ = ["AbstractNeuronModel", "NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire",
-           "MeanfieldModelEitn", "Config", "Mathsbox"]
+clean:
+	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done

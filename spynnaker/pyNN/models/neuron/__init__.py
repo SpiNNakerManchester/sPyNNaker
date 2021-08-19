@@ -29,9 +29,12 @@ from .population_machine_synapses_provenance import SynapseProvenance
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
+from .abstract_pynn_meanfield_model_standard import (
+    AbstractPyNNMeanfieldModelStandard)
 
 __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
-           "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
+           "AbstractPyNNNeuronModelStandard",
+           "AbstractPyNNMeanfieldModelStandard", "ConnectionHolder",
            "PopulationMachineVertex", "PopulationNeuronsMachineVertex",
            "NeuronProvenance", "PopulationSynapsesMachineVertexCommon",
            "PopulationSynapsesMachineVertexLead",

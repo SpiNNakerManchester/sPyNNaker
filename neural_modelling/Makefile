@@ -20,7 +20,8 @@ BUILDS = synapse_expander \
          robot_motor_control \
          neuron_only \
          synapse_only \
-         neuron 
+         neuron \
+         meanfield
 
 DIRS = $(BUILDS:%=makefiles/%)
 
