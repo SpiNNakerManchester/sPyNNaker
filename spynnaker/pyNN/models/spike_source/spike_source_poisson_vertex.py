@@ -95,7 +95,8 @@ class SpikeSourcePoissonVertex(
         "__data",
         "__is_variable_rate",
         "__max_spikes",
-        "__outgoing_projections"]
+        "__outgoing_projections",
+        "__incoming_control_edge"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -279,6 +280,7 @@ class SpikeSourcePoissonVertex(
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
+        self.__incoming_control_edge = None
 
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
@@ -594,3 +596,12 @@ class SpikeSourcePoissonVertex(
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
         return len(self._splitter.get_out_going_slices()[0])
+
+    def set_live_poisson_control_edge(self, edge):
+        if self.__incoming_control_edge is not None:
+            raise Exception("The Poisson can only be controlled by one source")
+        self.__incoming_control_edge = edge
+
+    @property
+    def incoming_control_edge(self):
+        return self.__incoming_control_edge

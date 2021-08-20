@@ -47,8 +47,6 @@ from spinn_front_end_common.interface.profiling.profile_utils import (
 from spynnaker.pyNN.models.abstract_models import (
     AbstractMaxSpikes, AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
@@ -220,17 +218,7 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
     def is_in_injection_mode(self):
         # pylint: disable=no-value-for-parameter
-        return self._is_in_injection_mode()
-
-    @inject_items({"graph": "MachineGraph"})
-    def _is_in_injection_mode(self, graph):
-        # pylint: disable=arguments-differ
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            self, LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Poisson source can only have one incoming control")
-        return len(in_edges) == 1
+        return self._app_vertex.incoming_control_edge is not None
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
@@ -539,19 +527,16 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Only one control edge can end at a Poisson vertex")
         incoming_mask = 0
-        if len(in_edges) == 1:
-            in_edge = in_edges[0]
-
-            # Get the mask of the incoming keys
-            incoming_mask = \
-                routing_info.get_routing_info_for_edge(in_edge).first_mask
-            incoming_mask = ~incoming_mask & 0xFFFFFFFF
+        if self._app_vertex.incoming_control_edge is not None:
+            in_edges = self._app_vertex.incoming_control_edge.machine_edges
+            for in_edge in in_edges:
+                if in_edge.post_vertex == self:
+                    # Get the mask of the incoming keys
+                    incoming_mask = routing_info.get_routing_info_for_edge(
+                        in_edge).first_mask
+                    incoming_mask = ~incoming_mask & 0xFFFFFFFF
+                    break
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)

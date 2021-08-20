@@ -280,8 +280,9 @@ class SpynnakerExternalDevicePluginManager(object):
             receive_port=receive_port,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
-        SpynnakerExternalDevicePluginManager.add_edge(
+        edge = SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
+        vertex.set_live_poisson_control_edge(edge)
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,
@@ -302,6 +303,7 @@ class SpynnakerExternalDevicePluginManager(object):
         _spinnaker = get_simulator()
         edge = ApplicationEdge(vertex, device_vertex)
         _spinnaker.add_application_edge(edge, partition_id)
+        return edge
 
     @staticmethod
     def add_application_vertex(vertex):
