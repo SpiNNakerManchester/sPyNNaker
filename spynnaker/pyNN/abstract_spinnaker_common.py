@@ -21,6 +21,7 @@ from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.utilities import FecExecutor
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -503,11 +504,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         """
         self.__id_counter = new_value
 
-    @overrides(AbstractSpinnakerBase._execute_compressor)
-    def _execute_compressor(self):
-        name = get_config_str("Mapping", "compressor")
-
-        if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
+    def _excetute_spynnaker_ordered_covering_compressor(self):
+        with FecExecutor(
+                self,
+                "Execute SpynnakerMachineBitFieldOrderedCoveringCompressor") \
+                as executor:
+            if executor.skip_if_virtual_board():
+                return None, []
             compressor = SpynnakerMachineBitFieldOrderedCoveringCompressor()
             provenance = compressor(
                 self._routing_tables, self._txrx, self._machine, self._app_id,
@@ -516,7 +519,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
             return None, provenance
 
-        if name == "SpynnakerMachineBitFieldPairRouterCompressor":
+    def _excetute_spynnaker_pair_compressor(self):
+        with FecExecutor(
+                self,
+                "Execute SpynnakerMachineBitFieldPairRouterCompressor") \
+                as executor:
+            if executor.skip_if_virtual_board():
+                return None, []
             compressor = SpynnakerMachineBitFieldPairRouterCompressor()
             provenance = compressor(
                 self._routing_tables, self._txrx, self._machine, self._app_id,
@@ -525,17 +534,38 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
             return None, provenance
 
+    @overrides(AbstractSpinnakerBase._execute_compressor)
+    def _execute_compressor(self):
+        name = get_config_str("Mapping", "compressor")
+
+        if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
+            return self._excetute_spynnaker_ordered_covering_compressor()
+
+        if name == "SpynnakerMachineBitFieldPairRouterCompressor":
+            return self._excetute_spynnaker_pair_compressor()
+
         return AbstractSpinnakerBase._execute_compressor(self)
+
+    def _execute_synapse_expander(self):
+        with FecExecutor(self, "Execute Synapse Expander"):
+            synapse_expander(
+                self.placements, self._txrx, self._executable_finder,
+                get_config_bool("Reports", "write_expander_iobuf"))
+
+    def _execute_on_chip_bit_field_generator(self):
+        with FecExecutor(self, "Execute On Chip Bit Field Generator"):
+            generator = OnChipBitFieldGenerator()
+            generator(
+                self.placements, self.application_graph,
+                self._executable_finder,
+                self._txrx, self._machine_graph, self._routing_infos)
+
+    def _execute_finish_connection_holders(self):
+        with FecExecutor(self, "Execute Finish Connection Holders"):
+            finish_connection_holders(self.application_graph)
 
     @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms)
     def _execute_extra_load_algorithms(self):
-        synapse_expander(
-            self.placements, self._txrx, self._executable_finder,
-            get_config_bool("Reports", "write_expander_iobuf"))
-
-        generator = OnChipBitFieldGenerator()
-        generator(
-            self.placements, self.application_graph, self._executable_finder,
-            self._txrx, self._machine_graph, self._routing_infos)
-
-        finish_connection_holders(self.application_graph)
+        self._execute_synapse_expander()
+        self._execute_on_chip_bit_field_generator()
+        self._execute_finish_connection_holders()
