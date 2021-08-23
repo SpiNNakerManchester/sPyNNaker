@@ -32,11 +32,12 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
+from spynnaker.pyNN.extra_algorithms import (
+    OnChipBitFieldGenerator, SpynnakerDataSpecificationWriter)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
         SpynnakerMachineBitFieldOrderedCoveringCompressor,
         SpynnakerMachineBitFieldPairRouterCompressor)
-from spynnaker.pyNN.extra_algorithms import OnChipBitFieldGenerator
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
@@ -503,6 +504,19 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value
+
+    @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
+    def _execute_graph_data_specification_writer(self):
+        """
+        Overridden by spy which adds placement_order
+
+        :return:
+        """
+        with FecExecutor(self, "Execute Spynnaker Data Specification Writer"):
+            writer = SpynnakerDataSpecificationWriter()
+            self._dsg_targets, self._region_sizes = writer(
+                self._placements, self._hostname, self._machine,
+                self._max_run_time_steps)
 
     def _excetute_spynnaker_ordered_covering_compressor(self):
         with FecExecutor(
