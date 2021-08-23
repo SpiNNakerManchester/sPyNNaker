@@ -34,8 +34,8 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
-    SpynnakerMachineBitFieldOrderedCoveringCompressor,
-    SpynnakerMachineBitFieldPairRouterCompressor)
+        SpynnakerMachineBitFieldOrderedCoveringCompressor,
+        SpynnakerMachineBitFieldPairRouterCompressor)
 from spynnaker.pyNN.extra_algorithms import OnChipBitFieldGenerator
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
