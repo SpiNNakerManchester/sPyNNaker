@@ -534,26 +534,29 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
             return None, provenance
 
-    @overrides(AbstractSpinnakerBase._execute_compressor)
-    def _execute_compressor(self):
-        name = get_config_str("Mapping", "compressor")
-
+    @overrides(AbstractSpinnakerBase._do_a_compression)
+    def _do_a_compression(self, name):
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
             return self._excetute_spynnaker_ordered_covering_compressor()
 
         if name == "SpynnakerMachineBitFieldPairRouterCompressor":
             return self._excetute_spynnaker_pair_compressor()
 
-        return AbstractSpinnakerBase._execute_compressor(self)
+        return AbstractSpinnakerBase._do_a_compression(self, name)
 
     def _execute_synapse_expander(self):
-        with FecExecutor(self, "Execute Synapse Expander"):
+        with FecExecutor(self, "Execute Synapse Expander") as executor:
+            if executor.skip_if_virtual_board():
+                return
             synapse_expander(
                 self.placements, self._txrx, self._executable_finder,
                 get_config_bool("Reports", "write_expander_iobuf"))
 
     def _execute_on_chip_bit_field_generator(self):
-        with FecExecutor(self, "Execute On Chip Bit Field Generator"):
+        with FecExecutor(self, "Execute On Chip Bit Field Generator")\
+                as executor:
+            if executor.skip_if_virtual_board():
+                return
             generator = OnChipBitFieldGenerator()
             generator(
                 self.placements, self.application_graph,
@@ -564,8 +567,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecExecutor(self, "Execute Finish Connection Holders"):
             finish_connection_holders(self.application_graph)
 
-    @overrides(AbstractSpinnakerBase._execute_extra_load_algorithms)
-    def _execute_extra_load_algorithms(self):
+    @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
+    def _do_extra_load_algorithms(self):
         self._execute_synapse_expander()
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
