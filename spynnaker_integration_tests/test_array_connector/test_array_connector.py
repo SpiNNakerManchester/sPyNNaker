@@ -120,6 +120,62 @@ def do_run(plot):
     return v, spikes, v2, spikes2
 
 
+def do_larger_array(plot):
+    p.setup(timestep=1.0)
+
+    n_i = 64
+    n_e = 64
+
+    spikeArray = {'spike_times': [0]}
+    input_pop = p.Population(n_e, p.SpikeSourceArray(**spikeArray),
+                             label='inputSpikes')
+    excit_pop = p.Population(n_e, p.IF_curr_exp, label='excit')
+    inhit_pop = p.Population(n_i, p.IF_curr_exp, label='inhib')
+    p.Projection(input_pop, excit_pop, p.AllToAllConnector(),
+                 synapse_type=p.StaticSynapse(weight=5),
+                 receptor_type='excitatory')
+
+    ie_conn = numpy.ones((n_i, n_e))
+    for i in range(n_e):
+        ie_conn[i, i] = 0
+
+    p.Projection(excit_pop, inhit_pop, p.OneToOneConnector(),
+                 synapse_type=p.StaticSynapse(weight=2),
+                 receptor_type='inhibitory')
+
+    ie_projec = p.Projection(inhit_pop, excit_pop, p.ArrayConnector(ie_conn),
+                             synapse_type=p.StaticSynapse(weight=3),
+                             receptor_type='excitatory')
+
+    excit_pop.record(["spikes", "v"])
+
+    runtime = 1000
+    p.run(runtime)
+
+    ie_conns = ie_projec.get(['weight', 'delay'], 'list')
+    v = excit_pop.get_data("v")
+    spikes = excit_pop.get_data("spikes")
+
+    if plot:
+        Figure(
+            # raster plot of the presynaptic neurons' spike times
+            Panel(spikes.segments[0].spiketrains,
+                  yticks=True, markersize=1.2, xlim=(0, runtime), xticks=True),
+            # membrane potential of the postsynaptic neurons
+            Panel(v.segments[0].filter(name='v')[0],
+                  ylabel="Membrane potential (mV)",
+                  data_labels=[inhit_pop.label], yticks=True,
+                  xlim=(0, runtime), xticks=True),
+            title="Testing ArrayConnector",
+            annotations="Simulated with {}".format(p.name())
+        )
+        plt.show()
+
+    p.end()
+
+    return v, spikes, ie_conns
+
+
 class ArrayConnectorTest(BaseTestCase):
 
     def a_run(self):
@@ -133,6 +189,17 @@ class ArrayConnectorTest(BaseTestCase):
     def test_a_run(self):
         self.runsafe(self.a_run)
 
+    def larger_array(self):
+        v, spikes, conns = do_larger_array(plot=False)
+        # checks go here
+        spikes_test = neo_convertor.convert_spikes(spikes)
+        self.assertEqual(4032, len(conns))
+        self.assertEqual(640, len(spikes_test))
+
+    def test_larger_array(self):
+        self.runsafe(self.larger_array)
+
 
 if __name__ == '__main__':
     v, spikes, v2, spikes2 = do_run(plot=True)
+    v, spikes, conns = do_larger_array(plot=True)

@@ -22,7 +22,7 @@ class ParamsUsingRandomDists(BaseTestCase):
 
     def do_run(self):
         nNeurons = 2
-        p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
+        p.setup(timestep=1.0, min_delay=1.0)
 
         rng = NumpyRNG(seed=85524)
         cm = p.RandomDistribution('uniform_int', [1, 4], rng=rng)

@@ -32,7 +32,7 @@ class TestPoissonSpikeSource(BaseTestCase):
                                msg="Error on {}".format(input.label))
 
     def recording_poisson_spikes(self, run_zero):
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 200  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
 
@@ -76,7 +76,7 @@ class TestPoissonSpikeSource(BaseTestCase):
         self.runsafe(self.recording_poisson_spikes_with_zero)
 
     def recording_poisson_spikes_big(self):
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 2560  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
 
@@ -109,7 +109,7 @@ class TestPoissonSpikeSource(BaseTestCase):
         self.runsafe(self.recording_poisson_spikes_big)
 
     def recording_poisson_spikes_rate_0(self):
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 256  # number of neurons in each population
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
 

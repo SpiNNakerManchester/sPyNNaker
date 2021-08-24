@@ -22,7 +22,7 @@ import spynnaker8 as sim
 class MyTestCase(BaseTestCase):
 
     def recording_1_element(self):
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 200
 
         boxed_array = numpy.zeros(shape=(0, 2))
