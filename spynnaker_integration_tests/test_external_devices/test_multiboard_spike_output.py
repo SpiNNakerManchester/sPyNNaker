@@ -68,7 +68,7 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             # can be received
             count = TestMultiBoardSpikeOutput.counts[label]
             self.assertGreaterEqual(count, 500)
-            self.assertLessEquals(count, 1000)
+            self.assertLessEqual(count, 1000)
 
     def test_multi_board_spike_output(self):
         self.runsafe(self.multi_board_spike_output)
