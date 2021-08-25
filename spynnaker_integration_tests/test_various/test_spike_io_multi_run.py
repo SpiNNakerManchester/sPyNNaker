@@ -236,7 +236,7 @@ class SpikeIoMultiRun(BaseTestCase):
         # Packets can get lost, so this is now a range
         self.assertGreaterEqual(len(spikes_forward), 300)
         self.assertLessEqual(len(spikes_forward), 600)
-        self.assertGreateEquals(len(spikes_backward), 300)
+        self.assertGreaterEqual(len(spikes_backward), 300)
         self.assertLessEqual(len(spikes_backward), 600)
 
     def test_run(self):
