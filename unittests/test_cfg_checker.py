@@ -33,8 +33,7 @@ class TestCfgChecker(unittest.TestCase):
         repeaters = [
             "application_to_machine_graph_algorithms",
             "machine_graph_to_machine_algorithms",
-            "machine_graph_to_virtual_machine_algorithms",
-            "loading_algorithms"]
+            "machine_graph_to_virtual_machine_algorithms"]
         run_config_checks(
             directories=[spynnaker, spy8, spynnaker_it, unittests],
             repeaters=repeaters)
