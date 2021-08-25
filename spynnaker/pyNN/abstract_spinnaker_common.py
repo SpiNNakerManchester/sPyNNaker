@@ -33,11 +33,12 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
-    OnChipBitFieldGenerator, SpynnakerDataSpecificationWriter)
+    OnChipBitFieldGenerator, SpynnakerDataSpecificationWriter,
+    SpYNNakerNeuronGraphNetworkSpecificationReport)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
         SpynnakerMachineBitFieldOrderedCoveringCompressor,
-        SpynnakerMachineBitFieldPairRouterCompressor)
+        SpynnakerMachineBitFieldPairRouterCompressor,)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
@@ -586,3 +587,21 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self._execute_synapse_expander()
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
+
+    def _execute_on_chip_bit_field_generator(self):
+        with FecExecutor(self, "Execute On Chip Bit Field Generator")\
+                as executor:
+            if executor.skip_if_virtual_board():
+                return
+
+    def _execute_write_network_graph(self):
+        with FecExecutor(self, "Execute On Chip Bit Field Generator") \
+                as executor:
+            if executor.skip_if_cfg_false("Reports", "write_network_graph"):
+                return
+            report = SpYNNakerNeuronGraphNetworkSpecificationReport()
+            report(self._application_graph)
+
+    @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms)
+    def _do_extra_mapping_algorithms(self):
+        self._execute_write_network_graph()
