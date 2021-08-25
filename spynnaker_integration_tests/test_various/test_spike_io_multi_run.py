@@ -233,8 +233,11 @@ class SpikeIoMultiRun(BaseTestCase):
 
     def check_run(self):
         (spikes_forward, spikes_backward) = do_run()
-        self.assertEqual(600, len(spikes_forward))
-        self.assertEqual(600, len(spikes_backward))
+        # Packets can get lost, so this is now a range
+        self.assertGreaterEqual(300, len(spikes_forward))
+        self.assertLessEqual(600, len(spikes_forward))
+        self.assertGreateEquals(300, len(spikes_backward))
+        self.assertLessEqual(600, len(spikes_backward))
 
     def test_run(self):
         self.runsafe(self.check_run)
