@@ -33,7 +33,8 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
-    OnChipBitFieldGenerator, SpynnakerDataSpecificationWriter,
+    DelaySupportAdder, OnChipBitFieldGenerator,
+    SpynnakerDataSpecificationWriter,
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
@@ -41,6 +42,8 @@ from spynnaker.pyNN.extra_algorithms.\
         SpynnakerMachineBitFieldPairRouterCompressor,)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
+from spynnaker.pyNN.extra_algorithms.splitter_components import (
+    SpynnakerSplitterSelector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -605,3 +608,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms)
     def _do_extra_mapping_algorithms(self):
         self._execute_write_network_graph()
+
+    @overrides(AbstractSpinnakerBase._execute_splitter_selector)
+    def _execute_splitter_selector(self):
+        with FecExecutor(self, "Execute Splitter Selector"):
+            selector = SpynnakerSplitterSelector()
+            selector(self._application_graph)
+
+    @overrides(AbstractSpinnakerBase._execute_splitter_selector)
+    def _execute_delay_support_adder(self):
+        with FecExecutor(self, "Execute Delay Support Adder"):
+            adder = DelaySupportAdder()
+            adder(self._application_graph)
