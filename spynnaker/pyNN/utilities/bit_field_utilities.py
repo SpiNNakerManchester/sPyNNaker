@@ -92,27 +92,11 @@ def get_estimated_sdram_for_key_region(incoming_projections):
             # Get the number of likely vertices
             slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
 
-            # If neuromodulation is turned on on this edge then treat
-            # edges with reward or punishment receptors differently
-            post_vertex = in_edge.post_vertex
-            neuromodulation = in_edge.is_neuromodulated(post_vertex)
-
-            receptor_type = in_edge.synapse_information[0].receptor_type
-            if neuromodulation and (receptor_type == "reward" or
-                                    receptor_type == "punishment"):
-                n_synapse_vertices = post_vertex.splitter.n_synapse_vertices
-                sdram += (n_synapse_vertices * len(slices) *
-                          N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD)
-                if in_edge.n_delay_stages:
-                    sdram += (n_synapse_vertices * len(slices) *
-                              N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                              BYTES_PER_WORD)
-            else:
+            sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                      BYTES_PER_WORD)
+            if in_edge.n_delay_stages:
                 sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                           BYTES_PER_WORD)
-                if in_edge.n_delay_stages:
-                    sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                              BYTES_PER_WORD)
 
     return sdram
 
@@ -228,9 +212,13 @@ def write_bitfield_init_data(
             post_vertex = in_edge.post_vertex
             neuromodulation = in_edge.is_neuromodulated(post_vertex)
 
-            receptor_type = in_edge.synapse_information[0].receptor_type
-            if neuromodulation and (receptor_type == "reward" or
-                                    receptor_type == "punishment"):
+            receptor_types = []
+            n_synapse_info = len(in_edge.synapse_information)
+            for n in range(n_synapse_info):
+                receptor_types.append(
+                    in_edge.synapse_information[n].receptor_type)
+            if neuromodulation and ("reward" in receptor_types or
+                                    "punishment" in receptor_types):
                 seen_machine_vertices = set()
                 for machine_edge in in_edge.machine_edges:
                     if machine_edge.pre_vertex in seen_machine_vertices:

@@ -40,6 +40,15 @@ void synapse_dynamics_process_neuromodulator_event(
         UNUSED uint32_t neuron_index, UNUSED uint32_t synapse_type) {
 }
 
+bool synapse_dynamics_is_neuromodulated(UNUSED uint32_t synapse_type) {
+    return false;
+}
+
+int32_t synapse_dynamics_get_concentration(
+        UNUSED uint32_t synapse_type, UNUSED int32_t concentration) {
+    return 0;
+}
+
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         UNUSED uint32_t time, UNUSED index_t neuron_index) {

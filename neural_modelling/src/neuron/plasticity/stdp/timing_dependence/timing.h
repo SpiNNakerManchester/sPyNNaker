@@ -22,8 +22,6 @@
 #ifndef _TIMING_H_
 #define _TIMING_H_
 
-// #include <neuron/plasticity/stdp/synapse_structure/synapse_structure.h>
-
 //! \brief Initialise the timing dependence state (global) from SDRAM
 //! \param[in] address: Location in SDRAM of timing data
 //! \return address of first word after the timing data

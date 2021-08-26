@@ -51,6 +51,10 @@ void synapse_dynamics_process_neuromodulator_event(
         uint32_t time, int32_t concentration, uint32_t neuron_index,
         uint32_t synapse_type);
 
+bool synapse_dynamics_is_neuromodulated(uint32_t synapse_type);
+
+int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration);
+
 //! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time
 //! \param[in] neuron_index: Which neuron are we processing

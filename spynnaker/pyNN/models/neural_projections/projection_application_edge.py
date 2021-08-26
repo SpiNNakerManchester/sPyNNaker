@@ -134,6 +134,9 @@ class ProjectionApplicationEdge(
                 dynamics = proj._synapse_information.synapse_dynamics
                 if are_dynamics_stdp(dynamics):
                     self.__is_neuromodulated = dynamics.neuromodulation
+                    # If true, return immediately; if not move to next proj
+                    if self.__is_neuromodulated:
+                        return self.__is_neuromodulated
 
         return self.__is_neuromodulated
 

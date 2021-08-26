@@ -305,6 +305,22 @@ void synapse_dynamics_process_neuromodulator_event(
         concentration, last_post_time, last_post_trace, synapse_type), true);
 }
 
+bool synapse_dynamics_is_neuromodulated(uint32_t synapse_type) {
+    if (synapse_type > 1) { // hard-coded still?
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration) {
+    if (synapse_type == 3) { // hard-coded still?
+        concentration = ~concentration + 1;
+    }
+    return concentration;
+}
+
 //---------------------------------------
 // can this be inlined?
 void synapse_dynamics_stdp_process_plastic_synapse(

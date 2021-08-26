@@ -367,13 +367,17 @@ class SynapticMatrices(object):
             # Is there a neuromodulated edge?
             post_vertex = app_edge.post_vertex
             neuromodulation = app_edge.is_neuromodulated(post_vertex)
-            receptor_type = app_edge.synapse_information[0].receptor_type
+            receptor_types = []
+            n_synapse_info = len(app_edge.synapse_information)
+            for n in range(n_synapse_info):
+                receptor_types.append(
+                    app_edge.synapse_information[n].receptor_type)
 
             seen_machine_vertices = set()
             # Add all incoming machine edges for this slice
             for machine_edge in app_edge.machine_edges:
-                if neuromodulation and (receptor_type == "reward" or
-                                        receptor_type == "punishment"):
+                if neuromodulation and ("reward" in receptor_types or
+                                        "punishment" in receptor_types):
                     if machine_edge.pre_vertex in seen_machine_vertices:
                         continue
 
@@ -384,6 +388,7 @@ class SynapticMatrices(object):
                     rinfo = routing_info.get_routing_info_for_edge(
                         machine_edge)
                     key_space_tracker.allocate_keys(rinfo)
+
                     in_edges_by_app_edge[app_edge].add(machine_edge)
 
             seen_machine_vertices = set()
@@ -392,8 +397,8 @@ class SynapticMatrices(object):
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
                 for machine_edge in delay_edge.machine_edges:
-                    if neuromodulation and (receptor_type == "reward" or
-                                            receptor_type == "punishment"):
+                    if neuromodulation and ("reward" in receptor_types or
+                                            "punishment" in receptor_types):
                         if machine_edge.pre_vertex in seen_machine_vertices:
                             continue
 

@@ -205,9 +205,9 @@ static inline bool process_fixed_synapses(
         uint32_t synapse_type = synapse_row_sparse_type(
             synaptic_word, synapse_index_bits, synapse_type_mask);
 
-        // If synapse type has non-input synapses and this synapse
-        // connects to one, pass event directly to synapse dynamics
-        if (synapse_type > 1) {
+        // If synapse type has non-input synapses (i.e. is neuromodulated) and
+        // this synapse connects to one, pass event directly to synapse dynamics
+        if (synapse_dynamics_is_neuromodulated(synapse_type)) {
             // Dopaminergic neurons send some amount of neuromodulator
             // concentration so this can actually be a weight as usual.
             int32_t concentration = synapse_row_sparse_weight(synaptic_word);
@@ -215,9 +215,7 @@ static inline bool process_fixed_synapses(
                 synaptic_word, synapse_index_mask);
             // In case this is punishment synapse, invert dopamine level
             // to cause depression.
-            if (synapse_type == 3) {
-                concentration = ~concentration + 1;
-            }
+            concentration = synapse_dynamics_get_concentration(synapse_type, concentration);
             synapse_dynamics_process_neuromodulator_event(time,
                 concentration, index, synapse_type);
         } else {
