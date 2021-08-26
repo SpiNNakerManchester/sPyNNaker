@@ -22,6 +22,10 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceIzhikevichNeuromodulation)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceMultiplicative)
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -105,6 +109,18 @@ class SynapseDynamicsSTDP(
         self.__delay = delay
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = neuromodulation
+
+        # For STDP with neuromodulation there can only be one combination of
+        # weight dependence and timing dependence
+        if neuromodulation:
+            if (not isinstance(weight_dependence,
+                               WeightDependenceMultiplicative)) or (
+                not isinstance(timing_dependence,
+                               TimingDependenceIzhikevichNeuromodulation)):
+                # Error
+                raise NotImplementedError(
+                    "Neuromodulation only uses WeightDependenceMultiplicative"
+                    " and TimingDependenceIzhikevichNeuromodulation")
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -251,15 +267,8 @@ class SynapseDynamicsSTDP(
         # For STDP with neuromodulation binary name is set completely in the
         # build as it must use a particular weight and timing dependence
         if self.__neuromodulation:
-            if (weight_suffix != "multiplicative") or (
-                    timing_suffix != "izhikevich_neuromodulation"):
-                # Error
-                raise NotImplementedError(
-                    "Neuromodulation only uses MultiplicativeWeightDependence"
-                    " and IzhikevichNeuromodulation timing dependence")
-            else:
-                name = "_stdp_izhikevich_neuromodulation"
-                return name
+            name = "_stdp_izhikevich_neuromodulation"
+            return name
         name = "_stdp_mad_" + timing_suffix + "_" + weight_suffix
         return name
 
