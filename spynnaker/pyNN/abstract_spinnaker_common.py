@@ -43,7 +43,7 @@ from spynnaker.pyNN.extra_algorithms.\
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SpynnakerSplitterSelector)
+    SpynnakerSplitterPartitioner, SpynnakerSplitterSelector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -552,15 +552,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
             return None, provenance
 
-    @overrides(AbstractSpinnakerBase._do_a_compression)
-    def _do_a_compression(self, name):
+    @overrides(AbstractSpinnakerBase._do_compression_by_name)
+    def _do_compression_by_name(self, name):
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
             return self._excetute_spynnaker_ordered_covering_compressor()
 
         if name == "SpynnakerMachineBitFieldPairRouterCompressor":
             return self._excetute_spynnaker_pair_compressor()
 
-        return AbstractSpinnakerBase._do_a_compression(self, name)
+        return AbstractSpinnakerBase._do_compression_by_name(self, name)
 
     def _execute_synapse_expander(self):
         with FecExecutor(self, "Execute Synapse Expander") as executor:
@@ -615,8 +615,23 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             selector = SpynnakerSplitterSelector()
             selector(self._application_graph)
 
-    @overrides(AbstractSpinnakerBase._execute_splitter_selector)
+    @overrides(AbstractSpinnakerBase._execute_delay_support_adder)
     def _execute_delay_support_adder(self):
         with FecExecutor(self, "Execute Delay Support Adder"):
             adder = DelaySupportAdder()
             adder(self._application_graph)
+
+    def _execute_splitter_partitioner(self):
+        """
+        overirdden by spynakker
+
+        :return:
+        """
+        with FecExecutor(
+                self, "Execute Spynnaker Splitter Partitioner") as executor:
+            if executor.skip_if_application_graph_empty():
+                return
+            partitioner = SpynnakerSplitterPartitioner()
+            self._machine_graph, _ = partitioner(
+                self._application_graph, self._machine, self._plan_n_timesteps,
+                pre_allocated_resources=None)
