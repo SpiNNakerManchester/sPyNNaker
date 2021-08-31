@@ -40,6 +40,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -56,7 +57,6 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
     exact_sdram_for_bit_field_builder_region)
-from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
@@ -86,8 +86,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__synapse_verts_by_neuron",
         # The number of synapse cores per neuron core
         "__n_synapse_vertices",
-        # Any application edges from Poisson sources that are handled here
-        "__poisson_edges",
+        # Any application Poisson sources that are handled here
+        "__poisson_sources",
         # The maximum delay supported
         "__max_delay",
         # The user-set maximum delay, for reset
@@ -490,7 +490,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The graph to add any Poisson cores to
         """
-        self.__poisson_edges = set()
+        self.__poisson_sources = set()
         incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
             pre_vertex = proj._projection_edge.pre_vertex
@@ -509,8 +509,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, proj._projection_edge))
 
-                # Keep track of edges that have been used for this
-                self.__poisson_edges.add(proj._projection_edge)
+                # Keep track of sources that have been handled
+                self.__poisson_sources.add(pre_vertex)
         return incoming_direct_poisson
 
     def __is_direct_poisson_source(self, pre_vertex, connector):
@@ -550,26 +550,26 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return self.__get_fixed_slices(), True
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        return {v: [MachineEdge] for v in self.__neuron_vertices}
+    def get_out_going_vertices(self, outgoing_edge_partition):
+        return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(
-            self, edge, outgoing_edge_partition, src_machine_vertex):
+    def get_in_coming_vertices(self, outgoing_edge_partition):
         # If the edge is delayed, get the real edge
-        if isinstance(edge, DelayedApplicationEdge):
-            edge = edge.undelayed_edge
+        pre_vertex = outgoing_edge_partition.pre_vertex
+        if isinstance(pre_vertex, DelayExtensionVertex):
+            pre_vertex = pre_vertex.source_vertex
 
         # Filter out edges from Poisson sources being done using SDRAM
-        if edge in self.__poisson_edges:
-            return {}
+        if pre_vertex in self.__poisson_sources:
+            return []
 
         # Pick the same synapse vertex index for each neuron vertex
         index = self.__next_synapse_index
         self.__next_synapse_index = (
             (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
-        return {self.__synapse_verts_by_neuron[neuron][index]: [MachineEdge]
-                for neuron in self.__neuron_vertices}
+        return [self.__synapse_verts_by_neuron[neuron][index]
+                for neuron in self.__neuron_vertices]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

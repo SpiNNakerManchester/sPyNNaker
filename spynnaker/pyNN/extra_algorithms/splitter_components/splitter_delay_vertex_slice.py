@@ -20,7 +20,6 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
 from pacman.model.resources import (
@@ -84,8 +83,12 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractDependentSplitter.get_out_going_vertices)
-    def get_out_going_vertices(self, edge, outgoing_edge_partition):
-        return self._get_map([MachineEdge])
+    def get_out_going_vertices(self, outgoing_edge_partition):
+        return self._governed_app_vertex.machine_vertices
+
+    @overrides(AbstractDependentSplitter.get_in_coming_vertices)
+    def get_in_coming_vertices(self, outgoing_edge_partition):
+        return self._governed_app_vertex.machine_vertices
 
     @property
     def source_of_delay_vertex(self):
@@ -122,13 +125,6 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     @overrides(AbstractDependentSplitter.get_out_going_slices)
     def get_out_going_slices(self):
         return self._other_splitter.get_out_going_slices()
-
-    @overrides(AbstractDependentSplitter.get_in_coming_vertices)
-    def get_in_coming_vertices(
-            self, edge, outgoing_edge_partition, src_machine_vertex):
-        return {
-            self._machine_vertex_by_slice[
-                src_machine_vertex.vertex_slice]: [MachineEdge]}
 
     @overrides(AbstractDependentSplitter.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
