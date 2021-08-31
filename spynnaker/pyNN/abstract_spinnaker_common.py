@@ -535,6 +535,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
+            self._multicast_routes_loaded = True
             return None, provenance
 
     def _excetute_spynnaker_pair_compressor(self):
@@ -550,6 +551,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
+            self._multicast_routes_loaded = True
             return None, provenance
 
     @overrides(AbstractSpinnakerBase._do_compression_by_name)
