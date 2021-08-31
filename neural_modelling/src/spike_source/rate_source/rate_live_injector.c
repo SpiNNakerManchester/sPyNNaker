@@ -66,6 +66,10 @@ typedef struct global_parameters {
     uint32_t refresh;
     //! The tag used to allocate the memory region
     uint32_t mem_index;
+    //! Total length of the dataset, if this is preloaded, 0 otherwise
+    uint32_t total_values;
+    //! The number of epochs
+    uint32_t epochs;
 
 } global_parameters;
 
@@ -105,6 +109,13 @@ static uint32_t vertex_offset;
 
 static uint32_t img_size;
 
+static uint32_t total_values;
+static uint32_t values_read;
+static uint32_t epochs;
+static uint32_t epoch_counter;
+
+static address_t dataset_pointer;
+
 static inline void update_mem_values() {
 
     refresh_timer = 0;
@@ -114,6 +125,25 @@ static inline void update_mem_values() {
         rate_values, DMA_READ, img_size);
 
     memory_values += generators;
+    values_read += generators;
+
+    if(values_read >= total_values) {
+
+        if(epoch_counter < epochs) {
+
+            memory_values = dataset_pointer;
+            values_read = 0;
+            epoch_counter++;
+        }
+        // Teaching fase is over, send test set
+        else{
+
+            values_read = 0;
+            // This is the new interval to keep test images
+            // Probably needs a bit of tuning
+            refresh = 10;
+        }
+    }
 }
 
 void dma_complete_callback(uint unused1, uint unused2) {
@@ -128,7 +158,7 @@ void dma_complete_callback(uint unused1, uint unused2) {
 }
 
 
-//! \brief method for reading the parameters stored in Poisson parameter region
+//! \brief method for reading the parameters stored in the parameter region
 //! \param[in] address the absolute SDRAM memory address to which the
 //!            rate parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
@@ -143,8 +173,13 @@ static bool read_rate_parameters(address_t address, address_t dataset) {
     refresh_counter = 1;
     refresh = params->refresh;
     mem_index = params->mem_index;
+    total_values = params->total_values;
+    epochs = params->epochs;
+    epoch_counter = 0;
 
     memory_values = (uint8_t *) dataset;
+
+    dataset_pointer = dataset;
     
     // The size of 1 image
     img_size = generators * sizeof(uint8_t);
@@ -163,6 +198,7 @@ static bool read_rate_parameters(address_t address, address_t dataset) {
     spin1_memcpy(shared_region[0], memory_values, img_size);
 
     memory_values += generators;
+    values_read = generators;
 
     log_info("read_rate_parameters: completed successfully");
     return true;

@@ -47,7 +47,7 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
 
             rate_update_threshold=2,
 
-            starting_rate=0, teach=True
+            starting_rate=0, teach=True, out=False
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireTwoCompRate(
@@ -61,7 +61,12 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
 
         self._rate_based = True
 
-        if teach:
+        if out:
+            super(IFExpRateTwoComp, self).__init__(
+                model_name="IF_exp_rate_two_comp", binary="Two_comp_rate_out.aplx",
+                neuron_model=neuron_model, input_type=input_type,
+                synapse_type=synapse_type, threshold_type=threshold_type)
+        elif teach:
             super(IFExpRateTwoComp, self).__init__(
                 model_name="IF_exp_rate_two_comp", binary="Two_comp_rate.aplx",
                 neuron_model=neuron_model, input_type=input_type,

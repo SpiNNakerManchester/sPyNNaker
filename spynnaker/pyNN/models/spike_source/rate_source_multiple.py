@@ -15,33 +15,21 @@
 
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from .rate_live_teacher_partition import RateLiveTeacherPartition
+from .rate_source_multiple_partition import RateSourceMultiplePartition
 
-class RateLiveTeacher(AbstractPyNNModel):
+DEFAULT_MAX_ATOMS_PER_CORE = 500
+
+class RateSourceMultiple(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, sources, refresh_rate, dataset, dataset_len, partitions=1, epochs=1):
+    def __init__(self, partitions=1):
 
-        self.__sources = sources
         self.__partitions = partitions
-        # Number of classes for MNIST. To Be Changed!
-        self._max_atoms_per_core = 10
-        # Numer of timesteps we want to keep each rate fixed
-        self.__refresh_rate = refresh_rate
-        self.__dataset = dataset
-        self.__dataset_len = dataset_len
-        self.__epochs = epochs
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints):
-        return RateLiveTeacherPartition(
-            self.__sources, constraints, label,
-            self, self.__partitions,
-            self.__refresh_rate, self.__dataset,
-            self.__dataset_len, self.__epochs)
-
-    @property
-    def _sources(self):
-        return self.__sources
+        max_atoms = 1000
+        return RateSourceMultiplePartition(
+            n_neurons, constraints, label, max_atoms, self, self.__partitions)

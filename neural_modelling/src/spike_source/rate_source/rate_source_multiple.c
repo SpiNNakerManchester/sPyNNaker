@@ -30,6 +30,8 @@
 
 #include <profiler.h>
 
+#define DMA_READ_TAG 0
+
 // Declare spin1_wfi
 extern void spin1_wfi(void);
 
@@ -39,20 +41,18 @@ extern uint ticks;
 //! spike source array region IDs in human readable form
 typedef enum region {
     SYSTEM, RATE_PARAMS,
-    RATE_VALUES,
     PROVENANCE_REGION,
     PROFILER_REGION
 } region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 #define BYTE_TO_WORD_CONVERTER 4
-#define DMA_READ_TAG 0
 
 typedef enum callback_priorities {
     MULTICAST = -1,
-    SDP = 2,
+    SDP = 0,
     DMA = 1,
-    TIMER = 1
+    TIMER = 2
 } callback_priorities;
 
 //! Parameters of the SpikeSourcePoisson
@@ -61,24 +61,26 @@ typedef struct global_parameters {
     bool has_key;
     //! The base key to send with (neuron ID to be added to it), or 0 if no key
     uint32_t key;
-    //! The number of rates
-    uint32_t generators;
     //! The offset of the timer ticks to desynchronize sources
     uint32_t timer_offset;
-    //! The refresh rate for the input sequence in timesteps
-    uint32_t refresh;
-    //! The number of teaching signals written in memory
-    uint32_t teaching_signals;
-    //! The number of epochs
-    uint32_t epochs;
 
 } global_parameters;
+
+//! The global_parameters for the sub-population
+static global_parameters params;
+
+
+struct config {
+
+    global_parameters globals;
+    uint32_t n_neurons;
+};
 
 struct source_provenance {
 
     uint32_t current_timer_tick;
-    uint32_t refresh_counts;
 };
+
 
 //! the time interval parameter TODO this variable could be removed and use the
 //! timer tick callback timer value.
@@ -93,83 +95,7 @@ static uint32_t infinite_run;
 //! The timer period
 static uint32_t timer_period;
 
-static uint32_t key = 0;
-
-//! Refresh frequency for the inputs
-static uint32_t refresh;
-
-static uint32_t refresh_counter;
-static uint32_t total_n_refresh;
-static uint32_t refresh_timer;
-
-static uint32_t generators;
-
-static uint8_t *rate_values;
-static uint8_t *memory_values;
-
-static uint32_t n_teaching_signals;
-static uint32_t bytes_read;
-static uint32_t max_size;
-
-static uint32_t teaching_signal;
-
-static uint32_t neg_teach = UINT32_MAX - ((1 << 21) - ((1 << 14) + 1));
-
-static address_t starting_ptr;
-static uint32_t total_read;
-static uint32_t epochs;
-static uint32_t epoch_counter;
-
-uint32_t elements;
-
-uint32_t rate_value;
-
-//! The size of the pool of rates to be sent
-static uint32_t pool_size;
-
-static inline void read_rate_values() {
-
-    refresh_timer = 0;
-
-    rate_value = rate_values[refresh_counter++];
-
-    if(refresh_counter >= elements) {
-
-        uint32_t size_to_read = 
-            bytes_read + pool_size > max_size ? 
-                max_size - bytes_read : pool_size;
-
-        spin1_dma_transfer(
-            DMA_READ_TAG, memory_values,
-            rate_values, DMA_READ, size_to_read);
-
-        memory_values += elements;
-        refresh_counter = 0;
-        bytes_read += size_to_read;
-        total_read += elements;
-
-        if(total_read >= n_teaching_signals) {
-
-            if(epoch_counter < epochs) {
-
-                total_read = 0;
-                memory_values = starting_ptr;
-                bytes_read = 0;
-                epoch_counter++;
-            }
-            else{
-
-                total_read = 0;
-                memory_values = starting_ptr + n_teaching_signals;
-                // This is the new interval to keep test images
-                // Probably needs a bit of tuning
-                refresh = 10;
-            }
-        }
-    }
-
-    total_n_refresh++;
-}
+static uint32_t n_neurons;
 
 
 //! \brief method for reading the parameters stored in Poisson parameter region
@@ -177,55 +103,12 @@ static inline void read_rate_values() {
 //!            rate parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-static bool read_rate_parameters(address_t address, address_t starting_values) {
+static bool read_rate_parameters(struct config *config) {
     // Allocate DTCM for array of rates and copy block of data
 
-    global_parameters *params = (void *) address;
+    spin1_memcpy(&params, &config->globals, sizeof(params));
 
-    generators = params->generators;
-    starting_ptr = starting_values;
-    epochs = params->epochs;
-    epoch_counter = 0;
-
-    // This ensures that we don't send a wrong teaching value on the first timestep
-    rate_value = generators;
-
-    refresh_timer = 0;
-    refresh = params->refresh;
-    if(params->has_key) {
-        key = params->key;
-    }
-
-    n_teaching_signals = params->teaching_signals;
-
-    elements = n_teaching_signals > 1024 ? 1024 : n_teaching_signals;
-    max_size = n_teaching_signals > 1024 ? n_teaching_signals : 1024;
-
-    max_size *= sizeof(uint8_t);
-
-    pool_size = elements * sizeof(uint8_t);
-
-    rate_values = spin1_malloc(pool_size);
-    if (rate_values == NULL) {
-        log_error("Could not allocate space for the rate values");
-        return false;
-    }
-
-    spin1_memcpy(rate_values, starting_values, pool_size);
-
-    bytes_read = pool_size;
-
-    memory_values = (uint8_t *) starting_values;
-    memory_values += elements;
-    total_read = elements;
-
-    rate_value = rate_values[0];
-
-    refresh_counter = 1;
-    total_n_refresh = 1;
-
-    // Storing 1 as S1615 to imporve performances when sending the teaching signal
-    teaching_signal = (1 << 21) + (1 << 14);
+    n_neurons = config->n_neurons;
 
     log_info("read_rate_parameters: completed successfully");
     return true;
@@ -238,7 +121,6 @@ void store_provenance_data(address_t provenance_region) {
 
     // store the data into the provenance data region
     prov->current_timer_tick = time;
-    prov->refresh_counts = total_n_refresh;
     log_debug("finished other provenance data");
 }
 
@@ -274,8 +156,7 @@ static bool initialize(void) {
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions),
-            data_specification_get_region(RATE_VALUES, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions))) {
         return false;
     }
 
@@ -297,8 +178,7 @@ static void resume_callback(void) {
             data_specification_get_data_address();
 
     if (!read_rate_parameters(
-            data_specification_get_region(RATE_PARAMS, ds_regions),
-            data_specification_get_region(RATE_VALUES, ds_regions))) {
+            data_specification_get_region(RATE_PARAMS, ds_regions))) {
         log_error("failed to reread the Rate parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -322,7 +202,6 @@ static void timer_callback(uint timer_count, uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
-    refresh_timer++;
 
     log_debug("Timer tick %u", time);
 
@@ -342,31 +221,11 @@ static void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    for(index_t i = 0; i < generators; i++) {
+    for(uint32_t i = 0; i < n_neurons; i++) {
 
-        if(rate_value == i) {
-            
-            while (!spin1_send_mc_packet(key | i, teaching_signal, WITH_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
-        }
-        // 11 means no teaching!
-        else if(rate_value != 11) {
-
-            while (!spin1_send_mc_packet(key | i, neg_teach, WITH_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
-        }
-        else{
-
-            while (!spin1_send_mc_packet(key | i, 0, WITH_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
-        }
-    }
-
-    if(refresh_timer > refresh) {
-        read_rate_values();
+       while (!spin1_send_mc_packet(params.key, i, WITH_PAYLOAD)) {
+            spin1_delay_us(1);
+       }
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
@@ -385,7 +244,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick_and_phase(timer_period, 0);
+    spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

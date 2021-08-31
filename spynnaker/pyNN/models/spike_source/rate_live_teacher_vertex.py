@@ -46,7 +46,8 @@ logger = logging.getLogger(__name__)
 
 # bool has_key; uint32_t key; uint32_t generators;
 # uint32_t timer_offset; uint32_t refresh; uint32_t teaching_signals;
-PARAMS_BASE_WORDS = 6
+# uint32_t epochs;
+PARAMS_BASE_WORDS = 7
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -75,7 +76,9 @@ class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
         "__n_profile_samples",
         "__requires_mapping",
         "__refresh_rate",
-        "__teaching_signals"
+        "__teaching_signals",
+        "__dataset_len",
+        "__epochs"
     ]
 
     RATE_RECORDING_REGION_ID = 0
@@ -83,12 +86,14 @@ class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
     _n_vertices = 0
 
     def __init__(self, sources, constraints, max_atoms_per_core, 
-            label, model, refresh_rate, teaching_signals):
+            label, model, refresh_rate, teaching_signals, dataset_len, epochs):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateLiveTeacher"
         self.__model = model
         self.__n_atoms = sources
         self.__refresh_rate = refresh_rate
+        self.__dataset_len = dataset_len
+        self.__epochs = epochs
 
         self.__change_requires_neuron_parameters_reload = False
         self.__machine_time_step = None
@@ -322,7 +327,10 @@ class RateLiveTeacherVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
         spec.write_value(data=self.__refresh_rate)
 
         #write how many teaching signals will be sent
-        spec.write_value(data=len(self.__teaching_signals))
+        spec.write_value(data=self.__dataset_len)
+
+        # Write the number of training epochs
+        spec.write_value(data=self.__epochs)
 
         # Set the focus to the memory region 3 (rate values):
         spec.switch_write_focus(_REGIONS.RATE_VALUES_REGION.value)

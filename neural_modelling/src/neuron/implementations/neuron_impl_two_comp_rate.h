@@ -84,7 +84,7 @@ static post_event_history_t *postsynaptic_buffer;
 
 static REAL *background_activity;
 
-static uint32_t seeds[] = {100, 200, 300, 40}; 
+static uint32_t *seeds;
 
 static inline void generate_background_activity(uint32_t n_neurons) {
     for (index_t i = 0; i < n_neurons; i++) {
@@ -93,6 +93,19 @@ static inline void generate_background_activity(uint32_t n_neurons) {
                                             seeds);
         //io_printf(IO_BUF, "rand %k\n", background_activity[i]);
     }
+}
+
+static void neuron_impl_set_background_noise_params(address_t address, uint32_t n_neurons) {
+
+     seeds = spin1_malloc(sizeof(uint32_t));
+        if (seeds == NULL) {
+            log_error("Unable to allocate seeds array");
+            return false;
+        }
+
+     spin1_memcpy(seeds, address, 4 * sizeof(uint32_t));
+
+     generate_background_activity(n_neurons);
 }
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
@@ -163,8 +176,6 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
         log_error("Unable to allocate background activity array - Out of DTCM");
         return false;
     }
-
-    generate_background_activity(n_neurons);
 
     return true;
 }
@@ -356,7 +367,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            background_activity[neuron_index], neuron);
 
     // ************************************************************************
     // determine if a spike should occur
@@ -495,6 +506,8 @@ static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index)
 }
 
 static inline void neuron_impl_send_postsynaptic_buffer(uint32_t n_neurons) {
+
+    //spin1_delay_us(150);
 
     spin1_dma_transfer(
         DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER, postsynaptic_buffer, postsynaptic_rates,

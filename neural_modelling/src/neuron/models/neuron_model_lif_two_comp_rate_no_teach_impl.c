@@ -38,7 +38,7 @@ state_t neuron_model_state_update(
 
     // Get the dendrite input in nA
     input_t dendrite_input_this_timestep =
-        exc_input[1] - inh_input[1] + external_bias + neuron->I_offset;
+        exc_input[1] - inh_input[1] + neuron->I_offset;
     //input_t dendrite_input_this_timestep =
     //  exc_input[1] - inh_input[1];
 
@@ -48,7 +48,7 @@ state_t neuron_model_state_update(
 
     //io_printf(IO_BUF, "dend input %k, soma input %k\n", dendrite_input_this_timestep, soma_input_this_timestep);
 
-    neuron->U_membrane = (neuron->g_D * neuron->V) /
+    neuron->U_membrane = (neuron->g_D * neuron->V + external_bias) /
                             (neuron->g_L + neuron->g_D);
 
     //io_printf(IO_BUF, "U %k, V %k\n", neuron->U_membrane, neuron->V);

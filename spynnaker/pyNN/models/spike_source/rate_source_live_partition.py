@@ -31,11 +31,14 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         "__machine_vertices",
         "__dataset",
         "__subsets",
-        "__packet_compressor"]
+        "__packet_compressor",
+        "__dataset_len",
+        "__epochs"]
 
     def __init__(
         self, sources, constraints, label, rate_source_live,
-        partitions, refresh_rate, dataset, packet_compressor):
+        partitions, refresh_rate, dataset, packet_compressor,
+        dataset_len, epochs):
 
         self.__n_atoms = sources
         self.__vertices = [list() for _ in range(partitions)]
@@ -44,6 +47,8 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         self.__dataset = dataset
         self.__injector_vertices = list()
         self.__packet_compressor = packet_compressor
+        self.__dataset_len = dataset_len
+        self.__epochs = epochs
 
         subset_length = int(len(self.__dataset[0]) / N_CHIPS)
 
@@ -59,7 +64,9 @@ class RateSourceLivePartition(SimplePopulationSettable, AbstractChangableAfterRu
         for chip in range(N_CHIPS):
             
             self.__injector_vertices.append(RateLiveInjectorVertex(
-                int(self.__n_atoms / N_CHIPS), "Rate_live_injector", constraints, rate_source_live, self.__subsets[chip][1:], refresh_rate))
+                int(self.__n_atoms / N_CHIPS), "Rate_live_injector",
+                constraints, rate_source_live, self.__subsets[chip][1:],
+                refresh_rate, self.__dataset_len, epochs))
     
             vertex_offset = 0
             atoms_partition_offset = 0

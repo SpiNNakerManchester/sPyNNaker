@@ -20,11 +20,9 @@
 
 static inline REAL out_rate(REAL v) {
 
-    // The + 0.5k bit is killing us
-    //v = (v >> 2) + 0.5k;
 
-    if(v > 1.0k)
-        return 1.0k;
+    if(v > 15.0k)
+        return 15.0k;
     else if (v < 0.0k)
         return 0.0k;
         

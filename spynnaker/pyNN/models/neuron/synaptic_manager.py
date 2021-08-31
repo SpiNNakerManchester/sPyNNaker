@@ -288,7 +288,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
             pass
 
         # Otherwise, the dynamics must be equal
-        elif not synapse_dynamics.is_sameinput_pop_as(self.__synapse_dynamics):
+        elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")

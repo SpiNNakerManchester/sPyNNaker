@@ -19,7 +19,9 @@ from .spike_source_poisson import SpikeSourcePoisson
 from .rate_source_array import RateSourceArray
 from .rate_source_live import RateSourceLive
 from .rate_live_teacher import RateLiveTeacher
+from .rate_source_multiple import RateSourceMultiple
 
 __all__ = ["SpikeSourceArray", "SpikeSourceFromFile",
         "SpikeSourcePoisson", "RateSourceArray",
-        "RateSourceLive", "RateLiveTeacher"]
+        "RateSourceLive", "RateLiveTeacher",
+        "RateSourceMultiple"]

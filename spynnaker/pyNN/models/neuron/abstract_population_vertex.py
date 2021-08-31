@@ -17,6 +17,7 @@ import logging
 import os
 import math
 import numpy
+import random
 
 from spinn_utilities.overrides import overrides
 
@@ -122,8 +123,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 12 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 40
+    # 16 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 64
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -578,7 +579,10 @@ class AbstractPopulationVertex(
         spec.write_value(
             data=len(self.__neuron_impl.get_recordable_variables()))
 
-        # Write the number of incoming partitions per synapse type 
+        seeds = [random.randint(0, 10000) for _ in range(4)]
+        spec.write_array(seeds)
+
+        # Write the number of incoming partitions per synapse type
         # to allocate a sufficiently big contribution area for all
         # the synapse cores.
         spec.write_array(self._incoming_partitions)
@@ -977,7 +981,7 @@ class AbstractPopulationVertex(
         parameters = dict()
         for parameter_name in self.__pynn_model.default_parameters:
             # BAD CODING : TMP FOR THE US NO TEACH!! FIX!!!!!!!!!!!!!!!!!!!!!
-            if parameter_name != "teach":
+            if parameter_name != "teach" and parameter_name != "out":
                 parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {

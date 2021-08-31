@@ -21,18 +21,25 @@ class RateLiveTeacherPartition(SimplePopulationSettable, AbstractChangableAfterR
         "__injector_vertex",
         "__atoms_per_partition",
         "__machine_vertices",
-        "__dataset"]
+        "__dataset",
+        "__dataset_len",
+        "__epochs"]
 
-    def __init__(self, sources, constraints, label, rate_live_teacher, partitions, refresh_rate, dataset):
+    def __init__(self, sources, constraints, label, rate_live_teacher,
+                 partitions, refresh_rate, dataset, dataset_len, epochs):
 
         self.__n_atoms = sources
         self.__vertices = list()
         self.__partitions = partitions
         self.__refresh_rate = refresh_rate
         self.__dataset = dataset
+        self.__dataset_len = dataset_len
+        self.__epochs = epochs
 
         self.__vertices.append(RateLiveTeacherVertex(
-            sources, constraints, sources, label, rate_live_teacher, refresh_rate, dataset))
+            sources, constraints, sources, label,
+            rate_live_teacher, refresh_rate, dataset,
+            dataset_len, epochs))
 
     @property
     def n_atoms(self):

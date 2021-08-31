@@ -135,8 +135,9 @@ struct neuron_parameters {
     uint32_t mem_index;
     uint32_t n_recorded_variables;
 };
+// The +4 is for the seeds for the background noise
 #define INCOMING_PARTITIONS_PTR \
-    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
+    ((sizeof(struct neuron_parameters) / sizeof(uint32_t)) + 4)
 
 static void reset_record_counter(void) {
 
@@ -338,6 +339,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     // Tag the postsynaptic region with memory_index+18. Still a unique id and saves space in DTCM
     // Memory_index is the core ID, +18 guarantees not to replicate a tag with another core ID
     neuron_impl_allocate_postsynaptic_region(memory_index+18, n_neurons);
+
+    neuron_impl_set_background_noise_params(address + INCOMING_PARTITIONS_PTR - 4, n_neurons);
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (REAL *) spin1_malloc(dma_size);

@@ -13,18 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = poisson \
-		rate_live_injector \
-		rate_source \
-		rate_source_multiple \
-		rate_source_live \
-		rate_source_live_compressor \
-		rate_live_teacher
-		 
 
+APP = $(notdir $(CURDIR))
 
-all:
-	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/synapse_dynamics_static_impl.c
 
-clean:
-	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done
+COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
+
+include ../synapse_build.mk
