@@ -17,7 +17,6 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
     MultiRegionSDRAM)
