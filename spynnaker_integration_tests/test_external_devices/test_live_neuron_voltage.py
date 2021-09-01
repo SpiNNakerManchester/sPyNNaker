@@ -127,12 +127,17 @@ def live_neuron_voltage():
     print(len(translator_1.voltages[key_1]), translator_1.voltages[key_1])
     print(len(translator_2.voltages[key_2_1]), translator_2.voltages[key_2_1])
     print(len(translator_2.voltages[key_2_2]), translator_2.voltages[key_2_2])
-    assert(len(translator_1.voltages[key_1]) == run_time // time_1)
-    assert(len(translator_2.voltages[key_2_1]) == run_time // time_2_1)
-    assert(len(translator_2.voltages[key_2_2]) == run_time // time_2_2)
-    assert(numpy.array_equal(relevant_v, translator_1.voltages[key_1]))
+    assert(len(translator_1.voltages[key_1]) >= (run_time // time_1) // 2)
+    assert(len(translator_2.voltages[key_2_1]) >= (run_time // time_2_1) // 2)
+    assert(len(translator_2.voltages[key_2_2]) >= (run_time // time_2_2) // 2)
     assert(numpy.sum(translator_2.voltages[key_2_1]) == 0)
     assert(numpy.sum(translator_2.voltages[key_2_2]) == 0)
+
+    i = 0
+    for volts in translator_1.voltages[key_1]:
+        while i < len(relevant_v) and volts != relevant_v[i]:
+            i += 1
+        assert(i < len(relevant_v))
 
 
 class TestLiveNeuronVoltage(BaseTestCase):

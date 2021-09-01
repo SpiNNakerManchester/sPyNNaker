@@ -64,9 +64,11 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
         p.end()
 
         for label in labels:
-            # print("Received {} of 1000 spikes from {}".format(
-            #    TestMultiBoardSpikeOutput.counts[label], label))
-            self.assertEqual(TestMultiBoardSpikeOutput.counts[label], 1000)
+            # Lost packets might mean some get lost, but no more than 1000
+            # can be received
+            count = TestMultiBoardSpikeOutput.counts[label]
+            self.assertGreaterEqual(count, 500)
+            self.assertLessEqual(count, 1000)
 
     def test_multi_board_spike_output(self):
         self.runsafe(self.multi_board_spike_output)
