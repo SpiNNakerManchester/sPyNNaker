@@ -613,7 +613,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder)
     def _execute_delay_support_adder(self):
-        with FecExecutor(self, "Execute Delay Support Adder"):
+        with FecExecutor(self, "Execute Delay Support Adder") as executor:
+            if executor.skip_if_cfg_false("Mapping","add_delay_supports"):
+                return
             adder = DelaySupportAdder()
             adder(self._application_graph)
 
