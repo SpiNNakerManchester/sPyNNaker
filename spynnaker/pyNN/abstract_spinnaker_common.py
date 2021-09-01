@@ -580,8 +580,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             generator = OnChipBitFieldGenerator()
             generator(
                 self.placements, self.application_graph,
-                self._executable_finder,
-                self._txrx, self._machine_graph, self._routing_infos)
+                self._executable_finder,  self._txrx, self._machine_graph,
+                self._routing_infos)
 
     def _execute_finish_connection_holders(self):
         with FecExecutor(self, "Execute Finish Connection Holders"):
@@ -592,17 +592,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self._execute_synapse_expander()
         self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
-
-    def _execute_on_chip_bit_field_generator(self):
-        with FecExecutor(self, "Execute On Chip Bit Field Generator")\
-                as executor:
-            if executor.skip_if_virtual_board():
-                return
-            generator = OnChipBitFieldGenerator()
-            generator(
-                self._placements, self._application_graph,
-                self._executable_finder, self._txrx, self._machine_graph,
-                self._routing_infos)
 
     def _execute_write_network_graph(self):
         with FecExecutor(self, "Execute On Chip Bit Field Generator") \
