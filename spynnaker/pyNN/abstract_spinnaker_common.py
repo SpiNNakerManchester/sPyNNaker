@@ -598,6 +598,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 as executor:
             if executor.skip_if_virtual_board():
                 return
+            generator = OnChipBitFieldGenerator()
+            generator(
+                self._placements, self._application_graph,
+                self._executable_finder, self._txrx, self._machine_graph,
+                self._routing_infos)
 
     def _execute_write_network_graph(self):
         with FecExecutor(self, "Execute On Chip Bit Field Generator") \
