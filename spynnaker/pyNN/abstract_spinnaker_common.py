@@ -17,7 +17,7 @@ import logging
 import math
 import os
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
@@ -614,10 +614,16 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder)
     def _execute_delay_support_adder(self):
         with FecExecutor(self, "Execute Delay Support Adder") as executor:
-            if executor.skip_if_cfg_false("Mapping","add_delay_supports"):
+            name = get_config_str("Mapping", "delay_support_adder")
+            if name is None:
+                executor.skip("delay_support_adder is None")
                 return
-            adder = DelaySupportAdder()
-            adder(self._application_graph)
+            if name == "DelaySupportAdder":
+                adder = DelaySupportAdder()
+                adder(self._application_graph)
+                return
+            raise ConfigurationException(
+                f"Unexpected cfg setting delay_support_adder: {name}")
 
     def _execute_splitter_partitioner(self):
         """
