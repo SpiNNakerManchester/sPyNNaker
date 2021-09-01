@@ -29,7 +29,7 @@
 #include <neuron/threshold_types/threshold_type.h>
 #include <neuron/synapse_types/synapse_types.h>
 
-#include <neuron/current_sources/current_source_impl.h>
+#include <neuron/current_sources/current_source.h>
 
 // Further includes
 #include <debug.h>

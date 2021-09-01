@@ -277,16 +277,15 @@ class PopulationMachineNeurons(
             cs_data_types = current_source.get_parameter_types
             cs_id = current_source.current_source_id
             for key, value in current_source.get_parameters.items():
-                # StepCurrentSource, ACSource currently handled with arrays
-                if ((cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value)
-                        or (cs_id == CurrentSourceIDs.AC_SOURCE.value)):
+                # StepCurrentSource currently handled with arrays
+                if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
                     n_params = len(current_source.get_parameters[key])
                     spec.write_value(n_params)
                     for n_p in range(n_params):
                         value_convert = convert_to(
                             value[n_p], cs_data_types[key]).view("uint32")
                         spec.write_value(data=value_convert)
-                # DCSource, NoisyCurrentSource have single-valued params
+                # All other sources have single-valued params
                 else:
                     if hasattr(value, "__getitem__"):
                         for m in range(len(value)):

@@ -22,7 +22,7 @@
 #include "neuron.h"
 #include "neuron_recording.h"
 #include "implementations/neuron_impl.h"
-#include "current_sources/current_source_impl.h"
+#include "current_sources/current_source.h"
 #include "plasticity/synapse_dynamics.h"
 #include "tdma_processing.h"
 #include <debug.h>

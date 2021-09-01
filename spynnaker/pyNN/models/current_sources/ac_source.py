@@ -35,7 +35,7 @@ class ACSource(AbstractCurrentSource):
         "__offset",
         "__frequency",
         "__phase",
-        "__local_parameters",
+        # "__local_parameters",
         "__parameters",
         "__parameter_types"]
 
@@ -43,31 +43,51 @@ class ACSource(AbstractCurrentSource):
                  frequency=0.0, phase=0.0):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
-        self.__start = start
-        self.__stop = stop
+        sim = get_simulator()
+        machine_ts = sim.machine_time_step
+        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        self.__start = start * time_convert_ms
+        self.__stop = stop * time_convert_ms
         self.__amplitude = amplitude
         self.__offset = offset
         self.__frequency = self._get_frequency(frequency)
         self.__phase = self._get_phase(phase)
 
-        self.__local_parameters = dict()
-        self.__local_parameters['start'] = start
-        self.__local_parameters['stop'] = stop
-        self.__local_parameters['amplitude'] = amplitude
-        self.__local_parameters['offset'] = offset
-        self.__local_parameters['frequency'] = self.__frequency
-        self.__local_parameters['phase'] = self.__phase
-
-        times, amplitudes = self._get_params(
-            start, stop, amplitude, offset, self.__frequency, self.__phase)
-
         self.__parameter_types = dict()
-        self.__parameter_types['times'] = DataType.UINT32
-        self.__parameter_types['amplitudes'] = DataType.S1615
+        self.__parameter_types['start'] = DataType.UINT32
+        self.__parameter_types['stop'] = DataType.UINT32
+        self.__parameter_types['amplitude'] = DataType.S1615
+        self.__parameter_types['offset'] = DataType.S1615
+        self.__parameter_types['frequency'] = DataType.S1615
+        self.__parameter_types['phase'] = DataType.S1615
 
         self.__parameters = dict()
-        self.__parameters['times'] = times
-        self.__parameters['amplitudes'] = amplitudes
+        self.__parameters['start'] = self.__start
+        self.__parameters['stop'] = self.__stop
+        self.__parameters['amplitude'] = self.__amplitude
+        self.__parameters['offset'] = self.__offset
+        self.__parameters['frequency'] = self.__frequency
+        self.__parameters['phase'] = self.__phase
+
+        # Below was used when ACSource was done using steps
+        # self.__local_parameters = dict()
+        # self.__local_parameters['start'] = start
+        # self.__local_parameters['stop'] = stop
+        # self.__local_parameters['amplitude'] = amplitude
+        # self.__local_parameters['offset'] = offset
+        # self.__local_parameters['frequency'] = self.__frequency
+        # self.__local_parameters['phase'] = self.__phase
+        #
+        # times, amplitudes = self._get_params(
+        #     start, stop, amplitude, offset, self.__frequency, self.__phase)
+        #
+        # self.__parameter_types = dict()
+        # self.__parameter_types['times'] = DataType.UINT32
+        # self.__parameter_types['amplitudes'] = DataType.S1615
+        #
+        # self.__parameters = dict()
+        # self.__parameters['times'] = times
+        # self.__parameters['amplitudes'] = amplitudes
 
     def set_parameters(self, **parameters):
         """ Set the current source parameters
@@ -81,22 +101,28 @@ class ACSource(AbstractCurrentSource):
                 raise SpynnakerException(msg)
             else:
                 if key == 'frequency':
-                    self.__local_parameters[key] = self._get_frequency(value)
+                    self.__parameters[key] = self._get_frequency(value)
                 elif key == 'phase':
-                    self.__local_parameters[key] = self._get_phase(value)
+                    self.__parameters[key] = self._get_phase(value)
                 else:
-                    self.__local_parameters[key] = value
-
-        times, amplitudes = self._get_params(
-            self.__local_parameters['start'],
-            self.__local_parameters['stop'],
-            self.__local_parameters['amplitude'],
-            self.__local_parameters['offset'],
-            self.__local_parameters['frequency'],
-            self.__local_parameters['phase'])
-
-        self.__parameters['times'] = times
-        self.__parameters['amplitudes'] = amplitudes
+                    self.__parameters[key] = value
+        #         if key == 'frequency':
+        #             self.__local_parameters[key] = self._get_frequency(value)
+        #         elif key == 'phase':
+        #             self.__local_parameters[key] = self._get_phase(value)
+        #         else:
+        #             self.__local_parameters[key] = value
+        #
+        # times, amplitudes = self._get_params(
+        #     self.__local_parameters['start'],
+        #     self.__local_parameters['stop'],
+        #     self.__local_parameters['amplitude'],
+        #     self.__local_parameters['offset'],
+        #     self.__local_parameters['frequency'],
+        #     self.__local_parameters['phase'])
+        #
+        # self.__parameters['times'] = times
+        # self.__parameters['amplitudes'] = amplitudes
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)
@@ -131,37 +157,38 @@ class ACSource(AbstractCurrentSource):
 
         :rtype: int
         """
+        return len(self.__parameters) * BYTES_PER_WORD
         # The parameters themselves take up this amount of space
         # ((len(times) + length_val)) * 2) + ID
-        sdram_for_parameters = ((
-            len(self.__parameters['times']) + 1) * 2) * BYTES_PER_WORD
+        # sdram_for_parameters = ((
+        #     len(self.__parameters['times']) + 1) * 2) * BYTES_PER_WORD
+        #
+        # # For each_source there is the last amplitude holder and index
+        # sdram_for_on_core_calcs = 2 * BYTES_PER_WORD
+        #
+        # return sdram_for_parameters + sdram_for_on_core_calcs
 
-        # For each_source there is the last amplitude holder and index
-        sdram_for_on_core_calcs = 2 * BYTES_PER_WORD
-
-        return sdram_for_parameters + sdram_for_on_core_calcs
-
-    def _get_params(self, start, stop, amplitude, offset, frequency, phase):
-        """ Convert provided parameters into arrays.
-
-        :rtype: list, list
-        """
-        # Convert to timestep indices rather than just using start and stop
-        sim = get_simulator()
-        machine_ts = sim.machine_time_step
-        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
-        times = numpy.arange(int(start) * time_convert_ms,
-                             (int(stop) * time_convert_ms) + 1)
-        time_minus_start = numpy.arange(
-            0, ((stop-start) * time_convert_ms) + 1)
-        # Work out the amplitudes based on the provided parameters
-        amplitudes = offset + (amplitude * numpy.sin(
-            (time_minus_start * frequency / time_convert_ms) + phase))
-
-        # Set final value to zero to turn off the source
-        amplitudes[-1] = 0.0
-
-        return times, amplitudes
+    # def _get_params(self, start, stop, amplitude, offset, frequency, phase):
+    #     """ Convert provided parameters into arrays.
+    #
+    #     :rtype: list, list
+    #     """
+    #     # Convert to timestep indices rather than just using start and stop
+    #     sim = get_simulator()
+    #     machine_ts = sim.machine_time_step
+    #     time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+    #     times = numpy.arange(int(start) * time_convert_ms,
+    #                          (int(stop) * time_convert_ms) + 1)
+    #     time_minus_start = numpy.arange(
+    #         0, ((stop-start) * time_convert_ms) + 1)
+    #     # Work out the amplitudes based on the provided parameters
+    #     amplitudes = offset + (amplitude * numpy.sin(
+    #         (time_minus_start * frequency / time_convert_ms) + phase))
+    #
+    #     # Set final value to zero to turn off the source
+    #     amplitudes[-1] = 0.0
+    #
+    #     return times, amplitudes
 
     def _get_frequency(self, frequency):
         """ Convert frequency to radian-friendly value.
