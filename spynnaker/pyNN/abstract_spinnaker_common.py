@@ -516,7 +516,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         :return:
         """
-        with FecTimer(self, "Execute Spynnaker Data Specification Writer"):
+        with FecTimer("Execute Spynnaker Data Specification Writer"):
             writer = SpynnakerDataSpecificationWriter()
             self._dsg_targets, self._region_sizes = writer(
                 self._placements, self._hostname, self._machine,
@@ -524,7 +524,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     def _excetute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
-                self,
                 "Execute SpynnakerMachineBitFieldOrderedCoveringCompressor") \
                 as timer:
             if timer.skip_if_virtual_board():
@@ -565,7 +564,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         return AbstractSpinnakerBase._do_compression_by_name(self, name)
 
     def _execute_synapse_expander(self):
-        with FecTimer(self, "Execute Synapse Expander") as timer:
+        with FecTimer("Execute Synapse Expander") as timer:
             if timer.skip_if_virtual_board():
                 return
             synapse_expander(
@@ -573,8 +572,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 get_config_bool("Reports", "write_expander_iobuf"))
 
     def _execute_on_chip_bit_field_generator(self):
-        with FecTimer(self, "Execute On Chip Bit Field Generator")\
-                as timer:
+        with FecTimer("Execute On Chip Bit Field Generator") as timer:
             if timer.skip_if_virtual_board():
                 return
             generator = OnChipBitFieldGenerator()
@@ -584,7 +582,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._routing_infos)
 
     def _execute_finish_connection_holders(self):
-        with FecTimer(self, "Execute Finish Connection Holders"):
+        with FecTimer("Execute Finish Connection Holders"):
             finish_connection_holders(self.application_graph)
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
@@ -594,8 +592,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self._execute_finish_connection_holders()
 
     def _execute_write_network_graph(self):
-        with FecTimer(self, "Execute On Chip Bit Field Generator") \
-                as timer:
+        with FecTimer("Execute On Chip Bit Field Generator") as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
             report = SpYNNakerNeuronGraphNetworkSpecificationReport()
@@ -607,13 +604,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
-        with FecTimer(self, "Execute Splitter Selector"):
+        with FecTimer("Execute Splitter Selector"):
             selector = SpynnakerSplitterSelector()
             selector(self._application_graph)
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder)
     def _execute_delay_support_adder(self):
-        with FecTimer(self, "Execute Delay Support Adder") as timer:
+        with FecTimer("Execute Delay Support Adder") as timer:
             name = get_config_str("Mapping", "delay_support_adder")
             if name is None:
                 timer.skip("delay_support_adder is None")
@@ -631,8 +628,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         :return:
         """
-        with FecTimer(
-                self, "Execute Spynnaker Splitter Partitioner") as timer:
+        with FecTimer("Execute Spynnaker Splitter Partitioner") as timer:
             if timer.skip_if_application_graph_empty():
                 return
             partitioner = SpynnakerSplitterPartitioner()
