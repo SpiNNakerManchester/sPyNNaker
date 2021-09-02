@@ -539,7 +539,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     def _excetute_spynnaker_pair_compressor(self):
         with FecTimer(
-                self,
                 "Execute SpynnakerMachineBitFieldPairRouterCompressor") \
                 as timer:
             if timer.skip_if_virtual_board():
