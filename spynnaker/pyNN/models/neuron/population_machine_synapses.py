@@ -249,6 +249,8 @@ class PopulationMachineSynapses(
 
         # Get values
         n_neurons = self._vertex_slice.n_atoms
+        # We only count neuron synapse types here, as this is related to
+        # the ring buffers
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         max_delay = self._app_vertex.splitter.max_support_delay()
 

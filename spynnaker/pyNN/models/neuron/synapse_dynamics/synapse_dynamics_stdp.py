@@ -39,6 +39,12 @@ from .abstract_generate_on_machine import (
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
+# The targets of neuromodulation
+NEUROMODULATION_TARGETS = {
+    "reward": 0,
+    "punishment": 1
+}
+
 
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
@@ -586,3 +592,15 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
+
+    @overrides(AbstractPlasticSynapseDynamics.get_n_synapse_types)
+    def get_n_synapse_types(self):
+        if self.__neuromodulation:
+            return 2
+        return 0
+
+    @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
+    def get_synapse_id_by_target(self, target):
+        if not self.__neuromodulation:
+            return None
+        return NEUROMODULATION_TARGETS.get(target, None)
