@@ -230,14 +230,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             constant_values=0).view("uint32") for row in rows]
         return words
 
-    def get_n_synapse_types(self):
-        """ Get the number of synapse types supported by the dynamics object,
-            by default 0 unless overridden.
-
-        :rtype: int
-        """
-        return 0
-
     def get_synapse_id_by_target(self, target):
         """ Get the index of the synapse type based on the name, or None
             if the name is not found.

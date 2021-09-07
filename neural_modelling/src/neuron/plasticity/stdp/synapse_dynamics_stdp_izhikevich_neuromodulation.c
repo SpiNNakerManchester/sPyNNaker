@@ -23,17 +23,24 @@
 
 #define SMULBB_STDP_FIXED(a, b) (__smulbb(a, b) >> STDP_FIXED_POINT)
 
-//! The format of the plastic data region of a synaptic row
-struct synapse_row_plastic_data_t {
-    uint32_t flags;
-};
+typedef struct neuromodulation_data_t {
+    uint32_t is_neuromodulation: 1;
+    uint32_t is_reward:1;
+    uint32_t synapse_type:30;
+} neuromodulation_data_t;
 
-typedef struct stdp_plastic_data_t {
-    //! The pre-event history
-    pre_event_history_t history;
-    //! The per-synapse information
-    plastic_synapse_t synapses[];
-} stdp_plastic_data_t;
+struct synapse_row_plastic_data_t {
+    union {
+        struct {
+            //! The pre-event history
+            pre_event_history_t history;
+            //! The per-synapse information
+            plastic_synapse_t synapses[];
+        };
+        //! Neuromodulation data
+        neuromodulation_data_t neuromodulation;
+    };
+};
 
 static uint32_t weight_update_constant_component;
 
@@ -42,7 +49,7 @@ static uint32_t weight_update_constant_component;
 // synaptic history trace buffer
 static inline post_trace_t add_dopamine_spike(
         uint32_t time, int32_t concentration, uint32_t last_post_time,
-        post_trace_t last_trace, uint32_t synapse_type) {
+        post_trace_t last_trace) {
 
     // Get time since last dopamine spike
     uint32_t delta_time = time - last_post_time;
@@ -51,18 +58,6 @@ static inline post_trace_t add_dopamine_spike(
     // trace
     int32_t decayed_dopamine_trace = __smulbb(last_trace,
             DECAY_LOOKUP_TAU_D(delta_time)) >> STDP_FIXED_POINT;
-
-    // Put dopamine concentration into STDP fixed-point format
-    weight_state_t dop_weight_state = weight_get_initial(
-        concentration, synapse_type);
-    if (dop_weight_state.weight_multiply_right_shift > STDP_FIXED_POINT) {
-        concentration >>=
-           (dop_weight_state.weight_multiply_right_shift - STDP_FIXED_POINT);
-    }
-    else {
-        concentration <<=
-           (STDP_FIXED_POINT - dop_weight_state.weight_multiply_right_shift);
-    }
 
     // Step increase dopamine trace due to new spike
     int32_t new_dopamine_trace = decayed_dopamine_trace + concentration;
@@ -226,7 +221,7 @@ static inline plastic_synapse_t izhikevich_neuromodulation_plasticity_update_syn
                 delayed_post_time, delayed_last_pre_time);
 
         next_trace_is_dopamine = post_events_next_is_dopamine(post_window);
-        
+
         // Apply spike to state
         correlation_apply_post_spike(
                 delayed_post_time, *post_window.next_trace,
@@ -359,24 +354,21 @@ static inline void process_plastic_synapse(
 static inline void process_neuromodulation(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
-    bool reward = plastic_region_address->flags & 0x40000000;
-    uint32_t synapse_type = plastic_region_address->flags & 0x3FFFFFFF;
+    bool reward = plastic_region_address->neuromodulation.is_reward;
     uint32_t n_synapses = synapse_row_num_plastic_controls(fixed_region);
-    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
-    weight_t *weights = (void *) &plastic_region_address[1];
+    const uint32_t *words = (uint32_t *) synapse_row_plastic_controls(fixed_region);
 
     // Loop through synapses
     for (; n_synapses > 0; n_synapses--) {
         // Get next control word (auto incrementing)
-        uint32_t control_word = *control_words++;
-        int32_t concentration = (int32_t) *weights++;
+        uint32_t word = *words++;
+        int32_t concentration = (int32_t) synapse_row_sparse_weight(word);
 
         if (!reward) {
             concentration = -concentration;
         }
 
-        uint32_t neuron_index = synapse_row_sparse_index(
-                control_word, synapse_index_mask);
+        uint32_t neuron_index = synapse_row_sparse_index(word, 0xFFFF);
 
         // Get post event history of this neuron
         post_event_history_t *history = &post_event_history[neuron_index];
@@ -386,7 +378,7 @@ static inline void process_neuromodulation(
 
         // Add a new history trace into the buffer of post synaptic events
         post_events_add(time, history, add_dopamine_spike(time,
-            concentration, last_post_time, last_post_trace, synapse_type), true);
+            concentration, last_post_time, last_post_trace), true);
     }
 }
 
@@ -396,28 +388,27 @@ bool synapse_dynamics_process_plastic_synapses(
         weight_t *ring_buffers, uint32_t time) {
 
     // If the flag is set, this is neuromodulation
-    if (plastic_region_address->flags & 0x80000000) {
+    if (plastic_region_address->neuromodulation.is_neuromodulation) {
         process_neuromodulation(plastic_region_address, fixed_region, time);
         return true;
     }
 
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    stdp_plastic_data_t *plastic_data = (void *) &plastic_region_address[1];
-    plastic_synapse_t *plastic_words = plastic_data->synapses;
+    plastic_synapse_t *plastic_words = plastic_region_address->synapses;
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
     size_t n_plastic_synapses = synapse_row_num_plastic_controls(fixed_region);
 
     num_plastic_pre_synaptic_events += n_plastic_synapses;
 
     // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = plastic_data->history.prev_time;
-    const pre_trace_t last_pre_trace = plastic_data->history.prev_trace;
+    const uint32_t last_pre_time = plastic_region_address->history.prev_time;
+    const pre_trace_t last_pre_trace = plastic_region_address->history.prev_trace;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    plastic_data->history.prev_time = time;
-    plastic_data->history.prev_trace =
+    plastic_region_address->history.prev_time = time;
+    plastic_region_address->history.prev_trace =
             timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
     // Loop through plastic synapses
@@ -427,17 +418,16 @@ bool synapse_dynamics_process_plastic_synapses(
 
         process_plastic_synapse(
                 control_word, last_pre_time, last_pre_trace,
-                plastic_data->history.prev_trace, ring_buffers, time,
+                plastic_region_address->history.prev_trace, ring_buffers, time,
                 plastic_words);
     }
     return true;
 }
 
 static inline plastic_synapse_t *get_plastic_synapses(synaptic_row_t row) {
-    const synapse_row_plastic_data_t *plastic_data = (void *)
+    synapse_row_plastic_data_t *plastic_data = (void *)
                 synapse_row_plastic_region(row);
-    stdp_plastic_data_t *stdp_plastic_data = (void *) &plastic_data[1];
-    return stdp_plastic_data->synapses;
+    return plastic_data->synapses;
 }
 
 bool synapse_dynamics_find_neuron(

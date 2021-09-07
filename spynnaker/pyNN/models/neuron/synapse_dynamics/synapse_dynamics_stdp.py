@@ -160,7 +160,7 @@ class SynapseDynamicsSTDP(
                 synapse_dynamics.seed,
                 backprop_delay=self.backprop_delay)
 
-        # Otherwise, it is static, so return ourselves
+        # Otherwise, it is static or neuromodulation, so return ourselves
         return self
 
     @property
@@ -592,15 +592,3 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
-
-    @overrides(AbstractPlasticSynapseDynamics.get_n_synapse_types)
-    def get_n_synapse_types(self):
-        if self.__neuromodulation:
-            return 2
-        return 0
-
-    @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
-    def get_synapse_id_by_target(self, target):
-        if not self.__neuromodulation:
-            return None
-        return NEUROMODULATION_TARGETS.get(target, None)
