@@ -16,6 +16,7 @@
 import math
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
+from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
@@ -31,6 +32,8 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    get_exp_lut_array, float_to_fixed)
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -40,6 +43,11 @@ NEUROMODULATION_TARGETS = {
     "reward": 0,
     "punishment": 1
 }
+
+# LOOKUP_TAU_C_SIZE = 520
+LOOKUP_TAU_C_SHIFT = 4
+# LOOKUP_TAU_D_SIZE = 370
+LOOKUP_TAU_D_SHIFT = 2
 
 
 class SynapseDynamicsSTDP(
@@ -68,7 +76,11 @@ class SynapseDynamicsSTDP(
         # Delay of connections formed by connector
         "__delay",
         # Whether to use back-propagation delay or not
-        "__backprop_delay"]
+        "__backprop_delay",
+        "__tau_c",
+        "__tau_d",
+        "__tau_c_data",
+        "__tau_d_data"]
 
     def __init__(
             self, timing_dependence, weight_dependence,
@@ -115,6 +127,10 @@ class SynapseDynamicsSTDP(
         self.__delay = delay
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = neuromodulation
+        self.__tau_c = tau_c
+        self.__tau_d = tau_d
+        self.__tau_c_data = None
+        self.__tau_d_data = None
 
         # For STDP with neuromodulation there can only be one combination of
         # weight dependence and timing dependence
@@ -127,6 +143,14 @@ class SynapseDynamicsSTDP(
                 raise SynapticConfigurationException(
                     "Neuromodulation requires a value for tau_d, "
                     "the dopamine decay rate")
+
+            ts = get_simulator().machine_time_step / 1000.0
+            self.__tau_c_data = get_exp_lut_array(
+                ts, self.__tau_c,
+                shift=LOOKUP_TAU_C_SHIFT)
+            self.__tau_d_data = get_exp_lut_array(
+                ts, self.__tau_d,
+                shift=LOOKUP_TAU_D_SHIFT)
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -287,10 +311,13 @@ class SynapseDynamicsSTDP(
         :rtype: int
         """
         # 32-bits for back-prop delay
-        size = 4
+        size = BYTES_PER_WORD
         size += self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
         size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
+        if self.__neuromodulation:
+            size += BYTES_PER_WORD
+            size += len(self.__tau_c_data) + len(self.__tau_d_data)
         return size
 
     def write_parameters(self, spec, region,  weight_scales):
@@ -315,8 +342,17 @@ class SynapseDynamicsSTDP(
             spec, weight_scales, self.__timing_dependence.n_weight_terms)
 
         if self.__neuromodulation:
-            # TODO:
-            pass
+            # Calculate constant component in Izhikevich's model weight update
+            # function and write to SDRAM.
+            weight_update_component = \
+                1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
+            weight_update_component = float_to_fixed(weight_update_component)
+            spec.write_value(data=weight_update_component,
+                             data_type=DataType.INT32)
+
+            # Write the LUT arrays
+            spec.write_array(self.__tau_c_data)
+            spec.write_array(self.__tau_d_data)
 
     @property
     def _n_header_bytes(self):
@@ -351,6 +387,9 @@ class SynapseDynamicsSTDP(
             self._n_header_bytes +
             (synapse_structure.get_n_half_words_per_connection() *
              BYTES_PER_SHORT * n_connections))
+        # Neuromodulated synapses have the actual weight separately
+        if self.__neuromodulation:
+            pp_size_bytes += BYTES_PER_SHORT
         pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
 
         return fp_size_words + pp_size_words
@@ -395,6 +434,10 @@ class SynapseDynamicsSTDP(
         synapse_structure = self.__timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
+        # If neuromodulation, the real weight comes first
+        if self.__neuromodulation:
+            n_half_words += 1
+            half_word = 0
         plastic_plastic = numpy.zeros(
             len(connections) * n_half_words, dtype="uint16")
         plastic_plastic[half_word::n_half_words] = \
@@ -477,6 +520,9 @@ class SynapseDynamicsSTDP(
         synapse_structure = self.__timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
+        if self.__neuromodulation:
+            n_half_words += 1
+            half_word = 0
         pp_half_words = numpy.concatenate([
             pp[:size * n_half_words * BYTES_PER_SHORT].view("uint16")[
                 half_word::n_half_words]
@@ -538,6 +584,8 @@ class SynapseDynamicsSTDP(
         bytes_per_pp = (
             synapse_structure.get_n_half_words_per_connection() *
             BYTES_PER_SHORT)
+        if self.__neuromodulation:
+            bytes_per_pp += BYTES_PER_SHORT
 
         # The fixed plastic size per connection is 2 bytes
         bytes_per_fp = BYTES_PER_SHORT
@@ -564,10 +612,14 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(self):
         synapse_struct = self.__timing_dependence.synaptic_structure
-        return numpy.array([
-            self._n_header_bytes // BYTES_PER_SHORT,
-            synapse_struct.get_n_half_words_per_connection(),
-            synapse_struct.get_weight_half_word()], dtype=numpy.uint32)
+        n_half_words = synapse_struct.get_n_half_words_per_connection()
+        half_word = synapse_struct.get_weight_half_word()
+        if self.__neuromodulation:
+            n_half_words += 1
+            half_word = 0
+        return numpy.array(
+            [self._n_header_bytes // BYTES_PER_SHORT, n_half_words, half_word],
+            dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.

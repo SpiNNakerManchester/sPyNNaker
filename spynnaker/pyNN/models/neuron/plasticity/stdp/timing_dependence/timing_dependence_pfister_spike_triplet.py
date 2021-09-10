@@ -153,7 +153,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         :rtype: int
         """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
-        return BYTES_PER_WORD
+        # and the time of the last spike
+        return BYTES_PER_WORD * 2
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):

@@ -18,6 +18,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import float_to_fixed
 # Six words per synapse type
 _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
@@ -118,29 +119,29 @@ class WeightDependenceAdditiveTriplet(
     def write_parameters(
             self, spec, weight_scales, n_weight_terms):
 
-        # Loop through each synapse type's weight scale
-        for w in weight_scales:
+        # Loop through each synapse type
+        for _ in weight_scales:
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
+                data=float_to_fixed(self.__w_min), data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
+                data=float_to_fixed(self.__w_max), data_type=DataType.INT32)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self.A_plus * self.__w_max * w)),
+                data=float_to_fixed(self.A_plus * self.__w_max),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self.A_minus * self.__w_max * w)),
+                data=float_to_fixed(self.A_minus * self.__w_max),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self.__a3_plus * self.__w_max * w)),
+                data=float_to_fixed(self.__a3_plus * self.__w_max),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self.__a3_minus * self.__w_max * w)),
+                data=float_to_fixed(self.__a3_minus * self.__w_max),
                 data_type=DataType.INT32)
 
     @property

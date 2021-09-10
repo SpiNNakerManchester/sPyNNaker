@@ -17,9 +17,9 @@ from spynnaker8.models.synapse_dynamics.timing_dependence import (
     TimingDependenceRecurrent as RecurrentRule,
     TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
     TimingDependenceVogels2011 as Vogels2011Rule,
-    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet,
-    TimingDependenceIzhikevichNeuromodulation as
-    TimingIzhikevichNeuromodulation)
+    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation as Neuromodulation)
 from spynnaker8.models.synapse_dynamics.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
@@ -51,13 +51,14 @@ __all__ = [
     'IZK_curr_exp_izhikevich_neuromodulation',
     'IZK_cond_exp_izhikevich_neuromodulation',
 
+    # Neuromodulation synapse dynamics (Mantas Mikaitis)
+    'Neuromodulation',
+
     # sPyNNaker 8 plastic stuff
     'WeightDependenceAdditiveTriplet',
     'PfisterSpikeTriplet',
     'SpikeNearestPairRule',
     'RecurrentRule', 'Vogels2011Rule',
-    # Neuromodulation (Mantas Mikaitis)
-    'TimingIzhikevichNeuromodulation',
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
