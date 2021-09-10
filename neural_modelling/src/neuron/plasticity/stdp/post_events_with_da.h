@@ -33,6 +33,11 @@
 //! Maximum number of post-synaptic events supported
 #define MAX_POST_SYNAPTIC_EVENTS 16
 
+typedef struct nm_post_trace_t {
+    int16_t dopamine_trace;
+    post_trace_t post_trace;
+} nm_post_trace_t;
+
 //---------------------------------------
 // Structures
 //---------------------------------------
@@ -43,7 +48,7 @@ typedef struct {
     //! Event times
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
     //! Event traces
-    post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
+    nm_post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
     //! Bit field to indicate whether a trace is dopamine or not
     uint32_t dopamine_trace_markers;
 } post_event_history_t;
@@ -51,11 +56,11 @@ typedef struct {
 //! Post event window description
 typedef struct {
     //! The previous post-synaptic event trace
-    post_trace_t prev_trace;
+    nm_post_trace_t prev_trace;
     //! The previous post-synaptic event time
     uint32_t prev_time;
     //! The next post-synaptic event trace
-    const post_trace_t *next_trace;
+    const nm_post_trace_t *next_trace;
     //! The next post-synaptic event time
     const uint32_t *next_time;
     //! The number of events
@@ -98,7 +103,9 @@ static inline post_event_history_t *post_events_init_buffers(
     for (uint32_t n = 0; n < n_neurons; n++) {
         // Add initial placeholder entry to buffer
         post_event_history[n].times[0] = 0;
-        post_event_history[n].traces[0] = timing_get_initial_post_trace();
+        post_event_history[n].traces[0].dopamine_trace = 0;
+        post_event_history[n].traces[0].post_trace =
+                timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
         post_event_history[n].dopamine_trace_markers = 0x00000000;
     }
@@ -119,7 +126,7 @@ static inline post_event_window_t post_events_get_window_delayed(
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
     const uint32_t *event_time = end_event_time;
-    const post_trace_t *event_trace = events->traces + count;
+    const nm_post_trace_t *event_trace = events->traces + count;
 
     post_event_window_t window;
     do {
@@ -148,7 +155,7 @@ static inline post_event_window_t post_events_get_window_delayed(
 
     // Find a vector of dopamine trace markers, with the LSB
     // entry in the vector corresponding to the oldest trace in the window
-    window.dopamine_trace_markers = 
+    window.dopamine_trace_markers =
         events->dopamine_trace_markers >> (count - window.num_events);
 
     // Return window
@@ -170,7 +177,7 @@ static inline post_event_window_t post_events_next(
 
     // Decrement remaining events
     window.num_events--;
-    
+
     // Shift the dopamine trace markers to place the next trace marker at LSB
     window.dopamine_trace_markers >>= 1;
     return window;
@@ -191,13 +198,15 @@ static inline bool post_events_next_is_dopamine(
 //! \param[in,out] events: the history to add to
 //! \param[in] trace: the trace of the event
 static inline void post_events_add(
-        uint32_t time, post_event_history_t *events, post_trace_t trace, bool dopamine) {
+        uint32_t time, post_event_history_t *events, post_trace_t post_trace,
+        int16_t dopamine_trace, bool dopamine) {
     if (events->count_minus_one < MAX_POST_SYNAPTIC_EVENTS - 1) {
         // If there's still space, store time at current end
         // and increment count minus 1
         const uint32_t new_index = ++events->count_minus_one;
         events->times[new_index] = time;
-        events->traces[new_index] = trace;
+        events->traces[new_index].post_trace = post_trace;
+        events->traces[new_index].dopamine_trace = dopamine_trace;
         if (dopamine) {
             events->dopamine_trace_markers |= (1 << new_index);
         } else {
@@ -214,7 +223,8 @@ static inline void post_events_add(
 
         // Stick new time at end
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
-        events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
+        events->traces[MAX_POST_SYNAPTIC_EVENTS - 1].post_trace = post_trace;
+        events->traces[MAX_POST_SYNAPTIC_EVENTS - 1].dopamine_trace = dopamine_trace;
         if (dopamine) {
             events->dopamine_trace_markers |=
                 (1 << (MAX_POST_SYNAPTIC_EVENTS - 1));

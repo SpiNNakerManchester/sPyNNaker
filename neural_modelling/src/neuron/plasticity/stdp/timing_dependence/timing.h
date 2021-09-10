@@ -39,6 +39,14 @@ static post_trace_t timing_get_initial_post_trace(void);
 static post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace);
 
+//! \brief Evolve the post trace without adding a spike
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the post trace to update
+//! \return the updated post trace
+static post_trace_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace);
+
 //! \brief Add a pre spike to the pre trace
 //! \param[in] time: the time of the spike
 //! \param[in] last_time: the time of the previous spike update
@@ -46,16 +54,6 @@ static post_trace_t timing_add_post_spike(
 //! \return the updated pre trace
 static pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace);
-
-#ifdef _TIMING_IZHIKEVICH_NEUROMODULATION_H_
-
-static inline int32_t get_post_trace(int32_t trace);
-
-static inline int32_t get_dopamine_trace(int32_t trace);
-
-static inline int32_t trace_build(int32_t post_trace, int32_t dopamine_trace);
-
-#else
 
 //! \brief Apply a pre-spike timing rule state update
 //! \param[in] time: the current time
@@ -84,7 +82,5 @@ static update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state);
-
-#endif
 
 #endif // _TIMING_H_

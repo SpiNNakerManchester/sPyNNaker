@@ -22,10 +22,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceIzhikevichNeuromodulation)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
-    WeightDependenceMultiplicative)
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -79,7 +75,7 @@ class SynapseDynamicsSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=StaticSynapse.default_parameters['weight'],
             delay=None, pad_to_length=None, backprop_delay=True,
-            neuromodulation=False):
+            neuromodulation=False, tau_c=None, tau_d=None):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
@@ -91,7 +87,11 @@ class SynapseDynamicsSTDP(
         :param pad_to_length:
         :type pad_to_length: int or None
         :param bool backprop_delay:
-        :param bool neuromodulation:
+        :param bool neuromodulation: Indicate whether to use neuromodulation
+        :param tau_c: Neuromodulation eligibility trace decay rate
+        :type tau_c: float or None
+        :param tau_d: Neuromodulation Dopamine trace decay rate
+        :type tau_d: float or None
         """
         if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
@@ -119,14 +119,14 @@ class SynapseDynamicsSTDP(
         # For STDP with neuromodulation there can only be one combination of
         # weight dependence and timing dependence
         if neuromodulation:
-            if (not isinstance(weight_dependence,
-                               WeightDependenceMultiplicative)) or (
-                not isinstance(timing_dependence,
-                               TimingDependenceIzhikevichNeuromodulation)):
-                # Error
-                raise NotImplementedError(
-                    "Neuromodulation only uses WeightDependenceMultiplicative"
-                    " and TimingDependenceIzhikevichNeuromodulation")
+            if tau_c is None:
+                raise SynapticConfigurationException(
+                    "Neuromodulation requires a value for tau_c, "
+                    "the eligibility trace decay rate")
+            if tau_d is None:
+                raise SynapticConfigurationException(
+                    "Neuromodulation requires a value for tau_d, "
+                    "the dopamine decay rate")
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
@@ -254,7 +254,10 @@ class SynapseDynamicsSTDP(
             self.__weight_dependence.is_same_as(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
-             synapse_dynamics.dendritic_delay_fraction))
+             synapse_dynamics.dendritic_delay_fraction) and
+            self.__neuromodulation == synapse_dynamics.neuromodulation and
+            self.__tau_c == synapse_dynamics.tau_c and
+            self.__tau_d == synapse_dynamics.tau_d)
 
     def are_weights_signed(self):
         """
@@ -270,12 +273,11 @@ class SynapseDynamicsSTDP(
         timing_suffix = self.__timing_dependence.vertex_executable_suffix
         weight_suffix = self.__weight_dependence.vertex_executable_suffix
 
-        # For STDP with neuromodulation binary name is set completely in the
-        # build as it must use a particular weight and timing dependence
         if self.__neuromodulation:
-            name = "_stdp_izhikevich_neuromodulation"
-            return name
-        name = "_stdp_mad_" + timing_suffix + "_" + weight_suffix
+            name = "_stdp_izhikevich_neuromodulation_"
+        else:
+            name = "_stdp_mad_"
+        name += timing_suffix + "_" + weight_suffix
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
@@ -311,6 +313,10 @@ class SynapseDynamicsSTDP(
         # Write weight dependence information to region
         self.__weight_dependence.write_parameters(
             spec, weight_scales, self.__timing_dependence.n_weight_terms)
+
+        if self.__neuromodulation:
+            # TODO:
+            pass
 
     @property
     def _n_header_bytes(self):

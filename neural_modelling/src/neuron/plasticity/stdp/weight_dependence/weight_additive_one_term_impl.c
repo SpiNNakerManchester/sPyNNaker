@@ -25,6 +25,9 @@
 //! Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
 
+//! Plasticity multiply shift array, in DTCM
+uint32_t *weight_shift;
+
 //! \brief How the configuration data for additive_one_term is laid out in
 //!     SDRAM. The layout is an array of these.
 typedef struct {
@@ -53,11 +56,21 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
+    weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
+    if (weight_shift == NULL) {
+        log_error("Could not initialise weight region data");
+        return NULL;
+    }
+
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         dtcm_copy[s].min_weight = config->min_weight;
         dtcm_copy[s].max_weight = config->max_weight;
         dtcm_copy[s].a2_plus = config->a2_plus;
         dtcm_copy[s].a2_minus = config->a2_minus;
+
+        // Copy weight shift
+        weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,

@@ -43,12 +43,8 @@ typedef struct plasticity_weight_region_data_two_term_t {
 
 //! The current state data for the rule
 typedef struct weight_state_t {
-    int32_t initial_weight; //!< The starting weight
-
-    int32_t a2_plus;        //!< Cumulative potentiation delta (term 1)
-    int32_t a2_minus;       //!< Cumulative depression delta (term 1)
-    int32_t a3_plus;        //!< Cumulative potentiation delta (term 2)
-    int32_t a3_minus;       //!< Cumulative depression delta (term 2)
+    int32_t weight;         //!< The weight
+    uint32_t weight_shift;  //!< Shift of weight to and from S1615 format
 
     //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
@@ -68,13 +64,13 @@ typedef struct weight_state_t {
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+    extern uint32_t *weight_shift;
+
+    int32_t s1615_weight = (int32_t) (weight << weight_shift[synapse_type]);
 
     return (weight_state_t) {
-        .initial_weight = (int32_t) weight,
-        .a2_plus = 0,
-        .a2_minus = 0,
-        .a3_plus = 0,
-        .a3_minus = 0,
+        .weight = s1615_weight >> S1615_TO_STDP_RIGHT_SHIFT,
+        .weight_shift = weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -87,8 +83,11 @@ static inline weight_state_t weight_get_initial(
 //! \return the updated weight state
 static inline weight_state_t weight_two_term_apply_depression(
         weight_state_t state, int32_t a2_minus, int32_t a3_minus) {
-    state.a2_minus += a2_minus;
-    state.a3_minus += a3_minus;
+    state.weight -= STDP_FIXED_MUL_16X16(
+            a2_minus, state.weight_region->a2_minus);
+    state.weight -= STDP_FIXED_MUL_16X16(
+            a3_minus, state.weight_region->a3_minus);
+    state.weight = MAX(state.weight, state.weight_region->min_weight);
     return state;
 }
 
@@ -100,46 +99,31 @@ static inline weight_state_t weight_two_term_apply_depression(
 //! \return the updated weight state
 static inline weight_state_t weight_two_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus, int32_t a3_plus) {
-    state.a2_plus += a2_plus;
-    state.a3_plus += a3_plus;
+    state.weight += STDP_FIXED_MUL_16X16(
+            a2_plus, state.weight_region->a2_plus);
+    state.weight += STDP_FIXED_MUL_16X16(
+            a3_plus, state.weight_region->a3_plus);
+    state.weight = MIN(state.weight, state.weight_region->max_weight);
     return state;
 }
 
 //---------------------------------------
 /*!
  * \brief Gets the final weight.
- * \param[in] new_state: The updated weight state
+ * \param[in] state: The updated weight state
  * \return The new weight.
  */
-static inline weight_t weight_get_final(weight_state_t new_state) {
-    // Scale potentiation and depression
-    // **NOTE** A2+, A2-, A3+ and A3- are pre-scaled into weight format
-    int32_t scaled_a2_plus = STDP_FIXED_MUL_16X16(
-            new_state.a2_plus, new_state.weight_region->a2_plus);
-    int32_t scaled_a2_minus = STDP_FIXED_MUL_16X16(
-            new_state.a2_minus, new_state.weight_region->a2_minus);
-    int32_t scaled_a3_plus = STDP_FIXED_MUL_16X16(
-            new_state.a3_plus, new_state.weight_region->a3_plus);
-    int32_t scaled_a3_minus = STDP_FIXED_MUL_16X16(
-            new_state.a3_minus, new_state.weight_region->a3_minus);
+static inline weight_t weight_get_final(weight_state_t state) {
+    int32_t s1615_weight = state.weight << S1615_TO_STDP_RIGHT_SHIFT;
+    return (weight_t) (s1615_weight >> state.weight_shift);
+}
 
-    // Apply all terms to initial weight
-    int32_t new_weight = new_state.initial_weight + scaled_a2_plus
-            + scaled_a3_plus - scaled_a2_minus - scaled_a3_minus;
+static inline void weight_decay(weight_state_t state, int32_t decay) {
+    state.weight = STDP_FIXED_MUL_16X16(state.weight, decay);
+}
 
-    // Clamp new weight
-    new_weight = MIN(new_state.weight_region->max_weight,
-            MAX(new_weight, new_state.weight_region->min_weight));
-
-    log_debug("\told_weight:%u, a2+:%d, a2-:%d, a3+:%d, a3-:%d",
-            new_state.initial_weight, new_state.a2_plus,
-            new_state.a2_minus, new_state.a3_plus, new_state.a3_minus);
-    log_debug("\tscaled a2+:%d, scaled a2-:%d, scaled a3+:%d, scaled a3-:%d,"
-            " new_weight:%d",
-            scaled_a2_plus, scaled_a2_minus, scaled_a3_plus,
-            scaled_a3_minus, new_weight);
-
-    return (weight_t) new_weight;
+static inline int32_t weight_get_update(weight_state_t state) {
+    return state.weight;
 }
 
 #endif  // _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_

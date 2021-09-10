@@ -147,15 +147,15 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 //---------------------------------------
-static inline void process_plastic_synapse(
+static inline plastic_synapse_t process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
 		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
-		plastic_synapse_t* plastic_words) {
+		plastic_synapse_t synapse) {
     fixed_stdp_synapse s = synapse_dynamics_stdp_get_fixed(control_word, time);
 
 	// Create update state from the plastic synaptic word
-	update_state_t current_state =
-			synapse_structure_get_update_state(*plastic_words, s.type);
+	update_state_t current_state = synapse_structure_get_update_state(
+	        synapse, s.type);
 
 	// Update the synapse state
 	uint32_t post_delay = s.delay_dendritic;
@@ -171,7 +171,7 @@ static inline void process_plastic_synapse(
 	int32_t weight = synapse_structure_get_final_weight(final_state);
 	synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, weight);
 
-	*plastic_words++ = synapse_structure_get_final_synaptic_word(final_state);
+	return synapse_structure_get_final_synaptic_word(final_state);
 }
 
 bool synapse_dynamics_process_plastic_synapses(
@@ -201,10 +201,11 @@ bool synapse_dynamics_process_plastic_synapses(
         // Get next control word (auto incrementing)
         uint32_t control_word = *control_words++;
 
-        process_plastic_synapse(
+        plastic_words[0] = process_plastic_synapse(
                 control_word, last_pre_time, last_pre_trace,
                 plastic_region_address->history.prev_trace, ring_buffers, time,
-                plastic_words);
+                plastic_words[0]);
+        plastic_words++;
     }
     return true;
 }
@@ -216,9 +217,28 @@ bool synapse_dynamics_find_neuron(
     const synapse_row_plastic_data_t *plastic_data = (void *)
             synapse_row_plastic_region(row);
     const plastic_synapse_t *plastic_words = plastic_data->synapses;
+    const control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    const size_t n_plastic_synapses = synapse_row_num_plastic_controls(fixed_region);
 
-    return synapse_dynamics_stdp_find_neuron(id, plastic_words, fixed_region,
-            weight, delay, offset, synapse_type);
+    // Loop through plastic synapses
+    for (size_t plastic_synapse = n_plastic_synapses; plastic_synapse > 0;
+            plastic_synapse--) {
+        // Take the weight anyway as this updates the plastic words
+        *weight = synapse_structure_get_weight(*plastic_words++);
+
+        // Check if index is the one I'm looking for
+        uint32_t control_word = *control_words++;
+        if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
+            *offset = n_plastic_synapses - plastic_synapse;
+            *delay = synapse_row_sparse_delay(control_word,
+                    synapse_type_index_bits, synapse_delay_mask);
+            *synapse_type = synapse_row_sparse_type(
+                    control_word, synapse_index_bits, synapse_type_mask);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
@@ -227,7 +247,19 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
             synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = plastic_data->synapses;
 
-    return synapse_dynamics_stdp_remove_neuron(offset, fixed_region, plastic_words);
+    control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+
+    // Delete weight at offset
+    plastic_words[offset] =  plastic_words[plastic_synapse - 1];
+
+    // Delete control word at offset
+    control_words[offset] = control_words[plastic_synapse - 1];
+    control_words[plastic_synapse - 1] = 0;
+
+    // Decrement FP
+    fixed_region->num_plastic--;
+    return true;
 }
 
 bool synapse_dynamics_add_neuron(uint32_t id, synaptic_row_t row,
@@ -235,6 +267,19 @@ bool synapse_dynamics_add_neuron(uint32_t id, synaptic_row_t row,
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     synapse_row_plastic_data_t *plastic_data = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = plastic_data->synapses;
-    return synapse_dynamics_stdp_add_neuron(id, fixed_region, plastic_words,
-            weight, delay, type);
+    plastic_synapse_t new_weight = synapse_structure_create_synapse(weight);
+    control_t new_control = control_conversion(id, delay, type);
+
+    control_t *control_words = synapse_row_plastic_controls(fixed_region);
+    int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+
+    // Add weight at offset
+    plastic_words[plastic_synapse] = new_weight;
+
+    // Add control word at offset
+    control_words[plastic_synapse] = new_control;
+
+    // Increment FP
+    fixed_region->num_plastic++;
+    return true;
 }
