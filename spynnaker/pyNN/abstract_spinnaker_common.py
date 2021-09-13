@@ -591,7 +591,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self._execute_finish_connection_holders()
 
     def _execute_write_network_graph(self):
-        with FecTimer("Execute On Chip Bit Field Generator") as timer:
+        with FecTimer("Execute Write Network Graph") as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
             report = SpYNNakerNeuronGraphNetworkSpecificationReport()
