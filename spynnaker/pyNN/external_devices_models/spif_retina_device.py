@@ -204,7 +204,7 @@ class SPIFRetinaDevice(
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = (1 << n_key_bits) - 1
         self.__spif_mask = (
-            key_mask +
+            (key_mask << self._key_shift) +
             (self.Y_MASK << self._source_y_shift) +
             (self.X_MASK << self._source_x_shift))
 
