@@ -17,8 +17,6 @@ from pacman.model.graphs.application import ApplicationFPGAVertex
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from pacman.model.graphs.application import FPGAConnection
-from pacman.model.graphs.common import Slice
-from spinn_utilities.overrides import overrides
 
 
 class ArbitraryFPGADevice(
