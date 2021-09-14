@@ -103,7 +103,8 @@ class ExternalFPGARetinaDevice(
 
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            label=label, board_address=board_address)
+            label=label, board_address=board_address, incoming=True,
+            outgoing=True)
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:
