@@ -15,9 +15,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
-from pacman.model.graphs.application import ApplicationFPGAVertex
-from pacman.model.graphs.common import Slice
-from pacman.utilities.constants import BITS_IN_KEY
+from pacman.model.graphs.application import Application2DFPGAVertex
 from pacman.model.graphs.application import FPGAConnection
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
@@ -25,9 +23,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
-import math
 from enum import IntEnum
 
 _REPEATS = 2
@@ -97,7 +93,7 @@ class _SpiNNFPGARegister(IntEnum):
 
 
 class SPIFRetinaDevice(
-        ApplicationFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
+        Application2DFPGAVertex, AbstractProvidesOutgoingPartitionConstraints,
         AbstractSendMeMulticastCommandsVertex, HasShapeKeyFields):
     """ A retina device connected to SpiNNaker using a SPIF board.
     """
@@ -113,31 +109,13 @@ class SPIFRetinaDevice(
     X_PER_ROW = 4
 
     __slots__ = [
-        "__width",
-        "__height",
-        "__sub_width",
-        "__sub_height",
-        "__n_atoms_per_subsquare",
-        "__n_squares_per_col",
-        "__n_squares_per_row",
-        "__key_bits",
-        "__fpga_mask",
         "__spif_mask",
-        "__fpga_x_shift",
-        "__fpga_y_shift",
-        "__x_index_shift",
-        "__y_index_shift",
         "__index_by_slice",
         "__base_key",
-        "__source_x_shift",
-        "__source_x_mask",
-        "__source_y_shift",
-        "__source_y_mask",
         "__input_y_mask",
         "__input_y_shift",
         "__input_x_mask",
-        "__input_x_shift",
-        "__polarity"]
+        "__input_x_shift"]
 
     def __init__(self, base_key, width, height, sub_width, sub_height,
                  input_x_shift=16, input_y_shift=0):
@@ -163,25 +141,10 @@ class SPIFRetinaDevice(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
 
-        if (not self.__is_power_of_2(sub_width) or
-                not self.__is_power_of_2(sub_height)):
-            raise ConfigurationException(
-                f"sub_width ({sub_width}) and sub_height ({sub_height}) must"
-                " each be a power of 2")
-        n_sub_squares = self.__n_sub_squares(
-            width, height, sub_width, sub_height)
-
         # Call the super
         super().__init__(
-            width * height, self.__incoming_fpgas, self.__outgoing_fpga,
-            n_machine_vertices_per_link=n_sub_squares)
-
-        # Store information needed later
-        self.__width = width
-        self.__height = height
-        self.__sub_width = sub_width
-        self.__sub_height = sub_height
-        self.__n_atoms_per_subsquare = sub_width * sub_height
+            width, height, sub_width, sub_height, self.__incoming_fpgas,
+            self.__outgoing_fpga)
 
         # The mask is going to be made up of:
         # | K | P | Y_I | Y_0 | Y_F | X_I | X_0 | X_F |
@@ -194,34 +157,13 @@ class SPIFRetinaDevice(
         # X_0 = 0s for values not cared about in X
         # X_F = FPGA x index
         # Now - go calculate:
-        x_bits = get_n_bits(width)
-        y_bits = get_n_bits(height)
-
-        self.__n_squares_per_row = int(math.ceil(width / sub_width))
-        self.__n_squares_per_col = int(math.ceil(height / sub_height))
-        sub_x_bits = get_n_bits(self.__n_squares_per_row)
-        sub_y_bits = get_n_bits(self.__n_squares_per_col)
-        sub_x_mask = (1 << sub_x_bits) - 1
-        sub_y_mask = (1 << sub_y_bits) - 1
-
-        key_shift = y_bits + x_bits
-        n_key_bits = BITS_IN_KEY - key_shift
-        key_mask = (1 << n_key_bits) - 1
+        x_bits = self._x_bits
+        y_bits = self._y_bits
 
         # Format of incoming keys is PYX because we make it so below
-        self.__fpga_y_shift = x_bits
-        self.__fpga_x_shift = 0
-        self.__x_index_shift = self.__fpga_x_shift + (x_bits - sub_x_bits)
-        self.__y_index_shift = self.__fpga_y_shift + (y_bits - sub_y_bits)
         self.__spif_mask = (
-            (self.Y_MASK << self.__fpga_y_shift) +
-            (self.X_MASK << self.__fpga_x_shift))
-        self.__fpga_mask = (
-            (key_mask << key_shift) +
-            (sub_y_mask << self.__y_index_shift) +
-            (sub_x_mask << self.__x_index_shift) +
-            self.__spif_mask)
-        self.__key_bits = base_key << key_shift
+            (self.Y_MASK << self._source_y_shift) +
+            (self.X_MASK << self._source_x_shift))
 
         # A dictionary to get vertex index from FPGA and slice
         self.__index_by_slice = dict()
@@ -237,40 +179,8 @@ class SPIFRetinaDevice(
         self.__input_y_shift = self.__unsigned(
             input_y_shift - x_bits)
 
-        # Generate the shifts and masks for this source after SPIF has
-        # converted the input to PYX
-        self.__source_x_shift = 0
-        self.__source_x_mask = (1 << x_bits) - 1
-        self.__source_y_shift = x_bits
-        self.__source_y_mask = ((1 << y_bits) - 1) << x_bits
-
     def __unsigned(self, n):
         return n & 0xFFFFFFFF
-
-    @property
-    @overrides(ApplicationFPGAVertex.atoms_shape)
-    def atoms_shape(self):
-        return (self.__width, self.__height)
-
-    def __n_sub_squares(self, width, height, sub_width, sub_height):
-        """ Get the number of sub-squares in an image
-
-        :param int width: The width of the image
-        :param int height: The height of the image
-        :param int sub_width: The width of the sub-square
-        :param int sub_height: The height of the sub-square
-        :rtype: int
-        """
-        return (int(math.ceil(width / sub_width)) *
-                int(math.ceil(height / sub_height)))
-
-    def __is_power_of_2(self, v):
-        """ Determine if a value is a power of 2
-
-        :param int v: The value to test
-        :rtype: bool
-        """
-        return 2 ** int(math.log2(v)) == v
 
     @property
     def __incoming_fpgas(self):
@@ -298,30 +208,12 @@ class SPIFRetinaDevice(
         fpga_y_index = fpga_index // self.X_PER_ROW
         return fpga_x_index, fpga_y_index
 
-    def __sub_square(self, index):
-        # Work out the x and y components of the index
-        x_index = index % self.__n_squares_per_row
-        y_index = index // self.__n_squares_per_row
-
-        # Return the information
-        return x_index, y_index
-
-    @overrides(ApplicationFPGAVertex.get_incoming_slice_for_link)
+    @overrides(Application2DFPGAVertex.get_incoming_slice_for_link)
     def get_incoming_slice_for_link(self, link, index):
-        x_index, y_index = self.__sub_square(index)
-        lo_atom_x = x_index * self.__sub_width
-        lo_atom_y = y_index * self.__sub_height
-        lo_atom = index * self.__n_atoms_per_subsquare
-        hi_atom = (lo_atom + self.__n_atoms_per_subsquare) - 1
-        vertex_slice = Slice(
-            lo_atom, hi_atom, (self.__sub_width, self.__sub_height),
-            (lo_atom_x, lo_atom_y))
+        vertex_slice = super(
+            SPIFRetinaDevice, self).get_incoming_slice_for_link(link, index)
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
-
-    @overrides(ApplicationFPGAVertex.get_outgoing_slice)
-    def get_outgoing_slice(self):
-        return Slice(0, 100)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -330,18 +222,17 @@ class SPIFRetinaDevice(
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]
+        key_and_mask = self._get_key_and_mask(self.__base_key, index)
+
         fpga_x, fpga_y = self.__fpga_indices(fpga_link_id)
-        x_index, y_index = self.__sub_square(index)
 
         # Finally we build the key from the components
-        fpga_key = (
-            self.__key_bits +
-            (y_index << self.__y_index_shift) +
-            (fpga_y << self.__fpga_y_shift) +
-            (x_index << self.__x_index_shift) +
-            (fpga_x << self.__fpga_x_shift))
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(fpga_key, self.__fpga_mask)])]
+        fpga_key = key_and_mask.key + (
+            (fpga_y << self._source_y_shift) +
+            (fpga_x << self._source_x_shift))
+        fpga_mask = key_and_mask.mask + self.__spif_mask
+        return [FixedKeyAndMaskConstraint(
+            [BaseKeyAndMask(fpga_key, fpga_mask)])]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -393,7 +284,7 @@ class SPIFRetinaDevice(
 
     def __spif_key(self, index):
         x, y = self.__fpga_indices(index)
-        return (x << self.__fpga_x_shift) + (y << self.__fpga_y_shift)
+        return (x << self._source_x_shift) + (y << self._source_y_shift)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
@@ -408,5 +299,4 @@ class SPIFRetinaDevice(
 
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
-        return ((0, self.__source_x_mask, self.__source_x_shift),
-                (0, self.__source_y_mask, self.__source_y_shift))
+        return self._key_fields
