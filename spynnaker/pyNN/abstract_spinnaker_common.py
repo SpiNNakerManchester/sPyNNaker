@@ -396,63 +396,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for neuron_type in self.__neurons_per_core_set:
             neuron_type.set_model_max_atoms_per_core()
 
-    def get_projections_data(self, projection_to_attribute_map):
-        """ Common data extractor for projection data. Allows fully
-            exploitation of the ????
-
-        :param projection_to_attribute_map:
-            the projection to attributes mapping
-        :type projection_to_attribute_map:
-            dict(~spynnaker.pyNN.models.projection.Projection,
-            list(int) or tuple(int) or None)
-        :return: a extracted data object with get method for getting the data
-        :rtype: ExtractedData
-        """
-        # pylint: disable=protected-access
-
-        # build data structure for holding data
-        mother_lode = ExtractedData()
-
-        # if using extra monitor functionality, locate extra data items
-        receivers = list()
-        if get_config_bool("Machine", "enable_advanced_monitor_support"):
-            receivers = self._locate_receivers_from_projections(
-                projection_to_attribute_map.keys(),
-                self.get_generated_output(
-                    "VertexToEthernetConnectedChipMapping"),
-                self.get_generated_output(
-                    "ExtraMonitorToChipMapping"))
-
-        # set up the router timeouts to stop packet loss
-        for data_receiver, extra_monitor_cores in receivers:
-            data_receiver.load_system_routing_tables(
-                self._txrx,
-                self.get_generated_output("ExtraMonitorVertices"),
-                self._placements)
-            data_receiver.set_cores_for_data_streaming(
-                self._txrx, list(extra_monitor_cores), self._placements)
-
-        # acquire the data
-        for projection in projection_to_attribute_map:
-            for attribute in projection_to_attribute_map[projection]:
-                data = projection._get_synaptic_data(
-                    as_list=True, data_to_get=attribute,
-                    fixed_values=None, notify=None,
-                    handle_time_out_configuration=False)
-                mother_lode.set(projection, attribute, data)
-
-        # reset time outs for the receivers
-        for data_receiver, extra_monitor_cores in receivers:
-            data_receiver.unset_cores_for_data_streaming(
-                self._txrx, list(extra_monitor_cores), self._placements)
-            data_receiver.load_application_routing_tables(
-                self._txrx,
-                self.get_generated_output("ExtraMonitorVertices"),
-                self._placements)
-
-        # return data items
-        return mother_lode
-
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):
         """ Locate receivers and their corresponding monitor cores for\

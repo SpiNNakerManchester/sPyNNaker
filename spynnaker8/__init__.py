@@ -149,7 +149,7 @@ __all__ = [
     'external_devices', 'extra_models',
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
-    'reset', 'set_number_of_neurons_per_core', 'get_projections_data',
+    'reset', 'set_number_of_neurons_per_core',
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
@@ -253,18 +253,6 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
     """
     return _pynn_distance(
         src, tgt, mask, scale_factor, offset, periodic_boundaries)
-
-
-def get_projections_data(projection_data):
-    """
-    :param projection_data: the projection to attributes mapping
-    :type projection_data:
-        dict(~.Projection, list(int) or tuple(int) or None)
-    :return: a extracted data object with get method for getting the data
-    :rtype: ExtractedData
-    """
-    return globals_variables.get_simulator().get_projections_data(
-        projection_data)
 
 
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
