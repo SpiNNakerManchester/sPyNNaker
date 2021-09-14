@@ -61,9 +61,6 @@ class ICUBRetinaDevice(
         self.__index_by_slice = dict()
         self.__base_key = base_key
 
-    def __unsigned(self, n):
-        return n & 0xFFFFFFFF
-
     @overrides(Application2DSpiNNakerLinkVertex.get_incoming_slice)
     def get_incoming_slice(self, index):
         vertex_slice = super(
