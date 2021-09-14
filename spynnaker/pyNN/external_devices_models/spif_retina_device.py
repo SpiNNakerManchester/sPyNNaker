@@ -311,10 +311,10 @@ class SPIFRetinaDevice(
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
         commands.extend(set_input_key(i, self.__spif_key(15 - (i * 2)))
-                        for i in range(self._pipe, self._pipe + 8))
+                        for i in range(self.__pipe, self.__pipe + 8))
         commands.extend(set_input_mask(i, self.__spif_mask)
-                        for i in range(self._pipe, self._pipe + 8))
-        commands.extend(set_input_route(i + self._pipe, i)
+                        for i in range(self.__pipe, self.__pipe + 8))
+        commands.extend(set_input_route(i + self.__pipe, i)
                         for i in range(8))
 
         # Send the start signal
