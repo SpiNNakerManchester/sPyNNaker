@@ -522,7 +522,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._placements, self._hostname, self._machine,
                 self._max_run_time_steps)
 
-    def _excetute_spynnaker_ordered_covering_compressor(self):
+    def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
                 "Execute SpynnakerMachineBitFieldOrderedCoveringCompressor") \
                 as timer:
@@ -537,7 +537,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             self._multicast_routes_loaded = True
             return None, provenance
 
-    def _excetute_spynnaker_pair_compressor(self):
+    def _execute_spynnaker_pair_compressor(self):
         with FecTimer(
                 "Execute SpynnakerMachineBitFieldPairRouterCompressor") \
                 as timer:
@@ -555,10 +555,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._do_compression_by_name)
     def _do_compression_by_name(self, name):
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
-            return self._excetute_spynnaker_ordered_covering_compressor()
+            return self._execute_spynnaker_ordered_covering_compressor()
 
         if name == "SpynnakerMachineBitFieldPairRouterCompressor":
-            return self._excetute_spynnaker_pair_compressor()
+            return self._execute_spynnaker_pair_compressor()
 
         return AbstractSpinnakerBase._do_compression_by_name(self, name)
 
