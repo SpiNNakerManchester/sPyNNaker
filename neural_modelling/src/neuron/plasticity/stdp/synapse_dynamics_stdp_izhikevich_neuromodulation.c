@@ -305,8 +305,12 @@ void synapse_dynamics_process_neuromodulator_event(
         concentration, last_post_time, last_post_trace, synapse_type), true);
 }
 
-bool synapse_dynamics_is_neuromodulated(uint32_t synapse_type) {
-    if (synapse_type > 1) { // hard-coded still?
+bool synapse_dynamics_is_neuromodulated(
+        uint32_t synaptic_word, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
+    uint32_t synapse_type = synapse_row_sparse_type(
+        synaptic_word, synapse_index_bits, synapse_type_mask);
+
+    if (synapse_type > 1) { // i.e. a dopaminergic synapse
         return true;
     }
     else {
@@ -315,7 +319,8 @@ bool synapse_dynamics_is_neuromodulated(uint32_t synapse_type) {
 }
 
 int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration) {
-    if (synapse_type == 3) { // hard-coded still?
+    // In case this is punishment synapse, invert dopamine level to cause depression.
+    if (synapse_type == 3) { // a punishment synapse
         concentration = ~concentration + 1;
     }
     return concentration;

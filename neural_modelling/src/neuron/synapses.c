@@ -202,22 +202,23 @@ static inline bool process_fixed_synapses(
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
-        uint32_t synapse_type = synapse_row_sparse_type(
-            synaptic_word, synapse_index_bits, synapse_type_mask);
 
         // If synapse type has non-input synapses (i.e. is neuromodulated) and
         // this synapse connects to one, pass event directly to synapse dynamics
-        if (synapse_dynamics_is_neuromodulated(synapse_type)) {
+        if (synapse_dynamics_is_neuromodulated(
+                synaptic_word, synapse_index_bits, synapse_type_mask)) {
             // Dopaminergic neurons send some amount of neuromodulator
             // concentration so this can actually be a weight as usual.
             int32_t concentration = synapse_row_sparse_weight(synaptic_word);
             uint32_t index = synapse_row_sparse_index(
                 synaptic_word, synapse_index_mask);
-            // In case this is punishment synapse, invert dopamine level
-            // to cause depression.
+            uint32_t synapse_type = synapse_row_sparse_type(
+                synaptic_word, synapse_index_bits, synapse_type_mask);
+
+            // Get the concentration value
             concentration = synapse_dynamics_get_concentration(synapse_type, concentration);
-            synapse_dynamics_process_neuromodulator_event(time,
-                concentration, index, synapse_type);
+            synapse_dynamics_process_neuromodulator_event(
+                time, concentration, index, synapse_type);
         } else {
             // The ring buffer index can be found by adding on the time to the delay
             // in the synaptic word directly, and then masking off the whole index.

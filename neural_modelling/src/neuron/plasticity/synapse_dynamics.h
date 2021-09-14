@@ -51,7 +51,8 @@ void synapse_dynamics_process_neuromodulator_event(
         uint32_t time, int32_t concentration, uint32_t neuron_index,
         uint32_t synapse_type);
 
-bool synapse_dynamics_is_neuromodulated(uint32_t synapse_type);
+bool synapse_dynamics_is_neuromodulated(
+        uint32_t synaptic_word, uint32_t synapse_index_bits, uint32_t synapse_type_mask);
 
 int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration);
 

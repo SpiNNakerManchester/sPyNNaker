@@ -141,7 +141,9 @@ void synapse_dynamics_process_neuromodulator_event(
         UNUSED uint32_t neuron_index, UNUSED uint32_t synapse_type) {
 }
 
-bool synapse_dynamics_is_neuromodulated(UNUSED uint32_t synapse_type) {
+bool synapse_dynamics_is_neuromodulated(
+        UNUSED uint32_t synaptic_word, UNUSED uint32_t synapse_index_bits,
+        UNUSED uint32_t synapse_type_mask) {
     return false;
 }
 
