@@ -35,8 +35,14 @@ _LC_KEY = 0xFFFFFE00
 #: Base key to send packets to SPIF (add register offset)
 _RC_KEY = 0xFFFFFF00
 
-#: The number of pipes supported
-_N_PIPES = 3
+#: The number of pipes
+_N_PIPES = 2
+
+#: The number of fields supported for each pipe
+_N_FIELDS = 2
+
+#: The number of filters supported for each pipe
+_N_FILTERS = 8
 
 
 class _SPIFRegister(IntEnum):
@@ -51,6 +57,9 @@ class _SPIFRegister(IntEnum):
     MP_KEY_BASE = 80
     MP_FLD_MASK_BASE = 96
     MP_FLD_SHIFT_BASE = 112
+    MP_FLD_LIMIT_BASE = 128
+    FL_VALUE_BASE = 144
+    FL_MASK_BASE = 176
 
     def cmd(self, payload=None, index=0):
         return MultiCastCommand(
@@ -63,12 +72,27 @@ def set_mapper_key(pipe, key):
 
 
 def set_field_mask(pipe, index, mask):
-    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * _N_PIPES) + index)
+    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * _N_FIELDS) + index)
 
 
 def set_field_shift(pipe, index, shift):
     return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(
-        shift, (pipe * _N_PIPES) + index)
+        shift, (pipe * _N_FIELDS) + index)
+
+
+def set_field_limit(pipe, index, limit):
+    return _SPIFRegister.MP_FLD_LIMIT_BASE.cmd(
+        limit, (pipe * _N_FIELDS) + index)
+
+
+def set_filter_value(pipe, index, value):
+    return _SPIFRegister.FL_VALUE_BASE.cmd(
+        value, (pipe * _N_FILTERS) + index)
+
+
+def set_filter_mask(pipe, index, mask):
+    return _SPIFRegister.FL_MASK_BASE.cmd(
+        mask, (pipe * _N_FILTERS) + index)
 
 
 def set_input_key(index, key):
@@ -152,6 +176,9 @@ class SPIFRetinaDevice(
             raise ConfigurationException(
                 "The sub-squares must be >=4 x >= 2"
                 f" ({sub_width} x {sub_height} specified)")
+        if pipe >= _N_PIPES:
+            raise ConfigurationException(
+                f"Pipe {pipe} is bigger than maximum allowed {_N_PIPES}")
 
         # Call the super
         super().__init__(
@@ -262,15 +289,19 @@ class SPIFRetinaDevice(
         # Configure the creation of packets from fields to keys using the
         # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
         commands.extend([
-            set_field_mask(0, self.__input_x_mask),
-            set_field_shift(0, self.__input_x_shift),
-            set_field_mask(1, self.__input_y_mask),
-            set_field_shift(1, self.__input_y_shift),
+            set_field_mask(self.__pipe, 0, self.__input_x_mask),
+            set_field_shift(self.__pipe, 0, self.__input_x_shift),
+            set_field_limit(self.__pipe, 0, self._width),
+            set_field_mask(self.__pipe, 1, self.__input_y_mask),
+            set_field_shift(self.__pipe, 1, self.__input_y_shift),
+            set_field_limit(self.__pipe, 1, self._height),
             # These are unused but set them to be sure
-            set_field_mask(2, 0),
-            set_field_shift(2, 0),
-            set_field_mask(3, 0),
-            set_field_shift(3, 0)
+            set_field_mask(self.__pipe, 2, 0),
+            set_field_shift(self.__pipe, 2, 0),
+            set_field_limit(self.__pipe, 2, 0),
+            set_field_mask(self.__pipe, 3, 0),
+            set_field_shift(self.__pipe, 3, 0),
+            set_field_limit(self.__pipe, 3, 0)
         ])
 
         # Configure the output routing key
