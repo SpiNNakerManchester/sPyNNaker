@@ -35,9 +35,11 @@ _LC_KEY = 0xFFFFFE00
 #: Base key to send packets to SPIF (add register offset)
 _RC_KEY = 0xFFFFFF00
 
+#: The number of pipes supported
+_N_PIPES = 3
+
 
 class _SPIFRegister(IntEnum):
-    MP_KEY = 1
     REPLY_KEY = 2
     IR_KEY_BASE = 16
     IR_MASK_BASE = 32
@@ -46,9 +48,9 @@ class _SPIFRegister(IntEnum):
     CONFIG_PKT_CNT = 65
     DROPPED_PKT_CNT = 66
     IN_PERIPH_PKT_CNT = 67
-    DIAG_PKT_CNT = 68
-    MP_FLD_MASK_BASE = 80
-    MP_FLD_SHIFT_BASE = 96
+    MP_KEY_BASE = 80
+    MP_FLD_MASK_BASE = 96
+    MP_FLD_SHIFT_BASE = 112
 
     def cmd(self, payload=None, index=0):
         return MultiCastCommand(
@@ -56,12 +58,17 @@ class _SPIFRegister(IntEnum):
             delay_between_repeats=_DELAY_BETWEEN_REPEATS)
 
 
-def set_field_mask(index, mask):
-    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, index)
+def set_mapper_key(pipe, key):
+    return _SPIFRegister.MP_KEY_BASE.cmd(key, pipe)
 
 
-def set_field_shift(index, shift):
-    return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(shift, index)
+def set_field_mask(pipe, index, mask):
+    return _SPIFRegister.MP_FLD_MASK_BASE.cmd(mask, (pipe * _N_PIPES) + index)
+
+
+def set_field_shift(pipe, index, shift):
+    return _SPIFRegister.MP_FLD_SHIFT_BASE.cmd(
+        shift, (pipe * _N_PIPES) + index)
 
 
 def set_input_key(index, key):
@@ -112,16 +119,17 @@ class SPIFRetinaDevice(
         "__spif_mask",
         "__index_by_slice",
         "__base_key",
+        "__pipe",
         "__input_y_mask",
         "__input_y_shift",
         "__input_x_mask",
         "__input_x_shift"]
 
-    def __init__(self, base_key, width, height, sub_width, sub_height,
-                 input_x_shift=16, input_y_shift=0):
+    def __init__(self, pipe, width, height, sub_width, sub_height,
+                 base_key=None, input_x_shift=16, input_y_shift=0):
         """
 
-        :param int base_key: The key that is common over the whole vertex
+        :param int pipe: Which pipe on SPIF the retina is connected to
         :param int width: The width of the retina in pixels
         :param int height: The height of the retina in pixels
         :param int sub_width:
@@ -130,6 +138,10 @@ class SPIFRetinaDevice(
         :param int sub_height:
             The height of rectangles to split the retina into for efficiency of
             sending
+        :param base_key:
+            The key that is common over the whole vertex,
+            or None to use the pipe number as the key
+        :type base_key: int or None
         :param int input_x_shift:
             The shift to get the x coordinate from the input keys sent to SPIF
         :param int input_y_shift:
@@ -168,7 +180,8 @@ class SPIFRetinaDevice(
         # A dictionary to get vertex index from FPGA and slice
         self.__index_by_slice = dict()
 
-        self.__base_key = base_key
+        self.__pipe = pipe
+        self.__base_key = base_key if base_key is not None else pipe
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
@@ -245,7 +258,6 @@ class SPIFRetinaDevice(
         commands.append(_SPIFRegister.CONFIG_PKT_CNT.cmd(0))
         commands.append(_SPIFRegister.DROPPED_PKT_CNT.cmd(0))
         commands.append(_SPIFRegister.IN_PERIPH_PKT_CNT.cmd(0))
-        commands.append(_SPIFRegister.DIAG_PKT_CNT.cmd(0))
 
         # Configure the creation of packets from fields to keys using the
         # "standard" input to SPIF (X | P | Y) and convert to (Y | X)
@@ -262,20 +274,17 @@ class SPIFRetinaDevice(
         ])
 
         # Configure the output routing key
-        commands.append(_SPIFRegister.MP_KEY.cmd(self.__base_key))
+        commands.append(set_mapper_key(
+            self.__pipe, self.__base_key << self._key_shift))
 
         # Configure the links to send packets to the 8 FPGAs using the
         # lower bits
         commands.extend(set_input_key(i, self.__spif_key(15 - (i * 2)))
-                        for i in range(8))
+                        for i in range(self._pipe, self._pipe + 8))
         commands.extend(set_input_mask(i, self.__spif_mask)
+                        for i in range(self._pipe, self._pipe + 8))
+        commands.extend(set_input_route(i + self._pipe, i)
                         for i in range(8))
-        commands.extend(set_input_route(i, i) for i in range(8))
-
-        # Set the other entries to 0
-        commands.extend(set_input_key(i, 0) for i in range(8, 16))
-        commands.extend(set_input_mask(i, 0) for i in range(8, 16))
-        commands.extend(set_input_route(i, 0) for i in range(8, 16))
 
         # Send the start signal
         commands.append(_SpiNNFPGARegister.START.cmd())
@@ -284,7 +293,9 @@ class SPIFRetinaDevice(
 
     def __spif_key(self, index):
         x, y = self.__fpga_indices(index)
-        return (x << self._source_x_shift) + (y << self._source_y_shift)
+        return ((self.__base_key << self._key_shift) +
+                (x << self._source_x_shift) +
+                (y << self._source_y_shift))
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
