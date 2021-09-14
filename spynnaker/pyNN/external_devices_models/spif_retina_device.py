@@ -18,6 +18,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.graphs.application import Application2DFPGAVertex
 from pacman.model.graphs.application import FPGAConnection
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.utilities.constants import BITS_IN_KEY
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractSendMeMulticastCommandsVertex)
@@ -199,8 +200,11 @@ class SPIFRetinaDevice(
         x_bits = self._x_bits
         y_bits = self._y_bits
 
-        # Format of incoming keys is PYX because we make it so below
+        # Mask to apply to route packets at input
+        n_key_bits = BITS_IN_KEY - self._key_shift
+        key_mask = (1 << n_key_bits) - 1
         self.__spif_mask = (
+            key_mask +
             (self.Y_MASK << self._source_y_shift) +
             (self.X_MASK << self._source_x_shift))
 
@@ -270,7 +274,7 @@ class SPIFRetinaDevice(
         fpga_key = key_and_mask.key + (
             (fpga_y << self._source_y_shift) +
             (fpga_x << self._source_x_shift))
-        fpga_mask = key_and_mask.mask + self.__spif_mask
+        fpga_mask = key_and_mask.mask | self.__spif_mask
         return [FixedKeyAndMaskConstraint(
             [BaseKeyAndMask(fpga_key, fpga_mask)])]
 
@@ -302,6 +306,14 @@ class SPIFRetinaDevice(
             set_field_mask(self.__pipe, 3, 0),
             set_field_shift(self.__pipe, 3, 0),
             set_field_limit(self.__pipe, 3, 0)
+        ])
+
+        # Don't filter
+        commands.extend([
+            set_filter_mask(self.__pipe, i, 0) for i in range(_N_FILTERS)
+        ])
+        commands.extend([
+            set_filter_value(self.__pipe, i, 1) for i in range(_N_FILTERS)
         ])
 
         # Configure the output routing key
