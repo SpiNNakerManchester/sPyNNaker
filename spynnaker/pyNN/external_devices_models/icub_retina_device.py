@@ -32,8 +32,8 @@ class ICUBRetinaDevice(
         "__index_by_slice",
         "__base_key"]
 
-    def __init__(self, base_key, width, height, sub_width, sub_height,
-                 spinnaker_link_id=0, board_address=None):
+    def __init__(self, base_key=0, width=304, height=240, sub_width=16,
+                 sub_height=16, spinnaker_link_id=0, board_address=None):
         """
 
         :param int base_key: The key that is common over the whole vertex
