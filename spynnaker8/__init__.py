@@ -428,7 +428,7 @@ def end(_=True):
         io = get_io(filename)
         population.write_data(io, variables)
     simulator.write_on_end = []
-    simulator.error()
+    simulator.stop()
 
 
 def record_v(source, filename):
