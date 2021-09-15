@@ -313,9 +313,8 @@ bool synapse_dynamics_is_neuromodulated(
     if (synapse_type > 1) { // i.e. a dopaminergic synapse
         return true;
     }
-    else {
-        return false;
-    }
+
+    return false;
 }
 
 int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration) {
