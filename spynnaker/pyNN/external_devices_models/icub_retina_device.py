@@ -80,3 +80,22 @@ class ICUBRetinaDevice(
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
         return self._key_fields
+
+    def _source_x_mask(self):
+        return ((1 << self._x_bits) - 1) << 1
+
+    @property
+    def _source_x_shift(self):
+        return 1
+
+    @property
+    def _source_y_mask(self):
+        return ((1 << self._y_bits) - 1) << 12
+
+    @property
+    def _source_y_shift(self):
+        return 12
+
+    @property
+    def _key_shift(self):
+        return 20
