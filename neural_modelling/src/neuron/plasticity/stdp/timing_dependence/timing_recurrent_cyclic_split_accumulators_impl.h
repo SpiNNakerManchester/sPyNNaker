@@ -305,9 +305,10 @@ static inline update_state_t timing_apply_pre_spike(
 	            	previous_state.lock = 1;
 		     	previous_state.dep_accumulator = 0;
                        if (!locked_weights_unchanged) {
-                           // previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
-			   previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-                           previous_state.weight_state.weight = previous_state.weight_state.weight - inc_LL_dep;
+                           // 8/6/21: SD Put back lock at baseline
+                            previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
+			   //previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                           //previous_state.weight_state.weight = previous_state.weight_state.weight - inc_LL_dep;
                        }
                     }
                     /* SD 9/2/21: Reverse ordering of conditions.
@@ -424,7 +425,8 @@ static inline update_state_t timing_apply_post_spike(
                // Check synapse is unlocked
                if (previous_state.lock == 0) {
                    //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
-                   if (syn_type == 2) { // For inhibitory synapses do nothing but reset accumulator:
+                   if (syn_type == 2) { // For inhibitory synapses do nothing but lock the synapse and reset accumulator:
+                       previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
                    }
                    else if (voltage_difference > 900.0k) {
@@ -450,7 +452,7 @@ static inline update_state_t timing_apply_post_spike(
                        previous_state.pot_accumulator = 0;
                        // SD 19/02/21: When nearly able to fire by FF alone, do a locked low, so that spike is kept a bit late, but 
                        //              does not jump to be much earlier. (Comment out potentiation and do a LL-pot:
-                       previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                       //SD 250821 - remove this: previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                        if (!locked_weights_unchanged) {
                            previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_pot;
                        }

@@ -367,7 +367,7 @@ bool synapse_dynamics_process_plastic_synapses(
 //        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
-        delay_dendritic = 10; // SD 2ms! //10; // SD 1.0 ms back propo time at 0.1 ms time step
+        delay_dendritic = 0; // SD 2ms! //10; // SD 1.0 ms back propo time at 0.1 ms time step
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(

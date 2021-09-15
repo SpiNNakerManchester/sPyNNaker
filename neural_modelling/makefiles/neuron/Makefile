@@ -1,6 +1,6 @@
-MODELS = IF_cond_exp_2E2I_stdp_mad_cyclic_cyclic \
-         IF_cond_comb_exp_2E2I_stdp_mad_cyclic_cyclic\
-         IF_cond_comb_exp_2E2I \
+MODELS = IF_cond_comb_exp_2E2I_stdp_mad_cyclic_cyclic\
+         IF_cond_comb_exp_2E2I
+         #IF_cond_exp_2E2I_stdp_mad_cyclic_cyclic \
          #IF_cond_exp_2E2I \
          #IF_curr_comb_exp_2E2I_stdp_mad_cyclic_cyclic\    
          #IF_curr_comb_exp_2E2I \ 
