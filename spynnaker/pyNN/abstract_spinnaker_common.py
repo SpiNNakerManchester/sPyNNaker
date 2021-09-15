@@ -287,7 +287,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # pylint: disable=protected-access
 
         # extra post run algorithms
-        self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
 
