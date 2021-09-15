@@ -66,10 +66,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay, hostname,
-            user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
-            user_extra_algorithms_pre_run=None, time_scale_factor=None,
-            extra_post_run_algorithms=None, extra_mapping_algorithms=None,
-            extra_load_algorithms=None, front_end_versions=None):
+            time_scale_factor=None, front_end_versions=None):
         """
         :param str graph_label:
         :param database_socket_addresses:
@@ -84,20 +81,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :type timestep: float or None
         :param float min_delay:
         :param str hostname:
-        :param user_extra_algorithm_xml_path:
-        :type user_extra_algorithm_xml_path: str or None
-        :param user_extra_mapping_inputs:
-        :type user_extra_mapping_inputs: dict(str, Any) or None
-        :param user_extra_algorithms_pre_run:
-        :type user_extra_algorithms_pre_run: list(str) or None
         :param time_scale_factor:
         :type time_scale_factor: float or None
-        :param extra_post_run_algorithms:
-        :type extra_post_run_algorithms: list(str) or None
-        :param extra_mapping_algorithms:
-        :type extra_mapping_algorithms: list(str) or None
-        :param extra_load_algorithms:
-        :type extra_load_algorithms: list(str) or None
         :param front_end_versions:
         :type front_end_versions: list(tuple(str,str)) or None
         """
@@ -120,15 +105,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self.__command_edge_count = 0
         self.__live_spike_recorder = dict()
 
-        # create XML path for where to locate sPyNNaker related functions when
-        # using auto pause and resume
-        extra_algorithm_xml_path = list()
-        extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(extra_algorithms.__file__),
-            "algorithms_metadata.xml"))
-        if user_extra_algorithm_xml_path is not None:
-            extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
-
         # timing parameters
         self.__min_delay = None
 
@@ -142,49 +118,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
-            extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             front_end_versions=versions)
-
-        # update inputs needed by the machine level calls.
-
-        extra_mapping_inputs = dict()
-        extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
-            get_config_bool("Reports", "write_expander_iobuf")
-        if user_extra_mapping_inputs is not None:
-            extra_mapping_inputs.update(user_extra_mapping_inputs)
-
-        if extra_mapping_algorithms is None:
-            extra_mapping_algorithms = []
-        if extra_load_algorithms is None:
-            extra_load_algorithms = []
-        # TODO raise error is not None
-        if extra_post_run_algorithms is None:
-            extra_post_run_algorithms = []
-        extra_load_algorithms.append("SynapseExpander")
-        extra_load_algorithms.append("OnChipBitFieldGenerator")
-        extra_load_algorithms.append("FinishConnectionHolders")
-        extra_algorithms_pre_run = []
-
-        if get_config_bool("Reports", "write_network_graph"):
-            extra_mapping_algorithms.append(
-                "SpYNNakerNeuronGraphNetworkSpecificationReport")
-
-        if get_config_bool("Reports", "reports_enabled"):
-            if get_config_bool("Reports", "write_synaptic_report"):
-                logger.exception(
-                    "write_synaptic_report ignored due to https://github.com/"
-                    "SpiNNakerManchester/sPyNNaker/issues/1081")
-                # extra_algorithms_pre_run.append("SynapticMatrixReport")
-        if user_extra_algorithms_pre_run is not None:
-            extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
-
-        self.update_extra_mapping_inputs(extra_mapping_inputs)
-        self.extend_extra_mapping_algorithms(extra_mapping_algorithms)
-        self.prepend_extra_pre_run_algorithms(extra_algorithms_pre_run)
-        self.extend_extra_post_run_algorithms(extra_post_run_algorithms)
-        self.extend_extra_load_algorithms(extra_load_algorithms)
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
