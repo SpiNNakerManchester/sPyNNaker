@@ -423,20 +423,18 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
         # Extract the data on which to work and convert to appropriate form
+        ids = self.vertex_slice.get_raster_ids(self._app_vertex.atoms_shape)
         starts = numpy.array(list(_flatten(
-            self._app_vertex.start[self.vertex_slice.as_slice]))).astype(
-                "float")
+            self._app_vertex.start.get_values(ids)))).astype("float")
         durations = numpy.array(list(_flatten(
-            self._app_vertex.duration[self.vertex_slice.as_slice]))).astype(
-                "float")
-        local_rates = self._app_vertex.rates[self.vertex_slice.as_slice]
+            self._app_vertex.duration.get_values(ids)))).astype("float")
+        local_rates = self._app_vertex.rates.get_values(ids)
         n_rates = numpy.array([len(r) for r in local_rates])
         splits = numpy.cumsum(n_rates)
         rates = numpy.array(list(_flatten(local_rates)))
         time_to_spike = numpy.array(list(_flatten(
-            self._app_vertex.time_to_spike[
-                self.vertex_slice.as_slice]))).astype("u4")
-        rate_change = self._app_vertex.rate_change[self.vertex_slice.as_slice]
+            self._app_vertex.time_to_spike.get_values(ids)))).astype("u4")
+        rate_change = self._app_vertex.rate_change[ids]
 
         # Convert start times to start time steps
         starts_scaled = self._convert_ms_to_n_timesteps(starts)
@@ -692,7 +690,8 @@ class SpikeSourcePoissonMachineVertex(
 
         # For each atom, read the number of rates and the rate parameters
         offset = 0
-        for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+        ids = vertex_slice.get_raster_ids(self._app_vertex.atoms_shape)
+        for i in ids:
             n_values, = _ONE_WORD.unpack_from(byte_array, offset)
             offset += 4
 

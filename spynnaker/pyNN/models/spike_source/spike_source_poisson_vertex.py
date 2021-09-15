@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
+from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
@@ -43,6 +44,7 @@ from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
@@ -70,7 +72,8 @@ class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
+        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI,
+        SupportsStructure):
     """ A Poisson Spike source object
     """
 
@@ -93,7 +96,8 @@ class SpikeSourcePoissonVertex(
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__outgoing_projections"]
+        "__outgoing_projections",
+        "__structure"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -267,6 +271,12 @@ class SpikeSourcePoissonVertex(
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
+
+        self.__structure = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
 
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
@@ -464,6 +474,13 @@ class SpikeSourcePoissonVertex(
     @property
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    @overrides(TDMAAwareApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.__n_atoms)
+        return super(SpikeSourcePoissonVertex, self).atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
