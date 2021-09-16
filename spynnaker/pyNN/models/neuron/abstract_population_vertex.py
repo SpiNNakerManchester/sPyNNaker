@@ -17,6 +17,8 @@ import logging
 import math
 import numpy
 from scipy import special  # @UnresolvedImport
+import operator
+from functools import reduce
 
 from pyNN.space import Grid2D, Grid3D
 
@@ -83,6 +85,14 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 # 1 for drop late packets,
 # 1 for incoming spike buffer size
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
+
+
+def _prod(iterable):
+    """ Finds the product of the iterable
+
+    :param iterable iterable: Things to multiply together
+    """
+    return reduce(operator.mul, iterable, 1)
 
 
 class AbstractPopulationVertex(
@@ -1012,7 +1022,7 @@ class AbstractPopulationVertex(
         max_atoms = vertex.get_max_atoms_per_core()
         if isinstance(max_atoms, int):
             max_atoms = (max_atoms,)
-        n_sub_atoms = int(min(math.prod(max_atoms), vertex.n_atoms))
+        n_sub_atoms = int(min(_prod(max_atoms), vertex.n_atoms))
         n_sub_edges = int(math.ceil(vertex.n_atoms / n_sub_atoms))
 
         if max_row_info.undelayed_max_n_synapses > 0:
