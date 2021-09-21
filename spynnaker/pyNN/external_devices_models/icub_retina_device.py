@@ -81,6 +81,7 @@ class ICUBRetinaDevice(
     def get_shape_key_fields(self, vertex_slice):
         return self._key_fields
 
+    @property
     def _source_x_mask(self):
         return ((1 << self._x_bits) - 1) << 1
 
