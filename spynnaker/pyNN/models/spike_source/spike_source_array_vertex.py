@@ -89,11 +89,15 @@ class SpikeSourceArrayVertex(
         """
         return self._spike_times
 
+    @property
+    def slice_list(self):
+        # to be extended when moving to multiple partitions
+        return [self]
+
     @spike_times.setter
     def spike_times(self, spike_times):
         """ Set the spike source array's spike times. Not an extend, but an\
             actual change
-
         """
         time_step = self.get_spikes_sampling_interval()
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
@@ -143,11 +147,9 @@ class SpikeSourceArrayVertex(
 
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
-
         The output may be customised by specifying a different template\
         together with an associated template engine\
         (see ``pyNN.descriptions``).
-
         If template is None, then a dictionary containing the template\
         context will be returned.
         """

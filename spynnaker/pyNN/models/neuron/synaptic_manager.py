@@ -125,7 +125,6 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "__gen_on_machine",
         "__max_row_info",
         "__synapse_indices",
-        "__synapse_rescale",
         "_n_atoms",
         "_n_profile_samples",
         "_vertex",
@@ -142,27 +141,22 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "_slice_list",
         "__change_requires_mapping",
         "_recordables",
-        "__mem_offset",
-        "__packet_compressor",
-        "__input_pop"]
+        "__mem_offset"]
 
     BASIC_MALLOC_USAGE = 2
 
-    # 36 + 4 for syn matrix size
-    BYTES_FOR_SYNAPSE_PARAMS = 40
+    BYTES_FOR_SYNAPSE_PARAMS = 36
 
     _n_vertices = 0
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 packet_compressor, input_pop=False, population_table_type=None, synapse_io=None,
-                 synapse_rescale=False):
+                 population_table_type=None, synapse_io=None):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
-        self.__synapse_rescale = synapse_rescale
         self._n_atoms = n_neurons
         self._weight_scale = weight_scale
         self._machine_vertices = dict()
@@ -174,8 +168,6 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         self._ring_buffer_shifts = [7]
         self._slice_list = None
         self.__mem_offset = mem_offset
-        self.__packet_compressor = packet_compressor
-        self.__input_pop = input_pop
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -192,6 +184,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         else:
             self._synapse_index = synapse_index
         
+        self._incoming_spike_buffer_size = incoming_spike_buffer_size
+
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
@@ -369,13 +363,12 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
 
-        dynamics = self.__synapse_dynamics.executable_prefix
-        synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
-        neuron_suffix, extension = os.path.splitext(
-            self._connected_app_vertices[0].get_binary_file_name())
-        compressor = "_compressor" if self.__packet_compressor else ""
-        input_suffix = "_input" if self.__input_pop and self._synapse_index == 1 else ""
-        return (dynamics + neuron_suffix + synapse_suffix + compressor + input_suffix + extension)
+        # dynamics = self.__synapse_dynamics.executable_prefix
+        # synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
+        # neuron_suffix, extension = os.path.splitext(
+        #     self._connected_app_vertices[0].get_binary_file_name())
+        # return (dynamics + neuron_suffix + synapse_suffix + extension)
+        return "Static_synapse.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -801,14 +794,13 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         return [list(max_weight_powers)[self._synapse_index]]
 
     @staticmethod
-    def _get_weight_scale(ring_buffer_to_input_left_shift, synapse_rescale):
+    def _get_weight_scale(ring_buffer_to_input_left_shift):
         """ Return the amount to scale the weights by to convert them from \
             floating point values to 16-bit fixed point numbers which can be \
             shifted left by ring_buffer_to_input_left_shift to produce an\
             s1615 fixed point number
         """
-        if not synapse_rescale:
-            return 1.0
+
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_padding(
@@ -886,25 +878,31 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
                                 synapse_info.weight, synapse_info.delay) and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
                             dynamics.generate_on_machine
-                           # COMMENTED OUT THIS CHECK TO FORCE SYNAPSE EXPANDER ON ONE TO ONE TOO!
-                           #  THS IS FOR US MODEL 
-                           #  and not self.__is_direct(
-                           #     single_addr, connector, pre_vertex_slice,
-                           #     post_vertex_slice, app_edge)
-                           ):
+                            and not self.__is_direct(
+                               single_addr, connector, pre_vertex_slice,
+                               post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_index, app_edge, rinfo))
                     # This else is for direct synapses!
                     else:
+
+                        scales = list()
+                        if self._synapse_index == 0:
+                            scales.extend(weight_scales)
+                            scales.append(0)
+                        else:
+                            scales.append(0)
+                            scales.extend(weight_scales)
+
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
                             pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge,
-                            self.__n_synapse_types,
+                            self._model_synapse_types,
                             single_synapses, master_pop_table_region,
-                            weight_scales, machine_time_step, rinfo,
+                            scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
                         key = (synapse_info, pre_vertex_slice.lo_atom,
@@ -1179,16 +1177,15 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         """ Get the ring buffer shifts for this vertex
         """
         if self.__ring_buffer_shifts is None:
-            # self.__ring_buffer_shifts = \
-            #     self._get_ring_buffer_to_input_left_shifts(
-            #         application_vertex, application_graph, machine_timestep,
-            #         weight_scale)
-            self.__ring_buffer_shifts = [0 for _ in range(self.__n_synapse_types)]
+            self.__ring_buffer_shifts = \
+                self._get_ring_buffer_to_input_left_shifts(
+                    application_vertex, application_graph, machine_timestep,
+                    weight_scale)
+            #self.__ring_buffer_shifts = [4 for _ in range(self.__n_synapse_types)]
         return self.__ring_buffer_shifts
 
     def _write_synapse_parameters(
-            self, spec, vertex_slice, application_graph, machine_time_step, index,
-            all_syn_block_sz):
+            self, spec, vertex_slice, application_graph, machine_time_step, index):
 
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Synapse Parameters for {} Neurons:\n".format(
@@ -1215,9 +1212,6 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         # Write the offset for SDRAM
         spec.write_value(data=self.__mem_offset)
-
-        spec.write_value(int(math.ceil(float(all_syn_block_sz) / 4.0)),
-            data_type=DataType.UINT32)
 
         # Hardcoded and moved in the constructor
         #ring_buffer_shifts = self._get_ring_buffer_shifts(
@@ -1313,10 +1307,10 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         self._write_synapse_parameters(
             spec, vertex_slice, application_graph, machine_time_step,
-            vertex.vertex_index, all_syn_block_sz)
+            vertex.vertex_index)
 
         scales = numpy.array([
-            self._get_weight_scale(r, self.__synapse_rescale) * self._weight_scale
+            self._get_weight_scale(r) * self._weight_scale
             for r in self._ring_buffer_shifts])
 
         # post_slices = graph_mapper.get_slices(self)
@@ -1418,7 +1412,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Convert the blocks into connections
         return self._read_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice,
-            max_row_length, delayed_max_row_len, self.__n_synapse_types,
+            max_row_length, delayed_max_row_len, self._implemented_synapse_types,
             self.__weight_scales[placement], data, delayed_data,
             app_edge.n_delay_stages, machine_time_step)
 

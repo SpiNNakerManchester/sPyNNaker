@@ -486,7 +486,7 @@ class AbstractPopulationVertex(
         """ Get the ring buffer shifts for this vertex
         """
         if self._ring_buffer_shifts is None:
-            self._ring_buffer_shifts = []
+            self._ring_buffer_shifts = [0 for _ in range(len(self.incoming_partitions))]
             previous_syn_type = -1
             for vertex in self._connected_app_vertices:
                 if vertex.synapse_index != previous_syn_type:
@@ -494,7 +494,7 @@ class AbstractPopulationVertex(
                     #     self._get_ring_buffer_to_input_left_shifts(
                     #         vertex, application_graph,
                     #         machine_timestep))
-                    self._ring_buffer_shifts.extend(vertex.ring_buffer_shifts)
+                    self._ring_buffer_shifts[vertex.synapse_index] = vertex.ring_buffer_shifts[0]
                     previous_syn_type = vertex.synapse_index
         return self._ring_buffer_shifts
     
@@ -579,20 +579,16 @@ class AbstractPopulationVertex(
         spec.write_value(
             data=len(self.__neuron_impl.get_recordable_variables()))
 
-        seeds = [random.randint(0, 10000) for _ in range(4)]
-        spec.write_array(seeds)
-
         # Write the number of incoming partitions per synapse type
         # to allocate a sufficiently big contribution area for all
         # the synapse cores.
         spec.write_array(self._incoming_partitions)
 
         # Write Synaptic contribution left shift
-        #AGAIN POSSIBLE DELETE
-        # ring_buffer_shifts = self._get_ring_buffer_shifts(
-        #     application_graph, machine_time_step)
+        ring_buffer_shifts = self._get_ring_buffer_shifts(
+            application_graph, machine_time_step)
 
-        # spec.write_array(ring_buffer_shifts)
+        spec.write_array(ring_buffer_shifts)
 
         # Write the recording data
         recording_data = self.__neuron_recorder.get_data(vertex_slice)

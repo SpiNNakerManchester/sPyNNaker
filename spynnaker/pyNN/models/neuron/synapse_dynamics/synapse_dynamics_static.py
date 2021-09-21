@@ -67,19 +67,10 @@ class SynapseDynamicsStatic(
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
-        # if (self.__pad_to_length is not None and
-        #         n_connections < self.__pad_to_length):
-        #     n_connections = self.__pad_to_length
-        # return n_connections
-        # Adaptation for Syn matrix in DTCM.
-
-        # Static words are n_connections for the weights, plus the neuronID and
-        # the syn ID, which are packed in bytes => n_connections / 4
-
-        # FOR US MODEL THERE IS NO REWIRING, SO THAT IF IS TEMPORARILY SKIPPED, NEEDS TO BE ADDED
-        # FOR FUTURE INTEGRATIONS
-
-        return n_connections + int(math.ceil(float(n_connections) / 4))
+        if (self.__pad_to_length is not None and
+                n_connections < self.__pad_to_length):
+            n_connections = self.__pad_to_length
+        return n_connections
 
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
