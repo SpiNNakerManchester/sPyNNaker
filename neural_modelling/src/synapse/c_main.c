@@ -70,7 +70,7 @@ struct synapse_provenance {
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, TIMER = 0, DMA = 0, USER = 1, SDP = 2
+    MC = -1, TIMER = 0, DMA = 0, USER = 0, SDP = 2 //User was 1 for US
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -221,8 +221,7 @@ static bool initialise(uint32_t *timer_period) {
     address_t indirect_synapses_address = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, ds_regions);
 
-    address_t dtcm_synaptic_matrix;
-    REAL starting_rate = 0;
+    address_t direct_synapses_address;
 
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
@@ -230,8 +229,7 @@ static bool initialise(uint32_t *timer_period) {
             &n_neurons, &n_synapse_types,
             &incoming_spike_buffer_size,
             &ring_buffer_to_input_buffer_left_shifts,
-            &dtcm_synaptic_matrix, starting_rate,
-            indirect_synapses_address)) {
+            &direct_synapses_address)) {
         return false;
     }
 
@@ -239,7 +237,7 @@ static bool initialise(uint32_t *timer_period) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            indirect_synapses_address, dtcm_synaptic_matrix,
+            indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }

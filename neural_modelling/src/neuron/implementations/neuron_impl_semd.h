@@ -23,7 +23,7 @@
 // Includes for model parts used in this implementation
 #include <neuron/models/neuron_model_lif_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
-#include <neuron/synapse_types/synapse_types_exponential_impl.h>
+#include <synapse/synapse_types/synapse_types_exponential_impl.h>
 
 // Further includes
 #include <common/out_spikes.h>

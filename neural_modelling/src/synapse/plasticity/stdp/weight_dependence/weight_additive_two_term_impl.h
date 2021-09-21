@@ -19,9 +19,9 @@
 #define _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 
 // Include generic plasticity maths functions
-#include <neuron/plasticity/stdp/maths.h>
-#include <neuron/plasticity/stdp/stdp_typedefs.h>
-#include <neuron/synapse_row.h>
+#include <synapse/plasticity/stdp/maths.h>
+#include <synapse/plasticity/stdp/stdp_typedefs.h>
+#include <synapse/synapse_row.h>
 
 #include <debug.h>
 

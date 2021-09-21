@@ -204,47 +204,32 @@ bool population_table_get_next_address(
     do {
         address_and_row_length item = address_list[next_item];
 
-        uint32_t row_length = get_row_length(item);
-
-        if(row_length > 0) {
-
-            uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-            uint32_t neuron_offset =
+        // If the row is a direct row, indicate this by specifying the
+        // n_bytes_to_transfer is 0
+        if (is_single(item)) {
+            *row_address = (address_t) (
+                    get_direct_address(item) + direct_rows_base_address +
+                    (last_neuron_id * sizeof(uint32_t)));
+            *n_bytes_to_transfer = 0;
+            is_valid = true;
+        } else {
+            uint32_t row_length = get_row_length(item);
+            if (row_length > 0) {
+                uint32_t block_address =
+                        get_address(item) + (uint32_t) synaptic_rows_base_address;
+                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+                uint32_t neuron_offset =
                         last_neuron_id * stride * sizeof(uint32_t);
 
-            // get_address gives the offset of the row, and neuron offset is the offset of the neuron in the row
-            *row_address = (address_t)
-                    (get_address(item) + direct_rows_base_address + neuron_offset);
-
-            is_valid = true;
+                *row_address = (address_t) (block_address + neuron_offset);
+                *n_bytes_to_transfer = stride * sizeof(uint32_t);
+                log_debug("neuron_id = %u, block_address = 0x%.8x,"
+                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                        last_neuron_id, block_address, row_length, *row_address,
+                        *n_bytes_to_transfer);
+                is_valid = true;
+            }
         }
-
-//        // If the row is a direct row, indicate this by specifying the
-//        // n_bytes_to_transfer is 0
-//        if (is_single(item)) {
-//            *row_address = (address_t) (
-//                    get_direct_address(item) + direct_rows_base_address +
-//                    (last_neuron_id * sizeof(uint32_t)));
-//            *n_bytes_to_transfer = 0;
-//            is_valid = true;
-//        } else {
-//            uint32_t row_length = get_row_length(item);
-//            if (row_length > 0) {
-//                uint32_t block_address =
-//                        get_address(item) + (uint32_t) synaptic_rows_base_address;
-//                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-//                uint32_t neuron_offset =
-//                        last_neuron_id * stride * sizeof(uint32_t);
-//
-//                *row_address = (address_t) (block_address + neuron_offset);
-//                *n_bytes_to_transfer = stride * sizeof(uint32_t);
-//                log_debug("neuron_id = %u, block_address = 0x%.8x,"
-//                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-//                        last_neuron_id, block_address, row_length, *row_address,
-//                        *n_bytes_to_transfer);
-//                is_valid = true;
-//            }
-//        }
 
         next_item++;
         items_to_go--;

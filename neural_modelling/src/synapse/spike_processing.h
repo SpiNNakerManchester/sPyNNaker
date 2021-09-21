@@ -19,7 +19,7 @@
 #define _SPIKE_PROCESSING_H_
 
 #include <common/neuron-typedefs.h>
-#include <common/in_rates.h>
+#include <common/in_spikes.h>
 #include <spin1_api.h>
 
 bool spike_processing_initialise(

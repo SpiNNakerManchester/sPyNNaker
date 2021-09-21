@@ -80,6 +80,9 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+//SDRAM address for postsynaptic buffers
+post_event_history_t *post_event_region;
+
 /* PRIVATE FUNCTIONS */
 
 //---------------------------------------
@@ -220,7 +223,7 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t *ring_buffer_to_input_buffer_left_shifts, bool *has_plastic_synapses) {
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
     if (address == NULL) {
@@ -360,6 +363,12 @@ void synapse_dynamics_process_post_synaptic_event(
             history->traces[history->count_minus_one];
     post_events_add(time, history,
             timing_add_post_spike(time, last_post_time, last_post_trace));
+}
+
+// Can we make this inline?
+void synapse_dynamics_set_post_buffer_region(uint32_t tag) {
+
+    post_event_region = sark_tag_ptr(tag, 0);
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(

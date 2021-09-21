@@ -29,8 +29,10 @@ static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
         uint32_t synapse_index_bits) {
-    return (synapse_type_index << synapse_index_bits)
-            | neuron_index;
+    return (((simuation_timestep & SYNAPSE_DELAY_MASK)
+             << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
+            | neuron_index);
 }
 
 // Get the index of the ring buffer for a given timestep and combined
@@ -39,18 +41,20 @@ static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
         uint32_t synapse_type_index_bits) {
-    return combined_synapse_neuron_index;
+    return (((simulation_timestep & SYNAPSE_DELAY_MASK)
+             << synapse_type_index_bits)
+            | combined_synapse_neuron_index);
 }
 
 // Converts a weight stored in a synapse row to an input
 static inline input_t synapses_convert_weight_to_input(
         int32_t weight, uint32_t left_shift) {
     union {
-        int32_t input_type;
+        int_k_t input_type;
         s1615 output_type;
     } converter;
 
-    converter.input_type = (int32_t) (weight) << left_shift;
+    converter.input_type = (int_k_t) (weight) << left_shift;
 
     return converter.output_type;
 }
@@ -70,8 +74,7 @@ bool synapses_initialise(
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *dtcm_synaptic_matrix, REAL starting_rate,
-        address_t synaptic_matrix_address);
+        address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 
@@ -83,7 +86,7 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] rate: input rate
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, uint32_t rate);
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.

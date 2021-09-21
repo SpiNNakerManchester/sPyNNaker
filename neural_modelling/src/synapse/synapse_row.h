@@ -48,27 +48,27 @@
 
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
-#define SYNAPSE_WEIGHT_BITS 32
+#define SYNAPSE_WEIGHT_BITS 16
 #endif
 
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 0
+#define SYNAPSE_DELAY_BITS 8
 #endif
 
 // Create some masks based on the number of bits
 //! the mask for the synapse delay in the row
-// #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
 // Define the type of the weights
-//#ifdef SYNAPSE_WEIGHTS_SIGNED
-//typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
-//#else
-//typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
-//#endif
-typedef accum weight_t;
+#ifdef SYNAPSE_WEIGHTS_SIGNED
+typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
+#else
+typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
+#endif
 
-typedef uint8_t control_t;
+
+typedef uint16_t control_t;
 
 #define N_SYNAPSE_ROW_HEADER_WORDS 3
 
@@ -133,13 +133,10 @@ static inline control_t* synapse_row_plastic_controls(address_t fixed) {
     return (control_t*) &fixed[2 + synapse_row_num_fixed_synapses(fixed)];
 }
 
-static inline accum *synapse_row_fixed_weight_controls(address_t fixed) {
-    return (accum *) &fixed[2];
+static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
+    return &fixed[2];
 }
 
-static inline uint8_t *synapse_row_fixed_data(address_t fixed, uint32_t n_synapses) {
-    return (uint8_t *) &fixed[2 + n_synapses];
-}
 
 // The following are offset calculations into the ring buffers
 static inline index_t synapse_row_sparse_index(
@@ -149,25 +146,22 @@ static inline index_t synapse_row_sparse_index(
 }
 
 static inline index_t synapse_row_sparse_type(
-        uint32_t x, uint32_t synapse_index_bits) {
-    // Returns synapse type
-    return x >> synapse_index_bits;
+        uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
+    return (x >> synapse_index_bits) & synapse_type_mask;
 }
 
 static inline index_t synapse_row_sparse_type_index(
-        uint32_t x) {
-    // Returns syn type and neuron ID
-    return x;
+        uint32_t x, uint32_t synapse_type_index_mask) {
+    return x & synapse_type_index_mask;
 }
 
 static inline index_t synapse_row_sparse_delay(
         uint32_t x, uint32_t synapse_type_index_bits) {
-    // return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
-    return 0;
+    return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
 }
 
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
-    return x;
+    return (x >> (32 - SYNAPSE_WEIGHT_BITS));
 }
 
 #endif  // SYNAPSE_ROW_H

@@ -47,7 +47,6 @@ struct connection_builder_config {
     uint32_t connector_type;
     uint32_t weight_type;
     uint32_t delay_type;
-    uint32_t random_weight_matrix;
 };
 
 struct expander_config {
@@ -127,8 +126,7 @@ static bool read_connection_builder_region(address_t *in_region,
             post_slice_start, post_slice_count,
             config.pre_slice_start, config.pre_slice_count,
             connection_generator, delay_generator, weight_generator,
-            config.max_stage, config.timestep_per_delay,
-            config.random_weight_matrix);
+            config.max_stage, config.timestep_per_delay);
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);

@@ -25,12 +25,14 @@
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
 #include <neuron/threshold_types/threshold_type.h>
-#include <neuron/synapse_types/synapse_types.h>
+#include <synapse/synapse_types/synapse_types.h>
 
 // Further includes
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
+
+#include <synapse/plasticity/stdp/post_events_rate_pyramidal.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -47,6 +49,8 @@
 #error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
 	shaping include
 #endif
+
+#define DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER 2
 
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
@@ -65,6 +69,12 @@ static global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
+
+//! Array containing the postsynaptic rates
+static post_event_history_t *postsynaptic_rates;
+
+//! Pointer to the SDRAM region for the postsynaptic values
+static post_event_history_t *postsynaptic_buffer;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -126,6 +136,9 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
             return false;
         }
     }
+
+    // Allocate DTCM for the rates used for plasticity
+    postsynaptic_rates = post_events_init_buffers(n_neurons);
 
     return true;
 }
@@ -338,6 +351,28 @@ static void neuron_impl_store_neuron_parameters(
                 n_neurons * sizeof(additional_input_t));
         next += n_words_needed(n_neurons * sizeof(additional_input_t));
     }
+}
+
+static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index) {
+
+    use(neuron_index);
+
+}
+
+static inline void neuron_impl_send_postsynaptic_buffer(uint32_t n_neurons) {
+
+    //spin1_delay_us(150);
+
+    spin1_dma_transfer(
+        DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER, postsynaptic_buffer, postsynaptic_rates,
+        DMA_WRITE, n_neurons * sizeof(post_event_history_t));
+}
+
+static void neuron_impl_allocate_postsynaptic_region(uint tag, uint n_neurons) {
+
+    postsynaptic_buffer =
+        (post_event_history_t *) sark_xalloc(
+            sv->sdram_heap, n_neurons * sizeof(post_event_history_t), tag, 1);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

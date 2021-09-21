@@ -43,20 +43,19 @@ address_t synapse_dynamics_initialise(
 
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
-        index_t neuron_index, REAL *rates) {
+        uint32_t time, index_t neuron_index) {
     use(neuron_index);
-    use(rates[0]);
+    use(time);
 }
 
 //---------------------------------------
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
-        REAL *ring_buffer, uint32_t time, uint32_t rate) {
+        weight_t *ring_buffer, uint32_t time) {
     use(plastic_region_address);
     use(fixed_region_address);
     use(ring_buffer);
     use(time);
-    use(rate);
 
     log_error("There should be no plastic synapses!");
     return false;

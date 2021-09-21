@@ -13,55 +13,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = Static_synapse_Pyramidal_rate \
-		 Static_synapse_Two_comp_rate \
-		 Static_synapse_Two_comp_rate_compressor \
-		 Static_synapse_Two_comp_rate_no_teach \
-		 Static_synapse_Two_comp_rate_out \
-		 Static_synapse_Pyramidal_rate_compressor \
-		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity \
-		 Plastic_synapse_Two_comp_rate_stdp_mad_Bern_plasticity \
-		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity_compressor \
-		 Plastic_synapse_Pyramidal_rate_stdp_mad_Bern_plasticity_compressor_input \
-		 Plastic_synapse_Two_comp_rate_stdp_mad_Bern_plasticity_compressor \
-		 Plastic_synapse_Two_comp_rate_no_teach_stdp_mad_Bern_plasticity \
-		 Plastic_synapse_Two_comp_rate_out_stdp_mad_Bern_plasticity \
-		 Two_comp_rate \
-		 Pyramidal_rate \
-		 Two_comp_rate_no_teach \
-		 Two_comp_rate_out \
-		 Two_comp_rate_stdp_mad_Bern_plasticity \
-		 Pyramidal_rate_stdp_mad_Bern_plasticity \
-#         IF_curr_exp \
-#         IF_cond_exp \
-#         IZK_curr_exp \
-#         IZK_cond_exp \
-#         IF_curr_exp_dual \
-#         IF_curr_exp_stdp_mad_pair_additive \
-#         IF_curr_exp_stdp_mad_pair_multiplicative \
-#         IF_cond_exp_stdp_mad_pair_additive \
-#         external_device_lif_control \
-#         IF_cond_exp_stoc \
-#         IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
-#         IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
-#         IF_curr_exp_stdp_mad_vogels_2011_additive \
-#         IF_curr_delta \
-#         IF_curr_exp_ca2_adaptive \
-#         IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive \
-#         IF_curr_exp_stdp_mad_nearest_pair_additive \
-#         IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
-#         IF_curr_exp_stdp_mad_pfister_triplet_additive \
-#         IF_cond_exp_stdp_mad_nearest_pair_additive \
-#	      IF_curr_alpha \
-#	      IF_curr_alpha_stdp_mad_pair_additive \
-#         IF_cond_exp_structural \
-#         IF_curr_exp_stdp_mad_pair_additive_structural \
-#         IF_curr_exp_structural \
-#         IF_cond_exp_stdp_mad_pair_additive_structural \
-#         IF_curr_exp_sEMD \
-#         IF_curr_exp_two_comp \
-#         IZK_curr_exp_stdp_mad_pair_additive \
-#         IZK_cond_exp_stdp_mad_pair_additive
+MODELS = Static_synapse \
+         IF_curr_exp \
+         IF_cond_exp \
+         IZK_curr_exp \
+         IZK_cond_exp \
+         IF_curr_exp_dual \
+         IF_curr_exp_stdp_mad_pair_additive \
+         IF_curr_exp_stdp_mad_pair_multiplicative \
+         IF_cond_exp_stdp_mad_pair_additive \
+         external_device_lif_control \
+         IF_cond_exp_stoc \
+         IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
+         IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
+         IF_curr_exp_stdp_mad_vogels_2011_additive \
+         IF_curr_delta \
+         IF_curr_exp_ca2_adaptive \
+         IF_curr_exp_ca2_adaptive_stdp_mad_pair_additive \
+         IF_curr_exp_stdp_mad_nearest_pair_additive \
+         IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
+         IF_curr_exp_stdp_mad_pfister_triplet_additive \
+         IF_cond_exp_stdp_mad_nearest_pair_additive \
+         IF_curr_alpha \
+	     IF_curr_alpha_stdp_mad_pair_additive \
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
