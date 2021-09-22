@@ -171,15 +171,22 @@ class ConnectionHolder(object):
             # all the data
             if (self.__data_items_to_return is None or
                     not self.__data_items_to_return):
-                self.__data_items = connections[order]
+                data_items = connections[order]
             # There is more than one item to return, so let numpy do its magic
             elif len(self.__data_items_to_return) > 1:
-                self.__data_items = \
+                data_items = \
                     connections[order][self.__data_items_to_return]
             # There is 1 item to return, so make sure only one item exists
             else:
-                self.__data_items = \
+                data_items = \
                     connections[order][self.__data_items_to_return[0]]
+
+            # Return in a format which can be understood by a FromListConnector
+            self.__data_items = []
+            for data_item in data_items:
+                data_item_list = [data_item[n] for n in range(len(data_item))]
+                self.__data_items.append(data_item_list)
+
         else:
             if self.__data_items_to_return is None:
                 return []
