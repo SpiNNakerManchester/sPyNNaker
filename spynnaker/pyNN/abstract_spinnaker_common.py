@@ -33,6 +33,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
     DelaySupportAdder, OnChipBitFieldGenerator,
+    RedundantPacketCountReport,
     SpynnakerDataSpecificationWriter,
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from spynnaker.pyNN.extra_algorithms.\
@@ -289,15 +290,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for projection in self._projections:
             projection._clear_cache()
 
-        if (get_config_bool("Reports", "reports_enabled") and
-                get_config_bool(
-                    "Reports", "write_redundant_packet_count_report") and
-                not self._use_virtual_board and run_time is not None and
-                not self._has_ran and get_config_bool(
-                    "Reports", "writeProvenanceData")):
-            self.extend_extra_post_run_algorithms(
-                ["RedundantPacketCountReport"])
-
         super().run(run_time, sync_time)
         for projection in self._projections:
             projection._clear_cache()
@@ -477,6 +469,25 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms)
     def _do_extra_mapping_algorithms(self):
         self._execute_write_network_graph()
+
+    @overrides(AbstractSpinnakerBase._do_provenance_reports)
+    def _do_provenance_reports(self, prov_items):
+        """
+        Can be extended to add more proevance reports
+        :param prov_items:
+        :return:
+        """
+        AbstractSpinnakerBase._do_provenance_reports(self, prov_items)
+        self._report_redundant_packet_count(prov_items)
+
+    def _report_redundant_packet_count(self, prov_items):
+        with FecTimer("Write Redundant Packet Count Report") as timer:
+            FecTimer.clear_provenance()
+        if timer.skip_if_cfg_false(
+                "Reports", "write_redundant_packet_count_report"):
+            return
+        report = RedundantPacketCountReport()
+        report(prov_items)
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
