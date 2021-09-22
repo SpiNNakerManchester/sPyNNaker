@@ -466,7 +466,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             report = SpYNNakerNeuronGraphNetworkSpecificationReport()
             report(self._application_graph)
 
-    @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms)
+    @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
+               extend_doc=False)
     def _do_extra_mapping_algorithms(self):
         self._execute_write_network_graph()
 
@@ -495,8 +496,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             selector = SpynnakerSplitterSelector()
             selector(self._application_graph)
 
-    @overrides(AbstractSpinnakerBase._execute_delay_support_adder)
+    @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
+               extend_doc=False)
     def _execute_delay_support_adder(self):
+        """
+        Runs, times and logs the DelaySupportAdder if required
+        """
         with FecTimer("Execute Delay Support Adder") as timer:
             name = get_config_str("Mapping", "delay_support_adder")
             if name is None:
