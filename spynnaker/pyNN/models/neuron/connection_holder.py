@@ -184,7 +184,10 @@ class ConnectionHolder(object):
             # Return in a format which can be understood by a FromListConnector
             self.__data_items = []
             for data_item in data_items:
-                data_item_list = [data_item[n] for n in range(len(data_item))]
+                data_item_list = data_item
+                if hasattr(data_item_list, "__len__"):
+                    data_item_list = [
+                        data_item[n] for n in range(len(data_item))]
                 self.__data_items.append(data_item_list)
 
         else:
