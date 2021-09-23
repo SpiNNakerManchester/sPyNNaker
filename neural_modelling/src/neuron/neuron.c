@@ -50,6 +50,8 @@ static uint32_t n_neurons;
 
 static uint32_t n_synapse_types;
 
+static uint32_t log_n_neurons;
+
 //! Number of timesteps between spike recordings
 static uint32_t spike_recording_rate;
 
@@ -125,6 +127,8 @@ static uint32_t *incoming_partitions;
 
 static uint32_t start_of_global_parameters;
 
+static uint32_t mem_offset;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t timer_start_offset;
@@ -134,6 +138,7 @@ struct neuron_parameters {
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
     uint32_t mem_index;
+    uint32_t mem_offset;
     uint32_t n_recorded_variables;
 };
 // The +4 is for the seeds for the background noise
@@ -274,12 +279,14 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     memory_index = params->mem_index;
 
+    mem_offset = params->mem_offset;
+
     // Read number of recorded variables
     n_recorded_vars = params->n_recorded_variables;
 
      // Avoids offset problems with a single neuron assuming min power = 2
     n_neurons_power_2 = (n_neurons == 1) ? 2 : n_neurons;
-    uint32_t log_n_neurons = 1;
+    log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {
             n_neurons_power_2 = next_power_of_2(n_neurons);
@@ -329,23 +336,13 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     }
     uint32_t log_incoming_partitions = ilog_2(incoming_partitions_power_2);
 
-    uint32_t contribution_bits =
-        log_n_neurons + log_incoming_partitions;
+    uint32_t contribution_bits = log_n_neurons;
     uint32_t contribution_size = 1 << contribution_bits;
 
     dma_size = contribution_size * sizeof(weight_t);
 
     dma_finished = false;
 
-
-    //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
-    //Flag = 1 allocates with lock in order to avoid multiple accesses
-    synaptic_region = (weight_t*) sark_xalloc(sv->sdram_heap, dma_size, memory_index, 1);
-
-    //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
-    for(index_t i = 0; i < contribution_size; i++) {
-        synaptic_region[i] = 0;
-    }
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -361,6 +358,11 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     if (synaptic_contributions == NULL) {
         log_error("Unable to allocate Synaptic contribution buffers");
         return false;
+    }
+
+    for (uint i = 0; i < contribution_size; i++) {
+
+        synaptic_contributions[i] = 0;
     }
 
     synaptic_contributions_to_input_left_shifts = (uint32_t *) spin1_malloc(
@@ -459,6 +461,13 @@ static void recording_done_callback(void) {
     n_recordings_outstanding--;
 }
 
+void neuron_set_contribution_region(){
+
+    synaptic_region = sark_tag_ptr(memory_index, 0);
+    synaptic_region += (mem_offset << log_n_neurons);
+
+}
+
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
 //! \param[in] time the timer tick  value currently being executed
@@ -467,13 +476,21 @@ void neuron_do_timestep_update( // EXPORTED
     
     current_time = time;
 
-    spin1_dma_transfer (
-        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
-        synaptic_contributions, DMA_READ, dma_size);
-    
-    while (!dma_finished);
+    if(time) {
+        spin1_dma_transfer (
+            DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
+            synaptic_contributions, DMA_READ, dma_size);
 
-    dma_finished = false;
+        io_printf(IO_BUF, "Reading from %x\n", synaptic_region);
+
+        while (!dma_finished);
+
+        dma_finished = false;
+    }
+    else {
+
+        neuron_set_contribution_region();
+    }
 
     // Set the next expected time to wait for between spike sending
     expected_time = sv->cpu_clk * timer_period;
@@ -545,15 +562,13 @@ void neuron_do_timestep_update( // EXPORTED
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            //io_printf(IO_BUF, "spike\n");
+            io_printf(IO_BUF, "spike\n");
 
             // Record the spike (or rate update)
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
             neuron_impl_process_post_synaptic_event(neuron_index);
-
-              //io_printf(IO_BUF, "ur %k, vr %k, t %d\n", neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index), time);
 
             if(use_key){
                  // Wait until the expected time to send

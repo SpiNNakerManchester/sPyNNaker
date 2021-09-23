@@ -53,7 +53,7 @@
 
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
-#define SYNAPSE_DELAY_BITS 8
+#define SYNAPSE_DELAY_BITS 4 //8
 #endif
 
 // Create some masks based on the number of bits

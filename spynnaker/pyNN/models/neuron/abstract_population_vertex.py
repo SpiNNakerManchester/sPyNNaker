@@ -56,6 +56,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
 from spynnaker.pyNN.models.neural_properties import AbstractIsRateBased
+#from spynnaker.pyNN.models.neuron import SynapseMachineVertex
 
 from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -113,7 +114,9 @@ class AbstractPopulationVertex(
         "__updated_state_variables",
         "_atoms_offset",
         "_slice_list",
-        "_incoming_partitions"]
+        "_incoming_partitions",
+        "_n_targets",
+        "_current_offset"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -123,8 +126,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 16 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 64
+    # 17 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 68
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -133,7 +136,7 @@ class AbstractPopulationVertex(
 
     def __init__(
             self, n_neurons, atoms_offset, label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, neuron_impl, pynn_model):
+            spikes_per_second, ring_buffer_sigma, neuron_impl, pynn_model, n_targets):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -142,6 +145,8 @@ class AbstractPopulationVertex(
         self.__n_subvertices = 0
         self.__n_data_specs = 0
         self._atoms_offset = atoms_offset
+        self._n_targets = n_targets
+        self._current_offset = 0
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -290,8 +295,12 @@ class AbstractPopulationVertex(
             resources_required, self.__neuron_recorder.recorded_region_ids,
             label, constraints)
 
+        vertex.mem_offset = self._current_offset
+        self._current_offset = (self._current_offset + 1) % self._n_targets
+
         AbstractPopulationVertex._n_vertices += 1
-        self._machine_vertices[self.__n_subvertices] = vertex
+        self._machine_vertices[(
+            vertex_slice.lo_atom, vertex_slice.hi_atom)] = vertex
 
         for app_vertex in self._connected_app_vertices:
             out_vertices =\
@@ -516,7 +525,7 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, index):
+            time_scale_factor, application_graph, index, mem_offset):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -574,6 +583,9 @@ class AbstractPopulationVertex(
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
+
+        # Write the SDRAM offset for the input contributions
+        spec.write_value(data=mem_offset)
 
         # Write the number of variables that can be recorded
         spec.write_value(
@@ -700,18 +712,16 @@ class AbstractPopulationVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
-        # writing of data spec for neuron vertices is forced to
-        # happen before synapse ones
-        vertex.vertex_index = placement.p
+        if vertex.vertex_index is None:
+            for c in vertex.constraints:
+                if isinstance(c, SameChipAsConstraint):# and isinstance(c.vertex, SynapseMachineVertex):
+                    vertex.vertex_index = c.vertex.vertex_index
 
-        for c in vertex.constraints:
-            if isinstance(c, SameChipAsConstraint):
-                c.vertex.vertex_index = placement.p
         
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, vertex.vertex_index)
+            time_scale_factor, application_graph, vertex.vertex_index, vertex.mem_offset)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -995,11 +1005,15 @@ class AbstractPopulationVertex(
     def get_n_synapse_types(self):
         return self.__neuron_impl.get_n_synapse_types()
 
-    def get_machine_vertex_at(self, index):
+    def get_machine_vertex_at(self, low, high):
 
-        if index in self._machine_vertices:
-            return self._machine_vertices[index]
-        return None
+        vertices = list()
+
+        for (lo, hi) in self._machine_vertices:
+            if lo >= low and hi <= high:
+                vertices.append(self._machine_vertices[(lo, hi)])
+
+        return vertices
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)

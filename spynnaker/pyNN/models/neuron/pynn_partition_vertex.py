@@ -41,17 +41,21 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_neurons_partition",
         "_n_outgoing_partitions",
         "_n_incoming_partitions",
-        "_max_atoms_neuron_core"]
+        "_max_atoms_neuron_core",
+        "_max_atoms_syn_core"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
-                 incoming_partitions, outgoing_partitions):
+                 incoming_partitions, outgoing_partitions, n_targets):
+
 
         self._n_atoms = n_neurons
 
         self._n_incoming_partitions = incoming_partitions
 
         self._max_atoms_neuron_core = max_atoms_neuron_core
+
+        self._max_atoms_syn_core = max_atoms_neuron_core * n_targets
 
         self._n_outgoing_partitions = 1 if self._n_atoms <= self._max_atoms_neuron_core else outgoing_partitions #int(math.ceil(float(self._n_atoms) / self._max_atoms_neuron_core))
 
@@ -76,7 +80,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
             self._neuron_vertices.append(AbstractPopulationVertex(
                 self._neurons_partition[i], offset, label + "_" + str(i) + "_neuron_vertex",
                 constraints, max_atoms_neuron_core, spikes_per_second,
-                ring_buffer_sigma, neuron_model, pynn_model))
+                ring_buffer_sigma, neuron_model, pynn_model, n_targets))
 
             syn_vertices = list()
 
@@ -87,7 +91,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                 syn_constraints = constraints
 
-            syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertices[i]))
+            #syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertices[i]))
 
             # memory offset for the synaptic contributions
             mem_offset = 0
@@ -98,7 +102,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                     vertex = SynapticManager(1, index, self._neurons_partition[i], offset, syn_constraints,
                                             label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
-                                            max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
+                                            self._max_atoms_syn_core, neuron_model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                             self._n_syn_types, mem_offset)
 

@@ -21,7 +21,9 @@ from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .pynn_partition_vertex import PyNNPartitionVertex
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
+from .synapse_machine_vertex import SynapseMachineVertex
 
 __all__ = ["AbstractPopulationVertex", "ConnectionHolder", "SynapticManager",
            "PopulationMachineVertex", "AbstractPyNNNeuronModel",
-           "AbstractPyNNNeuronModelStandard", "PyNNPartitionVertex"]
+           "AbstractPyNNNeuronModelStandard", "PyNNPartitionVertex",
+           "SynapseMachineVertex"]

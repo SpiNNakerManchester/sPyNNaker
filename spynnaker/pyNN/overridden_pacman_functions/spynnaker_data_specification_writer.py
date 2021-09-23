@@ -60,8 +60,8 @@ class SpynnakerDataSpecificationWriter(
             else:
                 placement_order.append(placement)
 
-        placement_order.extend(neuron_vertices)
         placement_order.extend(syn_vertices)
+        placement_order.extend(neuron_vertices)
         placement_order.extend(delay_extensions)
         placement_order.extend(rate_injectors)
         placement_order.extend(rate_sources)

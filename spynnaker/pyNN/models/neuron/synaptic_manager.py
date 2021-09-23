@@ -57,7 +57,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from .synapse_machine_vertex import SynapseMachineVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
@@ -1210,9 +1209,6 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
 
-        # Write the offset for SDRAM
-        spec.write_value(data=self.__mem_offset)
-
         # Hardcoded and moved in the constructor
         #ring_buffer_shifts = self._get_ring_buffer_shifts(
         #    self, application_graph, machine_time_step)
@@ -1300,10 +1296,13 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)
         ))
 
-        if vertex.vertex_index is None:
-            for c in vertex.constraints:
-                if isinstance(c, SameChipAsConstraint) and isinstance(c.vertex, PopulationMachineVertex):
-                    vertex.vertex_index = c.vertex.vertex_index
+        # writing of data spec for neuron vertices is forced to
+        # happen before synapse ones
+        vertex.vertex_index = placement.p
+
+        for c in vertex.constraints:
+            if isinstance(c, SameChipAsConstraint):
+                c.vertex.vertex_index = placement.p
 
         self._write_synapse_parameters(
             spec, vertex_slice, application_graph, machine_time_step,
@@ -1614,10 +1613,12 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         SynapticManager._n_vertices += 1
 
         for app_vertex in self._connected_app_vertices:
-            out_vertex =\
-                app_vertex.get_machine_vertex_at((vertex_slice.hi_atom - self._atoms_offset) // self._atoms_neuron_cores)
-            if out_vertex is not None:
-                vertex.add_constraint(SameChipAsConstraint(out_vertex))
+            out_vertices = \
+                app_vertex.get_machine_vertex_at(
+                    vertex_slice.lo_atom, vertex_slice.hi_atom)
+            if len(out_vertices) > 0:
+                for out_vertex in out_vertices:
+                    vertex.add_constraint(SameChipAsConstraint(out_vertex))
 
         # return machine vertex
         return vertex
@@ -1681,7 +1682,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         vertices = list()
 
         for (lo, hi) in self._machine_vertices:
-            if lo >= low and hi <= high:
+            if lo <= low and hi >= high:
                 vertices.append(self._machine_vertices[(lo, hi)])
 
         return vertices

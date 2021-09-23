@@ -66,7 +66,6 @@ static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
 static uint32_t memory_index;
-static uint32_t offset;
 
 static weight_t *synaptic_region;
 
@@ -104,7 +103,6 @@ struct synapse_parameters {
     uint32_t incoming_rate_buffer_size;
     uint32_t synapse_index;
     uint32_t mem_index;
-    uint32_t offset;
     // uint32_t synaptic_matrix_size;
     uint32_t n_recorded_variables;
     uint32_t is_recording;
@@ -274,8 +272,8 @@ static inline void process_fixed_synapses(
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
-        //io_printf(IO_BUF, "synaptic word %d\n", synaptic_word);
-        //io_printf(IO_BUF, "weight: %d, delay %d\n", weight, delay);
+        io_printf(IO_BUF, "synaptic word %d\n", synaptic_word);
+        io_printf(IO_BUF, "weight: %d, delay %d\n", weight, delay);
 
          // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
@@ -311,6 +309,8 @@ bool synapses_initialise(
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *direct_synapses_address) {
 
+    io_printf(IO_BUF, "carote\n");
+
     log_debug("synapses_initialise: starting");
 
     struct synapse_parameters *params = (void *) address;
@@ -326,8 +326,6 @@ bool synapses_initialise(
     synapse_index = params->synapse_index;
 
     memory_index = params->mem_index;
-
-    offset = params->offset; 
 
     n_recorded_vars = params->n_recorded_variables;
     is_recording = params->is_recording;
@@ -391,6 +389,8 @@ bool synapses_initialise(
             return false;
         }
     }
+    io_printf(IO_BUF, "banane\n");
+
 
     uint32_t ptr = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
@@ -424,6 +424,8 @@ bool synapses_initialise(
         }
     }
 
+    io_printf(IO_BUF, "zucchine\n");
+
         // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_size = direct_matrix_address[0];
@@ -444,6 +446,8 @@ bool synapses_initialise(
             *direct_synapses_address, &(direct_matrix_address[1]),
             direct_matrix_size);
     }
+
+    io_printf(IO_BUF, "pere\n");
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -474,13 +478,15 @@ bool synapses_initialise(
 
         log_error("Could not allocate %u entries for ring buffers",
                 ring_buffer_size);
+
+        return false;
     }
+
+    io_printf(IO_BUF, "mele\n");
 
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
-
-    size_to_be_transferred = (1 << (log_n_neurons + log_n_synapse_types)) * sizeof(weight_t);
 
     synapse_type_index_bits = log_n_neurons + 1;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -489,8 +495,26 @@ bool synapses_initialise(
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
-    //io_printf(IO_BUF, "syn index bits %d, syn type index %d, syn type bits %d\n", synapse_index_bits, synapse_type_index_bits, synapse_type_bits);
-    //io_printf(IO_BUF, "n syn types %d, log %d\n", n_synapse_types, log_n_synapse_types);
+    uint32_t contribution_size = n_neurons;
+
+    size_to_be_transferred = contribution_size * sizeof(weight_t);
+
+    //Allocate the region in SDRAM for synaptic contribution.
+    //Flag = 1 allocates with lock in order to avoid multiple accesses
+    synaptic_region = (weight_t*) sark_xalloc(sv->sdram_heap, size_to_be_transferred, memory_index, 1);
+
+    if (synaptic_region == NULL) {
+        log_error("Could not allocate synaptic region in memory");
+        return false;
+    }
+
+    //set the region to 0
+    for(index_t i = 0; i < contribution_size; i++) {
+        synaptic_region[i] = 0;
+    }
+
+    io_printf(IO_BUF, "syn index bits %d, syn type index %d, syn type bits %d\n", synapse_index_bits, synapse_type_index_bits, synapse_type_bits);
+    io_printf(IO_BUF, "n syn types %d, log %d\n", n_synapse_types, log_n_synapse_types);
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();
@@ -535,7 +559,7 @@ void synapses_do_timestep_update(timer_t time) {
 
     print_inputs();
 
-    //io_printf(IO_BUF, "time %d, writing %d\n", time, ring_buffers[ring_buffer_index]);
+    io_printf(IO_BUF, "time %d, writing %d addr %x\n", time, ring_buffers[ring_buffer_index], synaptic_region);
 
     if(is_recording) {
 
@@ -728,10 +752,10 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
 
 }
 
-void synapses_set_contribution_region(){
-
-    synaptic_region = sark_tag_ptr(memory_index, 0);
-    synaptic_region += (offset << synapse_index_bits);
-
-    synapse_dynamics_set_post_buffer_region(memory_index+18);
-}
+//void synapses_set_contribution_region(){
+//
+//    synaptic_region = sark_tag_ptr(memory_index, 0);
+//    synaptic_region += (offset << synapse_index_bits);
+//
+//    synapse_dynamics_set_post_buffer_region(memory_index+18);
+//}
