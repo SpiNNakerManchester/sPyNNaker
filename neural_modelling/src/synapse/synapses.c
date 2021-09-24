@@ -309,8 +309,6 @@ bool synapses_initialise(
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *direct_synapses_address) {
 
-    io_printf(IO_BUF, "carote\n");
-
     log_debug("synapses_initialise: starting");
 
     struct synapse_parameters *params = (void *) address;
@@ -389,8 +387,6 @@ bool synapses_initialise(
             return false;
         }
     }
-    io_printf(IO_BUF, "banane\n");
-
 
     uint32_t ptr = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
@@ -424,8 +420,6 @@ bool synapses_initialise(
         }
     }
 
-    io_printf(IO_BUF, "zucchine\n");
-
         // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_size = direct_matrix_address[0];
@@ -446,8 +440,6 @@ bool synapses_initialise(
             *direct_synapses_address, &(direct_matrix_address[1]),
             direct_matrix_size);
     }
-
-    io_printf(IO_BUF, "pere\n");
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -481,8 +473,6 @@ bool synapses_initialise(
 
         return false;
     }
-
-    io_printf(IO_BUF, "mele\n");
 
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;

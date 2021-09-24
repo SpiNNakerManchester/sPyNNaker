@@ -100,14 +100,14 @@ static uint32_t expected_time;
 static uint32_t n_recordings_outstanding = 0;
 
 //! The synaptic contributions for the current timestep
-static weight_t *synaptic_contributions;
+static weight_t **synaptic_contributions;
 
 static uint32_t *synaptic_contributions_to_input_left_shifts;
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
 
-static uint32_t memory_index;
+static uint32_t *memory_indices;
 
 static timer_t current_time;
 
@@ -117,8 +117,11 @@ static uint32_t n_neurons_power_2;
 static size_t dma_size;
 
 static volatile bool dma_finished;
+static volatile uint8_t dma_read;
 
-static weight_t *synaptic_region;
+static uint8_t total_partitions;
+
+static weight_t **synaptic_regions;
 
 //! Array containing the offsets for each syn type for the contributions
 static uint32_t *contribution_offset;
@@ -137,7 +140,6 @@ struct neuron_parameters {
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
-    uint32_t mem_index;
     uint32_t mem_offset;
     uint32_t n_recorded_variables;
 };
@@ -238,7 +240,14 @@ void dma_done_callback(uint arg1, uint arg2) {
     use(arg1);
     use(arg2);
 
-    dma_finished = true;
+
+    if(dma_read >= total_partitions) {
+
+        dma_finished = true;
+        return;
+    }
+    dma_read++;
+
 }
 
 //! \brief Set up the neuron models
@@ -277,8 +286,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     start_of_global_parameters = INCOMING_PARTITIONS_PTR + n_synapse_types;
 
-    memory_index = params->mem_index;
-
     mem_offset = params->mem_offset;
 
     // Read number of recorded variables
@@ -309,9 +316,13 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
+    io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
+
     contribution_offset = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
 
-    uint8_t total_partitions = 0;
+    io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
+
+    total_partitions = 0;
     
     for (index_t i = 0; i < n_synapse_types; i++) {
 
@@ -342,6 +353,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     dma_size = contribution_size * sizeof(weight_t);
 
     dma_finished = false;
+    dma_read = 1;
 
 
     // Call the neuron implementation initialise function to setup DTCM etc.
@@ -351,18 +363,35 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     // Tag the postsynaptic region with memory_index+18. Still a unique id and saves space in DTCM
     // Memory_index is the core ID, +18 guarantees not to replicate a tag with another core ID
-    neuron_impl_allocate_postsynaptic_region(memory_index+18, n_neurons);
+    //neuron_impl_allocate_postsynaptic_region(memory_index+18, n_neurons);
 
     // Allocate space for the synaptic contribution buffer
-    synaptic_contributions = (weight_t *) spin1_malloc(dma_size);
+    synaptic_contributions = (weight_t **) spin1_malloc(total_partitions * sizeof(weight_t *));
     if (synaptic_contributions == NULL) {
-        log_error("Unable to allocate Synaptic contribution buffers");
+        log_error("Unable to allocate Synaptic contribution buffers array");
         return false;
     }
 
-    for (uint i = 0; i < contribution_size; i++) {
+    // Allocate space for the synaptic contribution buffer
+    synaptic_regions = (weight_t **) spin1_malloc(total_partitions * sizeof(weight_t *));
+    if (synaptic_regions == NULL) {
+        log_error("Unable to allocate Synaptic contribution buffers array");
+        return false;
+    }
 
-        synaptic_contributions[i] = 0;
+    for(uint i = 0; i < total_partitions; i++) {
+
+        synaptic_contributions[i] = (weight_t *) spin1_malloc(dma_size);
+        if (synaptic_contributions[i] == NULL) {
+            log_error("Unable to allocate Synaptic contribution buffers");
+            return false;
+        }
+
+        for (uint j = 0; j < contribution_size; j++) {
+
+            synaptic_contributions[i][j] = 0;
+        }
+
     }
 
     synaptic_contributions_to_input_left_shifts = (uint32_t *) spin1_malloc(
@@ -371,11 +400,23 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         log_error("Unable to allocate Synaptic contribution shift array");
         return false;
     }
+
     spin1_memcpy(
         synaptic_contributions_to_input_left_shifts, address + start_of_global_parameters,
         (n_synapse_types) * sizeof(uint32_t));
 
-       start_of_global_parameters += n_synapse_types;
+    start_of_global_parameters += n_synapse_types;
+
+    memory_indices = (uint32_t *) spin1_malloc(total_partitions * sizeof(uint32_t));
+    if (memory_indices == NULL) {
+        log_error("Unable to allocate memory indices array");
+        return false;
+    }
+
+    spin1_memcpy(memory_indices, address + start_of_global_parameters,
+        (total_partitions) * sizeof(uint32_t));
+
+    start_of_global_parameters += total_partitions;
 
     // Set up the out spikes array - this is always n_neurons in size to ensure
     // it continues to work if changed between runs, but less might be used in
@@ -383,6 +424,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     if (!out_spikes_initialize(n_neurons)) {
         return false;
     }
+
+    //io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
 
     // Allocate recording space
     spike_recording_indexes = spin1_malloc(n_neurons * sizeof(uint8_t));
@@ -463,9 +506,11 @@ static void recording_done_callback(void) {
 
 void neuron_set_contribution_region(){
 
-    synaptic_region = sark_tag_ptr(memory_index, 0);
-    synaptic_region += (mem_offset << log_n_neurons);
+    for(uint i = 0; i < total_partitions; i++) {
 
+        synaptic_regions[i] = sark_tag_ptr(memory_indices[i], 0);
+        synaptic_regions[i] += mem_offset;
+    }
 }
 
 //! \executes all the updates to neural parameters when a given timer period
@@ -477,15 +522,18 @@ void neuron_do_timestep_update( // EXPORTED
     current_time = time;
 
     if(time) {
-        spin1_dma_transfer (
-            DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region,
-            synaptic_contributions, DMA_READ, dma_size);
 
-        io_printf(IO_BUF, "Reading from %x\n", synaptic_region);
+        for(index_t i = 0; i < total_partitions; i++) {
+
+            spin1_dma_transfer (
+                DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_regions[i],
+                synaptic_contributions[i], DMA_READ, dma_size);
+        }
 
         while (!dma_finished);
 
         dma_finished = false;
+        dma_read = 1;
     }
     else {
 
@@ -510,16 +558,20 @@ void neuron_do_timestep_update( // EXPORTED
     state_t recorded_variable_values[n_recorded_vars];
 
     register uint32_t sum;
+    register uint32_t sum_partitions;
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+
+        sum_partitions = 0;
         
         for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
-            register uint32_t buff_index = contribution_offset[synapse_type_index] + neuron_index;
+            //register uint32_t buff_index = contribution_offset[synapse_type_index] + neuron_index;
 
             //Add the values from synaptic_contributions
             sum = 0;
+
 
             for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
 
@@ -527,10 +579,12 @@ void neuron_do_timestep_update( // EXPORTED
 
                 //io_printf(IO_BUF, "buff index %d, contribution offset %d\n", buff_index, contribution_offset[synapse_type_index]);
 
-                sum += synaptic_contributions[buff_index];
-                buff_index += n_neurons_power_2;
+                sum += synaptic_contributions[i + sum_partitions][neuron_index];
+                //buff_index += n_neurons_power_2;
 
             }
+
+            sum_partitions += incoming_partitions[synapse_type_index];
 
             //io_printf(IO_BUF, "sum %d\n", sum);
 

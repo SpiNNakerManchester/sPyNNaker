@@ -293,7 +293,7 @@ class AbstractPopulationVertex(
 
         vertex = PopulationMachineVertex(
             resources_required, self.__neuron_recorder.recorded_region_ids,
-            label, constraints)
+            label, sum(self._incoming_partitions), constraints)
 
         vertex.mem_offset = self._current_offset
         self._current_offset = (self._current_offset + 1) % self._n_targets
@@ -343,6 +343,8 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             # 2 times for the in_partition array
             2 * (self.__neuron_impl.get_n_synapse_types() * 4) +
+            # Incoming max partitions
+            14 * 4 +
             self.__neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms) +
             base)
@@ -525,7 +527,7 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, index, mem_offset):
+            time_scale_factor, application_graph, indices, mem_offset):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -581,9 +583,6 @@ class AbstractPopulationVertex(
         # Write the number of synapse types
         spec.write_value(data=self.__neuron_impl.get_n_synapse_types())
 
-        # Write the SDRAM tag for the contribution area
-        spec.write_value(data=index)
-
         # Write the SDRAM offset for the input contributions
         spec.write_value(data=mem_offset)
 
@@ -601,6 +600,8 @@ class AbstractPopulationVertex(
             application_graph, machine_time_step)
 
         spec.write_array(ring_buffer_shifts)
+
+        spec.write_array(indices)
 
         # Write the recording data
         recording_data = self.__neuron_recorder.get_data(vertex_slice)
@@ -647,7 +648,7 @@ class AbstractPopulationVertex(
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice,
-            index=placement.vertex.vertex_index())
+            indices=placement.vertex.vertex_indices)
 
         # close spec
         spec.end_specification()
@@ -712,16 +713,15 @@ class AbstractPopulationVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
-        if vertex.vertex_index is None:
-            for c in vertex.constraints:
-                if isinstance(c, SameChipAsConstraint):# and isinstance(c.vertex, SynapseMachineVertex):
-                    vertex.vertex_index = c.vertex.vertex_index
+        for c in vertex.constraints:
+            if isinstance(c, SameChipAsConstraint):# and isinstance(c.vertex, SynapseMachineVertex):
+                vertex.index_at(c.vertex.mem_offset, c.vertex.vertex_index)
 
         
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, vertex.vertex_index, vertex.mem_offset)
+            time_scale_factor, application_graph, vertex.vertex_indices, vertex_slice.lo_atom)
 
         # write profile data
         profile_utils.write_profile_region_data(

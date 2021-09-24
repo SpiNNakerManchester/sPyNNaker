@@ -166,6 +166,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
         self._ring_buffer_shifts = [7]
         self._slice_list = None
+        #Global partition index
         self.__mem_offset = mem_offset
 
         # get config from simulator
@@ -1302,7 +1303,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         for c in vertex.constraints:
             if isinstance(c, SameChipAsConstraint):
-                c.vertex.vertex_index = placement.p
+                c.vertex.index_at(self.__mem_offset, placement.p)
 
         self._write_synapse_parameters(
             spec, vertex_slice, application_graph, machine_time_step,
@@ -1606,7 +1607,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         vertex = SynapseMachineVertex(
             resources_required, self.__synapse_recorder.recorded_region_ids,
-            label, constraints)
+            label, self.__mem_offset, constraints)
 
         self._machine_vertices[(
             vertex_slice.lo_atom, vertex_slice.hi_atom)] = vertex
