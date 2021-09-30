@@ -23,9 +23,6 @@ DELAY = 2
 
 class TestIndexBasedProbabilityConnector(BaseTestCase):
 
-    def setUp(self):
-        unittest_setup()
-
     def check_weights(self, projection, n, expression, allow_self_connections):
         weights = projection.get(["weight"], "list")
         pairs = [(s, d) for (s, d, _) in weights]
