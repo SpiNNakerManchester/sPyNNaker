@@ -15,7 +15,6 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
-from spynnaker.pyNN.config_setup import unittest_setup
 
 WEIGHT = 5
 DELAY = 2
