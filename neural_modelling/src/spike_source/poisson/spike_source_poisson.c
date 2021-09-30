@@ -119,8 +119,6 @@ typedef struct {
 typedef struct global_parameters {
     //! True if there is a key to transmit, False otherwise
     uint32_t has_key;
-    //! The base key to send with (neuron ID to be added to it), or 0 if no key
-    uint32_t key;
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
     //! The time between ticks in seconds for setting the rate
@@ -150,6 +148,9 @@ struct poisson_extension_provenance {
 
 //! The global_parameters for the sub-population
 static global_parameters ssp_params;
+
+//! The keys to send spikes with
+static uint32_t *keys;
 
 //! Collection of rates to apply over time to a particular spike source
 typedef struct source_info {
@@ -381,9 +382,16 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("read global_parameters: starting");
 
     spin1_memcpy(&ssp_params, sdram_globals, sizeof(ssp_params));
+    uint32_t keys_size = sizeof(uint32_t) * ssp_params.n_spike_sources;
+    keys = spin1_malloc(keys_size);
+    if (keys == NULL) {
+        log_error("Couldn't allocate space %u for %u keys",
+                keys_size, ssp_params.n_spike_sources);
+    }
+    spin1_memcpy(keys, &(sdram_globals[1]), keys_size);
 
-    log_info("\tkey = %08x, set rate mask = %08x",
-            ssp_params.key, ssp_params.set_rate_neuron_id_mask);
+    log_info("\tset rate mask = %08x",
+            ssp_params.set_rate_neuron_id_mask);
     log_info("\tseed = %u %u %u %u", ssp_params.spike_source_seed.c,
             ssp_params.spike_source_seed.x,
             ssp_params.spike_source_seed.y,
@@ -397,6 +405,9 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
             ssp_params.slow_rate_per_tick_cutoff);
     log_info("fast_rate_per_tick_cutoff = %k\n",
             ssp_params.fast_rate_per_tick_cutoff);
+    for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
+        log_info("Key %u: 0x%08x", i, keys[i]);
+    }
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -724,7 +735,7 @@ static void process_fast_source(
             // If no key has been given, do not send spikes to fabric
             if (ssp_params.has_key) {
                 // Send spikes
-                const uint32_t spike_key = ssp_params.key | s_id;
+                const uint32_t spike_key = keys[s_id];
                 tdma_processing_send_packet(
                     spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
@@ -765,7 +776,7 @@ static void process_slow_source(
             if (ssp_params.has_key) {
                 // Send package
                 tdma_processing_send_packet(
-                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+                        keys[s_id], count, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * count;

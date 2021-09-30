@@ -53,6 +53,7 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from pacman.utilities.utility_calls import get_field_based_keys
 
 
 def _flatten(alist):
@@ -159,18 +160,19 @@ class SpikeSourcePoissonMachineVertex(
     # between Knuth algorithm and Gaussian approx.
     FAST_RATE_PER_TICK_CUTOFF = 10
 
-    # 1. uint32_t has_key; 2. uint32_t key;
-    # 3. uint32_t set_rate_neuron_id_mask;
-    # 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;
-    # 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;
-    # 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;
-    # 10. uint32_t max_spikes_per_timestep;
-    # 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-    PARAMS_BASE_WORDS = 14
+    # 1. uint32_t has_key;
+    # 2. uint32_t set_rate_neuron_id_mask;
+    # 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
+    # 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+    # 7. uint32_t first_source_id; 8. uint32_t n_spike_sources;
+    # 9. uint32_t max_spikes_per_timestep;
+    # 10-13. mars_kiss64_seed_t (uint[4]) spike_source_seed;
+    # Note keys themselves are extra
+    PARAMS_BASE_WORDS = 13
 
     # Seed offset in parameters and size on bytes
-    SEED_OFFSET_BYTES = 10 * 4
-    SEED_SIZE_BYTES = 4 * 4
+    SEED_SIZE_BYTES = 4 * BYTES_PER_WORD
+    SEED_OFFSET_BYTES = PARAMS_BASE_WORDS - SEED_SIZE_BYTES
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -533,8 +535,12 @@ class SpikeSourcePoissonMachineVertex(
         # Write Key info for this core:
         key = routing_info.get_first_key_from_pre_vertex(
             placement.vertex, constants.SPIKE_PARTITION_ID)
-        spec.write_value(data=1 if key is not None else 0)
-        spec.write_value(data=key if key is not None else 0)
+        if key is None:
+            spec.write_value(0)
+            keys = [0] * self.vertex_slice.n_atoms
+        else:
+            spec.write_value(1)
+            keys = get_field_based_keys(key, self.vertex_slice)
 
         # Write the incoming mask if there is one
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
@@ -582,6 +588,8 @@ class SpikeSourcePoissonMachineVertex(
         for value in self._app_vertex.kiss_seed(self.vertex_slice):
             spec.write_value(data=value)
 
+        spec.write_array(keys)
+
     def reserve_memory_regions(self, spec, placement):
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
@@ -625,6 +633,15 @@ class SpikeSourcePoissonMachineVertex(
             label="sdram edge params",
             size=get_sdram_edge_params_bytes(self.vertex_slice))
 
+    @property
+    def __n_bytes_params(self):
+        """ The number of bytes for the parameters
+
+        :rtype: int
+        """
+        return (self.PARAMS_BASE_WORDS * BYTES_PER_WORD) + (
+            BYTES_PER_WORD * self.vertex_slice.n_atoms)
+
     def _reserve_poisson_params_rates_region(self, placement, spec):
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
@@ -637,7 +654,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.reserve_memory_region(
             region=(
                 self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
-            size=self.PARAMS_BASE_WORDS * BYTES_PER_WORD,
+            size=self.__n_bytes_params,
             label="PoissonParams")
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value,

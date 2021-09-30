@@ -34,7 +34,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
+    SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION, BYTES_PER_WORD)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step)
@@ -450,12 +450,14 @@ class SpikeSourcePoissonVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         # pylint: disable=arguments-differ
-        poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        rates_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        params_sz = SpikeSourcePoissonMachineVertex.PARAMS_BASE_WORDS + (
+            vertex_slice.n_atoms * BYTES_PER_WORD)
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz + self.tdma_sdram_size_in_bytes +
+            rates_sz + params_sz + self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples) +
