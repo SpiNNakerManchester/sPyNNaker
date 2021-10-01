@@ -36,7 +36,8 @@ class ACSource(AbstractCurrentSource):
         "__frequency",
         "__phase",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types",
+        "__app_vertex"]
 
     def __init__(self, start=0.0, stop=0.0, amplitude=0.0, offset=0.0,
                  frequency=0.0, phase=0.0):
@@ -68,6 +69,8 @@ class ACSource(AbstractCurrentSource):
         self.__parameters['frequency'] = self.__frequency
         self.__parameters['phase'] = self.__phase
 
+        self.__app_vertex = None
+
     def set_parameters(self, **parameters):
         """ Set the current source parameters
 
@@ -85,6 +88,16 @@ class ACSource(AbstractCurrentSource):
                     self.__parameters[key] = self._get_phase(value)
                 else:
                     self.__parameters[key] = value
+
+        # Parameters have been set, so if multi-run then it will have been
+        # injected already; if not then it can just be ignored
+        if self.__app_vertex is not None:
+            for m_vertex in self.__app_vertex.machine_vertices:
+                m_vertex.set_reload_required(True)
+
+    @overrides(AbstractCurrentSource.set_app_vertex)
+    def set_app_vertex(self, vertex):
+        self.__app_vertex = vertex
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)

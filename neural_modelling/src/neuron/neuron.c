@@ -55,6 +55,9 @@ static uint32_t *ring_buffer_to_input_left_shifts;
 //! The address where the actual neuron parameters start
 static address_t saved_params_address;
 
+//! The address for the current source parameters
+static address_t current_source_address;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t has_key;
@@ -84,6 +87,10 @@ bool neuron_resume(void) { // EXPORTED
         log_error("failed to reload the neuron recording parameters");
         return false;
     }
+
+    // For now it is probably safest to re-initialise all current sources
+    // in case a new one has been added between runs
+    current_source_impl_initialise(current_source_address);
 
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters();
@@ -134,6 +141,7 @@ bool neuron_initialise(
 
     // Store where the actual neuron parameters start
     saved_params_address = &params->ring_buffer_shifts[n_synapse_types];
+    current_source_address = cs_address;
 
     log_info("\t n_neurons = %u, peak %u", n_neurons, n_neurons_peak);
 

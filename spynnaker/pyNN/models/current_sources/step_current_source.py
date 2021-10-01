@@ -30,7 +30,8 @@ class StepCurrentSource(AbstractCurrentSource):
         "__amplitudes",
         "__times",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types",
+        "__app_vertex"]
 
     def __init__(self, times=[], amplitudes=[]):
         # There's probably no need to actually store these as you can't
@@ -54,6 +55,8 @@ class StepCurrentSource(AbstractCurrentSource):
         self.__parameters['times'] = self.__times
         self.__parameters['amplitudes'] = self.__amplitudes
 
+        self.__app_vertex = None
+
     def set_parameters(self, **parameters):
         """ Set the current source parameters
 
@@ -75,6 +78,16 @@ class StepCurrentSource(AbstractCurrentSource):
                 else:
                     self.__amplitudes = value
                 self.__parameters[key] = value
+
+        # Parameters have been set, so if multi-run then it will have been
+        # injected already; if not then it can just be ignored
+        if self.__app_vertex is not None:
+            for m_vertex in self.__app_vertex.machine_vertices:
+                m_vertex.set_reload_required(True)
+
+    @overrides(AbstractCurrentSource.set_app_vertex)
+    def set_app_vertex(self, vertex):
+        self.__app_vertex = vertex
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)

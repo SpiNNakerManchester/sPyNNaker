@@ -778,6 +778,11 @@ class AbstractPopulationVertex(
         """
         self.__current_sources.append(current_source)
         self.__current_source_id_list[current_source] = neuron_list
+        # set the associated vertex (for multi-run case)
+        current_source.set_app_vertex(self)
+        # set to reload for multi-run case
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_reload_required(True)
 
     @property
     def current_sources(self):

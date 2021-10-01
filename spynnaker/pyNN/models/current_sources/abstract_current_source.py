@@ -45,6 +45,13 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         cells.inject(self)
 
     @abstractmethod
+    def set_app_vertex(self, vertex):
+        """ Set the app vertex to that associated with the cells
+
+        :param AbstractPopulationVertex vertex: The population vertex
+        """
+
+    @abstractmethod
     def set_parameters(self, **parameters):
         """ Set the current source parameters
 

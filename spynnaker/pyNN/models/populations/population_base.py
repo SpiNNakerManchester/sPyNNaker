@@ -151,15 +151,10 @@ class PopulationBase(object, metaclass=AbstractBase):
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
 
-        .. warning::
-            Currently unimplemented.
-
         :param current_source:
         :type current_source:
             pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource
         """
-        # TODO:
-        # _we_dont_do_this_now(current_source)  # pragma: no cover
 
     def is_local(self,
                  id):  # pylint: disable=unused-argument, redefined-builtin

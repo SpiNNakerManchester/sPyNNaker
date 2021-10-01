@@ -242,6 +242,9 @@ class PopulationNeuronsMachineVertex(
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
 
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
+
         # close spec
         spec.end_specification()
 

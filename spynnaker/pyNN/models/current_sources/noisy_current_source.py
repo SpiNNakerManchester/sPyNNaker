@@ -37,7 +37,8 @@ class NoisyCurrentSource(AbstractCurrentSource):
         "__dt",
         "__rng",
         "__parameters",
-        "__parameter_types"]
+        "__parameter_types",
+        "__app_vertex"]
 
     def __init__(self, mean=0.0, stdev=0.0, start=0.0, stop=0.0, dt=1.0,
                  rng=None):
@@ -77,6 +78,8 @@ class NoisyCurrentSource(AbstractCurrentSource):
         self.__parameters['seed'] = utility_calls.create_mars_kiss_seeds(
             self.__rng)
 
+        self.__app_vertex = None
+
     def set_parameters(self, **parameters):
         """ Set the current source parameters
 
@@ -89,6 +92,16 @@ class NoisyCurrentSource(AbstractCurrentSource):
                 raise SpynnakerException(msg)
             else:
                 self.__parameters[key] = value
+
+        # Parameters have been set, so if multi-run then it will have been
+        # injected already; if not then it can just be ignored
+        if self.__app_vertex is not None:
+            for m_vertex in self.__app_vertex.machine_vertices:
+                m_vertex.set_reload_required(True)
+
+    @overrides(AbstractCurrentSource.set_app_vertex)
+    def set_app_vertex(self, vertex):
+        self.__app_vertex = vertex
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)
