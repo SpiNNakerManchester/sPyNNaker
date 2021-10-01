@@ -316,11 +316,11 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
-    io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
+    //io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
 
     contribution_offset = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
 
-    io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
+    //io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
 
     total_partitions = 0;
     
@@ -506,6 +506,9 @@ static void recording_done_callback(void) {
 
 void neuron_set_contribution_region(){
 
+
+    //io_printf(IO_BUF, "total partitions %d\n", total_partitions);
+
     for(uint i = 0; i < total_partitions; i++) {
 
         synaptic_regions[i] = sark_tag_ptr(memory_indices[i], 0);
@@ -528,6 +531,8 @@ void neuron_do_timestep_update( // EXPORTED
             spin1_dma_transfer (
                 DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_regions[i],
                 synaptic_contributions[i], DMA_READ, dma_size);
+
+            //io_printf(IO_BUF, "reading from %x, value %d\n", synaptic_regions[i], *synaptic_regions[i]);
         }
 
         while (!dma_finished);
@@ -575,7 +580,7 @@ void neuron_do_timestep_update( // EXPORTED
 
             for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
 
-                //io_printf(IO_BUF, "time %d, syn type %d, syn contr %d\n", time, synapse_type_index, synaptic_contributions[synapse_type_index]);
+                //io_printf(IO_BUF, "time %d, syn type %d, syn contr %d\n", time, synapse_type_index, synaptic_contributions[i + sum_partitions][neuron_index]);
 
                 //io_printf(IO_BUF, "buff index %d, contribution offset %d\n", buff_index, contribution_offset[synapse_type_index]);
 
@@ -616,7 +621,7 @@ void neuron_do_timestep_update( // EXPORTED
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            io_printf(IO_BUF, "spike\n");
+            //io_printf(IO_BUF, "spike\n");
 
             // Record the spike (or rate update)
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);

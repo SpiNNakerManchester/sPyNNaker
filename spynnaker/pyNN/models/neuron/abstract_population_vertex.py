@@ -116,7 +116,8 @@ class AbstractPopulationVertex(
         "_slice_list",
         "_incoming_partitions",
         "_n_targets",
-        "_current_offset"]
+        "_current_offset",
+        "__max_atoms_per_core"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -147,6 +148,7 @@ class AbstractPopulationVertex(
         self._atoms_offset = atoms_offset
         self._n_targets = n_targets
         self._current_offset = 0
+        self.__max_atoms_per_core = max_atoms_per_core
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -713,6 +715,7 @@ class AbstractPopulationVertex(
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
+
         for c in vertex.constraints:
             if isinstance(c, SameChipAsConstraint):# and isinstance(c.vertex, SynapseMachineVertex):
                 vertex.index_at(c.vertex.mem_offset, c.vertex.vertex_index)
@@ -721,7 +724,7 @@ class AbstractPopulationVertex(
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, vertex.vertex_indices, vertex_slice.lo_atom)
+            time_scale_factor, application_graph, vertex.vertex_indices, (self.__max_atoms_per_core*vertex.mem_offset))
 
         # write profile data
         profile_utils.write_profile_region_data(

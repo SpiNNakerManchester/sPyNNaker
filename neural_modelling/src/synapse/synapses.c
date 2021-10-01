@@ -272,8 +272,8 @@ static inline void process_fixed_synapses(
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
-        io_printf(IO_BUF, "synaptic word %d\n", synaptic_word);
-        io_printf(IO_BUF, "weight: %d, delay %d\n", weight, delay);
+        //io_printf(IO_BUF, "synaptic word %d\n", synaptic_word);
+        //io_printf(IO_BUF, "weight: %d, delay %d\n", weight, delay);
 
          // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
@@ -503,8 +503,8 @@ bool synapses_initialise(
         synaptic_region[i] = 0;
     }
 
-    io_printf(IO_BUF, "syn index bits %d, syn type index %d, syn type bits %d\n", synapse_index_bits, synapse_type_index_bits, synapse_type_bits);
-    io_printf(IO_BUF, "n syn types %d, log %d\n", n_synapse_types, log_n_synapse_types);
+    //io_printf(IO_BUF, "syn index bits %d, syn type index %d, syn type bits %d\n", synapse_index_bits, synapse_type_index_bits, synapse_type_bits);
+    //io_printf(IO_BUF, "n syn types %d, log %d\n", n_synapse_types, log_n_synapse_types);
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();
@@ -549,7 +549,7 @@ void synapses_do_timestep_update(timer_t time) {
 
     print_inputs();
 
-    io_printf(IO_BUF, "time %d, writing %d addr %x\n", time, ring_buffers[ring_buffer_index], synaptic_region);
+    //io_printf(IO_BUF, "time %d, writing %d addr %x\n", time, ring_buffers[ring_buffer_index], synaptic_region);
 
     if(is_recording) {
 

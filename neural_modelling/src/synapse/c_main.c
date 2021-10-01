@@ -200,8 +200,6 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    io_printf(IO_BUF, "pesche\n");
-
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, ds_regions),
@@ -377,14 +375,10 @@ void timer_callback(uint timer_count, uint unused) {
 //! \brief The entry point for this model.
 void c_main(void) {
 
-    io_printf(IO_BUF, "patate\n");
-
     // initialise the model
     if (!initialise(&timer_period)){
         rt_error(RTE_API);
     }
-
-    io_printf(IO_BUF, "meloni\n");
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;

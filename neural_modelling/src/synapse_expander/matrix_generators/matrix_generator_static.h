@@ -193,8 +193,6 @@ static void matrix_generator_static_write_row(
                 weight, delay.delay, synapse_type, post_index, synapse_type_bits,
                 synapse_index_bits);
 
-        //io_printf(IO_BUF, "weight: %d, delay %d, syn type %d\n", weight, delay.delay, synapse_type);
-
         // Write the word
         log_debug("Writing word to 0x%08x", &write_address[delay.stage][0]);
         write_address[delay.stage][0] = word;
