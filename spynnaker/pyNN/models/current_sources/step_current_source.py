@@ -30,8 +30,7 @@ class StepCurrentSource(AbstractCurrentSource):
         "__amplitudes",
         "__times",
         "__parameters",
-        "__parameter_types",
-        "__app_vertex"]
+        "__parameter_types"]
 
     def __init__(self, times=[], amplitudes=[]):
         # There's probably no need to actually store these as you can't
@@ -43,8 +42,9 @@ class StepCurrentSource(AbstractCurrentSource):
         self.__amplitudes = amplitudes
 
         if (len(times) != len(amplitudes)):
-            msg = "len(times) is {}, but len(amplitudes) is {}".format(
-                len(times), len(amplitudes))
+            msg = "In StepCurrentSource, len(times) is {}, "\
+                " but len(amplitudes) is {}".format(
+                    len(times), len(amplitudes))
             raise SpynnakerException(msg)
 
         self.__parameter_types = dict()
@@ -55,7 +55,7 @@ class StepCurrentSource(AbstractCurrentSource):
         self.__parameters['times'] = self.__times
         self.__parameters['amplitudes'] = self.__amplitudes
 
-        self.__app_vertex = None
+        super().__init__()
 
     def set_parameters(self, **parameters):
         """ Set the current source parameters
@@ -76,18 +76,25 @@ class StepCurrentSource(AbstractCurrentSource):
                         value[i] * convert_ms for i in range(len(value))]
                     value = self.__times
                 else:
+                    # Check length: if longer, need to remap
+                    if (len(self.__amplitudes) < len(value)):
+                        self.population.requires_mapping = True
+
                     self.__amplitudes = value
                 self.__parameters[key] = value
 
+        # Check the arrays are still the same lengths
+        if (len(self.__times) != len(self.__amplitudes)):
+            msg = "In StepCurrentSource, len(times) is {}, "\
+                " but len(amplitudes) is {}".format(
+                    len(self.__times), len(self.__amplitudes))
+            raise SpynnakerException(msg)
+
         # Parameters have been set, so if multi-run then it will have been
         # injected already; if not then it can just be ignored
-        if self.__app_vertex is not None:
-            for m_vertex in self.__app_vertex.machine_vertices:
+        if self.app_vertex is not None:
+            for m_vertex in self.app_vertex.machine_vertices:
                 m_vertex.set_reload_required(True)
-
-    @overrides(AbstractCurrentSource.set_app_vertex)
-    def set_app_vertex(self, vertex):
-        self.__app_vertex = vertex
 
     @property
     @overrides(AbstractCurrentSource.get_parameters)

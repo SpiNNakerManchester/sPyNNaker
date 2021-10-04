@@ -34,7 +34,13 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         the parameters during the run.
 
     """
-    __slots__ = ()
+    __slots__ = [
+        "__app_vertex",
+        "__population"]
+
+    def __init__(self):
+        self.__app_vertex = None
+        self.__population = None
 
     def inject_into(self, cells):
         """ Inject this source into the specified population cells
@@ -44,12 +50,27 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
         # Call the population method to pass the source in
         cells.inject(self)
 
-    @abstractmethod
     def set_app_vertex(self, vertex):
-        """ Set the app vertex to that associated with the cells
+        """ Set the app vertex associated with the current source
 
         :param AbstractPopulationVertex vertex: The population vertex
         """
+        self.__app_vertex = vertex
+
+    @property
+    def app_vertex(self):
+        return self.__app_vertex
+
+    def set_population(self, population):
+        """ Set the population associated with the current source
+
+        :param Population population: The population
+        """
+        self.__population = population
+
+    @property
+    def population(self):
+        return self.__population
 
     @abstractmethod
     def set_parameters(self, **parameters):

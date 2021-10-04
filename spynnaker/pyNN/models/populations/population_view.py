@@ -214,6 +214,7 @@ class PopulationView(PopulationBase):
             current_source: the CurrentSource to be injected
         """
         self._vertex.inject(current_source, self.__indexes)
+        current_source.set_population(self.__population)
 
     def describe(self, template='populationview_default.txt',
                  engine='default'):
