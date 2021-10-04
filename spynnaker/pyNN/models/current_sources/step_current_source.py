@@ -78,7 +78,8 @@ class StepCurrentSource(AbstractCurrentSource):
                 else:
                     # Check length: if longer, need to remap
                     if (len(self.__amplitudes) < len(value)):
-                        self.population.requires_mapping = True
+                        if self.population is not None:
+                            self.population.requires_mapping = True
 
                     self.__amplitudes = value
                 self.__parameters[key] = value
