@@ -109,8 +109,6 @@ static uint32_t synapse_index_bits;
 
 static uint32_t *memory_indices;
 
-static timer_t current_time;
-
 static uint32_t n_neurons_power_2;
 
 //! Size of DMA read for synaptic contributions
@@ -132,6 +130,10 @@ static uint32_t start_of_global_parameters;
 
 static uint32_t mem_offset;
 
+static uint32_t *sum_partitions;
+
+static uint8_t starting_index;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t timer_start_offset;
@@ -141,6 +143,7 @@ struct neuron_parameters {
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
     uint32_t mem_offset;
+    uint32_t index_offset;
     uint32_t n_recorded_variables;
 };
 // The +4 is for the seeds for the background noise
@@ -288,6 +291,10 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     mem_offset = params->mem_offset;
 
+    // Start reading memory contributions from a different position, according to
+    // the index of the core in the population
+    starting_index = (params->index_offset & 1);
+
     // Read number of recorded variables
     n_recorded_vars = params->n_recorded_variables;
 
@@ -316,6 +323,12 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         return false;
     }
 
+    sum_partitions = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
+    if (sum_partitions == NULL) {
+        log_error("Could not allocate space for sum_partitions");
+        return false;
+    }
+
     //io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
 
     contribution_offset = (uint32_t *) spin1_malloc(n_synapse_types * sizeof(uint32_t));
@@ -323,10 +336,13 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     //io_printf(IO_BUF, "Free %d\n", sark.heap->free_bytes);
 
     total_partitions = 0;
+    uint32_t sum_partitions_tmp = 0;
     
     for (index_t i = 0; i < n_synapse_types; i++) {
 
         contribution_offset[i] = total_partitions * n_neurons_power_2;
+
+        sum_partitions[i] = sum_partitions_tmp;
 
         incoming_partitions[i] =
             *(address + INCOMING_PARTITIONS_PTR + i);
@@ -339,6 +355,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         else {
             total_partitions += incoming_partitions[i];
         }
+
+        sum_partitions_tmp += incoming_partitions[i];
     }
 
     uint32_t incoming_partitions_power_2 = total_partitions;
@@ -521,16 +539,25 @@ void neuron_set_contribution_region(){
 //! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
-    
-    current_time = time;
 
     if(time) {
 
-        for(index_t i = 0; i < total_partitions; i++) {
+        register uint8_t i = starting_index;
+
+        for(index_t cnt = 0; cnt < total_partitions; cnt++) {
 
             spin1_dma_transfer (
                 DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_regions[i],
                 synaptic_contributions[i], DMA_READ, dma_size);
+
+            if(i >= (total_partitions - 1)) {
+
+                i = 0;
+            }
+            else {
+
+                i++;
+            }
 
             //io_printf(IO_BUF, "reading from %x, value %d\n", synaptic_regions[i], *synaptic_regions[i]);
         }
@@ -539,10 +566,6 @@ void neuron_do_timestep_update( // EXPORTED
 
         dma_finished = false;
         dma_read = 1;
-    }
-    else {
-
-        neuron_set_contribution_region();
     }
 
     // Set the next expected time to wait for between spike sending
@@ -563,12 +586,9 @@ void neuron_do_timestep_update( // EXPORTED
     state_t recorded_variable_values[n_recorded_vars];
 
     register uint32_t sum;
-    register uint32_t sum_partitions;
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
-        sum_partitions = 0;
         
         for (index_t synapse_type_index = 0; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
@@ -584,12 +604,10 @@ void neuron_do_timestep_update( // EXPORTED
 
                 //io_printf(IO_BUF, "buff index %d, contribution offset %d\n", buff_index, contribution_offset[synapse_type_index]);
 
-                sum += synaptic_contributions[i + sum_partitions][neuron_index];
+                sum += synaptic_contributions[i + sum_partitions[synapse_type_index]][neuron_index];
                 //buff_index += n_neurons_power_2;
 
             }
-
-            sum_partitions += incoming_partitions[synapse_type_index];
 
             //io_printf(IO_BUF, "sum %d\n", sum);
 
@@ -680,6 +698,11 @@ void neuron_do_timestep_update( // EXPORTED
         }
     } else {
         spike_recording_count += spike_recording_increment;
+    }
+
+    if(!time) {
+
+        neuron_set_contribution_region();
     }
 
     // do logging stuff if required

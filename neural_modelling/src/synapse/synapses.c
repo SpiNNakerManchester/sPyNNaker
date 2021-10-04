@@ -489,9 +489,17 @@ bool synapses_initialise(
 
     size_to_be_transferred = contribution_size * sizeof(weight_t);
 
-    //Allocate the region in SDRAM for synaptic contribution.
+    //Allocate the region for synaptic contribution.
     //Flag = 1 allocates with lock in order to avoid multiple accesses
-    synaptic_region = (weight_t*) sark_xalloc(sv->sdram_heap, size_to_be_transferred, memory_index, 1);
+    // If core ID is odd allocate into SDRAM, if even into SysRAM. Reduces memory contention
+    if((spin1_get_core_id() & 1)) {
+
+        synaptic_region = (weight_t*) sark_xalloc(sv->sdram_heap, size_to_be_transferred, memory_index, 1);
+    }
+    else {
+
+        synaptic_region = (weight_t*) sark_xalloc(sv->sysram_heap, size_to_be_transferred, memory_index, 1);
+    }
 
     if (synaptic_region == NULL) {
         log_error("Could not allocate synaptic region in memory");

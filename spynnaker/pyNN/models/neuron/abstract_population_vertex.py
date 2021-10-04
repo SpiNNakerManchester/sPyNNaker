@@ -127,8 +127,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 17 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 68
+    # 18 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 72
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -529,7 +529,8 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, indices, mem_offset):
+            time_scale_factor, application_graph, indices, mem_offset,
+            index_offset):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -587,6 +588,9 @@ class AbstractPopulationVertex(
 
         # Write the SDRAM offset for the input contributions
         spec.write_value(data=mem_offset)
+
+        # Write the index offset in the partition to calculate which memory to read from first
+        spec.write_value(data=index_offset)
 
         # Write the number of variables that can be recorded
         spec.write_value(
@@ -724,7 +728,8 @@ class AbstractPopulationVertex(
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph, vertex.vertex_indices, (self.__max_atoms_per_core*vertex.mem_offset))
+            time_scale_factor, application_graph, vertex.vertex_indices,
+            (self.__max_atoms_per_core*vertex.mem_offset), vertex.mem_offset)
 
         # write profile data
         profile_utils.write_profile_region_data(
