@@ -59,17 +59,25 @@ class AbstractCurrentSource(object, metaclass=AbstractBase):
 
     @property
     def app_vertex(self):
+        """ Get the app vertex associated with the current source
+
+        :param AbstractPopulationVertex
+        """
         return self.__app_vertex
 
     def set_population(self, population):
         """ Set the population associated with the current source
 
-        :param Population population: The population
+        :param ~spynnaker.pyNN.models.populations.Population population:
         """
         self.__population = population
 
     @property
     def population(self):
+        """ Get the population associated with the current source
+
+        :rtype ~spynnaker.pyNN.models.populations.Population
+        """
         return self.__population
 
     @abstractmethod
