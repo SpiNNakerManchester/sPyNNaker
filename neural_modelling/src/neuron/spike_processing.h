@@ -24,7 +24,7 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 
-// Provenance for spike processing
+//! Provenance for spike processing
 struct spike_processing_provenance {
     //! A count of the times that the synaptic input circular buffers overflowed
     uint32_t n_input_buffer_overflows;
@@ -46,9 +46,8 @@ struct spike_processing_provenance {
 //!     Multicast packet receive interrupt priority
 //! \param[in] user_event_priority: User event interrupt priority
 //! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
-//! \param[in] clear_input_buffers_of_late_packets: Whether packets that are left
-//!                                                 at the end of a time step are
-//!                                                 wiped
+//! \param[in] clear_input_buffers_of_late_packets_init:
+//!     Whether packets that are left at the end of a time step are wiped
 //! \param[in] packets_per_timestep_region:
 //!     The recording region to use for the packets per timestep
 //! \return True if initialisation succeeded
