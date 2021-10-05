@@ -1522,6 +1522,20 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
+      <name>user_callback</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>ab12cbb036b0ea4fb48a72d1d910cefa7</anchor>
+      <arglist>(uint unused0, uint unused1)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>background_callback</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>a49c7afe548d59aec1ea053bdde97724d</anchor>
+      <arglist>(uint local_time, uint timer_count)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>timer_callback</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
       <anchor>ac4eddb02ed618a1e59aef495625555f4</anchor>
@@ -2310,6 +2324,13 @@
       <anchor>a8967e8eb09363007076f840186a20995</anchor>
       <arglist>(void)</arglist>
     </member>
+    <member kind="function">
+      <type>void</type>
+      <name>timer_callback</name>
+      <anchorfile>c__main__synapses_8c.html</anchorfile>
+      <anchor>ac9914f4341d050b71b5e1516eb19a184</anchor>
+      <arglist>(uint unused0, uint unused1)</arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static bool</type>
       <name>initialise</name>
@@ -2921,6 +2942,13 @@
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
+      <name>neuron_impl_do_timestep_update</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a5c11520af8e2915ec00d5dc1edcd8b36</anchor>
+      <arglist>(uint32_t timer_count, uint32_t time, uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
       <name>neuron_impl_store_neuron_parameters</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>af2c8c3ce110bf3e9b4d0dc27f22b4860</anchor>
@@ -3288,6 +3316,27 @@
       <anchor>ae9b257f5e4059af3a5fa30730512f2b6</anchor>
       <arglist>(REAL h, neuron_t *neuron, REAL input_this_timestep)</arglist>
     </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_state_update</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_model_has_spiked</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>a6d9e95529a2c510cc1010163f9ea89ee</anchor>
+      <arglist>(neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_get_membrane_voltage</name>
+      <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
+      <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
+      <arglist>(const neuron_t *neuron)</arglist>
+    </member>
     <member kind="variable">
       <type>const global_neuron_params_t *</type>
       <name>global_params</name>
@@ -3350,6 +3399,27 @@
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
       <anchor>acdc543d115e02324c243ebbfdd303214</anchor>
       <arglist>(neuron_t *neuron, REAL V_prev, input_t input_this_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_state_update</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_model_has_spiked</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a6d9e95529a2c510cc1010163f9ea89ee</anchor>
+      <arglist>(neuron_t *restrict neuron)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static state_t</type>
+      <name>neuron_model_get_membrane_voltage</name>
+      <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
+      <anchor>a36ed2fe89ac12da019a6bcee8b6672c9</anchor>
+      <arglist>(const neuron_t *neuron)</arglist>
     </member>
   </compound>
   <compound kind="file">
@@ -5620,6 +5690,13 @@
       <anchor>a36896ff3554f8b8ee7fe1599ec6c26f5</anchor>
       <arglist></arglist>
     </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>INVALID_ADDRESS</name>
+      <anchorfile>population__table__binary__search__impl_8c.html</anchorfile>
+      <anchor>ac0e87c1d66cacc61454b23cdc12ff764</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function" static="yes">
       <type>static uint32_t</type>
       <name>get_direct_address</name>
@@ -6757,6 +6834,32 @@
     <includes id="elimination_8h" name="elimination.h" local="yes" imported="no">elimination/elimination.h</includes>
     <includes id="formation_8h" name="formation.h" local="yes" imported="no">formation/formation.h</includes>
     <class kind="struct">structural_recording_values_t</class>
+    <member kind="define">
+      <type>#define</type>
+      <name>ID_SHIFT</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a133e523294833f2163af1d9c289b755e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
+      <name>PRE_ID_SHIFT</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>ac72a3940dec756858cef5e5f77cdaef8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>ELIM_FLAG</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a385c44f6fb256e5716a2302a5b940388ae6ee7be3fbd9056d0d38e36762f50da7</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>FORM_FLAG</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a385c44f6fb256e5716a2302a5b940388a77fb1f2705b16e5d115198616780afb6</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="function">
       <type>void</type>
       <name>print_post_to_pre_entry</name>
@@ -6860,6 +6963,13 @@
       <name>rewiring_recording_index</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
       <anchor>a4a10759c0e9d46f40f5bdce22d00d454</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>structural_recording_values_t</type>
+      <name>structural_recording_values</name>
+      <anchorfile>topographic__map__impl_8c.html</anchorfile>
+      <anchor>a86abfa547d5ce057edf3ec291b2d0255</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -7863,8 +7973,8 @@
       <type>void</type>
       <name>synapses_resume</name>
       <anchorfile>synapses_8c.html</anchorfile>
-      <anchor>afbe95bd6dfc5b8703f0fc293891b8f64</anchor>
-      <arglist>(uint32_t time)</arglist>
+      <anchor>a96d59593a4844dc703e540f408d22321</anchor>
+      <arglist>(timer_t time)</arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
@@ -7976,6 +8086,13 @@
       <name>synapses_saturation_count</name>
       <anchorfile>synapses_8c.html</anchorfile>
       <anchor>a8b7881a6d9caca38f2050656c652cf26</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_neurons_peak</name>
+      <anchorfile>synapses_8c.html</anchorfile>
+      <anchor>a6b1b7d48e24674f12efcb5a84266f969</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -8934,49 +9051,49 @@
     <member kind="enumvalue">
       <name>ONE_TO_ONE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388adaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035dadaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>ALL_TO_ALL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a403e4025d2925f132293a50eae7381fe</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035da403e4025d2925f132293a50eae7381fe</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PROBABILITY</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035da8f6a6db47b5476cf11f24317f14ee4a7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_TOTAL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035da8338dcf5840ce1a01a4c26d9c49dc560</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PRE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035daa667dfec30c43a0320c7bd76b99bd4c7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_POST</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388aa130e7b038fc0ede3b0203931063b116</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035daa130e7b038fc0ede3b0203931063b116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035da53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_CONNECTION_GENERATORS</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>a385c44f6fb256e5716a2302a5b940388ab1144285d7382feeb4687af0263e2467</anchor>
+      <anchor>abc5c98fcc1211af2b80116dd6e0a035dab1144285d7382feeb4687af0263e2467</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9367,19 +9484,19 @@
     <member kind="enumvalue">
       <name>STATIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>abc5c98fcc1211af2b80116dd6e0a035daf14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8af14f18f5ed2665f8cb095c1363fc9848</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PLASTIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>abc5c98fcc1211af2b80116dd6e0a035da08b27fbab7a770bae071d9defb278782</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a08b27fbab7a770bae071d9defb278782</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_MATRIX_GENERATORS</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>abc5c98fcc1211af2b80116dd6e0a035daba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8aba9a03e4fd023b2837469ea1ff6225a3</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9581,49 +9698,49 @@
     <member kind="enumvalue">
       <name>CONSTANT</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a83972670b57415508523b5641bb46116</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9ea83972670b57415508523b5641bb46116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>UNIFORM</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a8f44784d154005a214e0fe94119d28ef</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9ea8f44784d154005a214e0fe94119d28ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a50d1448013c6f17125caee18aa418af7</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9ea50d1448013c6f17125caee18aa418af7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8ac40cefd2a096660da3f41d6ee6352889</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9eac40cefd2a096660da3f41d6ee6352889</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED_BOUNDARY</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8aca06c44d4221f47f9d61534ca1e35752</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9eaca06c44d4221f47f9d61534ca1e35752</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8aa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9eaa6055a3a8ab1aed0594419b51d9ec15e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9ea53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_PARAM_GENERATORS</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>ac36f475ca5b446f4fde4c9b90bec77c8ab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
+      <anchor>a05589fbab0657f08285ebdfe93f5ec9eab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">

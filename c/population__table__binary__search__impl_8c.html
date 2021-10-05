@@ -125,8 +125,8 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a36896ff3554f8b8ee7fe1599ec6c26f5">INDIRECT_ADDRESS_SHIFT</a>&#160;&#160;&#160;4</td></tr>
 <tr class="memdesc:a36896ff3554f8b8ee7fe1599ec6c26f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The shift to apply to indirect addresses. The address is in units of four words, so this multiplies by 16 (= up shifts by 4) <br /></td></tr>
 <tr class="separator:a36896ff3554f8b8ee7fe1599ec6c26f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0e87c1d66cacc61454b23cdc12ff764"><td class="memItemLeft" align="right" valign="top"><a id="ac0e87c1d66cacc61454b23cdc12ff764"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>INVALID_ADDRESS</b>&#160;&#160;&#160;((1 &lt;&lt; <a class="el" href="population__table__binary__search__impl_8c.html#a2233d5046582aeea3564c6ec3e72c553">N_ADDRESS_BITS</a>) - 1)</td></tr>
+<tr class="memitem:ac0e87c1d66cacc61454b23cdc12ff764"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac0e87c1d66cacc61454b23cdc12ff764">INVALID_ADDRESS</a>&#160;&#160;&#160;((1 &lt;&lt; <a class="el" href="population__table__binary__search__impl_8c.html#a2233d5046582aeea3564c6ec3e72c553">N_ADDRESS_BITS</a>) - 1)</td></tr>
+<tr class="memdesc:ac0e87c1d66cacc61454b23cdc12ff764"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Invalid address and row length.  <a href="population__table__binary__search__impl_8c.html#ac0e87c1d66cacc61454b23cdc12ff764">More...</a><br /></td></tr>
 <tr class="separator:ac0e87c1d66cacc61454b23cdc12ff764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -157,7 +157,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab08d6807fc8fd46ed5f70a8bd14a5a93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the source neuron ID for a spike given its table entry (without extra info)  <a href="population__table__binary__search__impl_8c.html#ab08d6807fc8fd46ed5f70a8bd14a5a93">More...</a><br /></td></tr>
 <tr class="separator:ab08d6807fc8fd46ed5f70a8bd14a5a93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0e1b8eb97598151a700431dc6226d089"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a0e1b8eb97598151a700431dc6226d089">get_local_neuron_id</a> (<a class="el" href="population__table__binary__search__impl_8c.html#structmaster__population__table__entry">master_population_table_entry</a> entry, <a class="el" href="population__table__binary__search__impl_8c.html#structextra__info">extra_info</a> extra, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
-<tr class="memdesc:a0e1b8eb97598151a700431dc6226d089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the neuron id of the neuron on the source core, for a spike with.  <a href="population__table__binary__search__impl_8c.html#a0e1b8eb97598151a700431dc6226d089">More...</a><br /></td></tr>
+<tr class="memdesc:a0e1b8eb97598151a700431dc6226d089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the neuron id of the neuron on the source core, for a spike with extra info.  <a href="population__table__binary__search__impl_8c.html#a0e1b8eb97598151a700431dc6226d089">More...</a><br /></td></tr>
 <tr class="separator:a0e1b8eb97598151a700431dc6226d089"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a3c2c10dcc54c9ec95a730e4c1324a2c5">print_master_population_table</a> (void)</td></tr>
 <tr class="memdesc:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the master pop table.  <a href="population__table__binary__search__impl_8c.html#a3c2c10dcc54c9ec95a730e4c1324a2c5">More...</a><br /></td></tr>
@@ -446,6 +446,26 @@ data[]</td>
 <td class="fielddoc">
 </td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ac0e87c1d66cacc61454b23cdc12ff764"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0e87c1d66cacc61454b23cdc12ff764">&#9670;&nbsp;</a></span>INVALID_ADDRESS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define INVALID_ADDRESS&#160;&#160;&#160;((1 &lt;&lt; <a class="el" href="population__table__binary__search__impl_8c.html#a2233d5046582aeea3564c6ec3e72c553">N_ADDRESS_BITS</a>) - 1)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>An Invalid address and row length. </p>
+<p>Used to keep indices aligned between delayed and undelayed tables </p>
+
+<p class="definition">Definition at line <a class="el" href="population__table__binary__search__impl_8c_source.html#l00089">89</a> of file <a class="el" href="population__table__binary__search__impl_8c_source.html">population_table_binary_search_impl.c</a>.</p>
 
 </div>
 </div>
@@ -831,11 +851,11 @@ data[]</td>
 </table>
 </div><div class="memdoc">
 
-<p>Get the neuron id of the neuron on the source core, for a spike with. </p>
+<p>Get the neuron id of the neuron on the source core, for a spike with extra info. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the table entry </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname"><a class="el" href="population__table__binary__search__impl_8c.html#structextra__info" title="A packed extra info (note: same size as address and row length)">extra_info</a></td><td>the extra info entry </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">extra</td><td>the extra info entry </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>the spike received </td></tr>
   </table>
   </dd>
@@ -1253,7 +1273,7 @@ data[]</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 16 2021 10:15:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

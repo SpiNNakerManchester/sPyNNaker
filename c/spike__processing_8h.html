@@ -86,6 +86,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structspike__processing__provenance"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#structspike__processing__provenance">spike_processing_provenance</a></td></tr>
+<tr class="memdesc:structspike__processing__provenance"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provenance for spike processing.  <a href="spike__processing_8h.html#structspike__processing__provenance">More...</a><br /></td></tr>
 <tr class="separator:structspike__processing__provenance"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -119,7 +120,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock">
+<div class="textblock"><p>Provenance for spike processing. </p>
+
 <p class="definition">Definition at line <a class="el" href="spike__processing_8h_source.html#l00028">28</a> of file <a class="el" href="spike__processing_8h_source.html">spike_processing.h</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
@@ -221,14 +223,14 @@ The maximum size of the input buffer. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">mc_packet_callback_priority</td><td>Multicast packet receive interrupt priority </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">user_event_priority</td><td>User event interrupt priority </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">incoming_spike_buffer_size</td><td>Size of buffer for receiving spikes </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">clear_input_buffers_of_late_packets</td><td>Whether packets that are left at the end of a time step are wiped </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">clear_input_buffers_of_late_packets_init</td><td>Whether packets that are left at the end of a time step are wiped </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">packets_per_timestep_region</td><td>The recording region to use for the packets per timestep </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00446">446</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00445">445</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -256,7 +258,7 @@ The maximum size of the input buffer. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00485">485</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00484">484</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -283,11 +285,9 @@ The maximum size of the input buffer. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>currently always true</dd></dl>
-<p>Set the number of times spike_processing has to attempt rewiring.</p>
-<dl class="section return"><dt>Returns</dt><dd>currently, always true </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>currently always true </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00496">496</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00493">493</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
@@ -310,20 +310,19 @@ The maximum size of the input buffer. </td></tr>
 <p>clears the input buffer of packets </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current timestep</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current timestep </td></tr>
   </table>
   </dd>
 </dl>
-<p>clears the input buffer of packets </p>
 
-<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00429">429</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="spike__processing_8c_source.html#l00428">428</a> of file <a class="el" href="spike__processing_8c_source.html">spike_processing.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 16 2021 10:15:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

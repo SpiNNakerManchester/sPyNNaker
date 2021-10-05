@@ -93,9 +93,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a511a4004e5621e6ec83228d4e4f94672"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a511a4004e5621e6ec83228d4e4f94672"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="population__table_8h.html#a511a4004e5621e6ec83228d4e4f94672">More...</a><br /></td></tr>
 <tr class="separator:a511a4004e5621e6ec83228d4e4f94672"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6af50f83e29bc2f5340724898921df93"><td class="memItemLeft" align="right" valign="top"><a id="a6af50f83e29bc2f5340724898921df93"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">population_table_is_next</a> (void)</td></tr>
-<tr class="memdesc:a6af50f83e29bc2f5340724898921df93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if there are more items with the same key. <br /></td></tr>
+<tr class="memitem:a6af50f83e29bc2f5340724898921df93"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">population_table_is_next</a> (void)</td></tr>
+<tr class="memdesc:a6af50f83e29bc2f5340724898921df93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine if there are more items with the same key.  <a href="population__table_8h.html#a6af50f83e29bc2f5340724898921df93">More...</a><br /></td></tr>
 <tr class="separator:a6af50f83e29bc2f5340724898921df93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06008941811a064b8c67dcf3a5846cde"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="el" href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a06008941811a064b8c67dcf3a5846cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="population__table_8h.html#a06008941811a064b8c67dcf3a5846cde">More...</a><br /></td></tr>
@@ -257,6 +256,37 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 
 </div>
 </div>
+<a id="a6af50f83e29bc2f5340724898921df93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6af50f83e29bc2f5340724898921df93">&#9670;&nbsp;</a></span>population_table_is_next()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool population_table_is_next </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Determine if there are more items with the same key. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether there are more items </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="population__table_8h_source.html#l00074">74</a> of file <a class="el" href="population__table_8h_source.html">population_table.h</a>.</p>
+
+</div>
+</div>
 <a id="a06008941811a064b8c67dcf3a5846cde"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a06008941811a064b8c67dcf3a5846cde">&#9670;&nbsp;</a></span>population_table_get_next_address()</h2>
 
@@ -362,7 +392,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 16 2021 10:15:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -742,12 +742,13 @@ The data, first the fixed then the plastic. </td></tr>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td>Number of bits for the synapse type and index (depends on type) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_delay_mask</td><td>The mask for selecting the bits of the delay </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the delay </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00222">222</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00223">223</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -784,7 +785,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the weight </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00230">230</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00231">231</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -832,7 +833,7 @@ The data, first the fixed then the plastic. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the actual input weight for the model </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00238">238</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00239">239</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -897,17 +898,18 @@ The data, first the fixed then the plastic. </td></tr>
 <p>Get the index of the ring buffer for a given timestep, synapse type and neuron index. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td>The timestep </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td>The synapse type index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>The neuron index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td>Number of bits for type and index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>Number of bits for index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_delay_mask</td><td>Mask for delay </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00258">258</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00260">260</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -954,15 +956,15 @@ The data, first the fixed then the plastic. </td></tr>
 <p>Get the index of the ring buffer for time 0, synapse type and neuron index. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td>The synapse type index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>The neuron index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>Number of bits for index </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00273">273</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00275">275</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -1009,14 +1011,15 @@ The data, first the fixed then the plastic. </td></tr>
 <p>Get the index of the first ring buffer for a given timestep. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td>The timestep </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td>Number of bits for type and index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_delay_mask</td><td>Mask for delay </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00283">283</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00286">286</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
@@ -1069,22 +1072,23 @@ The data, first the fixed then the plastic. </td></tr>
 <p>Get the index of the ring buffer for a given timestep and combined synapse type and neuron index (as stored in a synapse row) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">simulation_timestep</td><td>The timestep </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">combined_synapse_neuron_index</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td>Number of bits for type and index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_delay_mask</td><td>Mask for delay </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Index into the ring buffer </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00295">295</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__row_8h_source.html#l00299">299</a> of file <a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 16 2021 10:15:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

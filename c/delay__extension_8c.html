@@ -151,11 +151,11 @@ Functions</h2></td></tr>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#a35a7cd4c965a1200ebefc398d69554f2">spike_process</a> (void)</td></tr>
 <tr class="memdesc:a35a7cd4c965a1200ebefc398d69554f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes spikes queued by <a class="el" href="delay__extension_8c.html#a95885055138e174e0b8e70fcafa07388" title="Handles incoming spikes (FIQ)">incoming_spike_callback()</a> <br /></td></tr>
 <tr class="separator:a35a7cd4c965a1200ebefc398d69554f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab12cbb036b0ea4fb48a72d1d910cefa7"><td class="memItemLeft" align="right" valign="top"><a id="ab12cbb036b0ea4fb48a72d1d910cefa7"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>user_callback</b> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused0, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
+<tr class="memitem:ab12cbb036b0ea4fb48a72d1d910cefa7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#ab12cbb036b0ea4fb48a72d1d910cefa7">user_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused0, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
+<tr class="memdesc:ab12cbb036b0ea4fb48a72d1d910cefa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">User event callback.  <a href="delay__extension_8c.html#ab12cbb036b0ea4fb48a72d1d910cefa7">More...</a><br /></td></tr>
 <tr class="separator:ab12cbb036b0ea4fb48a72d1d910cefa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49c7afe548d59aec1ea053bdde97724d"><td class="memItemLeft" align="right" valign="top"><a id="a49c7afe548d59aec1ea053bdde97724d"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>background_callback</b> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> local_time, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count)</td></tr>
+<tr class="memitem:a49c7afe548d59aec1ea053bdde97724d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#a49c7afe548d59aec1ea053bdde97724d">background_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> local_time, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count)</td></tr>
+<tr class="memdesc:a49c7afe548d59aec1ea053bdde97724d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background event callback.  <a href="delay__extension_8c.html#a49c7afe548d59aec1ea053bdde97724d">More...</a><br /></td></tr>
 <tr class="separator:a49c7afe548d59aec1ea053bdde97724d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4eddb02ed618a1e59aef495625555f4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8c.html#ac4eddb02ed618a1e59aef495625555f4">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused1)</td></tr>
 <tr class="memdesc:ac4eddb02ed618a1e59aef495625555f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main timer callback.  <a href="delay__extension_8c.html#ac4eddb02ed618a1e59aef495625555f4">More...</a><br /></td></tr>
@@ -706,6 +706,100 @@ Background queue overloads. </td></tr>
 
 </div>
 </div>
+<a id="ab12cbb036b0ea4fb48a72d1d910cefa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab12cbb036b0ea4fb48a72d1d910cefa7">&#9670;&nbsp;</a></span>user_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void user_callback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>unused0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>unused1</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>User event callback. </p>
+<p>Delegates to <a class="el" href="delay__extension_8c.html#a35a7cd4c965a1200ebefc398d69554f2" title="Processes spikes queued by incoming_spike_callback()">spike_process()</a> </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">unused0</td><td>unused </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">unused1</td><td>unused </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00451">451</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+
+</div>
+</div>
+<a id="a49c7afe548d59aec1ea053bdde97724d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49c7afe548d59aec1ea053bdde97724d">&#9670;&nbsp;</a></span>background_callback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void background_callback </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>local_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a>&#160;</td>
+          <td class="paramname"><em>timer_count</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Background event callback. </p>
+<p>Handles sending delayed spikes at the right time. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_time</td><td>current simulation time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>unused </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00459">459</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+
+</div>
+</div>
 <a id="ac4eddb02ed618a1e59aef495625555f4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac4eddb02ed618a1e59aef495625555f4">&#9670;&nbsp;</a></span>timer_callback()</h2>
 
@@ -749,7 +843,7 @@ Background queue overloads. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00525">525</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__extension_8c_source.html#l00533">533</a> of file <a class="el" href="delay__extension_8c_source.html">delay_extension.c</a>.</p>
 
 </div>
 </div>
@@ -786,7 +880,7 @@ Background queue overloads. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 16 2021 10:15:12 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

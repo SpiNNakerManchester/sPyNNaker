@@ -143,7 +143,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current_time</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">current_time</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">current_time</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> has spike_times that are lower than &quot;</span>
                     <span class="s2">&quot;the current time </span><span class="si">{}</span><span class="s2"> For example </span><span class="si">{}</span><span class="s2"> - &quot;</span>
@@ -163,7 +163,7 @@
         <span class="k">for</span> <span class="n">neuron_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">):</span>
             <span class="n">id_times</span> <span class="o">=</span> <span class="n">spike_times</span><span class="p">[</span><span class="n">neuron_id</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">id_times</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">id_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">current_time</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">id_times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">current_time</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                        <span class="s2">&quot;SpikeSourceArray </span><span class="si">{}</span><span class="s2"> has spike_times that are lower &quot;</span>
                        <span class="s2">&quot;than the current time </span><span class="si">{}</span><span class="s2"> For example </span><span class="si">{}</span><span class="s2"> - &quot;</span>
@@ -303,7 +303,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.1.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
     </div>
   </body>
 </html>
