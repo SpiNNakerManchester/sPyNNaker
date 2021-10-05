@@ -44,8 +44,8 @@ class CheckDebug(BaseTestCase):
         # pylint: disable=protected-access
         reports = [
             # write_energy_report
-            EnergyReport._DETAILED_FILENAME,
-            EnergyReport._SUMMARY_FILENAME,
+            #EnergyReport._DETAILED_FILENAME,
+            #EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
             # write_router_reports
