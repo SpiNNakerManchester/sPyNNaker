@@ -68,6 +68,21 @@ static inline void lif_neuron_closed_form(
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
 }
 
+//! \brief primary function called in timer loop after synaptic updates
+//! \param[in] num_excitatory_inputs: Number of excitatory receptor types.
+//! \param[in] exc_input: Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a positive reaction within the neuron in
+//!     terms of stimulation.
+//! \param[in] num_inhibitory_inputs: Number of inhibitory receptor types.
+//! \param[in] inh_input: Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a negative reaction within the neuron in
+//!     terms of stimulation.
+//! \param[in] external_bias: This is the intrinsic plasticity which could be
+//!     used for ac, noisy input etc etc. (general purpose input)
+//! \param[in,out] neuron: the pointer to a neuron parameter struct which
+//!     contains all the parameters for a specific neuron
+//! \return the value to be compared with a threshold value to determine if the
+//!     neuron has spiked
 static state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
@@ -97,6 +112,9 @@ static state_t neuron_model_state_update(
     return neuron->V_membrane;
 }
 
+//! \brief Indicates that the neuron has spiked
+//! \param[in, out] neuron pointer to a neuron parameter struct which contains
+//!     all the parameters for a specific neuron
 static void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset membrane voltage
     neuron->V_membrane = neuron->V_reset;
@@ -105,6 +123,11 @@ static void neuron_model_has_spiked(neuron_t *restrict neuron) {
     neuron->refract_timer  = neuron->T_refract;
 }
 
+//! \brief get the neuron membrane voltage for a given neuron parameter set
+//! \param[in] neuron: a pointer to a neuron parameter struct which contains
+//!     all the parameters for a specific neuron
+//! \return the membrane voltage for a given neuron with the neuron
+//!     parameters specified in neuron
 static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
     return neuron->V_membrane;
 }

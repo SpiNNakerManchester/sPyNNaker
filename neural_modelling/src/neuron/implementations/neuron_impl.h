@@ -46,10 +46,9 @@ static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons);
 
 //! \brief Do the timestep update for the particular implementation
-//! \param[in] timer_count: The timer count
+//! \param[in] timer_count: The timer count, used for TDMA packet spreading
 //! \param[in] time: The time step of the update
 //! \param[in] n_neurons: The number of neurons
-//! \return True if a spike has occurred
 static void neuron_impl_do_timestep_update(
         uint32_t timer_count, uint32_t time, uint32_t n_neurons);
 

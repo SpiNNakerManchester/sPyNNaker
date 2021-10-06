@@ -69,9 +69,7 @@ struct neuron_parameters {
 };
 
 //! \brief does the memory copy for the neuron parameters
-//! \param[in] address: the address where the neuron parameters are stored
-//!     in SDRAM
-//! \return bool which is true if the mem copy's worked, false otherwise
+//! \return true if the memory copies worked, false otherwise
 static bool neuron_load_neuron_parameters(void) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work

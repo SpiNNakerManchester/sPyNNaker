@@ -80,6 +80,7 @@ uint32_t synapse_delay_mask;
 //! Count of the number of times the ring buffers have saturated
 uint32_t synapses_saturation_count = 0;
 
+//! Number of neurons
 static uint32_t n_neurons_peak;
 
 
@@ -188,6 +189,7 @@ static inline void print_ring_buffers(uint32_t time) {
 //!     be put into the ring buffer.
 //! \param[in] fixed_region: The fixed region of the synaptic matrix
 //! \param[in] time: The current simulation time
+//! \return Always true
 static inline bool process_fixed_synapses(
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
@@ -380,7 +382,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
-void synapses_resume(uint32_t time) {
+void synapses_resume(timer_t time) {
     // If the time has been reset to zero then the ring buffers need to be
     // flushed in case there is a delayed spike left over from a previous run
     if (time == 0) {
