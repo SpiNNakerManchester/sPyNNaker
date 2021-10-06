@@ -18,6 +18,7 @@ import statistics
 from collections import defaultdict
 
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
@@ -31,112 +32,105 @@ class RedundantPacketCountReport(object):
     _N_PROV_ITEMS_NEEDED = 4
     _MAX = 100
 
-    _CORE_LEVEL_MSG = (
-        "core {} \n\n    {} packets received.\n    {} were detected as "
-        "redundant packets by the bitfield filter.\n    {} were detected as "
-        "having no targets after the DMA stage.\n    {} were detected as "
-        "packets which we should not have received in the first place. \n"
-        "    Overall this makes a redundant percentage of {}\n")
-
-    _SUMMARY_LEVEL_MSG = (
-        "overall, the core with the most incoming packets had {} packets.\n"
-        "         The core with the least incoming packets had {} packets.\n"
-        "         The core with the most redundant packets had {} packets.\n"
-        "         The core with the least redundant packets had {} packets.\n"
-        "         The average incoming and redundant were {} and {}.\n"
-        "         The max and min percentages of redundant packets are {}"
-        " and {}. \n"
-        "         The average redundant percentages from each core were {} "
-        "accordingly.\n"
-        "          The total packets flown in system was {}"
-    )
-
-    def __call__(self, provenance_items):
-        """
-        :param provenance_items:
-        :type provenance_items:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
+    def __call__(self):
         file_name = os.path.join(report_default_directory(), self._FILE_NAME)
 
         try:
             with open(file_name, "w") as f:
-                self._write_report(f, provenance_items)
+                self._write_report(f)
         except Exception:  # pylint: disable=broad-except
             logger.exception("Generate_placement_reports: Can't open file"
                              " {} for writing.", self._FILE_NAME)
 
-    def _write_report(self, output, provenance_items):
-        data = defaultdict(dict)
+    def _write_report(self, output):
+        output.write(f"Packets report. Totals at the bottom")
+        max_incoming = None
+        max_percent = None
+        reader = ProvenanceReader()
+        for (x, y, p, source) in reader.get_cores_with_provenace():
+            ghost_searchs = reader.get_provenace_sum_by_core(
+                x, y, p, PopulationMachineVertex.GHOST_SEARCHES)
+            filtered = reader.get_provenace_sum_by_core(
+                x, y, p, PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS)
+            invalid = reader.get_provenace_sum_by_core(
+                x, y, p, PopulationMachineVertex.INVALID_MASTER_POP_HITS)
+            processed = reader.get_provenace_sum_by_core(
+                x, y, p, PopulationMachineVertex.SPIKES_PROCESSED)
 
-        overall_entries = list()
-        overall_redundant = list()
-        overall_redundant_percentage = list()
+            try:
+                redundant = ghost_searchs + filtered + invalid
+                total = redundant + processed
+                output.write(f"\ncore {source} \n")
+                output.write(f"    {total} packets received. \n")
+                output.write(f"    {redundant} were detected as "
+                             "redundant packets by the bitfield filter. \n")
 
-        for provenance_item in provenance_items:
-            last_name = provenance_item.names[-1]
-            key = provenance_item.names[0]
-            if ((last_name == PopulationMachineVertex.GHOST_SEARCHES) or
-                    (last_name ==
-                        PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS) or
-                    (last_name ==
-                        PopulationMachineVertex.INVALID_MASTER_POP_HITS) or
-                    (last_name == PopulationMachineVertex.SPIKES_PROCESSED)):
+                output.write(
+                    f"    {filtered} were detected as having no targets "
+                    f"after the DMA stage. \n")
+                output.write(
+                    f"    {ghost_searchs} were detected as packets which "
+                    f"we should not have received in the first place. \n")
 
-                # add to store
-                data[key][last_name] = provenance_item.value
+                if max_incoming is None:
+                    max_incoming = total
+                    min_incoming = total
+                    sum_incoming = total
+                    max_redundant = redundant
+                    min_redundant = redundant
+                    sum_redundant = redundant
+                    count = 1
+                else:
+                    if max_incoming < total:
+                        max_incoming = total
+                    if min_incoming > total:
+                        min_incoming = total
+                    sum_incoming += total
+                    count += 1
+                    if max_redundant < redundant:
+                        max_redundant = redundant
+                    if min_redundant > redundant:
+                        min_redundant = redundant
+                    sum_redundant += redundant
 
-                # accum enough data on a core to do summary
-                if len(data[key].keys()) == self._N_PROV_ITEMS_NEEDED:
+            except TypeError:
+                total = 0
 
-                    # total packets received
-                    total = (
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES] +
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS] +
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS] +
-                        data[key][PopulationMachineVertex.SPIKES_PROCESSED])
+            if total > 0:
+                percent = redundant / total * 100
+                output.write(f"    Overall this makes a redundant percentage of "
+                             f"{percent}\n")
+                if max_percent is None:
+                    max_percent = percent
+                    min_percent = percent
+                    sum_precent = percent
+                    count_percent = 1
+                else:
+                    if max_percent < percent:
+                        max_percent = percent
+                    if min_percent > percent:
+                        min_percent = percent
+                    sum_precent += percent
+                    count_percent += 1
 
-                    # total redundant packets
-                    redundant = (
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES] +
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS] +
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS])
+        if max_incoming is not None:
+            output.write(f"\n\noverall, the core with the most incoming "
+                         f"packets had {max_incoming} packets.\n")
+            output.write(f"    The core with the least incoming packets had "
+                         f"{min_incoming} packets.\n")
+            output.write(f"    The core with the most redundant packets had "
+                         f"{max_redundant} packets.\n")
+            output.write(f"    The core with the least redundant packets had "
+                         f"{min_redundant} packets.\n")
+            output.write(f"    The average incoming and redundant were "
+                         f"{sum_incoming/count} and {sum_redundant/count}.\n")
 
-                    percentage = 0
-                    if total != 0:
-                        percentage = (self._MAX / total) * redundant
-
-                    # add to the trackers for summary data
-                    overall_entries.append(total)
-                    overall_redundant.append(redundant)
-                    overall_redundant_percentage.append(percentage)
-
-                    output.write(self._CORE_LEVEL_MSG.format(
-                        key, total,
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS],
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES],
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS],
-                        percentage))
-
-        # do summary
-        if len(overall_entries) != 0:
-            output.write(self._SUMMARY_LEVEL_MSG.format(
-                max(overall_entries), min(overall_entries),
-                max(overall_redundant), min(overall_redundant),
-                statistics.mean(overall_entries),
-                statistics.mean(overall_redundant),
-                max(overall_redundant_percentage),
-                min(overall_redundant_percentage),
-                statistics.mean(overall_redundant_percentage),
-                sum(overall_entries)))
+            output.write(f"    The max and min percentages of redundant "
+                         f"packets are {max_percent} and {min_percent}. \n")
+            output.write(
+                f"    The average redundant percentages from each "
+                f"core were {sum_precent/count_percent} accordingly.\n")
+            output.write(f"    The total packets flown in system was "
+                         f"{sum_incoming}\n")
         else:
-            output.write("was no data to summarise")
+            output.write("No data to summarise")
