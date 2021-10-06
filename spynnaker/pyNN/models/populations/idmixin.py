@@ -164,7 +164,7 @@ class IDMixin(object):
         """
         self.__population._vertex.inject(current_source, [self.__id])
         current_source.set_population(self.__population)
-        self.__population.requires_mapping(True)
+        self.__population.requires_mapping = True
 
     def get_initial_value(self, variable):
         """ Get the initial value of a state variable of the cell.
