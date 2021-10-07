@@ -233,7 +233,6 @@ static inline bool sp_structs_add_synapse(
 
 //! \brief Common code for structural plasticity initialisation.
 //! \param[in] sdram_sp_address: Address of the configuration region.
-//! \param[in] n_neurons: The number of neurons on this core.
 //! \param[in,out] rewiring_data:
 //!     Address of the rewiring information structure to fill out.
 //! \param[in,out] pre_info:

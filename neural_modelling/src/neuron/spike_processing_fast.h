@@ -48,7 +48,7 @@ struct key_config {
     uint32_t self_connected;
 };
 
-// Provenance for spike processing
+//! Provenance for spike processing
 struct spike_processing_fast_provenance {
     //! A count of the times that the synaptic input circular buffers overflowed
     uint32_t n_input_buffer_overflows;
@@ -72,7 +72,6 @@ struct spike_processing_fast_provenance {
     uint32_t n_skipped_time_steps;
     //! The maximum additional time taken to transfer
     uint32_t max_transfer_timer_overrun;
-
 };
 
 //! \brief Set up spike processing
