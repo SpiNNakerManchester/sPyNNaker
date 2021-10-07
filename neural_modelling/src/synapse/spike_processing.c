@@ -240,6 +240,8 @@ static void post_buffer_complete_callback(uint unused1, uint unused2) {
 
     read_cb_calls++;
 
+    synapses_process_post_synaptic_event(time);
+
     if(!spin1_trigger_user_event(0, 0)) {
         log_debug("Could not trigger user event \n");
     }

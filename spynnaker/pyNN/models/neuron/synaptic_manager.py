@@ -164,7 +164,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         self._atoms_neuron_cores = max_atoms_per_core
         self._atoms_offset = atoms_offset
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
-        self._ring_buffer_shifts = [7]
+        self._ring_buffer_shifts = [8]
         self._slice_list = None
         #Global partition index
         self.__mem_offset = mem_offset
@@ -360,15 +360,23 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
     def mark_no_changes(self):
         self.__change_requires_mapping = False
 
+    def has_plastic_synapses(self):
+        if isinstance(self.__synapse_dynamics, SynapseDynamicsStatic):
+            return False
+        return True
+
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
 
-        # dynamics = self.__synapse_dynamics.executable_prefix
-        # synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
-        # neuron_suffix, extension = os.path.splitext(
-        #     self._connected_app_vertices[0].get_binary_file_name())
-        # return (dynamics + neuron_suffix + synapse_suffix + extension)
-        return "Static_synapse.aplx"
+        dynamics = self.__synapse_dynamics.executable_prefix
+        synapse_suffix = self.__synapse_dynamics.get_vertex_executable_suffix()
+        if self.has_plastic_synapses():
+            neuron_suffix, extension = os.path.splitext(
+                self._connected_app_vertices[0].get_binary_file_name())
+        else:
+            neuron_suffix = ""
+            extension = ".aplx"
+        return (dynamics + neuron_suffix + synapse_suffix + extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -1204,8 +1212,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         # Write the size of the incoming spike buffer
         spec.write_value(data=self._incoming_spike_buffer_size)
 
-        # Write the synapse index for SDRAM offset for synaptic contributions
-        spec.write_value(data=self._synapse_index)
+        # Write the partition index for SDRAM offset for synaptic contributions (plastic synapses)
+        spec.write_value(data=self.__partition)
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)

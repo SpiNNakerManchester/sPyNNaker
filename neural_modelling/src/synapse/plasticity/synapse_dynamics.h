@@ -36,7 +36,7 @@ bool synapse_dynamics_process_plastic_synapses(
         weight_t *ring_buffers, uint32_t time);
 
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index);
+        uint32_t time);
 
 input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index);
@@ -92,6 +92,11 @@ bool add_plastic_neuron_with_id(
 //! \param[in] tag: the memory tag for the address
 //! \return None
 void synapse_dynamics_set_post_buffer_region(uint32_t tag);
+
+//! \brief  Allocate the postsynaptic buffer in SDRAM
+//! \param[in] tag: the memory tag for the address
+//! \return None
+void synapse_dynamics_allocate_post_buffer_region(uint32_t tag);
 
 //! \brief Read the postsynaptic buffer
 //! \return None

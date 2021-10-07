@@ -742,15 +742,20 @@ class AbstractPopulationVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
 
-        # # Split binary name into title and extension
-        # binary_title, binary_extension = os.path.splitext(
-        #     self.__neuron_impl.binary_name)
+        plastic = "_static"
 
-        # # Reunite title and extension and return
-        # return (binary_title +
-        #         self._connected_app_vertices[0].vertex_executable_suffix +
-        #         binary_extension)
-        return self.__neuron_impl.binary_name
+        for vertex in self._connected_app_vertices:
+            if vertex.has_plastic_synapses():
+                plastic = "_plastic"
+
+        # Split binary name into title and extension
+        binary_title, binary_extension = os.path.splitext(
+            self.__neuron_impl.binary_name)
+
+        # Reunite title and extension and return
+        return (binary_title +
+                plastic +
+                binary_extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

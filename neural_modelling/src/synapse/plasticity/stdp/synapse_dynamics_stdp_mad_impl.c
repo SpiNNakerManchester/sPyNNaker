@@ -21,6 +21,8 @@
 // sPyNNaker neural modelling includes
 #include <synapse/synapses.h>
 
+#define DMA_TAG_READ_POST_BUFFER 2
+
 // Plasticity includes
 #include "maths.h"
 #include "post_events.h"
@@ -37,6 +39,9 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 static uint32_t synapse_type_mask;
+static uint32_t neurons;
+
+static uint8_t post_event_size;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
@@ -81,7 +86,9 @@ typedef struct {
 post_event_history_t *post_event_history;
 
 //SDRAM address for postsynaptic buffers
-post_event_history_t *post_event_region;
+uint8_t *post_event_region;
+
+uint8_t *post_event_local;
 
 /* PRIVATE FUNCTIONS */
 
@@ -243,6 +250,8 @@ address_t synapse_dynamics_initialise(
         return NULL;
     }
 
+    neurons = n_neurons;
+
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
@@ -265,6 +274,16 @@ address_t synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    post_event_size = n_neurons * sizeof(uint8_t);
+
+    post_event_local = spin1_malloc(post_event_size);
+    if (post_event_local == NULL) {
+        log_error("Not enough memory to allocate post event region locally");
+        return NULL;
+    }
+
+    *has_plastic_synapses = true;
 
     return weight_result;
 }
@@ -352,23 +371,41 @@ bool synapse_dynamics_process_plastic_synapses(
     return true;
 }
 
-void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
-    log_debug("Adding post-synaptic event to trace at time:%u", time);
-
-    // Add post-event
-    post_event_history_t *history = &post_event_history[neuron_index];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
-    const post_trace_t last_post_trace =
-            history->traces[history->count_minus_one];
-    post_events_add(time, history,
-            timing_add_post_spike(time, last_post_time, last_post_trace));
-}
-
 // Can we make this inline?
 void synapse_dynamics_set_post_buffer_region(uint32_t tag) {
 
     post_event_region = sark_tag_ptr(tag, 0);
+}
+
+void synapse_dynamics_allocate_post_buffer_region(uint32_t tag) {
+
+    post_event_region = (uint8_t*) sark_xalloc(sv->sdram_heap, post_event_size, tag, 1);
+}
+
+void synapse_dynamics_read_post_buffer() {
+
+    spin1_dma_transfer(
+        DMA_TAG_READ_POST_BUFFER, post_event_region,
+        post_event_local, DMA_READ, post_event_size);
+}
+
+void synapse_dynamics_process_post_synaptic_event(uint32_t time) {
+
+    log_debug("Adding post-synaptic event to trace at time:%u", time);
+
+    for(index_t neuron_index = 0; neuron_index < neurons; neuron_index++) {
+
+        if(post_event_region[neuron_index]) {
+
+            // Add post-event
+            post_event_history_t *history = &post_event_history[neuron_index];
+            const uint32_t last_post_time = history->times[history->count_minus_one];
+            const post_trace_t last_post_trace =
+                    history->traces[history->count_minus_one];
+            post_events_add(time, history,
+                    timing_add_post_spike(time, last_post_time, last_post_trace));
+        }
+    }
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(

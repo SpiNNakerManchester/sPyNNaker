@@ -42,7 +42,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_n_outgoing_partitions",
         "_n_incoming_partitions",
         "_max_atoms_neuron_core",
-        "_max_atoms_syn_core"]
+        "_max_atoms_syn_core",
+        "__label"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
@@ -62,6 +63,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._neuron_vertices = list()
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()
+
+        self.__label = label
 
         if len(self._n_incoming_partitions) < self._n_syn_types:
             raise Exception("Incorrect number of incoming partitions."
@@ -178,6 +181,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @property
     def n_syn_types(self):
         return self._n_syn_types
+
+    @property
+    def label(self):
+        return self.__label
 
     @property
     def n_incoming_partitions(self):

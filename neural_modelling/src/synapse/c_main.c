@@ -172,10 +172,10 @@ void write_contributions(uint unused1, uint unused2) {
 //! \return None
 void read_contributions(uint unused1, uint unused2) {
 
+    synapse_dynamics_read_post_buffer();
+
     use(unused1);
     use(unused2);
-
-    synapse_dynamics_read_post_buffer();
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -318,6 +318,10 @@ void timer_callback(uint timer_count, uint unused) {
         if(!timer_schedule_proc(read_contributions, 0, 0, rc_reg)) {
 
             rt_error(RTE_API);
+        }
+
+        if(!timer_count) {
+            synapses_set_contribution_region();
         }
     }
 

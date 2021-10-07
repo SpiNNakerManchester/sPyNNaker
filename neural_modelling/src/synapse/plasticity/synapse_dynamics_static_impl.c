@@ -43,8 +43,7 @@ address_t synapse_dynamics_initialise(
 
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
-    use(neuron_index);
+        uint32_t time) {
     use(time);
 }
 
@@ -130,6 +129,10 @@ bool add_plastic_neuron_with_id(
 }
 
 void synapse_dynamics_set_post_buffer_region(uint32_t tag) {
+    use(tag);
+}
+
+void synapse_dynamics_allocate_post_buffer_region(uint32_t tag) {
     use(tag);
 }
 

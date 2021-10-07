@@ -291,10 +291,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     mem_offset = params->mem_offset;
 
-    // Start reading memory contributions from a different position, according to
-    // the index of the core in the population
-    starting_index = (params->index_offset & 1);
-
     // Read number of recorded variables
     n_recorded_vars = params->n_recorded_variables;
 
@@ -353,10 +349,22 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
             total_partitions++;
         }
         else {
-            total_partitions += incoming_partitions[i];
+
+        total_partitions += incoming_partitions[i];
         }
 
         sum_partitions_tmp += incoming_partitions[i];
+    }
+
+    if(total_partitions > 1) {
+
+        // Start reading memory contributions from a different position, according to
+        // the index of the core in the population
+        starting_index = (params->index_offset & 1);
+    }
+    else {
+        // Edge case for a single incoming partition
+        starting_index = 0;
     }
 
     uint32_t incoming_partitions_power_2 = total_partitions;
@@ -365,10 +373,10 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     }
     uint32_t log_incoming_partitions = ilog_2(incoming_partitions_power_2);
 
-    uint32_t contribution_bits = log_n_neurons;
-    uint32_t contribution_size = 1 << contribution_bits;
+//    uint32_t contribution_bits = log_n_neurons;
+//    uint32_t contribution_size = 1 << contribution_bits;
 
-    dma_size = contribution_size * sizeof(weight_t);
+    dma_size = (1 << log_n_neurons) * sizeof(weight_t);
 
     dma_finished = false;
     dma_read = 1;
@@ -378,10 +386,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     if (!neuron_impl_initialise(n_neurons)) {
         return false;
     }
-
-    // Tag the postsynaptic region with memory_index+18. Still a unique id and saves space in DTCM
-    // Memory_index is the core ID, +18 guarantees not to replicate a tag with another core ID
-    //neuron_impl_allocate_postsynaptic_region(memory_index+18, n_neurons);
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (weight_t **) spin1_malloc(total_partitions * sizeof(weight_t *));
@@ -405,7 +409,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
             return false;
         }
 
-        for (uint j = 0; j < contribution_size; j++) {
+        for (uint j = 0; j < n_neurons; j++) {
 
             synaptic_contributions[i][j] = 0;
         }
@@ -600,16 +604,10 @@ void neuron_do_timestep_update( // EXPORTED
 
             for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
 
-                //io_printf(IO_BUF, "time %d, syn type %d, syn contr %d\n", time, synapse_type_index, synaptic_contributions[i + sum_partitions][neuron_index]);
-
-                //io_printf(IO_BUF, "buff index %d, contribution offset %d\n", buff_index, contribution_offset[synapse_type_index]);
-
                 sum += synaptic_contributions[i + sum_partitions[synapse_type_index]][neuron_index];
                 //buff_index += n_neurons_power_2;
 
             }
-
-            //io_printf(IO_BUF, "sum %d\n", sum);
 
             //MAKE IT INLINE?
             neuron_impl_add_inputs(
@@ -639,8 +637,6 @@ void neuron_do_timestep_update( // EXPORTED
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            //io_printf(IO_BUF, "spike\n");
-
             // Record the spike (or rate update)
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
@@ -667,8 +663,17 @@ void neuron_do_timestep_update( // EXPORTED
         }
     }
 
+    // Retrieve the pointers to memory for the syn contributions at time 0
+    if(!time) {
+
+        neuron_set_contribution_region();
+
+        // Retrieve the pointer for the postsynaptic buffer in memory
+        neuron_impl_set_postsynaptic_region(mem_offset);
+    }
+
     // Start the DMA with the postsynaptic contributions for the syn cores
-    neuron_impl_send_postsynaptic_buffer(n_neurons);
+    neuron_impl_send_postsynaptic_buffer();
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;
@@ -700,16 +705,14 @@ void neuron_do_timestep_update( // EXPORTED
         spike_recording_count += spike_recording_increment;
     }
 
-    if(!time) {
-
-        neuron_set_contribution_region();
-    }
-
     // do logging stuff if required
     out_spikes_print();
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
+
+    // Clear the postsynaptic buffer
+    neuron_impl_reset_post_synaptic_events(n_neurons);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

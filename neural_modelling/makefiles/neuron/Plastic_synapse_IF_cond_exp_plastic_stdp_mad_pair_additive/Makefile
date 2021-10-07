@@ -16,13 +16,11 @@
 
 APP = $(notdir $(CURDIR))
 
-SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/stdp/synapse_dynamics_multicomp_Bern.c
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/stdp/synapse_dynamics_stdp_mad_impl.c
 
-TIMING_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.h
-WEIGHT_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
-WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
-
-COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
+TIMING_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_pair_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_pair_impl.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
 
 include ../synapse_build.mk

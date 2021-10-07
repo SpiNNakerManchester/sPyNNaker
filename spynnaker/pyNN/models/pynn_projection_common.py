@@ -17,6 +17,8 @@ import logging
 import math
 import numpy
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ordered_default_dict import DefaultOrderedDict
+from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
@@ -259,6 +261,7 @@ class PyNNProjectionCommon(object):
 
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
+
         self.__get_projection_data(
             data_to_get, pre_vertex, post_vertex, connection_holder,
             handle_time_out_configuration)
@@ -283,37 +286,40 @@ class PyNNProjectionCommon(object):
             receivers = None
             extra_monitor_placements = None
 
-        edges = ctl.graph_mapper.get_machine_edges(self.__projection_edge)
-        progress = ProgressBar(
-            edges, "Getting {}s for projection between {} and {}".format(
-                data_to_get, pre_vertex.label, post_vertex.label))
-        for edge in progress.over(edges):
-            placement = ctl.placements.get_placement_of_vertex(
-                edge.post_vertex)
+        for edge in self.__projection_edge.application_edges:
+            e = ctl.graph_mapper.get_machine_edges(edge)
+            progress = ProgressBar(
+                e, "Getting {}s for projection between {} and {}".format(
+                    data_to_get, pre_vertex.label, post_vertex.label))
+            for ed in progress.over(e):
+                placement = ctl.placements.get_placement_of_vertex(
+                    ed.post_vertex)
 
-            # if using extra monitor data extractor find local receiver
-            if extra_monitors is not None:
-                receiver = helpful_functions.locate_extra_monitor_mc_receiver(
-                    placement_x=placement.x, placement_y=placement.y,
-                    machine=ctl.machine,
-                    packet_gather_cores_to_ethernet_connection_map=receivers)
-                sender_extra_monitor_core = extra_monitor_placements[
-                    placement.x, placement.y]
-                sender_monitor_place = ctl.placements.get_placement_of_vertex(
-                    sender_extra_monitor_core)
-            else:
-                receiver = None
-                sender_monitor_place = None
+                # if using extra monitor data extractor find local receiver
+                if extra_monitors is not None:
+                    receiver = helpful_functions.locate_extra_monitor_mc_receiver(
+                        placement_x=placement.x, placement_y=placement.y,
+                        machine=ctl.machine,
+                        packet_gather_cores_to_ethernet_connection_map=receivers)
+                    sender_extra_monitor_core = extra_monitor_placements[
+                        placement.x, placement.y]
+                    sender_monitor_place = ctl.placements.get_placement_of_vertex(
+                        sender_extra_monitor_core)
+                else:
+                    receiver = None
+                    sender_monitor_place = None
 
-            connections = post_vertex.get_connections_from_machine(
-                ctl.transceiver, placement, edge, ctl.graph_mapper,
-                ctl.routing_infos, self.__synapse_information,
-                ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, sender_monitor_place,
-                extra_monitors, handle_time_out_configuration,
-                ctl.fixed_routes)
-            if connections is not None:
-                connection_holder.add_connections(connections)
+                vertex = ctl.graph_mapper.get_application_edge(ed).post_vertex
+
+                connections = vertex.get_connections_from_machine(
+                    ctl.transceiver, placement, ed, ctl.graph_mapper,
+                    ctl.routing_infos, self.__synapse_information,
+                    ctl.machine_time_step, extra_monitors is not None,
+                    ctl.placements, receiver, sender_monitor_place,
+                    extra_monitors, handle_time_out_configuration,
+                    ctl.fixed_routes)
+                if connections is not None:
+                    connection_holder.add_connections(connections)
         connection_holder.finish()
 
     def _clear_cache(self):

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEURON_IMPL_STANDARD_H_
-#define _NEURON_IMPL_STANDARD_H_
+#ifndef _NEURON_IMPL_STANDARD_PLASTIC_H_
+#define _NEURON_IMPL_STANDARD_PLASTIC_H_
 
 #include "neuron_impl.h"
 
@@ -67,6 +67,15 @@ static global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
+
+//! Array containing the neurons that fired
+static uint8_t *spike_list;
+
+//! DMA write size for postsynaptic buffer
+static uint32_t postsynaptic_size;
+
+//! Pointer to the SDRAM postsynaptic buffer
+static uint8_t *postsynaptic_buffer;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -127,6 +136,14 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
                     " - Out of DTCM");
             return false;
         }
+    }
+
+    postsynaptic_size = n_neurons * sizeof(uint8_t);
+
+    spike_list = spin1_malloc(postsynaptic_size);
+    if (spike_list == NULL) {
+        log_error("Unable to allocate spike list array - Out of DTCM");
+        return false;
     }
 
     return true;
@@ -344,22 +361,31 @@ static void neuron_impl_store_neuron_parameters(
 
 static inline void neuron_impl_process_post_synaptic_event(index_t neuron_index) {
 
-    use(neuron_index);
+    spike_list[neuron_index] = 1;
 
 }
 
 static inline void neuron_impl_reset_post_synaptic_events(uint32_t n_neurons) {
 
-    use(n_neurons);
+    for(index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+
+        spike_list[neuron_index] = 0;
+    }
 
 }
 
 static inline void neuron_impl_send_postsynaptic_buffer() {
+
+    spin1_dma_transfer(
+        DMA_TAG_WRITE_POSTSYNAPTIC_BUFFER, postsynaptic_buffer, spike_list,
+        DMA_WRITE, postsynaptic_size);
 }
 
 static void neuron_impl_set_postsynaptic_region(uint32_t mem_offset) {
 
-    use(mem_offset);
+    // Post buffer in SDRAM has tag 19 as unique number
+    postsynaptic_buffer = sark_tag_ptr(19, 0);
+    postsynaptic_buffer += mem_offset;
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -401,4 +427,4 @@ const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
 }
 #endif // LOG_LEVEL >= LOG_DEBUG
 
-#endif // _NEURON_IMPL_STANDARD_H_
+#endif // _NEURON_IMPL_STANDARD_PLASTIC_H_

@@ -42,7 +42,7 @@ static uint32_t n_neurons;
 // The number of synapse types
 static uint32_t n_synapse_types;
 
-static uint8_t synapse_index;
+static uint8_t partition_index;
 
 // Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
@@ -66,6 +66,8 @@ static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
 static uint32_t memory_index;
+
+static uint32_t contribution_size;
 
 static weight_t *synaptic_region;
 
@@ -101,7 +103,7 @@ struct synapse_parameters {
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
     uint32_t incoming_rate_buffer_size;
-    uint32_t synapse_index;
+    uint32_t partition_index;
     uint32_t mem_index;
     // uint32_t synaptic_matrix_size;
     uint32_t n_recorded_variables;
@@ -271,7 +273,6 @@ static inline void process_fixed_synapses(
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
-
         //io_printf(IO_BUF, "synaptic word %d\n", synaptic_word);
         //io_printf(IO_BUF, "weight: %d, delay %d\n", weight, delay);
 
@@ -321,7 +322,7 @@ bool synapses_initialise(
 
     *incoming_rate_buffer_size = params->incoming_rate_buffer_size;
 
-    synapse_index = params->synapse_index;
+    partition_index = params->partition_index;
 
     memory_index = params->mem_index;
 
@@ -485,7 +486,7 @@ bool synapses_initialise(
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
-    uint32_t contribution_size = n_neurons;
+    contribution_size = 1 << (log_n_neurons + log_n_synapse_types);
 
     size_to_be_transferred = contribution_size * sizeof(weight_t);
 
@@ -509,6 +510,11 @@ bool synapses_initialise(
     //set the region to 0
     for(index_t i = 0; i < contribution_size; i++) {
         synaptic_region[i] = 0;
+    }
+
+    if(partition_index == 0) {
+
+        synapse_dynamics_allocate_post_buffer_region(19);
     }
 
     //io_printf(IO_BUF, "syn index bits %d, syn type index %d, syn type bits %d\n", synapse_index_bits, synapse_type_index_bits, synapse_type_bits);
@@ -750,10 +756,15 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
 
 }
 
-//void synapses_set_contribution_region(){
-//
-//    synaptic_region = sark_tag_ptr(memory_index, 0);
-//    synaptic_region += (offset << synapse_index_bits);
-//
-//    synapse_dynamics_set_post_buffer_region(memory_index+18);
-//}
+void synapses_set_contribution_region(){
+
+    if(partition_index) {
+
+        synapse_dynamics_set_post_buffer_region(19);
+    }
+}
+
+void synapses_process_post_synaptic_event(uint32_t time) {
+
+    synapse_dynamics_process_post_synaptic_event(time);
+}

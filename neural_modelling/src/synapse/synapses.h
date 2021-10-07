@@ -134,6 +134,8 @@ bool add_static_neuron_with_id(
 
 void synapses_set_contribution_region();
 
+void synapses_process_post_synaptic_event(uint32_t time);
+
 void synapses_flush_ring_buffer(uint32_t timestep);
 
 // DEFINED IN NEURON.H

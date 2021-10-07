@@ -13,18 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 APP = $(notdir $(CURDIR))
 
-PACKET_COMPRESSOR = $(NEURON_DIR)
+NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard_plastic.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/synapse/synapse_types/synapse_types_exponential_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/synapse_dynamics_static_impl.c
 
-SYNAPSE_DYNAMICS = $(NEURON_DIR)/synapse/plasticity/stdp/synapse_dynamics_multicomp_Bern.c
-
-TIMING_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/timing_dependence/timing_multicomp_Bern.h
-WEIGHT_DEPENDENCE = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.c
-WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/synapse/plasticity/stdp/weight_dependence/weight_multiplicative_multicomp_Bern.h
-
-COMPARTMENT_TYPE_H = $(NEURON_DIR)/synapse/compartment_type/compartment_type_US_model.h
-
-include ../synapse_build.mk
+include ../neural_build.mk

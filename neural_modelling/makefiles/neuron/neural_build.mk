@@ -97,6 +97,7 @@ else
     NEURON_IMPL := $(call strip_source_dirs,$(NEURON_IMPL_H))
     NEURON_IMPL_H := $(call replace_source_dirs,$(NEURON_IMPL_H))
     NEURON_IMPL_STANDARD := neuron/implementations/neuron_impl_standard.h
+    NEURON_IMPL_STANDARD_PLAST := neuron/implementations/neuron_impl_standard_plastic.h
     NEURON_INCLUDES := -include $(NEURON_IMPL_H)
     ifeq ($(NEURON_IMPL), $(NEURON_IMPL_STANDARD))
         
@@ -137,6 +138,54 @@ else
 		    SYNAPSE_TYPE_H := $(call replace_source_dirs,$(SYNAPSE_TYPE_H))
 		endif
 		
+		NEURON_INCLUDES := \
+	      -include $(NEURON_MODEL_H) \
+	      -include $(SYNAPSE_TYPE_H) \
+	      -include $(INPUT_TYPE_H) \
+	      -include $(THRESHOLD_TYPE_H) \
+	      -include $(ADDITIONAL_INPUT_H) \
+	      -include $(NEURON_IMPL_H)
+    endif
+    # TMP DUPLICATION. nEED TO FIND A GOOD WAY TO IMPLEMENT OR IN MAKEFILES!
+    ifeq ($(NEURON_IMPL), $(NEURON_IMPL_STANDARD_PLAST))
+
+        # Check required inputs and point them to modified sources
+		ifndef ADDITIONAL_INPUT_H
+		    ADDITIONAL_INPUT_H = $(MODIFIED_DIR)neuron/additional_inputs/additional_input_none_impl.h
+		else
+		    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
+		endif
+
+		ifndef NEURON_MODEL
+		    $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
+		else
+		    NEURON_MODEL := $(call strip_source_dirs,$(NEURON_MODEL))
+		endif
+
+		ifndef NEURON_MODEL_H
+		    $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
+		else
+		    NEURON_MODEL_H := $(call replace_source_dirs,$(NEURON_MODEL_H))
+		endif
+
+		ifndef INPUT_TYPE_H
+		    $(error INPUT_TYPE_H is not set.  Please select an input type header file)
+		else
+		    INPUT_TYPE_H := $(call replace_source_dirs,$(INPUT_TYPE_H))
+		endif
+
+		ifndef THRESHOLD_TYPE_H
+		    $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
+		else
+		    THRESHOLD_TYPE_H := $(call replace_source_dirs,$(THRESHOLD_TYPE_H))
+		endif
+
+		ifndef SYNAPSE_TYPE_H
+		    $(error SYNAPSE_TYPE_H is not set.  Please select a synapse type header file)
+		else
+		    SYNAPSE_TYPE_H := $(call replace_source_dirs,$(SYNAPSE_TYPE_H))
+		endif
+
 		NEURON_INCLUDES := \
 	      -include $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
