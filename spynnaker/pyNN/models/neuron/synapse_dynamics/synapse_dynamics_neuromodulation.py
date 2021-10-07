@@ -21,6 +21,8 @@ from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    STDP_FIXED_POINT_ONE)
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -67,7 +69,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         raise NotImplemented()
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
-    def write_parameters(self, spec, region,  weight_scales):
+    def write_parameters(
+            self, spec, region, global_weight_scale, synapse_weight_scales):
         # Shouldn't ever come up, as should be replaced by STDP
         raise NotImplemented()
 
@@ -85,10 +88,10 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
-
+        weights = numpy.rint(
+            numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
         fixed_plastic = (
-            ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
-              0xFFFF) << 16) |
+            ((weights.astype("uint32") & 0xFFFF) << 16) |
             ((connections["target"] - post_vertex_slice.lo_atom)) & 0xFFFF)
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
@@ -101,13 +104,13 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         if connections:
             synapse_type = connections[0]["synapse_type"]
             is_reward = synapse_type == NEUROMODULATION_TARGETS["reward"]
-        flags = 0x80000000 | int(is_reward) << 30 | synapse_type
+        flags = 0x80000000 | (int(is_reward) << 30) | synapse_type
 
         fp_size = self.get_n_items(fixed_plastic_rows, BYTES_PER_WORD)
         fp_data = [
             fixed_row.view("uint32") for fixed_row in fixed_plastic_rows]
-        pp_data = [numpy.array([flags], dtype="uint32") for _ in n_rows]
-        pp_size = [numpy.array([1], dtype="uint32") for _ in n_rows]
+        pp_data = [numpy.array([flags], dtype="uint32") for _ in range(n_rows)]
+        pp_size = [numpy.array([1], dtype="uint32") for _ in range(n_rows)]
 
         return fp_data, pp_data, fp_size, pp_size
 
@@ -197,6 +200,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
 
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
-        if not self.__neuromodulation:
-            return None
         return NEUROMODULATION_TARGETS.get(target, None)
+
+    @overrides(AbstractPlasticSynapseDynamics.are_weights_signed)
+    def are_weights_signed(self):
+        return False

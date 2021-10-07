@@ -31,10 +31,10 @@ uint32_t *weight_shift;
 //! \brief How the configuration data for multiplicative is laid out in SDRAM.
 //! The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
 } multiplicative_config_t;
 
 //---------------------------------------

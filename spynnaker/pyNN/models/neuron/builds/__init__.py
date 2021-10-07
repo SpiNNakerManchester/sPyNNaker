@@ -27,21 +27,9 @@ from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
-from .if_curr_exp_izhikevich_neuromodulation\
-    import IFCurrExpIzhikevichNeuromodulation
-from .if_cond_exp_izhikevich_neuromodulation\
-    import IFCondExpIzhikevichNeuromodulation
-from .izk_curr_exp_izhikevich_neuromodulation\
-    import IZKCurrExpIzhikevichNeuromodulation
-from .izk_cond_exp_izhikevich_neuromodulation\
-    import IZKCondExpIzhikevichNeuromodulation
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
-           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrExpIzhikevichNeuromodulation",
-           "IFCondExpIzhikevichNeuromodulation",
-           "IZKCurrExpIzhikevichNeuromodulation",
-           "IZKCondExpIzhikevichNeuromodulation"]
+           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase"]

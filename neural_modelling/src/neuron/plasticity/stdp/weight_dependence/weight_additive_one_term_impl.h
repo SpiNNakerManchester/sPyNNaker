@@ -32,16 +32,16 @@
 //---------------------------------------
 //! The configuration of the rule
 typedef struct {
-    int32_t min_weight;     //!< Minimum weight
-    int32_t max_weight;     //!< Maximum weight
+    accum min_weight;     //!< Minimum weight
+    accum max_weight;     //!< Maximum weight
 
-    int32_t a2_plus;        //!< Scaling factor for weight delta on potentiation
-    int32_t a2_minus;       //!< Scaling factor for weight delta on depression
+    accum a2_plus;        //!< Scaling factor for weight delta on potentiation
+    accum a2_minus;       //!< Scaling factor for weight delta on depression
 } plasticity_weight_region_data_t;
 
 //! The current state data for the rule
 typedef struct {
-    int32_t weight; //!< The starting weight
+    accum weight; //!< The starting weight
 
     uint32_t weight_shift; //!< Weight shift to S1615 version
 
@@ -50,6 +50,11 @@ typedef struct {
 } weight_state_t;
 
 #include "weight_one_term.h"
+
+
+static inline accum mul(accum a, int32_t stdp_fixed) {
+    return kbits((bitsk(a) * stdp_fixed) >> STDP_FIXED_POINT);
+}
 
 //---------------------------------------
 // STDP weight dependence functions
@@ -65,9 +70,9 @@ static inline weight_state_t weight_get_initial(
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;
     extern uint32_t *weight_shift;
 
-    int32_t s1615_weight = (int32_t) (weight << weight_shift[synapse_type]);
+    accum s1615_weight = kbits(weight << weight_shift[synapse_type]);
     return (weight_state_t) {
-        .weight = s1615_weight >> S1615_TO_STDP_RIGHT_SHIFT,
+        .weight = s1615_weight,
         .weight_shift = weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
@@ -80,8 +85,7 @@ static inline weight_state_t weight_get_initial(
 //! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t a2_minus) {
-    state.weight -= STDP_FIXED_MUL_16X16(
-            a2_minus, state.weight_region->a2_minus);
+    state.weight -= mul(state.weight_region->a2_minus, a2_minus);
     state.weight = MAX(state.weight, state.weight_region->min_weight);
     return state;
 }
@@ -93,8 +97,7 @@ static inline weight_state_t weight_one_term_apply_depression(
 //! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus) {
-    state.weight += STDP_FIXED_MUL_16X16(
-            a2_plus, state.weight_region->a2_plus);
+    state.weight += mul(state.weight_region->a2_plus, a2_plus);
     state.weight = MIN(state.weight, state.weight_region->max_weight);
     return state;
 }
@@ -106,16 +109,15 @@ static inline weight_state_t weight_one_term_apply_potentiation(
  * \return The new weight.
  */
 static inline weight_t weight_get_final(weight_state_t state) {
-    int32_t s1615_weight = state.weight << S1615_TO_STDP_RIGHT_SHIFT;
-    return (weight_t) (s1615_weight >> state.weight_shift);
+    return (weight_t) (bitsk(state.weight) >> state.weight_shift);
 }
 
 static inline void weight_decay(weight_state_t state, int32_t decay) {
-    state.weight = STDP_FIXED_MUL_16X16(state.weight, decay);
+    state.weight = mul(state.weight, decay);
 }
 
 static inline int32_t weight_get_update(weight_state_t state) {
-    return state.weight;
+    return bitsk(state.weight) >> S1615_TO_STDP_RIGHT_SHIFT;
 }
 
 #endif // _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_

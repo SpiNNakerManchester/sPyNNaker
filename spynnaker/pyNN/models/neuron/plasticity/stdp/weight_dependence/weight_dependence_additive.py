@@ -18,7 +18,6 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import float_to_fixed
 # Four words per synapse type
 _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
@@ -87,25 +86,28 @@ class WeightDependenceAdditive(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         # Loop through each synapse type
-        for _ in weight_scales:
+        for _ in synapse_weight_scales:
 
             # Scale the weights
             spec.write_value(
-                data=float_to_fixed(self.__w_min), data_type=DataType.INT32)
+                data=self.__w_min * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=float_to_fixed(self.__w_max), data_type=DataType.INT32)
+                data=self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=float_to_fixed(self.A_plus * self.__w_max),
-                data_type=DataType.INT32)
+                data=self.A_plus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=float_to_fixed(self.A_minus * self.__w_max),
-                data_type=DataType.INT32)
+                data=self.A_minus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):

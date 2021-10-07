@@ -22,9 +22,9 @@
 #include "stdp_typedefs.h"
 
 typedef struct neuromodulation_data_t {
-    uint32_t is_neuromodulation: 1;
-    uint32_t is_reward:1;
     uint32_t synapse_type:30;
+    uint32_t is_reward:1;
+    uint32_t is_neuromodulation: 1;
 } neuromodulation_data_t;
 
 typedef struct neuromodulated_synapse_t {
@@ -341,8 +341,10 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
 static inline void process_neuromodulation(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
+    log_info("Neuromodulation at time %u", time);
     bool reward = plastic_region_address->neuromodulation.is_reward;
     uint32_t n_synapses = synapse_row_num_plastic_controls(fixed_region);
+    log_info("Processing %u neuromodulated synapses, reward=%u", n_synapses, reward);
     const uint32_t *words = (uint32_t *) synapse_row_plastic_controls(fixed_region);
 
     // Loop through synapses
@@ -356,6 +358,8 @@ static inline void process_neuromodulation(
         }
 
         uint32_t neuron_index = synapse_row_sparse_index(word, 0xFFFF);
+
+        log_info("Concentration %i, index %u", concentration, neuron_index);
 
         // Get post event history of this neuron
         post_event_history_t *history = &post_event_history[neuron_index];

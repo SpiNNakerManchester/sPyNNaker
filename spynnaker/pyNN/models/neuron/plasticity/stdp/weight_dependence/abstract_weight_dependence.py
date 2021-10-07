@@ -66,12 +66,17 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_parameters(
-            self, spec, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param iterable(float) weight_scales:
-        :param int n_weight_terms:
+            The specification to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
+        :param int n_weight_terms: The number of terms used by the synapse rule
        """
 
     @abstractproperty

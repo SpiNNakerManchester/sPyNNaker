@@ -42,6 +42,7 @@ MODELS = IF_curr_exp \
          IZK_curr_exp_stdp_mad_pair_additive \
          IZK_cond_exp_stdp_mad_pair_additive \
          IF_curr_exp_stdp_izhikevich_neuromodulation_pair_additive \
+         IF_curr_exp_stdp_izhikevich_neuromodulation_pair_multiplicative \
          IF_cond_exp_stdp_izhikevich_neuromodulation_pair_additive \
          IZK_curr_exp_stdp_izhikevich_neuromodulation_pair_additive \
          IZK_cond_exp_stdp_izhikevich_neuromodulation_pair_additive \

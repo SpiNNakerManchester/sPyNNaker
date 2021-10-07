@@ -31,12 +31,12 @@ uint32_t *weight_shift;
 //! \brief How the configuration data for additive_two_term is laid out in
 //!     SDRAM. The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
-    int32_t a3_plus;
-    int32_t a3_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
+    accum a3_plus;
+    accum a3_minus;
 } additive_two_term_config_t;
 
 //---------------------------------------

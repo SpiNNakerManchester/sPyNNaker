@@ -317,15 +317,13 @@ class SynapseDynamicsSTDP(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
         if self.__neuromodulation:
             size += BYTES_PER_WORD
-            size += len(self.__tau_c_data) + len(self.__tau_d_data)
+            size += BYTES_PER_WORD * len(self.__tau_c_data)
+            size += BYTES_PER_WORD * len(self.__tau_d_data)
         return size
 
-    def write_parameters(self, spec, region,  weight_scales):
-        """
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param int region: region ID
-        :param list(float) weight_scales:
-        """
+    @overrides(AbstractPlasticSynapseDynamics.write_parameters)
+    def write_parameters(
+            self, spec, region, global_weight_scale, synapse_weight_scales):
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -335,11 +333,13 @@ class SynapseDynamicsSTDP(
         spec.write_value(int(self.__backprop_delay))
 
         # Write timing dependence parameters to region
-        self.__timing_dependence.write_parameters(spec, weight_scales)
+        self.__timing_dependence.write_parameters(
+            spec, global_weight_scale, synapse_weight_scales)
 
         # Write weight dependence information to region
         self.__weight_dependence.write_parameters(
-            spec, weight_scales, self.__timing_dependence.n_weight_terms)
+            spec, global_weight_scale, synapse_weight_scales,
+            self.__timing_dependence.n_weight_terms)
 
         if self.__neuromodulation:
             # Calculate constant component in Izhikevich's model weight update

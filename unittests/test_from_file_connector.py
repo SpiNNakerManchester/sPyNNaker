@@ -94,7 +94,7 @@ def test_connector(
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
         postpop_is_view=False, rng=None, synapse_dynamics=None,
         synapse_type=None, receptor_type=None, is_virtual_machine=False,
-        weights=weights, delays=delays)
+        synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
         [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))

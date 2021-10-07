@@ -189,7 +189,8 @@ class PopulationMachineSynapses(
                 size=synapse_dynamics_sz, label='synapseDynamicsParams',
                 reference=self._synapse_references.synapse_dynamics)
             synapse_dynamics.write_parameters(
-                spec, self._synapse_regions.synapse_dynamics, weight_scales)
+                spec, self._synapse_regions.synapse_dynamics,
+                self._app_vertex.weight_scale, weight_scales)
         elif self._synapse_references.synapse_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
