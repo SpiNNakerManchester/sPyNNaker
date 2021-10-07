@@ -31,6 +31,8 @@
 //!     parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address: Address of the start of the SDRAM region
 //!     which contains synaptic rewiring params.
+//! \param[in,out] recording_regions_used:
+//!     Variable used to track what recording regions have been used
 //! \return Whether we were successful.
 bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address, uint32_t *recording_regions_used);

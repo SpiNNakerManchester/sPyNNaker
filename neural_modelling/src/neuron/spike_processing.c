@@ -425,7 +425,6 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-//! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
     uint32_t n_spikes = in_spikes_size();
     if (clear_input_buffers_of_late_packets) {
@@ -491,8 +490,6 @@ void spike_processing_store_provenance(struct spike_processing_provenance *prov)
     prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
 }
 
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
     // disable interrupts
     uint cpsr = spin1_int_disable();

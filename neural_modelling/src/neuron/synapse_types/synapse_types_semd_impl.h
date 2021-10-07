@@ -131,6 +131,7 @@ static inline void synapse_types_add_neuron_input(
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //!     for a given parameter set
+//! \param[in,out] excitatory_response: Buffer to put response in
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_excitatory_input(
@@ -154,6 +155,7 @@ static inline input_t *synapse_types_get_excitatory_input(
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //!     for a given parameter set
+//! \param[in,out] inhibitory_response: Buffer to put response in
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_inhibitory_input(

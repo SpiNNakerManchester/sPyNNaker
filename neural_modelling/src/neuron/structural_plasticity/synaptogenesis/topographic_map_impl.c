@@ -43,10 +43,16 @@
 #include "elimination/elimination.h"
 #include "formation/formation.h"
 
-// define values used in recording
-#define ELIM_FLAG 0
-#define FORM_FLAG 1
+//! values used in recording
+enum {
+    //! Elimination flag
+    ELIM_FLAG = 0,
+    //! Formation flag
+    FORM_FLAG = 1
+};
+//! How much to shift post-IDs by
 #define ID_SHIFT 1
+//! How much to shift pre-IDs by
 #define PRE_ID_SHIFT 9
 
 //-----------------------------------------------------------------------------
@@ -88,8 +94,8 @@ typedef struct structural_recording_values_t {
     uint32_t value;
 } structural_recording_values_t;
 
+//! Working buffer for the recording of structural changes
 structural_recording_values_t structural_recording_values;
-
 
 //! Timer callbacks since last rewiring
 static uint32_t last_rewiring_time = 0;
