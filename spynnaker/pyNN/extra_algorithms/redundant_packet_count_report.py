@@ -32,7 +32,13 @@ class RedundantPacketCountReport(object):
     _N_PROV_ITEMS_NEEDED = 4
     _MAX = 100
 
-    def __call__(self):
+    def __call__(self, provenance_items):
+        """
+
+        :param provenance_items: IGNORED ONLY FOR ALGORITHM ORDER
+        :type provenance_items: object
+        :return:
+        """
         file_name = os.path.join(report_default_directory(), self._FILE_NAME)
 
         try:

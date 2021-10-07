@@ -389,7 +389,15 @@
     <algorithm name="RedundantPacketCountReport">
         <python_module>spynnaker.pyNN.extra_algorithms.redundant_packet_count_report</python_module>
         <python_class>RedundantPacketCountReport</python_class>
-        <input_definitions/>
+        <input_definitions>
+            <parameter>
+                <param_name>provenance_items</param_name>
+                <param_type>PlacementsProvenanceItems</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>provenance_items</param_name>
+        </required_inputs>
     </algorithm>
     <algorithm name="SpYNNakerConnectionHolderGenerator">
         <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations</python_module>
