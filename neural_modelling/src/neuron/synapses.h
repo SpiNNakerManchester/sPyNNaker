@@ -73,7 +73,7 @@ static inline void synapses_print_weight(
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //!     Array of shifts to use when converting from ring buffer values to input
 //!     buffer values
-//! \param[out] clear_input_buffers_of_late_packets:
+//! \param[out] clear_input_buffers_of_late_packets_init:
 //!     Inicates whether to clear the input buffers each time step
 //! \param[out] incoming_spike_buffer_size:
 //!     The number of spikes to support in the incoming spike circular buffer
