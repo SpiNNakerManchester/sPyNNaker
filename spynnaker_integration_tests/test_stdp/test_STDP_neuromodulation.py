@@ -84,25 +84,6 @@ class TestSTDPNeuromodulation(BaseTestCase):
         post_pop = sim.Population(
             1, sim.IF_curr_exp, cell_params, label='post1')
 
-        # Create STDP dynamics with neuromodulation
-        synapse_dynamics = sim.STDPMechanism(
-            timing_dependence=sim.SpikePairRule(
-                tau_plus=10, tau_minus=12,
-                A_plus=1, A_minus=1),
-            weight_dependence=sim.MultiplicativeWeightDependence(
-                w_min=0, w_max=20),
-            weight=rewarded_syn_weight,
-            neuromodulation=True,
-            tau_c=tau_c, tau_d=tau_d)
-
-        # Create dopaminergic connection
-        sim.Projection(
-            reward_pop, post_pop,
-            sim.AllToAllConnector(),
-            synapse_type=sim.extra_models.Neuromodulation(
-                weight=DA_concentration),
-            receptor_type='reward', label='reward synapses')
-
         # Stimulate post-synaptic neuron
         sim.Projection(
             post_stim, post_pop,
@@ -110,12 +91,29 @@ class TestSTDPNeuromodulation(BaseTestCase):
             synapse_type=sim.StaticSynapse(weight=6),
             receptor_type='excitatory')
 
+        # Create STDP dynamics
+        synapse_dynamics = sim.STDPMechanism(
+            timing_dependence=sim.SpikePairRule(
+                tau_plus=10, tau_minus=12,
+                A_plus=1, A_minus=1),
+            weight_dependence=sim.MultiplicativeWeightDependence(
+                w_min=0, w_max=20),
+            weight=rewarded_syn_weight)
+
         # Create a plastic connection between pre and post neurons
         plastic_projection = sim.Projection(
             pre_pop, post_pop,
             sim.AllToAllConnector(),
             synapse_type=synapse_dynamics,
             receptor_type='excitatory', label='Pre-post projection')
+
+        # Create dopaminergic connection
+        sim.Projection(
+            reward_pop, post_pop,
+            sim.AllToAllConnector(),
+            synapse_type=sim.extra_models.Neuromodulation(
+                weight=DA_concentration, tau_c=tau_c, tau_d=tau_d),
+            receptor_type='reward', label='reward synapses')
 
         sim.run(duration)
 

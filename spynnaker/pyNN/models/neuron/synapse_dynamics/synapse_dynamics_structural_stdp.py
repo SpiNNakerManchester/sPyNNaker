@@ -67,11 +67,7 @@ class SynapseDynamicsStructuralSTDP(
         # The formation rule
         "__formation",
         # The elimination rule
-        "__elimination",
-        # Defines whether neuromodulation is on
-        "__neuromodulation",
-        # Whether to use back-propagation delay or not
-        "__backprop_delay"
+        "__elimination"
     ]
 
     def __init__(
@@ -82,7 +78,7 @@ class SynapseDynamicsStructuralSTDP(
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
             with_replacement=True, seed=None,
             weight=StaticSynapse.default_parameters['weight'], delay=None,
-            backprop_delay=True, neuromodulation=False):
+            backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -118,12 +114,11 @@ class SynapseDynamicsStructuralSTDP(
             Use ``None`` to get the simulator default minimum delay.
         :type delay: float or None
         :param bool backprop_delay: Whether back-propagated delays are used
-        :param bool neuromodulation: Whether neuromodulation is turned on
         """
         super().__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
-            backprop_delay=backprop_delay, neuromodulation=neuromodulation)
+            backprop_delay=backprop_delay)
         self.__partner_selection = partner_selection
         self.__formation = formation
         self.__elimination = elimination

@@ -16,7 +16,6 @@
 import math
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
-from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
@@ -32,8 +31,7 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    get_exp_lut_array, float_to_fixed)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -43,11 +41,6 @@ NEUROMODULATION_TARGETS = {
     "reward": 0,
     "punishment": 1
 }
-
-# LOOKUP_TAU_C_SIZE = 520
-LOOKUP_TAU_C_SHIFT = 4
-# LOOKUP_TAU_D_SIZE = 370
-LOOKUP_TAU_D_SHIFT = 2
 
 
 class SynapseDynamicsSTDP(
@@ -67,7 +60,7 @@ class SynapseDynamicsSTDP(
         "__timing_dependence",
         # weight dependence to use for the STDP rule
         "__weight_dependence",
-        # Defines whether neuromodulation is on
+        # The neuromodulation instance if enabled
         "__neuromodulation",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
@@ -76,18 +69,13 @@ class SynapseDynamicsSTDP(
         # Delay of connections formed by connector
         "__delay",
         # Whether to use back-propagation delay or not
-        "__backprop_delay",
-        "__tau_c",
-        "__tau_d",
-        "__tau_c_data",
-        "__tau_d_data"]
+        "__backprop_delay"]
 
     def __init__(
             self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=StaticSynapse.default_parameters['weight'],
-            delay=None, pad_to_length=None, backprop_delay=True,
-            neuromodulation=False, tau_c=None, tau_d=None):
+            delay=None, pad_to_length=None, backprop_delay=True):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
@@ -99,11 +87,6 @@ class SynapseDynamicsSTDP(
         :param pad_to_length:
         :type pad_to_length: int or None
         :param bool backprop_delay:
-        :param bool neuromodulation: Indicate whether to use neuromodulation
-        :param tau_c: Neuromodulation eligibility trace decay rate
-        :type tau_c: float or None
-        :param tau_d: Neuromodulation Dopamine trace decay rate
-        :type tau_d: float or None
         """
         if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
@@ -126,43 +109,38 @@ class SynapseDynamicsSTDP(
             delay = get_simulator().min_delay
         self.__delay = delay
         self.__backprop_delay = backprop_delay
-        self.__neuromodulation = neuromodulation
-        self.__tau_c = tau_c
-        self.__tau_d = tau_d
-        self.__tau_c_data = None
-        self.__tau_d_data = None
-
-        # For STDP with neuromodulation there can only be one combination of
-        # weight dependence and timing dependence
-        if neuromodulation:
-            if tau_c is None:
-                raise SynapticConfigurationException(
-                    "Neuromodulation requires a value for tau_c, "
-                    "the eligibility trace decay rate")
-            if tau_d is None:
-                raise SynapticConfigurationException(
-                    "Neuromodulation requires a value for tau_d, "
-                    "the dopamine decay rate")
-
-            ts = get_simulator().machine_time_step / 1000.0
-            self.__tau_c_data = get_exp_lut_array(
-                ts, self.__tau_c,
-                shift=LOOKUP_TAU_C_SHIFT)
-            self.__tau_d_data = get_exp_lut_array(
-                ts, self.__tau_d,
-                shift=LOOKUP_TAU_D_SHIFT)
+        self.__neuromodulation = None
 
         if self.__dendritic_delay_fraction != 1.0:
             raise NotImplementedError("All delays must be dendritic!")
 
+    def merge_neuromodulation(self, neuromodulation):
+        if self.__neuromodulation is None:
+            self.__neuromodulation = neuromodulation
+        elif not self.__neuromodulation.is_neuromodulation_same_as(
+                neuromodulation):
+            raise SynapticConfigurationException(
+                "Neuromodulation must match exactly when using multiple"
+                " edges to the same Population")
+
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
+        # If dynamics is Neuromodulation, merge with other neuromodulation,
+        # and then return ourselves, as neuromodulation can't be used by
+        # itself
+        if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
+            self.merge_neuromodulation(synapse_dynamics)
+            return self
+
         # If dynamics is STDP, test if same as
         if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             if not self.is_same_as(synapse_dynamics):
                 raise SynapticConfigurationException(
                     "Synapse dynamics must match exactly when using multiple"
                     " edges to the same population")
+
+            if self.__neuromodulation is not None:
+                synapse_dynamics.merge_neuromodulation(self.__neuromodulation)
 
             # If STDP part matches, return the other, as it might also be
             # structural
@@ -249,14 +227,6 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = new_value
 
     @property
-    def tau_c(self):
-        return self.__tau_c
-
-    @property
-    def tau_d(self):
-        return self.__tau_d
-
-    @property
     def backprop_delay(self):
         """ Settable.
 
@@ -271,7 +241,7 @@ class SynapseDynamicsSTDP(
     @property
     def neuromodulation(self):
         """
-        :rtype: bool
+        :rtype: SynapseDynamicsNeuromodulation
         """
         return self.__neuromodulation
 
@@ -286,10 +256,7 @@ class SynapseDynamicsSTDP(
             self.__weight_dependence.is_same_as(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
-             synapse_dynamics.dendritic_delay_fraction) and
-            self.__neuromodulation == synapse_dynamics.neuromodulation and
-            self.__tau_c == synapse_dynamics.tau_c and
-            self.__tau_d == synapse_dynamics.tau_d)
+             synapse_dynamics.dendritic_delay_fraction))
 
     def are_weights_signed(self):
         """
@@ -306,7 +273,9 @@ class SynapseDynamicsSTDP(
         weight_suffix = self.__weight_dependence.vertex_executable_suffix
 
         if self.__neuromodulation:
-            name = "_stdp_izhikevich_neuromodulation_"
+            name = (
+                "_stdp_" +
+                self.__neuromodulation.get_vertex_executable_suffix())
         else:
             name = "_stdp_mad_"
         name += timing_suffix + "_" + weight_suffix
@@ -324,9 +293,8 @@ class SynapseDynamicsSTDP(
         size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
         if self.__neuromodulation:
-            size += BYTES_PER_WORD
-            size += BYTES_PER_WORD * len(self.__tau_c_data)
-            size += BYTES_PER_WORD * len(self.__tau_d_data)
+            size += self.__neuromodulation.get_parameters_sdram_usage_in_bytes(
+                n_neurons, n_synapse_types)
         return size
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
@@ -350,17 +318,8 @@ class SynapseDynamicsSTDP(
             self.__timing_dependence.n_weight_terms)
 
         if self.__neuromodulation:
-            # Calculate constant component in Izhikevich's model weight update
-            # function and write to SDRAM.
-            weight_update_component = \
-                1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
-            weight_update_component = float_to_fixed(weight_update_component)
-            spec.write_value(data=weight_update_component,
-                             data_type=DataType.INT32)
-
-            # Write the LUT arrays
-            spec.write_array(self.__tau_c_data)
-            spec.write_array(self.__tau_d_data)
+            self.__neuromodulation.write_parameters(
+                spec, region, global_weight_scale, synapse_weight_scales)
 
     @property
     def _n_header_bytes(self):

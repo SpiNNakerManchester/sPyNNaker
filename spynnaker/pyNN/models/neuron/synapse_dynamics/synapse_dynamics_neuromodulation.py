@@ -15,14 +15,15 @@
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
+from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    STDP_FIXED_POINT_ONE, get_exp_lut_array, float_to_fixed)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    STDP_FIXED_POINT_ONE)
 
 # The targets of neuromodulation
 NEUROMODULATION_TARGETS = {
@@ -30,49 +31,85 @@ NEUROMODULATION_TARGETS = {
     "punishment": 1
 }
 
+# LOOKUP_TAU_C_SIZE = 520
+LOOKUP_TAU_C_SHIFT = 4
+# LOOKUP_TAU_D_SIZE = 370
+LOOKUP_TAU_D_SHIFT = 2
+
 
 class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     """ Synapses that target a neuromodulation receptor
     """
 
-    def __init__(self, weight=StaticSynapse.default_parameters['weight']):
+    __slots__ = [
+        "__weight",
+        "__tau_c",
+        "__tau_d",
+        "__tau_c_data",
+        "__tau_d_data"]
+
+    def __init__(self, weight=StaticSynapse.default_parameters['weight'],
+                 tau_c=1000.0, tau_d=200.0):
         self.__weight = weight
+        self.__tau_c = tau_c
+        self.__tau_d = tau_d
+        ts = get_simulator().machine_time_step / 1000.0
+        self.__tau_c_data = get_exp_lut_array(
+            ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
+        self.__tau_d_data = get_exp_lut_array(
+            ts, self.__tau_d, shift=LOOKUP_TAU_D_SHIFT)
+
+    @property
+    def tau_c(self):
+        return self.__tau_c
+
+    @property
+    def tau_d(self):
+        return self.__tau_d
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
-        # If dynamics is STDP, check neuromodulation
-        if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
-            if not synapse_dynamics.neuromodulation:
-                raise SynapticConfigurationException(
-                    "An existing edge has been added with STDP but without "
-                    "neuromodulation")
-            return synapse_dynamics
-
-        # Only other options are another neuromodulation or static, so return
-        # self to override
-        return self
+        # This must replace something that supports neuromodulation,
+        # so it can't be the first thing to be merged!
+        raise SynapticConfigurationException(
+            "Neuromodulation synapses can only be added where an existing"
+            " projection has already been added which supports"
+            " neuromodulation")
 
     @overrides(AbstractPlasticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         # Shouln't ever come up, but if it does, it is False!
         return False
 
+    def is_neuromodulation_same_as(self, other):
+        return self.__tau_c == other.tau_c and self.__tau_d == other.tau_d
+
     @overrides(AbstractPlasticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplementedError()
+        return "izhikevich_neuromodulation_"
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplementedError()
+        size = BYTES_PER_WORD
+        size += BYTES_PER_WORD * len(self.__tau_c_data)
+        size += BYTES_PER_WORD * len(self.__tau_d_data)
+        return size
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
     def write_parameters(
             self, spec, region, global_weight_scale, synapse_weight_scales):
-        # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplementedError()
+        # Calculate constant component in Izhikevich's model weight update
+        # function and write to SDRAM.
+        weight_update_component = \
+            1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
+        weight_update_component = float_to_fixed(weight_update_component)
+        spec.write_value(data=weight_update_component,
+                         data_type=DataType.INT32)
+
+        # Write the LUT arrays
+        spec.write_array(self.__tau_c_data)
+        spec.write_array(self.__tau_d_data)
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)

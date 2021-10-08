@@ -39,7 +39,8 @@ from spinn_front_end_common.interface.interface_functions import (
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
-    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
+    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
+    SynapseDynamicsNeuromodulation)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
@@ -252,9 +253,15 @@ def test_set_synapse_dynamics():
         elimination=RandomByWeightElimination(0.5),
         timing_dependence=TimingDependenceSpikePair(),
         weight_dependence=WeightDependenceMultiplicative())
+    neuromodulation = SynapseDynamicsNeuromodulation()
+    alt_neuromodulation = SynapseDynamicsNeuromodulation(tau_c=1)
 
     # This should be fine as it is the first call
     post_app_vertex.synapse_dynamics = static
+
+    # This should fail as can't add neuromodulation first
+    with pytest.raises(SynapticConfigurationException):
+        post_app_vertex.synapse_dynamics = neuromodulation
 
     # This should be fine as STDP overrides static
     post_app_vertex.synapse_dynamics = stdp
@@ -263,14 +270,25 @@ def test_set_synapse_dynamics():
     with pytest.raises(SynapticConfigurationException):
         post_app_vertex.synapse_dynamics = alt_stdp
 
+    # This should pass because neuromodulation is OK after STDP
+    post_app_vertex.synapse_dynamics = neuromodulation
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
+
     # This should work because STDP dependences are the same
     post_app_vertex.synapse_dynamics = stdp
+
+    # This should fail as neuromodulation type is different
+    with pytest.raises(SynapticConfigurationException):
+        post_app_vertex.synapse_dynamics = alt_neuromodulation
+
+    # This should be fine as same neuromodulation
+    post_app_vertex.synapse_dynamics = neuromodulation
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
 
     # This should work because static always works, but the type should
     # still be STDP
     post_app_vertex.synapse_dynamics = static
-    assert isinstance(
-        post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
 
     # This should work but should merge with the STDP rule
     post_app_vertex.synapse_dynamics = static_struct
