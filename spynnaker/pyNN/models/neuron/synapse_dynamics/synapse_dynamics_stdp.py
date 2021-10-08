@@ -249,6 +249,14 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = new_value
 
     @property
+    def tau_c(self):
+        return self.__tau_c
+
+    @property
+    def tau_d(self):
+        return self.__tau_d
+
+    @property
     def backprop_delay(self):
         """ Settable.
 
