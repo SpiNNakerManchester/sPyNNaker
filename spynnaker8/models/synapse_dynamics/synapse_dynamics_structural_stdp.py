@@ -39,7 +39,7 @@ class SynapseDynamicsStructuralSTDP(_BaseClass):
             f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
             seed=None, weight=StaticSynapse.default_parameters['weight'],
-            delay=None, backprop_delay=True, neuromodulation=False):
+            delay=None, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -80,4 +80,4 @@ class SynapseDynamicsStructuralSTDP(_BaseClass):
             dendritic_delay_fraction=dendritic_delay_fraction, f_rew=f_rew,
             initial_weight=initial_weight, initial_delay=initial_delay,
             s_max=s_max, seed=seed, weight=weight, delay=delay,
-            backprop_delay=backprop_delay, neuromodulation=neuromodulation)
+            backprop_delay=backprop_delay)
