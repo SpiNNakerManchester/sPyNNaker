@@ -60,19 +60,19 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @overrides(AbstractPlasticSynapseDynamics.write_parameters)
     def write_parameters(
             self, spec, region, global_weight_scale, synapse_weight_scales):
         # Shouldn't ever come up, as should be replaced by STDP
-        raise NotImplemented()
+        raise NotImplementedError()
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)
