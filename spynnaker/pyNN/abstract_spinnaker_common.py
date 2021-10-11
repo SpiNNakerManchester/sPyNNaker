@@ -396,40 +396,38 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 "Execute SpynnakerMachineBitFieldOrderedCoveringCompressor") \
                 as timer:
             if timer.skip_if_virtual_board():
-                return None, []
+                return
             compressor = SpynnakerMachineBitFieldOrderedCoveringCompressor()
-            provenance = compressor(
+            self._compressor_provenance = compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
-            return None, provenance
 
     def _execute_spynnaker_pair_compressor(self):
         with FecTimer(
                 "Execute SpynnakerMachineBitFieldPairRouterCompressor") \
                 as timer:
             if timer.skip_if_virtual_board():
-                return None, []
+                return
             compressor = SpynnakerMachineBitFieldPairRouterCompressor()
-            provenance = compressor(
+            self._compressor_provenance = compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
-            return None, provenance
 
-    @overrides(AbstractSpinnakerBase._do_compression_by_name)
-    def _do_compression_by_name(self, name):
+    @overrides(AbstractSpinnakerBase._do_delayed_compression)
+    def _do_delayed_compression(self, name):
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
             return self._execute_spynnaker_ordered_covering_compressor()
 
         if name == "SpynnakerMachineBitFieldPairRouterCompressor":
             return self._execute_spynnaker_pair_compressor()
 
-        return AbstractSpinnakerBase._do_compression_by_name(self, name)
+        return AbstractSpinnakerBase._do_delayed_compression(self, name)
 
     def _execute_synapse_expander(self):
         with FecTimer("Execute Synapse Expander") as timer:
