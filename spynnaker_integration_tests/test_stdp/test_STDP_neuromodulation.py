@@ -54,7 +54,6 @@ class TestSTDPNeuromodulation(BaseTestCase):
         tau_d = 200  # Dopamine trace decay time constant.
         DA_concentration = 0.1  # Dopamine trace step increase size
 
-
         # Initial weight
         rewarded_syn_weight = 0.0
 
