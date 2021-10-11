@@ -93,11 +93,11 @@ static inline weight_t synapse_structure_get_weight(
 }
 
 static inline void synapse_structure_decay_weight(
-        update_state_t state, uint32_t decay) {
+        update_state_t *state, uint32_t decay) {
     return weight_decay(state, decay);
 }
 
-static inline int32_t synapse_structure_get_update_weight(update_state_t state) {
+static inline accum synapse_structure_get_update_weight(update_state_t state) {
     return weight_get_update(state);
 }
 
