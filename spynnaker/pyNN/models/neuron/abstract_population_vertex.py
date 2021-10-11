@@ -857,9 +857,14 @@ class AbstractPopulationVertex(
 
             weight_min = connector.get_weight_minimum(
                 synapse_info.weights, self.__weight_random_sigma, synapse_info)
+
+            if weight_min == 0:
+                weight_min = DataType.S1615.decode_from_int(1)
             weight_min *= weight_scale
-            if weight_min != 0 and not numpy.isnan(weight_min):
-                weight_min = float_gcd(min_weights[synapse_type], weight_min)
+            if not numpy.isnan(weight_min):
+                if min_weights[synapse_type] != sys.maxsize:
+                    weight_min = float_gcd(
+                        min_weights[synapse_type], weight_min)
                 min_weights[synapse_type] = min(
                     min_weights[synapse_type], weight_min)
 

@@ -335,16 +335,21 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
             weight_sd = math.sqrt(utility_calls.get_variance(weights))
-            min_weight = mean_weight - (weight_sd * weight_random_sigma)
             if mean_weight < 0:
+                min_weight = mean_weight + (weight_sd * weight_random_sigma)
+                if min_weight > 0:
+                    min_weight = -min_weight
                 high = utility_calls.high(weights)
                 if high is None:
                     return abs(min_weight)
                 return abs(max(min_weight, high))
             else:
+                min_weight = mean_weight - (weight_sd * weight_random_sigma)
                 low = utility_calls.low(weights)
                 if low is None:
                     return abs(min_weight)
+                if min_weight < 0:
+                    min_weight = abs(min_weight)
                 return abs(min(min_weight, low))
 
         elif isinstance(weights, str):
