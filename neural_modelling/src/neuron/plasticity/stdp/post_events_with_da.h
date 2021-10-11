@@ -250,9 +250,10 @@ static inline void print_delayed_window_events(
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time =
                 *post_window.next_time + delay_dendritic;
-        log_info("post spike: %u, time: %u, trace: %u",
+        log_info("post spike: %u, time: %u, trace: %u, dop_trace: %u",
                 post_window.num_events, delayed_post_time,
-                *post_window.next_trace);
+                post_window.next_trace->post_trace,
+                post_window.next_trace->dopamine_trace);
 
         post_window = post_events_next(post_window);
     }
