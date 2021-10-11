@@ -19,7 +19,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    STDP_FIXED_POINT_ONE, get_exp_lut_array, float_to_fixed)
+    STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -103,9 +103,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # function and write to SDRAM.
         weight_update_component = \
             1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
-        weight_update_component = float_to_fixed(weight_update_component)
         spec.write_value(data=weight_update_component,
-                         data_type=DataType.INT32)
+                         data_type=DataType.S1615)
 
         # Write the LUT arrays
         spec.write_array(self.__tau_c_data)

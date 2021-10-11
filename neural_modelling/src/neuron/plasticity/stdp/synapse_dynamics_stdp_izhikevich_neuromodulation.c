@@ -33,7 +33,8 @@ typedef struct neuromodulated_synapse_t {
 } neuromodulated_synapse_t;
 
 typedef struct nm_update_state_t {
-    weight_t weight;
+    accum weight;
+    uint32_t weight_shift;
     update_state_t eligibility_state;
 } nm_update_state_t;
 
@@ -55,11 +56,13 @@ struct synapse_row_plastic_data_t {
     };
 };
 
-static uint32_t weight_update_constant_component;
+static accum weight_update_constant_component;
 
 static int16_lut *tau_c_lookup;
 
 static int16_lut *tau_d_lookup;
+
+static uint32_t *nm_weight_shift;
 
 #define DECAY_LOOKUP_TAU_C(time) \
     maths_lut_exponential_decay(time, tau_c_lookup)
@@ -68,8 +71,10 @@ static int16_lut *tau_d_lookup;
 
 static inline nm_update_state_t get_nm_update_state(
         neuromodulated_synapse_t synapse, index_t synapse_type) {
+    accum s1615_weight = kbits(synapse.weight << nm_weight_shift[synapse_type]);
     nm_update_state_t update_state = {
-        .weight=synapse.weight,
+        .weight=s1615_weight,
+        .weight_shift=nm_weight_shift[synapse_type],
         .eligibility_state=synapse_structure_get_update_state(
                 synapse.eligibility_synapse, synapse_type)
     };
@@ -79,7 +84,7 @@ static inline nm_update_state_t get_nm_update_state(
 static inline nm_final_state_t get_nm_final_state(
         nm_update_state_t update_state) {
     nm_final_state_t final_state = {
-        .weight=update_state.weight,
+        .weight=(weight_t) (bitsk(update_state.weight) >> update_state.weight_shift),
         .final_state=synapse_structure_get_final_state(
                 update_state.eligibility_state)
     };
@@ -122,24 +127,21 @@ static inline post_event_window_t get_post_event_window(
     return post_window;
 }
 
-static inline int32_t get_weight_update(int32_t decay_eligibility_trace,
-        int32_t decay_dopamine_trace, int32_t last_dopamine_trace,
-        int32_t eligibility_weight) {
+static inline accum get_weight_update(int16_t decay_eligibility_trace,
+        int16_t decay_dopamine_trace, int16_t last_dopamine_trace,
+        accum eligibility_weight) {
     // (exp(-(t_j - t_c) / tau_C).exp(-(t_j - t_c) / tau_D) - 1)
-    int32_t mul_decay = STDP_FIXED_MUL_16X16(
+    int16_t mul_decay = STDP_FIXED_MUL_16X16(
             decay_eligibility_trace, decay_dopamine_trace)
                     - STDP_FIXED_POINT_ONE;
     // C_ij.D_c
-    int32_t mul_trace = STDP_FIXED_MUL_16X16(
-            last_dopamine_trace, eligibility_weight);
+    accum mul_trace = mul_accum_fixed(eligibility_weight, last_dopamine_trace);
     // C_ij.D_c.(exp(-(t_j - t_c) / tau_C).exp(-(t_j - t_c) / tau_D) - 1)
-    int32_t mul_trace_decay = STDP_FIXED_MUL_16X16(
-            mul_decay, mul_trace);
+    accum mul_trace_decay = mul_accum_fixed(mul_trace, mul_decay);
     // Constant component = 1 / -((1/tau_C) + (1/tau_D))
     // const_component.C_ij.D_c.
     //        (exp(-(t_j - t_c) / tau_C).exp(-(t_j - t_c) / tau_D) - 1)
-    return STDP_FIXED_MUL_16X16(
-            weight_update_constant_component, mul_trace_decay);
+    return mul_trace_decay * weight_update_constant_component;
 }
 
 //---------------------------------------
@@ -173,40 +175,41 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
     uint32_t prev_corr_time = delayed_last_pre_time;
 
     // D_c = D_prev.exp(-t_c - t_prev / tau_D)
-    int32_t last_dopamine_trace = STDP_FIXED_MUL_16X16(
+    int16_t last_dopamine_trace = 0;
+    if (post_window.prev_time_valid) {
+        last_dopamine_trace = STDP_FIXED_MUL_16X16(
             post_window.prev_trace.dopamine_trace,
             DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time));
+    }
 
-    bool next_trace_is_dopamine = false;
+    log_debug("Dopamine at %u = %k", delayed_last_pre_time, last_dopamine_trace << S1615_TO_STDP_RIGHT_SHIFT);
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time + delay_dendritic;
 
-        log_debug("\t\tApplying post-synaptic event at delayed time:%u, pre:%u\n",
-                delayed_post_time, delayed_last_pre_time);
+        log_debug("\t\tApplying post-synaptic event at delayed time:%u, pre:%u, prev_corr:%u",
+                delayed_post_time, delayed_last_pre_time, prev_corr_time);
 
         // Calculate EXP components of the weight update equation
-        int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
+        int16_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
             delayed_post_time - prev_corr_time);
-
-        next_trace_is_dopamine = post_events_next_is_dopamine(post_window);
 
         // No point if dopamine trace is 0 as will just multiply by 0
         if (last_dopamine_trace != 0) {
-            int32_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
+            int16_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
                         delayed_post_time - prev_corr_time);
-            int32_t eligibility_weight = synapse_structure_get_update_weight(
+            accum eligibility_weight = synapse_structure_get_update_weight(
                     current_state.eligibility_state);
             current_state.weight += get_weight_update(decay_eligibility_trace,
                     decay_dopamine_trace, last_dopamine_trace, eligibility_weight);
         }
 
         // C_ij = C_ij.exp(-(t_j-t_c) / tau_C)
-        synapse_structure_decay_weight(current_state.eligibility_state,
+        synapse_structure_decay_weight(&(current_state.eligibility_state),
                 decay_eligibility_trace);
 
-        if (!next_trace_is_dopamine) {
+        if (!post_events_next_is_dopamine(post_window)) {
             current_state.eligibility_state = timing_apply_post_spike(
                 delayed_post_time, post_window.next_trace->post_trace,
                 delayed_last_pre_time, last_pre_trace, post_window.prev_time,
@@ -226,22 +229,22 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
     // Apply spike to state only if there has been a post spike ever
     if (post_window.prev_time_valid) {
         const uint32_t delayed_last_post = post_window.prev_time + delay_dendritic;
-        log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
-                delayed_pre_time, delayed_last_post);
+        log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u, prev_corr=%u",
+                delayed_pre_time, delayed_last_post, prev_corr_time);
         int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
                 delayed_pre_time - prev_corr_time);
 
         if (last_dopamine_trace != 0) {
             int32_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
                     delayed_pre_time - prev_corr_time);
-            int32_t eligibility_weight = synapse_structure_get_update_weight(
+            accum eligibility_weight = synapse_structure_get_update_weight(
                     current_state.eligibility_state);
             current_state.weight += get_weight_update(decay_eligibility_trace,
                     decay_dopamine_trace, last_dopamine_trace, eligibility_weight);
         }
 
         // C_ij = C_ij.exp(-(t-t_c) / tau_C)
-        synapse_structure_decay_weight(current_state.eligibility_state,
+        synapse_structure_decay_weight(&(current_state.eligibility_state),
                 decay_eligibility_trace);
 
         current_state.eligibility_state = timing_apply_pre_spike(
@@ -268,12 +271,22 @@ bool synapse_dynamics_initialise(
     }
 
     // Read Izhikevich weight update equation constant component
-    weight_update_constant_component = address[0];
+    weight_update_constant_component = kbits(address[0]);
 
     // Read lookup tables
     address_t lut_address = &address[1];
     tau_c_lookup = maths_copy_int16_lut(&lut_address);
     tau_d_lookup = maths_copy_int16_lut(&lut_address);
+
+    // Store weight shifts
+    nm_weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
+    if (nm_weight_shift == NULL) {
+        log_error("Could not initialise weight region data");
+        return NULL;
+    }
+    for (uint32_t s = 0; s < n_synapse_types; s++) {
+        nm_weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
+    }
 
     return true;
 }
@@ -341,10 +354,8 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
 static inline void process_neuromodulation(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region, uint32_t time) {
-    log_info("Neuromodulation at time %u", time);
     bool reward = plastic_region_address->neuromodulation.is_reward;
     uint32_t n_synapses = synapse_row_num_plastic_controls(fixed_region);
-    log_info("Processing %u neuromodulated synapses, reward=%u", n_synapses, reward);
     const uint32_t *words = (uint32_t *) synapse_row_plastic_controls(fixed_region);
 
     // Loop through synapses
@@ -358,8 +369,6 @@ static inline void process_neuromodulation(
         }
 
         uint32_t neuron_index = synapse_row_sparse_index(word, 0xFFFF);
-
-        log_info("Concentration %i, index %u", concentration, neuron_index);
 
         // Get post event history of this neuron
         post_event_history_t *history = &post_event_history[neuron_index];
