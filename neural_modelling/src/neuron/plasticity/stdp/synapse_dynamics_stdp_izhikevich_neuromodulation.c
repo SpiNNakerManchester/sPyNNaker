@@ -182,8 +182,6 @@ static inline nm_final_state_t izhikevich_neuromodulation_plasticity_update_syna
             DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time));
     }
 
-    log_debug("Dopamine at %u = %k", delayed_last_pre_time, last_dopamine_trace << S1615_TO_STDP_RIGHT_SHIFT);
-
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time + delay_dendritic;
