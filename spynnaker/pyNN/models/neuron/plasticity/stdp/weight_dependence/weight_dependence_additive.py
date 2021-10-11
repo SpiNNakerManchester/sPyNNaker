@@ -103,10 +103,10 @@ class WeightDependenceAdditive(
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=self.A_plus * self.__w_max * global_weight_scale,
+                data=self.A_plus * global_weight_scale,
                 data_type=DataType.S1615)
             spec.write_value(
-                data=self.A_minus * self.__w_max * global_weight_scale,
+                data=self.A_minus * global_weight_scale,
                 data_type=DataType.S1615)
 
     @property
