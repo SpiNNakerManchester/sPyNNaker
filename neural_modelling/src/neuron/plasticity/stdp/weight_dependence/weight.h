@@ -34,10 +34,6 @@
 #ifndef _WEIGHT_H_
 #define _WEIGHT_H_
 
-//! The amount of right shift required to take a weight from s1615 format
-//! to STDP_FIXED_POINT format (s4,11)
-#define S1615_TO_STDP_RIGHT_SHIFT 5
-
 #include <common/neuron-typedefs.h>
 #include <neuron/synapse_row.h>
 
@@ -76,13 +72,13 @@ static weight_t weight_get_final(weight_state_t new_state);
  * \param[in] decay The "decay" to multiply the weight by, in STDP fixed point
  *                  format
  */
-static void weight_decay(weight_state_t state, int32_t decay);
+static void weight_decay(weight_state_t *state, int32_t decay);
 
 /*!
  * \brief Get the weight inside during update in STDP fixed point format
  * \param[in] state The state containing the current weight
- * \return The weight in STDP fixed point format
+ * \return The weight in s1615 format
  */
-static int32_t weight_get_update(weight_state_t state);
+static accum weight_get_update(weight_state_t state);
 
 #endif // _WEIGHT_H_

@@ -51,11 +51,6 @@ typedef struct {
 
 #include "weight_one_term.h"
 
-
-static inline accum mul(accum a, int32_t stdp_fixed) {
-    return kbits((bitsk(a) * stdp_fixed) >> STDP_FIXED_POINT);
-}
-
 //---------------------------------------
 // STDP weight dependence functions
 //---------------------------------------
@@ -85,7 +80,7 @@ static inline weight_state_t weight_get_initial(
 //! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t a2_minus) {
-    state.weight -= mul(state.weight_region->a2_minus, a2_minus);
+    state.weight -= mul_accum_fixed(state.weight_region->a2_minus, a2_minus);
     state.weight = MAX(state.weight, state.weight_region->min_weight);
     return state;
 }
@@ -97,7 +92,7 @@ static inline weight_state_t weight_one_term_apply_depression(
 //! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus) {
-    state.weight += mul(state.weight_region->a2_plus, a2_plus);
+    state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
     state.weight = MIN(state.weight, state.weight_region->max_weight);
     return state;
 }
@@ -112,12 +107,12 @@ static inline weight_t weight_get_final(weight_state_t state) {
     return (weight_t) (bitsk(state.weight) >> state.weight_shift);
 }
 
-static inline void weight_decay(weight_state_t state, int32_t decay) {
-    state.weight = mul(state.weight, decay);
+static inline void weight_decay(weight_state_t *state, int32_t decay) {
+    state->weight = mul_accum_fixed(state->weight, decay);
 }
 
-static inline int32_t weight_get_update(weight_state_t state) {
-    return bitsk(state.weight) >> S1615_TO_STDP_RIGHT_SHIFT;
+static inline accum weight_get_update(weight_state_t state) {
+    return state.weight;
 }
 
 #endif // _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
