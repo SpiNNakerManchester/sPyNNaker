@@ -66,6 +66,7 @@ class TestPowerMonitoring(BaseTestCase):
         self.assertIsNotNone(num_chips, "power provenance was not written")
 
     @unittest.skip(
-        "https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon/issues/866")
+        "https://github.com/SpiNNakerManchester/"
+        "SpiNNFrontEndCommon/issues/866")
     def test_power_monitoring(self):
         self.runsafe(self.do_run)
