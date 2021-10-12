@@ -15,6 +15,7 @@
 
 import os
 import numpy
+import unittest
 import spynnaker8 as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
@@ -64,5 +65,7 @@ class TestPowerMonitoring(BaseTestCase):
             num_chips = row["the_value"]
         self.assertIsNotNone(num_chips, "power provenance was not written")
 
+    @unittest.skip(
+        "https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon/issues/866")
     def test_power_monitoring(self):
         self.runsafe(self.do_run)
