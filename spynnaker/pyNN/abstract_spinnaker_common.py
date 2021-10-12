@@ -404,6 +404,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
+            return None
 
     def _execute_spynnaker_pair_compressor(self):
         with FecTimer(
@@ -418,16 +419,18 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
+            return None
 
     @overrides(AbstractSpinnakerBase._do_delayed_compression)
-    def _do_delayed_compression(self, name):
+    def _do_delayed_compression(self, name, compressed):
         if name == "SpynnakerMachineBitFieldOrderedCoveringCompressor":
             return self._execute_spynnaker_ordered_covering_compressor()
 
         if name == "SpynnakerMachineBitFieldPairRouterCompressor":
             return self._execute_spynnaker_pair_compressor()
 
-        return AbstractSpinnakerBase._do_delayed_compression(self, name)
+        return AbstractSpinnakerBase._do_delayed_compression(
+            self, name, compressed)
 
     def _execute_synapse_expander(self):
         with FecTimer("Execute Synapse Expander") as timer:
