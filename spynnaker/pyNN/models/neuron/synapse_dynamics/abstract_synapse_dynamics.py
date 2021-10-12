@@ -179,6 +179,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
 
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        """ Get the minimum weight for the synapses
+
+        :param AbstractConnector connector:
+        :param float weight_random_sigma:
+        :param SynapseInformation synapse_info:
+        """
+        # pylint: disable=too-many-arguments
+        return connector.get_weight_minimum(
+            synapse_info.weights, weight_random_sigma, synapse_info)
+
     def get_weight_variance(self, connector, weights, synapse_info):
         """ Get the variance in weight for the synapses
 

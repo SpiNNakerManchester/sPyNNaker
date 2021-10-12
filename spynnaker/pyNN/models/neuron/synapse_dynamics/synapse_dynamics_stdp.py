@@ -474,6 +474,14 @@ class SynapseDynamicsSTDP(
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_minimum)
+    def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
+        w_min = super().get_weight_minimum(
+            connector, weight_random_sigma, synapse_info)
+        # The minimum weight is the largest that it could be set to from
+        # the weight dependence
+        return min(w_min, self.__weight_dependence.weight_minimum)
+
     @overrides(AbstractSynapseDynamics.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         yield from self.__timing_dependence.get_provenance_data(

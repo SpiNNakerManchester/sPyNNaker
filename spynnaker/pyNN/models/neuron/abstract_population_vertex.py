@@ -855,8 +855,8 @@ class AbstractPopulationVertex(
             connector = synapse_info.connector
             synapse_dynamics = synapse_info.synapse_dynamics
 
-            weight_min = connector.get_weight_minimum(
-                synapse_info.weights, self.__weight_random_sigma, synapse_info)
+            weight_min = synapse_dynamics.get_weight_minimum(
+                connector, self.__weight_random_sigma, synapse_info)
 
             if weight_min == 0:
                 weight_min = DataType.S1615.decode_from_int(1)
@@ -896,6 +896,21 @@ class AbstractPopulationVertex(
         # set the weight to the smallest representable value if 0
         min_weights = [m if m > 0 else DataType.S1615.decode_from_int(1)
                        for m in min_weights]
+
+        # Now check that the maximum weight isn't too big
+        for proj in incoming_projections:
+            synapse_info = proj._synapse_information
+            synapse_type = synapse_info.synapse_type
+            connector = synapse_info.connector
+            synapse_dynamics = synapse_info.synapse_dynamics
+
+            weight_max = synapse_dynamics.get_weight_maximum(
+                connector, synapse_info)
+
+            weight_scale_limit = float(DataType.S1615.scale)
+            if weight_scale_limit * min_weights[synapse_type] < weight_max:
+                max_weight = self.__get_closest_weight(weight_max)
+                min_weights[synapse_type] = max_weight / weight_scale_limit
 
         self.__check_weights(min_weights, weight_scale, incoming_projections)
 
