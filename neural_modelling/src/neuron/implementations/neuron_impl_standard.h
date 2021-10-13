@@ -254,7 +254,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
 
         // Flush any synaptic input
-        flush_synaptic_input(synapse_type);
+        //flush_synaptic_input(synapse_type);
 
     }
 

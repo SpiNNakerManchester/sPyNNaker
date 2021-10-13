@@ -282,12 +282,15 @@ static inline update_state_t timing_apply_pre_spike(
                 if (previous_state.lock == 0){
                     // 24/5/21: SD Adding special case for inhib synapse, perform anti-Hebb learning, irrespective of voltage:
                     if (syn_type == 2) {  // Inhib synapse perform anti-Hebbian potentiation
+                        // XXXX Print inhib potentiation event
+                        //io_printf(IO_BUF, "Pot inh: %d : %d \n", time, previous_state.dep_accumulator);
 	            	previous_state.lock = 1;
 		     	previous_state.dep_accumulator = 0;
                         if (post_synaptic_neuron->V_membrane == 0.0k) { // Still in refrac. Allowed to potentiate this inhib synapse:
 				previous_state.weight_state.weight = previous_state.weight_state.weight_region->max_weight;
 				//previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                         } 
+                        //else previous_state.weight_state.weight = previous_state.weight_state.weight + 1; // Detect locked synapse
                     } // End of if syn_type == 2....
                     //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
                     // SD 9/2/21: Reverse order of these conditions: 
@@ -428,6 +431,7 @@ static inline update_state_t timing_apply_post_spike(
                    if (syn_type == 2) { // For inhibitory synapses do nothing but lock the synapse and reset accumulator:
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
+                       //previous_state.weight_state.weight = previous_state.weight_state.weight + 256; // XXXX TEMP! for debug purposes!
                    }
                    else if (voltage_difference > 900.0k) {
                        // Neuron fired through feed-forward input, ahead of desired time. Therefore, depress!! (New functionality!)
