@@ -356,7 +356,7 @@ class SynapseDynamicsSTDP(
              BYTES_PER_SHORT * n_connections))
         # Neuromodulated synapses have the actual weight separately
         if self.__neuromodulation:
-            pp_size_bytes += BYTES_PER_SHORT
+            pp_size_bytes += BYTES_PER_SHORT * n_connections
         pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
 
         return fp_size_words + pp_size_words

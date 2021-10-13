@@ -306,7 +306,7 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
-    log_debug("Adding post-synaptic event to trace at time:%u", time);
+    log_debug("Adding post-synaptic event to trace %u at time:%u", neuron_index, time);
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
@@ -346,7 +346,7 @@ static inline neuromodulated_synapse_t process_plastic_synapse(
 	// Add weight to ring-buffer entry
 	synapse_dynamics_stdp_update_ring_buffers(ring_buffers, s, final_state.weight);
 
-	return get_nm_final_synaptic_word(final_state);
+    return get_nm_final_synaptic_word(final_state);
 }
 
 static inline void process_neuromodulation(
@@ -389,11 +389,12 @@ static inline void process_neuromodulation(
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time) {
+        weight_t *ring_buffers, uint32_t time, bool *write_back) {
 
     // If the flag is set, this is neuromodulation
     if (plastic_region_address->neuromodulation.is_neuromodulation) {
         process_neuromodulation(plastic_region_address, fixed_region, time);
+        *write_back = false;
         return true;
     }
 
@@ -426,6 +427,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 plastic_words[0]);
         plastic_words++;
     }
+    *write_back = true;
     return true;
 }
 

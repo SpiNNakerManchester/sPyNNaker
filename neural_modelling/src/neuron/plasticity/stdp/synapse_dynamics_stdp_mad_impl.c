@@ -177,7 +177,7 @@ static inline plastic_synapse_t process_plastic_synapse(
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time) {
+        weight_t *ring_buffers, uint32_t time, bool *write_back) {
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = plastic_region_address->synapses;
@@ -207,6 +207,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 plastic_words[0]);
         plastic_words++;
     }
+    *write_back = true;
     return true;
 }
 

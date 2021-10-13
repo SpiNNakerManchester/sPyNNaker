@@ -137,7 +137,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # It is assumed that all connections have the same synapse type
         is_reward = 0
         synapse_type = 0
-        if connections:
+        if len(connections) > 0:
             synapse_type = connections[0]["synapse_type"]
             is_reward = synapse_type == NEUROMODULATION_TARGETS["reward"]
         flags = 0x80000000 | (int(is_reward) << 30) | synapse_type
