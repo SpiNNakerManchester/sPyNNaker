@@ -46,10 +46,12 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         "__tau_c",
         "__tau_d",
         "__tau_c_data",
-        "__tau_d_data"]
+        "__tau_d_data",
+        "__w_min",
+        "__w_max"]
 
     def __init__(self, weight=StaticSynapse.default_parameters['weight'],
-                 tau_c=1000.0, tau_d=200.0):
+                 tau_c=1000.0, tau_d=200.0, w_min=0.0, w_max=1.0):
         self.__weight = weight
         self.__tau_c = tau_c
         self.__tau_d = tau_d
@@ -58,6 +60,12 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
             ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
         self.__tau_d_data = get_exp_lut_array(
             ts, self.__tau_d, shift=LOOKUP_TAU_D_SHIFT)
+        self.__w_min = w_min
+        self.__w_max = w_max
+
+        if w_min < 0 or w_max < 0:
+            raise SynapticConfigurationException(
+                "Minimum and maximum weights must be >= 0")
 
     @property
     def tau_c(self):
@@ -66,6 +74,14 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @property
     def tau_d(self):
         return self.__tau_d
+
+    @property
+    def w_min(self):
+        return self.__w_min
+
+    @property
+    def w_max(self):
+        return self.__w_max
 
     @overrides(AbstractPlasticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
@@ -82,7 +98,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         return False
 
     def is_neuromodulation_same_as(self, other):
-        return self.__tau_c == other.tau_c and self.__tau_d == other.tau_d
+        return (self.__tau_c == other.tau_c and self.__tau_d == other.tau_d and
+                self.__w_min == other.w_min and self.__w_max == other.w_max)
 
     @overrides(AbstractPlasticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
@@ -91,7 +108,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics
                .get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        size = BYTES_PER_WORD
+        size = BYTES_PER_WORD * 3
         size += BYTES_PER_WORD * len(self.__tau_c_data)
         size += BYTES_PER_WORD * len(self.__tau_d_data)
         return size
@@ -104,6 +121,12 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         weight_update_component = \
             1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
         spec.write_value(data=weight_update_component,
+                         data_type=DataType.S1615)
+
+        # Write min and max weight
+        spec.write_value(data=self.__w_max * global_weight_scale,
+                         data_type=DataType.S1615)
+        spec.write_value(data=self.__w_min * global_weight_scale,
                          data_type=DataType.S1615)
 
         # Write the LUT arrays

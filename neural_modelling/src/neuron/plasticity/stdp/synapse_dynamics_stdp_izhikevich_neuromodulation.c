@@ -56,7 +56,20 @@ struct synapse_row_plastic_data_t {
     };
 };
 
-static accum weight_update_constant_component;
+typedef struct nm_params_t {
+
+    //! Constant part of weight update
+    accum weight_update_constant_component;
+
+    //! Maximum of weight after update
+    accum max_weight;
+
+    //! Minimum of weight after update (must be >= 0)
+    accum min_weight;
+
+} nm_params_t;
+
+static nm_params_t nm_params;
 
 static int16_lut *tau_c_lookup;
 
@@ -83,6 +96,8 @@ static inline nm_update_state_t get_nm_update_state(
 
 static inline nm_final_state_t get_nm_final_state(
         nm_update_state_t update_state) {
+    update_state.weight = MAX(update_state.weight, nm_params.min_weight);
+    update_state.weight = MIN(update_state.weight, nm_params.max_weight);
     nm_final_state_t final_state = {
         .weight=(weight_t) (bitsk(update_state.weight) >> update_state.weight_shift),
         .final_state=synapse_structure_get_final_state(
@@ -141,7 +156,8 @@ static inline accum get_weight_update(int16_t decay_eligibility_trace,
     // Constant component = 1 / -((1/tau_C) + (1/tau_D))
     // const_component.C_ij.D_c.
     //        (exp(-(t_j - t_c) / tau_C).exp(-(t_j - t_c) / tau_D) - 1)
-    return mul_trace_decay * weight_update_constant_component;
+    accum res =  mul_trace_decay * nm_params.weight_update_constant_component;
+    return res;
 }
 
 //---------------------------------------
@@ -268,11 +284,16 @@ bool synapse_dynamics_initialise(
         return false;
     }
 
-    // Read Izhikevich weight update equation constant component
-    weight_update_constant_component = kbits(address[0]);
+    // Load parameters
+    nm_params_t *sdram_params = (nm_params_t *) address;
+    spin1_memcpy(&nm_params, sdram_params, sizeof(nm_params_t));
+
+    log_info("Constant %k, min weight %k, max weight %k",
+            nm_params.weight_update_constant_component,
+            nm_params.min_weight, nm_params.max_weight);
 
     // Read lookup tables
-    address_t lut_address = &address[1];
+    address_t lut_address = (void *) &sdram_params[1];
     tau_c_lookup = maths_copy_int16_lut(&lut_address);
     tau_d_lookup = maths_copy_int16_lut(&lut_address);
 
@@ -284,6 +305,7 @@ bool synapse_dynamics_initialise(
     }
     for (uint32_t s = 0; s < n_synapse_types; s++) {
         nm_weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
+        log_info("Weight shift %u = %u", s, nm_weight_shift[s]);
     }
 
     return true;
