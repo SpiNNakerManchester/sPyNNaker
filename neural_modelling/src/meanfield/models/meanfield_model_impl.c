@@ -76,7 +76,8 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
     REAL Erfc = mathsbox->err_func;
     for(t=0; t==x; t+=dt){
         //Erfc += dt; //test otherwise IDTM overload
-        Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one
+        //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one
+        Erfc +=  factor*expk(-(t*t)); 
         //Erfc += factor+t*t;//fake one
     }
 
