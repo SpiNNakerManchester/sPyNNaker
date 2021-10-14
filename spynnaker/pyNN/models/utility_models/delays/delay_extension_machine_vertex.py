@@ -21,10 +21,9 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
@@ -123,59 +122,83 @@ class DelayExtensionMachineVertex(
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        # translate into provenance data items
-        yield ProvenanceDataItem(
-            names + [self.COUNT_SATURATION_NAME],
-            n_sat, (n_sat != 0),
-            f"The delay extension {label} has dropped {n_sat} packets because "
-            "during certain time steps a neuron was asked to spike more than "
-            "256 times. This causes a saturation on the count tracker which "
-            "is a uint8. Reduce the packet rates, or modify the delay "
-            "extension to have larger counters.")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_NEURON_ID_COUNT_NAME],
-            n_bad_neuron, (n_bad_neuron != 0),
-            f"The delay extension {label} has dropped {n_bad_neuron} packets "
-            "because their neuron id was not valid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_KEY_COUNT_NAME],
-            n_bad_keys, (n_bad_keys != 0),
-            f"The delay extension {label} has dropped {n_bad_keys} packets "
-            "due to the packet key being invalid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_RECEIVED_NAME], n_received)
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_PROCESSED_NAME],
-            n_processed, (n_received != n_processed),
-            f"The delay extension {label} only processed {n_processed} of "
-            f"{n_received} received packets.  This could indicate a fault.")
-        yield ProvenanceDataItem(
-            names + [self.MISMATCH_ADDED_FROM_PROCESSED_NAME],
-            n_added, (n_added != n_processed),
-            f"The delay extension {label} only added {n_added} of "
-            f"{n_processed} processed packets.  This could indicate a "
-            "routing or filtering fault")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_SENT_NAME], n_sent)
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_LOST_NAME],
-            n_overflows, (n_overflows > 0),
-            f"The input buffer for {label} lost packets on {n_overflows} "
-            "occasions. This is often a sign that the system is running "
-            "too quickly for the number of neurons per core.  Please "
-            "increase the timer_tic or time_scale_factor or decrease the "
-            "number of neurons per core.")
-        yield ProvenanceDataItem(
-            names + [self.DELAYED_FOR_TRAFFIC_NAME], n_delays)
-        yield self._app_vertex.get_tdma_provenance_item(
-            names, label, n_tdma_behind)
+        if n_sat != 0:
+            n_sat_message = (
+                f"The delay extension {label} has dropped {n_sat} packets "
+                f"because during certain time steps a neuron was asked to "
+                f"spike more than 256 times. This causes a saturation on the "
+                f"count tracker which is a uint8. "
+                f"Reduce the packet rates, or modify the delay extension to "
+                f"have larger counters.")
+        else:
+            n_sat_message = None
+
+        if n_bad_neuron != 0:
+            neuron_message = (
+                f"The delay extension {label} has dropped {n_bad_neuron} "
+                f"packets because their neuron id was not valid. "
+                f"This is likely a routing issue. Please fix and try again")
+        else:
+            neuron_message = None
+
+        if n_bad_keys != 0:
+            key_message = (
+                f"The delay extension {label} has dropped {n_bad_keys} "
+                f"packets due to the packet key being invalid. "
+                f"This is likely a routing issue. Please fix and try again")
+        else:
+            key_message = None
+
+        if n_received != n_processed:
+            processed_message = (
+                f"The delay extension {label} only processed {n_processed} "
+                f"of {n_received} received packets.  "
+                f"This could indicate a fault.")
+        else:
+            processed_message = None
+
+        if n_added != n_processed:
+            added_message = (
+                f"The delay extension {label} only added {n_added} of "
+                f"{n_processed} processed packets.  This could indicate a "
+                "routing or filtering fault")
+        else:
+            added_message = None
+
+        if n_overflows > 0:
+            overflow_message = (
+                f"The input buffer for {label} lost packets on {n_overflows} "
+                "occasions. This is often a sign that the system is running "
+                "too quickly for the number of neurons per core.  Please "
+                "increase the timer_tic or time_scale_factor or decrease the "
+                "number of neurons per core.")
+        else:
+            overflow_message = None
+
+        # translate and save provenance items
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.COUNT_SATURATION_NAME, n_sat, n_sat_message)
+            db.insert_core(
+                x, y, p, self.INVALID_NEURON_ID_COUNT_NAME,
+                n_bad_neuron, neuron_message)
+            db.insert_core(
+                x, y, p, self.INVALID_KEY_COUNT_NAME, n_bad_keys, key_message)
+            db.insert_core(x, y, p, self.N_PACKETS_RECEIVED_NAME, n_received)
+            db.insert_core(x, y, p. self.N_PACKETS_PROCESSED_NAME,
+                           n_processed, processed_message)
+            db.insert_core(x, y, p. self.MISMATCH_ADDED_FROM_PROCESSED_NAME,
+                n_added, added_message)
+            db.insert_core(x, y, p.self.N_PACKETS_SENT_NAME, n_sent)
+            db.insert_core(x, y, p. self.INPUT_BUFFER_LOST_NAME,
+                n_overflows, overflow_message)
+            db.insert_core(x, y, p.self.DELAYED_FOR_TRAFFIC_NAME, n_delays)
+            self._app_vertex.get_tdma_provenance_item(x, y, p, label, n_tdma_behind)
 
         late_message = (
             f"On {label}, {n_late_spikes} packets were dropped from the "

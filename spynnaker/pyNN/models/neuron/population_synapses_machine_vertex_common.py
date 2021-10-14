@@ -249,19 +249,21 @@ class PopulationSynapsesMachineVertexCommon(
             "Unknown post vertex type in edge {}".format(sdram_machine_edge))
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         proc_offset = SynapseProvenance.N_ITEMS
         yield from self._parse_synapse_provenance(
-            label, names, provenance_data[:proc_offset])
+            label, x, y, p, provenance_data[:proc_offset])
         yield from self._parse_spike_processing_fast_provenance(
-            label, names, provenance_data[proc_offset:])
+            label, x, y, p, provenance_data[proc_offset:])
 
     @abstractmethod
-    def _parse_synapse_provenance(self, label, names, provenance_data):
+    def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
         """ Extract and yield synapse provenance
 
         :param str label: The label of the node
-        :param list(str) names: The hierarchy of names for the provenance data
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
         :return: a list of provenance data items
         :rtype: iterator of ProvenanceDataItem
