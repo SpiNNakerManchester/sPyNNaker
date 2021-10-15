@@ -72,13 +72,14 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
 
     REAL dt = x/mathsbox->error_func_sample;
     REAL t;
-    REAL Pi = 3.1415927k;
+    //REAL Pi = 3.1415927;// here was a k
+    REAL two_over_sqrt_Pi = 1.128379167; //APPROXIMATION
     REAL Erfc = mathsbox->err_func;
     for(t=0; t==x; t+=dt){
         //Erfc += dt; //test otherwise ITCM overload
         //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
-        Erfc +=  factor*expk(-(t*t)); //working like this one
-        //Erfc += factor+t*t;//fake one
+        Erfc +=  factor*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
+        //Erfc += factor+t*t;//fake one working
     }
 
     mathsbox->err_func = Erfc;
@@ -117,7 +118,7 @@ void threshold_func(config_t *restrict config)
     */
 
     //        + 0.\ //P4*np.log(muGn)
-    /*
+    
     config->Vthre = config->P0\
         + config->P1*(config->muV-config->muV0)/config->DmuV0\
         + config->P2*(config->sV-config->sV0)/config->DsV0\
@@ -128,18 +129,13 @@ void threshold_func(config_t *restrict config)
         + config->P8*(config->muV-config->muV0)/config->DmuV0*(config->sV-config->sV0)/config->DsV0\
         + config->P9*(config->muV-config->muV0)/config->DmuV0*(config->TvN-config->TvN0)/config->DTvN0\
         + config->P10*(config->sV-config->sV0)/config->DsV0*(config->TvN-config->TvN0)/config->DTvN0;
-        */
 
-    config->Vthre = config->P0;
-
-    //return config->Vthre;
+    //config->Vthre = config->P0;
 
     }
 
 /*
-    REAL ONE get_fluct_regime_varsup
-*/
-/*
+//    REAL ONE get_fluct_regime_varsup
 void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 {
     //takes 880 bytes overflowed ITCM
@@ -198,6 +194,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 
     //return params->muV;//, sV+1e-12, muGn, TvN
 }
+//END of the REAL get_fluct_regime_varsup
 */
 
 
@@ -262,7 +259,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     //return params->muV;//, sV+1e-12, muGn, TvN
 }
 
-//END of the get_fluct_regime_varsup FAKE
+//END of the FAKE get_fluct_regime_varsup 
 
 
 
