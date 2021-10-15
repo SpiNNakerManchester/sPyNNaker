@@ -100,33 +100,33 @@ void threshold_func(config_t *restrict config)
         but not for now
     */
    
-    muV0 = config->muV0;//=-0.06;
-    DmuV0 = config->DmuV0;//=0.01;
+    REAL muV0 = config->muV0;//=-0.06;
+    REAL DmuV0 = config->DmuV0;//=0.01;
 
-    sV0 = config->sV0;//=0.004;
-    DsV0 = config->DsV0;//=0.006;
+    REAL sV0 = config->sV0;//=0.004;
+    REAL DsV0 = config->DsV0;//=0.006;
 
-    TvN0 = config->TvN0;//=0.5;
-    DTvN0 = config->DTvN0;//=1.;
+    REAL TvN0 = config->TvN0;//=0.5;
+    REAL DTvN0 = config->DTvN0;//=1.;
 
-    muV = config->muV;//=0.;
-    sV = config->sV;//=0.;
-    muGn = config->muGn;//=0.;
-    TvN = config->TvN;//=0.;
-    Vthre = config->Vthre;//=0.;
-    Fout_th = config->Fout_th;//=0.;
+    REAL muV = config->muV;//=0.;
+    REAL sV = config->sV;//=0.;
+    //REAL muGn = config->muGn;//=0.;
+    REAL TvN = config->TvN;//=0.;
+    REAL Vthre = config->Vthre;//=0.;
+    //REAL Fout_th = config->Fout_th;//=0.;
     
-    P0 = config->P0;
-    P1 = config->P1;
-    P2 = config->P2;
-    P3 = config->P3;
-    P4 = config->P4;
-    P5 = config->P5;
-    P6 = config->P6;
-    P7 = config->P7;
-    P8 = config->P8;
-    P9 = config->P9;
-    P10 = config->P10;
+    REAL P0 = config->P0;
+    REAL P1 = config->P1;
+    REAL P2 = config->P2;
+    REAL P3 = config->P3;
+    //REAL P4 = config->P4;
+    REAL P5 = config->P5;
+    REAL P6 = config->P6;
+    REAL P7 = config->P7;
+    REAL P8 = config->P8;
+    REAL P9 = config->P9;
+    REAL P10 = config->P10;
     
         
     
@@ -140,11 +140,11 @@ void threshold_func(config_t *restrict config)
         + P5*((muV-muV0)/DmuV0)*((muV-muV0)/DmuV0)\
         + P6*((sV-sV0)/DsV0)*((sV-sV0)/DsV0)\
         + P7*((TvN-TvN0)/DTvN0)*((TvN-TvN0)/DTvN0)\
-        + P8*(muV-muV0)/DmuV0*(sV-sV0)/DsV0\
-        + P9*(muV-muV0)/DmuV0*(TvN-TvN0)/DTvN0\
-        + P10*(sV-sV0)/DsV0*(TvN-TvN0)/DTvN0;
+        + P8*((muV-muV0)/DmuV0)*((sV-sV0)/DsV0)\
+        + P9*((muV-muV0)/DmuV0)*((TvN-TvN0)/DTvN0)\
+        + P10*((sV-sV0)/DsV0)*((TvN-TvN0)/DTvN0);
 
-    //config->Vthre = config->P0;
+    config->Vthre = Vthre;
 
     }
 
