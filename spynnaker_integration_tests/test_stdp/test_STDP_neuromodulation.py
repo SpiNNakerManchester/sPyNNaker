@@ -114,7 +114,7 @@ class TestSTDPNeuromodulation(BaseTestCase):
             reward_pop, post_pop,
             sim.AllToAllConnector(),
             synapse_type=sim.extra_models.Neuromodulation(
-                weight=DA_concentration, tau_c=tau_c, tau_d=tau_d),
+                weight=DA_concentration, tau_c=tau_c, tau_d=tau_d, w_max=20.0),
             receptor_type='reward', label='reward synapses')
 
         sim.run(duration)
