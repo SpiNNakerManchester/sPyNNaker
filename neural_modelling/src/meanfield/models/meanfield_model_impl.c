@@ -99,36 +99,50 @@ void threshold_func(config_t *restrict config)
     /*NEED TO AVOID DIVISION AS POSSIBLE
         but not for now
     */
-    /*
-    config->muV0=-0.06;
-    config->DmuV0=0.01;
+   
+    muV0 = config->muV0;//=-0.06;
+    DmuV0 = config->DmuV0;//=0.01;
 
-    config->sV0=0.004;
-    config->DsV0=0.006;
+    sV0 = config->sV0;//=0.004;
+    DsV0 = config->DsV0;//=0.006;
 
-    config->TvN0=0.5;
-    config->DTvN0=1.;
+    TvN0 = config->TvN0;//=0.5;
+    DTvN0 = config->DTvN0;//=1.;
 
-    config->muV=0.;
-    config->sV=0.;
-    config->muGn=0.;
-    config->TvN=0.;
-    config->Vthre=0.;
-    config->Fout_th=0.;
-    */
+    muV = config->muV;//=0.;
+    sV = config->sV;//=0.;
+    muGn = config->muGn;//=0.;
+    TvN = config->TvN;//=0.;
+    Vthre = config->Vthre;//=0.;
+    Fout_th = config->Fout_th;//=0.;
+    
+    P0 = config->P0;
+    P1 = config->P1;
+    P2 = config->P2;
+    P3 = config->P3;
+    P4 = config->P4;
+    P5 = config->P5;
+    P6 = config->P6;
+    P7 = config->P7;
+    P8 = config->P8;
+    P9 = config->P9;
+    P10 = config->P10;
+    
+        
+    
 
     //        + 0.\ //P4*np.log(muGn)
     
-    config->Vthre = config->P0\
-        + config->P1*(config->muV-config->muV0)/config->DmuV0\
-        + config->P2*(config->sV-config->sV0)/config->DsV0\
-        + config->P3*(config->TvN-config->TvN0)/config->DTvN0\
-        + config->P5*((config->muV-config->muV0)/config->DmuV0)*((config->muV-config->muV0)/config->DmuV0)\
-        + config->P6*((config->sV-config->sV0)/config->DsV0)*((config->sV-config->sV0)/config->DsV0)\
-        + config->P7*((config->TvN-config->TvN0)/config->DTvN0)*((config->TvN-config->TvN0)/config->DTvN0)\
-        + config->P8*(config->muV-config->muV0)/config->DmuV0*(config->sV-config->sV0)/config->DsV0\
-        + config->P9*(config->muV-config->muV0)/config->DmuV0*(config->TvN-config->TvN0)/config->DTvN0\
-        + config->P10*(config->sV-config->sV0)/config->DsV0*(config->TvN-config->TvN0)/config->DTvN0;
+    Vthre = P0\
+        + P1*(muV-muV0)/DmuV0\
+        + P2*(sV-sV0)/DsV0\
+        + P3*(TvN-TvN0)/DTvN0\
+        + P5*((muV-muV0)/DmuV0)*((muV-muV0)/DmuV0)\
+        + P6*((sV-sV0)/DsV0)*((sV-sV0)/DsV0)\
+        + P7*((TvN-TvN0)/DTvN0)*((TvN-TvN0)/DTvN0)\
+        + P8*(muV-muV0)/DmuV0*(sV-sV0)/DsV0\
+        + P9*(muV-muV0)/DmuV0*(TvN-TvN0)/DTvN0\
+        + P10*(sV-sV0)/DsV0*(TvN-TvN0)/DTvN0;
 
     //config->Vthre = config->P0;
 
