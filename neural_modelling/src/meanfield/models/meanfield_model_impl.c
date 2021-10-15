@@ -148,7 +148,6 @@ void threshold_func(config_t *restrict config)
 
     }
 
-/*
 //    REAL ONE get_fluct_regime_varsup
 void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 {
@@ -182,22 +181,29 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     Ui = params->Qi/muG*(params->Ei-params->muV);
 
 
-   //PENSEZ a enlever autant de division que possible
+   /*
+   normalement sqrt((Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
+                 Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm)))
+   
+   doit trouver une bonne focntion pour faire sqrt ...
+   |->sqrtk() ne fonctionne pas
+    */
+                 
 
-    params->sV = sqrtk(Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
+    params->sV = (Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
                  Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm));
 
-    if (params->sV < 1e-8){
-        params->sV = 1e-8;
+    if (params->sV < ACS_DBL_TINY){
+        params->sV = ACS_DBL_TINY;
     }
 
-    if (Fe<1e-9)//just to insure a non zero division,
+    if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
     {
-        Fe += 1e-9;
+        Fe += ACS_DBL_TINY;
     }
-    else if (Fi<1e-9)
+    else if (Fi<ACS_DBL_TINY)
     {
-        Fi += 1e-9;
+        Fi += ACS_DBL_TINY;
     }
 
     Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) + Fi*(params->Ti*Ui)*(params->Ti*Ui))\
@@ -209,9 +215,8 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     //return params->muV;//, sV+1e-12, muGn, TvN
 }
 //END of the REAL get_fluct_regime_varsup
-*/
 
-
+/*
 // FAKE ONE get_fluct_regime_varsup
 //where all division are removed
 
@@ -273,7 +278,8 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     //return params->muV;//, sV+1e-12, muGn, TvN
 }
 
-//END of the FAKE get_fluct_regime_varsup 
+//END of the FAKE get_fluct_regime_varsup
+*/
 
 
 
@@ -303,8 +309,14 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
         config->sV = REAL_CONST(1e-4);
     }
 
-    limit = 10;//REAL_HALF(config->Gl/(config->TvN * config->Cm));
-    argument = config->Vthre;//(config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
+    limit = 0.5*(config->Gl/(config->TvN * config->Cm));
+    /*
+    normalement sqrt:
+        argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
+
+    */
+    
+    argument = (config->Vthre - config->muV)/(REAL_CONST(2.))/config->sV;
 
 //    config->Fout_th = error_function(factor, argument, mathsbox);
     error_function(limit, argument, mathsbox);
@@ -325,8 +337,8 @@ on the user computer before send it to the DTCM.
 */
     REAL lastVe = meanfield->Ve;
     REAL T_inv = meanfield->Timescale_inv;
-    //TF(lastVe,1.,meanfield, config, mathsbox);
-    REAL lastTF = ONE; //config->Fout_th;
+    TF(lastVe,1.,meanfield, config, mathsbox);
+    REAL lastTF = config->Fout_th;
 
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
