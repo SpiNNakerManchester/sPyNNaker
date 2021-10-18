@@ -48,7 +48,7 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     ]
 
     # _RECORDABLES = ["Ve", "gsyn_exc", "gsyn_inh"]
-    _RECORDABLES = ["Ve", "muV", "sV", "muGn", "TvN", "Vthre",
+    _RECORDABLES = ["Ve", "Vi", "sV", "muGn", "TvN", "Vthre",
                     "Fout_th", "err_func",  "gsyn_exc", "gsyn_inh"]
 
     # _RECORDABLE_DATA_TYPES = {
@@ -58,7 +58,7 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     # }
     _RECORDABLE_DATA_TYPES = {
         "Ve": DataType.S1615,
-        "muV": DataType.S1615,
+        "Vi": DataType.S1615,
         "sV": DataType.S1615,
         "muGn": DataType.S1615,
         "TvN": DataType.S1615,
@@ -76,7 +76,7 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     # }
     _RECORDABLE_UNITS = {
         'Ve': 'mV',
-        'muV': "uS",
+        'Vi': "mV",
         'sV': "uS",
         'TvN': 'mV',
         'Vthre': "uS",

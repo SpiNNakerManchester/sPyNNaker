@@ -70,7 +70,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
     """
 
     # noinspection PyPep8Naming
-    @default_initial_values({"Ve", "muV", "sV", "muGn", "TvN", "Vthre",
+    @default_initial_values({"Ve", "Vi", "sV", "muGn", "TvN", "Vthre",
                              "Fout_th", "err_func", "isyn_exc", "isyn_inh"})
     def __init__(self,
                  nbr=1,
@@ -83,6 +83,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  ampnoise=0.0,
                  Timescale_inv=0.5,
                  Ve=0.,
+                 Vi=0.1,
 
                  pconnec=0.05,
                  q_exc=1.5,
@@ -142,7 +143,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = MeanfieldModelEitn(nbr, a, b, tauw, Trefrac,
                                           Vreset, delta_v, ampnoise,
-                                          Timescale_inv, Ve)
+                                          Timescale_inv, Ve, Vi)
         config = Config(pconnec, q_exc, q_inh,
                         Tsyn_exc, Tsyn_inh,
                         Erev_exc, Erev_inh,

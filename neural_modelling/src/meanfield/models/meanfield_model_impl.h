@@ -40,7 +40,7 @@ typedef struct meanfield_t {
     REAL Timescale_inv;
     
     REAL Ve; // will be used as a vector !!! OR Ve and Vi
-    //REAL Vi;
+    REAL Vi;
     
     //vector V = {Ve, Vi};
     
