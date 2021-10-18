@@ -74,7 +74,9 @@ class ConnectorsTest(BaseTestCase):
         counts = self.calc_spikes_received(v)
 
         expected = numpy.zeros([SOURCES, n_destinations])
-        for (src, dest, _) in weights:
+        for weight in weights:
+            src = weight[0]
+            dest = weight[1]
             expected[src][dest] += 1
         the_max = max(map(max, counts))
         if not numpy.array_equal(expected, counts):
@@ -237,8 +239,8 @@ class ConnectorsTest(BaseTestCase):
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
         sim.end()
-        target = [(1, 2, 0.5, 2.), (2, 3, 0.5, 2.)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[1, 2, 0.5, 2.], [2, 3, 0.5, 2.]]
+        self.assertCountEqual(weights, target)
 
     def test_onetoone_population_views(self):
         self.runsafe(self.onetoone_population_views)
@@ -259,9 +261,9 @@ class ConnectorsTest(BaseTestCase):
             edge.label == 'machine_edge_for_test')]
         sim.end()
         # Check the connections are correct
-        target = [(6, 9, 0.5, 2.), (7, 10, 0.5, 2.), (8, 11, 0.5, 2.),
-                  (9, 12, 0.5, 2.), (10, 13, 0.5, 2.), (11, 14, 0.5, 2.)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[6, 9, 0.5, 2.], [7, 10, 0.5, 2.], [8, 11, 0.5, 2.],
+                  [9, 12, 0.5, 2.], [10, 13, 0.5, 2.], [11, 14, 0.5, 2.]]
+        self.assertCountEqual(weights, target)
         # In this instance there should be three MachineEdges: one of the four
         # possible at the start should have been filtered out
         self.assertEqual(len(projection_edges), 3)
@@ -278,8 +280,8 @@ class ConnectorsTest(BaseTestCase):
         weights = conn.get(['weight', 'delay'], 'list')
         sim.end()
         # The fixed seed means this gives the same answer each time
-        target = [(1, 3, 0.5, 2.), (2, 2, 0.5, 2.), (2, 3, 0.5, 2)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[1, 3, 0.5, 2.], [2, 2, 0.5, 2.], [2, 3, 0.5, 2]]
+        self.assertCountEqual(weights, target)
 
     def test_fixedprob_population_views(self):
         self.runsafe(self.fixedprob_population_views)
@@ -296,9 +298,9 @@ class ConnectorsTest(BaseTestCase):
         weights = conn.get(['weight', 'delay'], 'list')
         sim.end()
         # The fixed seed means this gives the same answer each time
-        target = [(1, 1, 0.5, 2.0), (1, 2, 0.5, 2.0), (1, 3, 0.5, 2.0),
-                  (2, 1, 0.5, 2.0), (2, 2, 0.5, 2.0), (2, 3, 0.5, 2.0)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[1, 1, 0.5, 2.0], [1, 2, 0.5, 2.0], [1, 3, 0.5, 2.0],
+                  [2, 1, 0.5, 2.0], [2, 2, 0.5, 2.0], [2, 3, 0.5, 2.0]]
+        self.assertCountEqual(weights, target)
 
     def test_fixedpre_population_views(self):
         self.runsafe(self.fixedpre_population_views)
@@ -315,9 +317,9 @@ class ConnectorsTest(BaseTestCase):
         weights = conn.get(['weight', 'delay'], 'list')
         sim.end()
         # The fixed seed means this gives the same answer each time
-        target = [(0, 1, 0.5, 2.0), (0, 3, 0.5, 2.0), (1, 1, 0.5, 2.0),
-                  (1, 3, 0.5, 2.0), (2, 1, 0.5, 2.0), (2, 2, 0.5, 2.0)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[0, 1, 0.5, 2.0], [0, 3, 0.5, 2.0], [1, 1, 0.5, 2.0],
+                  [1, 3, 0.5, 2.0], [2, 1, 0.5, 2.0], [2, 2, 0.5, 2.0]]
+        self.assertCountEqual(weights, target)
 
     def test_fixedpost_population_views(self):
         self.runsafe(self.fixedpost_population_views)
@@ -341,14 +343,14 @@ class ConnectorsTest(BaseTestCase):
         weights2 = conn2.get(['weight', 'delay'], 'list')
         sim.end()
         # The fixed seed means this gives the same answer each time
-        target = [(0, 2, 0.5, 2.0), (0, 3, 0.5, 2.0), (1, 1, 0.5, 2.0),
-                  (1, 3, 0.5, 2.0), (2, 1, 0.5, 2.0)]
-        target2 = [(0, 2, 0.5, 2.0), (0, 2, 0.5, 2.0), (1, 1, 0.5, 2.0),
-                   (2, 2, 0.5, 2.0), (2, 3, 0.5, 2.0)]
-        self.assertEqual(weights.tolist(), target)
-        self.assertEqual(len(weights.tolist()), n_conns)
-        self.assertEqual(weights2.tolist(), target2)
-        self.assertEqual(len(weights2.tolist()), n_conns)
+        target = [[0, 2, 0.5, 2.0], [0, 3, 0.5, 2.0], [1, 1, 0.5, 2.0],
+                  [1, 3, 0.5, 2.0], [2, 1, 0.5, 2.0]]
+        target2 = [[0, 2, 0.5, 2.0], [0, 2, 0.5, 2.0], [1, 1, 0.5, 2.0],
+                   [2, 2, 0.5, 2.0], [2, 3, 0.5, 2.0]]
+        self.assertCountEqual(weights, target)
+        self.assertEqual(len(weights), n_conns)
+        self.assertCountEqual(weights2, target2)
+        self.assertEqual(len(weights2), n_conns)
 
     def test_fixedtotal_population_views(self):
         self.runsafe(self.fixedtotal_population_views)
