@@ -169,6 +169,10 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     muGi = params->Qi*params->Ti*Vi;
 
     muG = params->Gl+muGe+muGi;
+    
+    if (muG < ACS_DBL_TINY){
+        muG = ACS_DBL_TINY;
+    }
 
     params->muV = (muGe*params->Ee+muGi*params->Ei+params->Gl*params->El)/muG;
 
@@ -194,7 +198,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
                  Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm));
 
     if (params->sV < ACS_DBL_TINY){
-        params->sV = ACS_DBL_TINY;
+        params->sV += ACS_DBL_TINY;
     }
 
     if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
@@ -205,7 +209,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     {
         Fi += ACS_DBL_TINY;
     }
-
+    
     Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) + Fi*(params->Ti*Ui)*(params->Ti*Ui))\
         /(Fe*(Ue*params->Te)*(Ue*params->Te)/(params->Te+Tm)\
           + Fi*(params->Ti*Ui)*(params->Ti*Ui)/(params->Ti+Tm));
@@ -239,8 +243,8 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     get_fluct_regime_varsup(Ve, Vi, config);
     threshold_func(config);
 
-    if (config->sV<REAL_CONST(1e-4)){
-        config->sV = REAL_CONST(1e-4);
+    if (config->sV<ACS_DBL_TINY){
+        config->sV = ACS_DBL_TINY;
     }
 
     limit = 0.5*(config->Gl/(config->TvN * config->Cm));
@@ -254,6 +258,8 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
 
 //    config->Fout_th = error_function(factor, argument, mathsbox);
     error_function(limit, argument, mathsbox);
+    //config->Fout_th = (0.5*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN) ; REAL ONE
+    config->Fout_th = mathsbox->err_func ; //TEST
 
 
     if (config->Fout_th < ACS_DBL_TINY){
@@ -270,10 +276,16 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
 on the user computer before send it to the DTCM.
 */
     REAL lastVe = meanfield->Ve;
+    REAL lastVi = meanfield->Vi;
+    
+    if (lastVi < ACS_DBL_TINY){
+        lastVi = ACS_DBL_TINY;
+    }
+    
     REAL T_inv = meanfield->Timescale_inv;
-    TF(lastVe,1.,meanfield, config, mathsbox);
+    TF(lastVe, lastVi, meanfield, config, mathsbox);
     REAL lastTF = config->Fout_th;
-
+    
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
 
@@ -283,8 +295,15 @@ on the user computer before send it to the DTCM.
         *(REAL_CONST(2.0)-h)*h;
         */
 
-    meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
+    meanfield->Ve += lastVe \
+        + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
+    
+    meanfield->Vi += lastVi \
+        + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h);
+    meanfield->Vi =  meanfield->Vi * T_inv;
+    
+    
 }
 
 
@@ -383,11 +402,11 @@ state_t meanfield_model_get_firing_rate(const meanfield_t *meanfield) {
 
 void meanfield_model_print_state_variables(const meanfield_t *meanfield) {
     log_debug("Ve = %11.4k ", meanfield->Ve);
-    //log_debug("U = %11.4k ", meanfield->Vi);
+    log_debug("Vi = %11.4k ", meanfield->Vi);
 }
 
 void meanfield_model_print_parameters(const meanfield_t *meanfield) {
-    log_debug("Ve = %11.4k ", meanfield->Ve);
+    //log_debug("Ve = %11.4k ", meanfield->Ve);
     //log_debug("Vi = %11.4k ", meanfield->Vi);
     //log_debug("B = %11.4k ", neuron->B);
     //log_debug("C = %11.4k ", neuron->C);
