@@ -461,7 +461,7 @@ $(function() {
 <div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160; </div>
 <div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;    <span class="comment">// Get the address this core&#39;s DTCM data starts at from SRAM</span></div>
 <div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> *ds_regions =</div>
-<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a0b38bdde71cd69fa12ae7261036ea58d">data_specification_get_data_address</a>();</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a>();</div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160; </div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    <span class="comment">// Read the header</span></div>
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    <span class="keywordflow">if</span> (!<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#acfeb7a17f6fd55f4fde96be91a8a4b0a">data_specification_read_header</a>(ds_regions)) {</div>
@@ -552,7 +552,7 @@ $(function() {
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html#addbda0e729aa7007221fce996022659e">recording_reset</a>();</div>
 <div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160; </div>
 <div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> *ds_regions =</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a0b38bdde71cd69fa12ae7261036ea58d">data_specification_get_data_address</a>();</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a>();</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160; </div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="comment">// Setup regions that specify spike source array data</span></div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b">read_global_parameters</a>(</div>
@@ -589,7 +589,7 @@ $(function() {
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160; </div>
 <div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <span class="comment">// Get the address this core&#39;s DTCM data starts at from SRAM</span></div>
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;    <a class="code" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a> *sdram_globals = data_specification_get_region(</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de">POISSON_PARAMS</a>, <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a0b38bdde71cd69fa12ae7261036ea58d">data_specification_get_data_address</a>());</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de">POISSON_PARAMS</a>, <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a>());</div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160; </div>
 <div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    <span class="comment">// Copy the global_parameters back to SDRAM</span></div>
 <div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(sdram_globals, &amp;<a class="code" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a>, <span class="keyword">sizeof</span>(<a class="code" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a>));</div>
@@ -849,7 +849,7 @@ $(function() {
 <div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
 <div class="ttc" id="adata__specification_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a></div></div>
 <div class="ttc" id="adata__specification_8h_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a></div></div>
-<div class="ttc" id="adata__specification_8h_html_a0b38bdde71cd69fa12ae7261036ea58d"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a0b38bdde71cd69fa12ae7261036ea58d">data_specification_get_data_address</a></div><div class="ttdeci">data_specification_metadata_t * data_specification_get_data_address(void)</div></div>
+<div class="ttc" id="adata__specification_8h_html_a77cda8f0103039e98d16777000de889a"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a></div><div class="ttdeci">data_specification_metadata_t * data_specification_get_data_address(void)</div></div>
 <div class="ttc" id="adata__specification_8h_html_acfeb7a17f6fd55f4fde96be91a8a4b0a"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html#acfeb7a17f6fd55f4fde96be91a8a4b0a">data_specification_read_header</a></div><div class="ttdeci">bool data_specification_read_header(data_specification_metadata_t *ds_regions)</div></div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
@@ -1003,7 +1003,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Oct 5 2021 16:37:30 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Oct 18 2021 07:15:05 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
