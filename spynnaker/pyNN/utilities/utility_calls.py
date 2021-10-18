@@ -24,6 +24,7 @@ from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.safe_eval import SafeEval
+from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -45,7 +46,7 @@ N_RANDOM_NUMBERS = 4
 ARBITRARY_Y = 13031301
 MARS_C_MAX = 698769068
 
-FLOAT_GCD_TOLERANCE = 0.00001
+FLOAT_GCD_TOLERANCE = DataType.S1615.decode_from_int(1)
 
 STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
