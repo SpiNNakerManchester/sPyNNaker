@@ -104,9 +104,9 @@ class TestAllToAllConnector(BaseTestCase):
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
         sim.end()
-        target = [(1, 2, 0.5, 2.), (1, 3, 0.5, 2.), (2, 2, 0.5, 2.),
-                  (2, 3, 0.5, 2.)]
-        self.assertEqual(weights.tolist(), target)
+        target = [[1, 2, 0.5, 2.], [1, 3, 0.5, 2.], [2, 2, 0.5, 2.],
+                  [2, 3, 0.5, 2.]]
+        self.assertCountEqual(weights, target)
 
     def test_using_population_views(self):
         self.runsafe(self.using_population_views)
