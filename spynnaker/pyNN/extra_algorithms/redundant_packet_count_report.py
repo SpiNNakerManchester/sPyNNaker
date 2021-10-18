@@ -26,14 +26,14 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 REDUNDANCY_BY_CORE = (
     "CREATE VIEW IF NOT EXISTS redundancy_by_core AS "
-    "SELECT pro.x, pro.y, pro.p, source, "
+    "SELECT pro.x, pro.y, pro.p, core_name, "
        "received, filtered, invalid, failed, " 
        "filtered + invalid + failed AS redunant, " 
        "filtered + invalid + failed + received AS total, "
        "(filtered + invalid + failed) * 100.0 / " 
           "(filtered + invalid + failed + received) AS percent "
     "FROM" 
-        "(SELECT x, y, p, total as received, source "
+        "(SELECT x, y, p, total as received, core_name "
         "FROM core_stats_view "
         f"WHERE description = \"{PopulationMachineVertex.SPIKES_PROCESSED}\") "
         "AS pro "
