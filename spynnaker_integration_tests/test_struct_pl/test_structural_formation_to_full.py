@@ -60,13 +60,13 @@ class TestStructuralFormationToFull(BaseTestCase):
         conns, num_forms, num_elims, first_f = structural_formation_to_full()
         # Should have built all-to-all connectivity
         all_to_all_conns = [
-            (0, 0, 4., 3.), (0, 1, 4., 3.), (0, 2, 4., 3.), (0, 3, 4., 3.),
-            (1, 0, 4., 3.), (1, 1, 4., 3.), (1, 2, 4., 3.), (1, 3, 4., 3.),
-            (2, 0, 4., 3.), (2, 1, 4., 3.), (2, 2, 4., 3.), (2, 3, 4., 3.),
-            (3, 0, 4., 3.), (3, 1, 4., 3.), (3, 2, 4., 3.), (3, 3, 4., 3.)]
+            [0, 0, 4., 3.], [0, 1, 4., 3.], [0, 2, 4., 3.], [0, 3, 4., 3.],
+            [1, 0, 4., 3.], [1, 1, 4., 3.], [1, 2, 4., 3.], [1, 3, 4., 3.],
+            [2, 0, 4., 3.], [2, 1, 4., 3.], [2, 2, 4., 3.], [2, 3, 4., 3.],
+            [3, 0, 4., 3.], [3, 1, 4., 3.], [3, 2, 4., 3.], [3, 3, 4., 3.]]
         first_formation = "3_3_formation"
 
-        self.assertEqual(all_to_all_conns, conns.tolist())
+        self.assertCountEqual(all_to_all_conns, conns)
         self.assertEqual(len(conns), 16)
         self.assertEqual(num_forms, 16)
         self.assertEqual(num_elims, 0)
