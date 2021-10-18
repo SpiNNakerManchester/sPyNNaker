@@ -185,8 +185,8 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
    normalement sqrt((Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
                  Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm)))
    
-   doit trouver une bonne focntion pour faire sqrt ...
-   |->sqrtk() ne fonctionne pas
+   doit trouver une bonne fonction pour faire sqrt ...
+   |->sqrtk() ne fonctionne pas !!!
     */
                  
 
