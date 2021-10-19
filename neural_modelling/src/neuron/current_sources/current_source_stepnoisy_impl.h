@@ -182,6 +182,11 @@ static bool current_source_impl_initialise(address_t cs_address) {
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+static bool current_source_impl_load_parameters(address_t cs_address) {
+    return true;
+}
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 static REAL current_source_get_offset(uint32_t time, uint32_t neuron_index) {
 
     REAL current_offset = ZERO;

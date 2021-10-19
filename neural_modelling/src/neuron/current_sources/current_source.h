@@ -32,6 +32,8 @@
 //! \return True if successful
 static bool current_source_impl_initialise(address_t cs_address);
 
+static bool current_source_impl_load_parameters(address_t cs_address);
+
 static REAL current_source_get_offset(uint32_t time, uint32_t neuron_index);
 
 #endif // _CURRENT_SOURCE_H_

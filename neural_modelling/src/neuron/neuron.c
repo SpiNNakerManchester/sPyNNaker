@@ -86,9 +86,8 @@ bool neuron_resume(void) { // EXPORTED
         return false;
     }
 
-    // For now it is probably safest to re-initialise all current sources
-    // in case a new one has been added between runs
-    current_source_impl_initialise(current_source_address);
+    // (re)load the current source parameters
+    current_source_impl_load_parameters(current_source_address);
 
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters();
@@ -148,13 +147,18 @@ bool neuron_initialise(
         return false;
     }
 
-    // load the data into the allocated DTCM spaces.
+    // load the neuron data into the allocated DTCM spaces.
     if (!neuron_load_neuron_parameters()) {
         return false;
     }
 
     // Initialise for current sources
     if (!current_source_impl_initialise(cs_address)) {
+        return false;
+    }
+
+    // load the current source data into the allocated DTCM spaces
+    if (!current_source_impl_load_parameters(cs_address)) {
         return false;
     }
 
