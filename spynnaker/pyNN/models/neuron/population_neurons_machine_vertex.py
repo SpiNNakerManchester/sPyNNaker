@@ -171,7 +171,7 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
-        yield from self._parse_neuron_provenance(
+        self._parse_neuron_provenance(
             label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 
         neuron_prov = NeuronMainProvenance(
