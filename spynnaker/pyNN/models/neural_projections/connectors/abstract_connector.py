@@ -598,7 +598,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             db.insert_connector(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,
-                self.__class__.__name_, "Times_synaptic_delays_got_clipped",
+                self.__class__.__name__, "Times_synaptic_delays_got_clipped",
                 ncd, message),
 
     @property
