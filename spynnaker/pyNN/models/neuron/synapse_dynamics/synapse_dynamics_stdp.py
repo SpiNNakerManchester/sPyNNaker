@@ -465,13 +465,6 @@ class SynapseDynamicsSTDP(
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)
 
-    @overrides(AbstractSynapseDynamics.get_provenance_data)
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        yield from self.__timing_dependence.get_provenance_data(
-            pre_population_label, post_population_label)
-        yield from self.__weight_dependence.get_provenance_data(
-            pre_population_label, post_population_label)
-
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         names = ['weight', 'delay']

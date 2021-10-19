@@ -24,8 +24,8 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -575,28 +575,31 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray
         """
 
-    _CLIPPED_MSG = (
-        "The delays in the connector {} from {} to {} was clipped to {} a "
-        "total of {} times.  This can be avoided by reducing the timestep "
-        "or increasing the minimum delay to one timestep")
-
     def get_provenance_data(self, synapse_info):
         """
         :param SynapseInformation synapse_info:
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
-        yield ProvenanceDataItem(
-            [name, "Times_synaptic_delays_got_clipped"], ncd,
-            report=(ncd > 0), message=self._CLIPPED_MSG.format(
-                self.__class__.__name__, synapse_info.pre_population.label,
-                synapse_info.post_population.label, self.__min_delay,
-                ncd))
+        if ncd > 0:
+            message = (
+                f"The delays in the connector {self.__class__.__name__} "
+                f"from {synapse_info.pre_population.label} "
+                f"to {synapse_info.post_population.label} "
+                f"was clipped to {self.__min_delay} a total of {ncd} times. "
+                f"This can be avoided by reducing the timestep or "
+                f"increasing the minimum delay to one timestep")
+        else:
+            message = None
+        with ProvenanceWriter() as db:
+            db.insert_connector(
+                synapse_info.pre_population.label,
+                synapse_info.post_population.label,
+                self.__class__.__name_, "Times_synaptic_delays_got_clipped",
+                ncd, message),
 
     @property
     def safe(self):
