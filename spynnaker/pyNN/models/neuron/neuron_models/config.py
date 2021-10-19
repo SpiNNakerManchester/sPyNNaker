@@ -281,7 +281,7 @@ class Config(AbstractInputType):
         parameters[P8] = self._p8
         parameters[P9] = self._p9
         parameters[P10] = self._p10
-        parameters[MUV] = self._muV
+        #parameters[MUV] = self._muV
         parameters[MUV0] = self._muV0
         parameters[DMUV0] = self._DmuV0
         parameters[SV0] = self._sV0
@@ -291,7 +291,7 @@ class Config(AbstractInputType):
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
-        #state_variables[MUV] = self._muV
+        state_variables[MUV] = self._muV
         state_variables[SV] = self._sV
         state_variables[MUGN] = self._muGn
         state_variables[TVN] = self._TvN
@@ -344,7 +344,7 @@ class Config(AbstractInputType):
                 parameters[P8],
                 parameters[P9],
                 parameters[P10],
-                parameters[MUV],
+                state_variables[MUV],
                 parameters[MUV0],
                 parameters[DMUV0],
                 state_variables[SV],
@@ -368,14 +368,14 @@ class Config(AbstractInputType):
         _Gl, _Cm, _El,
         _p0, _p1, _p2, _p3, _p4,
         _p5, _p6, _p7, _p8, _p9, _p10,
-        _muV, _muV0, _DmuV0,
+        muV, _muV0, _DmuV0,
         sV, _sV0, _DsV0,
         muGn,
         TvN, _TvN0, _DTvN0,
         Vthre, Fout_th) = values
 
         # Copy the changed data only
-        #state_variables[MUV] = muV
+        state_variables[MUV] = muV
         state_variables[SV] = sV
         state_variables[MUGN] = muGn
         state_variables[TVN] = TvN

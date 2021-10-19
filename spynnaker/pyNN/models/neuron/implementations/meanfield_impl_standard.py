@@ -59,6 +59,7 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     _RECORDABLE_DATA_TYPES = {
         "Ve": DataType.S1615,
         "Vi": DataType.S1615,
+        #"muV": DataType.S1615,
         "sV": DataType.S1615,
         "muGn": DataType.S1615,
         "TvN": DataType.S1615,
@@ -77,7 +78,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     _RECORDABLE_UNITS = {
         'Ve': 'mV',
         'Vi': "mV",
+        #'muV': "uS",
         'sV': "uS",
+        'muGn':"uS",
         'TvN': 'mV',
         'Vthre': "uS",
         'Fout_th': "uS",

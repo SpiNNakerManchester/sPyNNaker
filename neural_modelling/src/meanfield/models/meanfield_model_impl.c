@@ -164,14 +164,14 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 
     Fe = Ve * (1.-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
     Fi = Vi * params->gei*params->pconnec*params->Ntot;
-
+    
     muGe = params->Qe*params->Te*Ve;
     muGi = params->Qi*params->Ti*Vi;
 
     muG = params->Gl+muGe+muGi;
     
     if (muG < ACS_DBL_TINY){
-        muG = ACS_DBL_TINY;
+        muG += ACS_DBL_TINY;
     }
 
     params->muV = (muGe*params->Ee+muGi*params->Ei+params->Gl*params->El)/muG;
@@ -213,6 +213,10 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) + Fi*(params->Ti*Ui)*(params->Ti*Ui))\
         /(Fe*(Ue*params->Te)*(Ue*params->Te)/(params->Te+Tm)\
           + Fi*(params->Ti*Ui)*(params->Ti*Ui)/(params->Ti+Tm));
+    
+    if (Tv < ACS_DBL_TINY){
+        Tv += ACS_DBL_TINY;
+    }    
 
     params->TvN = Tv*params->Gl/params->Cm;
 
