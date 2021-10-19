@@ -18,8 +18,8 @@ import ctypes
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -251,9 +251,9 @@ class PopulationSynapsesMachineVertexCommon(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         proc_offset = SynapseProvenance.N_ITEMS
-        yield from self._parse_synapse_provenance(
+        self._parse_synapse_provenance(
             label, x, y, p, provenance_data[:proc_offset])
-        yield from self._parse_spike_processing_fast_provenance(
+        self._parse_spike_processing_fast_provenance(
             label, x, y, p, provenance_data[proc_offset:])
 
     @abstractmethod
@@ -270,71 +270,90 @@ class PopulationSynapsesMachineVertexCommon(
         """
 
     def _parse_spike_processing_fast_provenance(
-            self, label, names, provenance_data):
+            self, label, x, y, p, provenance_data):
         """ Extract and yield spike processing provenance
 
         :param str label: The label of the node
-        :param list(str) names: The hierarchy of names for the provenance data
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
         :return: a list of provenance data items
         :rtype: iterator of ProvenanceDataItem
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_FULL_NAME],
-            prov.n_buffer_overflows,
-            prov.n_buffer_overflows > 0,
-            f"The input buffer for {label} lost packets on "
-            f"{prov.n_buffer_overflows} occasions. This is often a "
-            "sign that the system is running too quickly for the number of "
-            "neurons per core.  Please increase the timer_tic or"
-            " time_scale_factor or decrease the number of neurons per core.")
-        yield ProvenanceDataItem(
-            names + [self.DMA_COMPLETE], prov.n_dmas_complete)
-        yield ProvenanceDataItem(
-            names + [self.SPIKES_PROCESSED],
-            prov.n_spikes_processed)
-        yield ProvenanceDataItem(
-            names + [self.N_REWIRES_NAME], prov.n_rewires)
+        if prov.n_buffer_overflows > 0:
+            overflow_message = (
+                f"The input buffer for {label} lost packets on "
+                f"{prov.n_buffer_overflows} occasions. This is often a "
+                "sign that the system is running too quickly for the number "
+                "of neurons per core.  "
+                "Please increase the timer_tic or time_scale_factor or "
+                "decrease the number of neurons per core.")
+        else:
+            overflow_message = None
 
-        late_message = (
-            f"On {label}, {prov.n_late_packets} packets were dropped "
-            "from the input buffer, because they arrived too late to be "
-            "processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method."
-            if self._app_vertex.drop_late_spikes else
-            f"On {label}, {prov.n_late_packets} packets arrived too "
-            "late to be processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.N_LATE_SPIKES_NAME], prov.n_late_packets,
-            prov.n_late_packets > 0, late_message)
+        if prov.n_late_packets == 0:
+            late_message = None
+        elif self._app_vertex.drop_late_spikes:
+            late_message = (
+                f"On {label}, {prov.n_late_packets} packets were dropped "
+                "from the input buffer, because they arrived too late to be "
+                "processed in a given time step. Try increasing the "
+                "time_scale_factor located within the .spynnaker.cfg file or "
+                "in the pynn.setup() method.")
+        else:
+            late_message = (
+                f"On {label}, {prov.n_late_packets} packets arrived too "
+                "late to be processed in a given time step. "
+                "Try increasing the time_scale_factor located within the"
+                " .spynnaker.cfg file or in the pynn.setup() method.")
 
-        yield ProvenanceDataItem(
-            names + [self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME],
-            prov.max_size_input_buffer, report=False)
-        yield ProvenanceDataItem(
-            names + [self.MAX_SPIKES_RECEIVED], prov.max_spikes_received)
-        yield ProvenanceDataItem(
-            names + [self.MAX_SPIKES_PROCESSED], prov.max_spikes_processed)
-        yield ProvenanceDataItem(
-            names + [self.N_TRANSFER_TIMER_OVERRUNS],
-            prov.n_transfer_timer_overruns, prov.n_transfer_timer_overruns > 0,
-            f"On {label}, the transfer of synaptic inputs to SDRAM did not end"
-            " before the next timer tick started"
-            f" {prov.n_transfer_timer_overruns} times with a maximum overrun"
-            f" of {prov.max_transfer_timer_overrun}.  Try increasing "
-            " transfer_overhead_clocks in your .spynnaker.cfg file.")
-        yield ProvenanceDataItem(
-            names + [self.N_SKIPPED_TIME_STEPS], prov.n_skipped_time_steps,
-            prov.n_skipped_time_steps > 0,
-            f"On {label}, synaptic processing did not start on"
-            f" {prov.n_skipped_time_steps} time steps.  Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.MAX_TRANSFER_TIMER_OVERRUNS],
-            prov.max_transfer_timer_overrun)
+        if prov.n_transfer_timer_overruns > 0:
+            transfer_message = (
+                f"On {label}, the transfer of synaptic inputs to SDRAM did "
+                f"not end before the next timer tick started "
+                f"{prov.n_transfer_timer_overruns} times with a maximum "
+                f"overrun of {prov.max_transfer_timer_overrun}.  "
+                f"Try increasing transfer_overhead_clocks in your "
+                f".spynnaker.cfg file.")
+        else:
+            transfer_message = None
+
+        if prov.n_skipped_time_steps > 0:
+            skipped_message = (
+                f"On {label}, synaptic processing did not start on"
+                f" {prov.n_skipped_time_steps} time steps.  "
+                f"Try increasing the time_scale_factor located within the "
+                f".spynnaker.cfg file or in the pynn.setup() method.")
+        else:
+            skipped_message = None
+
+        with ProvenanceWriter() as db:
+            db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
+                prov.n_buffer_overflows, overflow_message)
+            db.insert_core(x, y, p, self.DMA_COMPLETE, prov.n_dmas_complete)
+            db.insert_core(
+                x, y, p, self.SPIKES_PROCESSED, prov.n_spikes_processed)
+            db.insert_core(
+                x, y, p, self.N_REWIRES_NAME, prov.n_rewires)
+            db.insert_core(
+                x, y, p, self.N_LATE_SPIKES_NAME, prov.n_late_packets,
+                late_message)
+            db.insert_core(
+                x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
+                prov.max_size_input_buffer)
+            db.insert_core(
+                x, y, p, self.MAX_SPIKES_RECEIVED, prov.max_spikes_received)
+            db.insert_core(
+                x, y, p, self.MAX_SPIKES_PROCESSED, prov.max_spikes_processed)
+            db.insert_core(
+                x, y, p, self.N_TRANSFER_TIMER_OVERRUNS,
+                prov.n_transfer_timer_overruns, transfer_message)
+            db.insert_core(
+                x, y, p, self.N_SKIPPED_TIME_STEPS, prov.n_skipped_time_steps,
+                skipped_message)
+            db.insert_core(
+                x, y, p, self.MAX_TRANSFER_TIMER_OVERRUNS,
+                prov.max_transfer_timer_overrun)
