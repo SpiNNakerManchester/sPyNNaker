@@ -54,7 +54,7 @@ class MeanfieldModelEitn(AbstractNeuronModel):
     """
     __slots__ = [
         "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
-        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init",
+        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init"
     ]
 
     def __init__(self, nbr, a, b, tauw,
@@ -134,7 +134,6 @@ class MeanfieldModelEitn(AbstractNeuronModel):
     def add_state_variables(self, state_variables):
         state_variables[VE] = self._Ve_init
         state_variables[VI] = self._Vi_init
-        #state_variables[U] = self.__u_init
 
     @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):

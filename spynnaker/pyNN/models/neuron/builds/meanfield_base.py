@@ -82,8 +82,8 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  delta_v=-0.5,
                  ampnoise=0.0,
                  Timescale_inv=0.5,
-                 Ve=0.,
-                 Vi=1.,
+                 Ve=9.,
+                 Vi=23.,
 
                  pconnec=0.05,
                  q_exc=1.5,

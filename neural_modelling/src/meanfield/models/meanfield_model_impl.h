@@ -39,11 +39,9 @@ typedef struct meanfield_t {
     REAL ampnoise;
     REAL Timescale_inv;
     
-    REAL Ve; // will be used as a vector !!! OR Ve and Vi
+    REAL Ve; 
     REAL Vi;
-    
-    //vector V = {Ve, Vi};
-    
+        
     REAL this_h;
         
     

@@ -22,6 +22,7 @@
 #include <debug.h>
 #include "../../meanfield/models/config.h"
 #include "../../meanfield/models/mathsbox.h"
+//#include "../../common/maths-util.h" // i.o to use SQRT(x) and SQR(a)
 
 //! The global parameters of the Izhekevich neuron model
 static const global_neuron_params_t *global_params;
@@ -73,7 +74,7 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
     REAL dt = x/mathsbox->error_func_sample;
     REAL t;
     //REAL Pi = 3.1415927;// here was a k
-    REAL two_over_sqrt_Pi = 1.128379167; //APPROXIMATION
+    REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
     REAL Erfc = mathsbox->err_func;
     for(t=0; t==x; t+=dt){
         //Erfc += dt; //test otherwise ITCM overload
@@ -162,7 +163,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 
     // here TOTAL (sum over synapses) excitatory and inhibitory input
 
-    Fe = Ve * (1.-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
+    Fe = Ve * (REAL_CONST(1.)-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
     Fi = Vi * params->gei*params->pconnec*params->Ntot;
     
     muGe = params->Qe*params->Te*Ve;
@@ -194,13 +195,9 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     */
                  
 
-    params->sV = (Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
-                 Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm));
-
-    if (params->sV < ACS_DBL_TINY){
-        params->sV += ACS_DBL_TINY;
-    }
-
+    params->sV = Fe*(Ue*params->Te)*(Ue*params->Te)/REAL_CONST(2.)/(params->Te+Tm)\
+               + Fi*(params->Ti*Ui)*(params->Ti*Ui)/REAL_CONST(2.)/(params->Ti+Tm);
+    
     if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
     {
         Fe += ACS_DBL_TINY;
@@ -238,36 +235,36 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     REAL argument;
 
     if (Ve < ACS_DBL_TINY){
-        Ve = ACS_DBL_TINY;
+        Ve += ACS_DBL_TINY;
     }
     if (Vi < ACS_DBL_TINY){
-        Vi = ACS_DBL_TINY;
+        Vi += ACS_DBL_TINY;
     }
 
     get_fluct_regime_varsup(Ve, Vi, config);
     threshold_func(config);
 
     if (config->sV<ACS_DBL_TINY){
-        config->sV = ACS_DBL_TINY;
+        config->sV += ACS_DBL_TINY;
     }
 
-    limit = 0.5*(config->Gl/(config->TvN * config->Cm));
+    limit = REAL_CONST(0.5)*(config->Gl/(config->TvN * config->Cm));
     /*
     normalement sqrt:
         argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
 
     */
     
-    argument = (config->Vthre - config->muV)/(REAL_CONST(2.))/config->sV;
+    argument = (config->Vthre - config->muV)/(REAL_CONST(1.4142137))/config->sV;
 
 //    config->Fout_th = error_function(factor, argument, mathsbox);
     error_function(limit, argument, mathsbox);
-    //config->Fout_th = (0.5*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN) ; REAL ONE
-    config->Fout_th = mathsbox->err_func ; //TEST
+    config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN) ;// REAL ONE
+    //config->Fout_th = mathsbox->err_func ; //TEST
 
 
     if (config->Fout_th < ACS_DBL_TINY){
-        config->Fout_th = ACS_DBL_TINY;
+        config->Fout_th += ACS_DBL_TINY;
     }
 
     //return config->Fout_th;
@@ -283,13 +280,13 @@ on the user computer before send it to the DTCM.
     REAL lastVi = meanfield->Vi;
     
     if (lastVi < ACS_DBL_TINY){
-        lastVi = ACS_DBL_TINY;
+        lastVi += ACS_DBL_TINY;
     }
     
     REAL T_inv = meanfield->Timescale_inv;
-    TF(lastVe, lastVi, meanfield, config, mathsbox);
-    REAL lastTF = config->Fout_th;
     
+    TF(1., lastVi, meanfield, config, mathsbox);
+    REAL lastTF = config->Fout_th;
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
 
@@ -299,13 +296,12 @@ on the user computer before send it to the DTCM.
         *(REAL_CONST(2.0)-h)*h;
         */
 
-    meanfield->Ve += lastVe \
-        + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
+    meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
     
-    meanfield->Vi += lastVi \
-        + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Vi =  meanfield->Vi * T_inv;
+    meanfield->Vi += lastVi;
+    //meanfield->Vi += T_inv*(lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h));
+    //meanfield->Vi =  meanfield->Vi * T_inv;
     
     
 }

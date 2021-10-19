@@ -46,7 +46,7 @@ enum word_recording_indices {
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
     GSYN_INH_RECORDING_INDEX = 2,
     //! Number of recorded word-sized state variables
-    N_RECORDED_VARS = 10
+    N_RECORDED_VARS = 5
 };
 
 //! Indices for recording of bitfields
