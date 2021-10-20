@@ -177,18 +177,16 @@ class PopulationNeuronsMachineVertex(
         neuron_prov = NeuronMainProvenance(
             *provenance_data[-NeuronMainProvenance.N_ITEMS:])
 
-        if neuron_prov.n_timer_overruns > 0:
-            message = (
-                f"Vertex {label} overran on {neuron_prov.n_timer_overruns} "
-                "timesteps. This may mean that the simulation results are invalid."
-                " Try with fewer neurons per core, increasing the time"
-                " scale factor, or reducing the number of spikes sent")
-        else:
-            message = None
-
         with ProvenanceWriter() as db:
             db.insert_core(x, y, p, "Timer tick overruns",
-                           neuron_prov.n_timer_overruns, message)
+                           neuron_prov.n_timer_overruns)
+            if neuron_prov.n_timer_overruns > 0:
+                db.insert_report(
+                    f"Vertex {label} overran on "
+                    f"{neuron_prov.n_timer_overruns} timesteps. "
+                    f"This may mean that the simulation results are invalid."
+                    " Try with fewer neurons per core, increasing the time"
+                    " scale factor, or reducing the number of spikes sent")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):

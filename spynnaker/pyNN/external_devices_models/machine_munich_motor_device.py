@@ -126,20 +126,17 @@ class MachineMunichMotorDevice(
             self, label, x, y, p, provenance_data):
         n_buffer_overflows, = provenance_data
 
-        if n_buffer_overflows > 0:
-            message = (
-                f"The input buffer for {label} lost packets on "
-                f"{n_buffer_overflows} occasions. "
-                "This is often a sign that the system is running too quickly "
-                "for the number of neurons per core.  Please increase the "
-                "timer_tic or time_scale_factor or decrease the number of "
-                "neurons per core.")
-        else:
-            message = None
-
         with ProvenanceWriter() as db:
             db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
-                           n_buffer_overflows, message)
+                           n_buffer_overflows)
+            if n_buffer_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_buffer_overflows} occasions. "
+                    "This is often a sign that the system is running too "
+                    "quickly for the number of neurons per core.  "
+                    "Please increase the timer_tic or time_scale_factor "
+                    "or decrease the number of neurons per core.")
 
     @inject_items({"routing_info": "RoutingInfos"})
     @overrides(

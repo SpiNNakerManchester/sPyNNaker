@@ -584,22 +584,20 @@ class AbstractConnector(object, metaclass=AbstractBase):
             synapse_info.post_population.label, self.__class__.__name__)
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
-        if ncd > 0:
-            message = (
-                f"The delays in the connector {self.__class__.__name__} "
-                f"from {synapse_info.pre_population.label} "
-                f"to {synapse_info.post_population.label} "
-                f"was clipped to {self.__min_delay} a total of {ncd} times. "
-                f"This can be avoided by reducing the timestep or "
-                f"increasing the minimum delay to one timestep")
-        else:
-            message = None
         with ProvenanceWriter() as db:
             db.insert_connector(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,
                 self.__class__.__name__, "Times_synaptic_delays_got_clipped",
-                ncd, message),
+                ncd),
+            if ncd > 0:
+                db.insert_report(
+                    f"The delays in the connector {self.__class__.__name__} "
+                    f"from {synapse_info.pre_population.label} "
+                    f"to {synapse_info.post_population.label} "
+                    f"was clipped to {self.__min_delay} a total of {ncd} "
+                    f"times. This can be avoided by reducing the timestep or "
+                    f"increasing the minimum delay to one timestep")
 
     @property
     def safe(self):

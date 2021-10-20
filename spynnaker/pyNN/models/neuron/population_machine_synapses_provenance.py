@@ -79,73 +79,53 @@ class PopulationMachineSynapsesProvenance(object):
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 
-        if synapse_prov.n_saturations > 0:
-            saturated_message = (
-                f"The weights from the synapses for {label} saturated "
-                f"{synapse_prov.n_saturations} times. If this causes issues "
-                f"you can increase the spikes_per_second and / or "
-                f"ring_buffer_sigma values located within the "
-                f".spynnaker.cfg file.")
-        else:
-            saturated_message = None
-
-        if synapse_prov.n_plastic_saturations > 0:
-            plastic_message = (
-                f"The weights from the plastic synapses for {label} "
-                f"saturated {synapse_prov.n_plastic_saturations} times. "
-                f"If this causes issues increase the spikes_per_second and / "
-                f"or ring_buffer_sigma values located within the "
-                f".spynnaker.cfg file.")
-        else:
-            plastic_message = None
-
-        if synapse_prov.n_ghost_searches > 0:
-            ghost_message = (
-                f"The number of failed population table searches for {label} "
-                f"was {synapse_prov.n_ghost_searches}. "
-                f"If this number is large relative to the predicted incoming "
-                f"spike rate, try increasing source and target neurons per "
-                f"core")
-        else:
-            ghost_message = None
-
-        if synapse_prov.n_failed_bitfield_reads:
-            failed_message = (
-                f"On {label}, the filter for stopping redundant DMAs couldn't "
-                f"be fully filled in; it failed to read "
-                f"{synapse_prov.n_failed_bitfield_reads} entries. "
-                "Try reducing neurons per core.")
-        else:
-            failed_message = None
-
-        if synapse_prov.n_invalid_pop_table_hits > 0:
-            invalid_message = (
-                f"On {label}, there were "
-                f"{synapse_prov.n_invalid_pop_table_hits} keys received that "
-                f"had no master pop entry for them. "
-                f"This is an error, which most likely stems from bad routing.")
-        else:
-            invalid_message = None
-
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME,
                 synapse_prov.n_pre_synaptic_events)
+
             db.insert_core(
                 x, y, p, self.SATURATION_COUNT_NAME,
-                synapse_prov.n_saturations, saturated_message)
+                synapse_prov.n_saturations)
+            if synapse_prov.n_saturations > 0:
+                db.insert_report(
+                    f"The weights from the synapses for {label} saturated "
+                    f"{synapse_prov.n_saturations} times. ")
+
             db.insert_core(
                 x, y, p, self.SATURATED_PLASTIC_WEIGHTS_NAME,
-                synapse_prov.n_plastic_saturations, plastic_message)
+                synapse_prov.n_plastic_saturations)
+            if synapse_prov.n_plastic_saturations > 0:
+                db.insert_report(
+                    f"The weights from the plastic synapses for {label} "
+                    f"saturated {synapse_prov.n_plastic_saturations} times. ")
+
             db.insert_core(
-                x, y, p, self.GHOST_SEARCHES, synapse_prov.n_ghost_searches,
-                ghost_message)
+                x, y, p, self.GHOST_SEARCHES, synapse_prov.n_ghost_searches)
+            if synapse_prov.n_ghost_searches > 0:
+                db.insert_report(
+                    f"The number of failed population table searches for "
+                    f"{label} was {synapse_prov.n_ghost_searches}. ")
+
             db.insert_core(
                 x, y, p, self.BIT_FIELDS_NOT_READ,
-                synapse_prov.n_failed_bitfield_reads, failed_message)
+                synapse_prov.n_failed_bitfield_reads)
+            if synapse_prov.n_failed_bitfield_reads:
+                db.insert_report(
+                    f"On {label}, the filter for stopping redundant DMAs "
+                    f"couldn't be fully filled in; it failed to read "
+                    f"{synapse_prov.n_failed_bitfield_reads} entries. "
+                    "Try reducing neurons per core.")
+
             db.insert_core(
                 x, y, p, self.INVALID_MASTER_POP_HITS,
-                synapse_prov.n_invalid_pop_table_hits, invalid_message)
+                synapse_prov.n_invalid_pop_table_hits)
+            if synapse_prov.n_invalid_pop_table_hits > 0:
+                db.insert_report(
+                    f"On {label}, there were "
+                    f"{synapse_prov.n_invalid_pop_table_hits} keys received "
+                    f"that had no master pop entry for them.")
+
             db.insert_core(
                 x, y, p, self.BIT_FIELD_FILTERED_PACKETS,
                 synapse_prov.n_filtered_by_bitfield)

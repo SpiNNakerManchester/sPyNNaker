@@ -239,28 +239,25 @@ class PopulationMachineVertex(
             label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
-        if main_prov.max_background_queued > 1:
-            queued_message = (
-                f"A maximum of {main_prov.max_background_queued} background"
-                f" tasks were queued on {label}.  Try increasing the"
-                " time_scale_factor located within the .spynnaker.cfg file or"
-                " in the pynn.setup() method.")
-        else:
-            queued_message = None
-        if main_prov.n_background_overloads > 0:
-            overloads_message = (
-                "The background queue overloaded "
-                f"{main_prov.n_background_overloads} times on {label}."
-                " Try increasing the time_scale_factor located within"
-                " the .spynnaker.cfg file or in the pynn.setup() method.")
-        else:
-            overloads_message = None
 
         with ProvenanceWriter() as db:
             db.insert_core(x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
-                main_prov.max_background_queued, queued_message)
+                main_prov.max_background_queued)
+            if main_prov.max_background_queued > 1:
+                db.insert_report(
+                    f"A maximum of {main_prov.max_background_queued} "
+                    f"background tasks were queued on {label}.  "
+                    f"Try increasing the time_scale_factor located within "
+                    f"the .spynnaker.cfg file or in the pynn.setup() method.")
+
             db.insert_core(x, y, p, self.BACKGROUND_OVERLOADS_NAME,
-                main_prov.n_background_overloads, overloads_message)
+                main_prov.n_background_overloads)
+            if main_prov.n_background_overloads > 0:
+                db.insert_report(
+                    "The background queue overloaded "
+                    f"{main_prov.n_background_overloads} times on {label}."
+                    " Try increasing the time_scale_factor located within"
+                    " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
@@ -336,47 +333,49 @@ class PopulationMachineVertex(
         """
         prov = SpikeProcessingProvenance(*provenance_data)
 
-        if prov.n_buffer_overflows > 0:
-            overflow_message = (
-                f"The input buffer for {label} lost packets on "
-                f"{prov.n_buffer_overflows} occasions. This is often a "
-                "sign that the system is running too quickly for the number "
-                "of neurons per core.  "
-                "Please increase the timer_tic or time_scale_factor or "
-                "decrease the number of neurons per core.")
-        else:
-            overflow_message = None
-
-        if prov.n_late_packets > 0:
-            if self._app_vertex.drop_late_spikes:
-                late_message = (
-                    f"On {label}, {prov.n_late_packets} packets were dropped "
-                    "from the input buffer, because they arrived too late to "
-                    "be processed in a given time step. Try increasing the "
-                    "time_scale_factor located within the .spynnaker.cfg "
-                    "file or in the pynn.setup() method.")
-            else:
-                late_message = (
-                    f"On {label}, {prov.n_late_packets} packets arrived too "
-                    "late to be processed in a given time step. "
-                    "Try increasing the time_scale_factor located within the "
-                    ".spynnaker.cfg file or in the pynn.setup() method.")
-        else:
-            late_message = None
-
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, self.INPUT_BUFFER_FULL_NAME,
-                prov.n_buffer_overflows, overflow_message)
+                prov.n_buffer_overflows)
+            if prov.n_buffer_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{prov.n_buffer_overflows} occasions. This is often a "
+                    "sign that the system is running too quickly for the "
+                    "number of neurons per core.  "
+                    "Please increase the timer_tic or time_scale_factor or "
+                    "decrease the number of neurons per core.")
+
             db.insert_core(
                 x, y, p, self.DMA_COMPLETE, prov.n_dmas_complete)
+
             db.insert_core(
                 x, y, p, self.SPIKES_PROCESSED, prov.n_spikes_processed)
+
             db.insert_core(
                 x, y, p, self.N_REWIRES_NAME, prov.n_rewires)
+
             db.insert_core(
                 x, y, p, self.N_LATE_SPIKES_NAME,
-                prov.n_late_packets, late_message)
+                prov.n_late_packets)
+
+            if prov.n_late_packets > 0:
+                if self._app_vertex.drop_late_spikes:
+                    db.insert_report(
+                        f"On {label}, {prov.n_late_packets} packets were "
+                        f"dropped from the input buffer, because they "
+                        f"arrived too late to be processed in a given time "
+                        f"step. Try increasing the time_scale_factor located "
+                        f"within the .spynnaker.cfg file or in the "
+                        f"pynn.setup() method.")
+                else:
+                    db.insert_report(
+                        f"On {label}, {prov.n_late_packets} packets arrived "
+                        f"too late to be processed in a given time step. "
+                        "Try increasing the time_scale_factor located within "
+                        "the .spynnaker.cfg file or in the pynn.setup() "
+                        "method.")
+
             db.insert_core(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)

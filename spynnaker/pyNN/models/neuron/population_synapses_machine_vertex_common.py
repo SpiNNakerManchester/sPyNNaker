@@ -283,77 +283,75 @@ class PopulationSynapsesMachineVertexCommon(
         """
         prov = SpikeProcessingFastProvenance(*provenance_data)
 
-        if prov.n_buffer_overflows > 0:
-            overflow_message = (
-                f"The input buffer for {label} lost packets on "
-                f"{prov.n_buffer_overflows} occasions. This is often a "
-                "sign that the system is running too quickly for the number "
-                "of neurons per core.  "
-                "Please increase the timer_tic or time_scale_factor or "
-                "decrease the number of neurons per core.")
-        else:
-            overflow_message = None
-
-        if prov.n_late_packets == 0:
-            late_message = None
-        elif self._app_vertex.drop_late_spikes:
-            late_message = (
-                f"On {label}, {prov.n_late_packets} packets were dropped "
-                "from the input buffer, because they arrived too late to be "
-                "processed in a given time step. Try increasing the "
-                "time_scale_factor located within the .spynnaker.cfg file or "
-                "in the pynn.setup() method.")
-        else:
-            late_message = (
-                f"On {label}, {prov.n_late_packets} packets arrived too "
-                "late to be processed in a given time step. "
-                "Try increasing the time_scale_factor located within the"
-                " .spynnaker.cfg file or in the pynn.setup() method.")
-
-        if prov.n_transfer_timer_overruns > 0:
-            transfer_message = (
-                f"On {label}, the transfer of synaptic inputs to SDRAM did "
-                f"not end before the next timer tick started "
-                f"{prov.n_transfer_timer_overruns} times with a maximum "
-                f"overrun of {prov.max_transfer_timer_overrun}.  "
-                f"Try increasing transfer_overhead_clocks in your "
-                f".spynnaker.cfg file.")
-        else:
-            transfer_message = None
-
-        if prov.n_skipped_time_steps > 0:
-            skipped_message = (
-                f"On {label}, synaptic processing did not start on"
-                f" {prov.n_skipped_time_steps} time steps.  "
-                f"Try increasing the time_scale_factor located within the "
-                f".spynnaker.cfg file or in the pynn.setup() method.")
-        else:
-            skipped_message = None
-
         with ProvenanceWriter() as db:
             db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
-                prov.n_buffer_overflows, overflow_message)
+                prov.n_buffer_overflows)
+            if prov.n_buffer_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{prov.n_buffer_overflows} occasions. This is often a "
+                    "sign that the system is running too quickly for the "
+                    "number of neurons per core.  "
+                    "Please increase the timer_tic or time_scale_factor or "
+                    "decrease the number of neurons per core.")
+
             db.insert_core(x, y, p, self.DMA_COMPLETE, prov.n_dmas_complete)
+
             db.insert_core(
                 x, y, p, self.SPIKES_PROCESSED, prov.n_spikes_processed)
+
             db.insert_core(
                 x, y, p, self.N_REWIRES_NAME, prov.n_rewires)
+
             db.insert_core(
-                x, y, p, self.N_LATE_SPIKES_NAME, prov.n_late_packets,
-                late_message)
+                x, y, p, self.N_LATE_SPIKES_NAME, prov.n_late_packets)
+            if prov.n_late_packets == 0:
+                pass
+            elif self._app_vertex.drop_late_spikes:
+                db.insert_report(
+                    f"On {label}, {prov.n_late_packets} packets were dropped "
+                    "from the input buffer, because they arrived too late to "
+                    "be processed in a given time step. Try increasing the "
+                    "time_scale_factor located within the .spynnaker.cfg file "
+                    "or in the pynn.setup() method.")
+            else:
+                db.insert_report(
+                    f"On {label}, {prov.n_late_packets} packets arrived too "
+                    "late to be processed in a given time step. "
+                    "Try increasing the time_scale_factor located within the"
+                    " .spynnaker.cfg file or in the pynn.setup() method.")
+
             db.insert_core(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)
+
             db.insert_core(
                 x, y, p, self.MAX_SPIKES_RECEIVED, prov.max_spikes_received)
+
             db.insert_core(
                 x, y, p, self.MAX_SPIKES_PROCESSED, prov.max_spikes_processed)
+
             db.insert_core(
                 x, y, p, self.N_TRANSFER_TIMER_OVERRUNS,
-                prov.n_transfer_timer_overruns, transfer_message)
+                prov.n_transfer_timer_overruns)
+            if prov.n_transfer_timer_overruns > 0:
+                db.insert_report(
+                    f"On {label}, the transfer of synaptic inputs to SDRAM did "
+                    f"not end before the next timer tick started "
+                    f"{prov.n_transfer_timer_overruns} times with a maximum "
+                    f"overrun of {prov.max_transfer_timer_overrun}.  "
+                    f"Try increasing transfer_overhead_clocks in your "
+                    f".spynnaker.cfg file.")
+
             db.insert_core(
-                x, y, p, self.N_SKIPPED_TIME_STEPS, prov.n_skipped_time_steps,
-                skipped_message)
+                x, y, p, self.N_SKIPPED_TIME_STEPS, prov.n_skipped_time_steps)
+            if prov.n_skipped_time_steps > 0:
+                db.insert_report(
+                    f"On {label}, synaptic processing did not start on"
+                    f" {prov.n_skipped_time_steps} time steps.  "
+                    f"Try increasing the time_scale_factor located within the "
+                    f".spynnaker.cfg file or in the pynn.setup() method.")
+
             db.insert_core(
                 x, y, p, self.MAX_TRANSFER_TIMER_OVERRUNS,
                 prov.max_transfer_timer_overrun)
