@@ -205,12 +205,15 @@ static bool current_source_impl_initialise(address_t cs_address) {
     }
 
     return true;
-
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Load the data into the allocated array structures
+//! \param[in] cs_address: The address to start reading data from
+//! \return True if successful
 static bool current_source_impl_load_parameters(address_t cs_address) {
 
+    // Read the number of current sources
     n_current_sources = cs_address[0];
 
     uint32_t next = 1;

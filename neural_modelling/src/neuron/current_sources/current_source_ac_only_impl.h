@@ -80,6 +80,7 @@ static bool current_source_impl_initialise(address_t cs_address) {
                     ncs, n_current_sources);
             return false;
         }
+
         spin1_memcpy(current_source[ncs], &cs_address[next], struct_size);
 
         // Count sources
@@ -113,7 +114,7 @@ static bool current_source_impl_initialise(address_t cs_address) {
             log_error("Unable to allocate DC source parameters - out of DTCM");
             return false;
         }
-        spin1_memcpy(ac_source[n_ac], &cs_address[next], sizeof(ac_sources_t));
+
         next += sizeof(ac_sources_t) / 4;
     }
 
@@ -134,7 +135,30 @@ static bool current_source_impl_initialise(address_t cs_address) {
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Load the data into the allocated array structures
+//! \param[in] cs_address: The address to start reading data from
+//! \return True if successful
 static bool current_source_impl_load_parameters(address_t cs_address) {
+    n_current_sources = cs_address[0];
+
+    uint32_t next = 1;
+
+    // Copy data into current source array
+    for (uint32_t ncs=0; ncs < n_current_sources; ncs++) {
+        uint32_t n_ids = (uint32_t) cs_address[next+2];
+        uint32_t struct_size = (n_ids + 3) * sizeof(uint32_t);
+
+        spin1_memcpy(current_source[ncs], &cs_address[next], struct_size);
+
+        next += (n_ids + 3);
+    }
+
+    // Copy into AC sources array
+    for (uint32_t n_ac=0; n_ac < n_ac_sources; n_ac++) {
+        spin1_memcpy(ac_source[n_ac], &cs_address[next], sizeof(ac_sources_t));
+        next += sizeof(ac_sources_t) / 4;
+    }
+
     return true;
 }
 

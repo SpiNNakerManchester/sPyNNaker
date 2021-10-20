@@ -151,14 +151,13 @@ static bool current_source_impl_initialise(address_t cs_address) {
             log_error("Unable to allocate step current source times - out of DTCM");
             return false;
         }
-        spin1_memcpy(step_cs_times[n_step], &cs_address[next], struct_size);
 
         step_cs_amps[n_step] = spin1_malloc(struct_size);
         if (step_cs_amps[n_step] == NULL) {
             log_error("Unable to allocate step current source amplitudes - out of DTCM");
             return false;
         }
-        spin1_memcpy(step_cs_amps[n_step], &cs_address[next+arr_len+1], struct_size);
+
         next += 2 * (arr_len + 1);
         step_cs_amp_last[n_step] = ZERO;
         step_cs_index[n_step] = 0;
@@ -172,8 +171,7 @@ static bool current_source_impl_initialise(address_t cs_address) {
             log_error("Unable to allocate DC source parameters - out of DTCM");
             return false;
         }
-        spin1_memcpy(noisy_current_source[n_noisy], &cs_address[next],
-                sizeof(noisy_current_sources_t));
+
         next += sizeof(noisy_current_sources_t) / 4;
     }
 
@@ -183,6 +181,43 @@ static bool current_source_impl_initialise(address_t cs_address) {
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 static bool current_source_impl_load_parameters(address_t cs_address) {
+
+    // Read the number of current sources
+    n_current_sources = cs_address[0];
+
+    uint32_t next = 1;
+
+    // Copy data into current source array
+    for (uint32_t ncs=0; ncs < n_current_sources; ncs++) {
+        uint32_t n_ids = (uint32_t) cs_address[next+2];
+        uint32_t struct_size = (n_ids + 3) * sizeof(uint32_t);
+
+        spin1_memcpy(current_source[ncs], &cs_address[next], struct_size);
+
+        next += (n_ids + 3);
+    }
+
+    // Copy into step current sources array
+    for (uint32_t n_step=0; n_step < n_step_current_sources; n_step++) {
+        uint32_t arr_len = (uint32_t) cs_address[next];
+        uint32_t struct_size = (arr_len + 1) * sizeof(uint32_t);
+
+        spin1_memcpy(step_cs_times[n_step], &cs_address[next], struct_size);
+        spin1_memcpy(step_cs_amps[n_step], &cs_address[next+arr_len+1], struct_size);
+
+        next += 2 * (arr_len + 1);
+
+        step_cs_amp_last[n_step] = ZERO;
+        step_cs_index[n_step] = 0;
+    }
+
+    // Copy into noisy current sources array
+    for (uint32_t n_noisy=0; n_noisy < n_noisy_current_sources; n_noisy++) {
+        spin1_memcpy(noisy_current_source[n_noisy], &cs_address[next],
+                sizeof(noisy_current_sources_t));
+        next += sizeof(noisy_current_sources_t) / 4;
+    }
+
     return true;
 }
 
