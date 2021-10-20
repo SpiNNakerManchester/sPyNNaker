@@ -121,7 +121,7 @@ class SynapticMatrixApp(object):
 
         # Calculate the max row info for this edge
         self.__max_row_info = self.__app_edge.post_vertex.get_max_row_info(
-            synapse_info, self.__post_vertex_slice, app_edge)
+            synapse_info, self.__post_vertex_slice.n_atoms, app_edge)
 
         # These are set directly later
         self.__all_syn_block_sz = None

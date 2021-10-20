@@ -175,10 +175,10 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         prob_in_slice = min(
-            post_vertex_slice.n_atoms / float(synapse_info.n_post_neurons),
+            n_post_atoms / float(synapse_info.n_post_neurons),
             1.0)
         max_in_slice = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice)

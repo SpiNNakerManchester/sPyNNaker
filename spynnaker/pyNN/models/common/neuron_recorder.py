@@ -176,14 +176,31 @@ class NeuronRecorder(object):
         """
         :param str variable:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
+        :rtype: int or None
         """
+        if variable not in self.__sampling_rates:
+            return None
         if self.__sampling_rates[variable] == 0:
             return 0
         if self.__indexes[variable] is None:
             return vertex_slice.n_atoms
         return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
                    for index in self.__indexes[variable])
+
+    def _max_recording_per_slice(self, variable, n_atoms):
+        """
+        """
+        if self.__sampling_rates[variable] == 0:
+            return 0
+        if self.__indexes[variable] is None:
+            return n_atoms
+        indices = self.__indexes[variable]
+        max_index = numpy.amax(indices)
+        existence = numpy.zeros(max_index + 1)
+        existence[indices] = 1
+        splits = numpy.arange(n_atoms, max_index + 1, n_atoms)
+        split_array = numpy.array_split(existence, splits)
+        return max([numpy.sum(s) for s in split_array])
 
     def _neurons_recording(self, variable, vertex_slice):
         """
@@ -980,8 +997,7 @@ class NeuronRecorder(object):
         recording_data = self._get_data(vertex_slice)
         spec.write_array(recording_data)
 
-    def get_buffered_sdram_per_record(
-            self, variable, vertex_slice):
+    def _get_buffered_sdram_per_record(self, variable, n_neurons):
         """ Return the SDRAM used per record
 
         :param str variable: PyNN variable name
@@ -1000,7 +1016,6 @@ class NeuronRecorder(object):
             size = self.__events_per_core_datatypes[variable].size
             return self.__events_per_ts[self.MAX_REWIRES] * (
                 self._N_BYTES_FOR_TIMESTAMP + size)
-        n_neurons = self._count_recording_per_slice(variable, vertex_slice)
         if n_neurons == 0:
             return 0
         if variable in self.__bitfield_variables:
@@ -1011,6 +1026,29 @@ class NeuronRecorder(object):
         else:
             size = self.__data_types[variable].size
             return self._N_BYTES_FOR_TIMESTAMP + (n_neurons * size)
+
+    def get_buffered_sdram_per_record(
+            self, variable, vertex_slice):
+        """ Return the SDRAM used per record
+
+        :param str variable: PyNN variable name
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :return:
+        :rtype: int
+        """
+        n_neurons = self._count_recording_per_slice(variable, vertex_slice)
+        return self._get_buffered_sdram_per_record(variable, n_neurons)
+
+    def get_max_buffered_sdram_per_record(self, variable, n_atoms):
+        """ Return the SDRAM used per record
+
+        :param str variable: PyNN variable name
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :return:
+        :rtype: int
+        """
+        n_neurons = self._max_recording_per_slice(variable, n_atoms)
+        return self._get_buffered_sdram_per_record(variable, n_neurons)
 
     def get_buffered_sdram_per_timestep(
             self, variable, vertex_slice):
@@ -1111,7 +1149,7 @@ class NeuronRecorder(object):
         """
         return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_metadata_sdram_usage_in_bytes(self, vertex_slice):
+    def get_metadata_sdram_usage_in_bytes(self, n_atoms):
         """ Get the SDRAM usage of the metadata for recording
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1119,7 +1157,7 @@ class NeuronRecorder(object):
         """
         # This calculates the size of the metadata only; thus no reference to
         # per-timestep variables which have no metadata
-        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
+        n_words_for_n_neurons = self.__n_bytes_to_n_words(n_atoms)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
@@ -1132,7 +1170,7 @@ class NeuronRecorder(object):
         return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
                 bitfield_bytes)
 
-    def _get_fixed_sdram_usage(self, vertex_slice):
+    def _get_fixed_sdram_usage(self, n_atoms):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
@@ -1144,7 +1182,7 @@ class NeuronRecorder(object):
         fixed_sdram += self._N_BYTES_PER_INDEX
         # index_parameters one per neuron
         # even if not recording as also act as a gate
-        fixed_sdram += self._N_BYTES_PER_INDEX * vertex_slice.n_atoms
+        fixed_sdram += self._N_BYTES_PER_INDEX * n_atoms
         return fixed_sdram
 
     def get_variable_sdram_usage(self, vertex_slice):
@@ -1156,7 +1194,7 @@ class NeuronRecorder(object):
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
-            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
+            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice.n_atoms)
             if rate > 0:
                 fixed_sdram += self._SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
@@ -1178,14 +1216,45 @@ class NeuronRecorder(object):
                 variable, vertex_slice)
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
-    def get_dtcm_usage_in_bytes(self, vertex_slice):
+    def get_max_variable_sdram_usage(self, n_atoms):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: ~pacman.model.resources.VariableSDRAM
+        """
+        fixed_sdram = 0
+        per_timestep_sdram = 0
+        for variable in self.__sampling_rates:
+            rate = self.__sampling_rates[variable]
+            fixed_sdram += self._get_fixed_sdram_usage(n_atoms)
+            if rate > 0:
+                fixed_sdram += self._SARK_BLOCK_SIZE
+                per_record = self.get_max_buffered_sdram_per_record(
+                    variable, n_atoms)
+                if rate == 1:
+                    # Add size for one record as recording every timestep
+                    per_timestep_sdram += per_record
+                else:
+                    # Get the average cost per timestep
+                    average_per_timestep = per_record / rate
+                    per_timestep_sdram += average_per_timestep
+                    # Add the rest once to fixed for worst case
+                    fixed_sdram += (per_record - average_per_timestep)
+        for variable in self.__per_timestep_recording:
+            per_timestep_sdram += self.get_max_buffered_sdram_per_record(
+                variable, n_atoms)
+        for variable in self.__events_per_core_recording:
+            per_timestep_sdram += self.get_max_buffered_sdram_per_record(
+                variable, n_atoms)
+        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
+
+    def get_dtcm_usage_in_bytes(self, n_atoms):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
         # Note: Per-timestep variables uses no DTCM
         # *_rate + n_neurons_recording_* + *_indexes
-        usage = self.get_metadata_sdram_usage_in_bytes(vertex_slice)
+        usage = self.get_metadata_sdram_usage_in_bytes(n_atoms)
 
         # *_count + *_increment
         usage += (len(self.__sampling_rates) * (
@@ -1195,14 +1264,12 @@ class NeuronRecorder(object):
         # out_spikes, *_values
         for variable in self.__sampling_rates:
             if variable in self.__bitfield_variables:
-                out_spike_words = int(
-                    math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+                out_spike_words = int(math.ceil(n_atoms / BITS_PER_WORD))
                 out_spike_bytes = out_spike_words * BYTES_PER_WORD
                 usage += self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
                 size = self.__data_types[variable].size
-                usage += (
-                    self._N_BYTES_FOR_TIMESTAMP + vertex_slice.n_atoms * size)
+                usage += self._N_BYTES_FOR_TIMESTAMP + (n_atoms * size)
 
         # *_size
         usage += len(self.__sampling_rates) * self._N_BYTES_PER_SIZE

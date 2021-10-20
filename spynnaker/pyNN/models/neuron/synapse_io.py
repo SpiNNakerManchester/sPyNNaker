@@ -136,15 +136,15 @@ def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
 
 
 def get_max_row_info(
-        synapse_info, post_vertex_slice, n_delay_stages, in_edge):
+        synapse_info, n_post_atoms, n_delay_stages, in_edge):
     """ Get the information about the maximum lengths of delayed and\
         undelayed rows in bytes (including header), words (without header)\
         and number of synapses
 
     :param SynapseInformation synapse_info:
         The synapse information to get the row data for
-    :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        The slice of the machine vertex being represented
+    :param int n_post_atoms:
+        The number of post atoms to get the maximum for
     :param int n_delay_stages:
         The number of delay stages on the edge
     :param ProjectionApplicationEdge in_edge:
@@ -165,7 +165,7 @@ def get_max_row_info(
     # row length for the non-delayed synaptic matrix
     max_undelayed_n_synapses = synapse_info.connector \
         .get_n_connections_from_pre_vertex_maximum(
-            post_vertex_slice, synapse_info, 0, max_delay_supported)
+            n_post_atoms, synapse_info, 0, max_delay_supported)
     if pad_to_length is not None:
         max_undelayed_n_synapses = max(
             pad_to_length, max_undelayed_n_synapses)
@@ -175,7 +175,7 @@ def get_max_row_info(
     if n_delay_stages > 0:
         max_delayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                post_vertex_slice, synapse_info,
+                n_post_atoms, synapse_info,
                 min_delay_for_delay_extension, max_delay)
         if pad_to_length is not None:
             max_delayed_n_synapses = max(

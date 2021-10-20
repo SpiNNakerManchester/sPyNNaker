@@ -114,9 +114,9 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        n_connections_max = post_vertex_slice.n_atoms
+        n_connections_max = n_post_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

@@ -123,7 +123,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex,
             vertex_slice, index, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_size(vertex_slice),
-            self.__structural_size(vertex_slice))
+            self.__structural_size(vertex_slice.n_atoms))
 
     @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -202,10 +202,10 @@ class SplitterAbstractPopulationVertexSlice(
             app_vertex.get_synapse_params_size())
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
-            app_vertex.get_synapse_dynamics_size(vertex_slice))
+            app_vertex.get_synapse_dynamics_size(vertex_slice.n_atoms))
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.structural_dynamics,
-            self.__structural_size(vertex_slice))
+            self.__structural_size(vertex_slice.n_atoms))
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
             self.__all_syn_block_size(vertex_slice))
@@ -236,18 +236,18 @@ class SplitterAbstractPopulationVertexSlice(
         self.__all_syn_block_sz[vertex_slice] = all_syn_block_sz
         return all_syn_block_sz
 
-    def __structural_size(self, vertex_slice):
+    def __structural_size(self, n_atoms):
         """ Work out how much SDRAM is needed by the structural plasticity data
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
         :rtype: int
         """
-        if vertex_slice in self.__structural_sz:
-            return self.__structural_sz[vertex_slice]
+        if n_atoms in self.__structural_sz:
+            return self.__structural_sz[n_atoms]
         structural_sz = self._governed_app_vertex.get_structural_dynamics_size(
-            vertex_slice, self._governed_app_vertex.incoming_projections)
-        self.__structural_sz[vertex_slice] = structural_sz
+            n_atoms, self._governed_app_vertex.incoming_projections)
+        self.__structural_sz[n_atoms] = structural_sz
         return structural_sz
 
     def __synapse_expander_size(self):

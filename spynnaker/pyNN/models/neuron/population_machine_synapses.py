@@ -182,7 +182,7 @@ class PopulationMachineSynapses(
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
         synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
-            self._vertex_slice)
+            self._vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
             spec.reserve_memory_region(
                 region=self._synapse_regions.synapse_dynamics,

@@ -276,7 +276,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         """ Get the maximum number of connections from any
             neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -286,7 +286,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_post_atoms:
         :param SynapseInformation synapse_info:
         :param min_delay:
         :type min_delay: int or None
