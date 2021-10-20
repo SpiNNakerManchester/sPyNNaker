@@ -241,7 +241,8 @@ class PopulationMachineVertex(
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
 
         with ProvenanceWriter() as db:
-            db.insert_core(x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
+            db.insert_core(
+                x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
                 main_prov.max_background_queued)
             if main_prov.max_background_queued > 1:
                 db.insert_report(
@@ -250,7 +251,8 @@ class PopulationMachineVertex(
                     f"Try increasing the time_scale_factor located within "
                     f"the .spynnaker.cfg file or in the pynn.setup() method.")
 
-            db.insert_core(x, y, p, self.BACKGROUND_OVERLOADS_NAME,
+            db.insert_core(
+                x, y, p, self.BACKGROUND_OVERLOADS_NAME,
                 main_prov.n_background_overloads)
             if main_prov.n_background_overloads > 0:
                 db.insert_report(

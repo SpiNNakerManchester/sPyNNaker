@@ -284,7 +284,8 @@ class PopulationSynapsesMachineVertexCommon(
         prov = SpikeProcessingFastProvenance(*provenance_data)
 
         with ProvenanceWriter() as db:
-            db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
+            db.insert_core(
+                x, y, p, self.INPUT_BUFFER_FULL_NAME,
                 prov.n_buffer_overflows)
             if prov.n_buffer_overflows > 0:
                 db.insert_report(
@@ -336,8 +337,8 @@ class PopulationSynapsesMachineVertexCommon(
                 prov.n_transfer_timer_overruns)
             if prov.n_transfer_timer_overruns > 0:
                 db.insert_report(
-                    f"On {label}, the transfer of synaptic inputs to SDRAM did "
-                    f"not end before the next timer tick started "
+                    f"On {label}, the transfer of synaptic inputs to SDRAM "
+                    f"did not end before the next timer tick started "
                     f"{prov.n_transfer_timer_overruns} times with a maximum "
                     f"overrun of {prov.max_transfer_timer_overrun}.  "
                     f"Try increasing transfer_overhead_clocks in your "

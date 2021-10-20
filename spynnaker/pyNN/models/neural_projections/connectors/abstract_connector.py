@@ -579,9 +579,6 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         :param SynapseInformation synapse_info:
         """
-        name = "connector_{}_{}_{}".format(
-            synapse_info.pre_population.label,
-            synapse_info.post_population.label, self.__class__.__name__)
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         with ProvenanceWriter() as db:

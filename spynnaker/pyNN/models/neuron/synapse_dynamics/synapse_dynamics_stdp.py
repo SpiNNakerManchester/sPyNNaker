@@ -26,7 +26,6 @@ from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (

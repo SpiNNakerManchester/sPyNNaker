@@ -170,8 +170,8 @@ class DelayExtensionMachineVertex(
                     f"{n_processed} of {n_received} received packets.  "
                     f"This could indicate a fault.")
 
-            db.insert_core(x, y, p, self.MISMATCH_ADDED_FROM_PROCESSED_NAME,
-                n_added)
+            db.insert_core(
+                x, y, p, self.MISMATCH_ADDED_FROM_PROCESSED_NAME, n_added)
             if n_added != n_processed:
                 db.insert_report(
                     f"The delay extension {label} only added {n_added} of "
@@ -180,15 +180,16 @@ class DelayExtensionMachineVertex(
 
             db.insert_core(x, y, p, self.N_PACKETS_SENT_NAME, n_sent)
 
-            db.insert_core(x, y, p, self.INPUT_BUFFER_LOST_NAME,
-                n_overflows)
+            db.insert_core(
+                x, y, p, self.INPUT_BUFFER_LOST_NAME, n_overflows)
             if n_overflows > 0:
                 db.insert_report(
-                    f"The input buffer for {label} lost packets on {n_overflows} "
-                    "occasions. This is often a sign that the system is running "
-                    "too quickly for the number of neurons per core.  Please "
-                    "increase the timer_tic or time_scale_factor or decrease the "
-                    "number of neurons per core.")
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_overflows} occasions. This is often a sign that the "
+                    f"system is running too quickly for the number of "
+                    f"neurons per core.  "
+                    f"Please increase the timer_tic or time_scale_factor "
+                    f"or decrease the number of neurons per core.")
 
             db.insert_core(x, y, p, self.DELAYED_FOR_TRAFFIC_NAME, n_delays)
 
@@ -197,17 +198,17 @@ class DelayExtensionMachineVertex(
                 pass
             elif self._app_vertex.drop_late_spikes:
                 db.insert_report(
-                    f"On {label}, {n_late_spikes} packets were dropped from the "
-                    "input buffer, because they arrived too late to be processed "
-                    "in a given time step. "
+                    f"On {label}, {n_late_spikes} packets were dropped from "
+                    f"the input buffer, because they arrived too late to be "
+                    f"processed in a given time step. "
                     "Try increasing the time_scale_factor located within the "
                     ".spynnaker.cfg file or in the pynn.setup() method.")
             else:
                 db.insert_report(
-                    f"On {label}, {n_late_spikes} packets arrived too late to be "
-                    "processed in a given time step. Try increasing the "
-                    "time_scale_factor located within the .spynnaker.cfg file or "
-                    "in the pynn.setup() method.")
+                    f"On {label}, {n_late_spikes} packets arrived too late to "
+                    f"be processed in a given time step. Try increasing the "
+                    "time_scale_factor located within the .spynnaker.cfg file "
+                    "or in the pynn.setup() method.")
 
             db.insert_core(
                 x, y, p, self.BACKGROUND_MAX_QUEUED_NAME, max_bg)
