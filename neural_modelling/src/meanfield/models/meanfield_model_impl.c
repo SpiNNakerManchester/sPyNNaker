@@ -396,8 +396,12 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield) {
 }
 
 //change name neuron -> meanfield and membrane -> rate
-state_t meanfield_model_get_firing_rate(const meanfield_t *meanfield) {
+state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield) {
     return meanfield->Ve;
+}
+
+state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
+    return meanfield->Vi;
 }
 
 void meanfield_model_print_state_variables(const meanfield_t *meanfield) {

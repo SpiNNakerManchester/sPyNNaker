@@ -40,11 +40,12 @@
 //! Indices for recording of words
 enum word_recording_indices {
     //! V (somatic potential) recording index
-    V_RECORDING_INDEX = 0,
+    VE_RECORDING_INDEX = 0,
+    VI_RECORDING_INDEX = 1,
     //! Gsyn_exc (excitatory synaptic conductance/current) recording index
-    GSYN_EXC_RECORDING_INDEX = 1,
+    GSYN_EXC_RECORDING_INDEX = 2,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
-    GSYN_INH_RECORDING_INDEX = 2,
+    GSYN_INH_RECORDING_INDEX = 3,
     //! Number of recorded word-sized state variables
     N_RECORDED_VARS = 5
 };
@@ -336,7 +337,8 @@ static void neuron_impl_do_timestep_update(
         // and because the index doesn't actually matter
         for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
             // Get the voltage->firing rate
-            state_t firing_rate = meanfield_model_get_firing_rate(this_meanfield);
+            state_t firing_rate_Ve = meanfield_model_get_firing_rate_Ve(this_meanfield);
+            state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(this_meanfield);
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
@@ -366,7 +368,9 @@ static void neuron_impl_do_timestep_update(
             // Do recording if on the first step
             if (i_step == n_steps_per_timestep) {
                 neuron_recording_record_accum(
-                        V_RECORDING_INDEX, meanfield_index, firing_rate);
+                        VE_RECORDING_INDEX, meanfield_index, firing_rate_Ve);
+                neuron_recording_record_accum(
+                        VI_RECORDING_INDEX, meanfield_index, firing_rate_Vi);
                 neuron_recording_record_accum(
                         GSYN_EXC_RECORDING_INDEX, meanfield_index, total_exc);
                 neuron_recording_record_accum(
@@ -375,9 +379,9 @@ static void neuron_impl_do_timestep_update(
 
             // Call functions to convert exc_input and inh_input to current
             input_type_convert_excitatory_input_to_current(
-                    exc_input_values, input_types, firing_rate);
+                    exc_input_values, input_types, firing_rate_Ve);
             input_type_convert_inhibitory_input_to_current(
-                    inh_input_values, input_types, firing_rate);
+                    inh_input_values, input_types, firing_rate_Vi);
 
 //            input_t external_bias += additional_input_get_input_value_as_current(
 //                    additional_inputs, firing_rate);

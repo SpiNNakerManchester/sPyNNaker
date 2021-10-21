@@ -90,7 +90,8 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield);
 //!     all the parameters for a specific neuron
 //! \return the membrane voltage for a given neuron with the neuron
 //!     parameters specified in neuron
-state_t meanfield_model_get_firing_rate(const meanfield_t *meanfield);
+state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield);
+state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield);
 
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
