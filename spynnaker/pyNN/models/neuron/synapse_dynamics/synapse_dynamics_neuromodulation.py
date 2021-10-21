@@ -202,6 +202,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         connections["target"] = (data & 0xFFFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = 1
+        return connections
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):

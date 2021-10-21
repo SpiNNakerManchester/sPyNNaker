@@ -356,6 +356,7 @@ class SynapticMatrices(object):
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
+        pre_vertices = set()
 
         for proj in incoming_projections:
             app_edge = proj._projection_edge
@@ -368,6 +369,10 @@ class SynapticMatrices(object):
             for machine_edge in app_edge.machine_edges:
                 if (machine_edge.post_vertex.vertex_slice ==
                         self.__post_vertex_slice):
+                    if machine_edge.pre_vertex in pre_vertices:
+                        continue
+
+                    pre_vertices.add(machine_edge.pre_vertex)
                     rinfo = routing_info.get_routing_info_for_edge(
                         machine_edge)
                     key_space_tracker.allocate_keys(rinfo)
@@ -382,6 +387,10 @@ class SynapticMatrices(object):
 
                     if (machine_edge.post_vertex.vertex_slice ==
                             self.__post_vertex_slice):
+                        if machine_edge.pre_vertex in pre_vertices:
+                            continue
+
+                        pre_vertices.add(machine_edge.pre_vertex)
                         rinfo = routing_info.get_routing_info_for_edge(
                             machine_edge)
                         key_space_tracker.allocate_keys(rinfo)
