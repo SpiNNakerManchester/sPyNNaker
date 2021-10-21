@@ -47,28 +47,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         "__n_steps_per_timestep"
     ]
 
-    # _RECORDABLES = ["Ve", "gsyn_exc", "gsyn_inh"]
-    #_RECORDABLES = ["Ve", "Vi", "sV", "muGn", "TvN", "Vthre",
-    #                "Fout_th", "err_func",  "gsyn_exc", "gsyn_inh"]
     _RECORDABLES = ["Ve", "Vi", "Fout_th", "gsyn_exc", "gsyn_inh"]
 
-    # _RECORDABLE_DATA_TYPES = {
-    #     "Ve": DataType.S1615,
-    #     "gsyn_exc": DataType.S1615,
-    #     "gsyn_inh": DataType.S1615
-    # }
-    #_RECORDABLE_DATA_TYPES = {
-    #    "Ve": DataType.S1615,
-    #    "Vi": DataType.S1615,
-    #    "sV": DataType.S1615,
-    #    "muGn": DataType.S1615,
-    #    "TvN": DataType.S1615,
-    #    "Vthre": DataType.S1615,
-    #    "Fout_th": DataType.S1615,
-    #    "err_func": DataType.S1615,
-    #    "gsyn_exc": DataType.S1615,
-    #    "gsyn_inh": DataType.S1615
-    #}
     _RECORDABLE_DATA_TYPES = {
         "Ve": DataType.S1615,
         "Vi": DataType.S1615,
@@ -77,24 +57,7 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         "gsyn_inh": DataType.S1615
     }
 
-    # _RECORDABLE_UNITS = {
-    #     'Ve': 'mV',
-    #     'gsyn_exc': "uS",
-    #     'gsyn_inh': "uS"
-    # }
-#    _RECORDABLE_UNITS = {
-#        'Ve': 'mV',
-#        'Vi': 'mV',
-#        'sV': "uS",
-#        'muGn':"uS",
-#        'TvN': 'mV',
-#        'Vthre': "uS",
-#        'Fout_th': "uS",
-#        'err_func': 'mV',
-#        'gsyn_exc': "uS",
-#        'gsyn_inh': "uS"
-#    }
-        _RECORDABLE_UNITS = {
+    _RECORDABLE_UNITS = {
         'Ve': 'mV',
         'Vi': 'mV',
         'Fout_th': "uS",

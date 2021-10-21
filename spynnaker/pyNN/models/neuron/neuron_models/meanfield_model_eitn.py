@@ -50,7 +50,7 @@ UNITS = {
 
 
 class MeanfieldModelEitn(AbstractNeuronModel):
-    """ Model of meanfield due to Destehexe et al
+    """ Model of meanfield due to A.Destehexe et al
     """
     __slots__ = [
         "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",

@@ -244,9 +244,7 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     get_fluct_regime_varsup(Ve, Vi, config);
     threshold_func(config);
 
-    if (config->sV<ACS_DBL_TINY){
-        config->sV += ACS_DBL_TINY;
-    }
+    
 
     limit = REAL_CONST(0.5)*(config->Gl/(config->TvN * config->Cm));
     /*
@@ -254,7 +252,9 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
         argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
 
     */
-    
+    if (config->sV<ACS_DBL_TINY){
+        config->sV += ACS_DBL_TINY;
+    }
     argument = (config->Vthre - config->muV)/(REAL_CONST(1.4142137))/config->sV;
 
 //    config->Fout_th = error_function(factor, argument, mathsbox);
@@ -277,11 +277,11 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
 on the user computer before send it to the DTCM.
 */
     REAL lastVe = meanfield->Ve;
-    REAL lastVi = meanfield->Vi;
+    REAL lastVi = 1.;//meanfield->Vi;
     
-    if (lastVi < ACS_DBL_TINY){
+    /*if (lastVi < ACS_DBL_TINY){
         lastVi += ACS_DBL_TINY;
-    }
+    }*/
     
     REAL T_inv = meanfield->Timescale_inv;
     
@@ -299,7 +299,7 @@ on the user computer before send it to the DTCM.
     meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
     
-    meanfield->Vi += lastVi;
+    meanfield->Vi += lastVi*2;
     //meanfield->Vi += T_inv*(lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h));
     //meanfield->Vi =  meanfield->Vi * T_inv;
     

@@ -146,7 +146,7 @@ static bool meanfield_impl_initialise(uint32_t n_meanfields) {
 
     // Allocate DTCM for mathsbox array and copy block of data
     if (sizeof(mathsbox_t)) {
-        mathsbox_array = spin1_malloc(n_meanfields * sizeof(config_t));
+        mathsbox_array = spin1_malloc(n_meanfields * sizeof(mathsbox_t));
         if (mathsbox_array == NULL) {
             log_error("Unable to allocate mathsbox array - Out of DTCM");
             return false;

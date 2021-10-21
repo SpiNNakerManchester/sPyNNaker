@@ -36,6 +36,7 @@ __all__ = [
     # sPyNNaker 8 models
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
+    'Meanfield',
 
     # sPyNNaker 8 plastic stuff
     'WeightDependenceAdditiveTriplet',
