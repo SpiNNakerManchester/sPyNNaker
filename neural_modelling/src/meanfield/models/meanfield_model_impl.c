@@ -285,7 +285,7 @@ on the user computer before send it to the DTCM.
     
     REAL T_inv = meanfield->Timescale_inv;
     
-    TF(1., lastVi, meanfield, config, mathsbox);
+    TF(lastVe, lastVi, meanfield, config, mathsbox);
     REAL lastTF = config->Fout_th;
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
@@ -299,9 +299,9 @@ on the user computer before send it to the DTCM.
     meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
     
-    meanfield->Vi += lastVi*2;
-    //meanfield->Vi += T_inv*(lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h));
-    //meanfield->Vi =  meanfield->Vi * T_inv;
+    
+    meanfield->Vi += T_inv*(lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h));
+    meanfield->Vi =  meanfield->Vi * T_inv;
     
     
 }
