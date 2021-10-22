@@ -385,11 +385,11 @@ bool synapse_dynamics_process_plastic_synapses(
         int32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test){
-            accumulation = sat_test - 1;
-            plastic_saturation_count += 1;
-        }
+//        uint32_t sat_test = accumulation & 0x10000;
+//        if (sat_test){
+//            accumulation = sat_test - 1;
+//            plastic_saturation_count += 1;
+//        }
 
 //        io_printf(IO_BUF, "Adding weight: %u \n", accumulation);
 
