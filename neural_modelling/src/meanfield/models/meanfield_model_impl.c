@@ -76,7 +76,7 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
     //REAL Pi = 3.1415927;// here was a k
     REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
     REAL Erfc = mathsbox->err_func;
-    for(t=0; t==x; t+=dt){
+    for(t=0; t<=x; t+=dt){
         //Erfc += dt; //test otherwise ITCM overload
         //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
         Erfc +=  factor*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
@@ -259,7 +259,7 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
 
 //    config->Fout_th = error_function(factor, argument, mathsbox);
     error_function(limit, argument, mathsbox);
-    config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN) ;// REAL ONE
+    config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN);// REAL ONE
     //config->Fout_th = mathsbox->err_func ; //TEST
 
 
@@ -277,7 +277,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
 on the user computer before send it to the DTCM.
 */
     REAL lastVe = meanfield->Ve;
-    REAL lastVi = 1.;//meanfield->Vi;
+    REAL lastVi = meanfield->Vi;
     
     /*if (lastVi < ACS_DBL_TINY){
         lastVi += ACS_DBL_TINY;
@@ -300,7 +300,7 @@ on the user computer before send it to the DTCM.
     meanfield->Ve =  meanfield->Ve * T_inv;
     
     
-    meanfield->Vi += T_inv*(lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h));
+    meanfield->Vi += lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h);
     meanfield->Vi =  meanfield->Vi * T_inv;
     
     
@@ -403,6 +403,11 @@ state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield) {
 state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
     return meanfield->Vi;
 }
+
+state_t meanfield_model_get_Fout_th(const config_t *config){
+    return config->Fout_th;
+}
+
 
 void meanfield_model_print_state_variables(const meanfield_t *meanfield) {
     log_debug("Ve = %11.4k ", meanfield->Ve);

@@ -42,10 +42,11 @@ enum word_recording_indices {
     //! V (somatic potential) recording index
     VE_RECORDING_INDEX = 0,
     VI_RECORDING_INDEX = 1,
+    FOUT_TH_RECORDING_INDEX = 2,
     //! Gsyn_exc (excitatory synaptic conductance/current) recording index
-    GSYN_EXC_RECORDING_INDEX = 2,
+    GSYN_EXC_RECORDING_INDEX = 3,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
-    GSYN_INH_RECORDING_INDEX = 3,
+    GSYN_INH_RECORDING_INDEX = 4,
     //! Number of recorded word-sized state variables
     N_RECORDED_VARS = 5
 };
@@ -339,6 +340,8 @@ static void neuron_impl_do_timestep_update(
             // Get the voltage->firing rate
             state_t firing_rate_Ve = meanfield_model_get_firing_rate_Ve(this_meanfield);
             state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(this_meanfield);
+            
+            state_t Fout_th = meanfield_model_get_Fout_th(config_types);
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
@@ -365,12 +368,14 @@ static void neuron_impl_do_timestep_update(
                 total_inh += inh_input_values[i];
             }
 
-            // Do recording if on the first step
+            // Do recording if on the first step 
             if (i_step == n_steps_per_timestep) {
                 neuron_recording_record_accum(
                         VE_RECORDING_INDEX, meanfield_index, firing_rate_Ve);
                 neuron_recording_record_accum(
                         VI_RECORDING_INDEX, meanfield_index, firing_rate_Vi);
+                neuron_recording_record_accum(
+                        FOUT_TH_RECORDING_INDEX, meanfield_index, Fout_th);
                 neuron_recording_record_accum(
                         GSYN_EXC_RECORDING_INDEX, meanfield_index, total_exc);
                 neuron_recording_record_accum(
@@ -389,9 +394,6 @@ static void neuron_impl_do_timestep_update(
             // update neuron parameters
             state_t result = meanfield_model_state_update(
                 this_meanfield, config_types, mathsbox_types);
-
-            //reinitialise Fout_th
-            config_types->Fout_th = 0.0; // I don't understand what this does
 
             // determine if a spike should occur
             bool spike_now =
