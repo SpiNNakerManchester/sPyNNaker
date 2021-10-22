@@ -281,13 +281,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             if not weights.size:
                 pass
                 # logger.warning("No connection in " + str(self))
-            elif numpy.amin(weights) < 0 < numpy.amax(weights):
-                raise Exception(
-                    "Weights must be either all positive or all negative"
-                    " in projection {}->{}".format(
-                        self.__pre_population.label,
-                        self.__post_population.label))
-        return numpy.abs(weights)
+#             elif numpy.amin(weights) < 0 < numpy.amax(weights):
+#                 raise Exception(
+#                     "Weights must be either all positive or all negative"
+#                     " in projection {}->{}".format(
+#                         self.__pre_population.label,
+#                         self.__post_population.label))
+        return weights #numpy.abs(weights)
 
     def _clip_delays(self, delays):
         """ Clip delay values, keeping track of how many have been clipped.

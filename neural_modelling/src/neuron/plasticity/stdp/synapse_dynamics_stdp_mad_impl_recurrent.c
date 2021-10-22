@@ -382,7 +382,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 delay_axonal + full_delay + time, type_index,
                 synapse_type_index_bits);
 
-        uint32_t accumulation = ring_buffers[ring_buffer_index] +
+        int32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
         uint32_t sat_test = accumulation & 0x10000;

@@ -422,7 +422,7 @@ class SynapticManager(object):
         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)
         biggest_weight = numpy.zeros(n_synapse_types)
-        weights_signed = False
+        weights_signed = True
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = 1000000.0 / machine_timestep
 

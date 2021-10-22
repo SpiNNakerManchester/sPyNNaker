@@ -41,9 +41,13 @@
 //! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
+#define SYNAPSE_WEIGHTS_SIGNED true
+
+
 // Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
+io_printf(IO_BUF, "Using signed weights!! \n ");
 #else
 typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #endif

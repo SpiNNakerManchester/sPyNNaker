@@ -62,8 +62,8 @@ class SynapseDynamicsStatic(
         n_synapse_type_bits = get_n_bits(n_synapse_types)
 
         fixed_fixed = (
-            ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
-              0xFFFF) << 16) |
+            ((numpy.rint(connections["weight"]).astype("uint16") &
+              0xFFFF).astype("uint32") << 16) |
             ((connections["delay"].astype("uint32") & 0xF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
@@ -119,7 +119,7 @@ class SynapseDynamicsStatic(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
-        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["weight"] = ((data >> 16) & 0xFFFF).astype("int16")
         connections["delay"] = (data >> (n_neuron_id_bits +
                                          n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
