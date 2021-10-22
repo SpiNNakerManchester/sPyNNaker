@@ -77,15 +77,11 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
     REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
     REAL Erfc = mathsbox->err_func;
     for(t=0; t<=x; t+=dt){
-        //Erfc += dt; //test otherwise ITCM overload
         //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
         Erfc +=  factor*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
-        //Erfc += factor+t*t;//fake one working
     }
 
     mathsbox->err_func = Erfc;
-
-    //return Erfc;
 
 }
 
@@ -149,10 +145,8 @@ void threshold_func(config_t *restrict config)
 
     }
 
-//    REAL ONE get_fluct_regime_varsup
 void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 {
-    //takes 880 bytes overflowed ITCM
 
     REAL Fe;
     REAL Fi;
@@ -217,18 +211,13 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
 
     params->TvN = Tv*params->Gl/params->Cm;
 
-    //return params->muV;//, sV+1e-12, muGn, TvN
 }
-//END of the REAL get_fluct_regime_varsup
 
 
 void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
         mathsbox_t *restrict mathsbox){
 
-// argument are fe, fi and pseq_params
-//   problem is to implement it with params and instruction coming from
-//   DTCM and ITCM.
-//   when get_fluct_regime_varsup is ON  takes 1360 bytes overflowed ITCM
+//PUT comments HERE!!!
 
 
     REAL limit;
@@ -244,8 +233,6 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     get_fluct_regime_varsup(Ve, Vi, config);
     threshold_func(config);
 
-    
-
     limit = REAL_CONST(0.5)*(config->Gl/(config->TvN * config->Cm));
     /*
     normalement sqrt:
@@ -257,8 +244,12 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     }
     argument = (config->Vthre - config->muV)/(REAL_CONST(1.4142137))/config->sV;
 
-//    config->Fout_th = error_function(factor, argument, mathsbox);
     error_function(limit, argument, mathsbox);
+    
+    if (config->P0 == 0.){
+        mathsbox->err_func = 1;
+    }
+    
     config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN);// REAL ONE
     //config->Fout_th = mathsbox->err_func ; //TEST
 
@@ -267,22 +258,15 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
         config->Fout_th += ACS_DBL_TINY;
     }
 
-    //return config->Fout_th;
 }
 
 
 void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
         mathsbox_t *restrict mathsbox) {
-/* need to input T_inv time scale where the 1/T will be done (and rounding)
-on the user computer before send it to the DTCM.
-*/
+
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
-    
-    /*if (lastVi < ACS_DBL_TINY){
-        lastVi += ACS_DBL_TINY;
-    }*/
-    
+       
     REAL T_inv = meanfield->Timescale_inv;
     
     TF(lastVe, lastVi, meanfield, config, mathsbox);
@@ -290,11 +274,6 @@ on the user computer before send it to the DTCM.
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
 
-
-    /*meanfield->Ve += lastVe\
-        + REAL_HALF(TF(lastVe,1,meanfield, config, mathsbox) - lastVe)\
-        *(REAL_CONST(2.0)-h)*h;
-        */
 
     meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
