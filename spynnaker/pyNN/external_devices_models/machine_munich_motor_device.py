@@ -26,12 +26,11 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.utility_objs import (
-    ExecutableType, ProvenanceDataItem)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 
@@ -124,17 +123,20 @@ class MachineMunichMotorDevice(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
     def parse_extra_provenance_items(
-            self, label, names, provenance_data):
+            self, label, x, y, p, provenance_data):
         n_buffer_overflows, = provenance_data
 
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_FULL_NAME], n_buffer_overflows,
-            (n_buffer_overflows > 0),
-            f"The input buffer for {label} lost packets on "
-            f"{n_buffer_overflows} occasions. "
-            "This is often a sign that the system is running too quickly for "
-            "the number of neurons per core.  Please increase the timer_tic "
-            "or time_scale_factor or decrease the number of neurons per core.")
+        with ProvenanceWriter() as db:
+            db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
+                           n_buffer_overflows)
+            if n_buffer_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_buffer_overflows} occasions. "
+                    "This is often a sign that the system is running too "
+                    "quickly for the number of neurons per core.  "
+                    "Please increase the timer_tic or time_scale_factor "
+                    "or decrease the number of neurons per core.")
 
     @inject_items({"routing_info": "RoutingInfos"})
     @overrides(

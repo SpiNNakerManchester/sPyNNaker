@@ -50,9 +50,6 @@ class TestDebug(BaseTestCase):
             reports_names._PLACEMENT_VTX_GRAPH_FILENAME,
             reports_names._PLACEMENT_CORE_GRAPH_FILENAME,
             reports_names._SDRAM_FILENAME,
-            # write_machine_graph_placer_report
-            reports_names._PLACEMENT_VTX_SIMPLE_FILENAME,
-            reports_names._PLACEMENT_CORE_SIMPLE_FILENAME,
             # repeats reports_names._SDRAM_FILENAME,
             # write_router_info_report
             reports_names._VIRTKEY_FILENAME,
