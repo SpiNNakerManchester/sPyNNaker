@@ -108,10 +108,6 @@
                 <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_data_objects</param_name>
-                <param_type>RouterCompressorProvenanceItems</param_type>
-            </parameter>
-            <parameter>
                 <param_name>read_expander_iobuf</param_name>
                 <param_type>SynapticExpanderReadIOBuf</param_type>
             </parameter>
@@ -129,12 +125,8 @@
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
-        <optional_inputs>
-            <param_name>provenance_data_objects</param_name>
-        </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
-            <param_type>RouterCompressorProvenanceItems</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerMachineBitFieldUnorderedRouterCompressor">
@@ -179,10 +171,6 @@
                 <param_type>RoutingInfos</param_type>
             </parameter>
             <parameter>
-                <param_name>provenance_data_objects</param_name>
-                <param_type>RouterCompressorProvenanceItems</param_type>
-            </parameter>
-            <parameter>
                 <param_name>read_expander_iobuf</param_name>
                 <param_type>SynapticExpanderReadIOBuf</param_type>
             </parameter>
@@ -200,12 +188,8 @@
             <param_name>executable_targets</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
-        <optional_inputs>
-            <param_name>provenance_data_objects</param_name>
-        </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
-            <param_type>RouterCompressorProvenanceItems</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerMachineBitFieldPairRouterCompressor">
@@ -252,10 +236,6 @@
                 <param_name>routing_infos</param_name>
                 <param_type>RoutingInfos</param_type>
             </parameter>
-            <parameter>
-                <param_name>provenance_data_objects</param_name>
-                <param_type>RouterCompressorProvenanceItems</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>executable_finder</param_name>
@@ -270,12 +250,8 @@
             <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
-        <optional_inputs>
-            <param_name>provenance_data_objects</param_name>
-        </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
-            <param_type>RouterCompressorProvenanceItems</param_type>
         </outputs>
     </algorithm>
     <algorithm name="OnChipBitFieldGenerator">
@@ -390,13 +366,9 @@
         <python_module>spynnaker.pyNN.extra_algorithms.redundant_packet_count_report</python_module>
         <python_class>RedundantPacketCountReport</python_class>
         <input_definitions>
-            <parameter>
-                <param_name>provenance_items</param_name>
-                <param_type>PlacementsProvenanceItems</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
-            <param_name>provenance_items</param_name>
+            <token>PlacementsProvenanceItems</token>
         </required_inputs>
     </algorithm>
     <algorithm name="SpYNNakerConnectionHolderGenerator">
