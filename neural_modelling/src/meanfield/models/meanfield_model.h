@@ -37,6 +37,10 @@ struct config_t;
 typedef struct config_t config_t;
 typedef struct config_t* config_pointer_t;
 
+struct Vthre_params_t;
+typedef struct Vthre_params_t Vthre_params_t;
+typedef struct Vthre_params_t* Vthre_params_pointer_t;
+
 struct mathsbox_t;
 typedef struct mathsbox_t mathsbox_t;
 typedef struct mathsbox_t* mathsbox_pointer_t;

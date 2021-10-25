@@ -86,7 +86,7 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
 }
 
 
-void threshold_func(config_t *restrict config)
+void threshold_func(config_t *restrict config, Vthre_params_t *restrict Vparams)
 {
     /*
     setting by default to True the square
@@ -113,17 +113,17 @@ void threshold_func(config_t *restrict config)
     REAL Vthre = config->Vthre;//=0.;
     //REAL Fout_th = config->Fout_th;//=0.;
     
-    REAL P0 = config->P0;
-    REAL P1 = config->P1;
-    REAL P2 = config->P2;
-    REAL P3 = config->P3;
-    //REAL P4 = config->P4;
-    REAL P5 = config->P5;
-    REAL P6 = config->P6;
-    REAL P7 = config->P7;
-    REAL P8 = config->P8;
-    REAL P9 = config->P9;
-    REAL P10 = config->P10;
+    REAL P0 = Vparams->P0;
+    REAL P1 = Vparams->P1;
+    REAL P2 = Vparams->P2;
+    REAL P3 = Vparams->P3;
+    REAL P4 = Vparams->P4;
+    REAL P5 = Vparams->P5;
+    REAL P6 = Vparams->P6;
+    REAL P7 = Vparams->P7;
+    REAL P8 = Vparams->P8;
+    REAL P9 = Vparams->P9;
+    REAL P10 = Vparams->P10;
     
         
     
@@ -145,7 +145,7 @@ void threshold_func(config_t *restrict config)
 
     }
 
-void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
+void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
 {
 
     REAL Fe;
@@ -153,31 +153,51 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     REAL muGe, muGi, muG;
     REAL Ue, Ui;
     REAL Tm, Tv;
+    
+    REAL gei = config->gei;
+    REAL pconnec = config->pconnec;
+    REAL Ntot = config->Ntot;
+    REAL Qe = config->Qe;
+    REAL Qi = config->Qi;
+    REAL Te = config->Te;
+    REAL Ti = config->Ti;
+    REAL Gl = config->Gl;
+    REAL El = config->El;
+    REAL Ei = config->Ei;
+    REAL Ee = config->Ee;
+    REAL Cm = config->Cm;
+    
+    REAL muV = config->muV;
+    REAL muGn = config->muGn;
+    REAL sV = config->sV;
+    REAL TvN = config->TvN;
+    
+    
 
 
     // here TOTAL (sum over synapses) excitatory and inhibitory input
 
-    Fe = Ve * (REAL_CONST(1.)-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
-    Fi = Vi * params->gei*params->pconnec*params->Ntot;
+    Fe = Ve * (REAL_CONST(1.)-gei)*pconnec*Ntot; // default is 1 !!
+    Fi = Vi * gei*pconnec*Ntot;
     
-    muGe = params->Qe*params->Te*Ve;
-    muGi = params->Qi*params->Ti*Vi;
+    muGe = Qe*Te*Ve;
+    muGi = Qi*Ti*Vi;
 
-    muG = params->Gl+muGe+muGi;
+    muG = Gl+muGe+muGi;
     
     if (muG < ACS_DBL_TINY){
         muG += ACS_DBL_TINY;
     }
 
-    params->muV = (muGe*params->Ee+muGi*params->Ei+params->Gl*params->El)/muG;
+    muV = (muGe*Ee + muGi*Ei + Gl*El)/muG;
 
 
-    params->muGn = muG/params->Gl;
+    muGn = muG/Gl;
 
-    Tm = params->Cm/muG;
+    Tm = Cm/muG;
 
-    Ue = params->Qe/muG*(params->Ee-params->muV);
-    Ui = params->Qi/muG*(params->Ei-params->muV);
+    Ue = Qe/muG*(Ee-muV);
+    Ui = Qi/muG*(Ei-muV);
 
 
    /*
@@ -189,8 +209,8 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     */
                  
 
-    params->sV = Fe*(Ue*params->Te)*(Ue*params->Te)/REAL_CONST(2.)/(params->Te+Tm)\
-               + Fi*(params->Ti*Ui)*(params->Ti*Ui)/REAL_CONST(2.)/(params->Ti+Tm);
+    sV = Fe*(Ue*Te)*(Ue*Te)/REAL_CONST(2.)/(Te+Tm)\
+               + Fi*(Ti*Ui)*(Ti*Ui)/REAL_CONST(2.)/(Ti+Tm);
     
     if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
     {
@@ -201,21 +221,20 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
         Fi += ACS_DBL_TINY;
     }
     
-    Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) + Fi*(params->Ti*Ui)*(params->Ti*Ui))\
-        /(Fe*(Ue*params->Te)*(Ue*params->Te)/(params->Te+Tm)\
-          + Fi*(params->Ti*Ui)*(params->Ti*Ui)/(params->Ti+Tm));
+    Tv = ( Fe*(Ue*Te)*(Ue*Te) + Fi*(Ti*Ui)*(Ti*Ui))\
+        /(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm));
     
     if (Tv < ACS_DBL_TINY){
         Tv += ACS_DBL_TINY;
     }    
 
-    params->TvN = Tv*params->Gl/params->Cm;
+    TvN = Tv*Gl/Cm;
 
 }
 
 
 void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
-        mathsbox_t *restrict mathsbox){
+        Vthre_params_t *restrict Vparams, mathsbox_t *restrict mathsbox){
 
 //PUT comments HERE!!!
 
@@ -231,9 +250,9 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     }
 
     get_fluct_regime_varsup(Ve, Vi, config);
-    threshold_func(config);
+    threshold_func(config, Vparams);
 
-    limit = REAL_CONST(0.5)*(config->Gl/(config->TvN * config->Cm));
+    limit = REAL_HALF*(config->Gl/(config->TvN * config->Cm));
     /*
     normalement sqrt:
         argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
@@ -245,10 +264,11 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     argument = (config->Vthre - config->muV)/(REAL_CONST(1.4142137))/config->sV;
 
     error_function(limit, argument, mathsbox);
-    
+    /*
     if (config->P0 == 0.){
-        mathsbox->err_func = 1;
+        mathsbox->err_func = 1; a simple test
     }
+    */
     
     config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN);// REAL ONE
     //config->Fout_th = mathsbox->err_func ; //TEST
@@ -261,16 +281,24 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
 }
 
 
-void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
-        mathsbox_t *restrict mathsbox) {
+void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
+                     config_t *restrict config,
+                     Vthre_params_t *restrict Vparams_Ve,
+                     Vthre_params_t *restrict Vparams_Vi,
+                     mathsbox_t *restrict mathsbox) {
 
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
        
     REAL T_inv = meanfield->Timescale_inv;
     
-    TF(lastVe, lastVi, meanfield, config, mathsbox);
-    REAL lastTF = config->Fout_th;
+    TF(lastVe, lastVi, meanfield, config, Vparams_Ve, mathsbox);
+    REAL lastTF_Ve = config->Fout_th;
+    
+    
+    TF(lastVe, lastVi, meanfield, config, Vparams_Vi, mathsbox);
+    REAL lastTF_Vi = config->Fout_th;
+    
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
 
@@ -279,7 +307,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
     meanfield->Ve =  meanfield->Ve * T_inv;
     
     
-    meanfield->Vi += lastVi + (REAL_HALF(lastTF - lastVi) * (REAL_CONST(2.0)-h) * h);
+    meanfield->Vi += lastVi + (REAL_HALF(lastTF_Vi - lastVi) * (REAL_CONST(2.0)-h) * h);
     meanfield->Vi =  meanfield->Vi * T_inv;
     
     
@@ -332,7 +360,10 @@ void meanfield_model_set_global_neuron_params(
   and maybe is there some contamanation from the neightbourest neighbour MF!
 */
 state_t meanfield_model_state_update(
-        meanfield_t *restrict meanfield, config_t *restrict config, mathsbox_t *restrict mathsbox){
+    meanfield_t *restrict meanfield, config_t *restrict config,
+    Vthre_params_t *restrict Vparams_Ve,
+    Vthre_params_t *restrict Vparams_Vi,
+    mathsbox_t *restrict mathsbox){
     /*
         uint16_t num_excitatory_inputs, const input_t *exc_input,
 		uint16_t num_inhibitory_inputs, const input_t *inh_input,
@@ -353,7 +384,9 @@ state_t meanfield_model_state_update(
     */
 
     // the best AR update so far
-    RK2_midpoint_MF(meanfield->this_h, meanfield, config, mathsbox);
+    RK2_midpoint_MF(meanfield->this_h, meanfield,
+                    Vparams_Ve, Vparams_Vi,
+                    config, mathsbox);
     meanfield->this_h = global_params->machine_timestep_ms;
 
     return meanfield->Ve;
