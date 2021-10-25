@@ -59,9 +59,9 @@ class TestPowerMonitoring(BaseTestCase):
         # Did we output power provenance data, as requested?
         num_chips = None
         for row in self.query_provenance(
-                "SELECT the_value FROM provenance_view "
-                "WHERE source_name = 'power_provenance' "
-                "AND description_name = 'num_chips' LIMIT 1"):
+                "SELECT the_value "
+                "FROM power_provenance "
+                "WHERE description = 'Num_chips' LIMIT 1"):
             num_chips = row["the_value"]
         self.assertIsNotNone(num_chips, "power provenance was not written")
 
