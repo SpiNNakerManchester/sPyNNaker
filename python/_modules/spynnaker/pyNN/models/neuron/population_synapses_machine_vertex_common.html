@@ -56,8 +56,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="n">ProvenanceWriter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">,</span> <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">)</span>
@@ -287,93 +287,113 @@
             <span class="s2">&quot;Unknown post vertex type in edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdram_machine_edge</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineCommon</span><span class="o">.</span><span class="n">parse_extra_provenance_items</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="n">proc_offset</span> <span class="o">=</span> <span class="n">SynapseProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_synapse_provenance</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[:</span><span class="n">proc_offset</span><span class="p">])</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_spike_processing_fast_provenance</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[</span><span class="n">proc_offset</span><span class="p">:])</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_synapse_provenance</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[:</span><span class="n">proc_offset</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_spike_processing_fast_provenance</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[</span><span class="n">proc_offset</span><span class="p">:])</span></div>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_synapse_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_parse_synapse_provenance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract and yield synapse provenance</span>
 
 <span class="sd">        :param str label: The label of the node</span>
-<span class="sd">        :param list(str) names: The hierarchy of names for the provenance data</span>
+<span class="sd">        :param int x: x coordinate of the chip where this core</span>
+<span class="sd">        :param int y: y coordinate of the core where this core</span>
+<span class="sd">        :param int p: virtual id of the core</span>
 <span class="sd">        :param list(int) provenance_data: A list of data items to interpret</span>
 <span class="sd">        :return: a list of provenance data items</span>
 <span class="sd">        :rtype: iterator of ProvenanceDataItem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_parse_spike_processing_fast_provenance</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extract and yield spike processing provenance</span>
 
 <span class="sd">        :param str label: The label of the node</span>
-<span class="sd">        :param list(str) names: The hierarchy of names for the provenance data</span>
+<span class="sd">        :param int x: x coordinate of the chip where this core</span>
+<span class="sd">        :param int y: y coordinate of the core where this core</span>
+<span class="sd">        :param int p: virtual id of the core</span>
 <span class="sd">        :param list(int) provenance_data: A list of data items to interpret</span>
 <span class="sd">        :return: a list of provenance data items</span>
 <span class="sd">        :rtype: iterator of ProvenanceDataItem</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prov</span> <span class="o">=</span> <span class="n">SpikeProcessingFastProvenance</span><span class="p">(</span><span class="o">*</span><span class="n">provenance_data</span><span class="p">)</span>
 
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">],</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span><span class="p">,</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span><span class="si">}</span><span class="s2"> occasions. This is often a &quot;</span>
-            <span class="s2">&quot;sign that the system is running too quickly for the number of &quot;</span>
-            <span class="s2">&quot;neurons per core.  Please increase the timer_tic or&quot;</span>
-            <span class="s2">&quot; time_scale_factor or decrease the number of neurons per core.&quot;</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">DMA_COMPLETE</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_dmas_complete</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">],</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_spikes_processed</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_REWIRES_NAME</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_rewires</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">,</span>
+                <span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_buffer_overflows</span><span class="si">}</span><span class="s2"> occasions. This is often a &quot;</span>
+                    <span class="s2">&quot;sign that the system is running too quickly for the &quot;</span>
+                    <span class="s2">&quot;number of neurons per core.  &quot;</span>
+                    <span class="s2">&quot;Please increase the timer_tic or time_scale_factor or &quot;</span>
+                    <span class="s2">&quot;decrease the number of neurons per core.&quot;</span><span class="p">)</span>
 
-        <span class="n">late_message</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="si">}</span><span class="s2"> packets were dropped &quot;</span>
-            <span class="s2">&quot;from the input buffer, because they arrived too late to be &quot;</span>
-            <span class="s2">&quot;processed in a given time step. Try increasing the &quot;</span>
-            <span class="s2">&quot;time_scale_factor located within the .spynnaker.cfg file or in &quot;</span>
-            <span class="s2">&quot;the pynn.setup() method.&quot;</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span> <span class="k">else</span>
-            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="si">}</span><span class="s2"> packets arrived too &quot;</span>
-            <span class="s2">&quot;late to be processed in a given time step. Try increasing the &quot;</span>
-            <span class="s2">&quot;time_scale_factor located within the .spynnaker.cfg file or in &quot;</span>
-            <span class="s2">&quot;the pynn.setup() method.&quot;</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_NAME</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="p">,</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">late_message</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DMA_COMPLETE</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_dmas_complete</span><span class="p">)</span>
 
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME</span><span class="p">],</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">max_size_input_buffer</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_SPIKES_RECEIVED</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">max_spikes_received</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_SPIKES_PROCESSED</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">max_spikes_processed</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_TRANSFER_TIMER_OVERRUNS</span><span class="p">],</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, the transfer of synaptic inputs to SDRAM did not end&quot;</span>
-            <span class="s2">&quot; before the next timer tick started&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span><span class="si">}</span><span class="s2"> times with a maximum overrun&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; of </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">max_transfer_timer_overrun</span><span class="si">}</span><span class="s2">.  Try increasing &quot;</span>
-            <span class="s2">&quot; transfer_overhead_clocks in your .spynnaker.cfg file.&quot;</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">N_SKIPPED_TIME_STEPS</span><span class="p">],</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span><span class="p">,</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, synaptic processing did not start on&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span><span class="si">}</span><span class="s2"> time steps.  Try increasing the &quot;</span>
-            <span class="s2">&quot;time_scale_factor located within the .spynnaker.cfg file or in &quot;</span>
-            <span class="s2">&quot;the pynn.setup() method.&quot;</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_TRANSFER_TIMER_OVERRUNS</span><span class="p">],</span>
-            <span class="n">prov</span><span class="o">.</span><span class="n">max_transfer_timer_overrun</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_spikes_processed</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_REWIRES_NAME</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_rewires</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_LATE_SPIKES_NAME</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">drop_late_spikes</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="si">}</span><span class="s2"> packets were dropped &quot;</span>
+                    <span class="s2">&quot;from the input buffer, because they arrived too late to &quot;</span>
+                    <span class="s2">&quot;be processed in a given time step. Try increasing the &quot;</span>
+                    <span class="s2">&quot;time_scale_factor located within the .spynnaker.cfg file &quot;</span>
+                    <span class="s2">&quot;or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_late_packets</span><span class="si">}</span><span class="s2"> packets arrived too &quot;</span>
+                    <span class="s2">&quot;late to be processed in a given time step. &quot;</span>
+                    <span class="s2">&quot;Try increasing the time_scale_factor located within the&quot;</span>
+                    <span class="s2">&quot; .spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME</span><span class="p">,</span>
+                <span class="n">prov</span><span class="o">.</span><span class="n">max_size_input_buffer</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_SPIKES_RECEIVED</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">max_spikes_received</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_SPIKES_PROCESSED</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">max_spikes_processed</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_TRANSFER_TIMER_OVERRUNS</span><span class="p">,</span>
+                <span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, the transfer of synaptic inputs to SDRAM &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;did not end before the next timer tick started &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_transfer_timer_overruns</span><span class="si">}</span><span class="s2"> times with a maximum &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;overrun of </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">max_transfer_timer_overrun</span><span class="si">}</span><span class="s2">.  &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Try increasing transfer_overhead_clocks in your &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;.spynnaker.cfg file.&quot;</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_SKIPPED_TIME_STEPS</span><span class="p">,</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;On </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, synaptic processing did not start on&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">prov</span><span class="o">.</span><span class="n">n_skipped_time_steps</span><span class="si">}</span><span class="s2"> time steps.  &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Try increasing the time_scale_factor located within the &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;.spynnaker.cfg file or in the pynn.setup() method.&quot;</span><span class="p">)</span>
+
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_TRANSFER_TIMER_OVERRUNS</span><span class="p">,</span>
+                <span class="n">prov</span><span class="o">.</span><span class="n">max_transfer_timer_overrun</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

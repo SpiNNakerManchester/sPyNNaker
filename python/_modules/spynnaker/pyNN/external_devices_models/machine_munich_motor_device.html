@@ -64,12 +64,11 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
+    <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span> <span class="n">ProvenanceWriter</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ExecutableType</span><span class="p">,</span> <span class="n">ProvenanceDataItem</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 
 
@@ -162,17 +161,20 @@
 <div class="viewcode-block" id="MachineMunichMotorDevice.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">parse_extra_provenance_items</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
         <span class="n">n_buffer_overflows</span><span class="p">,</span> <span class="o">=</span> <span class="n">provenance_data</span>
 
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">],</span> <span class="n">n_buffer_overflows</span><span class="p">,</span>
-            <span class="p">(</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_buffer_overflows</span><span class="si">}</span><span class="s2"> occasions. &quot;</span>
-            <span class="s2">&quot;This is often a sign that the system is running too quickly for &quot;</span>
-            <span class="s2">&quot;the number of neurons per core.  Please increase the timer_tic &quot;</span>
-            <span class="s2">&quot;or time_scale_factor or decrease the number of neurons per core.&quot;</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INPUT_BUFFER_FULL_NAME</span><span class="p">,</span>
+                           <span class="n">n_buffer_overflows</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The input buffer for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> lost packets on &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_buffer_overflows</span><span class="si">}</span><span class="s2"> occasions. &quot;</span>
+                    <span class="s2">&quot;This is often a sign that the system is running too &quot;</span>
+                    <span class="s2">&quot;quickly for the number of neurons per core.  &quot;</span>
+                    <span class="s2">&quot;Please increase the timer_tic or time_scale_factor &quot;</span>
+                    <span class="s2">&quot;or decrease the number of neurons per core.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MachineMunichMotorDevice.generate_data_specification"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>

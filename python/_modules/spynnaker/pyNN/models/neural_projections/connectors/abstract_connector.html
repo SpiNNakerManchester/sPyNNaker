@@ -62,8 +62,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.safe_eval</span> <span class="kn">import</span> <span class="n">SafeEval</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">machine_time_step_ms</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="n">ProvenanceWriter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 
@@ -613,28 +613,26 @@
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-    <span class="n">_CLIPPED_MSG</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;The delays in the connector </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> was clipped to </span><span class="si">{}</span><span class="s2"> a &quot;</span>
-        <span class="s2">&quot;total of </span><span class="si">{}</span><span class="s2"> times.  This can be avoided by reducing the timestep &quot;</span>
-        <span class="s2">&quot;or increasing the minimum delay to one timestep&quot;</span><span class="p">)</span>
-
 <div class="viewcode-block" id="AbstractConnector.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">        :rtype:</span>
-<span class="sd">            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;connector_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="c1"># Convert to native Python integer; provenance system assumption</span>
         <span class="n">ncd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">],</span> <span class="n">ncd</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="p">(</span><span class="n">ncd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span> <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_CLIPPED_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-                <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span><span class="p">,</span>
-                <span class="n">ncd</span><span class="p">))</span></div>
+        <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_connector</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">,</span>
+                <span class="n">ncd</span><span class="p">),</span>
+            <span class="k">if</span> <span class="n">ncd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The delays in the connector </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;was clipped to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span><span class="si">}</span><span class="s2"> a total of </span><span class="si">{</span><span class="n">ncd</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;times. This can be avoided by reducing the timestep or &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;increasing the minimum delay to one timestep&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">safe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

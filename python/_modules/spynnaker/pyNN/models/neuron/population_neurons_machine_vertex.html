@@ -58,8 +58,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="n">ProvenanceWriter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">,</span> <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">)</span>
@@ -208,20 +208,23 @@
         <span class="k">return</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_neuron&quot;</span> <span class="o">+</span> <span class="n">ext</span>
 
 <div class="viewcode-block" id="PopulationNeuronsMachineVertex.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineCommon</span><span class="o">.</span><span class="n">parse_extra_provenance_items</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_neuron_provenance</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[:</span><span class="n">NeuronProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">parse_extra_provenance_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_neuron_provenance</span><span class="p">(</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">provenance_data</span><span class="p">[:</span><span class="n">NeuronProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">])</span>
 
         <span class="n">neuron_prov</span> <span class="o">=</span> <span class="n">NeuronMainProvenance</span><span class="p">(</span>
             <span class="o">*</span><span class="n">provenance_data</span><span class="p">[</span><span class="o">-</span><span class="n">NeuronMainProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">:])</span>
 
-        <span class="k">yield</span> <span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="n">names</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Timer tick overruns&quot;</span><span class="p">],</span>
-            <span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span><span class="p">,</span> <span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;Vertex </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> overran on </span><span class="si">{</span><span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span><span class="si">}</span><span class="s2"> &quot;</span>
-            <span class="s2">&quot;timesteps. This may mean that the simulation results are invalid.&quot;</span>
-            <span class="s2">&quot; Try with fewer neurons per core, increasing the time&quot;</span>
-            <span class="s2">&quot; scale factor, or reducing the number of spikes sent&quot;</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert_core</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s2">&quot;Timer tick overruns&quot;</span><span class="p">,</span>
+                           <span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">insert_report</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Vertex </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> overran on &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">neuron_prov</span><span class="o">.</span><span class="n">n_timer_overruns</span><span class="si">}</span><span class="s2"> timesteps. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;This may mean that the simulation results are invalid.&quot;</span>
+                    <span class="s2">&quot; Try with fewer neurons per core, increasing the time&quot;</span>
+                    <span class="s2">&quot; scale factor, or reducing the number of spikes sent&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PopulationNeuronsMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationMachineCommon</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

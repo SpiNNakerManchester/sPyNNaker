@@ -58,18 +58,6 @@
 <span class="k">class</span> <span class="nc">AbstractWeightDependence</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-<div class="viewcode-block" id="AbstractWeightDependence.get_provenance_data"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get any provenance data</span>
-
-<span class="sd">        :param str pre_population_label: label of pre.</span>
-<span class="sd">        :param str post_population_label: label of post.</span>
-<span class="sd">        :return: the provenance data of the weight dependency</span>
-<span class="sd">        :rtype:</span>
-<span class="sd">            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=unused-argument</span>
-        <span class="k">return</span> <span class="p">[]</span></div>
-
 <div class="viewcode-block" id="AbstractWeightDependence.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the parameter names</span>

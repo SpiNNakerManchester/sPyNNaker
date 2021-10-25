@@ -52,15 +52,57 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">statistics</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ProvenanceReader</span><span class="p">,</span> <span class="n">ProvenanceWriter</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">report_default_directory</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">PopulationMachineVertex</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+<span class="n">REDUNDANCY_BY_CORE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;CREATE VIEW IF NOT EXISTS redundancy_by_core AS &quot;</span>
+    <span class="s2">&quot;SELECT pro.x, pro.y, pro.p, core_name, &quot;</span>
+    <span class="s2">&quot;   received, filtered, invalid, failed, &quot;</span>
+    <span class="s2">&quot;   filtered + invalid + failed AS redunant, &quot;</span>
+    <span class="s2">&quot;   filtered + invalid + failed + received AS total, &quot;</span>
+    <span class="s2">&quot;   (filtered + invalid + failed) * 100.0 / &quot;</span>
+    <span class="s2">&quot;       (filtered + invalid + failed + received) AS percent &quot;</span>
+    <span class="s2">&quot;FROM&quot;</span>
+    <span class="s2">&quot;   (SELECT x, y, p, total as received, core_name &quot;</span>
+    <span class="s2">&quot;   FROM core_stats_view &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;    WHERE description = </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">) &quot;</span>
+    <span class="s2">&quot;        AS pro &quot;</span>
+    <span class="s2">&quot;LEFT JOIN &quot;</span>
+    <span class="s2">&quot;   (SELECT x, y, p, total AS filtered &quot;</span>
+    <span class="s2">&quot;   FROM core_stats_view &quot;</span>
+    <span class="s2">&quot;   WHERE description = &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;      </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">) &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;  AS bit &quot;</span>
+    <span class="s2">&quot;LEFT JOIN &quot;</span>
+    <span class="s2">&quot;   (SELECT x, y, p, total AS invalid &quot;</span>
+    <span class="s2">&quot;   FROM core_stats_view &quot;</span>
+    <span class="s2">&quot;   WHERE description = &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;      </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">) AS inv &quot;</span>
+    <span class="s2">&quot;LEFT JOIN &quot;</span>
+    <span class="s2">&quot;   (SELECT x, y, p, total AS failed &quot;</span>
+    <span class="s2">&quot;   FROM core_stats_view &quot;</span>
+    <span class="s2">&quot;   WHERE description = &quot;</span>
+    <span class="sa">f</span><span class="s2">&quot;      </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">) AS fai &quot;</span>
+    <span class="s2">&quot;WHERE pro.x = bit.x AND pro.y = bit.y AND pro.p = bit.p &quot;</span>
+    <span class="s2">&quot;   AND pro.x = inv.x AND pro.y = inv.y AND pro.p = inv.p &quot;</span>
+    <span class="s2">&quot;   AND pro.x = fai.x AND pro.y = fai.y AND pro.p = fai.p&quot;</span><span class="p">)</span>
+
+
+<span class="n">REDUNDANCY_SUMMARY</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;CREATE VIEW IF NOT EXISTS redundancy_summary AS &quot;</span>
+    <span class="s2">&quot;SELECT SUM(total), MAX(total), MIN(total), AVG(total), &quot;</span>
+    <span class="s2">&quot;   SUM(redunant), MAX(redunant), MIN(redunant), AVG(redunant), &quot;</span>
+    <span class="s2">&quot;   MAX(percent), MIN(percent), AVG(percent), &quot;</span>
+    <span class="s2">&quot;   SUM(redunant) * 100.0 / SUM(total) as global_percent &quot;</span>
+    <span class="s2">&quot;FROM redundancy_by_core&quot;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">RedundantPacketCountReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -69,115 +111,69 @@
     <span class="n">_N_PROV_ITEMS_NEEDED</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">_MAX</span> <span class="o">=</span> <span class="mi">100</span>
 
-    <span class="n">_CORE_LEVEL_MSG</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;core </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">    </span><span class="si">{}</span><span class="s2"> packets received.</span><span class="se">\n</span><span class="s2">    </span><span class="si">{}</span><span class="s2"> were detected as &quot;</span>
-        <span class="s2">&quot;redundant packets by the bitfield filter.</span><span class="se">\n</span><span class="s2">    </span><span class="si">{}</span><span class="s2"> were detected as &quot;</span>
-        <span class="s2">&quot;having no targets after the DMA stage.</span><span class="se">\n</span><span class="s2">    </span><span class="si">{}</span><span class="s2"> were detected as &quot;</span>
-        <span class="s2">&quot;packets which we should not have received in the first place. </span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;    Overall this makes a redundant percentage of </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="n">_SUMMARY_LEVEL_MSG</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;overall, the core with the most incoming packets had </span><span class="si">{}</span><span class="s2"> packets.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The core with the least incoming packets had </span><span class="si">{}</span><span class="s2"> packets.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The core with the most redundant packets had </span><span class="si">{}</span><span class="s2"> packets.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The core with the least redundant packets had </span><span class="si">{}</span><span class="s2"> packets.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The average incoming and redundant were </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The max and min percentages of redundant packets are </span><span class="si">{}</span><span class="s2">&quot;</span>
-        <span class="s2">&quot; and </span><span class="si">{}</span><span class="s2">. </span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;         The average redundant percentages from each core were </span><span class="si">{}</span><span class="s2"> &quot;</span>
-        <span class="s2">&quot;accordingly.</span><span class="se">\n</span><span class="s2">&quot;</span>
-        <span class="s2">&quot;          The total packets flown in system was </span><span class="si">{}</span><span class="s2">&quot;</span>
-    <span class="p">)</span>
-
-<div class="viewcode-block" id="RedundantPacketCountReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">):</span>
+<div class="viewcode-block" id="RedundantPacketCountReport.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.RedundantPacketCountReport.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param provenance_items:</span>
-<span class="sd">        :type provenance_items:</span>
-<span class="sd">            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
+
+<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_default_directory</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILE_NAME</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_views</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_write_report</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_report</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Generate_placement_reports: Can&#39;t open file&quot;</span>
                              <span class="s2">&quot; </span><span class="si">{}</span><span class="s2"> for writing.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILE_NAME</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_create_views</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">db</span><span class="o">.</span><span class="n">transaction</span><span class="p">()</span> <span class="k">as</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">REDUNDANCY_BY_CORE</span><span class="p">)</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">REDUNDANCY_SUMMARY</span><span class="p">)</span>
 
-        <span class="n">overall_entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">overall_redundant</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">overall_redundant_percentage</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_write_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">ProvenanceReader</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">reader</span><span class="o">.</span><span class="n">run_query</span><span class="p">(</span><span class="s2">&quot;select * from redundancy_by_core&quot;</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">received</span><span class="p">,</span> <span class="n">filtered</span><span class="p">,</span> <span class="n">invalid</span><span class="p">,</span> <span class="n">failed</span><span class="p">,</span>
+                <span class="n">redundant</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">percent</span><span class="p">)</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">core </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> packets received. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">redundant</span><span class="si">}</span><span class="s2"> were detected as &quot;</span>
+                         <span class="s2">&quot;redundant packets by the bitfield filter. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">filtered</span><span class="si">}</span><span class="s2"> were detected as having no targets &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;after the DMA stage. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">invalid</span><span class="si">}</span><span class="s2"> were detected as packets which &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;we should not have received in the first place. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Overall this makes a redundant percentage of &quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">percent</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">run_query</span><span class="p">(</span><span class="s2">&quot;select * from redundancy_summary&quot;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">sum_total</span><span class="p">,</span> <span class="n">max_total</span><span class="p">,</span> <span class="n">min_total</span><span class="p">,</span> <span class="n">avg_total</span><span class="p">,</span>
+            <span class="n">sum_reduant</span><span class="p">,</span> <span class="n">max_redundant</span><span class="p">,</span> <span class="n">min_redundant</span><span class="p">,</span> <span class="n">avg_redundant</span><span class="p">,</span>
+            <span class="n">max_percent</span><span class="p">,</span> <span class="n">min_percent</span><span class="p">,</span> <span class="n">avg_percent</span><span class="p">,</span> <span class="n">global_percent</span><span class="p">)</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The total packets flown in system was &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sum_total</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    The max, min and avergae per core was </span><span class="si">{</span><span class="n">max_total</span><span class="si">}</span><span class="s2">, &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">min_total</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">avg_total</span><span class="si">}</span><span class="s2"> packets.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The total redundant packets was &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sum_reduant</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    The max, min and avergae per core was &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_redundant</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">min_redundant</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">avg_redundant</span><span class="si">}</span><span class="s2"> &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;packets.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The percentages of redundant packets was </span><span class="si">{</span><span class="n">global_percent</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    The max and min percentages of redundant &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;packets are </span><span class="si">{</span><span class="n">max_percent</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">min_percent</span><span class="si">}</span><span class="s2">. </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;    The average redundant percentages from each &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;core were </span><span class="si">{</span><span class="n">avg_percent</span><span class="si">}</span><span class="s2"> accordingly.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">provenance_item</span> <span class="ow">in</span> <span class="n">provenance_items</span><span class="p">:</span>
-            <span class="n">last_name</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">((</span><span class="n">last_name</span> <span class="o">==</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">)</span> <span class="ow">or</span>
-                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span>
-                        <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">)</span> <span class="ow">or</span>
-                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span>
-                        <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">)</span> <span class="ow">or</span>
-                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">)):</span>
 
-                <span class="c1"># add to store</span>
-                <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">last_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">value</span>
-
-                <span class="c1"># accum enough data on a core to do summary</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_PROV_ITEMS_NEEDED</span><span class="p">:</span>
-
-                    <span class="c1"># total packets received</span>
-                    <span class="n">total</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">]</span> <span class="o">+</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span>
-                            <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">]</span> <span class="o">+</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">]</span> <span class="o">+</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">])</span>
-
-                    <span class="c1"># total redundant packets</span>
-                    <span class="n">redundant</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">]</span> <span class="o">+</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span>
-                            <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">]</span> <span class="o">+</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">])</span>
-
-                    <span class="n">percentage</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="k">if</span> <span class="n">total</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_MAX</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span> <span class="o">*</span> <span class="n">redundant</span>
-
-                    <span class="c1"># add to the trackers for summary data</span>
-                    <span class="n">overall_entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
-                    <span class="n">overall_redundant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">redundant</span><span class="p">)</span>
-                    <span class="n">overall_redundant_percentage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">percentage</span><span class="p">)</span>
-
-                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_CORE_LEVEL_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">key</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span>
-                            <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">],</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">],</span>
-                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
-                            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">],</span>
-                        <span class="n">percentage</span><span class="p">))</span>
-
-        <span class="c1"># do summary</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overall_entries</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SUMMARY_LEVEL_MSG</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">max</span><span class="p">(</span><span class="n">overall_entries</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">overall_entries</span><span class="p">),</span>
-                <span class="nb">max</span><span class="p">(</span><span class="n">overall_redundant</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">overall_redundant</span><span class="p">),</span>
-                <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">overall_entries</span><span class="p">),</span>
-                <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">overall_redundant</span><span class="p">),</span>
-                <span class="nb">max</span><span class="p">(</span><span class="n">overall_redundant_percentage</span><span class="p">),</span>
-                <span class="nb">min</span><span class="p">(</span><span class="n">overall_redundant_percentage</span><span class="p">),</span>
-                <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">overall_redundant_percentage</span><span class="p">),</span>
-                <span class="nb">sum</span><span class="p">(</span><span class="n">overall_entries</span><span class="p">)))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;was no data to summarise&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">REDUNDANCY_BY_CORE</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">REDUNDANCY_SUMMARY</span><span class="p">)</span>
 </pre></div>
 
             <div class="clearer"></div>

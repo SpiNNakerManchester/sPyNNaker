@@ -64,7 +64,6 @@
     <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SynapticConfigurationException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">.abstract_plastic_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractPlasticSynapseDynamics</span>
-<span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractSynapseDynamics</span>
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
@@ -502,13 +501,6 @@
         <span class="c1"># The maximum weight is the largest that it could be set to from</span>
         <span class="c1"># the weight dependence</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">w_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">weight_maximum</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SynapseDynamicsSTDP.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_provenance_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">get_provenance_data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">get_provenance_data</span><span class="p">(</span>
-            <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">)</span>
-        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">get_provenance_data</span><span class="p">(</span>
-            <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

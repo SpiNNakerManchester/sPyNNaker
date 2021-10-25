@@ -86,8 +86,7 @@
 <div class="viewcode-block" id="AbstractMachineBitFieldRouterCompressor.__call__"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.AbstractMachineBitFieldRouterCompressor.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="p">,</span>
             <span class="n">machine_graph</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
-            <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">,</span>
-            <span class="n">provenance_data_objects</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">executable_targets</span><span class="p">,</span> <span class="n">read_expander_iobuf</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; entrance for routing table compression with bit field</span>
 
 <span class="sd">        :param routing_tables: routing tables</span>
@@ -107,21 +106,18 @@
 <span class="sd">        :type retry_count: int or None</span>
 <span class="sd">        :param bool read_algorithm_iobuf: flag saying if read iobuf</span>
 <span class="sd">        :param bool read_expander_iobuf: reads the synaptic expander iobuf.</span>
-<span class="sd">        :rtype:</span>
-<span class="sd">            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># build machine compressor</span>
         <span class="n">machine_bit_field_router_compressor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_factory</span><span class="p">()</span>
-        <span class="p">(</span><span class="n">compressor_executable_targets</span><span class="p">,</span> <span class="n">prov_items</span><span class="p">)</span> <span class="o">=</span> \
+        <span class="n">compressor_executable_targets</span> <span class="o">=</span> \
             <span class="n">machine_bit_field_router_compressor</span><span class="p">(</span>
                 <span class="n">routing_tables</span><span class="o">=</span><span class="n">routing_tables</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">=</span><span class="n">transceiver</span><span class="p">,</span>
                 <span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">,</span> <span class="n">app_id</span><span class="o">=</span><span class="n">app_id</span><span class="p">,</span>
                 <span class="n">machine_graph</span><span class="o">=</span><span class="n">machine_graph</span><span class="p">,</span>
                 <span class="n">placements</span><span class="o">=</span><span class="n">placements</span><span class="p">,</span> <span class="n">executable_finder</span><span class="o">=</span><span class="n">executable_finder</span><span class="p">,</span>
                 <span class="n">routing_infos</span><span class="o">=</span><span class="n">routing_infos</span><span class="p">,</span>
-                <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">,</span>
-                <span class="n">provenance_data_objects</span><span class="o">=</span><span class="n">provenance_data_objects</span><span class="p">)</span>
+                <span class="n">executable_targets</span><span class="o">=</span><span class="n">executable_targets</span><span class="p">)</span>
 
         <span class="c1"># adjust cores to exclude the ones which did not give sdram.</span>
         <span class="n">expander_chip_cores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_expander_rerun_targets</span><span class="p">(</span>
@@ -131,9 +127,7 @@
         <span class="c1"># just rerun the synaptic expander for safety purposes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rerun_synaptic_cores</span><span class="p">(</span>
             <span class="n">expander_chip_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="n">read_expander_iobuf</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">prov_items</span></div>
+            <span class="n">read_expander_iobuf</span><span class="p">)</span></div>
 
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">_compressor_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
