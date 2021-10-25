@@ -20,8 +20,8 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -172,20 +172,23 @@ class PopulationNeuronsMachineVertex(
         return name + "_neuron" + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
-        yield from self._parse_neuron_provenance(
-            label, names, provenance_data[:NeuronProvenance.N_ITEMS])
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
+        self._parse_neuron_provenance(
+            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 
         neuron_prov = NeuronMainProvenance(
             *provenance_data[-NeuronMainProvenance.N_ITEMS:])
 
-        yield ProvenanceDataItem(
-            names + ["Timer tick overruns"],
-            neuron_prov.n_timer_overruns, neuron_prov.n_timer_overruns > 0,
-            f"Vertex {label} overran on {neuron_prov.n_timer_overruns} "
-            "timesteps. This may mean that the simulation results are invalid."
-            " Try with fewer neurons per core, increasing the time"
-            " scale factor, or reducing the number of spikes sent")
+        with ProvenanceWriter() as db:
+            db.insert_core(x, y, p, "Timer tick overruns",
+                           neuron_prov.n_timer_overruns)
+            if neuron_prov.n_timer_overruns > 0:
+                db.insert_report(
+                    f"Vertex {label} overran on "
+                    f"{neuron_prov.n_timer_overruns} timesteps. "
+                    f"This may mean that the simulation results are invalid."
+                    " Try with fewer neurons per core, increasing the time"
+                    " scale factor, or reducing the number of spikes sent")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
