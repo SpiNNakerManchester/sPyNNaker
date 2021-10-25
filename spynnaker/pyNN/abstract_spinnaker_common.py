@@ -473,23 +473,17 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         self._execute_write_network_graph()
 
     @overrides(AbstractSpinnakerBase._do_provenance_reports)
-    def _do_provenance_reports(self, prov_items):
-        """
-        Can be extended to add more proevance reports
-        :param prov_items:
-        :return:
-        """
-        AbstractSpinnakerBase._do_provenance_reports(self, prov_items)
-        self._report_redundant_packet_count(prov_items)
+    def _do_provenance_reports(self):
+        AbstractSpinnakerBase._do_provenance_reports(self)
+        self._report_redundant_packet_count()
 
-    def _report_redundant_packet_count(self, prov_items):
+    def _report_redundant_packet_count(self):
         with FecTimer("Write Redundant Packet Count Report") as timer:
-            FecTimer.clear_provenance()
-        if timer.skip_if_cfg_false(
-                "Reports", "write_redundant_packet_count_report"):
-            return
-        report = RedundantPacketCountReport()
-        report(prov_items)
+            if timer.skip_if_cfg_false(
+                    "Reports", "write_redundant_packet_count_report"):
+                return
+            report = RedundantPacketCountReport()
+            report()
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
