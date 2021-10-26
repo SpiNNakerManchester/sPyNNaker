@@ -15,7 +15,7 @@
 
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldModelEitn
-from spynnaker.pyNN.models.neuron.neuron_models import Config
+from spynnaker.pyNN.models.neuron.neuron_models import ParamsFromNetwork
 from spynnaker.pyNN.models.neuron.neuron_models import Mathsbox
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
@@ -144,17 +144,17 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
         neuron_model = MeanfieldModelEitn(nbr, a, b, tauw, Trefrac,
                                           Vreset, delta_v, ampnoise,
                                           Timescale_inv, Ve, Vi)
-        config = Config(pconnec, q_exc, q_inh,
-                        Tsyn_exc, Tsyn_inh,
-                        Erev_exc, Erev_inh,
-                        Ntot, gei, ext_drive,
-                        afferent_exc_fraction,
-                        Gl, Cm, El,
-                        muV, muV0,DmuV0,
-                        sV, sV0, DsV0,
-                        muGn,
-                        TvN, TvN0, DTvN0,
-                        Vthre, Fout_th)
+        params_from_network = ParamsFromNetwork(pconnec, q_exc, q_inh,
+                                                Tsyn_exc, Tsyn_inh,
+                                                Erev_exc, Erev_inh,
+                                                Ntot, gei, ext_drive,
+                                                afferent_exc_fraction,
+                                                Gl, Cm, El,
+                                                muV, muV0,DmuV0,
+                                                sV, sV0, DsV0,
+                                                muGn,
+                                                TvN, TvN0, DTvN0,
+                                                Vthre, Fout_th)
         Vthre_params_Ve = 
         Vthre_params_vi = 
         mathsbox = Mathsbox(sample, err_func)
@@ -167,7 +167,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
             model_name="meanfield_model_cond",
             binary="meanfield_model_cond.aplx",
             neuron_model=neuron_model,
-            config=config,
+            params_from_network=params_from_network,
             Vthre_params_Ve = , #PUT HERE
             Vthre_params_vi = , #PUT HERE
             mathsbox=mathsbox,

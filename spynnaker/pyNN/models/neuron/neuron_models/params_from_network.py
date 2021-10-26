@@ -113,7 +113,7 @@ UNITS = {
 }
 
 
-class Config(AbstractInputType):
+class ParamsFromNetwork(AbstractInputType):
     """ Model of neuron due to Eugene M. Izhikevich et al
     """
     __slots__ = [
