@@ -41,9 +41,9 @@ struct pFitPolynomial_t;
 typedef struct pFitPolynomial_t pFitPolynomial_t;
 typedef struct pFitPolynomial_t* pFitPolynomial_pointer_t;
 
-struct mathsbox_t;
-typedef struct mathsbox_t mathsbox_t;
-typedef struct mathsbox_t* mathsbox_pointer_t;
+struct EstimateErrFunc_t;
+typedef struct EstimateErrFunc_t EstimateErrFunc_t;
+typedef struct EstimateErrFunc_t* EstimateErrFunc_pointer_t;
 
 //! Forward declaration of global neuron parameters
 struct global_neuron_params_t;
@@ -86,7 +86,7 @@ state_t meanfield_model_state_update(
     ParamsFromNetwork_t *restrict params_from_network,
     pFitPolynomial_t *restrict Pfit_exc,
     pFitPolynomial_t *restrict Pfit_inh,
-    mathsbox_t *restrict mathsbox);
+    EstimateErrFunc_t *restrict err_func);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains

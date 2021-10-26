@@ -1,5 +1,5 @@
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
+#ifndef _PARAMS_FROM_NETWORK_H_
+#define _PARAMS_FROM_NETWORK_H_
 
 #include "../../meanfield/models/meanfield_model.h"
 
