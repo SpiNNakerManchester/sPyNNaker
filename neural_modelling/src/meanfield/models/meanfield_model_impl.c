@@ -20,7 +20,7 @@
 #include "../../meanfield/models/meanfield_model_impl.h"
 
 #include <debug.h>
-#include "../../meanfield/models/config.h"
+#include "../../meanfield/models/params_from_network.h"
 #include "../../meanfield/models/mathsbox.h"
 #include "../../meanfield/models/P_fit_polynomial.h"
 //#include "../../common/maths-util.h" // i.o to use SQRT(x) and SQR(a)
@@ -87,7 +87,7 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
 }
 
 
-void threshold_func(config_t *restrict config, pFitPolynomial_t *restrict pfit)
+void threshold_func(ParamsFromNetwork_t *restrict pNetwork, pFitPolynomial_t *restrict pfit)
 {
     /*
         threshold function coming from :
@@ -104,21 +104,21 @@ void threshold_func(config_t *restrict config, pFitPolynomial_t *restrict pfit)
         but not for now
     */
    
-    REAL muV0 = config->muV0;
-    REAL DmuV0 = config->DmuV0;
+    REAL muV0 = pNetwork->muV0;
+    REAL DmuV0 = pNetwork->DmuV0;
 
-    REAL sV0 = config->sV0;
-    REAL DsV0 = config->DsV0;
+    REAL sV0 = pNetwork->sV0;
+    REAL DsV0 = pNetwork->DsV0;
 
-    REAL TvN0 = config->TvN0;
-    REAL DTvN0 = config->DTvN0;
+    REAL TvN0 = pNetwork->TvN0;
+    REAL DTvN0 = pNetwork->DTvN0;
 
-    REAL muV = config->muV;
-    REAL sV = config->sV;
-    //REAL muGn = config->muGn;
-    REAL TvN = config->TvN;
-    REAL Vthre = config->Vthre;
-    //REAL Fout_th = config->Fout_th;
+    REAL muV = pNetwork->muV;
+    REAL sV = pNetwork->sV;
+    //REAL muGn = pNetwork->muGn;
+    REAL TvN = pNetwork->TvN;
+    REAL Vthre = pNetwork->Vthre;
+    //REAL Fout_th = pNetwork->Fout_th;
     
     REAL P0 = pfit->P0;
     REAL P1 = pfit->P1;
@@ -145,11 +145,11 @@ void threshold_func(config_t *restrict config, pFitPolynomial_t *restrict pfit)
         + P9*((muV-muV0)/DmuV0)*((TvN-TvN0)/DTvN0)\
         + P10*((sV-sV0)/DsV0)*((TvN-TvN0)/DTvN0);
 
-    config->Vthre = Vthre;
+    pNetwork->Vthre = Vthre;
 
     }
 
-void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
+void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNetwork)
 {
 
     REAL Fe;
@@ -158,23 +158,23 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
     REAL Ue, Ui;
     REAL Tm, Tv;
     
-    REAL gei = config->gei;
-    REAL pconnec = config->pconnec;
-    REAL Ntot = config->Ntot;
-    REAL Qe = config->Qe;
-    REAL Qi = config->Qi;
-    REAL Te = config->Te;
-    REAL Ti = config->Ti;
-    REAL Gl = config->Gl;
-    REAL El = config->El;
-    REAL Ei = config->Ei;
-    REAL Ee = config->Ee;
-    REAL Cm = config->Cm;
+    REAL gei = pNetwork->gei;
+    REAL pconnec = pNetwork->pconnec;
+    REAL Ntot = pNetwork->Ntot;
+    REAL Qe = pNetwork->Qe;
+    REAL Qi = pNetwork->Qi;
+    REAL Te = pNetwork->Te;
+    REAL Ti = pNetwork->Ti;
+    REAL Gl = pNetwork->Gl;
+    REAL El = pNetwork->El;
+    REAL Ei = pNetwork->Ei;
+    REAL Ee = pNetwork->Ee;
+    REAL Cm = pNetwork->Cm;
     
-    REAL muV = config->muV;
-    REAL muGn = config->muGn;
-    REAL sV = config->sV;
-    REAL TvN = config->TvN;
+    REAL muV = pNetwork->muV;
+    REAL muGn = pNetwork->muGn;
+    REAL sV = pNetwork->sV;
+    REAL TvN = pNetwork->TvN;
     
     // here TOTAL (sum over synapses) excitatory and inhibitory input
 
@@ -234,8 +234,11 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
 }
 
 
-void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
-        pFitPolynomial_t *restrict Pfit, mathsbox_t *restrict mathsbox){
+void TF(REAL Ve, REAL Vi,
+        meanfield_t *meanfield,
+        ParamsFromNetwork_t *restrict pNetwork,
+        pFitPolynomial_t *restrict Pfit,
+        mathsbox_t *restrict mathsbox){
 
 //PUT comments HERE!!!
 
@@ -250,40 +253,40 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
         Vi += ACS_DBL_TINY;
     }
 
-    get_fluct_regime_varsup(Ve, Vi, config);
-    threshold_func(config, Pfit);
+    get_fluct_regime_varsup(Ve, Vi, pNetwork);
+    threshold_func(pNetwork, Pfit);
 
-    limit = REAL_HALF(config->Gl/(config->TvN * config->Cm));
+    limit = REAL_HALF(pNetwork->Gl/(pNetwork->TvN * pNetwork->Cm));
     /*
     normalement sqrt:
-        argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
+        argument = (pNetwork->Vthre - pNetwork->muV)/sqrtk(REAL_CONST(2.))/pNetwork->sV;
 
     */
-    if (config->sV<ACS_DBL_TINY){
-        config->sV += ACS_DBL_TINY;
+    if (pNetwork->sV<ACS_DBL_TINY){
+        pNetwork->sV += ACS_DBL_TINY;
     }
-    argument = (config->Vthre - config->muV)/(REAL_CONST(1.4142137))/config->sV;
+    argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137))/pNetwork->sV;
 
     error_function(limit, argument, mathsbox);
     /*
-    if (config->P0 == 0.){
+    if (pNetwork->P0 == 0.){
         mathsbox->err_func = 1; a simple test
     }
     */
     
-    config->Fout_th = (HALF*config->Gl) * mathsbox->err_func / (config->Cm*config->TvN);// REAL ONE
-    //config->Fout_th = mathsbox->err_func ; //TEST
+    pNetwork->Fout_th = (HALF*pNetwork->Gl) * mathsbox->err_func / (pNetwork->Cm*pNetwork->TvN);// REAL ONE
+    //pNetwork->Fout_th = mathsbox->err_func ; //TEST
 
 
-    if (config->Fout_th < ACS_DBL_TINY){
-        config->Fout_th += ACS_DBL_TINY;
+    if (pNetwork->Fout_th < ACS_DBL_TINY){
+        pNetwork->Fout_th += ACS_DBL_TINY;
     }
 
 }
 
 
 void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
-                     config_t *restrict config,
+                     ParamsFromNetwork_t *restrict pNetwork,
                      pFitPolynomial_t *restrict Pfit_exc,
                      pFitPolynomial_t *restrict Pfit_inh,
                      mathsbox_t *restrict mathsbox) {
@@ -293,12 +296,12 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
        
     REAL T_inv = meanfield->Timescale_inv;
     
-    TF(lastVe, lastVi, meanfield, config, Pfit_exc, mathsbox);
-    REAL lastTF_Ve = config->Fout_th;
+    TF(lastVe, lastVi, meanfield, pNetwork, Pfit_exc, mathsbox);
+    REAL lastTF_Ve = pNetwork->Fout_th;
     
     
-    TF(lastVe, lastVi, meanfield, config, Pfit_inh, mathsbox);
-    REAL lastTF_Vi = config->Fout_th;
+    TF(lastVe, lastVi, meanfield, pNetwork, Pfit_inh, mathsbox);
+    REAL lastTF_Vi = pNetwork->Fout_th;
     
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
@@ -362,7 +365,7 @@ void meanfield_model_set_global_neuron_params(
 */
 state_t meanfield_model_state_update(
     meanfield_t *restrict meanfield,
-    config_t *restrict config,
+    ParamsFromNetwork_t *restrict pNetwork,
     pFitPolynomial_t *restrict Pfit_exc,
     pFitPolynomial_t *restrict Pfit_inh,
     mathsbox_t *restrict mathsbox){
@@ -370,7 +373,7 @@ state_t meanfield_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
 		uint16_t num_inhibitory_inputs, const input_t *inh_input,
 		input_t external_bias, meanfield_t *restrict meanfield,
-        config_t *restrict config) {
+        ParamsFromNetwork_t *restrict pNetwork) {
     REAL total_exc = 0;
     REAL total_inh = 0;
 
@@ -388,7 +391,7 @@ state_t meanfield_model_state_update(
     // the best AR update so far
     RK2_midpoint_MF(meanfield->this_h,
                     meanfield,
-                    config,
+                    pNetwork,
                     Pfit_exc,
                     Pfit_inh,
                     mathsbox);
@@ -421,8 +424,8 @@ state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
     return meanfield->Vi;
 }
 
-state_t meanfield_model_get_Fout_th(const config_t *config){
-    return config->Fout_th;
+state_t meanfield_model_get_Fout_th(const ParamsFromNetwork_t *pNetwork){
+    return pNetwork->Fout_th;
 }
 
 

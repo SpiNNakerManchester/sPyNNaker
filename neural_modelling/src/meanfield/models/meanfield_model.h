@@ -33,9 +33,9 @@ struct meanfield_t;
 typedef struct meanfield_t meanfield_t;
 typedef struct meanfield_t* meanfield_pointer_t;
 
-struct config_t;
-typedef struct config_t config_t;
-typedef struct config_t* config_pointer_t;
+struct ParamsFromNetwork_t;
+typedef struct ParamsFromNetwork_t ParamsFromNetwork_t;
+typedef struct ParamsFromNetwork_t* ParamsFromNetwork_pointer_t;
 
 struct pFitPolynomial_t;
 typedef struct pFitPolynomial_t pFitPolynomial_t;
@@ -83,7 +83,7 @@ state_t meanfield_model_state_update(
 
 state_t meanfield_model_state_update(
     meanfield_t *restrict meanfield,
-    config_t *restrict config,
+    ParamsFromNetwork_t *restrict params_from_network,
     pFitPolynomial_t *restrict Pfit_exc,
     pFitPolynomial_t *restrict Pfit_inh,
     mathsbox_t *restrict mathsbox);
@@ -100,7 +100,7 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield);
 //!     parameters specified in neuron
 state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield);
 state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield);
-state_t meanfield_model_get_Fout_th(const config_t *config);
+state_t meanfield_model_get_Fout_th(const ParamsFromNetwork_t *params_from_network);
 
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all

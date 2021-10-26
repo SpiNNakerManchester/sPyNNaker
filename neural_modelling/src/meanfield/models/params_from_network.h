@@ -8,7 +8,7 @@
 typedef struct config_t config_t;
 typedef struct config_t* config_t;*/
 
-typedef struct config_t {
+typedef struct ParamsFromNetwork_t {
     // nominally 'fixed' parameters
     REAL pconnec;
     REAL Qe;
@@ -48,7 +48,7 @@ typedef struct config_t {
     REAL Vthre;
     
     REAL Fout_th;
-} config_t;
+} ParamsFromNetwork_t;
 
 /*
 typedef struct global_toolbox_params_t {

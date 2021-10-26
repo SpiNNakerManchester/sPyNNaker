@@ -24,7 +24,7 @@
 
 // Includes for model parts used in this implementation
 #include <meanfield/models/meanfield_model_impl.h>
-#include <meanfield/models/config.h>
+#include <meanfield/models/params_from_network.h>
 #include <meanfield/models/P_fit_polynomial.h>
 #include <meanfield/models/mathsbox.h>
 
@@ -72,7 +72,7 @@ enum bitfield_recording_indices {
 //! Array of meanfield states -> will be change in future , the future is now!!
 static meanfield_t *meanfield_array;
 
-static config_t *config_array;
+static ParamsFromNetwork_t *pNetwork_array;
 
 static mathsbox_t *mathsbox_array;
 
@@ -141,9 +141,9 @@ static bool meanfield_impl_initialise(uint32_t n_meanfields) {
     }
 
     // Allocate DTCM for config array and copy block of data
-    if (sizeof(config_t)) {
-        config_array = spin1_malloc(n_meanfields * sizeof(config_t));
-        if (config_array == NULL) {
+    if (sizeof(ParamsFromNetwork_t)) {
+        pNetwork_array = spin1_malloc(n_meanfields * sizeof(ParamsFromNetwork_t));
+        if (pNetwork_array == NULL) {
             log_error("Unable to allocate config array - Out of DTCM");
             return false;
         }
@@ -277,11 +277,11 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_meanfields * sizeof(meanfield_t));
     }
 
-    if (sizeof(config_t)) {
+    if (sizeof(ParamsFromNetwork_t)) {
         log_debug("reading config parameters");
-        spin1_memcpy(config_array, &address[next],
-                n_meanfields * sizeof(config_t));
-        next += n_words_needed(n_meanfields * sizeof(config_t));
+        spin1_memcpy(pNetwork_array, &address[next],
+                n_meanfields * sizeof(ParamsFromNetwork_t));
+        next += n_words_needed(n_meanfields * sizeof(ParamsFromNetwork_t));
     }
     
     if (sizeof(pFitPolynomial_t)) {
@@ -352,8 +352,8 @@ static void neuron_impl_do_timestep_update(
         // Get the neuron itself
         meanfield_t *this_meanfield = &meanfield_array[meanfield_index];
 
-        // Get the config and mathsbox params for this neuron
-        config_t *config_types = &config_array[meanfield_index];
+        // Get the Params from network and mathsbox params for this neuron
+        ParamsFromNetwork_t *pNetwork_types = &pNetwork_array[meanfield_index];
         pFitPolynomial_t *Pfit_exc_types = &Pfit_exc_array[meanfield_index];
         pFitPolynomial_t *Pfit_inh_types = &Pfit_inh_array[meanfield_index];
         
@@ -381,7 +381,7 @@ static void neuron_impl_do_timestep_update(
             state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(
                 this_meanfield);
             
-            state_t Fout_th = meanfield_model_get_Fout_th(config_types);
+            state_t Fout_th = meanfield_model_get_Fout_th(pNetwork_types);
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
@@ -433,7 +433,7 @@ static void neuron_impl_do_timestep_update(
 
             // update neuron parameters
             state_t result = meanfield_model_state_update(
-                this_meanfield, config_types,
+                this_meanfield, pNetwork_types,
                 Pfit_exc_types, Pfit_inh_types,
                 mathsbox_types);
 
@@ -459,7 +459,7 @@ static void neuron_impl_do_timestep_update(
 
             // Shape the existing input according to the included rule
             synapse_types_shape_input(the_synapse_type);
-            if (config_types->Fout_th==0.0) {
+            if (pNetwork_types->Fout_th==0.0) {
                 has_spiked = true;
             }
         }
@@ -500,11 +500,11 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_meanfields * sizeof(meanfield_t));
     }
 
-    if (sizeof(config_t)) {
+    if (sizeof(ParamsFromNetwork_t)) {
         log_debug("writing input type parameters");
-        spin1_memcpy(&address[next], config_array,
-                n_meanfields * sizeof(config_t));
-        next += n_words_needed(n_meanfields * sizeof(config_t));
+        spin1_memcpy(&address[next], pNetwork_array,
+                n_meanfields * sizeof(ParamsFromNetwork_t));
+        next += n_words_needed(n_meanfields * sizeof(ParamsFromNetwork_t));
     }
 
 }
