@@ -22,6 +22,7 @@
 #include <debug.h>
 #include "../../meanfield/models/config.h"
 #include "../../meanfield/models/mathsbox.h"
+#include "../../meanfield/models/P_fit_polynomial.h"
 //#include "../../common/maths-util.h" // i.o to use SQRT(x) and SQR(a)
 
 //! The global parameters of the Izhekevich neuron model
@@ -86,8 +87,14 @@ void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
 }
 
 
-void threshold_func(config_t *restrict config, Vthre_params_t *restrict Vparams)
+void threshold_func(config_t *restrict config, pFitPolynomial_t *restrict pfit)
 {
+    /*
+        threshold function coming from :
+        Neural Computation 31, 653–680 (2019) doi:10.1162/neco_a_01173
+        where P's are polynomials parameters involve in a 
+        voltage-effective threshold.
+    */
     /*
     setting by default to True the square
     because when use by external modules, coeff[5:]=np.zeros(3)
@@ -97,36 +104,33 @@ void threshold_func(config_t *restrict config, Vthre_params_t *restrict Vparams)
         but not for now
     */
    
-    REAL muV0 = config->muV0;//=-0.06;
-    REAL DmuV0 = config->DmuV0;//=0.01;
+    REAL muV0 = config->muV0;
+    REAL DmuV0 = config->DmuV0;
 
-    REAL sV0 = config->sV0;//=0.004;
-    REAL DsV0 = config->DsV0;//=0.006;
+    REAL sV0 = config->sV0;
+    REAL DsV0 = config->DsV0;
 
-    REAL TvN0 = config->TvN0;//=0.5;
-    REAL DTvN0 = config->DTvN0;//=1.;
+    REAL TvN0 = config->TvN0;
+    REAL DTvN0 = config->DTvN0;
 
-    REAL muV = config->muV;//=0.;
-    REAL sV = config->sV;//=0.;
-    //REAL muGn = config->muGn;//=0.;
-    REAL TvN = config->TvN;//=0.;
-    REAL Vthre = config->Vthre;//=0.;
-    //REAL Fout_th = config->Fout_th;//=0.;
+    REAL muV = config->muV;
+    REAL sV = config->sV;
+    //REAL muGn = config->muGn;
+    REAL TvN = config->TvN;
+    REAL Vthre = config->Vthre;
+    //REAL Fout_th = config->Fout_th;
     
-    REAL P0 = Vparams->P0;
-    REAL P1 = Vparams->P1;
-    REAL P2 = Vparams->P2;
-    REAL P3 = Vparams->P3;
-    REAL P4 = Vparams->P4;
-    REAL P5 = Vparams->P5;
-    REAL P6 = Vparams->P6;
-    REAL P7 = Vparams->P7;
-    REAL P8 = Vparams->P8;
-    REAL P9 = Vparams->P9;
-    REAL P10 = Vparams->P10;
-    
-        
-    
+    REAL P0 = pfit->P0;
+    REAL P1 = pfit->P1;
+    REAL P2 = pfit->P2;
+    REAL P3 = pfit->P3;
+    REAL P4 = pfit->P4;
+    REAL P5 = pfit->P5;
+    REAL P6 = pfit->P6;
+    REAL P7 = pfit->P7;
+    REAL P8 = pfit->P8;
+    REAL P9 = pfit->P9;
+    REAL P10 = pfit->P10;
 
     //        + 0.\ //P4*np.log(muGn)
     
@@ -172,9 +176,6 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
     REAL sV = config->sV;
     REAL TvN = config->TvN;
     
-    
-
-
     // here TOTAL (sum over synapses) excitatory and inhibitory input
 
     Fe = Ve * (REAL_CONST(1.)-gei)*pconnec*Ntot; // default is 1 !!
@@ -234,7 +235,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict config)
 
 
 void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
-        Vthre_params_t *restrict Vparams, mathsbox_t *restrict mathsbox){
+        pFitPolynomial_t *restrict Pfit, mathsbox_t *restrict mathsbox){
 
 //PUT comments HERE!!!
 
@@ -250,9 +251,9 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
     }
 
     get_fluct_regime_varsup(Ve, Vi, config);
-    threshold_func(config, Vparams);
+    threshold_func(config, Pfit);
 
-    limit = REAL_HALF*(config->Gl/(config->TvN * config->Cm));
+    limit = REAL_HALF(config->Gl/(config->TvN * config->Cm));
     /*
     normalement sqrt:
         argument = (config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
@@ -283,8 +284,8 @@ void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
 
 void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
                      config_t *restrict config,
-                     Vthre_params_t *restrict Vparams_Ve,
-                     Vthre_params_t *restrict Vparams_Vi,
+                     pFitPolynomial_t *restrict Pfit_exc,
+                     pFitPolynomial_t *restrict Pfit_inh,
                      mathsbox_t *restrict mathsbox) {
 
     REAL lastVe = meanfield->Ve;
@@ -292,18 +293,18 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
        
     REAL T_inv = meanfield->Timescale_inv;
     
-    TF(lastVe, lastVi, meanfield, config, Vparams_Ve, mathsbox);
+    TF(lastVe, lastVi, meanfield, config, Pfit_exc, mathsbox);
     REAL lastTF_Ve = config->Fout_th;
     
     
-    TF(lastVe, lastVi, meanfield, config, Vparams_Vi, mathsbox);
+    TF(lastVe, lastVi, meanfield, config, Pfit_inh, mathsbox);
     REAL lastTF_Vi = config->Fout_th;
     
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
 
 
-    meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
+    meanfield->Ve += lastVe + (REAL_HALF(lastTF_Ve - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
     
     
@@ -360,9 +361,10 @@ void meanfield_model_set_global_neuron_params(
   and maybe is there some contamanation from the neightbourest neighbour MF!
 */
 state_t meanfield_model_state_update(
-    meanfield_t *restrict meanfield, config_t *restrict config,
-    Vthre_params_t *restrict Vparams_Ve,
-    Vthre_params_t *restrict Vparams_Vi,
+    meanfield_t *restrict meanfield,
+    config_t *restrict config,
+    pFitPolynomial_t *restrict Pfit_exc,
+    pFitPolynomial_t *restrict Pfit_inh,
     mathsbox_t *restrict mathsbox){
     /*
         uint16_t num_excitatory_inputs, const input_t *exc_input,
@@ -384,9 +386,12 @@ state_t meanfield_model_state_update(
     */
 
     // the best AR update so far
-    RK2_midpoint_MF(meanfield->this_h, meanfield,
-                    Vparams_Ve, Vparams_Vi,
-                    config, mathsbox);
+    RK2_midpoint_MF(meanfield->this_h,
+                    meanfield,
+                    config,
+                    Pfit_exc,
+                    Pfit_inh,
+                    mathsbox);
     meanfield->this_h = global_params->machine_timestep_ms;
 
     return meanfield->Ve;

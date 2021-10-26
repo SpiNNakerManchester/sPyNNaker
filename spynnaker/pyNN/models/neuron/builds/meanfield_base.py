@@ -150,13 +150,13 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                         Ntot, gei, ext_drive,
                         afferent_exc_fraction,
                         Gl, Cm, El,
-                        p0, p1, p2, p3, p4, p5,
-                        p6, p7, p8, p9, p10,
                         muV, muV0,DmuV0,
                         sV, sV0, DsV0,
                         muGn,
                         TvN, TvN0, DTvN0,
                         Vthre, Fout_th)
+        Vthre_params_Ve = 
+        Vthre_params_vi = 
         mathsbox = Mathsbox(sample, err_func)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
@@ -166,6 +166,11 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
         super().__init__(
             model_name="meanfield_model_cond",
             binary="meanfield_model_cond.aplx",
-            neuron_model=neuron_model, config=config, mathsbox=mathsbox,
-            input_type=input_type, synapse_type=synapse_type,
+            neuron_model=neuron_model,
+            config=config,
+            Vthre_params_Ve = , #PUT HERE
+            Vthre_params_vi = , #PUT HERE
+            mathsbox=mathsbox,
+            input_type=input_type,
+            synapse_type=synapse_type,
             threshold_type=threshold_type)

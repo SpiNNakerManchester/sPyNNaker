@@ -126,6 +126,12 @@ else
 		    CONFIG_H := $(call replace_source_dirs,$(CONFIG_H))
 		endif
 		
+		ifndef P_FIT_POLYNOMIAL_H
+		    $(error P_FIT_POLYNOMIAL_H is not set.  Please select an input type header file)
+		else
+		    P_FIT_POLYNOMIAL_H := $(call replace_source_dirs,$(P_FIT_POLYNOMIAL_H))
+		endif
+		
 		ifndef INPUT_TYPE_H
 		    $(error INPUT_TYPE_H is not set.  Please select an input type header file)
 		else
@@ -154,6 +160,7 @@ else
 	      -include $(MEANFIELD_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(CONFIG_H)\
+          -include $(P_FIT_POLYNOMIAL_H)\
           -include $(MATHSBOX_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \

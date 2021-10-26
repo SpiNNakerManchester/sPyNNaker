@@ -25,6 +25,7 @@
 // Includes for model parts used in this implementation
 #include <meanfield/models/meanfield_model_impl.h>
 #include <meanfield/models/config.h>
+#include <meanfield/models/P_fit_polynomial.h>
 #include <meanfield/models/mathsbox.h>
 
 #include <meanfield/input_types/input_type.h>
@@ -68,13 +69,15 @@ enum bitfield_recording_indices {
     };*/
 
 
-//! Array of meanfield states -> will be change in future
+//! Array of meanfield states -> will be change in future , the future is now!!
 static meanfield_t *meanfield_array;
 
 static config_t *config_array;
 
 static mathsbox_t *mathsbox_array;
 
+static pFitPolynomial_t *Pfit_exc_array;
+static pFitPolynomial_t *Pfit_inh_array;
 
 //! Input states array
 static input_type_t *input_type_array;
@@ -145,7 +148,25 @@ static bool meanfield_impl_initialise(uint32_t n_meanfields) {
             return false;
         }
     }
-
+    
+    // Allocate DTCM for P fit from polyomial for exc array and copy block of data
+    if (sizeof(pFitPolynomial_t)) {
+        Pfit_exc_array = spin1_malloc(n_meanfields * sizeof(pFitPolynomial_t));
+        if (Pfit_exc_array == NULL) {
+            log_error("Unable to allocate Pfit_exc_array - Out of DTCM");
+            return false;
+        }
+    }
+    
+    // Allocate DTCM for P fit from polyomial for exc array and copy block of data
+    if (sizeof(pFitPolynomial_t)) {
+        Pfit_inh_array = spin1_malloc(n_meanfields * sizeof(pFitPolynomial_t));
+        if (Pfit_inh_array == NULL) {
+            log_error("Unable to allocate Pfit_inh_array - Out of DTCM");
+            return false;
+        }
+    }
+    
     // Allocate DTCM for mathsbox array and copy block of data
     if (sizeof(mathsbox_t)) {
         mathsbox_array = spin1_malloc(n_meanfields * sizeof(mathsbox_t));
@@ -262,7 +283,21 @@ static void neuron_impl_load_neuron_parameters(
                 n_meanfields * sizeof(config_t));
         next += n_words_needed(n_meanfields * sizeof(config_t));
     }
-
+    
+    if (sizeof(pFitPolynomial_t)) {
+        log_debug("reading pFitPolynomial exc parameters");
+        spin1_memcpy(Pfit_exc_array, &address[next],
+                n_meanfields * sizeof(pFitPolynomial_t));
+        next += n_words_needed(n_meanfields * sizeof(pFitPolynomial_t));
+    }
+    
+    if (sizeof(pFitPolynomial_t)) {
+        log_debug("reading pFitPolynomial inh parameters");
+        spin1_memcpy(Pfit_inh_array, &address[next],
+                n_meanfields * sizeof(pFitPolynomial_t));
+        next += n_words_needed(n_meanfields * sizeof(pFitPolynomial_t));
+    }
+    
     if (sizeof(mathsbox_t)) {
         log_debug("reading mathsbox parameters");
         spin1_memcpy(mathsbox_array, &address[next],
@@ -319,6 +354,9 @@ static void neuron_impl_do_timestep_update(
 
         // Get the config and mathsbox params for this neuron
         config_t *config_types = &config_array[meanfield_index];
+        pFitPolynomial_t *Pfit_exc_types = &Pfit_exc_array[meanfield_index];
+        pFitPolynomial_t *Pfit_inh_types = &Pfit_inh_array[meanfield_index];
+        
         mathsbox_t *mathsbox_types = &mathsbox_array[meanfield_index];
 
         // Get the input_type parameters and voltage for this neuron
@@ -338,8 +376,10 @@ static void neuron_impl_do_timestep_update(
         // and because the index doesn't actually matter
         for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
             // Get the voltage->firing rate
-            state_t firing_rate_Ve = meanfield_model_get_firing_rate_Ve(this_meanfield);
-            state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(this_meanfield);
+            state_t firing_rate_Ve = meanfield_model_get_firing_rate_Ve(
+                this_meanfield);
+            state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(
+                this_meanfield);
             
             state_t Fout_th = meanfield_model_get_Fout_th(config_types);
 
@@ -393,7 +433,9 @@ static void neuron_impl_do_timestep_update(
 
             // update neuron parameters
             state_t result = meanfield_model_state_update(
-                this_meanfield, config_types, mathsbox_types);
+                this_meanfield, config_types,
+                Pfit_exc_types, Pfit_inh_types,
+                mathsbox_types);
 
             // determine if a spike should occur
             bool spike_now =
