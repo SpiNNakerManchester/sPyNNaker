@@ -101,17 +101,17 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Cm=200.,
                  El=-70.,
 
-                 p0=-0.0515518,
-                 p1=0.00455197,
-                 p2=-0.00760625,
-                 p3=0.00094851,
-                 p4=0.001,
-                 p5=-0.0009863,
-                 p6=-0.0026474,
-                 p7=-0.0135417,
-                 p8=0.0028742,
-                 p9=0.0029213,
-                 p10=-0.014084,
+                 p0_exc=-0.0515518,
+                 p1_exc=0.00455197,
+                 p2_exc=-0.00760625,
+                 p3_exc=0.00094851,
+                 p4_exc=0.001,
+                 p5_exc=-0.0009863,
+                 p6_exc=-0.0026474,
+                 p7_exc=-0.0135417,
+                 p8_exc=0.0028742,
+                 p9_exc=0.0029213,
+                 p10_exc=-0.014084,
 
                  muV=0.,
                  muV0=-0.06,
@@ -155,8 +155,14 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                                                 muGn,
                                                 TvN, TvN0, DTvN0,
                                                 Vthre, Fout_th)
-        Vthre_params_Ve = 
-        Vthre_params_vi = 
+        p_fit_polynomial_exc = pFitPolynomial(p0_exc, p1_exc, p2_exc,
+                                              p3_exc, p4_exc, p5_exc, 
+                                              p6_exc, p7_exc, p8_exc,
+                                              p9_exc, p10_exc)
+        p_fit_polynomial_inh = pFitPolynomial(p0_inh, p1_inh, p2_inh,
+                                              p3_inh, p4_inh, p5_inh,
+                                              p6_inh, p7_inh, p8_inh,
+                                              p9_inh, p10_inh)
         mathsbox = Mathsbox(sample, err_func)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
@@ -168,8 +174,8 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
             binary="meanfield_model_cond.aplx",
             neuron_model=neuron_model,
             params_from_network=params_from_network,
-            Vthre_params_Ve = , #PUT HERE
-            Vthre_params_vi = , #PUT HERE
+            p_fit_polynomial_exc = , #PUT HERE
+            p_fit_polynomial_inh = , #PUT HERE
             mathsbox=mathsbox,
             input_type=input_type,
             synapse_type=synapse_type,

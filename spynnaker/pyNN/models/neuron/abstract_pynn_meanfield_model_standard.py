@@ -33,7 +33,7 @@ class AbstractPyNNMeanfieldModelStandard(AbstractPyNNNeuronModel):
 
     def __init__(
         self, model_name, binary, neuron_model,
-        params_from_network, Vthre_params_Ve, Vthre_params_Vi,
+        params_from_network, p_fit_polynomial_exc, p_fit_polynomial_inh,
         mathsbox, input_type, synapse_type, threshold_type,
         additional_input_type=None):
         """
@@ -51,7 +51,7 @@ class AbstractPyNNMeanfieldModelStandard(AbstractPyNNNeuronModel):
         """
         super().__init__(MeanfieldImplStandard(
             model_name, binary, neuron_model,
-            params_from_network, #PUT HERE
+            params_from_network, p_fit_polynomial_exc, p_fit_polynomial_inh,
             mathsbox, input_type,
             synapse_type, threshold_type, additional_input_type))
 
