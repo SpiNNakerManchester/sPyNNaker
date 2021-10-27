@@ -3,11 +3,6 @@
 
 #include "../../meanfield/models/meanfield_model.h"
 
-
-/*struct config_t;
-typedef struct config_t config_t;
-typedef struct config_t* config_t;*/
-
 typedef struct ParamsFromNetwork_t {
     // nominally 'fixed' parameters
     REAL pconnec;

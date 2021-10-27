@@ -38,6 +38,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         "__binary",
         "__neuron_model",
         "__params_from_network",
+        "__p_fit_polynomial_exc",
+        "__p_fit_polynomial_inh",
         "__mathsbox",
         "__input_type",
         "__synapse_type",
@@ -67,7 +69,10 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
 
     def __init__(
             self, model_name, binary, neuron_model,
-            params_from_network, mathsbox,
+            params_from_network,
+            p_fit_polynomial_exc,
+            p_fit_polynomial_inh,
+            mathsbox,
             input_type, synapse_type, threshold_type,
             additional_input_type=None):
         """
@@ -84,6 +89,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         self.__binary = binary
         self.__neuron_model = neuron_model
         self.__params_from_network = params_from_network
+        self.__p_fit_polynomial_exc = p_fit_polynomial_exc
+        self.__p_fit_polynomial_inh = p_fit_polynomial_inh
         self.__mathsbox = mathsbox
         self.__input_type = input_type
         self.__synapse_type = synapse_type
@@ -120,6 +127,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         total = self.__neuron_model.get_n_cpu_cycles(n_neurons)
         total += self.__synapse_type.get_n_cpu_cycles(n_neurons)
         total += self.__params_from_network.get_n_cpu_cycles(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_n_cpu_cycles(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_n_cpu_cycles(n_neurons)
         total += self.__input_type.get_n_cpu_cycles(n_neurons)
         total += self.__mathsbox.get_n_cpu_cycles(n_neurons)
         total += self.__threshold_type.get_n_cpu_cycles(n_neurons)
@@ -133,6 +142,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__params_from_network.get_dtcm_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_dtcm_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__mathsbox.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_dtcm_usage_in_bytes(n_neurons)
@@ -147,6 +158,8 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         total += self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__params_from_network.get_sdram_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_sdram_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_sdram_usage_in_bytes(n_neurons)
         total += self.__input_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__mathsbox.get_sdram_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_sdram_usage_in_bytes(n_neurons)

@@ -107,8 +107,6 @@ class ParamsFromNetwork(AbstractInputType):
                  Ntot, gei, ext_drive,
                  afferent_exc_fraction,
                  Gl, Cm, El,
-                 p0, p1, p2, p3, p4, p5,
-                 p6, p7, p8, p9, p10,
                  muV, muV0,DmuV0,
                  sV, sV0, DsV0,
                  muGn,

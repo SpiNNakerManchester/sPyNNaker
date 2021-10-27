@@ -16,11 +16,12 @@
 from .abstract_neuron_model import AbstractNeuronModel
 from .neuron_model_izh import NeuronModelIzh
 from .meanfield_model_eitn import MeanfieldModelEitn
-from .config import Config
+from .params_from_network import ParamsFromNetwork
+from .p_fit_polynomial import pFitPolynomial
 from .mathsbox import Mathsbox
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
 
 __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
            "NeuronModelLeakyIntegrateAndFire",
-           "MeanfieldModelEitn", "Config", "Mathsbox"]
+           "MeanfieldModelEitn", "pFitPolynomial", "ParamsFromNetwork", "Mathsbox"]

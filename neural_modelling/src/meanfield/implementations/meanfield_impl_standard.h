@@ -432,10 +432,11 @@ static void neuron_impl_do_timestep_update(
 //                    additional_inputs, firing_rate);
 
             // update neuron parameters
-            state_t result = meanfield_model_state_update(
-                this_meanfield, pNetwork_types,
-                Pfit_exc_types, Pfit_inh_types,
-                mathsbox_types);
+            state_t result = meanfield_model_state_update(this_meanfield,
+                                                          pNetwork_types,
+                                                          Pfit_exc_types,
+                                                          Pfit_inh_types,
+                                                          mathsbox_types);
 
             // determine if a spike should occur
             bool spike_now =

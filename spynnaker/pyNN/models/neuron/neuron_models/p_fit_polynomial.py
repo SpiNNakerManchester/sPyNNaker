@@ -22,7 +22,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 ###--transfert function inputs from 'data_test/'+NRN1+'_'+NTWK+'_fit.npy' --###
-P0 = "p0"
+P0 = "p0_exc"
 P1 = "p1"
 P2 = "p2"
 P3 = "p3"
@@ -50,16 +50,16 @@ UNITS = {
 
 
 class pFitPolynomial(AbstractInputType):
-    """ Model of neuron due to Eugene M. Izhikevich et al
+    """ Model of neuron due to ...
     """
     __slots__ = [
-        "_p0", "_p1", "_p2", "_p3", "_p4", "_p5",
-        "_p6", "_p7", "_p8", "_p9", "_p10"
+        "__p0_exc", "__p1_exc", "__p2_exc", "__p3_exc", "__p4_exc", "__p5_exc",
+        "__p6_exc", "__p7_exc", "__p8_exc", "__p9_exc", "__p10_exc"
     ]
 
     def __init__(self,
-                 p0, p1, p2, p3, p4, p5,
-                 p6, p7, p8, p9, p10,):
+                 p0_exc, p1_exc, p2_exc, p3_exc, p4_exc, p5_exc,
+                 p6_exc, p7_exc, p8_exc, p9_exc, p10_exc):
         """
         :param a: :math:`a`
         :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
@@ -81,17 +81,17 @@ class pFitPolynomial(AbstractInputType):
              DataType.S031, #p9
              DataType.S031]) #p10
         
-        self._p0 = p0
-        self._p1 = p1
-        self._p2 = p2
-        self._p3 = p3
-        self._p4 = p4
-        self._p5 = p5
-        self._p6 = p6
-        self._p7 = p7
-        self._p8 = p8
-        self._p9 = p9
-        self._p10 = p10        
+        self.__p0_exc = p0_exc
+        self.__p1_exc = p1_exc
+        self.__p2_exc = p2_exc
+        self.__p3_exc = p3_exc
+        self.__p4_exc = p4_exc
+        self.__p5_exc = p5_exc
+        self.__p6_exc = p6_exc
+        self.__p7_exc = p7_exc
+        self.__p8_exc = p8_exc
+        self.__p9_exc = p9_exc
+        self.__p10_exc = p10_exc        
 
     @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -101,17 +101,17 @@ class pFitPolynomial(AbstractInputType):
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         ###--TF inputs--###
-        parameters[P0] = self._p0
-        parameters[P1] = self._p1
-        parameters[P2] = self._p2
-        parameters[P3] = self._p3
-        parameters[P4] = self._p4
-        parameters[P5] = self._p5
-        parameters[P6] = self._p6
-        parameters[P7] = self._p7
-        parameters[P8] = self._p8
-        parameters[P9] = self._p9
-        parameters[P10] = self._p10
+        parameters[P0] = self.__p0_exc
+        parameters[P1] = self.__p1_exc
+        parameters[P2] = self.__p2_exc
+        parameters[P3] = self.__p3_exc
+        parameters[P4] = self.__p4_exc
+        parameters[P5] = self.__p5_exc
+        parameters[P6] = self.__p6_exc
+        parameters[P7] = self.__p7_exc
+        parameters[P8] = self.__p8_exc
+        parameters[P9] = self.__p9_exc
+        parameters[P10] = self.__p10_exc
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -154,8 +154,8 @@ class pFitPolynomial(AbstractInputType):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        (_p0, _p1, _p2, _p3, _p4,
-        _p5, _p6, _p7, _p8, _p9, _p10) = values
+        (__p0_exc, __p1_exc, __p2_exc, __p3_exc, __p4_exc,
+        __p5_exc, __p6_exc, __p7_exc, __p8_exc, __p9_exc, __p10_exc) = values
         
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
@@ -166,15 +166,15 @@ class pFitPolynomial(AbstractInputType):
 ###################
 
     @property
-    def p0(self):
-        return self._p0
+    def p0_exc(self):
+        return self.__p0_exc
         
     @property
-    def p1(self):
+    def p1_exc(self):
         return self._p1
 
     @property
-    def p2(self):
+    def p2_exc(self):
         return self._p2
 
     @property
