@@ -23,16 +23,16 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 ###--transfert function inputs from 'data_test/'+NRN1+'_'+NTWK+'_fit.npy' --###
 P0 = "p0_exc"
-P1 = "p1"
-P2 = "p2"
-P3 = "p3"
-P4 = "p4"
-P5 = "p5"
-P6 = "p6"
-P7 = "p7"
-P8 = "p8"
-P9 = "p9"
-P10 = "p10"
+P1 = "p1_exc"
+P2 = "p2_exc"
+P3 = "p3_exc"
+P4 = "p4_exc"
+P5 = "p5_exc"
+P6 = "p6_exc"
+P7 = "p7_exc"
+P8 = "p8_exc"
+P9 = "p9_exc"
+P10 = "p10_exc"
 
 UNITS = {
     P0 : "",
@@ -49,7 +49,7 @@ UNITS = {
 }
 
 
-class pFitPolynomial(AbstractInputType):
+class pFitPolynomialExc(AbstractInputType):
     """ Model of neuron due to ...
     """
     __slots__ = [
@@ -171,44 +171,44 @@ class pFitPolynomial(AbstractInputType):
         
     @property
     def p1_exc(self):
-        return self._p1
+        return self._p1_exc
 
     @property
     def p2_exc(self):
-        return self._p2
+        return self._p2_exc
 
     @property
-    def p3(self):
-        return self._p3
+    def p3_exc(self):
+        return self._p3_exc
 
     @property
-    def p4(self):
-        return self._p4
+    def p4_exc(self):
+        return self._p4_exc
 
     @property
-    def p5(self):
-        return self._p5
+    def p5_exc(self):
+        return self._p5_exc
         
     @property
-    def p6(self):
-        return self._p6
+    def p6_exc(self):
+        return self._p6_exc
 
     @property
-    def p6(self):
-        return self._p6
+    def p6_exc(self):
+        return self._p6_exc
 
     @property
-    def p7(self):
-        return self._p7
+    def p7_exc(self):
+        return self._p7_exc
 
     @property
-    def p8(self):
-        return self._p8
+    def p8_exc(self):
+        return self._p8_exc
 
     @property
-    def p9(self):
-        return self._p9
+    def p9_exc(self):
+        return self._p9_exc
 
     @property
-    def p10(self):
-        return self._p10
+    def p10_exc(self):
+        return self._p10_exc

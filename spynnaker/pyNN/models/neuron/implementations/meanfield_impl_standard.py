@@ -99,8 +99,14 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         self.__n_steps_per_timestep = _DEFAULT_N_STEPS_PER_TIMESTEP
 
         self.__components = [
-            self.__neuron_model, self.__params_from_network, self.__mathsbox,
-            self.__input_type, self.__threshold_type, self.__synapse_type]
+            self.__neuron_model,
+            self.__params_from_network,
+            self.__p_fit_polynomial_exc,
+            self.__p_fit_polynomial_inh,
+            self.__mathsbox,
+            self.__input_type,
+            self.__threshold_type,
+            self.__synapse_type]
         if self.__additional_input_type is not None:
             self.__components.append(self.__additional_input_type)
 

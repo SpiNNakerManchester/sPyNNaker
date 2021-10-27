@@ -16,7 +16,8 @@
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldModelEitn
 from spynnaker.pyNN.models.neuron.neuron_models import ParamsFromNetwork
-from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomial
+from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialExc
+from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialInh
 from spynnaker.pyNN.models.neuron.neuron_models import Mathsbox
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
@@ -135,11 +136,11 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                                                 muGn,
                                                 TvN, TvN0, DTvN0,
                                                 Vthre, Fout_th)
-        p_fit_polynomial_exc = pFitPolynomial(p0_exc, p1_exc, p2_exc,
+        p_fit_polynomial_exc = pFitPolynomialExc(p0_exc, p1_exc, p2_exc,
                                               p3_exc, p4_exc, p5_exc, 
                                               p6_exc, p7_exc, p8_exc,
                                               p9_exc, p10_exc)
-        p_fit_polynomial_inh = pFitPolynomial(p0_inh, p1_inh, p2_inh,
+        p_fit_polynomial_inh = pFitPolynomialInh(p0_inh, p1_inh, p2_inh,
                                               p3_inh, p4_inh, p5_inh,
                                               p6_inh, p7_inh, p8_inh,
                                               p9_inh, p10_inh)
