@@ -120,6 +120,6 @@ class PopulationSynapsesMachineVertexLead(
         spec.end_specification()
 
     @overrides(PopulationSynapsesMachineVertexCommon._parse_synapse_provenance)
-    def _parse_synapse_provenance(self, label, names, provenance_data):
+    def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
         return PopulationMachineSynapses._parse_synapse_provenance(
-            self, label, names, provenance_data)
+            self, label, x, y, p, provenance_data)

@@ -46,9 +46,7 @@ from spinn_front_end_common.interface.buffer_management\
     .recording_utilities import (
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
@@ -1324,26 +1322,29 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
-        prov_items = list()
         synapse_names = list(self.__neuron_impl.get_synapse_targets())
 
-        # Record the min weight used for each synapse type
-        for i, weight in enumerate(self.__min_weights):
-            prov_items.append(ProvenanceDataItem(
-                [self._label, "min_weight_{}".format(synapse_names[i])],
-                weight))
+        with ProvenanceWriter() as db:
+            for i, weight in enumerate(self.__min_weights):
+                print("i, weight ", self.label, synapse_names[i], weight)
+                db.insert_app_vertex(
+                    self.label,
+                    synapse_names[i], "min_weight",
+                    weight),
 
-        # Report any known weights that couldn't be represented
-        for (weight, r_weight) in self.__weight_provenance:
-            proj_info = self.__weight_provenance[weight, r_weight]
-            for i, (proj, s_info) in enumerate(proj_info):
-                prov_items.append(ProvenanceDataItem(
-                    [self._label, proj.label,
-                     s_info.connector.__class__.__name__,
-                     "weight_representation"], r_weight,
-                    report=(i == 0),
-                    message="Weight of {} could not be represented precisely;"
+            for (weight, r_weight) in self.__weight_provenance:
+                proj_info = self.__weight_provenance[weight, r_weight]
+                for i, (proj, s_info) in enumerate(proj_info):
+                    db.insert_connector(
+                        s_info.pre_population.label,
+                        s_info.post_population.label,
+                        s_info.connector.__class__.__name__,
+                        "weight_representation",
+                        weight == r_weight
+                        )
+
+                    if (weight != r_weight):
+                        db.insert_report(
+                            "Weight of {} could not be represented precisely;"
                             " a weight of {} was used instead".format(
-                                weight, r_weight)))
-
-        return prov_items
+                                weight, r_weight))

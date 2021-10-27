@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import ctypes
 from spinn_utilities.abstract_base import abstractproperty
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 
 
 class SynapseProvenance(ctypes.LittleEndianStructure):
@@ -66,56 +66,66 @@ class PopulationMachineSynapsesProvenance(object):
         :rtype: AbstractPopulationVertex
         """
 
-    def _parse_synapse_provenance(self, label, names, provenance_data):
+    def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
         """ Extract and yield synapse provenance
 
         :param str label: The label of the node
-        :param list(str) names: The hierarchy of names for the provenance data
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
         :return: a list of provenance data items
         :rtype: iterator of ProvenanceDataItem
         """
         synapse_prov = SynapseProvenance(*provenance_data)
 
-        yield ProvenanceDataItem(
-            names + [self.TOTAL_PRE_SYNAPTIC_EVENT_NAME],
-            synapse_prov.n_pre_synaptic_events)
-        yield ProvenanceDataItem(
-            names + [self.SATURATION_COUNT_NAME],
-            synapse_prov.n_saturations, synapse_prov.n_saturations > 0,
-            f"The weights from the synapses for {label} saturated "
-            f"{synapse_prov.n_saturations} times. If this causes issues you "
-            "can increase the spikes_per_second and / or ring_buffer_sigma "
-            "values located within the .spynnaker.cfg file.")
-        yield ProvenanceDataItem(
-            names + [self.SATURATED_PLASTIC_WEIGHTS_NAME],
-            synapse_prov.n_plastic_saturations,
-            synapse_prov.n_plastic_saturations > 0,
-            f"The weights from the plastic synapses for {label} saturated "
-            f"{synapse_prov.n_plastic_saturations} times. If this causes "
-            "issues increase the spikes_per_second and / or ring_buffer_sigma"
-            " values located within the .spynnaker.cfg file.")
-        yield ProvenanceDataItem(
-            names + [self.GHOST_SEARCHES], synapse_prov.n_ghost_searches,
-            synapse_prov.n_ghost_searches > 0,
-            f"The number of failed population table searches for {label} was "
-            f"{synapse_prov.n_ghost_searches}. If this number is large "
-            "relative to the  predicted incoming spike rate, try increasing "
-            " source and target neurons per core")
-        yield ProvenanceDataItem(
-            names + [self.BIT_FIELDS_NOT_READ],
-            synapse_prov.n_failed_bitfield_reads, False,
-            f"On {label}, the filter for stopping redundant DMAs couldn't be "
-            f"fully filled in; it failed to read "
-            f"{synapse_prov.n_failed_bitfield_reads} entries. "
-            "Try reducing neurons per core.")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_MASTER_POP_HITS],
-            synapse_prov.n_invalid_pop_table_hits,
-            synapse_prov.n_invalid_pop_table_hits > 0,
-            f"On {label}, there were {synapse_prov.n_invalid_pop_table_hits} "
-            "keys received that had no master pop entry for them. This is an "
-            "error, which most likely stems from bad routing.")
-        yield ProvenanceDataItem(
-            names + [self.BIT_FIELD_FILTERED_PACKETS],
-            synapse_prov.n_filtered_by_bitfield)
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME,
+                synapse_prov.n_pre_synaptic_events)
+
+            db.insert_core(
+                x, y, p, self.SATURATION_COUNT_NAME,
+                synapse_prov.n_saturations)
+            if synapse_prov.n_saturations > 0:
+                db.insert_report(
+                    f"The weights from the synapses for {label} saturated "
+                    f"{synapse_prov.n_saturations} times. ")
+
+            db.insert_core(
+                x, y, p, self.SATURATED_PLASTIC_WEIGHTS_NAME,
+                synapse_prov.n_plastic_saturations)
+            if synapse_prov.n_plastic_saturations > 0:
+                db.insert_report(
+                    f"The weights from the plastic synapses for {label} "
+                    f"saturated {synapse_prov.n_plastic_saturations} times. ")
+
+            db.insert_core(
+                x, y, p, self.GHOST_SEARCHES, synapse_prov.n_ghost_searches)
+            if synapse_prov.n_ghost_searches > 0:
+                db.insert_report(
+                    f"The number of failed population table searches for "
+                    f"{label} was {synapse_prov.n_ghost_searches}. ")
+
+            db.insert_core(
+                x, y, p, self.BIT_FIELDS_NOT_READ,
+                synapse_prov.n_failed_bitfield_reads)
+            if synapse_prov.n_failed_bitfield_reads:
+                db.insert_report(
+                    f"On {label}, the filter for stopping redundant DMAs "
+                    f"couldn't be fully filled in; it failed to read "
+                    f"{synapse_prov.n_failed_bitfield_reads} entries. "
+                    "Try reducing neurons per core.")
+
+            db.insert_core(
+                x, y, p, self.INVALID_MASTER_POP_HITS,
+                synapse_prov.n_invalid_pop_table_hits)
+            if synapse_prov.n_invalid_pop_table_hits > 0:
+                db.insert_report(
+                    f"On {label}, there were "
+                    f"{synapse_prov.n_invalid_pop_table_hits} keys received "
+                    f"that had no master pop entry for them.")
+
+            db.insert_core(
+                x, y, p, self.BIT_FIELD_FILTERED_PACKETS,
+                synapse_prov.n_filtered_by_bitfield)

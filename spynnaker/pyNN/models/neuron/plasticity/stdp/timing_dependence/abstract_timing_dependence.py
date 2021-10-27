@@ -94,14 +94,3 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
             each of the values of the arrays must then be an array of arrays
         :rtype: list of (float or list of float)
         """
-
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-
-        :param str pre_population_label: label of pre.
-        :param str post_population_label: label of post.
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        # pylint: disable=unused-argument
-        return []
