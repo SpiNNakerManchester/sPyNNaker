@@ -1326,7 +1326,6 @@ class AbstractPopulationVertex(
 
         with ProvenanceWriter() as db:
             for i, weight in enumerate(self.__min_weights):
-                print("i, weight ", self.label, synapse_names[i], weight)
                 db.insert_app_vertex(
                     self.label,
                     synapse_names[i], "min_weight",
