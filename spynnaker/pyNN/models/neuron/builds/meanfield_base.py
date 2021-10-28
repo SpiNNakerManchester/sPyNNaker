@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
-from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldModelEitn
+from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldOfAdexNetwork
 from spynnaker.pyNN.models.neuron.neuron_models import ParamsFromNetwork
 from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialExc
 from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialInh
@@ -124,9 +124,9 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  sample=100,
                  err_func=0.):
         # pylint: disable=too-many-arguments, too-many-locals
-        neuron_model = MeanfieldModelEitn(nbr, a, b, tauw, Trefrac,
-                                          Vreset, delta_v, ampnoise,
-                                          Timescale_inv, Ve, Vi)
+        neuron_model = MeanfieldOfAdexNetwork(nbr, a, b, tauw, Trefrac,
+                                              Vreset, delta_v, ampnoise,
+                                              Timescale_inv, Ve, Vi)
         params_from_network = ParamsFromNetwork(pconnec, q_exc, q_inh,
                                                 Tsyn_exc, Tsyn_inh,
                                                 Erev_exc, Erev_inh,

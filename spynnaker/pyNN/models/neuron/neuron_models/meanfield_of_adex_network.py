@@ -49,7 +49,7 @@ UNITS = {
 }
 
 
-class MeanfieldModelEitn(AbstractNeuronModel):
+class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     """ Model of meanfield due to A.Destehexe et al
     """
     __slots__ = [
