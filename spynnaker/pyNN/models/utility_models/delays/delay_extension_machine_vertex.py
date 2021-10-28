@@ -21,10 +21,9 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
@@ -123,87 +122,111 @@ class DelayExtensionMachineVertex(
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        # translate into provenance data items
-        yield ProvenanceDataItem(
-            names + [self.COUNT_SATURATION_NAME],
-            n_sat, (n_sat != 0),
-            f"The delay extension {label} has dropped {n_sat} packets because "
-            "during certain time steps a neuron was asked to spike more than "
-            "256 times. This causes a saturation on the count tracker which "
-            "is a uint8. Reduce the packet rates, or modify the delay "
-            "extension to have larger counters.")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_NEURON_ID_COUNT_NAME],
-            n_bad_neuron, (n_bad_neuron != 0),
-            f"The delay extension {label} has dropped {n_bad_neuron} packets "
-            "because their neuron id was not valid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_KEY_COUNT_NAME],
-            n_bad_keys, (n_bad_keys != 0),
-            f"The delay extension {label} has dropped {n_bad_keys} packets "
-            "due to the packet key being invalid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_RECEIVED_NAME], n_received)
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_PROCESSED_NAME],
-            n_processed, (n_received != n_processed),
-            f"The delay extension {label} only processed {n_processed} of "
-            f"{n_received} received packets.  This could indicate a fault.")
-        yield ProvenanceDataItem(
-            names + [self.MISMATCH_ADDED_FROM_PROCESSED_NAME],
-            n_added, (n_added != n_processed),
-            f"The delay extension {label} only added {n_added} of "
-            f"{n_processed} processed packets.  This could indicate a "
-            "routing or filtering fault")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_SENT_NAME], n_sent)
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_LOST_NAME],
-            n_overflows, (n_overflows > 0),
-            f"The input buffer for {label} lost packets on {n_overflows} "
-            "occasions. This is often a sign that the system is running "
-            "too quickly for the number of neurons per core.  Please "
-            "increase the timer_tic or time_scale_factor or decrease the "
-            "number of neurons per core.")
-        yield ProvenanceDataItem(
-            names + [self.DELAYED_FOR_TRAFFIC_NAME], n_delays)
-        yield self._app_vertex.get_tdma_provenance_item(
-            names, label, n_tdma_behind)
+        self._app_vertex.get_tdma_provenance_item(
+            x, y, p, label, n_tdma_behind)
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.COUNT_SATURATION_NAME, n_sat)
+            if n_sat != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_sat} packets "
+                    f"because during certain time steps a neuron was asked to "
+                    f"spike more than 256 times. This causes a saturation on "
+                    f"the count tracker which is a uint8. "
+                    f"Reduce the packet rates, or modify the delay extension "
+                    f"to have larger counters.")
 
-        late_message = (
-            f"On {label}, {n_late_spikes} packets were dropped from the "
-            "input buffer, because they arrived too late to be processed in "
-            "a given time step. Try increasing the time_scale_factor located "
-            "within the .spynnaker.cfg file or in the pynn.setup() method."
-            if self._app_vertex.drop_late_spikes else
-            f"On {label}, {n_late_spikes} packets arrived too late to be "
-            "processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.N_LATE_SPIKES_NAME],
-            n_late_spikes, report=(n_late_spikes > 0),
-            message=late_message)
+            db.insert_core(
+                x, y, p, self.INVALID_NEURON_ID_COUNT_NAME,
+                n_bad_neuron)
+            if n_bad_neuron != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_bad_neuron} "
+                    f"packets because their neuron id was not valid. "
+                    f"This is likely a routing issue. "
+                    f"Please fix and try again")
 
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_MAX_QUEUED_NAME],
-            max_bg, (max_bg > 1),
-            f"On {label}, a maximum of {max_bg} background tasks were queued. "
-            "Try increasing the time_scale_factor located within the "
-            ".spynnaker.cfg file or in the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_OVERLOADS_NAME],
-            n_bg_overloads, (n_bg_overloads > 0),
-            f"On {label}, the background queue overloaded {n_bg_overloads} "
-            "times. Try increasing the time_scale_factor located within the "
-            ".spynnaker.cfg file or in the pynn.setup() method.")
+            db.insert_core(
+                x, y, p, self.INVALID_KEY_COUNT_NAME, n_bad_keys)
+            if n_bad_keys != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_bad_keys} "
+                    f"packets due to the packet key being invalid. "
+                    f"This is likely a routing issue. "
+                    f"Please fix and try again")
+
+            db.insert_core(x, y, p, self.N_PACKETS_RECEIVED_NAME, n_received)
+
+            db.insert_core(x, y, p, self.N_PACKETS_PROCESSED_NAME,
+                           n_processed)
+            if n_received != n_processed:
+                db.insert_report(
+                    f"The delay extension {label} only processed "
+                    f"{n_processed} of {n_received} received packets.  "
+                    f"This could indicate a fault.")
+
+            db.insert_core(
+                x, y, p, self.MISMATCH_ADDED_FROM_PROCESSED_NAME, n_added)
+            if n_added != n_processed:
+                db.insert_report(
+                    f"The delay extension {label} only added {n_added} of "
+                    f"{n_processed} processed packets.  This could indicate "
+                    f"a routing or filtering fault")
+
+            db.insert_core(x, y, p, self.N_PACKETS_SENT_NAME, n_sent)
+
+            db.insert_core(
+                x, y, p, self.INPUT_BUFFER_LOST_NAME, n_overflows)
+            if n_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_overflows} occasions. This is often a sign that the "
+                    f"system is running too quickly for the number of "
+                    f"neurons per core.  "
+                    f"Please increase the timer_tic or time_scale_factor "
+                    f"or decrease the number of neurons per core.")
+
+            db.insert_core(x, y, p, self.DELAYED_FOR_TRAFFIC_NAME, n_delays)
+
+            db.insert_core(x, y, p, self.N_LATE_SPIKES_NAME, n_late_spikes)
+            if n_late_spikes == 0:
+                pass
+            elif self._app_vertex.drop_late_spikes:
+                db.insert_report(
+                    f"On {label}, {n_late_spikes} packets were dropped from "
+                    f"the input buffer, because they arrived too late to be "
+                    f"processed in a given time step. "
+                    "Try increasing the time_scale_factor located within the "
+                    ".spynnaker.cfg file or in the pynn.setup() method.")
+            else:
+                db.insert_report(
+                    f"On {label}, {n_late_spikes} packets arrived too late to "
+                    f"be processed in a given time step. Try increasing the "
+                    "time_scale_factor located within the .spynnaker.cfg file "
+                    "or in the pynn.setup() method.")
+
+            db.insert_core(
+                x, y, p, self.BACKGROUND_MAX_QUEUED_NAME, max_bg)
+            if max_bg > 1:
+                db.insert_report(
+                    f"On {label}, a maximum of {max_bg} background tasks "
+                    f"were queued. Try increasing the time_scale_factor "
+                    f"located within the .spynnaker.cfg file or in the "
+                    f"pynn.setup() method.")
+
+            db.insert_core(
+                x, y, p, self.BACKGROUND_OVERLOADS_NAME, n_bg_overloads)
+            if n_bg_overloads > 0:
+                db.insert_report(
+                    f"On {label}, the background queue overloaded "
+                    f"{n_bg_overloads} times. "
+                    f"Try increasing the time_scale_factor located within the "
+                    ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
