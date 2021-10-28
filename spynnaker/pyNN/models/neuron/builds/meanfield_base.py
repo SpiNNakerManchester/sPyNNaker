@@ -36,12 +36,14 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
     """
 
     # noinspection PyPep8Naming
-    @default_initial_values({"Ve", "Vi", "muV", "sV", "muGn", "TvN", "Vthre",
-                             "Fout_th", "err_func", "isyn_exc", "isyn_inh"})
+    @default_initial_values({"Ve", "Vi", "Fout_th",
+                             "muV", "sV", "muGn",
+                             "TvN", "Vthre",
+                             "err_func", "isyn_exc", "isyn_inh"})
     def __init__(self,
                  nbr=1,
-                 a=0,
-                 b=0,
+                 a=0.,
+                 b=0.,
                  tauw=1.,
                  Trefrac=5.0,
                  Vreset=-65.,
@@ -98,17 +100,17 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  p9_exc=0.0029213,
                  p10_exc=-0.014084,
                  
-                 p0_inh=-0.049683193394879956,
-                 p1_inh=0.004122891837443331,
-                 p2_inh=-0.005484937414333363,
-                 p3_inh=-0.0013451469634945864,
+                 p0_inh=-0.0496832,
+                 p1_inh=0.00412289,
+                 p2_inh=-0.0054849,
+                 p3_inh=-0.0013451,
                  p4_inh=0.001,
-                 p5_inh=-0.0010458736523258204,
-                 p6_inh=0.0030610187552845367,
-                 p7_inh=-0.00844848145052594,
-                 p8_inh=-0.0025716686439000045,
-                 p9_inh=0.0017986248339644851,
-                 p10_inh=-0.013829339299067179,
+                 p5_inh=-0.0010459,
+                 p6_inh=0.00306102,
+                 p7_inh=-0.0084485,
+                 p8_inh=-0.0025717,
+                 p9_inh=0.00179862,
+                 p10_inh=-0.013830,
 
 
                  tau_syn_E=5.0,
