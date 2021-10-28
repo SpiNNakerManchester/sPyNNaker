@@ -308,6 +308,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
 
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
+    REAL lastW = meanfield->W;
        
     REAL T_inv = meanfield->Timescale_inv;
     
@@ -328,6 +329,8 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     
     meanfield->Vi += lastVi + (REAL_HALF(lastTF_inh - lastVi) * (REAL_CONST(2.0)-h) * h);
     meanfield->Vi =  meanfield->Vi * T_inv;
+    
+    meanfield->W += lastW;
         
 }
 
@@ -438,8 +441,8 @@ state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
     return meanfield->Vi;
 }
 
-state_t meanfield_model_get_Fout_th(const ParamsFromNetwork_t *pNetwork){
-    return pNetwork->Fout_th;
+state_t meanfield_model_get_adaptation_W(const meanfield_t *meanfield){
+    return meanfield->W;
 }
 
 

@@ -32,6 +32,7 @@ AMPNOISE = "ampnoise"
 TIMESCALE_INV = "Timescale_inv"
 VE = "Ve"
 VI = "Vi"
+W = "W"
 
 UNITS = {
     ###--Meanfield--###
@@ -46,6 +47,7 @@ UNITS = {
     TIMESCALE_INV: "Hz",
     VE: "Hz",
     VI: "Hz",
+    W: " ",
 }
 
 
@@ -54,37 +56,18 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     """
     __slots__ = [
         "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
-        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init"
+        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_W_init",
     ]
 
     def __init__(self, nbr, a, b, tauw,
                  Trefrac, Vreset, delta_v,
-                 ampnoise, Timescale_inv, Ve_init, Vi_init):
+                 ampnoise, Timescale_inv,
+                 Ve_init, Vi_init, W_init):
         """
         :param a: :math:`a`
         :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
-        :param b: :math:`b`
-        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param c: :math:`c`
-        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param d: :math:`d`
-        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param v_init: :math:`v_{init}`
-        :type v_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param u_init: :math:`u_{init}`
-        :type u_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param i_offset: :math:`I_{offset}`
-        :type i_offset:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        
         """
         super().__init__(
             [DataType.UINT32, #nbr
@@ -97,7 +80,8 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
             DataType.S1615, #ampnoise
             DataType.S1615, #Timescale_inv
             DataType.S1615, #Ve
-            DataType.S1615, #Vi            
+            DataType.S1615, #Vi
+            DataType.S1615, #W
             DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
         self._nbr = nbr
@@ -111,6 +95,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         self._Timescale_inv = Timescale_inv
         self._Ve_init = Ve_init
         self._Vi_init = Vi_init
+        self._W_init = W_init
 
     @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -134,7 +119,8 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     def add_state_variables(self, state_variables):
         state_variables[VE] = self._Ve_init
         state_variables[VI] = self._Vi_init
-
+        state_variables[W] = self._W_init
+        
     @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
@@ -163,6 +149,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
             parameters[TIMESCALE_INV],
             state_variables[VE],
             state_variables[VI],
+            state_variables[W],            
             float(ts) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
@@ -172,11 +159,12 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         # Decode the values
         (_nbr, _a, _b, _tauw,
         _Trefrac, _Vreset, _delta_v,
-        _ampnoise, _Timescale_inv, Ve, Vi, _this_h) = values
+        _ampnoise, _Timescale_inv, Ve, Vi, W, _this_h) = values
 
         # Copy the changed data only
         state_variables[VE] = Ve
         state_variables[VI] = Vi
+        state_variables[W] = W
         #state_variables[U] = u
 
 ################
@@ -236,3 +224,10 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         """
         return self._Vi_init    
 
+    @property
+    def W_init(self):
+        """ Settable model parameter: :math:`V_{i}`
+
+        :rtype: float
+        """
+        return self._W_init    

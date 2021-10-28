@@ -41,6 +41,7 @@ typedef struct meanfield_t {
     
     REAL Ve; 
     REAL Vi;
+    REAL W;
         
     REAL this_h;
         

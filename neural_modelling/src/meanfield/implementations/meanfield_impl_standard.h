@@ -43,7 +43,7 @@ enum word_recording_indices {
     //! V (somatic potential) recording index
     VE_RECORDING_INDEX = 0,
     VI_RECORDING_INDEX = 1,
-    FOUT_TH_RECORDING_INDEX = 2,
+    W_RECORDING_INDEX = 2,
     //! Gsyn_exc (excitatory synaptic conductance/current) recording index
     GSYN_EXC_RECORDING_INDEX = 3,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
@@ -381,7 +381,7 @@ static void neuron_impl_do_timestep_update(
             state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(
                 this_meanfield);
             
-            state_t Fout_th = meanfield_model_get_Fout_th(pNetwork_types);
+            state_t adaptation_W = meanfield_model_get_adaptation_W(this_meanfield);
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
@@ -415,7 +415,7 @@ static void neuron_impl_do_timestep_update(
                 neuron_recording_record_accum(
                         VI_RECORDING_INDEX, meanfield_index, firing_rate_Vi);
                 neuron_recording_record_accum(
-                        FOUT_TH_RECORDING_INDEX, meanfield_index, Fout_th);
+                        W_RECORDING_INDEX, meanfield_index, adaptation_W);
                 neuron_recording_record_accum(
                         GSYN_EXC_RECORDING_INDEX, meanfield_index, total_exc);
                 neuron_recording_record_accum(
@@ -501,12 +501,14 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_meanfields * sizeof(meanfield_t));
     }
 
+    /*
     if (sizeof(ParamsFromNetwork_t)) {
         log_debug("writing input type parameters");
         spin1_memcpy(&address[next], pNetwork_array,
                 n_meanfields * sizeof(ParamsFromNetwork_t));
         next += n_words_needed(n_meanfields * sizeof(ParamsFromNetwork_t));
     }
+    */
 
 }
 

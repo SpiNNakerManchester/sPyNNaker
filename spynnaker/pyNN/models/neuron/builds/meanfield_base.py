@@ -36,7 +36,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
     """
 
     # noinspection PyPep8Naming
-    @default_initial_values({"Ve", "Vi", "Fout_th",
+    @default_initial_values({"Ve", "Vi", "W", "Fout_th",
                              "muV", "sV", "muGn",
                              "TvN", "Vthre",
                              "err_func", "isyn_exc", "isyn_inh"})
@@ -52,6 +52,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Timescale_inv=0.5,
                  Ve=9.,
                  Vi=23.,
+                 W=1.,
 
                  pconnec=0.05,
                  q_exc=1.5,
@@ -126,7 +127,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = MeanfieldOfAdexNetwork(nbr, a, b, tauw, Trefrac,
                                               Vreset, delta_v, ampnoise,
-                                              Timescale_inv, Ve, Vi)
+                                              Timescale_inv, Ve, Vi, W)
         params_from_network = ParamsFromNetwork(pconnec, q_exc, q_inh,
                                                 Tsyn_exc, Tsyn_inh,
                                                 Erev_exc, Erev_inh,
