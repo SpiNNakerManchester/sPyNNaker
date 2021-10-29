@@ -69,17 +69,17 @@ static inline void neuron_ode(
     ###################################################################
     */
 
-void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
+void error_function( REAL x, REAL argument, mathsbox_t *restrict mathsbox){
 //devra coder fonction powerof
 
     REAL dt = x/mathsbox->error_func_sample;
     REAL t;
     //REAL Pi = 3.1415927;// here was a k
     REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
-    REAL Erfc = mathsbox->err_func;
+    REAL Erfc = 0.;//mathsbox->err_func;
     for(t=0; t<=x; t+=dt){
         //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
-        Erfc +=  factor*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
+        Erfc +=  argument*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
     }
 
     mathsbox->err_func = Erfc;
@@ -149,7 +149,7 @@ void threshold_func(ParamsFromNetwork_t *restrict pNetwork, pFitPolynomial_t *re
 
     }
 
-void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNetwork)
+void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *restrict pNetwork)
 {
 
     REAL Fe;
@@ -171,6 +171,8 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNe
     REAL Ee = pNetwork->Ee;
     REAL Cm = pNetwork->Cm;
     
+    
+    
     //REAL muV = pNetwork->muV;
     //REAL muGn = pNetwork->muGn;
     //REAL sV = pNetwork->sV;
@@ -181,7 +183,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNe
     Fe = Ve * (REAL_CONST(1.)-gei)*pconnec*Ntot; // default is 1 !!
     Fi = Vi * gei*pconnec*Ntot;
     
-    muGe = Qe*Te*Ve;
+    muGe = Qe*Te*Ve; // normaly = Ve*Te*Qe*Ke with Ke = p*Nue what it is?
     muGi = Qi*Ti*Vi;
 
     muG = Gl+muGe+muGi;
@@ -190,7 +192,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNe
         muG += ACS_DBL_TINY;
     }
 
-    pNetwork->muV = (muGe*Ee + muGi*Ei + Gl*El)/muG;
+    pNetwork->muV = (muGe*Ee + muGi*Ei + Gl*El - W)/muG;
 
 
     pNetwork->muGn = muG/Gl;
@@ -237,7 +239,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, ParamsFromNetwork_t *restrict pNe
 }
 
 
-void TF(REAL Ve, REAL Vi,
+void TF(REAL Ve, REAL Vi, REAL W,
         meanfield_t *meanfield,
         ParamsFromNetwork_t *restrict pNetwork,
         pFitPolynomial_t *restrict Pfit,
@@ -268,7 +270,7 @@ void TF(REAL Ve, REAL Vi,
         Vi += ACS_DBL_TINY;
     }
 
-    get_fluct_regime_varsup(Ve, Vi, pNetwork);
+    get_fluct_regime_varsup(Ve, Vi, W, pNetwork);
     threshold_func(pNetwork, Pfit);
 
     limit = REAL_HALF(Gl/(pNetwork->TvN * Cm));
@@ -280,7 +282,7 @@ void TF(REAL Ve, REAL Vi,
     if (pNetwork->sV<ACS_DBL_TINY){
         pNetwork->sV += ACS_DBL_TINY;
     }
-    argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137))/pNetwork->sV;
+    argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137)*pNetwork->sV);
 
     error_function(limit, argument, mathsbox);
     /*
@@ -309,28 +311,51 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
     REAL lastW = meanfield->W;
+    //REAL tauw = meanfield->tauw;
+    
+    //REAL W_tauw;
        
     REAL T_inv = meanfield->Timescale_inv;
     
-    TF(lastVe, lastVi, meanfield, pNetwork, Pfit_exc, mathsbox);    
+    TF(lastVe, lastVi, lastW, meanfield, pNetwork, Pfit_exc, mathsbox);    
     REAL lastTF_exc = pNetwork->Fout_th;
     
     
-    TF(lastVe, lastVi, meanfield, pNetwork, Pfit_inh, mathsbox);
+    TF(lastVe, lastVi, lastW, meanfield, pNetwork, Pfit_inh, mathsbox);
     REAL lastTF_inh = pNetwork->Fout_th;
     
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
+    /*
+        some trouble come from constants :
+        from spynnaker.pyNN.utilities.constants 
+        
+        and
+        
+        pyNN/models/recorder.py
+        
+    */
 
-
-    meanfield->Ve += lastVe + (REAL_HALF(lastTF_exc - lastVe) * (REAL_CONST(2.0)-h) * h);
+    
+    REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
+    REAL k2_exc = lastVe + h*k1_exc;
+    
+    meanfield->Ve += lastVe + REAL_HALF(h*(k1_exc + k2_exc))*REAL_CONST(0.5);
+    
+    //meanfield->Ve += lastVe + (REAL_HALF(lastTF_exc - lastVe) * (REAL_CONST(2.0)-h) * h);
     meanfield->Ve =  meanfield->Ve * T_inv;
     
     
     meanfield->Vi += lastVi + (REAL_HALF(lastTF_inh - lastVi) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Vi =  meanfield->Vi * T_inv;
+    meanfield->Vi =  meanfield->Vi * ONE;
     
-    meanfield->W += lastW;
+    REAL k1_W = -lastW;//tauw;
+    REAL k2_W = -lastW*(ONE+h);//tauw;
+    
+    //W_tauw = -lastW ;//+ meanfield->b*lastVe*meanfield->tauw 
+    //                 + meanfield->a*(pNetwork->muV-pNetwork->El)*meanfield->tauw;
+    //meanfield->W += W_tauw ;/// meanfield->tauw ;
+    meanfield->W += lastW;//lastW + (h*(k1_W+k2_W));
         
 }
 

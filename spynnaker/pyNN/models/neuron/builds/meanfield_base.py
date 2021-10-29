@@ -41,7 +41,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                              "TvN", "Vthre",
                              "err_func", "isyn_exc", "isyn_inh"})
     def __init__(self,
-                 nbr=1,
+                 nbr=1.,
                  a=0.,
                  b=0.,
                  tauw=1.,
@@ -52,7 +52,7 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Timescale_inv=0.5,
                  Ve=9.,
                  Vi=23.,
-                 W=1.,
+                 W=0.5,
 
                  pconnec=0.05,
                  q_exc=1.5,
@@ -69,8 +69,6 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Gl=10.,
                  Cm=200.,
                  El=-70.,
-                 
-                                  
 
                  muV=0.,
                  muV0=-0.06,

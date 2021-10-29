@@ -47,7 +47,7 @@ UNITS = {
     TIMESCALE_INV: "Hz",
     VE: "Hz",
     VI: "Hz",
-    W: " ",
+    W: "mV ",
 }
 
 
