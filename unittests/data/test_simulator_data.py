@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spinn_front_end_common.data import FecDataView, FecDataWriter
 from spinn_front_end_common.utilities.exceptions import (
     SimulatorDataNotYetAvialable)
 from spynnaker.pyNN.data import SpynnakerDataView, SpynnakerDataWriter
@@ -59,3 +60,33 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(400, view["MinDelay"])
         self.assertTrue("MinDelay" in view)
         self.assertEqual(8, view["APPID"])
+
+    def test_mock(self):
+        view = SpynnakerDataView()
+        writer = SpynnakerDataWriter()
+        writer.mock()
+        # check there is a value not what it is
+        self.assertIsNotNone(view.app_id)
+        self.assertIsNotNone(view.min_delay)
+
+    def test_multiple(self):
+        view = SpynnakerDataView()
+        writer = SpynnakerDataWriter()
+        view1 = SpynnakerDataView()
+        writer1 = SpynnakerDataWriter()
+        view2 = FecDataView()
+        writer2 = FecDataWriter()
+        writer2.set_app_id(7)
+        self.assertEqual(7, view.app_id)
+        self.assertEqual(7, view2.app_id)
+        self.assertEqual(7, view1.app_id)
+        self.assertEqual(7, writer.app_id)
+        self.assertEqual(7, writer1.app_id)
+        self.assertEqual(7, writer2.app_id)
+        writer.set_min_delay(345)
+        self.assertEqual(345, view.min_delay)
+        self.assertEqual(345, view1.min_delay)
+        # view2 has no min_delay
+        self.assertEqual(345, writer.min_delay)
+        self.assertEqual(345, writer1.min_delay)
+        # writter2 has no min_delay

@@ -15,6 +15,7 @@
 
 import logging
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data import FecDataWriter
 from .spynnaker_data_view import SpynnakerDataView
 
@@ -27,9 +28,15 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     """
 
+    @overrides(FecDataWriter.setup)
     def setup(self):
         FecDataWriter.setup(self)
         self._spy_data._SpynnakerDataModel__clear()
+
+    @overrides(FecDataWriter.mock)
+    def mock(self):
+        FecDataWriter.mock(self)
+        self.set_min_delay(1000)
 
     def set_min_delay(self, min_delay):
         """
