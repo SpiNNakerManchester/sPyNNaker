@@ -41,3 +41,21 @@ class TestSimulatorData(unittest.TestCase):
         writer.set_min_delay(200)
         self.assertEqual(200, view.min_delay)
 
+    def test_dict(self):
+        view = SpynnakerDataView()
+        writer = SpynnakerDataWriter()
+        writer.setup()
+
+        self.assertFalse(view.has_min_delay())
+        self.assertFalse("MinDelay" in view)
+        with self.assertRaises(KeyError):
+            view["MinDelay"]
+        with self.assertRaises(SimulatorDataNotYetAvialable):
+            view.min_delay
+        writer.set_min_delay(400)
+        writer.set_app_id(8)
+        self.assertTrue(view.has_min_delay())
+        self.assertEqual(400, view.min_delay)
+        self.assertEqual(400, view["MinDelay"])
+        self.assertTrue("MinDelay" in view)
+        self.assertEqual(8, view["APPID"])

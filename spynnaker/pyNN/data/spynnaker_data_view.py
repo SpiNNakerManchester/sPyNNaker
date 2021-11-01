@@ -78,9 +78,9 @@ class SpynnakerDataView(FecDataView):
         # MinDelay is not required for injection
         # ONLY included (possibly temporary) to show test extended method
         if item == "MinDelay":
-            if self._spy_data.__SpynnakerDataModel___min_delay is not None:
-                return self._spy_data.__SpynnakerDataModel___min_delay
-            # In this case even if None
-            return self._fec_data._FecDataModel__machine_time_step
+            if self.has_min_delay():
+                return self.min_delay
+            else:
+                return None
 
-        return super._unchecked_gettiem(self, item)
+        return FecDataView._unchecked_getitem(self, item)
