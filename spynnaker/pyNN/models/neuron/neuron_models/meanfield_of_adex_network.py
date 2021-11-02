@@ -55,7 +55,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     """ Model of meanfield due to A.Destehexe et al
     """
     __slots__ = [
-        "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
+        "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
         "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init",
     ]
 
@@ -70,8 +70,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         
         """
         super().__init__(
-            [DataType.UINT32, #nbr
-            DataType.S1615, #a
+            [DataType.S1615, #a DataType.UINT32, #nbr
             DataType.S1615, #b
             DataType.S1615, #tauw
             DataType.S1615, #Trefrac
@@ -84,7 +83,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
             DataType.S1615, #W
             DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
-        self._nbr = nbr
+        #self._nbr = nbr
         self._a = a
         self._b = b
         self._tauw = tauw
@@ -105,7 +104,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         ###--neuron--###
-        parameters[NBR] = self._nbr
+        #parameters[NBR] = self._nbr
         parameters[A] = self._a
         parameters[B] = self._b
         parameters[TAUW] = self._tauw
@@ -143,7 +142,8 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
 
         # Add the rest of the data
         return [
-            parameters[NBR],parameters[A],parameters[B],parameters[TAUW],
+            #parameters[NBR],
+            parameters[A],parameters[B],parameters[TAUW],
             parameters[TREFRAC],
             parameters[VRESET],parameters[DELTA_V],parameters[AMPNOISE],
             parameters[TIMESCALE_INV],
@@ -157,7 +157,8 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        (_nbr, _a, _b, _tauw,
+        (#_nbr,
+         _a, _b, _tauw,
         _Trefrac, _Vreset, _delta_v,
         _ampnoise, _Timescale_inv, Ve, Vi, w, _this_h) = values
 
@@ -171,9 +172,9 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
 ###--Meanfield--###
 ################
 
-    @property
-    def nbr(self):
-        return self._nbr
+   # @property
+   # def nbr(self):
+    #    return self._nbr
 
 
     @property

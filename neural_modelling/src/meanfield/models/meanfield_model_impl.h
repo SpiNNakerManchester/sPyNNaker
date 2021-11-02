@@ -33,7 +33,6 @@ typedef struct meanfield_t {
     REAL b;
     REAL tauw;
     REAL Trefrac;
-    REAL Vthre;
     REAL Vreset;
     REAL delta_v;
     REAL ampnoise;
