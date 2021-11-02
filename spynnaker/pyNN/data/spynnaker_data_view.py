@@ -15,7 +15,44 @@
 
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.data import FecDataView
-from .spynakker_data_model import SpynnakerDataModel
+
+
+class _SpynnakerDataModel(object):
+    """
+    Singleton data model
+
+    This class should not be accessed directly please use the DataView and
+    DataWriter classes.
+    Accessing or editing the data held here directly is NOT SUPPORTED
+
+    There are other DataModel classes which sit next to this one and hold
+    additional data. The DataView and DataWriter classes will combine these
+    as needed.
+
+    What data is held where and how can change without notice.
+    """
+
+    __singleton = None
+
+    __slots__ = [
+        # Data values cached
+        "_min_delay"
+    ]
+
+    def __new__(cls):
+        if cls.__singleton:
+            return cls.__singleton
+        # pylint: disable=protected-access
+        obj = object.__new__(cls)
+        cls.__singleton = obj
+        obj._clear()
+        return obj
+
+    def _clear(self):
+        """
+        Clears out all data
+        """
+        self._min_delay = None
 
 
 class SpynnakerDataView(FecDataView):
@@ -29,7 +66,7 @@ class SpynnakerDataView(FecDataView):
     without notice, methods in this class can be considered a supported API
     """
 
-    _spy_data = SpynnakerDataModel()
+    __spy_data = _SpynnakerDataModel()
 
     __slots__ = []
 
@@ -41,16 +78,16 @@ class SpynnakerDataView(FecDataView):
         :raises SpinnFrontEndException:
             If the min_delay is currently unavailable
         """
-        if self._spy_data._SpynnakerDataModel__min_delay is not None:
-            return self._spy_data._SpynnakerDataModel__min_delay
-        if self._fec_data._FecDataModel__machine_time_step is None:
-            raise self.status.exception("min_delay")
-        return self._fec_data._FecDataModel__machine_time_step
+        if self.__spy_data._min_delay is not None:
+            return self.__spy_data._min_delay
+        if self.has_machine_time_step():
+            return self.machine_time_step
+        raise self.status.exception("min_delay")
 
     def has_min_delay(self):
-        if self._spy_data._SpynnakerDataModel__min_delay is not None:
+        if self.__spy_data._min_delay is not None:
             return True
-        return self._fec_data._FecDataModel__machine_time_step is not None
+        return self.has_machine_time_step()
 
     @overrides(FecDataView.items)
     def items(self):
