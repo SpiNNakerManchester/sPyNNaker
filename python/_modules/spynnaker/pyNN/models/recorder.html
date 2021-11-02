@@ -541,7 +541,8 @@
                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">segment_number</span><span class="p">),</span>
                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Empty&quot;</span><span class="p">,</span>
                 <span class="n">rec_datetime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
-            <span class="k">return</span> <span class="n">segment</span>
+            <span class="n">block</span><span class="o">.</span><span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+            <span class="k">return</span>
 
         <span class="n">data_cache</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span><span class="p">[</span><span class="n">segment_number</span><span class="p">]</span>
 
