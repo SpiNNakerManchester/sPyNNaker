@@ -193,6 +193,18 @@ class Population(PopulationBase):
         return variable in \
             self._recorder.get_all_possible_recordable_variables()
 
+    def __verify_record_params(self, to_file, sampling_interval):
+        if (to_file is not None) and (not isinstance(
+                to_file,
+                (neo.io.baseio.BaseIO, neo.rawio.baserawio.BaseRawIO, str))):
+            raise InvalidParameterType(
+                f"Incorrect type {type(to_file)} for tofile")
+        if (sampling_interval is not None) and (
+                not isinstance(sampling_interval, int)):
+            raise InvalidParameterType(
+                f"Incorrect type {type(sampling_interval)} for "
+                f"sampling_interval")
+
     @overrides(PopulationBase.record, extend_doc=False)
     def record(self, variables, to_file=None, sampling_interval=None):
         """ Record the specified variable or variables for all cells in the\
@@ -209,6 +221,7 @@ class Population(PopulationBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
+        self.__verify_record_params(to_file, sampling_interval)
         self._recorder.record(
             variables, to_file, sampling_interval, indexes=None)
 
@@ -233,6 +246,7 @@ class Population(PopulationBase):
             these indexes and asking the View to record.
         :type indexes: None or list(int)
         """
+        self.__verify_record_params(to_file, sampling_interval)
         self._recorder.record(
             variables, to_file, sampling_interval, indexes=indexes)
 
