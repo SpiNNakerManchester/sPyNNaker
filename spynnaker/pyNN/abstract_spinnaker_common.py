@@ -503,11 +503,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         """
         Runs, times and logs the DelaySupportAdder if required
         """
-        with FecTimer(MAPPING, "DelaySupportAdder") as timer:
-            name = get_config_str("Mapping", "delay_support_adder")
-            if name is None:
-                timer.skip("delay_support_adder is None")
-                return
+        name = get_config_str("Mapping", "delay_support_adder")
+        if name is None:
+            return
+        with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
                 adder = DelaySupportAdder()
                 adder(self._application_graph)
@@ -517,9 +516,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self, pre_allocated_resources):
+        if not self._application_graph.n_vertices:
+            return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner") as timer:
-            if timer.skip_if_application_graph_empty():
-                return
             if self._machine:
                 machine = self._machine
             else:
