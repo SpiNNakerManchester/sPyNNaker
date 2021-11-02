@@ -32,7 +32,7 @@ AMPNOISE = "ampnoise"
 TIMESCALE_INV = "Timescale_inv"
 VE = "Ve"
 VI = "Vi"
-W = "W"
+W = "w"
 
 UNITS = {
     ###--Meanfield--###
@@ -56,13 +56,13 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     """
     __slots__ = [
         "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
-        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_W_init",
+        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init",
     ]
 
     def __init__(self, nbr, a, b, tauw,
                  Trefrac, Vreset, delta_v,
                  ampnoise, Timescale_inv,
-                 Ve_init, Vi_init, W_init):
+                 Ve_init, Vi_init, w_init):
         """
         :param a: :math:`a`
         :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
@@ -95,7 +95,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         self._Timescale_inv = Timescale_inv
         self._Ve_init = Ve_init
         self._Vi_init = Vi_init
-        self._W_init = W_init
+        self._w_init = w_init
 
     @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -119,7 +119,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     def add_state_variables(self, state_variables):
         state_variables[VE] = self._Ve_init
         state_variables[VI] = self._Vi_init
-        state_variables[W] = self._W_init
+        state_variables[W] = self._w_init
         
     @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
@@ -159,12 +159,12 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         # Decode the values
         (_nbr, _a, _b, _tauw,
         _Trefrac, _Vreset, _delta_v,
-        _ampnoise, _Timescale_inv, Ve, Vi, W, _this_h) = values
+        _ampnoise, _Timescale_inv, Ve, Vi, w, _this_h) = values
 
         # Copy the changed data only
         state_variables[VE] = Ve
         state_variables[VI] = Vi
-        state_variables[W] = W
+        state_variables[W] = w
         #state_variables[U] = u
 
 ################
@@ -225,9 +225,9 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         return self._Vi_init    
 
     @property
-    def W_init(self):
+    def w_init(self):
         """ Settable model parameter: :math:`V_{i}`
 
         :rtype: float
         """
-        return self._W_init    
+        return self._w_init    

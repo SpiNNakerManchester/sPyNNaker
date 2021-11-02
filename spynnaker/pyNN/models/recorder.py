@@ -25,14 +25,16 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
 from spynnaker.pyNN.utilities.constants import (
-    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB, REWIRING)
+    SPIKES, FIRING_RATE_EXC, FIRING_RATE_INH, ADAPTATION, GSYN_EXCIT, GSYN_INHIB, REWIRING)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _DEFAULT_UNITS = {
     SPIKES: "spikes",
-    MEMBRANE_POTENTIAL: "mV",
+    FIRING_RATE_EXC : 'Hz',
+    FIRING_RATE_INH : 'Hz',
+    ADAPTATION : 'pA',#MEMBRANE_POTENTIAL: "mV",
     GSYN_EXCIT: "uS",
     GSYN_INHIB: "uS",
     REWIRING: "ms"}
@@ -62,9 +64,11 @@ class Recorder(object):
         # file flags, allows separate files for the recorded variables
         self.__write_to_files_indicators = {
             'spikes': None,
+            'Ve' : None,
+            'Vi' : None,
+            'w' : None,
             'gsyn_exc': None,
-            'gsyn_inh': None,
-            'v': None}
+            'gsyn_inh': None}
         self._recording_start_time = get_simulator().t
         self._data_cache = {}
 

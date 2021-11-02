@@ -310,7 +310,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
 
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
-    REAL lastW = meanfield->W;
+    REAL lastW = meanfield->w;
     //REAL tauw = meanfield->tauw;
     
     //REAL W_tauw;
@@ -327,7 +327,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
     //In fact no configVe and configVi just config, all in the same file.
     /*
-        some trouble come from constants :
+        some troubles maybe come from constants :
         from spynnaker.pyNN.utilities.constants 
         
         and
@@ -347,15 +347,15 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     
     
     meanfield->Vi += lastVi + (REAL_HALF(lastTF_inh - lastVi) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Vi =  meanfield->Vi * ONE;
+    meanfield->Vi =  meanfield->Vi * ONE; //*T_inv normaly
     
     REAL k1_W = -lastW;//tauw;
     REAL k2_W = -lastW*(ONE+h);//tauw;
     
     //W_tauw = -lastW ;//+ meanfield->b*lastVe*meanfield->tauw 
     //                 + meanfield->a*(pNetwork->muV-pNetwork->El)*meanfield->tauw;
-    //meanfield->W += W_tauw ;/// meanfield->tauw ;
-    meanfield->W += lastW;//lastW + (h*(k1_W+k2_W));
+    meanfield->w += meanfield->tauw ;
+    //meanfield->w += lastW;///REAL_CONST(10.);//lastW + (h*(k1_W+k2_W));
         
 }
 
@@ -467,13 +467,14 @@ state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
 }
 
 state_t meanfield_model_get_adaptation_W(const meanfield_t *meanfield){
-    return meanfield->W;
+    return meanfield->w;
 }
 
 
 void meanfield_model_print_state_variables(const meanfield_t *meanfield) {
     log_debug("Ve = %11.4k ", meanfield->Ve);
     log_debug("Vi = %11.4k ", meanfield->Vi);
+    log_debug("W = %11.4k ", meanfield->w);
 }
 
 void meanfield_model_print_parameters(const meanfield_t *meanfield) {

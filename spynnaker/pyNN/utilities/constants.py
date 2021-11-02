@@ -62,6 +62,9 @@ SPIKE_PARTITION_ID = "SPIKE"
 
 # names for recording components
 SPIKES = 'spikes'
+FIRING_RATE_EXC = 'Ve'
+FIRING_RATE_INH = 'Vi'
+ADAPTATION = 'w'
 MEMBRANE_POTENTIAL = "v"
 GSYN_EXCIT = "gsyn_exc"
 GSYN_INHIB = "gsyn_inh"
