@@ -518,7 +518,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     def _execute_splitter_partitioner(self, pre_allocated_resources):
         if not self._application_graph.n_vertices:
             return
-        with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner") as timer:
+        with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
             if self._machine:
                 machine = self._machine
             else:
