@@ -311,7 +311,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     REAL lastVe = meanfield->Ve;
     REAL lastVi = meanfield->Vi;
     REAL lastW = meanfield->w;
-    //REAL tauw = meanfield->tauw;
+    REAL tauw = meanfield->tauw;
     
     //REAL W_tauw;
        
@@ -338,24 +338,27 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
 
     
     REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
-    REAL k2_exc = lastVe + h*k1_exc;
+    REAL k2_exc = (lastTF_exc - (lastVe + h*k1_exc))*T_inv;
     
-    meanfield->Ve += lastVe + REAL_HALF(h*(k1_exc + k2_exc))*REAL_CONST(0.5);
+    meanfield->Ve += lastVe + REAL_HALF(h*(k1_exc + k2_exc));
     
     //meanfield->Ve += lastVe + (REAL_HALF(lastTF_exc - lastVe) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Ve =  meanfield->Ve * T_inv;
+    //meanfield->Ve =  meanfield->Ve * T_inv;
     
+    REAL k1_inh = (lastTF_inh - lastVi)*T_inv;
+    REAL k2_inh = lastVi - h*k1_inh;//(lastTF_inh - (lastVi + h*k1_inh))*T_inv;
     
-    meanfield->Vi += lastVi + (REAL_HALF(lastTF_inh - lastVi) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Vi =  meanfield->Vi * ONE; //*T_inv normaly
+    meanfield->Vi += lastVi + REAL_HALF(h*(k1_inh + k2_inh));
+    //meanfield->Vi += lastVi + (REAL_HALF(lastTF_inh - lastVi) * (REAL_CONST(2.0)-h) * h);
+    //meanfield->Vi =  meanfield->Vi * ONE; //*T_inv normaly
     
-    REAL k1_W = -lastW;//tauw;
-    REAL k2_W = -lastW*(ONE+h);//tauw;
+    REAL k1_W = -lastW/tauw + meanfield->b * lastVe;
+    REAL k2_W = lastW + h * k1_W;//-(lastW + h*k1_W)/tauw + meanfield->b * lastVe;
     
-    //W_tauw = -lastW ;//+ meanfield->b*lastVe*meanfield->tauw 
-    //                 + meanfield->a*(pNetwork->muV-pNetwork->El)*meanfield->tauw;
-    meanfield->w += meanfield->tauw ;
-    //meanfield->w += lastW;///REAL_CONST(10.);//lastW + (h*(k1_W+k2_W));
+    //W_tauw = -lastW + meanfield->b*lastVe*tauw 
+    //                 + meanfield->a*(pNetwork->muV-pNetwork->El)*tauw;
+    //meanfield->w += meanfield->tauw ;
+    meanfield->w += lastW + REAL_HALF(h*(k1_W+k2_W));
         
 }
 

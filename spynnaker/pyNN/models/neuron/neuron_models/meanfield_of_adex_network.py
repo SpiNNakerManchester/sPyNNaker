@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 ###--Meanfield Params--###
-NBR = "nbr"
+#NBR = "nbr"
 A = "a"
 B = "b"
 TAUW = "tauw"
@@ -36,7 +36,7 @@ W = "w"
 
 UNITS = {
     ###--Meanfield--###
-    NBR: "",
+    #NBR: "",
     A: "nS",
     B: "nS",
     TAUW: "ms",
@@ -47,7 +47,7 @@ UNITS = {
     TIMESCALE_INV: "Hz",
     VE: "Hz",
     VI: "Hz",
-    W: "mV ",
+    W: "pA",
 }
 
 
@@ -59,7 +59,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
         "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init",
     ]
 
-    def __init__(self, nbr, a, b, tauw,
+    def __init__(self, a, b, tauw,
                  Trefrac, Vreset, delta_v,
                  ampnoise, Timescale_inv,
                  Ve_init, Vi_init, w_init):
@@ -142,7 +142,6 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
 
         # Add the rest of the data
         return [
-            #parameters[NBR],
             parameters[A],parameters[B],parameters[TAUW],
             parameters[TREFRAC],
             parameters[VRESET],parameters[DELTA_V],parameters[AMPNOISE],
@@ -157,8 +156,8 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        (#_nbr,
-         _a, _b, _tauw,
+        #(#_nbr,
+        (_a, _b, _tauw,
         _Trefrac, _Vreset, _delta_v,
         _ampnoise, _Timescale_inv, Ve, Vi, w, _this_h) = values
 
@@ -227,7 +226,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
 
     @property
     def w_init(self):
-        """ Settable model parameter: :math:`V_{i}`
+        """ Settable model parameter: :math:`w`
 
         :rtype: float
         """
