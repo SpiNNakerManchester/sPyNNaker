@@ -205,46 +205,28 @@ static inline bool process_fixed_synapses(
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
 
-        // If synapse type has non-input synapses (i.e. is neuromodulated) and
-        // this synapse connects to one, pass event directly to synapse dynamics
-        if (synapse_dynamics_is_neuromodulated(
-                synaptic_word, synapse_index_bits, synapse_type_mask)) {
-            // Dopaminergic neurons send some amount of neuromodulator
-            // concentration so this can actually be a weight as usual.
-            int32_t concentration = synapse_row_sparse_weight(synaptic_word);
-            uint32_t index = synapse_row_sparse_index(
-                synaptic_word, synapse_index_mask);
-            uint32_t synapse_type = synapse_row_sparse_type(
-                synaptic_word, synapse_index_bits, synapse_type_mask);
+        // The ring buffer index can be found by adding on the time to the delay
+        // in the synaptic word directly, and then masking off the whole index.
+        // The addition of the masked time to the delay even with the mask might
+        // overflow into the weight at worst but can't affect the lower bits.
+        uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
+        uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
-            // Get the concentration value
-            concentration = synapse_dynamics_get_concentration(synapse_type, concentration);
-            synapse_dynamics_process_neuromodulator_event(
-                time, concentration, index, synapse_type);
-        } else {
-            // The ring buffer index can be found by adding on the time to the delay
-            // in the synaptic word directly, and then masking off the whole index.
-            // The addition of the masked time to the delay even with the mask might
-            // overflow into the weight at worst but can't affect the lower bits.
-            uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
-            uint32_t weight = synapse_row_sparse_weight(synaptic_word);
+        // Add weight to current ring buffer value
+        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
-            // Add weight to current ring buffer value
-            uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
-
-            // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
-            // **NOTE** 0x10000 can be expressed as an ARM literal,
-            //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
-            //          to obtain this value
-            uint32_t sat_test = accumulation & 0x10000;
-            if (sat_test) {
-                accumulation = sat_test - 1;
-                synapses_saturation_count++;
-            }
-
-            // Store saturated value back in ring-buffer
-            ring_buffers[ring_buffer_index] = accumulation;
+        // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
+        // **NOTE** 0x10000 can be expressed as an ARM literal,
+        //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
+        //          to obtain this value
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test) {
+            accumulation = sat_test - 1;
+            synapses_saturation_count++;
         }
+
+        // Store saturated value back in ring-buffer
+        ring_buffers[ring_buffer_index] = accumulation;
     }
     return true;
 }
@@ -362,6 +344,9 @@ void synapses_flush_ring_buffers(timer_t time) {
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back) {
 
+    // By default don't write back
+    *write_back = false;
+
     // Get address of non-plastic region from row
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
 
@@ -377,14 +362,11 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_data,
-                fixed_region, ring_buffers, time)) {
+                fixed_region, ring_buffers, time, write_back)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
                 PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-        // Perform DMA write back
-        *write_back = true;
     }
 
     // Process any fixed synapses

@@ -13,18 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
-    AbstractSynapseStructure)
+APP = $(notdir $(CURDIR))
 
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_mad_stdp.c
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_izhikevich_neuromodulation.c
+TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.h
+WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.c
+WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
 
-class SynapseStructureWeightEligibilityTrace(AbstractSynapseStructure):
-    __slots__ = ()
-
-    @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)
-    def get_n_half_words_per_connection(self):
-        return 2
-
-    @overrides(AbstractSynapseStructure.get_weight_half_word)
-    def get_weight_half_word(self):
-        return 1
+include ../synapse_build.mk

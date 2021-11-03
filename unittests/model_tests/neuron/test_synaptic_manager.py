@@ -39,7 +39,8 @@ from spinn_front_end_common.interface.interface_functions import (
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
-    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
+    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic,
+    SynapseDynamicsNeuromodulation)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
@@ -111,59 +112,6 @@ def test_write_data_spec():
         pre_pop, post_pop, p.AllToAllConnector(allow_self_connections=False),
         p.StaticSynapse(weight=4.5, delay=4.0))
 
-    # spynnaker8.setup(timestep=1)
-    # # Add an sdram so max SDRAM is high enough
-    # SDRAM(10000)
-    #
-    # set_config("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
-    #
-    # placements = Placements()
-    # pre_app_population = MockPopulation(10, "mock pop pre")
-    # pre_app_vertex = SimpleTestVertex(10, label="pre")
-    # pre_app_vertex.splitter = MockSplitter()
-    # pre_app_vertex.splitter._called = True
-    # pre_vertex_slice = Slice(0, 9)
-    #
-    # post_app_population = MockPopulation(10, "mock pop post")
-    # pre_vertex = pre_app_vertex.create_machine_vertex(
-    #     pre_vertex_slice, None)
-    # placements.add_placement(Placement(pre_vertex, 0, 0, 1))
-    # post_app_vertex = SimpleTestVertex(10, label="post")
-    # post_app_vertex.splitter = MockSplitter()
-    # post_app_vertex.splitter._called = True
-    # post_vertex_slice = Slice(0, 9)
-    # post_vertex = post_app_vertex.create_machine_vertex(
-    #     post_vertex_slice, None)
-    # post_vertex_placement = Placement(post_vertex, 0, 0, 2)
-    # placements.add_placement(post_vertex_placement)
-    # delay_app_vertex = DelayExtensionVertex(
-    #     10, 16, 51, pre_app_vertex, label="delay")
-    # delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
-    #     16, 51)
-    # delay_app_vertex.splitter = SplitterDelayVertexSlice(
-    #     pre_app_vertex.splitter)
-    # delay_vertex = DelayExtensionMachineVertex(
-    #     resources_required=None, label="", constraints=[],
-    #     app_vertex=delay_app_vertex, vertex_slice=post_vertex_slice)
-    # placements.add_placement(Placement(delay_vertex, 0, 0, 3))
-    # one_to_one_connector_1 = OneToOneConnector(None)
-    # direct_synapse_information_1 = SynapseInformation(
-    #     one_to_one_connector_1, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 0, None, True, 1.5, 1.0)
-    # one_to_one_connector_1.set_projection_information(
-    #     direct_synapse_information_1)
-    # one_to_one_connector_2 = OneToOneConnector(None)
-    # direct_synapse_information_2 = SynapseInformation(
-    #     one_to_one_connector_2, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 1, None, True, 2.5, 2.0)
-    # one_to_one_connector_2.set_projection_information(
-    #     direct_synapse_information_2)
-    # all_to_all_connector = AllToAllConnector(False)
-    # all_to_all_synapse_information = SynapseInformation(
-    #     all_to_all_connector, pre_app_population, post_app_population,
-    #     False, False, None, SynapseDynamicsStatic(), 0, None, True, 4.5, 4.0)
-    # all_to_all_connector.set_projection_information(
-    #     all_to_all_synapse_information)
     from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
     proj_from_list = p.Projection(
         pre_pop, post_pop, p.FromListConnector(from_list_list),
@@ -305,9 +253,15 @@ def test_set_synapse_dynamics():
         elimination=RandomByWeightElimination(0.5),
         timing_dependence=TimingDependenceSpikePair(),
         weight_dependence=WeightDependenceMultiplicative())
+    neuromodulation = SynapseDynamicsNeuromodulation()
+    alt_neuromodulation = SynapseDynamicsNeuromodulation(tau_c=1)
 
     # This should be fine as it is the first call
     post_app_vertex.synapse_dynamics = static
+
+    # This should fail as can't add neuromodulation first
+    with pytest.raises(SynapticConfigurationException):
+        post_app_vertex.synapse_dynamics = neuromodulation
 
     # This should be fine as STDP overrides static
     post_app_vertex.synapse_dynamics = stdp
@@ -316,14 +270,25 @@ def test_set_synapse_dynamics():
     with pytest.raises(SynapticConfigurationException):
         post_app_vertex.synapse_dynamics = alt_stdp
 
+    # This should pass because neuromodulation is OK after STDP
+    post_app_vertex.synapse_dynamics = neuromodulation
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
+
     # This should work because STDP dependences are the same
     post_app_vertex.synapse_dynamics = stdp
+
+    # This should fail as neuromodulation type is different
+    with pytest.raises(SynapticConfigurationException):
+        post_app_vertex.synapse_dynamics = alt_neuromodulation
+
+    # This should be fine as same neuromodulation
+    post_app_vertex.synapse_dynamics = neuromodulation
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
 
     # This should work because static always works, but the type should
     # still be STDP
     post_app_vertex.synapse_dynamics = static
-    assert isinstance(
-        post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
+    assert isinstance(post_app_vertex.synapse_dynamics, SynapseDynamicsSTDP)
 
     # This should work but should merge with the STDP rule
     post_app_vertex.synapse_dynamics = static_struct

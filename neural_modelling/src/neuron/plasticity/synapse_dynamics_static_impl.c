@@ -35,23 +35,6 @@ bool synapse_dynamics_initialise(
 }
 
 //---------------------------------------
-void synapse_dynamics_process_neuromodulator_event(
-        UNUSED uint32_t time, UNUSED int32_t concentration,
-        UNUSED uint32_t neuron_index, UNUSED uint32_t synapse_type) {
-}
-
-bool synapse_dynamics_is_neuromodulated(
-        UNUSED uint32_t synaptic_word, UNUSED uint32_t synapse_index_bits,
-        UNUSED uint32_t synapse_type_mask) {
-    return false;
-}
-
-int32_t synapse_dynamics_get_concentration(
-        UNUSED uint32_t synapse_type, UNUSED int32_t concentration) {
-    return 0;
-}
-
-//---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         UNUSED uint32_t time, UNUSED index_t neuron_index) {
 }
@@ -60,8 +43,9 @@ void synapse_dynamics_process_post_synaptic_event(
 bool synapse_dynamics_process_plastic_synapses(
         UNUSED synapse_row_plastic_data_t *plastic_region_data,
         UNUSED synapse_row_fixed_part_t *fixed_region,
-        UNUSED weight_t *ring_buffer, UNUSED uint32_t time) {
+        UNUSED weight_t *ring_buffer, UNUSED uint32_t time, bool *write_back) {
     log_error("There should be no plastic synapses!");
+    *write_back = false;
     return false;
 }
 

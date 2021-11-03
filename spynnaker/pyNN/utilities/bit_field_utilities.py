@@ -16,7 +16,8 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-# from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+from spinn_utilities.ordered_set import OrderedSet
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -199,47 +200,25 @@ def write_bitfield_init_data(
 
     spec.switch_write_focus(bit_field_key_map_region_id)
 
-    # Gather the machine edges that target this core
-    machine_edges = list()
+    # Gather the source vertices that target this core
+    sources = OrderedSet()
     seen_app_edges = set()
     for proj in incoming_projections:
         in_edge = proj._projection_edge
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-
-            # If neuromodulation is turned on on this edge then treat
-            # edges with reward or punishment receptors differently
-            post_vertex = in_edge.post_vertex
-            neuromodulation = in_edge.is_neuromodulated(post_vertex)
-
-            receptor_types = []
-            n_synapse_info = len(in_edge.synapse_information)
-            for n in range(n_synapse_info):
-                receptor_types.append(
-                    in_edge.synapse_information[n].receptor_type)
-            if neuromodulation and ("reward" in receptor_types or
-                                    "punishment" in receptor_types):
-                seen_machine_vertices = set()
-                for machine_edge in in_edge.machine_edges:
-                    if machine_edge.pre_vertex in seen_machine_vertices:
-                        continue
-
-                    seen_machine_vertices.add(machine_edge.pre_vertex)
-
-                    if machine_edge.post_vertex.vertex_slice == vertex_slice:
-                        machine_edges.append(machine_edge)
-            else:
-                for machine_edge in in_edge.machine_edges:
-                    if machine_edge.post_vertex.vertex_slice == vertex_slice:
-                        machine_edges.append(machine_edge)
+            for machine_edge in in_edge.machine_edges:
+                if machine_edge.post_vertex.vertex_slice == vertex_slice:
+                    sources.add(machine_edge.pre_vertex)
 
     # write n keys max atom map
-    spec.write_value(len(machine_edges))
+    spec.write_value(len(sources))
 
     # load in key to max atoms map
-    for machine_edge in machine_edges:
-        spec.write_value(routing_info.get_first_key_for_edge(machine_edge))
-        spec.write_value(machine_edge.pre_vertex.vertex_slice.n_atoms)
+    for source_vertex in sources:
+        spec.write_value(routing_info.get_first_key_from_pre_vertex(
+            source_vertex, SPIKE_PARTITION_ID))
+        spec.write_value(source_vertex.vertex_slice.n_atoms)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)

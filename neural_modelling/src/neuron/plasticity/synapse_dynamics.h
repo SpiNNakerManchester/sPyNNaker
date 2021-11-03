@@ -41,20 +41,12 @@ bool synapse_dynamics_initialise(
 //! \param[in] fixed_region: Where the fixed data is
 //! \param[in,out] ring_buffers: The ring buffers
 //! \param[in] time: The current simulation time
-//! \return ???
+//! \param[out] Whether to write back anything
+//! \return Whether the processing was successful or not
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time);
-
-void synapse_dynamics_process_neuromodulator_event(
-        uint32_t time, int32_t concentration, uint32_t neuron_index,
-        uint32_t synapse_type);
-
-bool synapse_dynamics_is_neuromodulated(
-        uint32_t synaptic_word, uint32_t synapse_index_bits, uint32_t synapse_type_mask);
-
-int32_t synapse_dynamics_get_concentration(uint32_t synapse_type, int32_t concentration);
+        weight_t *ring_buffers, uint32_t time, bool *write_back);
 
 //! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time

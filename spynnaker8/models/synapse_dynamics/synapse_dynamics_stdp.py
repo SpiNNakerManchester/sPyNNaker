@@ -33,7 +33,7 @@ class SynapseDynamicsSTDP(_BaseClass):
             self, timing_dependence, weight_dependence,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=PyNNStaticSynapse.default_parameters['weight'], delay=None,
-            backprop_delay=True, neuromodulation=False):
+            backprop_delay=True):
         """
         :param AbstractTimingDependence timing_dependence:
         :param AbstractWeightDependence weight_dependence:
@@ -43,7 +43,6 @@ class SynapseDynamicsSTDP(_BaseClass):
         :param delay:
         :type delay: float or None
         :param bool backprop_delay:
-        :param bool neuromodulation:
         """
         # pylint: disable=too-many-arguments
 
@@ -54,4 +53,4 @@ class SynapseDynamicsSTDP(_BaseClass):
         super(SynapseDynamicsSTDP, self).__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay,
-            backprop_delay=backprop_delay, neuromodulation=neuromodulation)
+            backprop_delay=backprop_delay)

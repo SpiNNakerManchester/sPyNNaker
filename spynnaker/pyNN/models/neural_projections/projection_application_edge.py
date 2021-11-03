@@ -18,9 +18,11 @@ from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 _DynamicsStructural = None
 _DynamicsSTDP = None
+_DynamicsNeuromodulation = None
 
 
 def are_dynamics_structural(synapse_dynamics):
@@ -43,6 +45,16 @@ def are_dynamics_stdp(synapse_dynamics):
     return isinstance(synapse_dynamics, _DynamicsSTDP)
 
 
+def are_dynamics_neuromodulation(synapse_dynamics):
+    global _DynamicsNeuromodulation
+    if _DynamicsNeuromodulation is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            SynapseDynamicsNeuromodulation)
+        _DynamicsNeuromodulation = SynapseDynamicsNeuromodulation
+    return isinstance(synapse_dynamics, _DynamicsNeuromodulation)
+
+
 class ProjectionApplicationEdge(
         ApplicationEdge, AbstractSlicesConnect,
         AbstractProvidesLocalProvenanceData):
@@ -59,7 +71,7 @@ class ProjectionApplicationEdge(
         "__slices_list_mode",
         "__machine_edges_by_slices",
         "__filter",
-        "__is_neuromodulated"
+        "__is_neuromodulation"
     ]
 
     def __init__(
@@ -67,20 +79,17 @@ class ProjectionApplicationEdge(
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param synapse_information:
+        :param SynapseInformation synapse_information:
             The synapse information on this edge
-        :type synapse_information:
-            SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
         super().__init__(pre_vertex, post_vertex, label=label)
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
-        if hasattr(synapse_information, '__iter__'):
-            self.__synapse_information = synapse_information
-        else:
-            self.__synapse_information = [synapse_information]
+        self.__synapse_information = [synapse_information]
+        self.__is_neuromodulation = are_dynamics_neuromodulation(
+            synapse_information.synapse_dynamics)
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
@@ -96,13 +105,17 @@ class ProjectionApplicationEdge(
         # By default, allow filtering
         self.__filter = True
 
-        # By default, not neuromodulated
-        self.__is_neuromodulated = None
-
     def add_synapse_information(self, synapse_information):
         """
         :param SynapseInformation synapse_information:
         """
+        dynamics = synapse_information.synapse_dynamics
+        is_neuromodulation = are_dynamics_neuromodulation(dynamics)
+        if is_neuromodulation != self.__is_neuromodulation:
+            raise SynapticConfigurationException(
+                "Cannot mix neuromodulated and non-neuromodulated synapses"
+                f" between the same source Population {self._pre_vertex} and"
+                f" target Population {self._post_vertex}")
         self.__synapse_information.append(synapse_information)
 
     @property
@@ -124,21 +137,13 @@ class ProjectionApplicationEdge(
     def delay_edge(self, delay_edge):
         self.__delay_edge = delay_edge
 
-    def is_neuromodulated(self, post_vertex):
-        """ Check if neuromodulation is set on any edge into the post_vertex
+    @property
+    def is_neuromodulation(self):
+        """ Check if this edge is providing neuromodulation
 
         :rtype: bool
         """
-        if self.__is_neuromodulated is None:
-            for proj in post_vertex.incoming_projections:
-                dynamics = proj._synapse_information.synapse_dynamics
-                if are_dynamics_stdp(dynamics):
-                    self.__is_neuromodulated = dynamics.neuromodulation
-                    # If true, return immediately; if not move to next proj
-                    if self.__is_neuromodulated:
-                        return self.__is_neuromodulated
-
-        return self.__is_neuromodulated
+        return self.__is_neuromodulation
 
     def set_filter(self, do_filter):
         """ Set the ability to filter or not

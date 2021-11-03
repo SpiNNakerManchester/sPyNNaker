@@ -569,23 +569,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if edge in self.__poisson_edges:
             return {}
 
-        # Work out if there is a neuromodulated edge
-        app_vertex = self._governed_app_vertex
-        neuromodulation = edge.is_neuromodulated(app_vertex)
-
         # If the incoming edge targets the reward or punishment receptors
         # then it needs to be treated differently
-        receptor_types = []
-        n_synapse_info = len(edge.synapse_information)
-        for n in range(n_synapse_info):
-            receptor_types.append(
-                edge.synapse_information[n].receptor_type)
-        if neuromodulation and ("reward" in receptor_types or
-                                "punishment" in receptor_types):
-            # Increment the vertex index so non-neuromodulated edges work
-            # index = self.__next_synapse_index
-            # self.__next_synapse_index = (
-            #     (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+        if edge.is_neuromodulation:
 
             # In this instance, choose to send to all synapse vertices
             return {self.__synapse_verts_by_neuron[neuron][s_index]:

@@ -24,6 +24,7 @@ from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
     DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -67,11 +68,7 @@ class SynapseDynamicsStructuralSTDP(
         # The formation rule
         "__formation",
         # The elimination rule
-        "__elimination",
-        # Defines whether neuromodulation is on
-        "__neuromodulation",
-        # Whether to use back-propagation delay or not
-        "__backprop_delay"
+        "__elimination"
     ]
 
     def __init__(
@@ -82,7 +79,7 @@ class SynapseDynamicsStructuralSTDP(
             initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
             with_replacement=True, seed=None,
             weight=StaticSynapse.default_parameters['weight'], delay=None,
-            backprop_delay=True, neuromodulation=False):
+            backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
@@ -118,12 +115,11 @@ class SynapseDynamicsStructuralSTDP(
             Use ``None`` to get the simulator default minimum delay.
         :type delay: float or None
         :param bool backprop_delay: Whether back-propagated delays are used
-        :param bool neuromodulation: Whether neuromodulation is turned on
         """
         super().__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
-            backprop_delay=backprop_delay, neuromodulation=neuromodulation)
+            backprop_delay=backprop_delay)
         self.__partner_selection = partner_selection
         self.__formation = formation
         self.__elimination = elimination
@@ -146,6 +142,12 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.merge)
     def merge(self, synapse_dynamics):
+        # If dynamics is Neuromodulation, merge with other neuromodulation,
+        # and then return ourselves, as neuromodulation can't be used by
+        # itself
+        if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
+            super().merge_neuromodulation(synapse_dynamics)
+            return self
         # If other is structural, check structural matches
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             if not SynapseDynamicsStructuralCommon.is_same_as(

@@ -17,6 +17,7 @@ import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 import numpy
 import unittest
+import math
 
 
 class TestSTDPNeuromodulation(BaseTestCase):
@@ -82,26 +83,8 @@ class TestSTDPNeuromodulation(BaseTestCase):
 
         # Create post-synaptic pop which will be modulated by DA concentration
         post_pop = sim.Population(
-            1, sim.extra_models.IF_curr_exp_izhikevich_neuromodulation,
-            cell_params, label='post1')
-
-        # Create STDP dynamics with neuromodulation
-        synapse_dynamics = sim.STDPMechanism(
-            timing_dependence=sim.extra_models.TimingIzhikevichNeuromodulation(
-                tau_plus=10, tau_minus=12,
-                A_plus=1, A_minus=1,
-                tau_c=tau_c, tau_d=tau_d),
-            weight_dependence=sim.MultiplicativeWeightDependence(
-                w_min=0, w_max=20),
-            weight=rewarded_syn_weight,
-            neuromodulation=True)
-
-        # Create dopaminergic connection
-        sim.Projection(
-            reward_pop, post_pop,
-            sim.AllToAllConnector(),
-            synapse_type=sim.StaticSynapse(weight=DA_concentration),
-            receptor_type='reward', label='reward synapses')
+            1, sim.IF_curr_exp, cell_params, label='post1')
+        post_pop.record("spikes")
 
         # Stimulate post-synaptic neuron
         sim.Projection(
@@ -110,6 +93,15 @@ class TestSTDPNeuromodulation(BaseTestCase):
             synapse_type=sim.StaticSynapse(weight=6),
             receptor_type='excitatory')
 
+        # Create STDP dynamics
+        synapse_dynamics = sim.STDPMechanism(
+            timing_dependence=sim.SpikePairRule(
+                tau_plus=10, tau_minus=12,
+                A_plus=1, A_minus=1),
+            weight_dependence=sim.AdditiveWeightDependence(
+                w_min=0, w_max=20),
+            weight=rewarded_syn_weight)
+
         # Create a plastic connection between pre and post neurons
         plastic_projection = sim.Projection(
             pre_pop, post_pop,
@@ -117,18 +109,38 @@ class TestSTDPNeuromodulation(BaseTestCase):
             synapse_type=synapse_dynamics,
             receptor_type='excitatory', label='Pre-post projection')
 
+        # Create dopaminergic connection
+        sim.Projection(
+            reward_pop, post_pop,
+            sim.AllToAllConnector(),
+            synapse_type=sim.extra_models.Neuromodulation(
+                weight=DA_concentration, tau_c=tau_c, tau_d=tau_d, w_max=20.0),
+            receptor_type='reward', label='reward synapses')
+
         sim.run(duration)
 
         # End simulation on SpiNNaker
         weights = plastic_projection.get('weight', 'list')
+        spikes = post_pop.get_data("spikes").segments[0].spiketrains[0]
 
         sim.end()
 
-        # weight that should be returned from SpiNNaker
-        weight_exact = 10.0087890625
+        print(spikes)
+
+        pot = 1 * math.exp(-((1504 - 1500)/10))
+        decay = math.exp(-((1601 - 1504)/1000))
+        el = pot * decay
+        const = 1.0 / (-((1.0/1000.0) + (1.0/200.0)))
+        decay_d = math.exp(-((2400 - 1601)/200))
+        decay_e = math.exp(-((2400 - 1601)/1000))
+        weight_exact = (
+            ((el * DA_concentration) * const)*((decay_d * decay_e) - 1))
+
+        print(f"Weight calculated: {weight_exact}")
+        print(f"Weight from SpiNNaker: {weights[0][2]}")
 
         self.assertTrue(numpy.allclose(
-                        weights[0][2], weight_exact, atol=0.001))
+                        weights[0][2], weight_exact, atol=0.02))
 
     def test_neuromodulation(self):
         self.runsafe(self.neuromodulation)

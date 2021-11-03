@@ -120,10 +120,7 @@ static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
 static inline int32_t maths_fixed_mul16(
         int32_t a, int32_t b, const int32_t fixed_point_position) {
     // Multiply lower 16-bits of a and b together
-    int32_t mul = __smulbb(a, b);
-
-    // Shift down
-    return (mul >> fixed_point_position);
+    return __smulbb(a, b) >> fixed_point_position;
 }
 
 //---------------------------------------
