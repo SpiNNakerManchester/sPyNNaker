@@ -17,8 +17,8 @@ import os
 import unittest
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
-from spinn_front_end_common.utilities.report_functions import (
-    NetworkSpecification)
+from spinn_front_end_common.utilities.report_functions.network_specification \
+    import _FILENAME as network_specification_file_name
 from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
 from spinnaker_testbase import BaseTestCase
@@ -67,7 +67,7 @@ class TestDebug(BaseTestCase):
             # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
-            NetworkSpecification._FILENAME,
+            network_specification_file_name,
             # write_provenance_data
             "provenance_data",
             # write_tag_allocation_reports
