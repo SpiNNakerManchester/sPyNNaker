@@ -56,7 +56,7 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
     """
     __slots__ = [
         "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
-        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init",
+        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init"
     ]
 
     def __init__(self, a, b, tauw,
@@ -83,7 +83,6 @@ class MeanfieldOfAdexNetwork(AbstractNeuronModel):
             DataType.S1615, #W
             DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
-        #self._nbr = nbr
         self._a = a
         self._b = b
         self._tauw = tauw

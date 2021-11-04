@@ -427,7 +427,7 @@ static void neuron_impl_do_timestep_update(
                     exc_input_values, input_types, firing_rate_Ve);
             input_type_convert_inhibitory_input_to_current(
                     inh_input_values, input_types, firing_rate_Vi);
-
+            
 //            input_t external_bias += additional_input_get_input_value_as_current(
 //                    additional_inputs, firing_rate);
 

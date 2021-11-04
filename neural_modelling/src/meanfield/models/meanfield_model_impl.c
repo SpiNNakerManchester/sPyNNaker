@@ -336,7 +336,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
         
     */
 
-    
+    //cut more the equation for underflowed ITCM!!
     REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
     REAL k2_exc = (lastTF_exc - (lastVe + h*k1_exc))*T_inv;
     
@@ -358,7 +358,7 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     //W_tauw = -lastW + meanfield->b*lastVe*tauw 
     //                 + meanfield->a*(pNetwork->muV-pNetwork->El)*tauw;
     //meanfield->w += meanfield->tauw ;
-    meanfield->w += lastW + REAL_HALF(h*(k1_W+k2_W));
+    meanfield->w += lastVi;//lastW ;//+ REAL_HALF(h*(k1_W+k2_W));
         
 }
 

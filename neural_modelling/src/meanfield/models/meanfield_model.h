@@ -100,7 +100,7 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield);
 //!     parameters specified in neuron
 state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield);
 state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield);
-state_t meanfield_model_get_Fout_th(const ParamsFromNetwork_t *params_from_network);
+state_t meanfield_model_get_adaptation_W(const meanfield_t *meanfield);
 
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
