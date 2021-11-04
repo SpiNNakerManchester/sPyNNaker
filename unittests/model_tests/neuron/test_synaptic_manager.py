@@ -35,7 +35,7 @@ from data_specification import (
 from data_specification.constants import MAX_MEM_REGIONS
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.interface_functions import (
-    EdgeToNKeysMapper)
+    edge_to_n_keys_mapper)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -179,8 +179,7 @@ def test_write_data_spec():
         machine_graph, _ = spynnaker_splitter_partitioner(
             app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        n_keys_map = edge_to_n_keys_mapper(machine_graph)
         routing_info = allocator.__call__(
             machine_graph, n_keys_map, flexible=False)
 
@@ -494,8 +493,7 @@ def test_pop_based_master_pop_table_standard(
         machine_graph, _ = spynnaker_splitter_partitioner(
             app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        n_keys_map = edge_to_n_keys_mapper(machine_graph)
         routing_info = allocator.__call__(
             machine_graph, n_keys_map, flexible=False)
 
