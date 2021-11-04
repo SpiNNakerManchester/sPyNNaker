@@ -26,7 +26,7 @@ from spinn_front_end_common.utilities.report_functions.\
 # from spinn_front_end_common.utilities.report_functions.energy_report \
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
-    import BoardChipReport
+    import AREA_CODE_REPORT_NAME
 from spinn_front_end_common.utility_models import \
      DataSpeedUpPacketGatherMachineVertex
 from spinnaker_testbase import BaseTestCase
@@ -79,7 +79,7 @@ class CheckDebug(BaseTestCase):
             # write_algorithm_timings
             # "provenance_data/pacman.xml"  = different test
             # write_board_chip_report
-            BoardChipReport.AREA_CODE_REPORT_NAME,
+            AREA_CODE_REPORT_NAME,
             SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME,
             SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_NAME + "." +
             SpYNNakerNeuronGraphNetworkSpecificationReport._GRAPH_FORMAT,
