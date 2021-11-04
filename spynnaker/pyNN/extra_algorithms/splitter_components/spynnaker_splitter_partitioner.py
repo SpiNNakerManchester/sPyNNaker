@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms.splitter_partitioner import (
+    _SplitterPartitioner)
 from data_specification import ReferenceContext
 
 
-class SpynnakerSplitterPartitioner(SplitterPartitioner):
+class _SpynnakerSplitterPartitioner(_SplitterPartitioner):
     """ a splitter partitioner that's bespoke for spynnaker vertices.
     """
 
@@ -46,7 +47,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         # return the accepted things
         return machine_graph, chips_used
 
-    @overrides(SplitterPartitioner.create_machine_edge)
+    @overrides(_SplitterPartitioner.create_machine_edge)
     def create_machine_edge(
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
@@ -75,3 +76,23 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
             label=self.MACHINE_EDGE_LABEL.format(app_edge.label))
         machine_graph.add_edge(
             machine_edge, app_outgoing_edge_partition.identifier)
+
+
+def spynnaker_splitter_partitioner(
+        app_graph, machine, plan_n_time_steps,
+        pre_allocated_resources=None):
+    """
+    a splitter partitioner that's bespoke for spynnaker vertices.
+
+    :param ApplicationGraph app_graph: app graph
+    :param ~spinn_machine.Machine machine: machine
+    :param int plan_n_time_steps: the number of time steps to run for
+    :param pre_allocated_resources: any pre-allocated res to account for
+        before doing any splitting.
+    :type pre_allocated_resources: PreAllocatedResourceContainer or None
+    :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
+    :raise PacmanPartitionException: when it cant partition
+    """
+    partitioner = _SpynnakerSplitterPartitioner()
+    return partitioner(
+        app_graph, machine, plan_n_time_steps, pre_allocated_resources)

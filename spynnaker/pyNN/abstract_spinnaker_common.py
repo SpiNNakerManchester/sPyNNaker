@@ -46,7 +46,7 @@ from spynnaker.pyNN.extra_algorithms.\
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SpynnakerSplitterPartitioner, spynnaker_splitter_selector)
+    spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -522,7 +522,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 machine = self._machine
             else:
                 machine = self._max_machine
-            partitioner = SpynnakerSplitterPartitioner()
-            self._machine_graph, self._n_chips_needed = partitioner(
-                self._application_graph, machine, self._plan_n_timesteps,
-                pre_allocated_resources)
+            self._machine_graph, self._n_chips_needed = \
+                spynnaker_splitter_partitioner(
+                    self._application_graph, machine, self._plan_n_timesteps,
+                    pre_allocated_resources)

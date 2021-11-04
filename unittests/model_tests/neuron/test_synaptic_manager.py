@@ -53,7 +53,7 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
+    SplitterAbstractPopulationVertexSlice, spynnaker_splitter_partitioner)
 from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -176,8 +176,8 @@ def test_write_data_spec():
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
         delay_adder.__call__(app_graph)
-        partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        machine_graph, _ = spynnaker_splitter_partitioner(
+            app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
         n_keys_mapper = EdgeToNKeysMapper()
         n_keys_map = n_keys_mapper.__call__(machine_graph)
@@ -491,8 +491,8 @@ def test_pop_based_master_pop_table_standard(
     with (injection_context(context)):
         delay_adder = DelaySupportAdder()
         delay_adder.__call__(app_graph)
-        partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        machine_graph, _ = spynnaker_splitter_partitioner(
+            app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
         n_keys_mapper = EdgeToNKeysMapper()
         n_keys_map = n_keys_mapper.__call__(machine_graph)
