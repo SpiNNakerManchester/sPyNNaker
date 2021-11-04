@@ -69,18 +69,23 @@ static inline void neuron_ode(
     ###################################################################
     */
 
-void error_function( REAL x, REAL argument, mathsbox_t *restrict mathsbox){
+void error_function(REAL argument, mathsbox_t *restrict mathsbox){
 //devra coder fonction powerof
 
-    REAL dt = x/mathsbox->error_func_sample;
+    REAL step = argument/mathsbox->error_func_sample;
+    REAL x;
     REAL t;
     //REAL Pi = 3.1415927;// here was a k
     REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
-    REAL Erfc = 0.;//mathsbox->err_func;
-    for(t=0; t<=x; t+=dt){
+    REAL Erf = ZERO;//mathsbox->err_func;
+    REAL Erfc = ZERO;
+    
+    for(x=0; x<=argument; x+=step){
         //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
-        Erfc +=  argument*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
+        t = x + REAL_HALF(step);
+        Erf +=  step*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
     }
+    Erfc = ONE-Erf;
 
     mathsbox->err_func = Erfc;
 
@@ -210,11 +215,10 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *rest
    doit trouver une bonne fonction pour faire sqrt ...
    |->sqrtk() ne fonctionne pas !!!
     */
-                 
     
     pNetwork->sV = Fe*(Ue*Te)*(Ue*Te)/REAL_CONST(2.)/(Te+Tm)\
                + Fi*(Ti*Ui)*(Ti*Ui)/REAL_CONST(2.)/(Ti+Tm);
-    
+
     
     
     if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
@@ -252,7 +256,7 @@ void TF(REAL Ve, REAL Vi, REAL W,
 */
 
 
-    REAL limit;
+    REAL factor;
     REAL argument;
     
     REAL Gl = pNetwork->Gl;
@@ -273,7 +277,7 @@ void TF(REAL Ve, REAL Vi, REAL W,
     get_fluct_regime_varsup(Ve, Vi, W, pNetwork);
     threshold_func(pNetwork, Pfit);
 
-    limit = REAL_HALF(Gl/(pNetwork->TvN * Cm));
+    
     /*
     normalement sqrt:
         argument = (pNetwork->Vthre - pNetwork->muV)/sqrtk(REAL_CONST(2.))/pNetwork->sV;
@@ -282,9 +286,10 @@ void TF(REAL Ve, REAL Vi, REAL W,
     if (pNetwork->sV<ACS_DBL_TINY){
         pNetwork->sV += ACS_DBL_TINY;
     }
+    //factor = REAL_HALF(Gl/(pNetwork->TvN * Cm));
     argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137)*pNetwork->sV);
 
-    error_function(limit, argument, mathsbox);
+    error_function(argument, mathsbox);
     /*
     if (pNetwork->P0 == 0.){
         mathsbox->err_func = 1; a simple test
