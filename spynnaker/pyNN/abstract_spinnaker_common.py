@@ -46,7 +46,7 @@ from spynnaker.pyNN.extra_algorithms.\
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SpynnakerSplitterPartitioner, SpynnakerSplitterSelector)
+    SpynnakerSplitterPartitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -494,8 +494,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
         with FecTimer(MAPPING, "Spynnaker splitter selector"):
-            selector = SpynnakerSplitterSelector()
-            selector(self._application_graph)
+            spynnaker_splitter_selector(self._application_graph)
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
                extend_doc=False)
