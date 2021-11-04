@@ -96,8 +96,10 @@ static inline nm_update_state_t get_nm_update_state(
 
 static inline nm_final_state_t get_nm_final_state(
         nm_update_state_t update_state) {
-    update_state.weight = MAX(update_state.weight, nm_params.min_weight);
-    update_state.weight = MIN(update_state.weight, nm_params.max_weight);
+    update_state.weight = kbits(MAX(bitsk(update_state.weight),
+            bitsk(nm_params.min_weight)));
+    update_state.weight = kbits(MIN(bitsk(update_state.weight),
+            bitsk(nm_params.max_weight)));
     nm_final_state_t final_state = {
         .weight=(weight_t) (bitsk(update_state.weight) >> update_state.weight_shift),
         .final_state=synapse_structure_get_final_state(

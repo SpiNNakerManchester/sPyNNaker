@@ -85,7 +85,7 @@ static inline weight_state_t weight_two_term_apply_depression(
         weight_state_t state, int32_t a2_minus, int32_t a3_minus) {
     state.weight -= mul_accum_fixed(state.weight_region->a2_minus, a2_minus);
     state.weight -= mul_accum_fixed(state.weight_region->a3_minus, a3_minus);
-    state.weight = MAX(state.weight, state.weight_region->min_weight);
+    state.weight = kbits(MAX(bitsk(state.weight), bitsk(state.weight_region->min_weight)));
     return state;
 }
 
@@ -99,7 +99,7 @@ static inline weight_state_t weight_two_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus, int32_t a3_plus) {
     state.weight += mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
     state.weight += mul_accum_fixed(state.weight_region->a3_plus, a3_plus);
-    state.weight = MIN(state.weight, state.weight_region->max_weight);
+    state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
     return state;
 }
 
