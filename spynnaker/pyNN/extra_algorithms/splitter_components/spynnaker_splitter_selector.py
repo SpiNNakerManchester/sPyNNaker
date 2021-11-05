@@ -21,9 +21,9 @@ from spinn_front_end_common.interface.splitter_selectors import (
     SplitterSelector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
-from .splitter_abstract_pop_vertex_slice import (
-    SplitterAbstractPopulationVertexSlice)
-from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from .splitter_abstract_pop_vertex_fixed import (
+    SplitterAbstractPopulationVertexFixed)
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
@@ -80,7 +80,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
+        app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
 
     @staticmethod
     def external_spinnaker_link_heuristic(app_vertex):
@@ -108,7 +108,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        app_vertex.splitter = SpynnakerSplitterSliceLegacy()
+        app_vertex.splitter = SpynnakerSplitterFixedLegacy()
 
     @staticmethod
     def spike_source_poisson_heuristic(app_vertex):

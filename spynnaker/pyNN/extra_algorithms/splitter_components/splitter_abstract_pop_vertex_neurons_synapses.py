@@ -24,7 +24,8 @@ from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import (
-    MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
+    MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge,
+    MulticastEdgePartition)
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import get_remaining_constraints
 from spinn_front_end_common.utilities.globals_variables import (
@@ -100,7 +101,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # The next synapse core to use for an incoming machine edge
         "__next_synapse_index",
         # The incoming vertices cached
-        "__incoming_vertices"]
+        "__incoming_vertices",
+        # The internal multicast partitions
+        "__multicast_partitions",
+        # The internal SDRAM partitions
+        "__sdram_partitions"
+        ]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
 
@@ -140,6 +146,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__user_allow_delay_extension = allow_delay_extension
         self.__slices = None
         self.__next_synapse_index = 0
+        self.__multicast_partitions = []
+        self.__sdram_partitions = []
 
         if (self.__max_delay is not None and
                 self.__allow_delay_extension is None):
@@ -153,7 +161,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    def create_machine_vertices(self, plan_n_timesteps):
         app_vertex = self._governed_app_vertex
         label = app_vertex.label
         constraints = get_remaining_constraints(app_vertex)
@@ -184,8 +192,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices = list()
         self.__synapse_verts_by_neuron = defaultdict(list)
 
-        incoming_direct_poisson = self.__handle_poisson_sources(
-            label, machine_graph)
+        incoming_direct_poisson = self.__handle_poisson_sources(label)
 
         # Work out the ring buffer shifts based on all incoming things
         rb_shifts = app_vertex.get_ring_buffer_shifts(
@@ -213,7 +220,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_resources, label, index, rb_shifts,
-                weight_scales, machine_graph, constraints)
+                weight_scales, constraints)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -221,17 +228,18 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             self.__synapse_verts_by_neuron[neuron_vertex] = synapse_vertices
 
             # Add the first vertex
-            synapse_references, syn_label = self.__add_lead_synapse_core(
-                vertex_slice, all_syn_block_sz, structural_sz,
-                lead_synapse_resources, label, rb_shifts, weight_scales,
-                machine_graph, synapse_vertices, neuron_vertex, constraints)
+            synapse_references, syn_label, feedback_partition = \
+                self.__add_lead_synapse_core(
+                    vertex_slice, all_syn_block_sz, structural_sz,
+                    lead_synapse_resources, label, rb_shifts, weight_scales,
+                    synapse_vertices, neuron_vertex, constraints)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
-                    shared_synapse_resources, machine_graph, synapse_vertices,
-                    neuron_vertex, constraints)
+                    shared_synapse_resources, feedback_partition,
+                    synapse_vertices, neuron_vertex, constraints)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -246,17 +254,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             source_vertices = added_poisson_vertices + synapse_vertices
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
                 SYNAPSE_SDRAM_PARTITION_ID, sdram_label, source_vertices)
-            machine_graph.add_outgoing_edge_partition(sdram_partition)
+            self.__sdram_partitions.append(sdram_partition)
             neuron_vertex.set_sdram_partition(sdram_partition)
 
             # Add SDRAM edges for synapse vertices
             for source_vertex in source_vertices:
                 edge_label = "SDRAM {}-->{}".format(
                     source_vertex.label, neuron_vertex.label)
-                machine_graph.add_edge(
-                    SDRAMMachineEdge(
-                        source_vertex, neuron_vertex, edge_label),
-                    SYNAPSE_SDRAM_PARTITION_ID)
+                sdram_partition.add_edge(
+                    SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label))
                 source_vertex.set_sdram_partition(sdram_partition)
 
         self.__incoming_vertices = [
@@ -286,7 +292,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, neuron_resources, label, index, rb_shifts,
-            weight_scales, machine_graph, constraints):
+            weight_scales, constraints):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -298,8 +304,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             back to S1615 values
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The graph to add the core to
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints to add
         :return: The neuron vertex created and the resources used
@@ -312,7 +316,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_vertex = PopulationNeuronsMachineVertex(
             neuron_resources, neuron_label, constraints, app_vertex,
             vertex_slice, index, rb_shifts, weight_scales)
-        machine_graph.add_vertex(neuron_vertex)
+        app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
         return neuron_vertex
@@ -320,8 +324,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_lead_synapse_core(
             self, vertex_slice, all_syn_block_sz, structural_sz,
             lead_synapse_resources, label, rb_shifts, weight_scales,
-            machine_graph, synapse_vertices, neuron_vertex,
-            constraints):
+            synapse_vertices, neuron_vertex, constraints):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
@@ -340,8 +343,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The scale to apply to weights to encode them in the 16-bit synapses
         :param list(~pacman.model.resources.ResourceContainer) all_resources:
             A list to add the resources of the vertex to
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The graph to add the core to
         :param list(~pacman.model.graphs.machine.MachineVertex) \
                 synapse_vertices:
             A list to add the core to
@@ -362,18 +363,17 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             lead_synapse_resources, "{}(0)".format(syn_label), constraints,
             self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
             all_syn_block_sz, structural_sz, synapse_references)
-        machine_graph.add_vertex(lead_synapse_vertex)
+        self._governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)
 
-        self.__add_plastic_feedback(
-            machine_graph, neuron_vertex, lead_synapse_vertex)
+        part = self.__add_plastic_feedback(neuron_vertex, lead_synapse_vertex)
 
-        return synapse_references, syn_label
+        return synapse_references, syn_label, part
 
     def __add_shared_synapse_core(
             self, syn_label, s_index, vertex_slice, synapse_references,
-            shared_synapse_resources, machine_graph, synapse_vertices,
+            shared_synapse_resources, feedback_partition, synapse_vertices,
             neuron_vertex, constraints):
         """ Add a second or subsequent synapse core.  This will reference the
             synaptic data generated by the lead synapse core.
@@ -401,24 +401,24 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         synapse_vertex = PopulationSynapsesMachineVertexShared(
             shared_synapse_resources, synapse_label, constraints, app_vertex,
             vertex_slice, synapse_references)
-        machine_graph.add_vertex(synapse_vertex)
+        app_vertex.remember_machine_vertex(synapse_vertex)
         self.__synapse_vertices.append(synapse_vertex)
         synapse_vertices.append(synapse_vertex)
 
-        self.__add_plastic_feedback(
-            machine_graph, neuron_vertex, synapse_vertex)
+        if feedback_partition is not None:
+            neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
+            feedback_partition.add_edge(neuron_to_synapse_edge)
+            synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
 
-    def __add_plastic_feedback(
-            self, machine_graph, neuron_vertex, synapse_vertex):
+    def __add_plastic_feedback(self, neuron_vertex, synapse_vertex):
         """ Add an edge if needed from the neuron core back to the synapse core
             to allow the synapse core to process plastic synapses
 
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The graph to add the core to
         :param PopulationNeuronsMachineVertex neuron_vertex:
             The neuron vertex to start the edge at
         :param PopulationSynapsesMachineVertexCommon synapse_vertex:
             A synapse vertex to feed the spikes back to
+        :rtype: MulticastEdgePartition
         """
 
         # If synapse dynamics is not simply static, link the neuron vertex
@@ -428,18 +428,21 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 not isinstance(app_vertex.synapse_dynamics,
                                SynapseDynamicsStatic) and
                 app_vertex.self_projection is None):
+            feedback_partition = MulticastEdgePartition(
+                neuron_vertex, SPIKE_PARTITION_ID)
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            machine_graph.add_edge(neuron_to_synapse_edge, SPIKE_PARTITION_ID)
+            feedback_partition.add_edge(neuron_to_synapse_edge)
+            self.__multicast_partitions.append(feedback_partition)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
+            return feedback_partition
+        return None
 
-    def __handle_poisson_sources(self, label, machine_graph):
+    def __handle_poisson_sources(self, label):
         """ Go through the incoming projections and find Poisson sources with
             splitters that work with us, and one-to-one connections that will
             then work with SDRAM
 
         :param str label: Base label to give to the Poisson cores
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The graph to add any Poisson cores to
         """
         self.__poisson_sources = set()
         incoming_direct_poisson = defaultdict(list)
@@ -456,7 +459,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                         label, vertex_slice.lo_atom, vertex_slice.hi_atom)
                     poisson_m_vertex = pre_vertex.create_machine_vertex(
                         vertex_slice, resources, label=poisson_label)
-                    machine_graph.add_vertex(poisson_m_vertex)
+                    pre_vertex.remember_machine_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, proj._projection_edge))
 
@@ -494,11 +497,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return self.__get_fixed_slices(), True
+        return self.__get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self.__get_fixed_slices(), True
+        return self.__get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, outgoing_edge_partition):
@@ -747,3 +750,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if self.__allow_delay_extension is None:
             self.__get_max_delay
         return self.__allow_delay_extension
+
+    @overrides(AbstractSplitterCommon.get_internal_multicast_partitions)
+    def get_internal_multicast_partitions(self):
+        return self.__multicast_partitions
+
+    @overrides(AbstractSplitterCommon.get_internal_sdram_partitions)
+    def get_internal_sdram_partitions(self):
+        return self.__sdram_partitions

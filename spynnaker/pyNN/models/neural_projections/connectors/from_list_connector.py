@@ -433,9 +433,9 @@ class FromListConnector(AbstractConnector):
     def could_connect(
             self, synapse_info, src_machine_vertex, dest_machine_vertex):
         pre_slices = \
-            src_machine_vertex.app_vertex.splitter.get_out_going_slices()[0]
+            src_machine_vertex.app_vertex.splitter.get_out_going_slices()
         post_slices = \
-            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()[0]
+            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
         self._split_connections(pre_slices, post_slices)
         pre_hi = src_machine_vertex.vertex_slice.hi_atom
         post_hi = dest_machine_vertex.vertex_slice.hi_atom

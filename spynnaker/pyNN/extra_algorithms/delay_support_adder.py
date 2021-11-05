@@ -143,6 +143,7 @@ class DelaySupportAdder(object):
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
             app_edge.delay_edge = delay_edge
+            delay_app_vertex.add_outgoing_edge(delay_edge)
 
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, delay_per_stage,

@@ -288,7 +288,7 @@ class AbstractPopulationVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
 
     @property
     def size(self):
@@ -1080,7 +1080,7 @@ class AbstractPopulationVertex(
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
             n_sub_edges = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             if not n_sub_edges:
                 vertex = app_edge.pre_vertex
                 max_atoms = float(min(vertex.get_max_atoms_per_core(),

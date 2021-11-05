@@ -157,10 +157,10 @@ class MockSplitter(object):
         self.slices = slices
 
     def get_out_going_slices(self):
-        return (self.slices, True)
+        return self.slices
 
     def get_in_coming_slices(self):
-        return (self.slices, True)
+        return self.slices
 
 
 class MockAppVertex(object):

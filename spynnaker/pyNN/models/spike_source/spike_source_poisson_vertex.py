@@ -595,7 +595,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
 
     def set_live_poisson_control_edge(self, edge):
         if self.__incoming_control_edge is not None:

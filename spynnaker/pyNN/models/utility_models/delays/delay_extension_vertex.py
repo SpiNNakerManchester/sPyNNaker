@@ -48,7 +48,8 @@ class DelayExtensionVertex(
         "__n_delay_stages",
         "__source_vertex",
         "__delay_generator_data",
-        "__drop_late_spikes"]
+        "__drop_late_spikes",
+        "__outgoing_edges"]
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -91,6 +92,8 @@ class DelayExtensionVertex(
 
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
+
+        self.__outgoing_edges = list()
 
     @property
     def n_atoms(self):
@@ -220,4 +223,19 @@ class DelayExtensionVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
+
+    def add_outgoing_edge(self, edge):
+        """ Add an outgoing edge to the delay extension
+
+        :param DelayedApplicationEdge delay_edge: The edge to add
+        """
+        self.__outgoing_edges.append(edge)
+
+    @property
+    def outgoing_edges(self):
+        """ Get the outgoing edges from this vertex
+
+        :rtype: list(DelayApplicationEdge)
+        """
+        return self.__outgoing_edges

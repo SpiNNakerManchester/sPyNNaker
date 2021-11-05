@@ -431,7 +431,7 @@ class SynapticMatrixApp(object):
              del_max_addr) = self.__reserve_app_blocks(block_addr)
 
             pre_slices =\
-                self.__app_edge.pre_vertex.splitter.get_out_going_slices()[0]
+                self.__app_edge.pre_vertex.splitter.get_out_going_slices()
             if self.__max_row_info.delayed_max_n_synapses == 0:
                 # If we are not using delays (as we have to sync with delays)
                 # Generate for theoretical maximum pre-slices that the
@@ -543,7 +543,7 @@ class SynapticMatrixApp(object):
         :rtype: GeneratorData
         """
         post_slices =\
-            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0]
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -565,7 +565,7 @@ class SynapticMatrixApp(object):
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
         post_slices =\
-            self.__app_edge.post_vertex.splitter.get_in_coming_slices()[0]
+            self.__app_edge.post_vertex.splitter.get_in_coming_slices()
         if (self.__max_row_info.delayed_max_n_synapses > 0 and
                 self.__app_edge.delay_edge is not None):
             self.__app_edge.delay_edge.pre_vertex.add_generator_data(

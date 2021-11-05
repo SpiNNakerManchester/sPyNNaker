@@ -21,8 +21,10 @@ from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
     MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
-    AbstractSplitterSlice)
+    AbstractSplitterCommon)
 from pacman.utilities import utility_calls
+from pacman.utilities.algorithm_utilities\
+    .partition_algorithm_utilities import get_remaining_constraints
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
@@ -37,11 +39,15 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     exact_sdram_for_bit_field_builder_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
+from pacman.model.graphs.common.slice import Slice
+from pacman.utilities.utility_objs import ChipCounter
 
 
-class SplitterAbstractPopulationVertexSlice(
-        AbstractSplitterSlice, AbstractSpynnakerSplitterDelay):
-    """ handles the splitting of the AbstractPopulationVertex via slice logic.
+class SplitterAbstractPopulationVertexFixed(
+        AbstractSplitterCommon, AbstractSpynnakerSplitterDelay):
+    """ handles the splitting of the AbstractPopulationVertex using fixed
+        slices
     """
 
     __slots__ = [
@@ -58,16 +64,22 @@ class SplitterAbstractPopulationVertexSlice(
         # The size of all the bitfield data
         "__bitfield_sz",
         # The next index to use for a synapse core
-        "__next_index"
+        "__next_index",
+        # The pre-calculated slices of the vertex
+        "__slices",
+        # All the machine vertices
+        "__vertices",
+        # The maximum atoms per core
+        "__max_atoms"
     ]
 
     """ The name of the splitter """
-    SPLITTER_NAME = "SplitterAbstractPopulationVertexSlice"
+    SPLITTER_NAME = "SplitterAbstractPopulationVertexFixed"
 
     """ The message to use when the Population is invalid """
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
-        "SplitterAbstractPopulationVertexSlice as"
+        "SplitterAbstractPopulationVertexFixed as"
         " the only vertex supported by this splitter is a "
         "AbstractPopulationVertex. Please use the correct splitter for "
         "your vertex and try again.")
@@ -81,31 +93,76 @@ class SplitterAbstractPopulationVertexSlice(
         self.__synapse_expander_sz = None
         self.__bitfield_sz = None
         self.__next_index = 0
+        self.__slices = None
+        self.__max_atoms = None
 
-    @overrides(AbstractSplitterSlice.set_governed_app_vertex)
+    @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         super().set_governed_app_vertex(app_vertex)
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(AbstractSplitterSlice.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    @overrides(AbstractSplitterCommon.set_max_atoms_per_core)
+    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
+        n_atoms = self._governed_app_vertex.atoms_shape
+
+        if self.__max_atoms is None:
+            self.__max_atoms = list(n_atoms)
+        if isinstance(max_atoms_per_core, int):
+            for i in range(len(self.__max_atoms)):
+                self.__max_atoms[i] = min(
+                    self.__max_atoms[i], max_atoms_per_core)
+        else:
+            if len(max_atoms_per_core) != len(n_atoms):
+                raise SpynnakerSplitterConfigurationException(
+                    "The length of max_atoms_per_core does not match the "
+                    " number of dimensions")
+            for i in range(len(self.__max_atoms)):
+                self.__max_atoms[i] = min(
+                    self.__max_atoms[i], max_atoms_per_core[i])
+
+    @overrides(AbstractSplitterCommon.create_machine_vertices)
+    def create_machine_vertices(self, plan_n_timesteps):
+        chip_counter = ChipCounter()
         app_vertex = self._governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
-        return super(SplitterAbstractPopulationVertexSlice, self)\
-            .create_machine_vertices(resource_tracker, machine_graph)
+        self.__create_slices()
+        constraints = get_remaining_constraints(app_vertex)
+        self.__vertices = list()
+        for vertex_slice in self.__slices:
+            resources = self.get_resources_used_by_atoms(vertex_slice)
+            sdram = resources.sdram.get_total_sdram(plan_n_timesteps)
+            chip_counter.add_core(sdram)
+            label = f"Slice {vertex_slice} of {app_vertex.label}"
+            machine_vertex = self.create_machine_vertex(
+                vertex_slice, resources, label, constraints)
+            self._governed_app_vertex.remember_machine_vertex(machine_vertex)
+            self.__vertices.append(machine_vertex)
 
-    @overrides(AbstractSplitterSlice.get_out_going_vertices)
+    @overrides(AbstractSplitterCommon.get_in_coming_slices)
+    def get_in_coming_slices(self):
+        self.__create_slices()
+        return self.__slices
+
+    @overrides(AbstractSplitterCommon.get_out_going_slices)
+    def get_out_going_slices(self):
+        self.__create_slices()
+        return self.__slices
+
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
-    @overrides(AbstractSplitterSlice.get_in_coming_vertices)
+    @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
-    @overrides(AbstractSplitterSlice.create_machine_vertex)
+    @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
+    def machine_vertices_for_recording(self, variable_to_record):
+        return self.__vertices
+
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):
 
@@ -118,14 +175,15 @@ class SplitterAbstractPopulationVertexSlice(
 
         index = self.__next_index
         self.__next_index += 1
+
+        # Otherwise create a normal vertex
         return PopulationMachineVertex(
             resources, label, remaining_constraints,
             self._governed_app_vertex,
             vertex_slice, index, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_size(vertex_slice),
-            self.__structural_size(vertex_slice.n_atoms))
+            self.__structural_size(vertex_slice))
 
-    @overrides(AbstractSplitterSlice.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         """  Gets the resources of a slice of atoms
 
@@ -175,12 +233,15 @@ class SplitterAbstractPopulationVertexSlice(
         n_record = (
             len(self._governed_app_vertex.neuron_recordables) +
             len(self._governed_app_vertex.synapse_recordables))
-        n_provenance = (
-            NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
-            MainProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
+
+        n_provenance = NeuronProvenance.N_ITEMS + MainProvenance.N_ITEMS
+        n_provenance += (
+            SynapseProvenance.N_ITEMS + SpikeProcessingProvenance.N_ITEMS)
+
         sdram = MultiRegionSDRAM()
         sdram.merge(self._governed_app_vertex.get_common_constant_sdram(
-            n_record, n_provenance, PopulationMachineVertex.COMMON_REGIONS))
+            n_record, n_provenance,
+            PopulationMachineVertex.COMMON_REGIONS))
         sdram.merge(self._governed_app_vertex.get_neuron_constant_sdram(
             vertex_slice, PopulationMachineVertex.NEURON_REGIONS))
         sdram.merge(self.__get_synapse_constant_sdram(vertex_slice))
@@ -202,10 +263,10 @@ class SplitterAbstractPopulationVertexSlice(
             app_vertex.get_synapse_params_size())
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
-            app_vertex.get_synapse_dynamics_size(vertex_slice.n_atoms))
+            app_vertex.get_synapse_dynamics_size(vertex_slice))
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.structural_dynamics,
-            self.__structural_size(vertex_slice.n_atoms))
+            self.__structural_size(vertex_slice))
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
             self.__all_syn_block_size(vertex_slice))
@@ -236,18 +297,18 @@ class SplitterAbstractPopulationVertexSlice(
         self.__all_syn_block_sz[vertex_slice] = all_syn_block_sz
         return all_syn_block_sz
 
-    def __structural_size(self, n_atoms):
+    def __structural_size(self, vertex_slice):
         """ Work out how much SDRAM is needed by the structural plasticity data
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to get the size of
         :rtype: int
         """
-        if n_atoms in self.__structural_sz:
-            return self.__structural_sz[n_atoms]
+        if vertex_slice in self.__structural_sz:
+            return self.__structural_sz[vertex_slice]
         structural_sz = self._governed_app_vertex.get_structural_dynamics_size(
-            n_atoms, self._governed_app_vertex.incoming_projections)
-        self.__structural_sz[n_atoms] = structural_sz
+            vertex_slice, self._governed_app_vertex.incoming_projections)
+        self.__structural_sz[vertex_slice] = structural_sz
         return structural_sz
 
     def __synapse_expander_size(self):
@@ -303,7 +364,7 @@ class SplitterAbstractPopulationVertexSlice(
             self._governed_app_vertex.get_neuron_cpu(vertex_slice) +
             self._governed_app_vertex.get_synapse_cpu(vertex_slice))
 
-    @overrides(AbstractSplitterSlice.check_supported_constraints)
+    @overrides(AbstractSplitterCommon.check_supported_constraints)
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
@@ -311,11 +372,22 @@ class SplitterAbstractPopulationVertexSlice(
                 MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
-    @overrides(AbstractSplitterSlice.reset_called)
+    @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
-        super(SplitterAbstractPopulationVertexSlice, self).reset_called()
+        super(SplitterAbstractPopulationVertexFixed, self).reset_called()
         self.__ring_buffer_shifts = None
         self.__weight_scales = None
         self.__all_syn_block_sz = dict()
         self.__structural_sz = dict()
         self.__next_index = 0
+        self.__slices = None
+
+    def __create_slices(self):
+        """ Create slices if not already done
+        """
+        if self.__slices is not None:
+            return
+        n_atoms = self._governed_app_vertex.atoms_shape
+        per_core = self.__max_atoms
+        self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
+                         for i in range(0, n_atoms, per_core)]

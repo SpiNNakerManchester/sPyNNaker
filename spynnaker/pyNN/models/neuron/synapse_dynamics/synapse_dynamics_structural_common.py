@@ -350,7 +350,7 @@ class SynapseDynamicsStructuralCommon(
             dynamics = proj._synapse_information.synapse_dynamics
             app_edge = proj._projection_edge
             n_sub_edges += len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()
             param_sizes += dynamics.elimination\
