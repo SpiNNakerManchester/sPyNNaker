@@ -12,21 +12,28 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
 
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as sim
+from spinn_front_end_common.utilities import FecTimer
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker_integration_tests import test_master_pop
+from .key_constraint_adder import KeyConstraintAdder
+
+
+def fancy_do_load(graph_changed):
+    with FecTimer("WEIRD", "KeyConstraintAdder"):
+        simulator = get_simulator()
+        adder = KeyConstraintAdder()
+        adder(simulator.machine_graph)
+    simulator.do_load_normal(graph_changed)
 
 
 def do_run():
     sim.setup(1.0)
     simulator = get_simulator()
-    simulator._xml_paths.append(
-        os.path.join(
-            os.path.dirname(test_master_pop.__file__),
-            "algorithms.xml"))
+    simulator.do_load_normal = simulator._do_load
+    simulator._do_load = fancy_do_load
+
     # Break up the pre population as that is where delays happen
     sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, 50)
     pop1 = sim.Population(100, sim.SpikeSourceArray([1]), label="pop1")
