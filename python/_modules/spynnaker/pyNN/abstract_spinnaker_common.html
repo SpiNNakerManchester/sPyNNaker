@@ -274,7 +274,9 @@
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.add_application_vertex"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_application_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">CommandSender</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_command_sender</span> <span class="o">=</span> <span class="n">vertex</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Please contact spinnker team as adding a CommandSender &quot;</span>
+                <span class="s2">&quot;currently disabled&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_application_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
