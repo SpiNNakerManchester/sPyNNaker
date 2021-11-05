@@ -218,6 +218,7 @@ static inline index_t synapse_row_sparse_type_index(
 //! \param[in] x: The value to decode
 //! \param[in] synapse_type_index_bits:
 //!     Number of bits for the synapse type and index (depends on type)
+//! \param[in] synapse_delay_mask: The mask for selecting the bits of the delay
 //! \return the delay
 static inline index_t synapse_row_sparse_delay(
         uint32_t x, uint32_t synapse_type_index_bits, uint32_t synapse_delay_mask) {
@@ -249,11 +250,12 @@ static inline input_t synapse_row_convert_weight_to_input(
 
 //! \brief Get the index of the ring buffer for a given timestep, synapse type
 //!     and neuron index
-//! \param[in] simulation_timestep:
-//! \param[in] synapse_type_index:
-//! \param[in] neuron_index:
-//! \param[in] synapse_type_index_bits:
-//! \param[in] synapse_index_bits:
+//! \param[in] simulation_timestep: The timestep
+//! \param[in] synapse_type_index: The synapse type index
+//! \param[in] neuron_index: The neuron index
+//! \param[in] synapse_type_index_bits: Number of bits for type and index
+//! \param[in] synapse_index_bits: Number of bits for index
+//! \param[in] synapse_delay_mask: Mask for delay
 //! \return Index into the ring buffer
 static inline index_t synapse_row_get_ring_buffer_index(
         uint32_t simulation_timestep, uint32_t synapse_type_index,
@@ -266,9 +268,9 @@ static inline index_t synapse_row_get_ring_buffer_index(
 
 //! \brief Get the index of the ring buffer for time 0, synapse type
 //!     and neuron index
-//! \param[in] synapse_type_index:
-//! \param[in] neuron_index:
-//! \param[in] synapse_index_bits:
+//! \param[in] synapse_type_index: The synapse type index
+//! \param[in] neuron_index: The neuron index
+//! \param[in] synapse_index_bits: Number of bits for index
 //! \return Index into the ring buffer
 static inline index_t synapse_row_get_ring_buffer_index_time_0(
         uint32_t synapse_type_index, uint32_t neuron_index,
@@ -277,8 +279,9 @@ static inline index_t synapse_row_get_ring_buffer_index_time_0(
 }
 
 //! \brief Get the index of the first ring buffer for a given timestep
-//! \param[in] simulation_timestep:
-//! \param[in] synapse_type_index_bits:
+//! \param[in] simulation_timestep: The timestep
+//! \param[in] synapse_type_index_bits: Number of bits for type and index
+//! \param[in] synapse_delay_mask: Mask for delay
 //! \return Index into the ring buffer
 static inline index_t synapse_row_get_first_ring_buffer_index(
         uint32_t simulation_timestep, uint32_t synapse_type_index_bits,
@@ -288,9 +291,10 @@ static inline index_t synapse_row_get_first_ring_buffer_index(
 
 //! \brief Get the index of the ring buffer for a given timestep and combined
 //!     synapse type and neuron index (as stored in a synapse row)
-//! \param[in] simulation_timestep:
+//! \param[in] simulation_timestep: The timestep
 //! \param[in] combined_synapse_neuron_index:
-//! \param[in] synapse_type_index_bits:
+//! \param[in] synapse_type_index_bits: Number of bits for type and index
+//! \param[in] synapse_delay_mask: Mask for delay
 //! \return Index into the ring buffer
 static inline index_t synapse_row_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,

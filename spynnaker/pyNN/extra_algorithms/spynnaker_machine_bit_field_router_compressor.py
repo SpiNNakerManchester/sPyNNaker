@@ -48,8 +48,7 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
             machine_graph, placements, executable_finder, routing_infos,
-            executable_targets, read_expander_iobuf,
-            provenance_data_objects=None):
+            executable_targets, read_expander_iobuf):
         """ entrance for routing table compression with bit field
 
         :param routing_tables: routing tables
@@ -69,21 +68,18 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         :type retry_count: int or None
         :param bool read_algorithm_iobuf: flag saying if read iobuf
         :param bool read_expander_iobuf: reads the synaptic expander iobuf.
-        :rtype:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
 
         # build machine compressor
         machine_bit_field_router_compressor = self._compressor_factory()
-        (compressor_executable_targets, prov_items) = \
+        compressor_executable_targets = \
             machine_bit_field_router_compressor(
                 routing_tables=routing_tables, transceiver=transceiver,
                 machine=machine, app_id=app_id,
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
                 routing_infos=routing_infos,
-                executable_targets=executable_targets,
-                provenance_data_objects=provenance_data_objects)
+                executable_targets=executable_targets)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_expander_rerun_targets(
@@ -94,8 +90,6 @@ class AbstractMachineBitFieldRouterCompressor(object, metaclass=AbstractBase):
         self._rerun_synaptic_cores(
             expander_chip_cores, transceiver, executable_finder, True,
             read_expander_iobuf)
-
-        return prov_items
 
     @abstractmethod
     def _compressor_factory(self):

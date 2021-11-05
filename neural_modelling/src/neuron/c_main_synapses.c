@@ -128,6 +128,9 @@ void resume_callback(void) {
     synapses_resume(time + 1);
 }
 
+//! \brief Timer event callback.
+//! \param[in] unused0: unused
+//! \param[in] unused1: unused
 void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
     if (simulation_is_finished()) {

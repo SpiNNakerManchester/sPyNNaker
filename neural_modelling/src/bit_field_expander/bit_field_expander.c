@@ -283,7 +283,7 @@ bool process_synaptic_row(synaptic_row_t row) {
 }
 
 //! \brief Do an SDRAM read to get synaptic row.
-//! \param[in] row_address: the SDRAM address to read
+//! \param[in] row: the SDRAM address to read
 //! \param[in] n_bytes_to_transfer:
 //!     how many bytes to read to get the synaptic row
 //! \return Whether there is target
