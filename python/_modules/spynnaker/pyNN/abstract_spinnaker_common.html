@@ -55,20 +55,37 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span><span class="p">,</span> <span class="n">get_config_str</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpinnakerBase</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="n">LOADING</span><span class="p">,</span> <span class="n">MAPPING</span><span class="p">,</span> <span class="n">RUN_LOOP</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">FecTimer</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">CommandSender</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_algorithms</span><span class="p">,</span> <span class="n">model_binaries</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">model_binaries</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.config_setup</span> <span class="kn">import</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">,</span> <span class="n">setup_configs</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.extracted_data</span> <span class="kn">import</span> <span class="n">ExtractedData</span>
 <span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version</span>
-
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DelaySupportAdder</span><span class="p">,</span> <span class="n">OnChipBitFieldGenerator</span><span class="p">,</span>
+    <span class="n">RedundantPacketCountReport</span><span class="p">,</span>
+    <span class="n">SpynnakerDataSpecificationWriter</span><span class="p">,</span>
+    <span class="n">SpYNNakerNeuronGraphNetworkSpecificationReport</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.</span>\
+    <span class="n">spynnaker_machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">,</span>
+        <span class="n">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">,)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.connection_holder_finisher</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">finish_connection_holders</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.splitter_components</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SpynnakerSplitterPartitioner</span><span class="p">,</span> <span class="n">SpynnakerSplitterSelector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.synapse_expander</span> <span class="kn">import</span> <span class="n">synapse_expander</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
 
@@ -90,10 +107,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span> <span class="n">database_socket_addresses</span><span class="p">,</span> <span class="n">n_chips_required</span><span class="p">,</span>
             <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
-            <span class="n">user_extra_algorithm_xml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_extra_mapping_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">user_extra_algorithms_pre_run</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">extra_load_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">front_end_versions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">front_end_versions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str graph_label:</span>
 <span class="sd">        :param database_socket_addresses:</span>
@@ -108,20 +122,8 @@
 <span class="sd">        :type timestep: float or None</span>
 <span class="sd">        :param float min_delay:</span>
 <span class="sd">        :param str hostname:</span>
-<span class="sd">        :param user_extra_algorithm_xml_path:</span>
-<span class="sd">        :type user_extra_algorithm_xml_path: str or None</span>
-<span class="sd">        :param user_extra_mapping_inputs:</span>
-<span class="sd">        :type user_extra_mapping_inputs: dict(str, Any) or None</span>
-<span class="sd">        :param user_extra_algorithms_pre_run:</span>
-<span class="sd">        :type user_extra_algorithms_pre_run: list(str) or None</span>
 <span class="sd">        :param time_scale_factor:</span>
 <span class="sd">        :type time_scale_factor: float or None</span>
-<span class="sd">        :param extra_post_run_algorithms:</span>
-<span class="sd">        :type extra_post_run_algorithms: list(str) or None</span>
-<span class="sd">        :param extra_mapping_algorithms:</span>
-<span class="sd">        :type extra_mapping_algorithms: list(str) or None</span>
-<span class="sd">        :param extra_load_algorithms:</span>
-<span class="sd">        :type extra_load_algorithms: list(str) or None</span>
 <span class="sd">        :param front_end_versions:</span>
 <span class="sd">        :type front_end_versions: list(tuple(str,str)) or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -144,15 +146,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__command_edge_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__live_spike_recorder</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="c1"># create XML path for where to locate sPyNNaker related functions when</span>
-        <span class="c1"># using auto pause and resume</span>
-        <span class="n">extra_algorithm_xml_path</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">extra_algorithm_xml_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">extra_algorithms</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
-            <span class="s2">&quot;algorithms_metadata.xml&quot;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">user_extra_algorithm_xml_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_algorithm_xml_path</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_extra_algorithm_xml_path</span><span class="p">)</span>
-
         <span class="c1"># timing parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -166,48 +159,9 @@
             <span class="n">executable_finder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="p">,</span>
             <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
             <span class="n">database_socket_addresses</span><span class="o">=</span><span class="n">database_socket_addresses</span><span class="p">,</span>
-            <span class="n">extra_algorithm_xml_paths</span><span class="o">=</span><span class="n">extra_algorithm_xml_path</span><span class="p">,</span>
             <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
             <span class="n">n_boards_required</span><span class="o">=</span><span class="n">n_boards_required</span><span class="p">,</span>
             <span class="n">front_end_versions</span><span class="o">=</span><span class="n">versions</span><span class="p">)</span>
-
-        <span class="c1"># update inputs needed by the machine level calls.</span>
-
-        <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;SynapticExpanderReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">user_extra_mapping_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_mapping_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_extra_mapping_inputs</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">extra_mapping_algorithms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_mapping_algorithms</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">extra_load_algorithms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_load_algorithms</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">extra_post_run_algorithms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_post_run_algorithms</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SynapseExpander&quot;</span><span class="p">)</span>
-        <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OnChipBitFieldGenerator&quot;</span><span class="p">)</span>
-        <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;FinishConnectionHolders&quot;</span><span class="p">)</span>
-        <span class="n">extra_algorithms_pre_run</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_network_graph&quot;</span><span class="p">):</span>
-            <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_synaptic_report&quot;</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
-                    <span class="s2">&quot;write_synaptic_report ignored due to https://github.com/&quot;</span>
-                    <span class="s2">&quot;SpiNNakerManchester/sPyNNaker/issues/1081&quot;</span><span class="p">)</span>
-                <span class="c1"># extra_algorithms_pre_run.append(&quot;SynapticMatrixReport&quot;)</span>
-        <span class="k">if</span> <span class="n">user_extra_algorithms_pre_run</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">extra_algorithms_pre_run</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">user_extra_algorithms_pre_run</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_extra_mapping_inputs</span><span class="p">(</span><span class="n">extra_mapping_inputs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_mapping_algorithms</span><span class="p">(</span><span class="n">extra_mapping_algorithms</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prepend_extra_pre_run_algorithms</span><span class="p">(</span><span class="n">extra_algorithms_pre_run</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span><span class="n">extra_post_run_algorithms</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_load_algorithms</span><span class="p">(</span><span class="n">extra_load_algorithms</span><span class="p">)</span>
 
         <span class="c1"># set up machine targeted data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
@@ -374,18 +328,8 @@
         <span class="c1"># pylint: disable=protected-access</span>
 
         <span class="c1"># extra post run algorithms</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_algorithm</span> <span class="o">=</span> <span class="s2">&quot;SpynnakerDataSpecificationWriter&quot;</span>
         <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
             <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="n">get_config_bool</span><span class="p">(</span>
-                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_virtual_board</span> <span class="ow">and</span> <span class="n">run_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_ran</span> <span class="ow">and</span> <span class="n">get_config_bool</span><span class="p">(</span>
-                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;writeProvenanceData&quot;</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;RedundantPacketCountReport&quot;</span><span class="p">])</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
@@ -418,63 +362,6 @@
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.reset_number_of_neurons_per_core"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.reset_number_of_neurons_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">reset_number_of_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">neuron_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span><span class="p">:</span>
             <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.get_projections_data"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.get_projections_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_projections_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_to_attribute_map</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Common data extractor for projection data. Allows fully</span>
-<span class="sd">            exploitation of the ????</span>
-
-<span class="sd">        :param projection_to_attribute_map:</span>
-<span class="sd">            the projection to attributes mapping</span>
-<span class="sd">        :type projection_to_attribute_map:</span>
-<span class="sd">            dict(~spynnaker.pyNN.models.projection.Projection,</span>
-<span class="sd">            list(int) or tuple(int) or None)</span>
-<span class="sd">        :return: a extracted data object with get method for getting the data</span>
-<span class="sd">        :rtype: ExtractedData</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-
-        <span class="c1"># build data structure for holding data</span>
-        <span class="n">mother_lode</span> <span class="o">=</span> <span class="n">ExtractedData</span><span class="p">()</span>
-
-        <span class="c1"># if using extra monitor functionality, locate extra data items</span>
-        <span class="n">receivers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;enable_advanced_monitor_support&quot;</span><span class="p">):</span>
-            <span class="n">receivers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_receivers_from_projections</span><span class="p">(</span>
-                <span class="n">projection_to_attribute_map</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span>
-                    <span class="s2">&quot;VertexToEthernetConnectedChipMapping&quot;</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span>
-                    <span class="s2">&quot;ExtraMonitorToChipMapping&quot;</span><span class="p">))</span>
-
-        <span class="c1"># set up the router timeouts to stop packet loss</span>
-        <span class="k">for</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">extra_monitor_cores</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">:</span>
-            <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_system_routing_tables</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;ExtraMonitorVertices&quot;</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
-            <span class="n">data_receiver</span><span class="o">.</span><span class="n">set_cores_for_data_streaming</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_monitor_cores</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
-
-        <span class="c1"># acquire the data</span>
-        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projection_to_attribute_map</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">projection_to_attribute_map</span><span class="p">[</span><span class="n">projection</span><span class="p">]:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">projection</span><span class="o">.</span><span class="n">_get_synaptic_data</span><span class="p">(</span>
-                    <span class="n">as_list</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_to_get</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span>
-                    <span class="n">fixed_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="n">mother_lode</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-
-        <span class="c1"># reset time outs for the receivers</span>
-        <span class="k">for</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">extra_monitor_cores</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">:</span>
-            <span class="n">data_receiver</span><span class="o">.</span><span class="n">unset_cores_for_data_streaming</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_monitor_cores</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
-            <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_application_routing_tables</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">get_generated_output</span><span class="p">(</span><span class="s2">&quot;ExtraMonitorVertices&quot;</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">)</span>
-
-        <span class="c1"># return data items</span>
-        <span class="k">return</span> <span class="n">mother_lode</span></div>
 
     <span class="k">def</span> <span class="nf">_locate_receivers_from_projections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">projections</span><span class="p">,</span> <span class="n">gatherers</span><span class="p">,</span> <span class="n">extra_monitors_per_chip</span><span class="p">):</span>
@@ -530,7 +417,154 @@
 
 <span class="sd">        :param int new_value: new value for id_counter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_graph_data_specification_writer</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_execute_graph_data_specification_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Overridden by spy which adds placement_order</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="s2">&quot;Spynnaker data specification writer&quot;</span><span class="p">):</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">SpynnakerDataSpecificationWriter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_sizes</span> <span class="o">=</span> <span class="n">writer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_execute_spynnaker_ordered_covering_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
+                <span class="n">LOADING</span><span class="p">,</span>
+                <span class="s2">&quot;Spynnaker machine bitfield ordered covering compressor&quot;</span><span class="p">)</span> \
+                <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="n">compressor</span> <span class="o">=</span> <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_provenance</span> <span class="o">=</span> <span class="n">compressor</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
+                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_multicast_routes_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_execute_spynnaker_pair_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
+                <span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Spynnaker machine bitfield pair router compressor&quot;</span><span class="p">)</span> \
+                <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="n">compressor</span> <span class="o">=</span> <span class="n">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_provenance</span> <span class="o">=</span> <span class="n">compressor</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
+                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_multicast_routes_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_delayed_compression</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_delayed_compression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">compressed</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;SpynnakerMachineBitFieldOrderedCoveringCompressor&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_spynnaker_ordered_covering_compressor</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;SpynnakerMachineBitFieldPairRouterCompressor&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_spynnaker_pair_compressor</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_delayed_compression</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_execute_synapse_expander</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Synapse expander&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="n">synapse_expander</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
+                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_execute_on_chip_bit_field_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Execute on chip bitfield generator&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="n">OnChipBitFieldGenerator</span><span class="p">()</span>
+            <span class="n">generator</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_graph</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_execute_finish_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Finish connection holders&quot;</span><span class="p">):</span>
+            <span class="n">finish_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_graph</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_extra_load_algorithms</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_extra_load_algorithms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_synapse_expander</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_on_chip_bit_field_generator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_finish_connection_holders</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_execute_write_network_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
+                <span class="n">MAPPING</span><span class="p">,</span>
+                <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_network_graph&quot;</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="n">SpYNNakerNeuronGraphNetworkSpecificationReport</span><span class="p">()</span>
+            <span class="n">report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_extra_mapping_algorithms</span><span class="p">,</span>
+               <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_extra_mapping_algorithms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_write_network_graph</span><span class="p">()</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_provenance_reports</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_do_provenance_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_provenance_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_report_redundant_packet_count</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_report_redundant_packet_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">RUN_LOOP</span><span class="p">,</span> <span class="s2">&quot;Redundant packet count report&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span>
+                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">):</span>
+                <span class="k">return</span>
+            <span class="n">report</span> <span class="o">=</span> <span class="n">RedundantPacketCountReport</span><span class="p">()</span>
+            <span class="n">report</span><span class="p">()</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_splitter_selector</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_execute_splitter_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;Spynnaker splitter selector&quot;</span><span class="p">):</span>
+            <span class="n">selector</span> <span class="o">=</span> <span class="n">SpynnakerSplitterSelector</span><span class="p">()</span>
+            <span class="n">selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_delay_support_adder</span><span class="p">,</span>
+               <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_execute_delay_support_adder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs, times and logs the DelaySupportAdder if required</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Mapping&quot;</span><span class="p">,</span> <span class="s2">&quot;delay_support_adder&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">:</span>
+                <span class="n">adder</span> <span class="o">=</span> <span class="n">DelaySupportAdder</span><span class="p">()</span>
+                <span class="n">adder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected cfg setting delay_support_adder: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_splitter_partitioner</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_execute_splitter_partitioner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_allocated_resources</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="o">.</span><span class="n">n_vertices</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span>  <span class="s2">&quot;SpynnakerSplitterPartitioner&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">:</span>
+                <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_machine</span>
+            <span class="n">partitioner</span> <span class="o">=</span> <span class="n">SpynnakerSplitterPartitioner</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_chips_needed</span> <span class="o">=</span> <span class="n">partitioner</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan_n_timesteps</span><span class="p">,</span>
+                <span class="n">pre_allocated_resources</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

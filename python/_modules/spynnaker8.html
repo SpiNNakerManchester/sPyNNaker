@@ -187,7 +187,7 @@
     <span class="s1">&#39;external_devices&#39;</span><span class="p">,</span> <span class="s1">&#39;extra_models&#39;</span><span class="p">,</span>
     <span class="c1"># Stuff that we define</span>
     <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39;run_until&#39;</span><span class="p">,</span> <span class="s1">&#39;run_for&#39;</span><span class="p">,</span> <span class="s1">&#39;num_processes&#39;</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="s1">&#39;set_number_of_neurons_per_core&#39;</span><span class="p">,</span> <span class="s1">&#39;get_projections_data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="s1">&#39;set_number_of_neurons_per_core&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Projection&#39;</span><span class="p">,</span>
     <span class="s1">&#39;get_current_time&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="s1">&#39;get_time_step&#39;</span><span class="p">,</span> <span class="s1">&#39;get_min_delay&#39;</span><span class="p">,</span>
     <span class="s1">&#39;get_max_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;initialize&#39;</span><span class="p">,</span> <span class="s1">&#39;list_standard_models&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
@@ -293,26 +293,11 @@
         <span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">periodic_boundaries</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_projections_data"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_projections_data">[docs]</a><span class="k">def</span> <span class="nf">get_projections_data</span><span class="p">(</span><span class="n">projection_data</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param projection_data: the projection to attributes mapping</span>
-<span class="sd">    :type projection_data:</span>
-<span class="sd">        dict(~.Projection, list(int) or tuple(int) or None)</span>
-<span class="sd">    :return: a extracted data object with get method for getting the data</span>
-<span class="sd">    :rtype: ExtractedData</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_projections_data</span><span class="p">(</span>
-        <span class="n">projection_data</span><span class="p">)</span></div>
-
-
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
           <span class="n">min_delay</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_MIN_DELAY</span><span class="p">,</span>
           <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">graph_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">database_socket_addresses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_algorithm_xml_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">extra_mapping_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">extra_pre_run_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">extra_load_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+          <span class="n">database_socket_addresses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">n_chips_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_boards_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The main method needed to be called to make the PyNN 0.8 setup. Needs\</span>
 <span class="sd">        to be called before any other function</span>
@@ -332,21 +317,6 @@
 <span class="sd">        for the database notification protocol</span>
 <span class="sd">    :type database_socket_addresses:</span>
 <span class="sd">        iterable(~spinn_utilities.socket_address.SocketAddress)</span>
-<span class="sd">    :param extra_algorithm_xml_paths:</span>
-<span class="sd">        list of paths to where other XML are located</span>
-<span class="sd">    :type extra_algorithm_xml_paths: list(str) or None</span>
-<span class="sd">    :param extra_mapping_inputs: other inputs used by the mapping process</span>
-<span class="sd">    :type extra_mapping_inputs: dict(str, Any) or None</span>
-<span class="sd">    :param extra_mapping_algorithms:</span>
-<span class="sd">        other algorithms to be used by the mapping process</span>
-<span class="sd">    :type extra_mapping_algorithms: list(str) or None</span>
-<span class="sd">    :param extra_pre_run_algorithms: extra algorithms to use before a run</span>
-<span class="sd">    :type extra_pre_run_algorithms: list(str) or None</span>
-<span class="sd">    :param extra_post_run_algorithms: extra algorithms to use after a run</span>
-<span class="sd">    :type extra_post_run_algorithms: list(str) or None</span>
-<span class="sd">    :param extra_load_algorithms:</span>
-<span class="sd">        extra algorithms to use within the loading phase</span>
-<span class="sd">    :type extra_load_algorithms: list(str) or None</span>
 <span class="sd">    :param time_scale_factor: multiplicative factor to the machine time step</span>
 <span class="sd">        (does not affect the neuron models accuracy)</span>
 <span class="sd">    :type time_scale_factor: int or None</span>
@@ -396,12 +366,6 @@
     <span class="c1"># create the main object for all stuff related software</span>
     <span class="n">SpiNNaker</span><span class="p">(</span>
         <span class="n">database_socket_addresses</span><span class="o">=</span><span class="n">database_socket_addresses</span><span class="p">,</span>
-        <span class="n">extra_algorithm_xml_paths</span><span class="o">=</span><span class="n">extra_algorithm_xml_paths</span><span class="p">,</span>
-        <span class="n">extra_mapping_inputs</span><span class="o">=</span><span class="n">extra_mapping_inputs</span><span class="p">,</span>
-        <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="n">extra_mapping_algorithms</span><span class="p">,</span>
-        <span class="n">extra_pre_run_algorithms</span><span class="o">=</span><span class="n">extra_pre_run_algorithms</span><span class="p">,</span>
-        <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="n">extra_post_run_algorithms</span><span class="p">,</span>
-        <span class="n">extra_load_algorithms</span><span class="o">=</span><span class="n">extra_load_algorithms</span><span class="p">,</span>
         <span class="n">time_scale_factor</span><span class="o">=</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="n">timestep</span><span class="p">,</span>
         <span class="n">min_delay</span><span class="o">=</span><span class="n">min_delay</span><span class="p">,</span> <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
         <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
