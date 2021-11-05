@@ -227,12 +227,12 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         n_times_tdma_fell_behind = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSED_SLOTS.value]
 
         yield self._app_vertex.get_tdma_provenance_item(
-            names, label, n_times_tdma_fell_behind)
+            x, y, p, label, n_times_tdma_fell_behind)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

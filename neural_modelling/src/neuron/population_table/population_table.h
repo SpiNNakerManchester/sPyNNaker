@@ -70,6 +70,7 @@ bool population_table_get_first_address(
         size_t* n_bytes_to_transfer);
 
 //! \brief Determine if there are more items with the same key
+//! \return Whether there are more items
 static inline bool population_table_is_next(void) {
     return items_to_go > 0;
 }

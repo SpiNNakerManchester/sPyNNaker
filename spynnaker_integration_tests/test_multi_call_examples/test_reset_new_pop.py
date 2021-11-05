@@ -26,7 +26,7 @@ class TestResetNewInput(BaseTestCase):
 
     def check_data(self, pop, expected_spikes, simtime, segments):
         neo = pop.get_data("all")
-        for segment in range(segments):
+        for segment in segments:
             spikes = neo.segments[segment].spiketrains
             v = neo.segments[segment].filter(name="v")[0]
             gsyn_exc = neo.segments[segment].filter(name="gsyn_exc")[0]
@@ -53,8 +53,8 @@ class TestResetNewInput(BaseTestCase):
         sim.Projection(input, pop_2, sim.AllToAllConnector(),
                        synapse_type=sim.StaticSynapse(weight=5, delay=1))
         sim.run(simtime)
-        self.check_data(pop_1, len(input_spikes), simtime, 2)
-        self.check_data(pop_2, len(input_spikes), simtime, 1)
+        self.check_data(pop_1, len(input_spikes), simtime, [0, 1])
+        self.check_data(pop_2, len(input_spikes), simtime, [1])
         sim.end()
 
     def test_do_run(self):

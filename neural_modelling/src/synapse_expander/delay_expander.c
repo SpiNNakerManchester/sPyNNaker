@@ -47,15 +47,15 @@ struct delay_builder_config {
 
 /**
  * \brief Generate the data for a single connector
- * \param[in,out] in_region: The address to read the parameters from.  Should be
- *                           updated to the position just after the parameters
- *                           after calling.
- * \param[in,out] neuron_delay_stage_config: Bit fields into which to write the
- *                                           delay information
- * \param[in] post_slice_start: The start of the slice of the delay extension to
- *                              generate for
- * \param[in] post_slice_count: The number of neurons of the delay extension to
- *                              generate for
+ * \param[in,out] in_region:
+ *      The address to read the parameters from.  Should be updated to the
+ *      position just after the parameters after calling.
+ * \param[in,out] neuron_delay_stage_config:
+ *      Bit fields into which to write the delay information
+ * \param[in] pre_slice_start:
+ *      The start of the slice of the delay extension to generate for
+ * \param[in] pre_slice_count:
+ *      The number of neurons of the delay extension to generate for
  * \return True if the region was correctly generated, False if there was an
  *         error
  */
