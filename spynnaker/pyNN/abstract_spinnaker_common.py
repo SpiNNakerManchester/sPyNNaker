@@ -236,7 +236,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
-            self._command_sender = vertex
+            raise NotImplementedError(
+                "Please contact spinnker team as adding a CommandSender "
+                "currently disabled")
         super().add_application_vertex(vertex)
 
     @staticmethod
