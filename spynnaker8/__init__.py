@@ -156,7 +156,7 @@ __all__ = [
     'DCSource', 'ACSource', 'StepCurrentSource', 'NoisyCurrentSource',
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
-    'reset', 'set_number_of_neurons_per_core', 'get_projections_data',
+    'reset', 'set_number_of_neurons_per_core',
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
@@ -262,26 +262,11 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
         src, tgt, mask, scale_factor, offset, periodic_boundaries)
 
 
-def get_projections_data(projection_data):
-    """
-    :param projection_data: the projection to attributes mapping
-    :type projection_data:
-        dict(~.Projection, list(int) or tuple(int) or None)
-    :return: a extracted data object with get method for getting the data
-    :rtype: ExtractedData
-    """
-    return globals_variables.get_simulator().get_projections_data(
-        projection_data)
-
-
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           min_delay=_pynn_control.DEFAULT_MIN_DELAY,
           max_delay=None,
           graph_label=None,
-          database_socket_addresses=None, extra_algorithm_xml_paths=None,
-          extra_mapping_inputs=None, extra_mapping_algorithms=None,
-          extra_pre_run_algorithms=None, extra_post_run_algorithms=None,
-          extra_load_algorithms=None, time_scale_factor=None,
+          database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
     """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
         to be called before any other function
@@ -301,21 +286,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         for the database notification protocol
     :type database_socket_addresses:
         iterable(~spinn_utilities.socket_address.SocketAddress)
-    :param extra_algorithm_xml_paths:
-        list of paths to where other XML are located
-    :type extra_algorithm_xml_paths: list(str) or None
-    :param extra_mapping_inputs: other inputs used by the mapping process
-    :type extra_mapping_inputs: dict(str, Any) or None
-    :param extra_mapping_algorithms:
-        other algorithms to be used by the mapping process
-    :type extra_mapping_algorithms: list(str) or None
-    :param extra_pre_run_algorithms: extra algorithms to use before a run
-    :type extra_pre_run_algorithms: list(str) or None
-    :param extra_post_run_algorithms: extra algorithms to use after a run
-    :type extra_post_run_algorithms: list(str) or None
-    :param extra_load_algorithms:
-        extra algorithms to use within the loading phase
-    :type extra_load_algorithms: list(str) or None
     :param time_scale_factor: multiplicative factor to the machine time step
         (does not affect the neuron models accuracy)
     :type time_scale_factor: int or None
@@ -365,12 +335,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     # create the main object for all stuff related software
     SpiNNaker(
         database_socket_addresses=database_socket_addresses,
-        extra_algorithm_xml_paths=extra_algorithm_xml_paths,
-        extra_mapping_inputs=extra_mapping_inputs,
-        extra_mapping_algorithms=extra_mapping_algorithms,
-        extra_pre_run_algorithms=extra_pre_run_algorithms,
-        extra_post_run_algorithms=extra_post_run_algorithms,
-        extra_load_algorithms=extra_load_algorithms,
         time_scale_factor=time_scale_factor, timestep=timestep,
         min_delay=min_delay, graph_label=graph_label,
         n_chips_required=n_chips_required,
