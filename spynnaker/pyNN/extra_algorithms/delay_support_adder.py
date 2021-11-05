@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+import math
 
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
@@ -34,8 +35,6 @@ class DelaySupportAdder(object):
     """ adds delay extension vertices into the APP graph as needed
 
     :param ApplicationGraph app_graph: the app graph
-    :param int machine_time_step: the machine time step
-    :param int user_max_delay: the user defined max delay
     :rtype: None
     """
 
@@ -44,25 +43,43 @@ class DelaySupportAdder(object):
         "_delay_post_edge_map",
         "_delay_pre_edges"]
 
+    INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG = (
+        "The app vertex {} with splitter {} does not support delays and yet "
+        "requires a delay support for edge {}. Please use a Splitter which "
+        "utilises the AbstractSpynnakerSplitterDelay interface.")
+
+    DELAYS_NOT_SUPPORTED_SPLITTER = (
+        "The app vertex {} with splitter {} does not support delays and yet "
+        "requires a delay support for edge {}. Please use a Splitter which "
+        "does not have accepts_edges_from_delay_vertex turned off.")
+
+    NOT_SUPPORTED_DELAY_ERROR_MSG = (
+        "The maximum delay {}ms for projection {} is not supported "
+        "by the splitter {} (max supported delay of the splitter is {}ms and "
+        "a delay extension can add {}ms extra delay). either reduce "
+        "the delay, or use a splitter which supports a larger delay, or "
+        "finally implement the code to allow multiple delay extensions. "
+        "good luck.")
+
+    APP_DELAY_PROGRESS_BAR_TEXT = "Adding delay extensions as required"
+
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
         self._delay_pre_edges = list()
 
-    def __call__(self, app_graph, machine_time_step, user_max_delay):
+    def __call__(self, app_graph):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
             the app graph
-        :param int machine_time_step: the machine time step
-        :param int user_max_delay: the user defined max delay
         """
 
         # progress abr and data holders
         progress = ProgressBar(
             len(list(app_graph.outgoing_edge_partitions)),
-            "Adding delay extensions as required")
+            self.APP_DELAY_PROGRESS_BAR_TEXT)
 
         # go through all partitions.
         for app_outgoing_edge_partition in progress.over(
@@ -72,24 +89,17 @@ class DelaySupportAdder(object):
 
                     # figure the max delay and if we need a delay extension
                     synapse_infos = app_edge.synapse_information
-                    (max_delay_needed, post_vertex_max_delay,
+                    (n_delay_stages, delay_steps_per_stage,
                      need_delay_extension) = self._check_delay_values(
-                        app_edge, user_max_delay, machine_time_step,
-                        synapse_infos)
+                        app_edge, synapse_infos)
 
                     # if we need a delay, add it to the app graph.
                     if need_delay_extension:
                         delay_app_vertex = (
                             self._create_delay_app_vertex_and_pre_edge(
                                 app_outgoing_edge_partition, app_edge,
-                                post_vertex_max_delay, app_graph,
-                                max_delay_needed))
-
-                        # update the delay extension for the max delay slots.
-                        # NOTE do it accumulately. coz else more loops.
-                        delay_app_vertex. \
-                            set_new_n_delay_stages_and_delay_per_stage(
-                                post_vertex_max_delay, max_delay_needed)
+                                delay_steps_per_stage, app_graph,
+                                n_delay_stages))
 
                         # add the edge from the delay extension to the
                         # dest vertex
@@ -135,8 +145,8 @@ class DelaySupportAdder(object):
             app_edge.delay_edge = delay_edge
 
     def _create_delay_app_vertex_and_pre_edge(
-            self, app_outgoing_edge_partition, app_edge, post_vertex_max_delay,
-            app_graph, max_delay_needed):
+            self, app_outgoing_edge_partition, app_edge, delay_per_stage,
+            app_graph, n_delay_stages):
         """ creates the delay extension app vertex and the edge from the src\
             vertex to this delay extension. Adds to the graph, as safe to do\
             so.
@@ -144,8 +154,8 @@ class DelaySupportAdder(object):
         :param OutgoingEdgePartition app_outgoing_edge_partition:
             the original outgoing edge partition.
         :param AppEdge app_edge: the undelayed app edge.
-        :param int post_vertex_max_delay: delay supported by post vertex.
-        :param int max_delay_needed: the max delay needed by this app edge.
+        :param int delay_per_stage: delay for each delay stage
+        :param int n_delay_stages: the number of delay stages needed
         :param ApplicationGraph app_graph: the app graph.
         :return: the DelayExtensionAppVertex
         """
@@ -157,9 +167,8 @@ class DelaySupportAdder(object):
             # build delay app vertex
             delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
             delay_app_vertex = DelayExtensionVertex(
-                app_edge.pre_vertex.n_atoms, post_vertex_max_delay,
-                max_delay_needed - post_vertex_max_delay, app_edge.pre_vertex,
-                label=delay_name)
+                app_edge.pre_vertex.n_atoms, delay_per_stage, n_delay_stages,
+                app_edge.pre_vertex, label=delay_name)
 
             # set trackers
             delay_app_vertex.splitter = (
@@ -174,74 +183,59 @@ class DelaySupportAdder(object):
                 label="{}_to_DelayExtension".format(
                     app_edge.pre_vertex.label))
             self._delay_pre_edges.append(delay_pre_edge)
+        else:
+            delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
+                n_delay_stages, delay_per_stage)
         return delay_app_vertex
 
-    def _check_delay_values(
-            self, app_edge, user_max_delay, machine_time_step, synapse_infos):
+    def _check_delay_values(self, app_edge, synapse_infos):
         """ checks the delay required from the user defined max, the max delay\
             supported by the post vertex splitter and the delay Extensions.
 
         :param ApplicationEdge app_edge: the undelayed app edge
-        :param int user_max_delay: user max delay of the sim.
-        :param int machine_time_step: machine time step of the sim.
         :param iterable[SynapseInfo] synapse_infos: iterable of synapse infos
-        :return:tuple of max_delay_needed, post_vertex_max_delay, bool.
+        :return: tuple(n_delay_stages, delay_steps_per_stage, extension_needed)
         """
 
         # get max delay required
-        max_delay_needed = max(
+        max_delay_needed_ms = max(
             synapse_info.synapse_dynamics.get_delay_maximum(
                 synapse_info.connector, synapse_info)
             for synapse_info in synapse_infos)
-
-        # check max delay works
-        if max_delay_needed > user_max_delay:
-            logger.warning(
-                "The end user entered a max delay "
-                "for which the projection breaks")
 
         # get if the post vertex needs a delay extension
         post_splitter = app_edge.post_vertex.splitter
         if not isinstance(
                 post_splitter, AbstractSpynnakerSplitterDelay):
             raise DelayExtensionException(
-                f"The app vertex {app_edge.post_vertex} "
-                f"with splitter {post_splitter} does not support delays "
-                f"and yet requires a delay support for edge {app_edge}. "
-                f"Please use a Splitter which utilises the "
-                f"AbstractSpynnakerSplitterDelay interface.")
+                self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
+                    app_edge.post_vertex, post_splitter, app_edge))
 
-        post_vertex_max_delay = (
-                app_edge.post_vertex.splitter.max_support_delay() *
-                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+        max_delay_steps = app_edge.post_vertex.splitter.max_support_delay()
+        max_delay_ms = max_delay_steps * machine_time_step_ms()
 
         # if does not need a delay extension, run away
-        if post_vertex_max_delay >= max_delay_needed:
-            return max_delay_needed, post_vertex_max_delay, False
+        if max_delay_ms >= max_delay_needed_ms:
+            return 0, max_delay_steps, False
 
         # Check post vertex is ok with getting a delay
         if not post_splitter.accepts_edges_from_delay_vertex():
             raise DelayExtensionException(
-                f"The app vertex {app_edge.post_vertex} "
-                f"with splitter {post_splitter} does not support delays "
-                f"and yet requires a delay support for edge {app_edge}. "
-                f"Please use a Splitter which does not have "
-                f"accepts_edges_from_delay_vertex turned off.")
+                self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
+                    app_edge.post_vertex, post_splitter, app_edge))
 
         # needs a delay extension, check can be supported with 1 delay
         # extension. coz we dont do more than 1 at the moment
-        total_supported_delay = (
-            post_vertex_max_delay +
-            (DelayExtensionVertex.get_max_delay_ticks_supported(
-                post_vertex_max_delay) *
-             (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)))
-        if total_supported_delay < max_delay_needed:
+        ext_provided_ms = (DelayExtensionVertex.get_max_delay_ticks_supported(
+                max_delay_steps) * machine_time_step_ms())
+        total_delay_ms = ext_provided_ms + max_delay_ms
+        if total_delay_ms < max_delay_needed_ms:
             raise DelayExtensionException(
-                f"Edge:{app_edge.label} "
-                f"has a max delay of {max_delay_needed}. "
-                f"But at a timestep of "
-                f"{machine_time_step / MICRO_TO_MILLISECOND_CONVERSION} "
-                f"the max delay supported is {total_supported_delay}")
+                self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(
+                    max_delay_needed_ms, app_edge,
+                    app_edge.post_vertex.splitter,
+                    max_delay_ms, ext_provided_ms))
 
         # return data for building delay extensions
-        return max_delay_needed, post_vertex_max_delay, True
+        n_stages = int(math.ceil(max_delay_needed_ms / max_delay_ms)) - 1
+        return n_stages, max_delay_steps, True

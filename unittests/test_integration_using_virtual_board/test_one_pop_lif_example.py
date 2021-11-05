@@ -21,7 +21,7 @@ from spinnaker_testbase import BaseTestCase
 
 def do_run(nNeurons):
 
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=8.0)
+    p.setup(timestep=1.0, min_delay=1.0)
 
     cell_params_lif_in = {'tau_m': 333.33, 'cm': 208.33, 'v': 0.0,
                           'v_rest': 0.1, 'v_reset': 0.0, 'v_thresh': 1.0,
@@ -44,6 +44,9 @@ def do_run(nNeurons):
 
 
 class OnePopLifExample(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         nNeurons = 255  # number of neurons in each population
         do_run(nNeurons)

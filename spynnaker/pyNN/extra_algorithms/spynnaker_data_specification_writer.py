@@ -26,16 +26,11 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
     __slots__ = ()
 
     def __call__(
-            self, placements, hostname, report_default_directory,
-            write_text_specs, machine, data_n_timesteps):
+            self, placements, hostname, machine, data_n_timesteps):
         """
         :param ~pacman.model.placements.Placements placements:
             placements of machine graph to cores
         :param str hostname: SpiNNaker machine name
-        :param str report_default_directory:
-            the location where reports are stored
-        :param bool write_text_specs:
-            True if the textual version of the specification is to be written
         :param ~spinn_machine.Machine machine:
             the python representation of the SpiNNaker machine
         :param int data_n_timesteps:
@@ -59,5 +54,4 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
         placement_order.extend(delay_extensions)
 
         return super().__call__(
-            placements, hostname, report_default_directory, write_text_specs,
-            machine, data_n_timesteps, placement_order)
+            placements, hostname, machine, data_n_timesteps, placement_order)

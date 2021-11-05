@@ -31,12 +31,10 @@ class TestOnlyCoresRecording(BaseTestCase):
             1, sim.SpikeSourceArray(spike_times=[0]), label="input1")
         input2 = sim.Population(
             1, sim.SpikeSourceArray(spike_times=[0]), label="input2")
-        pop_1 = sim.Population(5, sim.IF_curr_exp(), label="pop_1")
-        pop_2 = sim.Population(5, sim.IF_curr_exp(), label="pop_2")
-        sim.Projection(input1, pop_1, sim.AllToAllConnector(),
-                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
-        sim.Projection(input2, pop_2, sim.AllToAllConnector(),
-                       synapse_type=sim.StaticSynapse(weight=5, delay=1))
+        input3 = sim.Population(
+            1, sim.SpikeSourceArray(spike_times=[0]), label="input3")
+        input4 = sim.Population(
+            1, sim.SpikeSourceArray(spike_times=[0]), label="input4")
 
         # Make sure there is stuff at the cores specified in the cfg file
         input1.set_constraint(
@@ -45,10 +43,10 @@ class TestOnlyCoresRecording(BaseTestCase):
             ChipAndCoreConstraint(0, 0, 3))
         # While there must be a chip 0,0  chip 1,1 could be missing
         if machine.is_chip_at(1, 1):
-            pop_1.set_constraint(
+            input3.set_constraint(
                 ChipAndCoreConstraint(1, 1, 1))
         # Make sure there is stuff at a core not specified in the cfg file
-        pop_2.set_constraint(
+        input4.set_constraint(
             ChipAndCoreConstraint(0, 0, 2))
 
         sim.run(500)

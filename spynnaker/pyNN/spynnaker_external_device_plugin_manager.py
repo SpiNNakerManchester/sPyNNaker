@@ -73,9 +73,8 @@ class SpynnakerExternalDevicePluginManager(object):
     def activate_live_output_for(
             population, database_notify_host=None,
             database_notify_port_num=None,
-            database_ack_port_num=None, board_address=None, port=None,
-            host=None, tag=None, strip_sdp=True, use_prefix=False,
-            key_prefix=None,
+            database_ack_port_num=None, port=None, host=None, tag=None,
+            strip_sdp=True, use_prefix=False, key_prefix=None,
             prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
             right_shift=0, payload_as_time_stamps=True, notify=True,
             use_payload_prefix=True, payload_prefix=None,
@@ -95,9 +94,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param int database_notify_port_num:
             The port number to which a external device will receive the
             database is ready command
-        :param str board_address:
-            A fixed board address required for the tag, or None if any
-            address is OK
         :param key_prefix: the prefix to be applied to the key
         :type key_prefix: int or None
         :param ~spinnman.messages.eieio.EIEIOPrefix prefix_type:
@@ -145,10 +141,10 @@ class SpynnakerExternalDevicePluginManager(object):
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, "LiveSpikeReceiver", port, host, board_address,
-            tag, strip_sdp, use_prefix, key_prefix, prefix_type,
-            message_type, right_shift, payload_as_time_stamps,
-            use_payload_prefix, payload_prefix, payload_right_shift,
+            population._vertex, "LiveSpikeReceiver", port, host, tag,
+            strip_sdp, use_prefix, key_prefix, prefix_type, message_type,
+            right_shift, payload_as_time_stamps, use_payload_prefix,
+            payload_prefix, payload_right_shift,
             number_of_packets_sent_per_time_step,
             partition_ids=[SPIKE_PARTITION_ID])
 
@@ -194,9 +190,8 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def update_live_packet_gather_tracker(
             vertex_to_record_from, lpg_label, port=None, hostname=None,
-            board_address=None, tag=None, strip_sdp=True, use_prefix=False,
-            key_prefix=None, prefix_type=None,
-            message_type=EIEIOType.KEY_32_BIT,
+            tag=None, strip_sdp=True, use_prefix=False, key_prefix=None,
+            prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
             right_shift=0, payload_as_time_stamps=True,
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
@@ -212,7 +207,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param str lpg_label:
         :param int port:
         :param str hostname:
-        :param str board_address:
         :param int tag:
         :param bool strip_sdp:
         :param bool use_prefix:
@@ -229,8 +223,8 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
-            port=port, hostname=hostname, tag=tag, board_address=board_address,
-            strip_sdp=strip_sdp, use_prefix=use_prefix, key_prefix=key_prefix,
+            port=port, hostname=hostname, tag=tag, strip_sdp=strip_sdp,
+            use_prefix=use_prefix, key_prefix=key_prefix,
             prefix_type=prefix_type, message_type=message_type,
             right_shift=right_shift, payload_prefix=payload_prefix,
             payload_as_time_stamps=payload_as_time_stamps,
@@ -306,11 +300,3 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_application_vertex(vertex):
         get_simulator().add_application_vertex(vertex)
-
-    @staticmethod
-    def machine_time_step():
-        return get_simulator().machine_time_step
-
-    @staticmethod
-    def time_scale_factor():
-        return get_simulator().time_scale_factor

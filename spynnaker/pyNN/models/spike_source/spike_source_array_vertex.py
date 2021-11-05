@@ -22,7 +22,8 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, machine_time_step)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
@@ -102,9 +103,9 @@ class SpikeSourceArrayVertex(
 
         :param iterable(int spike_times:
         """
-        current_time = globals_variables.get_simulator().get_current_time()
+        current_time = get_simulator().get_current_time()
         for i in range(len(spike_times)):
-            if spike_times[i] > current_time:
+            if spike_times[i] < current_time:
                 logger.warning(
                     "SpikeSourceArray {} has spike_times that are lower than "
                     "the current time {} For example {} - "
@@ -120,11 +121,11 @@ class SpikeSourceArrayVertex(
 
         :param iterable(iterable(int) spike_times:
         """
-        current_time = globals_variables.get_simulator().get_current_time()
+        current_time = get_simulator().get_current_time()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
             for i in range(len(id_times)):
-                if id_times[i] > current_time:
+                if id_times[i] < current_time:
                     logger.warning(
                        "SpikeSourceArray {} has spike_times that are lower "
                        "than the current time {} For example {} - "
@@ -167,17 +168,16 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return machine_time_step()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager, 0, placements, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
-                else 0,
-            machine_time_step)
+                else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements):

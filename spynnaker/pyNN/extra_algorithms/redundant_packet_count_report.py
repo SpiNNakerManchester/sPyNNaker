@@ -14,13 +14,57 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import logging
-import statistics
-from collections import defaultdict
 
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.interface.provenance import (
+    ProvenanceReader, ProvenanceWriter)
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+REDUNDANCY_BY_CORE = (
+    "CREATE VIEW IF NOT EXISTS redundancy_by_core AS "
+    "SELECT pro.x, pro.y, pro.p, core_name, "
+    "   received, filtered, invalid, failed, "
+    "   filtered + invalid + failed AS redunant, "
+    "   filtered + invalid + failed + received AS total, "
+    "   (filtered + invalid + failed) * 100.0 / "
+    "       (filtered + invalid + failed + received) AS percent "
+    "FROM"
+    "   (SELECT x, y, p, total as received, core_name "
+    "   FROM core_stats_view "
+    f"    WHERE description = \"{PopulationMachineVertex.SPIKES_PROCESSED}\") "
+    "        AS pro "
+    "LEFT JOIN "
+    "   (SELECT x, y, p, total AS filtered "
+    "   FROM core_stats_view "
+    "   WHERE description = "
+    f"      \"{PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS}\") "
+    f"  AS bit "
+    "LEFT JOIN "
+    "   (SELECT x, y, p, total AS invalid "
+    "   FROM core_stats_view "
+    "   WHERE description = "
+    f"      \"{PopulationMachineVertex.INVALID_MASTER_POP_HITS}\") AS inv "
+    "LEFT JOIN "
+    "   (SELECT x, y, p, total AS failed "
+    "   FROM core_stats_view "
+    "   WHERE description = "
+    f"      \"{PopulationMachineVertex.GHOST_SEARCHES}\") AS fai "
+    "WHERE pro.x = bit.x AND pro.y = bit.y AND pro.p = bit.p "
+    "   AND pro.x = inv.x AND pro.y = inv.y AND pro.p = inv.p "
+    "   AND pro.x = fai.x AND pro.y = fai.y AND pro.p = fai.p")
+
+
+REDUNDANCY_SUMMARY = (
+    "CREATE VIEW IF NOT EXISTS redundancy_summary AS "
+    "SELECT SUM(total), MAX(total), MIN(total), AVG(total), "
+    "   SUM(redunant), MAX(redunant), MIN(redunant), AVG(redunant), "
+    "   MAX(percent), MIN(percent), AVG(percent), "
+    "   SUM(redunant) * 100.0 / SUM(total) as global_percent "
+    "FROM redundancy_by_core")
 
 
 class RedundantPacketCountReport(object):
@@ -29,113 +73,66 @@ class RedundantPacketCountReport(object):
     _N_PROV_ITEMS_NEEDED = 4
     _MAX = 100
 
-    _CORE_LEVEL_MSG = (
-        "core {} \n\n    {} packets received.\n    {} were detected as "
-        "redundant packets by the bitfield filter.\n    {} were detected as "
-        "having no targets after the DMA stage.\n    {} were detected as "
-        "packets which we should not have received in the first place. \n"
-        "    Overall this makes a redundant percentage of {}\n")
-
-    _SUMMARY_LEVEL_MSG = (
-        "overall, the core with the most incoming packets had {} packets.\n"
-        "         The core with the least incoming packets had {} packets.\n"
-        "         The core with the most redundant packets had {} packets.\n"
-        "         The core with the least redundant packets had {} packets.\n"
-        "         The average incoming and redundant were {} and {}.\n"
-        "         The max and min percentages of redundant packets are {}"
-        " and {}. \n"
-        "         The average redundant percentages from each core were {} "
-        "accordingly.\n"
-        "          The total packets flown in system was {}"
-    )
-
-    def __call__(self, provenance_items, report_default_directory):
+    def __call__(self):
         """
-        :param provenance_items:
-        :type provenance_items:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        :param str report_default_directory:
-        """
-        file_name = os.path.join(report_default_directory, self._FILE_NAME)
 
+        :return:
+        """
+        file_name = os.path.join(report_default_directory(), self._FILE_NAME)
+
+        self._create_views()
         try:
             with open(file_name, "w") as f:
-                self._write_report(f, provenance_items)
+                self._write_report(f)
         except Exception:  # pylint: disable=broad-except
             logger.exception("Generate_placement_reports: Can't open file"
                              " {} for writing.", self._FILE_NAME)
 
-    def _write_report(self, output, provenance_items):
-        data = defaultdict(dict)
+    def _create_views(self):
+        with ProvenanceWriter() as db:
+            with db.transaction() as cur:
+                cur.execute(REDUNDANCY_BY_CORE)
+                cur.execute(REDUNDANCY_SUMMARY)
 
-        overall_entries = list()
-        overall_redundant = list()
-        overall_redundant_percentage = list()
+    def _write_report(self, output):
+        reader = ProvenanceReader()
+        for data in reader.run_query("select * from redundancy_by_core"):
+            (x, y, p, source, received, filtered, invalid, failed,
+                redundant, total, percent) = data
+            output.write(f"\ncore {source} \n")
+            output.write(f"    {total} packets received. \n")
+            output.write(f"    {redundant} were detected as "
+                         "redundant packets by the bitfield filter. \n")
+            output.write(
+                f"    {filtered} were detected as having no targets "
+                f"after the DMA stage. \n")
+            output.write(
+                f"    {invalid} were detected as packets which "
+                f"we should not have received in the first place. \n")
+            output.write(f"    Overall this makes a redundant percentage of "
+                         f"{percent}\n")
+        data = reader.run_query("select * from redundancy_summary")
+        (sum_total, max_total, min_total, avg_total,
+            sum_reduant, max_redundant, min_redundant, avg_redundant,
+            max_percent, min_percent, avg_percent, global_percent) = data[0]
+        output.write(f"\nThe total packets flown in system was "
+                     f"{sum_total}\n")
+        output.write(f"    The max, min and avergae per core was {max_total}, "
+                     f"{min_total}, {avg_total} packets.\n")
+        output.write(f"The total redundant packets was "
+                     f"{sum_reduant}\n")
+        output.write(f"    The max, min and avergae per core was "
+                     f"{max_redundant}, {min_redundant}, {avg_redundant} "
+                     f"packets.\n")
+        output.write(
+            f"The percentages of redundant packets was {global_percent}\n")
+        output.write(f"    The max and min percentages of redundant "
+                     f"packets are {max_percent} and {min_percent}. \n")
+        output.write(
+            f"    The average redundant percentages from each "
+            f"core were {avg_percent} accordingly.\n")
 
-        for provenance_item in provenance_items:
-            last_name = provenance_item.names[-1]
-            key = provenance_item.names[0]
-            if ((last_name == PopulationMachineVertex.GHOST_SEARCHES) or
-                    (last_name ==
-                        PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS) or
-                    (last_name ==
-                        PopulationMachineVertex.INVALID_MASTER_POP_HITS) or
-                    (last_name == PopulationMachineVertex.SPIKES_PROCESSED)):
 
-                # add to store
-                data[key][last_name] = provenance_item.value
-
-                # accum enough data on a core to do summary
-                if len(data[key].keys()) == self._N_PROV_ITEMS_NEEDED:
-
-                    # total packets received
-                    total = (
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES] +
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS] +
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS] +
-                        data[key][PopulationMachineVertex.SPIKES_PROCESSED])
-
-                    # total redundant packets
-                    redundant = (
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES] +
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS] +
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS])
-
-                    percentage = 0
-                    if total != 0:
-                        percentage = (self._MAX / total) * redundant
-
-                    # add to the trackers for summary data
-                    overall_entries.append(total)
-                    overall_redundant.append(redundant)
-                    overall_redundant_percentage.append(percentage)
-
-                    output.write(self._CORE_LEVEL_MSG.format(
-                        key, total,
-                        data[key][
-                            PopulationMachineVertex.
-                            BIT_FIELD_FILTERED_PACKETS],
-                        data[key][PopulationMachineVertex.GHOST_SEARCHES],
-                        data[key][
-                            PopulationMachineVertex.INVALID_MASTER_POP_HITS],
-                        percentage))
-
-        # do summary
-        if len(overall_entries) != 0:
-            output.write(self._SUMMARY_LEVEL_MSG.format(
-                max(overall_entries), min(overall_entries),
-                max(overall_redundant), min(overall_redundant),
-                statistics.mean(overall_entries),
-                statistics.mean(overall_redundant),
-                max(overall_redundant_percentage),
-                min(overall_redundant_percentage),
-                statistics.mean(overall_redundant_percentage),
-                sum(overall_entries)))
-        else:
-            output.write("was no data to summarise")
+if __name__ == '__main__':
+    print(REDUNDANCY_BY_CORE)
+    print(REDUNDANCY_SUMMARY)

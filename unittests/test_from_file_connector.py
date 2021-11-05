@@ -19,8 +19,11 @@ import pytest
 from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromFileConnector)
-from unittests.mocks import MockSynapseInfo, MockPopulation
+from unittests.mocks import MockPopulation
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 import spynnaker8
+
+# NO unittest_setup() as sim.setup is called
 
 
 @pytest.mark.parametrize(
@@ -86,10 +89,13 @@ def test_connector(
     # Check weights and delays are used or ignored as expected
     pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "Pre"),
-                                        MockPopulation(10, "Post"),
-                                        weights, delays)
+    synapse_info = SynapseInformation(
+        connector=None, pre_population=MockPopulation(10, "Pre"),
+        post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+        postpop_is_view=False, rng=None, synapse_dynamics=None,
+        synapse_type=None, is_virtual_machine=False, weights=weights,
+        delays=delays)
     block = connector.create_synaptic_block(
-        [pre_slice], [post_slice], pre_slice, post_slice, 1, mock_synapse_info)
+        [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))

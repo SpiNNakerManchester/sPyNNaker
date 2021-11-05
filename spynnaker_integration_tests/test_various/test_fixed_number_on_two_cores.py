@@ -27,7 +27,7 @@ class FixNumberOnTwoCoresCase(BaseTestCase):
         delays = 17.0
         n_pre = 10
 
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
 
         p1 = sim.Population(n_neurons, sim.IF_curr_exp, {}, label='pop1')

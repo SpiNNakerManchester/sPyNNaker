@@ -22,9 +22,8 @@ from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, machine_time_step_ms, machine_time_step_per_ms)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.abstract_models import (
@@ -38,6 +37,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic)
 from spynnaker._version import __version__
 from spynnaker.pyNN.models.populations import Population, PopulationView
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -86,7 +87,6 @@ class Projection(object):
                 "cells.".format(__version__))
 
         sim = get_simulator()
-        machine_time_step = sim.machine_time_step
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False
@@ -145,10 +145,9 @@ class Projection(object):
         if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
                 and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(
-                numpy.rint(
-                    numpy.array(synapse_dynamics.delay) *
-                    (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
-                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+                numpy.rint(numpy.array(synapse_dynamics.delay) *
+                           machine_time_step_per_ms()) *
+                machine_time_step_ms())
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -164,8 +163,7 @@ class Projection(object):
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
-        connector.set_projection_information(
-            machine_time_step, self.__synapse_information)
+        connector.set_projection_information(self.__synapse_information)
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)
@@ -186,9 +184,6 @@ class Projection(object):
         # add projection to the SpiNNaker control system
         sim.add_projection(self)
 
-        # reset the ring buffer shifts
-        post_vertex.reset_ring_buffer_shifts()
-
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None
@@ -200,6 +195,15 @@ class Projection(object):
 
             self.__synapse_information.add_pre_run_connection_holder(
                 connection_holder)
+
+        # If the target is a population, add to the list of incoming
+        # projections
+        if isinstance(post_vertex, AbstractPopulationVertex):
+            post_vertex.add_incoming_projection(self)
+
+        # If the source is a poisson, add to the list of outgoing projections
+        if isinstance(pre_vertex, SpikeSourcePoissonVertex):
+            pre_vertex.add_outgoing_projection(self)
 
     @staticmethod
     def __check_population(param, connector):
@@ -492,20 +496,6 @@ class Projection(object):
             post_vertex.clear_connection_cache()
 
     # -----------------------------------------------------------------
-
-    def __len__(self):
-        """
-        .. warning::
-            Not implemented.
-        """
-        _we_dont_do_this_now()
-
-    def __iter__(self):
-        """
-        .. warning::
-            Not implemented.
-        """
-        _we_dont_do_this_now()
 
     def set(self, **attributes):  # @UnusedVariable
         # pylint: disable=unused-argument

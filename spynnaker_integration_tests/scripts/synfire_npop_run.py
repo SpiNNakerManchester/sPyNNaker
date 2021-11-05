@@ -20,6 +20,7 @@ Synfirechain-like example
 """
 import numpy
 import spynnaker8 as p
+from spinnaker_testbase.root_test_case import RootTestCase
 
 
 def do_synfire_npop(nNeurons, n_pops, neurons_per_core, runtime=25000):
@@ -35,7 +36,8 @@ def do_synfire_npop(nNeurons, n_pops, neurons_per_core, runtime=25000):
     :param runtime: time to run the script for
     :type  runtime: int
     """
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+    p.setup(timestep=1.0)
+    RootTestCase.assert_not_spin_three()
     p.set_number_of_neurons_per_core(p.IF_curr_exp, neurons_per_core)
 
     cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,

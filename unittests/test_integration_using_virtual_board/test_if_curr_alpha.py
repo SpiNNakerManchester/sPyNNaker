@@ -45,6 +45,8 @@ def do_run():
 
 class TestAlpha(BaseTestCase):
 
+    # NO unittest_setup() as sim.setup is called
+
     def test_run(self):
         do_run()
 

@@ -138,7 +138,6 @@ static inline void neuron_recording_record_int32(
     data[index] = value;
 }
 
-
 //! \brief stores a recording of a set bit; this is the only way to set a bit
 //!        in a bitfield; neuron_recording_record_value doesn't work for this!
 //! \param[in] var_index: which bitfield recording variable to write this is
@@ -154,6 +153,7 @@ static inline void neuron_recording_record_bit(
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
+
     for (uint32_t i = N_RECORDED_VARS; i > 0; i--) {
         recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
@@ -209,17 +209,12 @@ bool neuron_recording_reset(uint32_t n_neurons);
 
 //! \brief sets up the recording stuff
 //! \param[in] recording_address: sdram location for the recording data
-//! \param[out] recording_flags: Output of flags which can be used to check if
-//!            a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \param[out] n_rec_regions_used: Output the number of regions used by neuron
 //!            recording
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
-        void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons, uint32_t *n_rec_regions_used);
-
-//! \brief finishes recording
-void neuron_recording_finalise(void);
+        void *recording_address, uint32_t n_neurons,
+        uint32_t *n_rec_regions_used);
 
 #endif //_NEURON_RECORDING_H_

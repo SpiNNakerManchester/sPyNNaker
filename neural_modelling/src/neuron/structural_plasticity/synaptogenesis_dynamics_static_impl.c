@@ -23,7 +23,11 @@
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-bool synaptogenesis_dynamics_initialise(UNUSED address_t sdram_sp_address) {
+bool synaptogenesis_dynamics_initialise(
+        UNUSED address_t sdram_sp_address, uint32_t *recording_regions_used) {
+    // The recording region is defined even if unused, so this value needs to
+    // be incremented in order for the recording region IDs to match up
+    *recording_regions_used += 1;
     return true;
 }
 
@@ -38,15 +42,11 @@ bool synaptogenesis_row_restructure(
     return false;
 }
 
-int32_t synaptogenesis_rewiring_period(void) {
-    return -1;
-}
-
-bool synaptogenesis_is_fast(void) {
-    return false;
-}
-
 void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
+}
+
+uint32_t synaptogenesis_n_updates(void) {
+    return 0;
 }
 
 void print_post_to_pre_entry(void) {

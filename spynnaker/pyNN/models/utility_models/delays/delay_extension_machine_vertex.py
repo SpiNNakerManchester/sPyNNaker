@@ -12,27 +12,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import math
 from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    BITS_PER_WORD, BYTES_PER_WORD, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SIMULATION_N_BYTES)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
-    ProvidesProvenanceDataFromMachineImpl)
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-
-_DELAY_PARAM_HEADER_WORDS = 8
 
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
@@ -45,6 +41,7 @@ class DelayExtensionMachineVertex(
 
     __slots__ = [
         "__resources",
+        "__slice_index",
         "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
@@ -86,7 +83,7 @@ class DelayExtensionMachineVertex(
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
     def __init__(self, resources_required, label, constraints=None,
-                 app_vertex=None, vertex_slice=None):
+                 app_vertex=None, vertex_slice=None, slice_index=None):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources required by the vertex
@@ -104,6 +101,7 @@ class DelayExtensionMachineVertex(
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
+        self.__slice_index = slice_index
         self.__resources = resources_required
 
     @property
@@ -124,87 +122,111 @@ class DelayExtensionMachineVertex(
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         (n_received, n_processed, n_added, n_sent, n_overflows, n_delays,
          n_tdma_behind, n_sat, n_bad_neuron, n_bad_keys, n_late_spikes,
          max_bg, n_bg_overloads) = provenance_data
 
-        # translate into provenance data items
-        yield ProvenanceDataItem(
-            names + [self.COUNT_SATURATION_NAME],
-            n_sat, (n_sat != 0),
-            f"The delay extension {label} has dropped {n_sat} packets because "
-            "during certain time steps a neuron was asked to spike more than "
-            "256 times. This causes a saturation on the count tracker which "
-            "is a uint8. Reduce the packet rates, or modify the delay "
-            "extension to have larger counters.")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_NEURON_ID_COUNT_NAME],
-            n_bad_neuron, (n_bad_neuron != 0),
-            f"The delay extension {label} has dropped {n_bad_neuron} packets "
-            "because their neuron id was not valid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.INVALID_KEY_COUNT_NAME],
-            n_bad_keys, (n_bad_keys != 0),
-            f"The delay extension {label} has dropped {n_bad_keys} packets "
-            "due to the packet key being invalid. This is likely a routing "
-            "issue. Please fix and try again")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_RECEIVED_NAME], n_received)
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_PROCESSED_NAME],
-            n_processed, (n_received != n_processed),
-            f"The delay extension {label} only processed {n_processed} of "
-            f"{n_received} received packets.  This could indicate a fault.")
-        yield ProvenanceDataItem(
-            names + [self.MISMATCH_ADDED_FROM_PROCESSED_NAME],
-            n_added, (n_added != n_processed),
-            f"The delay extension {label} only added {n_added} of "
-            f"{n_processed} processed packets.  This could indicate a "
-            "routing or filtering fault")
-        yield ProvenanceDataItem(
-            names + [self.N_PACKETS_SENT_NAME], n_sent)
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_LOST_NAME],
-            n_overflows, (n_overflows > 0),
-            f"The input buffer for {label} lost packets on {n_overflows} "
-            "occasions. This is often a sign that the system is running "
-            "too quickly for the number of neurons per core.  Please "
-            "increase the timer_tic or time_scale_factor or decrease the "
-            "number of neurons per core.")
-        yield ProvenanceDataItem(
-            names + [self.DELAYED_FOR_TRAFFIC_NAME], n_delays)
-        yield self._app_vertex.get_tdma_provenance_item(
-            names, label, n_tdma_behind)
+        self._app_vertex.get_tdma_provenance_item(
+            x, y, p, label, n_tdma_behind)
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.COUNT_SATURATION_NAME, n_sat)
+            if n_sat != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_sat} packets "
+                    f"because during certain time steps a neuron was asked to "
+                    f"spike more than 256 times. This causes a saturation on "
+                    f"the count tracker which is a uint8. "
+                    f"Reduce the packet rates, or modify the delay extension "
+                    f"to have larger counters.")
 
-        late_message = (
-            f"On {label}, {n_late_spikes} packets were dropped from the "
-            "input buffer, because they arrived too late to be processed in "
-            "a given time step. Try increasing the time_scale_factor located "
-            "within the .spynnaker.cfg file or in the pynn.setup() method."
-            if self._app_vertex.drop_late_spikes else
-            f"On {label}, {n_late_spikes} packets arrived too late to be "
-            "processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.N_LATE_SPIKES_NAME],
-            n_late_spikes, report=(n_late_spikes > 0),
-            message=late_message)
+            db.insert_core(
+                x, y, p, self.INVALID_NEURON_ID_COUNT_NAME,
+                n_bad_neuron)
+            if n_bad_neuron != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_bad_neuron} "
+                    f"packets because their neuron id was not valid. "
+                    f"This is likely a routing issue. "
+                    f"Please fix and try again")
 
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_MAX_QUEUED_NAME],
-            max_bg, (max_bg > 1),
-            f"On {label}, a maximum of {max_bg} background tasks were queued. "
-            "Try increasing the time_scale_factor located within the "
-            ".spynnaker.cfg file or in the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_OVERLOADS_NAME],
-            n_bg_overloads, (n_bg_overloads > 0),
-            f"On {label}, the background queue overloaded {n_bg_overloads} "
-            "times. Try increasing the time_scale_factor located within the "
-            ".spynnaker.cfg file or in the pynn.setup() method.")
+            db.insert_core(
+                x, y, p, self.INVALID_KEY_COUNT_NAME, n_bad_keys)
+            if n_bad_keys != 0:
+                db.insert_report(
+                    f"The delay extension {label} has dropped {n_bad_keys} "
+                    f"packets due to the packet key being invalid. "
+                    f"This is likely a routing issue. "
+                    f"Please fix and try again")
+
+            db.insert_core(x, y, p, self.N_PACKETS_RECEIVED_NAME, n_received)
+
+            db.insert_core(x, y, p, self.N_PACKETS_PROCESSED_NAME,
+                           n_processed)
+            if n_received != n_processed:
+                db.insert_report(
+                    f"The delay extension {label} only processed "
+                    f"{n_processed} of {n_received} received packets.  "
+                    f"This could indicate a fault.")
+
+            db.insert_core(
+                x, y, p, self.MISMATCH_ADDED_FROM_PROCESSED_NAME, n_added)
+            if n_added != n_processed:
+                db.insert_report(
+                    f"The delay extension {label} only added {n_added} of "
+                    f"{n_processed} processed packets.  This could indicate "
+                    f"a routing or filtering fault")
+
+            db.insert_core(x, y, p, self.N_PACKETS_SENT_NAME, n_sent)
+
+            db.insert_core(
+                x, y, p, self.INPUT_BUFFER_LOST_NAME, n_overflows)
+            if n_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_overflows} occasions. This is often a sign that the "
+                    f"system is running too quickly for the number of "
+                    f"neurons per core.  "
+                    f"Please increase the timer_tic or time_scale_factor "
+                    f"or decrease the number of neurons per core.")
+
+            db.insert_core(x, y, p, self.DELAYED_FOR_TRAFFIC_NAME, n_delays)
+
+            db.insert_core(x, y, p, self.N_LATE_SPIKES_NAME, n_late_spikes)
+            if n_late_spikes == 0:
+                pass
+            elif self._app_vertex.drop_late_spikes:
+                db.insert_report(
+                    f"On {label}, {n_late_spikes} packets were dropped from "
+                    f"the input buffer, because they arrived too late to be "
+                    f"processed in a given time step. "
+                    "Try increasing the time_scale_factor located within the "
+                    ".spynnaker.cfg file or in the pynn.setup() method.")
+            else:
+                db.insert_report(
+                    f"On {label}, {n_late_spikes} packets arrived too late to "
+                    f"be processed in a given time step. Try increasing the "
+                    "time_scale_factor located within the .spynnaker.cfg file "
+                    "or in the pynn.setup() method.")
+
+            db.insert_core(
+                x, y, p, self.BACKGROUND_MAX_QUEUED_NAME, max_bg)
+            if max_bg > 1:
+                db.insert_report(
+                    f"On {label}, a maximum of {max_bg} background tasks "
+                    f"were queued. Try increasing the time_scale_factor "
+                    f"located within the .spynnaker.cfg file or in the "
+                    f"pynn.setup() method.")
+
+            db.insert_core(
+                x, y, p, self.BACKGROUND_OVERLOADS_NAME, n_bg_overloads)
+            if n_bg_overloads > 0:
+                db.insert_report(
+                    f"On {label}, the background queue overloaded "
+                    f"{n_bg_overloads} times. "
+                    f"Try increasing the time_scale_factor located within the "
+                    ".spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(MachineVertex.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, _partition):
@@ -219,23 +241,17 @@ class DelayExtensionMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_graph": "MemoryMachineGraph",
-        "routing_infos": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"})
+        "machine_graph": "MachineGraph",
+        "routing_infos": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_graph", "routing_infos", "machine_time_step",
-            "time_scale_factor"})
+            "machine_graph", "routing_infos"})
     def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos,
-            machine_time_step, time_scale_factor):
+            self, spec, placement, machine_graph, routing_infos):
         """
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        :param int machine_time_step: machine time step of the sim.
-        :param int time_scale_factor: the time scale factor of the sim.
         """
         # pylint: disable=arguments-differ
 
@@ -246,11 +262,8 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        n_words_per_stage = int(
-            math.ceil(self._vertex_slice.n_atoms / BITS_PER_WORD))
-        delay_params_sz = BYTES_PER_WORD * (
-            _DELAY_PARAM_HEADER_WORDS +
-            (self._app_vertex.n_delay_stages * n_words_per_stage))
+        delay_params_sz = self._app_vertex.delay_params_size(
+            self._vertex_slice)
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -267,9 +280,7 @@ class DelayExtensionMachineVertex(
         # reserve region for provenance
         self.reserve_provenance_data_region(spec)
 
-        self._write_setup_info(
-            spec, machine_time_step, time_scale_factor,
-            vertex.get_binary_file_name())
+        self._write_setup_info(spec, vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -313,23 +324,20 @@ class DelayExtensionMachineVertex(
             self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
-                self._app_vertex.vertex_slices.index(self._vertex_slice)))
+                self.__slice_index))
 
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(
-            self, spec, machine_time_step, time_scale_factor, binary_name):
+    def _write_setup_info(self, spec, binary_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:v the machine time step
-        :param int time_scale_factor: the time scale factor
         :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(self._DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            binary_name, machine_time_step, time_scale_factor))
+            binary_name))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask):

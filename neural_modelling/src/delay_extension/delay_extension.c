@@ -226,10 +226,10 @@ static bool read_parameters(struct delay_parameters *params) {
 
     log_info("\t parrot neurons = %u, neuron bit field words = %u,"
             " num delay stages = %u, num delay slots = %u (pot = %u),"
-            " num delay slots mask = %08x",
+            " num delay slots mask = %08x, n delay in a stage = %u",
             num_neurons, neuron_bit_field_words,
             num_delay_stages, num_delay_slots, num_delay_slots_pot,
-            num_delay_slots_mask);
+            num_delay_slots_mask, n_delay_in_a_stage);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage
@@ -444,10 +444,18 @@ static inline void spike_process(void) {
     spin1_mode_restore(state);
 }
 
+//! \brief User event callback.
+//! \details Delegates to spike_process()
+//! \param[in] unused0: unused
+//! \param[in] unused1: unused
 static void user_callback(UNUSED uint unused0, UNUSED uint unused1) {
     spike_process();
 }
 
+//! \brief Background event callback.
+//! \details Handles sending delayed spikes at the right time.
+//! \param[in] local_time: current simulation time
+//! \param[in] timer_count: unused
 static void background_callback(uint local_time, UNUSED uint timer_count) {
     // reset the TDMA for this next cycle.
     tdma_processing_reset_phase();
@@ -479,14 +487,14 @@ static void background_callback(uint local_time, UNUSED uint timer_count) {
                         uint32_t neuron_index = ((d * num_neurons) + n);
                         uint32_t spike_key = neuron_index + key;
 
-                        #if LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
                         if (delay_stage_spike_counters[n] > 0) {
                             log_debug("Neuron %u sending %u spikes after delay"
                                     "stage %u with key %x",
                                     n, delay_stage_spike_counters[n], d,
                                     spike_key);
                         }
-                        #endif
+#endif
 
                         // fire n spikes as payload, 1 as none payload.
                         if (has_key) {

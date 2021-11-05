@@ -23,62 +23,72 @@
 #include "neuron_recording.h"
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
+#include "tdma_processing.h"
 #include <debug.h>
-#include <tdma_processing.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
-static key_t key;
+key_t key;
 
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.
-static bool use_key;
+bool use_key;
+
+//! Latest time in a timestep that any neuron has sent a spike
+uint32_t latest_send_time = 0xFFFFFFFF;
+
+//! Earliest time in a timestep that any neuron has sent a spike
+uint32_t earliest_send_time = 0;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! The recording flags
-static uint32_t recording_flags = 0;
+//! The closest power of 2 >= n_neurons
+static uint32_t n_neurons_peak;
+
+//! The number of synapse types
+static uint32_t n_synapse_types;
+
+//! Amount to left shift the ring buffer by to make it an input
+static uint32_t *ring_buffer_to_input_left_shifts;
+
+//! The address where the actual neuron parameters start
+static address_t saved_params_address;
 
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
+    uint32_t n_neurons_peak;
     uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
+    uint32_t ring_buffer_shifts[];
 };
 
-//! Offset of start of global parameters, in words.
-#define START_OF_GLOBAL_PARAMETERS \
-    ((sizeof(struct neuron_parameters) + \
-      sizeof(struct tdma_parameters)) / sizeof(uint32_t))
-
 //! \brief does the memory copy for the neuron parameters
-//! \param[in] address: the address where the neuron parameters are stored
-//!     in SDRAM
-//! \return bool which is true if the mem copy's worked, false otherwise
-static bool neuron_load_neuron_parameters(address_t address) {
+//! \return true if the memory copies worked, false otherwise
+static bool neuron_load_neuron_parameters(void) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
-    neuron_impl_load_neuron_parameters(
-        address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+    // Note the "next" is 0 here because we are using a saved address
+    // which has already accounted for the position of the data within
+    // the region being read.
+    neuron_impl_load_neuron_parameters(saved_params_address, 0, n_neurons);
     return true;
 }
 
-bool neuron_resume(address_t address) { // EXPORTED
+bool neuron_resume(void) { // EXPORTED
     if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         return false;
     }
 
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return neuron_load_neuron_parameters(address);
+    return neuron_load_neuron_parameters();
 }
 
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
-        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
-        uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used) {
+        uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -103,14 +113,26 @@ bool neuron_initialise(
 
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
-    *n_neurons_value = n_neurons;
-    *n_synapse_types_value = params->n_synapse_types;
+    n_neurons_peak = params->n_neurons_peak;
+    n_synapse_types = params->n_synapse_types;
 
-    // Read the size of the incoming spike buffer to use
-    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
+    // Set up ring buffer left shifts
+    uint32_t ring_buffer_bytes = n_synapse_types * sizeof(uint32_t);
+    ring_buffer_to_input_left_shifts = spin1_malloc(ring_buffer_bytes);
+    if (ring_buffer_to_input_left_shifts == NULL) {
+        log_error("Not enough memory to allocate ring buffer");
+        return false;
+    }
 
-    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
-            *incoming_spike_buffer_size);
+    // read in ring buffer to input left shifts
+    spin1_memcpy(
+            ring_buffer_to_input_left_shifts, params->ring_buffer_shifts,
+            ring_buffer_bytes);
+
+    // Store where the actual neuron parameters start
+    saved_params_address = &params->ring_buffer_shifts[n_synapse_types];
+
+    log_info("\t n_neurons = %u, peak %u", n_neurons, n_neurons_peak);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -118,85 +140,64 @@ bool neuron_initialise(
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!neuron_load_neuron_parameters(address)) {
+    if (!neuron_load_neuron_parameters()) {
         return false;
     }
 
     // setup recording region
     if (!neuron_recording_initialise(
-            recording_address, &recording_flags, n_neurons, n_rec_regions_used)) {
+            recording_address, n_neurons, n_rec_regions_used)) {
         return false;
     }
 
     return true;
 }
 
-void neuron_pause(address_t address) { // EXPORTED
-    /* Finalise any recordings that are in progress, writing back the final
-     * amounts of samples recorded to SDRAM */
-    if (recording_flags > 0) {
-        log_debug("updating recording regions");
-        neuron_recording_finalise();
-    }
+void neuron_pause(void) { // EXPORTED
 
     // call neuron implementation function to do the work
-    neuron_impl_store_neuron_parameters(
-            address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+    neuron_impl_store_neuron_parameters(saved_params_address, 0, n_neurons);
 }
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // the phase in this timer tick im in (not tied to neuron index)
-    tdma_processing_reset_phase();
+    // tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
-    // update each neuron individually
-    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
-        // Get external bias from any source of intrinsic plasticity
-        input_t external_bias =
-                synapse_dynamics_get_intrinsic_bias(time, neuron_index);
-
-        // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias);
-
-        // If the neuron has spiked
-        if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
-
-            if (use_key) {
-                tdma_processing_send_packet(
-                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
-            }
-        } else {
-            log_debug("the neuron %d has been determined to not spike",
-                      neuron_index);
-         }
-    }
+    neuron_impl_do_timestep_update(timer_count, time, n_neurons);
 
     log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
-    // Disable interrupts to avoid possible concurrent access
-    uint cpsr = spin1_int_disable();
-
     // Record the recorded variables
     neuron_recording_record(time);
-
-    // Re-enable interrupts
-    spin1_mode_restore(cpsr);
 }
 
-void neuron_add_inputs( // EXPORTED
-        index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep) {
-    neuron_impl_add_inputs(
-            synapse_type_index, neuron_index, weights_this_timestep);
+void neuron_transfer(weight_t *syns) { // EXPORTED
+    uint32_t synapse_index = 0;
+    uint32_t ring_buffer_index = 0;
+    for (uint32_t s_i = n_synapse_types; s_i > 0; s_i--) {
+        uint32_t rb_shift = ring_buffer_to_input_left_shifts[synapse_index];
+        uint32_t neuron_index = 0;
+        for (uint32_t n_i = n_neurons_peak; n_i > 0; n_i--) {
+            weight_t value = syns[ring_buffer_index];
+            if (value > 0) {
+                if (neuron_index > n_neurons) {
+                    log_error("Neuron index %u out of range", neuron_index);
+                    rt_error(RTE_SWERR);
+                }
+                input_t val_to_add = synapse_row_convert_weight_to_input(
+                        value, rb_shift);
+                neuron_impl_add_inputs(synapse_index, neuron_index, val_to_add);
+            }
+            syns[ring_buffer_index] = 0;
+            ring_buffer_index++;
+            neuron_index++;
+        }
+        synapse_index++;
+    }
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

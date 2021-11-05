@@ -110,9 +110,6 @@ static synapse_param_t *neuron_synapse_shaping_params;
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
 
-//! setup from c_main
-extern uint global_timer_count;
-
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
 #endif // !SOMETIMES_UNUSED
@@ -333,132 +330,132 @@ static bool _test_will_fire(packet_firing_data_t *packet_firing) {
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Do the timestep update for the particular implementation
-//! \param[in] neuron_index: The index of the neuron to update
-//! \param[in] external_bias: External input to be applied to the neuron
-//! \return True if a spike has occurred
-static bool neuron_impl_do_timestep_update(index_t neuron_index,
-        input_t external_bias) {
-    // Get the neuron itself
-    neuron_t *this_neuron = &neuron_array[neuron_index];
+//! \param[in] timer_count: The timer count, used for TDMA packet spreading
+//! \param[in] time: The time step of the update
+//! \param[in] n_neurons: The number of neurons
+static void neuron_impl_do_timestep_update(
+        uint32_t timer_count, UNUSED uint32_t time, uint32_t n_neurons) {
 
-    // Get the input_type parameters and voltage for this neuron
-    input_type_t *input_types = &input_type_array[neuron_index];
+    for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        // Get the neuron itself
+        neuron_t *this_neuron = &neuron_array[neuron_index];
 
-    // Get threshold and additional input parameters for this neuron
-    packet_firing_data_t *the_packet_firing =
-        &packet_firing_array[neuron_index];
-    additional_input_t *additional_inputs =
-            &additional_input_array[neuron_index];
-    synapse_param_t *the_synapse_type =
-            &neuron_synapse_shaping_params[neuron_index];
+        // Get the input_type parameters and voltage for this neuron
+        input_type_t *input_types = &input_type_array[neuron_index];
 
-    // Store whether the neuron has spiked
-    bool will_fire = false;
+        // Get threshold and additional input parameters for this neuron
+        packet_firing_data_t *the_packet_firing =
+            &packet_firing_array[neuron_index];
+        additional_input_t *additional_inputs =
+                &additional_input_array[neuron_index];
+        synapse_param_t *the_synapse_type =
+                &neuron_synapse_shaping_params[neuron_index];
 
-    // Loop however many times requested; do this in reverse for efficiency,
-    // and because the index doesn't actually matter
-    for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
-        // Get the voltage
-        state_t soma_voltage = neuron_model_get_membrane_voltage(this_neuron);
+        // Store whether the neuron has spiked
+        bool will_fire = false;
 
-        // Get the exc and inh values from the synapses
-        input_t exc_values[NUM_EXCITATORY_RECEPTORS];
-        input_t *exc_syn_values =
-                synapse_types_get_excitatory_input(exc_values, the_synapse_type);
-        input_t inh_values[NUM_INHIBITORY_RECEPTORS];
-        input_t *inh_syn_values =
-                synapse_types_get_inhibitory_input(inh_values, the_synapse_type);
+        // Loop however many times requested; do this in reverse for efficiency,
+        // and because the index doesn't actually matter
+        for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
+            // Get the voltage
+            state_t soma_voltage = neuron_model_get_membrane_voltage(this_neuron);
 
-        // Call functions to obtain exc_input and inh_input
-        input_t *exc_input_values = input_type_get_input_value(
-                exc_syn_values, input_types, NUM_EXCITATORY_RECEPTORS);
-        input_t *inh_input_values = input_type_get_input_value(
-                inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
+            // Get the exc and inh values from the synapses
+            input_t exc_values[NUM_EXCITATORY_RECEPTORS];
+            input_t *exc_syn_values =
+                    synapse_types_get_excitatory_input(exc_values, the_synapse_type);
+            input_t inh_values[NUM_INHIBITORY_RECEPTORS];
+            input_t *inh_syn_values =
+                    synapse_types_get_inhibitory_input(inh_values, the_synapse_type);
 
-        // Sum g_syn contributions from all receptors for recording
-        REAL total_exc = 0;
-        REAL total_inh = 0;
+            // Call functions to obtain exc_input and inh_input
+            input_t *exc_input_values = input_type_get_input_value(
+                    exc_syn_values, input_types, NUM_EXCITATORY_RECEPTORS);
+            input_t *inh_input_values = input_type_get_input_value(
+                    inh_syn_values, input_types, NUM_INHIBITORY_RECEPTORS);
 
-        for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
-            total_exc += exc_input_values[i];
-        }
-        for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-            total_inh += inh_input_values[i];
-        }
+            // Sum g_syn contributions from all receptors for recording
+            REAL total_exc = 0;
+            REAL total_inh = 0;
 
-        // Do recording if on the first step
-        if (i == n_steps_per_timestep) {
-            neuron_recording_record_accum(
-                    V_RECORDING_INDEX, neuron_index, soma_voltage);
-            neuron_recording_record_accum(
-                    GSYN_EXC_RECORDING_INDEX, neuron_index, total_exc);
-            neuron_recording_record_accum(
-                    GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
-        }
-
-        // Call functions to convert exc_input and inh_input to current
-        input_type_convert_excitatory_input_to_current(
-                exc_input_values, input_types, soma_voltage);
-        input_type_convert_inhibitory_input_to_current(
-                inh_input_values, input_types, soma_voltage);
-
-        external_bias += additional_input_get_input_value_as_current(
-                additional_inputs, soma_voltage);
-
-        // update neuron parameters
-        state_t result = neuron_model_state_update(
-                NUM_EXCITATORY_RECEPTORS, exc_input_values,
-                NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                external_bias, this_neuron);
-
-        // determine if a packet should fly
-        will_fire = _test_will_fire(the_packet_firing);
-
-        // If spike occurs, communicate to relevant parts of model
-        if (will_fire) {
-            if (the_packet_firing->value_as_payload) {
-                accum value_to_send = result;
-                if (result > the_packet_firing->max_value) {
-                    value_to_send = the_packet_firing->max_value;
-                }
-                if (result < the_packet_firing->min_value) {
-                    value_to_send = the_packet_firing->min_value;
-                }
-
-                uint payload = _get_payload(
-                    the_packet_firing->type,
-                    value_to_send * the_packet_firing->value_as_payload);
-
-                log_debug("Sending key=0x%08x payload=0x%08x",
-                        the_packet_firing->key, payload);
-
-                tdma_processing_send_packet(
-                    the_packet_firing->key, payload,
-                    WITH_PAYLOAD, global_timer_count);
-            } else {
-                log_debug("Sending key=0x%08x", the_packet_firing->key);
-
-                tdma_processing_send_packet(
-                    the_packet_firing->key, 0,
-                    NO_PAYLOAD, global_timer_count);
+            for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
+                total_exc += exc_input_values[i];
             }
+            for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
+                total_inh += inh_input_values[i];
+            }
+
+            // Do recording if on the first step
+            if (i == n_steps_per_timestep) {
+                neuron_recording_record_accum(
+                        V_RECORDING_INDEX, neuron_index, soma_voltage);
+                neuron_recording_record_accum(
+                        GSYN_EXC_RECORDING_INDEX, neuron_index, total_exc);
+                neuron_recording_record_accum(
+                        GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
+            }
+
+            // Call functions to convert exc_input and inh_input to current
+            input_type_convert_excitatory_input_to_current(
+                    exc_input_values, input_types, soma_voltage);
+            input_type_convert_inhibitory_input_to_current(
+                    inh_input_values, input_types, soma_voltage);
+
+            uint32_t external_bias = additional_input_get_input_value_as_current(
+                    additional_inputs, soma_voltage);
+
+            // update neuron parameters
+            state_t result = neuron_model_state_update(
+                    NUM_EXCITATORY_RECEPTORS, exc_input_values,
+                    NUM_INHIBITORY_RECEPTORS, inh_input_values,
+                    external_bias, this_neuron);
+
+            // determine if a packet should fly
+            will_fire = _test_will_fire(the_packet_firing);
+
+            // If spike occurs, communicate to relevant parts of model
+            if (will_fire) {
+                if (the_packet_firing->value_as_payload) {
+                    accum value_to_send = result;
+                    if (result > the_packet_firing->max_value) {
+                        value_to_send = the_packet_firing->max_value;
+                    }
+                    if (result < the_packet_firing->min_value) {
+                        value_to_send = the_packet_firing->min_value;
+                    }
+
+                    uint payload = _get_payload(
+                        the_packet_firing->type,
+                        value_to_send * the_packet_firing->value_as_payload);
+
+                    log_debug("Sending key=0x%08x payload=0x%08x",
+                            the_packet_firing->key, payload);
+
+                    tdma_processing_send_packet(
+                        the_packet_firing->key, payload,
+                        WITH_PAYLOAD, timer_count);
+                } else {
+                    log_debug("Sending key=0x%08x", the_packet_firing->key);
+
+                    tdma_processing_send_packet(
+                        the_packet_firing->key, 0,
+                        NO_PAYLOAD, timer_count);
+                }
+            }
+
+            // Shape the existing input according to the included rule
+            synapse_types_shape_input(the_synapse_type);
         }
 
-        // Shape the existing input according to the included rule
-        synapse_types_shape_input(the_synapse_type);
+        if (will_fire) {
+            // Record the spike
+            neuron_recording_record_bit(PACKET_RECORDING_BITFIELD, neuron_index);
+        }
+
+    #if LOG_LEVEL >= LOG_DEBUG
+        neuron_model_print_state_variables(this_neuron);
+    #endif // LOG_LEVEL >= LOG_DEBUG
     }
-
-    if (will_fire) {
-        // Record the spike
-        neuron_recording_record_bit(PACKET_RECORDING_BITFIELD, neuron_index);
-    }
-
-#if LOG_LEVEL >= LOG_DEBUG
-    neuron_model_print_state_variables(this_neuron);
-#endif // LOG_LEVEL >= LOG_DEBUG
-
-    // Return the boolean to the model timestep update
-    return false;
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes

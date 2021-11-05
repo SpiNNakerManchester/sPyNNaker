@@ -35,10 +35,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
 
     def __init__(
             self, database_socket_addresses,
-            extra_algorithm_xml_paths, extra_mapping_inputs,
-            extra_mapping_algorithms, extra_pre_run_algorithms,
-            extra_post_run_algorithms, extra_load_algorithms,
-            time_scale_factor, min_delay, max_delay, graph_label,
+            time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1,
             hostname=None):
         # pylint: disable=too-many-arguments, too-many-locals
@@ -58,21 +55,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
-        # handle the extra load algorithms and the built in ones
-        built_in_extra_load_algorithms = list()
-        if extra_load_algorithms is not None:
-            built_in_extra_load_algorithms.extend(extra_load_algorithms)
-
-        # handle extra xmls and the ones needed by default
-        built_in_extra_xml_paths = list()
-        if extra_algorithm_xml_paths is not None:
-            built_in_extra_xml_paths.extend(extra_algorithm_xml_paths)
-
-        # handle the extra mapping inputs and the built in ones
-        built_in_extra_mapping_inputs = dict()
-        if extra_mapping_inputs is not None:
-            built_in_extra_mapping_inputs.update(extra_mapping_inputs)
-
         front_end_versions = [("sPyNNaker8_version", _version.__version__)]
         front_end_versions.append(("pyNN_version", pynn_version))
         front_end_versions.append(("quantities_version", quantities_version))
@@ -82,17 +64,10 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         # SpiNNaker setup
         super(SpiNNaker, self).__init__(
             database_socket_addresses=database_socket_addresses,
-            user_extra_algorithm_xml_path=built_in_extra_xml_paths,
-            user_extra_mapping_inputs=built_in_extra_mapping_inputs,
-            extra_mapping_algorithms=extra_mapping_algorithms,
-            user_extra_algorithms_pre_run=extra_pre_run_algorithms,
-            extra_post_run_algorithms=extra_post_run_algorithms,
-            extra_load_algorithms=built_in_extra_load_algorithms,
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             hostname=hostname, min_delay=min_delay,
-            max_delay=max_delay, timestep=timestep,
-            time_scale_factor=time_scale_factor,
+            timestep=timestep, time_scale_factor=time_scale_factor,
             front_end_versions=front_end_versions)
 
     def run(self, run_time, sync_time=0.0):
@@ -197,7 +172,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the machine time step
         :rtype: float
         """
-        return self.machine_time_step / float(MICRO_TO_MILLISECOND_CONVERSION)
+        return self.machine_time_step_ms
 
     @dt.setter
     def dt(self, new_value):
@@ -214,8 +189,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return (
-            self._current_run_timesteps * (self.machine_time_step / 1000.0))
+        return self._current_run_timesteps * self.machine_time_step_ms
 
     @property
     def segment_counter(self):

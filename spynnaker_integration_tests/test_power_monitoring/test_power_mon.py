@@ -15,9 +15,12 @@
 
 import os
 import numpy
+import unittest
 import spynnaker8 as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
+from spinn_front_end_common.utilities.globals_variables import (
+    provenance_file_path, report_default_directory)
 from spinn_front_end_common.utilities.report_functions import EnergyReport
 import sqlite3
 
@@ -35,8 +38,7 @@ synfire_run = SynfireRunner()
 class TestPowerMonitoring(BaseTestCase):
     def query_provenance(self, query, *args):
         prov_file = os.path.join(
-            synfire_run._default_report_folder, "provenance_data",
-            "provenance.sqlite3")
+            provenance_file_path(), "provenance.sqlite3")
         with sqlite3.connect(prov_file) as prov_db:
             prov_db.row_factory = sqlite3.Row
             return list(prov_db.execute(query, args))
@@ -53,15 +55,18 @@ class TestPowerMonitoring(BaseTestCase):
         self.assertIsNotNone(hist, "must have a histogram")
         # Did we build the report file like we asked for in config file?
         self.assertIn(EnergyReport._SUMMARY_FILENAME,
-                      os.listdir(synfire_run._default_report_folder))
+                      os.listdir(report_default_directory()))
         # Did we output power provenance data, as requested?
         num_chips = None
         for row in self.query_provenance(
-                "SELECT the_value FROM provenance_view "
-                "WHERE source_name = 'power_provenance' "
-                "AND description_name = 'num_chips' LIMIT 1"):
+                "SELECT the_value "
+                "FROM power_provenance "
+                "WHERE description = 'Num_chips' LIMIT 1"):
             num_chips = row["the_value"]
         self.assertIsNotNone(num_chips, "power provenance was not written")
 
+    @unittest.skip(
+        "https://github.com/SpiNNakerManchester/"
+        "SpiNNFrontEndCommon/issues/866")
     def test_power_monitoring(self):
         self.runsafe(self.do_run)

@@ -19,6 +19,8 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import get_config_bool
+from spinn_front_end_common.utilities.constants import (
+    BITS_PER_WORD, BYTES_PER_WORD)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
@@ -30,6 +32,8 @@ from spynnaker.pyNN.utilities.constants import (
 from .delay_block import DelayBlock
 from .delay_generator_data import DelayGeneratorData
 
+_DELAY_PARAM_HEADER_WORDS = 8
+
 
 class DelayExtensionVertex(
         TDMAAwareApplicationVertex, AbstractHasDelayStages,
@@ -40,16 +44,14 @@ class DelayExtensionVertex(
     __slots__ = [
         "__delay_blocks",
         "__delay_per_stage",
-        "__max_delay_needed_to_support",
         "__n_atoms",
         "__n_delay_stages",
         "__source_vertex",
         "__delay_generator_data",
-        "__n_data_specs",
         "__drop_late_spikes"]
 
     # this maps to what master assumes
-    MAX_TICKS_POSSIBLE_TO_SUPPORT = 8 * 16
+    MAX_SLOTS = 8
     SAFETY_FACTOR = 5000
     MAX_DTCM_AVAILABLE = 59756 - SAFETY_FACTOR
 
@@ -58,12 +60,12 @@ class DelayExtensionVertex(
         "yet feasible. Please report it to Spinnaker user mail list.")
 
     def __init__(
-            self, n_neurons, delay_per_stage, max_delay_to_support,
+            self, n_neurons, delay_per_stage, n_delay_stages,
             source_vertex, constraints=None, label="DelayExtension"):
         """
         :param int n_neurons: the number of neurons
         :param int delay_per_stage: the delay per stage
-        :param int max_delay_to_support: the max delay this will cover
+        :param int n_delay_stages: the (initial) number of delay stages needed
         :param ~pacman.model.graphs.application.ApplicationVertex \
                 source_vertex:
             where messages are coming from
@@ -77,13 +79,9 @@ class DelayExtensionVertex(
             label, constraints, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
         self.__source_vertex = source_vertex
-        self.__n_delay_stages = 0
-        self.__max_delay_needed_to_support = max_delay_to_support
+        self.__n_delay_stages = n_delay_stages
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
-        self.__n_data_specs = 0
-        self.set_new_n_delay_stages_and_delay_per_stage(
-            self.__delay_per_stage, self.__max_delay_needed_to_support)
 
         # atom store
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -104,10 +102,7 @@ class DelayExtensionVertex(
 
     @staticmethod
     def get_max_delay_ticks_supported(delay_ticks_at_post_vertex):
-        max_slots = math.floor(
-            DelayExtensionVertex.MAX_TICKS_POSSIBLE_TO_SUPPORT /
-            delay_ticks_at_post_vertex)
-        return max_slots * delay_ticks_at_post_vertex
+        return DelayExtensionVertex.MAX_SLOTS * delay_ticks_at_post_vertex
 
     @property
     @overrides(AbstractHasDelayStages.n_delay_stages)
@@ -120,18 +115,14 @@ class DelayExtensionVertex(
         return self.__n_delay_stages
 
     def set_new_n_delay_stages_and_delay_per_stage(
-            self, new_post_vertex_n_delay, new_max_delay):
-        if new_post_vertex_n_delay != self.__delay_per_stage:
+            self, n_delay_stages, delay_per_stage):
+        if delay_per_stage != self.__delay_per_stage:
             raise DelayExtensionException(
                 self.MISMATCHED_DELAY_PER_STAGE_ERROR_MESSAGE.format(
-                    self.__delay_per_stage, new_post_vertex_n_delay))
+                    self.__delay_per_stage, delay_per_stage))
 
-        new_n_stages = int(math.ceil(
-            (new_max_delay - self.__delay_per_stage) /
-            self.__delay_per_stage))
-
-        if new_n_stages > self.__n_delay_stages:
-            self.__n_delay_stages = new_n_stages
+        if n_delay_stages > self.__n_delay_stages:
+            self.__n_delay_stages = n_delay_stages
 
     @property
     def delay_per_stage(self):
@@ -167,8 +158,7 @@ class DelayExtensionVertex(
     def add_generator_data(
             self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,
             post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, max_delay_per_stage,
-            machine_time_step):
+            synapse_information, max_stage, max_delay_per_stage):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
@@ -193,16 +183,13 @@ class DelayExtensionVertex(
             ~spynnaker.pyNN.models.neural_projections.SynapseInformation
         :param int max_stage:
             The maximum delay stage
-        :param int machine_time_step: sim machine time step
-        :param int max_delay_per_stage: max delay per stage
         """
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, post_slices,
                 pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, max_delay_per_stage,
-                machine_time_step))
+                synapse_information, max_stage, max_delay_per_stage))
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -219,3 +206,18 @@ class DelayExtensionVertex(
 
     def delay_generator_data(self, vertex_slice):
         return self.__delay_generator_data.get(vertex_slice, None)
+
+    def delay_params_size(self, vertex_slice):
+        """ The size of the delay parameters for a given vertex slice
+
+        :param Slice slice: The slice to get the size of the parameters for
+        """
+        n_words_per_stage = int(
+            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        return BYTES_PER_WORD * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
+
+    @overrides(TDMAAwareApplicationVertex.get_n_cores)
+    def get_n_cores(self):
+        return len(self._splitter.get_out_going_slices()[0])

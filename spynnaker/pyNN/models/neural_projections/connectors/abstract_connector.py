@@ -22,10 +22,10 @@ from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -91,13 +91,12 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         self.__space = space
 
-    def set_projection_information(self, machine_time_step, synapse_info):
+    def set_projection_information(self, synapse_info):
         """ sets a connectors projection info
-        :param int machine_time_step: machine time step
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
+        self.__min_delay = machine_time_step_ms()
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
@@ -279,7 +278,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        """ Get the maximum number of connections between those from any
+        """ Get the maximum number of connections from any
             neuron in the pre vertex to the neurons in the post_vertex_slice,
             for connections with a delay between min_delay and max_delay
             (inclusive) if both specified (otherwise all connections).
@@ -298,7 +297,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        """ Get the maximum number of connections between those to any neuron
+        """ Get the maximum number of connections to any neuron
             in the post vertex from neurons in the pre vertex.
 
         :param SynapseInformation synapse_info:
@@ -576,28 +575,26 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :rtype: ~numpy.ndarray
         """
 
-    _CLIPPED_MSG = (
-        "The delays in the connector {} from {} to {} was clipped to {} a "
-        "total of {} times.  This can be avoided by reducing the timestep "
-        "or increasing the minimum delay to one timestep")
-
     def get_provenance_data(self, synapse_info):
         """
         :param SynapseInformation synapse_info:
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        name = "connector_{}_{}_{}".format(
-            synapse_info.pre_population.label,
-            synapse_info.post_population.label, self.__class__.__name__)
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
-        yield ProvenanceDataItem(
-            [name, "Times_synaptic_delays_got_clipped"], ncd,
-            report=(ncd > 0), message=self._CLIPPED_MSG.format(
-                self.__class__.__name__, synapse_info.pre_population.label,
-                synapse_info.post_population.label, self.__min_delay,
-                ncd))
+        with ProvenanceWriter() as db:
+            db.insert_connector(
+                synapse_info.pre_population.label,
+                synapse_info.post_population.label,
+                self.__class__.__name__, "Times_synaptic_delays_got_clipped",
+                ncd),
+            if ncd > 0:
+                db.insert_report(
+                    f"The delays in the connector {self.__class__.__name__} "
+                    f"from {synapse_info.pre_population.label} "
+                    f"to {synapse_info.post_population.label} "
+                    f"was clipped to {self.__min_delay} a total of {ncd} "
+                    f"times. This can be avoided by reducing the timestep or "
+                    f"increasing the minimum delay to one timestep")
 
     @property
     def safe(self):
@@ -652,7 +649,8 @@ class AbstractConnector(object, metaclass=AbstractBase):
         """
         return False
 
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
         """
         Checks if a pre slice and a post slice could connect.
 
@@ -664,9 +662,9 @@ class AbstractConnector(object, metaclass=AbstractBase):
             This method should never return a false negative,
             but may return a false positives
 
-        :param ~pacman.model.graphs.common.Slice _pre_slice:
-        :param ~pacman.model.graphs.common.Slice _post_slice:
-        :param SynapseInformation _synapse_info:
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertexx:
+        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:
         :rtype: bool
         """
         # Unless we know for sure we must say they could connect

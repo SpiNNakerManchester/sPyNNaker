@@ -217,6 +217,13 @@ bool matrix_generator_generate(
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
+        for (uint32_t j = 0; j < n_indices; j++) {
+            if (indices[j] >= post_slice_count) {
+                log_error("Index %u out of bounds for %u neurons", indices[j], post_slice_count);
+                rt_error(RTE_SWERR);
+            }
+        }
+
         accum delay_params[n_indices], weight_params[n_indices];
         uint16_t delays[n_indices], weights[n_indices];
 

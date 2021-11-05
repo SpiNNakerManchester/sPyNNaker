@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
-import sqlite3
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as p
 
@@ -35,43 +33,44 @@ def structural_formation_to_full():
             f_rew=1000, initial_weight=4.0, initial_delay=3.0,
             s_max=4, seed=0, weight=0.0, delay=1.0, with_replacement=False))
 
+    pop.record("rewiring")
+
     p.run(1000)
 
     # Get the final connections
     conns = proj.get(["weight", "delay"], "list")
 
-    num_rewires = None
+    rewiring = pop.get_data("rewiring")
 
-    report_dir = p.globals_variables.get_simulator()._report_default_directory
-    prov_file = os.path.join(
-        report_dir, "provenance_data", "provenance.sqlite3")
-    with sqlite3.connect(prov_file) as prov_db:
-        prov_db.row_factory = sqlite3.Row
-        rows = list(prov_db.execute(
-            "SELECT the_value FROM provenance_view "
-            "WHERE source_name LIKE '%pop%' "
-            "AND description_name = 'Number_of_rewires' LIMIT 1"))
-    for row in rows:
-        num_rewires = row["the_value"]
+    formation_events = rewiring.segments[0].events[0]
+    elimination_events = rewiring.segments[0].events[1]
+
+    num_forms = len(formation_events.times)
+    num_elims = len(elimination_events.times)
+
+    first_f = formation_events.labels[0]
 
     p.end()
 
-    return conns, num_rewires
+    return conns, num_forms, num_elims, first_f
 
 
 class TestStructuralFormationToFull(BaseTestCase):
     def do_run(self):
-        conns, num_rewires = structural_formation_to_full()
+        conns, num_forms, num_elims, first_f = structural_formation_to_full()
         # Should have built all-to-all connectivity
         all_to_all_conns = [
-            (0, 0, 4., 3.), (0, 1, 4., 3.), (0, 2, 4., 3.), (0, 3, 4., 3.),
-            (1, 0, 4., 3.), (1, 1, 4., 3.), (1, 2, 4., 3.), (1, 3, 4., 3.),
-            (2, 0, 4., 3.), (2, 1, 4., 3.), (2, 2, 4., 3.), (2, 3, 4., 3.),
-            (3, 0, 4., 3.), (3, 1, 4., 3.), (3, 2, 4., 3.), (3, 3, 4., 3.)]
+            [0, 0, 4., 3.], [0, 1, 4., 3.], [0, 2, 4., 3.], [0, 3, 4., 3.],
+            [1, 0, 4., 3.], [1, 1, 4., 3.], [1, 2, 4., 3.], [1, 3, 4., 3.],
+            [2, 0, 4., 3.], [2, 1, 4., 3.], [2, 2, 4., 3.], [2, 3, 4., 3.],
+            [3, 0, 4., 3.], [3, 1, 4., 3.], [3, 2, 4., 3.], [3, 3, 4., 3.]]
+        first_formation = "3_3_formation"
 
-        self.assertEqual(all_to_all_conns, conns.tolist())
+        self.assertCountEqual(all_to_all_conns, conns)
         self.assertEqual(len(conns), 16)
-        self.assertEqual(num_rewires, 16)
+        self.assertEqual(num_forms, 16)
+        self.assertEqual(num_elims, 0)
+        self.assertEqual(first_f, first_formation)
 
     def test_structural_formation_to_full(self):
         self.runsafe(self.do_run)

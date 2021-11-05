@@ -16,10 +16,11 @@
 import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FromListConnector)
-from unittests.mocks import MockSynapseInfo, MockPopulation
-import spynnaker8
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
+from unittests.mocks import MockPopulation
 
 
 @pytest.mark.parametrize(
@@ -51,7 +52,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    spynnaker8.setup()
+    unittest_setup()
     connector = FromListConnector(clist, column_names=column_names)
     if expected_clist is not None:
         assert(numpy.array_equal(connector.conn_list, expected_clist))
@@ -73,11 +74,14 @@ def test_connector(
     # Check weights and delays are used or ignored as expected
     pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "Pre"),
-                                        MockPopulation(10, "Post"),
-                                        weights, delays)
+    synapse_info = SynapseInformation(
+            connector=None, pre_population=MockPopulation(10, "Pre"),
+            post_population=MockPopulation(10, "Post"), prepop_is_view=False,
+            postpop_is_view=False, rng=None, synapse_dynamics=None,
+            synapse_type=None, is_virtual_machine=False, weights=weights,
+            delays=delays)
     block = connector.create_synaptic_block(
-        [pre_slice], [post_slice], pre_slice, post_slice, 1, mock_synapse_info)
+        [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
 
@@ -98,7 +102,7 @@ class MockFromListConnector(FromListConnector):
 
 
 def test_connector_split():
-    spynnaker8.setup()
+    unittest_setup()
     n_sources = 1000
     n_targets = 1000
     n_connections = 10000
@@ -115,9 +119,12 @@ def test_connector_split():
     connector = MockFromListConnector(connection_list)
     weight = 1.0
     delay = 1.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(n_sources, "Pre"),
-                                        MockPopulation(n_targets, "Post"),
-                                        weight, delay)
+    synapse_info = SynapseInformation(
+        connector=None, pre_population=MockPopulation(n_sources, "Pre"),
+        post_population=MockPopulation(n_targets, "Post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics=None, synapse_type=None, is_virtual_machine=False,
+        weights=weight, delays=delay)
     has_block = set()
     try:
         # Check each connection is in the right place
@@ -125,7 +132,7 @@ def test_connector_split():
             for post_slice in post_slices:
                 block = connector.create_synaptic_block(
                     pre_slices, post_slices, pre_slice, post_slice, 1,
-                    mock_synapse_info)
+                    synapse_info)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
                 for target in block["target"]:
@@ -144,19 +151,47 @@ def test_connector_split():
         raise e
 
 
+class MockSplitter(object):
+
+    def __init__(self, slices):
+        self.slices = slices
+
+    def get_out_going_slices(self):
+        return (self.slices, True)
+
+    def get_in_coming_slices(self):
+        return (self.slices, True)
+
+
+class MockAppVertex(object):
+
+    def __init__(self, slices):
+        self.splitter = MockSplitter(slices)
+
+
+class MockMachineVertex(object):
+
+    def __init__(self, slice, slices):
+        self.vertex_slice = slice
+        self.app_vertex = MockAppVertex(slices)
+
+
 def test_could_connect():
+    unittest_setup()
     connector = FromListConnector(
         [[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8], [4, 1], [5, 0],
          [6, 2], [4, 8]])
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     for pre_slice in pre_slices:
+        pre_vertex = MockMachineVertex(pre_slice, pre_slices)
         for post_slice in post_slices:
+            post_vertex = MockMachineVertex(post_slice, post_slices)
             count = connector.get_n_connections(
                 pre_slices, post_slices, pre_slice.hi_atom,
                 post_slice.hi_atom)
             if count:
-                assert(connector.could_connect(None, pre_slice, post_slice))
+                assert(connector.could_connect(None, pre_vertex, post_vertex))
             else:
                 assert(not connector.could_connect(
-                    None, pre_slice, post_slice))
+                    None, pre_vertex, post_vertex))

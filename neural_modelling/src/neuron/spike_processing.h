@@ -24,12 +24,30 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 
+//! Provenance for spike processing
+struct spike_processing_provenance {
+    //! A count of the times that the synaptic input circular buffers overflowed
+    uint32_t n_input_buffer_overflows;
+    //! The number of DMAs performed
+    uint32_t n_dmas_complete;
+    //! The number of spikes received and processed
+    uint32_t n_spikes_processed;
+    //! The number of rewirings performed.
+    uint32_t n_rewires;
+    //! The number of packets that were cleared at the end of timesteps
+    uint32_t n_packets_dropped_from_lateness;
+    //! The maximum size of the input buffer
+    uint32_t max_filled_input_buffer_size;
+};
+
 //! \brief Initialise the spike processing system
 //! \param[in] row_max_n_bytes: The maximum size of a synaptic row
 //! \param[in] mc_packet_callback_priority:
 //!     Multicast packet receive interrupt priority
 //! \param[in] user_event_priority: User event interrupt priority
 //! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
+//! \param[in] clear_input_buffers_of_late_packets_init:
+//!     Whether packets that are left at the end of a time step are wiped
 //! \param[in] packets_per_timestep_region:
 //!     The recording region to use for the packets per timestep
 //! \return True if initialisation succeeded
@@ -39,39 +57,17 @@ bool spike_processing_initialise(
         bool clear_input_buffers_of_late_packets_init,
         uint32_t packets_per_timestep_region);
 
-//! \brief Gets the number of times the input buffer has overflowed
-//! \return the number of times the input buffer has overflowed
-uint32_t spike_processing_get_buffer_overflows(void);
-
-//! \brief Gets the number of DMA's that were completed
-//! \return the number of DMA's that were completed.
-uint32_t spike_processing_get_dma_complete_count(void);
-
-//! \brief Gets the number of spikes that were processed
-//! \return the number of spikes that were processed
-uint32_t spike_processing_get_spike_processing_count(void);
-
-//! \brief Gets the number of successful rewires performed
-//! \return the number of successful rewires
-uint32_t spike_processing_get_successful_rewires(void);
+//! \brief Get provenance data for Spike processing
+//! \param[in] prov The structure to store the provenance data in
+void spike_processing_store_provenance(struct spike_processing_provenance *prov);
 
 //! \brief Set the number of times spike_processing has to attempt rewiring.
 //! \param[in] number_of_rewires: The number of rewirings to perform
 //! \return currently always true
 bool spike_processing_do_rewiring(int number_of_rewires);
 
-//! \brief return the number of packets dropped by the input buffer as they
-//! arrived too late to be processed
-//! \return the number of packets dropped.
-uint32_t spike_processing_get_n_packets_dropped_from_lateness(void);
-
 //! \brief clears the input buffer of packets
 //! \param[in] time: The current timestep
 void spike_processing_clear_input_buffer(timer_t time);
-
-//! \brief returns how many packets were at max inside the input buffer at
-//! any given point.
-//! \return the max size the input buffer reached
-uint32_t spike_processing_get_max_filled_input_buffer_size(void);
 
 #endif // _SPIKE_PROCESSING_H_

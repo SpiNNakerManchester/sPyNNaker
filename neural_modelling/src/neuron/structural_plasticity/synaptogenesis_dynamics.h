@@ -31,9 +31,11 @@
 //!     parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address: Address of the start of the SDRAM region
 //!     which contains synaptic rewiring params.
+//! \param[in,out] recording_regions_used:
+//!     Variable used to track what recording regions have been used
 //! \return Whether we were successful.
 bool synaptogenesis_dynamics_initialise(
-        address_t sdram_sp_address);
+        address_t sdram_sp_address, uint32_t *recording_regions_used);
 
 //! \brief Trigger the process of synaptic rewiring
 //! \details Usually called on a timer registered in c_main()
@@ -51,24 +53,16 @@ bool synaptogenesis_dynamics_rewire(uint32_t time,
 //! \return True if the row was changed and needs to be written back
 bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row);
 
-//! \brief Get the period of rewiring
-//! \return Based on synaptogenesis_is_fast(), this can either be how many times
-//!     rewiring happens in a timestep, or how many timesteps have to pass until
-//!     rewiring happens.
-int32_t synaptogenesis_rewiring_period(void);
-
-//! \brief Get whether rewiring is attempted multiple times per timestep
-//!     or after a number of timesteps.
-//! \return true if the result of synaptogenesis_rewiring_period() is the number
-//!     of attempts to try per timestep.
-bool synaptogenesis_is_fast(void);
-
 //! \brief Indicates that a spike has been received
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
-//! Print a certain data object
+//! \brief Number of updates to do of synaptogenesis this time step
+//! \return The number of updates to do this time step
+uint32_t synaptogenesis_n_updates(void);
+
+//! \brief Print a certain data object
 void print_post_to_pre_entry(void);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

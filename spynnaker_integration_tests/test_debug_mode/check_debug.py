@@ -23,8 +23,8 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
     routing_tables_from_machine_report
-from spinn_front_end_common.utilities.report_functions.energy_report \
-    import EnergyReport
+# from spinn_front_end_common.utilities.report_functions.energy_report \
+#    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
     import BoardChipReport
 from spinn_front_end_common.utility_models import \
@@ -44,8 +44,8 @@ class CheckDebug(BaseTestCase):
         # pylint: disable=protected-access
         reports = [
             # write_energy_report
-            EnergyReport._DETAILED_FILENAME,
-            EnergyReport._SUMMARY_FILENAME,
+            # EnergyReport._DETAILED_FILENAME,
+            # EnergyReport._SUMMARY_FILENAME,
             # write_text_specs = False
             "data_spec_text_files",
             # write_router_reports
@@ -104,7 +104,7 @@ class CheckDebug(BaseTestCase):
         pop.get_data("v")
         sim.end()
 
-        report_directory = globals_variables.run_report_directory()
+        report_directory = globals_variables.report_default_directory()
         found = os.listdir(report_directory)
         for report in reports:
             self.assertIn(report, found)

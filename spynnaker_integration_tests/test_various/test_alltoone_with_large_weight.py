@@ -27,7 +27,7 @@ class AllToOneWithLargeWeightCase(BaseTestCase):
         weights = 50.0
         delays = 1
 
-        sim.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+        sim.setup(timestep=1.0, min_delay=1.0)
 
         p1 = sim.Population(sources, sim.IF_curr_exp, {}, label='pop1')
         p2 = sim.Population(destinations, sim.IF_curr_exp, {}, label='pop2')

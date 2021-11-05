@@ -34,7 +34,7 @@ class SynfireRunner(object):
         self.__init_object_state()
 
     def do_run(
-            self, n_neurons, time_step=1, max_delay=144.0,
+            self, n_neurons, time_step=1,
             input_class=SpikeSourceArray, spike_times=None, rate=None,
             start_time=None, duration=None, seed=None,
             spike_times_list=None,
@@ -59,8 +59,6 @@ class SynfireRunner(object):
         :type n_neurons: int
         :param time_step: time step value to be used in p.setup
         :type time_step: float
-        :param max_delay: max_delay value to be used in p.setup
-        :type max_delay: float
         :param rate: the rate of the SSP to fire at
         :type rate: float
         :param start_time: the start time for the SSP
@@ -206,7 +204,7 @@ class SynfireRunner(object):
                 record_gsyn_exc_7, gsyn_path_exc, get_gsyn_inh,
                 record_gsyn_inh, record_gsyn_inh_7, gsyn_path_inh)
 
-        p.setup(timestep=time_step, min_delay=1.0, max_delay=max_delay)
+        p.setup(timestep=time_step)
         if neurons_per_core is not None:
             p.set_number_of_neurons_per_core(p.IF_curr_exp, neurons_per_core)
 
@@ -281,7 +279,6 @@ class SynfireRunner(object):
         self._input_spikes_recorded_7 = []
         self._weights = []
         self._delays = []
-        self._default_report_folder = None
 
     @staticmethod
     def __verify_parameters(
@@ -480,13 +477,7 @@ class SynfireRunner(object):
 
         p.run(run_times[-1])
 
-        self._default_report_folder = \
-            p.globals_variables.get_simulator()._report_default_directory
-
         return results
-
-    def get_default_report_folder(self):
-        return self._default_report_folder
 
     def get_output_pop_gsyn_exc_neo(self):
         return self._recorded_gsyn_exc_list[0]
