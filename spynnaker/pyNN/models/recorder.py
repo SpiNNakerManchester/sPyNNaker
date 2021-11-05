@@ -503,7 +503,8 @@ class Recorder(object):
                 name="segment{}".format(segment_number),
                 description="Empty",
                 rec_datetime=datetime.now())
-            return segment
+            block.segments.append(segment)
+            return
 
         data_cache = self._data_cache[segment_number]
 
