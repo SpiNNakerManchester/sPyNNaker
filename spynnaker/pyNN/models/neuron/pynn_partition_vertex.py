@@ -107,7 +107,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                             label + "_p" + str(i) + "_v" + str(j) + "_syn_type_" + str(index),
                                             self._max_atoms_syn_core, neuron_model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                            self._n_syn_types, mem_offset)
+                                            self._n_syn_types, mem_offset, n_targets)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)

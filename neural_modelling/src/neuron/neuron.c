@@ -567,19 +567,16 @@ void neuron_do_timestep_update( // EXPORTED
         }
 
         while (!dma_finished);
-
-        dma_finished = false;
-        dma_read = 1;
     }
 
     // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+    //expected_time = sv->cpu_clk * timer_period;
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
-    while (n_recordings_outstanding > 0) {
-        spin1_wfi();
-    }
+//    while (n_recordings_outstanding > 0) {
+//        spin1_wfi();
+//    }
 
     // Reset the out spikes before starting if a beginning of recording
     if (spike_recording_count == 1) {
@@ -600,13 +597,12 @@ void neuron_do_timestep_update( // EXPORTED
 
             //Add the values from synaptic_contributions
             sum = 0;
+            register uint32_t incoming_part = incoming_partitions[synapse_type_index];
+            register uint32_t sum_part = sum_partitions[synapse_type_index];
 
+            for (index_t i = 0; i < incoming_part; i++) {
 
-            for (index_t i = 0; i < incoming_partitions[synapse_type_index]; i++) {
-
-                sum += synaptic_contributions[i + sum_partitions[synapse_type_index]][neuron_index];
-                //buff_index += n_neurons_power_2;
-
+                sum += synaptic_contributions[i + sum_part][neuron_index];
             }
 
             //MAKE IT INLINE?
@@ -618,24 +614,24 @@ void neuron_do_timestep_update( // EXPORTED
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
         }    
         // Get external bias from any source of intrinsic plasticity
-        input_t external_bias =
-                synapse_dynamics_get_intrinsic_bias(time, neuron_index);
+//        input_t external_bias =
+//                synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
         // MAKE IT INLINE
         bool spike = neuron_impl_do_timestep_update(
-                neuron_index, external_bias, recorded_variable_values);
+                neuron_index, 0, recorded_variable_values);
 
         // Write the recorded variable values
-        for (uint32_t i = 0; i < n_recorded_vars; i++) {
-            uint32_t index = var_recording_indexes[i][neuron_index];
-            var_recording_values[i]->states[index] =
-                    recorded_variable_values[i];
-        }
+//        for (uint32_t i = 0; i < n_recorded_vars; i++) {
+//            uint32_t index = var_recording_indexes[i][neuron_index];
+//            var_recording_values[i]->states[index] =
+//                    recorded_variable_values[i];
+//        }
 
         // If the neuron has spiked
         if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
+            //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike (or rate update)
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
@@ -645,11 +641,11 @@ void neuron_do_timestep_update( // EXPORTED
 
             if(use_key){
                  // Wait until the expected time to send
-                while ((ticks == timer_count) &&
-                        (tc[T1_COUNT] > expected_time)) {
-                    // Do Nothing
-                }
-                expected_time -= time_between_spikes;
+//                while ((ticks == timer_count) &&
+//                        (tc[T1_COUNT] > expected_time)) {
+//                    // Do Nothing
+//                }
+//                expected_time -= time_between_spikes;
 
                 // Send the spike
                 while (!spin1_send_mc_packet(
@@ -658,8 +654,8 @@ void neuron_do_timestep_update( // EXPORTED
                 }
             }
         } else {
-            log_debug("the neuron %d has been determined to not spike",
-                    neuron_index);
+            //log_debug("the neuron %d has been determined to not spike",
+            //        neuron_index);
         }
     }
 
@@ -672,6 +668,13 @@ void neuron_do_timestep_update( // EXPORTED
         neuron_impl_set_postsynaptic_region(mem_offset);
     }
 
+    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+    	neuron_impl_shape_synapses(neuron_index);
+    }
+
+    dma_finished = false;
+    dma_read = 1;
+
     // Start the DMA with the postsynaptic contributions for the syn cores
     neuron_impl_send_postsynaptic_buffer();
 
@@ -680,18 +683,18 @@ void neuron_do_timestep_update( // EXPORTED
     cpsr = spin1_int_disable();
 
     // Record the recorded variables
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        if (var_recording_count[i] == var_recording_rate[i]) {
-            var_recording_count[i] = 1;
-            n_recordings_outstanding++;
-            var_recording_values[i]->time = time;
-            recording_record_and_notify(
-                    i + 1, var_recording_values[i], var_recording_size[i],
-                    recording_done_callback);
-        } else {
-            var_recording_count[i] += var_recording_increment[i];
-        }
-    }
+//    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+//        if (var_recording_count[i] == var_recording_rate[i]) {
+//            var_recording_count[i] = 1;
+//            n_recordings_outstanding++;
+//            var_recording_values[i]->time = time;
+//            recording_record_and_notify(
+//                    i + 1, var_recording_values[i], var_recording_size[i],
+//                    recording_done_callback);
+//        } else {
+//            var_recording_count[i] += var_recording_increment[i];
+//        }
+//    }
 
     // Record any spikes this timestep
     if (spike_recording_count == spike_recording_rate) {
@@ -706,7 +709,7 @@ void neuron_do_timestep_update( // EXPORTED
     }
 
     // do logging stuff if required
-    out_spikes_print();
+    //out_spikes_print();
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);

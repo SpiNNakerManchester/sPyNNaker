@@ -61,7 +61,7 @@ struct neuron_provenance {
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC = -1, DMA = 0, USER = 1, SDP = 2, TIMER = 1
+    DMA = -1, USER = 1, SDP = 2, TIMER = 1
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -197,7 +197,7 @@ void timer_callback(uint timer_count, uint unused) {
     //   from the circular buffer
     // If time == 0 as well as output == input == 0  then no rewire is
     //   supposed to happen. No spikes yet
-    log_debug("Timer tick %u \n", time);
+    //log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */

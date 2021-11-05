@@ -93,12 +93,13 @@ static inline bool is_something_to_do(
     bool something_to_do = false;
 
     // Synaptic rewiring needs to be done?
-    if (number_of_rewires) {
-        something_to_do = true;
+//    if (number_of_rewires) {
+//        something_to_do = true;
 
     // Is there another address in the population table?
     // Note, this is fairly quick to check, so leave interrupts disabled
-    } else if (population_table_get_next_address(
+    //} else
+    if (population_table_get_next_address(
             row_address, n_bytes_to_transfer)) {
         something_to_do = true;
     } else {
@@ -132,7 +133,7 @@ static void dma_complete_callback(uint unused, uint tag) {
 
     use(unused);
 
-    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
+    //log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
@@ -170,11 +171,12 @@ void setup_synaptic_dma_read(void) { // EXPORTED
 
     bool setup_done = false;
     while (!setup_done && is_something_to_do(&row_address, &n_bytes_to_transfer)) {
-        if (number_of_rewires) {
-            number_of_rewires--;
-            synaptogenesis_dynamics_rewire(time);
-            setup_done = true;
-        } else if (n_bytes_to_transfer == 0) {
+//        if (number_of_rewires) {
+//            number_of_rewires--;
+//            synaptogenesis_dynamics_rewire(time);
+//            setup_done = true;
+//      else
+        if (n_bytes_to_transfer == 0) {
             do_direct_row(row_address);
         } else {
             do_dma_read(row_address, n_bytes_to_transfer);
@@ -208,21 +210,21 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
 
     any_spike = true;
-    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    //log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
-            log_debug("Sending user event for new spike");
+            //log_debug("Sending user event for new spike");
             if (spin1_trigger_user_event(0, 0)) {
                 dma_busy = true;
             } else {
-                log_debug("Could not trigger user event\n");
+                //log_debug("Could not trigger user event\n");
             }
         }
     } else {
-        log_debug("Could not add spike");
+        //log_debug("Could not add spike");
     }
 }
 

@@ -97,7 +97,7 @@ _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 # Reintroduced for now, but reduced from 1.1 to 1.05
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
 
-_ONE_WORD = struct.Struct("<I")
+_ONE_WORD = struct.Struct("<I"),
 
 
 class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
@@ -140,18 +140,21 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "_slice_list",
         "__change_requires_mapping",
         "_recordables",
-        "__mem_offset"]
+        "__mem_offset",
+        "__n_targets"]
 
     BASIC_MALLOC_USAGE = 2
 
-    BYTES_FOR_SYNAPSE_PARAMS = 36
+    BYTES_FOR_SYNAPSE_PARAMS = 40
 
     _n_vertices = 0
+
+    memory_LUT = [12, 18, 19, 24, 23, 23, 27, 27, 27, 27, 22, 22, 12]
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 population_table_type=None, synapse_io=None):
+                 n_targets, population_table_type=None, synapse_io=None):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -168,6 +171,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         self._slice_list = None
         #Global partition index
         self.__mem_offset = mem_offset
+        self.__n_targets = n_targets
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -189,6 +193,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
+
+        self._incoming_spike_buffer_size = 1024
 
         self._vertex = super(SynapticManager, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -1217,6 +1223,9 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
+
+        # Write the number of microseconds needed for the syn contribution write
+        spec.write_value(data=self.memory_LUT[self.__n_targets - 1])
 
         # Hardcoded and moved in the constructor
         #ring_buffer_shifts = self._get_ring_buffer_shifts(

@@ -91,8 +91,11 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
-// Load DTCM data
+//! Load DTCM data
 static uint32_t timer_period;
+
+//! Time required for syn contribution writing
+static uint32_t writing_time;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
@@ -229,7 +232,7 @@ static bool initialise(uint32_t *timer_period) {
             &n_neurons, &n_synapse_types,
             &incoming_spike_buffer_size,
             &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &direct_synapses_address, &writing_time)) {
         return false;
     }
 
@@ -307,7 +310,7 @@ void timer_callback(uint timer_count, uint unused) {
     uint32_t state = spin1_int_disable();
     
     // 40 for test purposes, to add prints. It was 10 before
-    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - writing_time;
     // Overallocate 60 microseconds from the beginning of the timestep
     // Max time required with 8 neurons and 14 partitions was 52 microseconds
     uint32_t rc_reg = 60;

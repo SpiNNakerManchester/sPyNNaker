@@ -105,7 +105,7 @@ struct synapse_parameters {
     uint32_t incoming_rate_buffer_size;
     uint32_t partition_index;
     uint32_t mem_index;
-    // uint32_t synaptic_matrix_size;
+    uint32_t writing_time;
     uint32_t n_recorded_variables;
     uint32_t is_recording;
 };
@@ -253,6 +253,7 @@ static inline void process_fixed_synapses(
 
 
     num_fixed_pre_synaptic_events += fixed_synapse;
+    num_fixed_pre_synaptic_events_per_timestep += fixed_synapse;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -308,7 +309,8 @@ bool synapses_initialise(
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address) {
+        address_t *direct_synapses_address,
+        uint32_t *writing_time) {
 
     log_debug("synapses_initialise: starting");
 
@@ -325,6 +327,8 @@ bool synapses_initialise(
     partition_index = params->partition_index;
 
     memory_index = params->mem_index;
+
+    *writing_time = params->writing_time;
 
     n_recorded_vars = params->n_recorded_variables;
     is_recording = params->is_recording;
@@ -585,26 +589,26 @@ bool synapses_process_synaptic_row(
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
     // If this row has a plastic region
-    if (synapse_row_plastic_size(row) > 0) {
-        // Get region's address
-        address_t plastic_region_address = synapse_row_plastic_region(row);
-
-        // Process any plastic synapses
-        profiler_write_entry_disable_fiq(
-                PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
-            return false;
-        }
-        profiler_write_entry_disable_fiq(
-                PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-        // Perform DMA write back
-        if (write) {
-            spike_processing_finish_write(process_id);
-        }
-    }
+//    if (synapse_row_plastic_size(row) > 0) {
+//        // Get region's address
+//        address_t plastic_region_address = synapse_row_plastic_region(row);
+//
+//        // Process any plastic synapses
+//        profiler_write_entry_disable_fiq(
+//                PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+//
+//        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
+//                fixed_region_address, ring_buffers, time)) {
+//            return false;
+//        }
+//        profiler_write_entry_disable_fiq(
+//                PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+//
+//        // Perform DMA write back
+//        if (write) {
+//            spike_processing_finish_write(process_id);
+//        }
+//    }
     // Process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance

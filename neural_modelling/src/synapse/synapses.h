@@ -74,7 +74,8 @@ bool synapses_initialise(
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_rate_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address);
+        address_t *direct_synapses_address,
+        uint32_t *writing_time);
 
 void synapses_do_timestep_update(timer_t time);
 

@@ -277,9 +277,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
-            NUM_EXCITATORY_RECEPTORS, exc_input_values,
-            NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            //NUM_EXCITATORY_RECEPTORS,
+            exc_input_values,
+            //NUM_INHIBITORY_RECEPTORS,
+            inh_input_values,
+            //external_bias,
+            neuron);
 
     // determine if a spike should occur
     bool spike = threshold_type_is_above_threshold(result, threshold_type);
@@ -303,6 +306,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Return the boolean to the model timestep update
     return spike;
+}
+
+static inline void neuron_impl_shape_synapses(index_t neuron_index){
+    synapse_param_pointer_t synapse_type =
+        &neuron_synapse_shaping_params[neuron_index];
+    synapse_types_shape_input(synapse_type);
 }
 
 //! \brief stores neuron parameter back into sdram
