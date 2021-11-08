@@ -25,15 +25,18 @@
 //! Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
 
+//! Plasticity multiply shift array, in DTCM
+uint32_t *weight_shift;
+
 //! \brief How the configuration data for additive_two_term is laid out in
 //!     SDRAM. The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
-    int32_t a3_plus;
-    int32_t a3_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
+    accum a3_plus;
+    accum a3_minus;
 } additive_two_term_config_t;
 
 //---------------------------------------
@@ -57,6 +60,13 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
+    weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
+    if (weight_shift == NULL) {
+        log_error("Could not initialise weight region data");
+        return NULL;
+    }
+
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         dtcm_copy[s].min_weight = config->min_weight;
         dtcm_copy[s].max_weight = config->max_weight;
@@ -64,6 +74,9 @@ address_t weight_initialise(
         dtcm_copy[s].a2_minus = config->a2_minus;
         dtcm_copy[s].a3_plus = config->a3_plus;
         dtcm_copy[s].a3_minus = config->a3_minus;
+
+        // Copy weight shift
+        weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
                 " A3+:%d, A3-:%d",

@@ -203,6 +203,8 @@ class PopulationMachineNeurons(
         spec.write_value(data=2**get_n_bits(n_atoms))
 
         # Write the ring buffer data
+        # This is only the synapse types that need a ring buffer i.e. not
+        # those stored in synapse dynamics
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)

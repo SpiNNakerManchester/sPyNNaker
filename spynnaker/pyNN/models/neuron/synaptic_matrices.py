@@ -25,6 +25,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+# from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -355,6 +356,8 @@ class SynapticMatrices(object):
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
+        pre_vertices = set()
+
         for proj in incoming_projections:
             app_edge = proj._projection_edge
 
@@ -366,9 +369,14 @@ class SynapticMatrices(object):
             for machine_edge in app_edge.machine_edges:
                 if (machine_edge.post_vertex.vertex_slice ==
                         self.__post_vertex_slice):
+                    if machine_edge.pre_vertex in pre_vertices:
+                        continue
+
+                    pre_vertices.add(machine_edge.pre_vertex)
                     rinfo = routing_info.get_routing_info_for_edge(
                         machine_edge)
                     key_space_tracker.allocate_keys(rinfo)
+
                     in_edges_by_app_edge[app_edge].add(machine_edge)
 
             # Also go through the delay edges in case an undelayed edge
@@ -376,8 +384,13 @@ class SynapticMatrices(object):
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
                 for machine_edge in delay_edge.machine_edges:
+
                     if (machine_edge.post_vertex.vertex_slice ==
                             self.__post_vertex_slice):
+                        if machine_edge.pre_vertex in pre_vertices:
+                            continue
+
+                        pre_vertices.add(machine_edge.pre_vertex)
                         rinfo = routing_info.get_routing_info_for_edge(
                             machine_edge)
                         key_space_tracker.allocate_keys(rinfo)
@@ -387,6 +400,7 @@ class SynapticMatrices(object):
                                 machine_edge.post_vertex))
                         in_edges_by_app_edge[app_edge].add(
                             undelayed_machine_edge)
+
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod

@@ -16,6 +16,8 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_utilities.ordered_set import OrderedSet
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -90,11 +92,13 @@ def get_estimated_sdram_for_key_region(incoming_projections):
 
             # Get the number of likely vertices
             slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
+
             sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                       BYTES_PER_WORD)
             if in_edge.n_delay_stages:
                 sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                           BYTES_PER_WORD)
+
     return sdram
 
 
@@ -196,8 +200,8 @@ def write_bitfield_init_data(
 
     spec.switch_write_focus(bit_field_key_map_region_id)
 
-    # Gather the machine edges that target this core
-    machine_edges = list()
+    # Gather the source vertices that target this core
+    sources = OrderedSet()
     seen_app_edges = set()
     for proj in incoming_projections:
         in_edge = proj._projection_edge
@@ -205,15 +209,16 @@ def write_bitfield_init_data(
             seen_app_edges.add(in_edge)
             for machine_edge in in_edge.machine_edges:
                 if machine_edge.post_vertex.vertex_slice == vertex_slice:
-                    machine_edges.append(machine_edge)
+                    sources.add(machine_edge.pre_vertex)
 
     # write n keys max atom map
-    spec.write_value(len(machine_edges))
+    spec.write_value(len(sources))
 
     # load in key to max atoms map
-    for machine_edge in machine_edges:
-        spec.write_value(routing_info.get_first_key_for_edge(machine_edge))
-        spec.write_value(machine_edge.pre_vertex.vertex_slice.n_atoms)
+    for source_vertex in sources:
+        spec.write_value(routing_info.get_first_key_from_pre_vertex(
+            source_vertex, SPIKE_PARTITION_ID))
+        spec.write_value(source_vertex.vertex_slice.n_atoms)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)
