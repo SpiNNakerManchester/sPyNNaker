@@ -278,7 +278,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             all_vertices = list(source_vertices)
             all_vertices.append(neuron_vertex)
-            self.__same_chip_groups.append(all_vertices, total_sdram)
+            self.__same_chip_groups.append((all_vertices, total_sdram))
 
         self.__incoming_vertices = [
             [self.__synapse_verts_by_neuron[neuron][index]
