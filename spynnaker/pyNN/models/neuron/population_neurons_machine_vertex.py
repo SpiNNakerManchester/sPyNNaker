@@ -269,16 +269,21 @@ class PopulationNeuronsMachineVertex(
     def weight_scales(self):
         return self.__weight_scales
 
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
-    def n_bytes_for_transfer(self):
-        n_bytes = (2 ** get_n_bits(self.n_target_neurons) *
-                   self.n_target_synapse_types * self.N_BYTES_PER_INPUT)
+    @staticmethod
+    def get_n_bytes_for_transfer(n_neurons, n_synapse_types):
+        n_bytes = (2 ** get_n_bits(n_neurons) *
+                   n_synapse_types * self.N_BYTES_PER_INPUT)
         # May need to add some padding if not a round number of words
         extra_bytes = n_bytes % BYTES_PER_WORD
         if extra_bytes:
             n_bytes += BYTES_PER_WORD - extra_bytes
         return n_bytes
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
+    def n_bytes_for_transfer(self):
+        return self.get_n_bytes_for_transfer(
+            self.n_target_neurons, self.n_target_synapse_types)
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

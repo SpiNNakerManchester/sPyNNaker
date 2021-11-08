@@ -105,7 +105,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # The internal multicast partitions
         "__multicast_partitions",
         # The internal SDRAM partitions
-        "__sdram_partitions"
+        "__sdram_partitions",
+        # The same chip groups
+        "__same_chip_groups"
         ]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
@@ -148,6 +150,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__next_synapse_index = 0
         self.__multicast_partitions = []
         self.__sdram_partitions = []
+        self.__same_chip_groups = []
 
         if (self.__max_delay is not None and
                 self.__allow_delay_extension is None):
@@ -215,6 +218,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             atoms_per_core, shared_synapse_sdram)
         shared_synapse_resources = self.__get_synapse_resources(atoms_per_core)
 
+        # Keep track of the SDRAM for each group of vertices
+        total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
+        for _ in range(self.__n_synapse_vertices - 1):
+            total_sdram += shared_synapse_resources.sdram
+        total_sdram += PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
+            atoms_per_core, n_synapse_types) * (
+                self.__n_synapse_vertices + len(self.__poisson_sources))
+
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
             # Create the neuron vertex for the slice
@@ -264,6 +275,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 sdram_partition.add_edge(
                     SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label))
                 source_vertex.set_sdram_partition(sdram_partition)
+
+            all_vertices = list(source_vertices)
+            all_vertices.append(neuron_vertex)
+            self.__same_chip_groups.append(all_vertices, total_sdram)
 
         self.__incoming_vertices = [
             [self.__synapse_verts_by_neuron[neuron][index]
@@ -538,6 +553,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_verts_by_neuron = None
         self.__max_delay = self.__user_max_delay
         self.__allow_delay_extension = self.__user_allow_delay_extension
+        self.__multicast_partitions = []
+        self.__sdram_partitions = []
+        self.__same_chip_groups = []
 
     @property
     def __synapse_references(self):
@@ -750,6 +768,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if self.__allow_delay_extension is None:
             self.__get_max_delay
         return self.__allow_delay_extension
+
+    @overrides(AbstractSplitterCommon.get_same_chip_groups)
+    def get_same_chip_groups(self):
+        return self.__same_chip_groups
 
     @overrides(AbstractSplitterCommon.get_internal_multicast_partitions)
     def get_internal_multicast_partitions(self):
