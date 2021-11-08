@@ -86,17 +86,18 @@ class WeightDependenceMultiplicative(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        # Loop through each synapse type's weight scale
-        for w in weight_scales:
-            spec.write_value(
-                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
-            spec.write_value(
-                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
+        # Loop through each synapse type
+        for _ in synapse_weight_scales:
+            spec.write_value(data=self.__w_min * global_weight_scale,
+                             data_type=DataType.S1615)
+            spec.write_value(data=self.__w_max * global_weight_scale,
+                             data_type=DataType.S1615)
 
             spec.write_value(data=self.A_plus, data_type=DataType.S1615)
             spec.write_value(data=self.A_minus, data_type=DataType.S1615)

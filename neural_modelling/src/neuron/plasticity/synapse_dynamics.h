@@ -33,19 +33,19 @@
 //!     How to interpret the values from the ring buffers
 //! \return Whether the initialisation succeeded.
 bool synapse_dynamics_initialise(
-        address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        REAL *min_weights);
+        address_t address, uint32_t n_neurons, uint32_t n_synapse_types);
 
 //! \brief Process the dynamics of the synapses
 //! \param[in,out] plastic_region_data: Where the plastic data is
 //! \param[in] fixed_region: Where the fixed data is
 //! \param[in,out] ring_buffers: The ring buffers
 //! \param[in] time: The current simulation time
-//! \return ???
+//! \param[out] Whether to write back anything
+//! \return Whether the processing was successful or not
 bool synapse_dynamics_process_plastic_synapses(
         synapse_row_plastic_data_t *plastic_region_data,
         synapse_row_fixed_part_t *fixed_region,
-        weight_t *ring_buffers, uint32_t time);
+        weight_t *ring_buffers, uint32_t time, bool *write_back);
 
 //! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time

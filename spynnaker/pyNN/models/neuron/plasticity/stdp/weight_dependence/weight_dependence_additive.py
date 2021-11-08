@@ -86,25 +86,28 @@ class WeightDependenceAdditive(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, weight_scales, n_weight_terms):
-        # Loop through each synapse type's weight scale
-        for w in weight_scales:
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
+        # Loop through each synapse type
+        for _ in synapse_weight_scales:
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
+                data=self.__w_min * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
+                data=self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self.A_plus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.A_plus * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.A_minus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.A_minus * global_weight_scale,
+                data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):

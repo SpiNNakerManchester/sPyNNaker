@@ -65,4 +65,15 @@ static plastic_synapse_t synapse_structure_create_synapse(weight_t weight);
 //! \return the current synaptic weight
 static weight_t synapse_structure_get_weight(plastic_synapse_t synaptic_word);
 
+//! \brief Decay the synaptic weight value stored by multiplication
+//! \param[in] state The update state containing the current weight
+//! \param[in] decay The "decay" to multiply the weight by, in STDP fixed point
+//!                  format
+static void synapse_structure_decay_weight(update_state_t *state, uint32_t decay);
+
+//! \brief Get the current synaptic weight stored in the update state
+//! \param[in] state The update state containing the current weight
+//! \return The current weight in s1615 fixed point format
+static accum synapse_structure_get_update_weight(update_state_t state);
+
 #endif // _SYNAPSE_STRUCTURE_H_

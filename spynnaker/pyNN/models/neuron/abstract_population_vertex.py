@@ -849,6 +849,9 @@ class AbstractPopulationVertex(
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
+            # Skip if this is a synapse dynamics synapse type
+            if synapse_info.synapse_type_from_dynamics:
+                continue
             synapse_type = synapse_info.synapse_type
             connector = synapse_info.connector
             synapse_dynamics = synapse_info.synapse_dynamics
@@ -1004,6 +1007,8 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
+        # This will only hold ring buffer scaling for the neuron synapse
+        # types
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__neuron_impl.get_n_synapse_types()))
 

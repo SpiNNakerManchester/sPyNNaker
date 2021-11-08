@@ -28,18 +28,17 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 //! \brief How the configuration data for multiplicative is laid out in SDRAM.
 //! The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    REAL a2_plus;
-    REAL a2_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
 } multiplicative_config_t;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
 
-address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, UNUSED REAL *min_weights) {
+address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP multiplicative weight dependence");
 
@@ -60,7 +59,7 @@ address_t weight_initialise(
         dtcm_copy[s].a2_plus = config->a2_plus;
         dtcm_copy[s].a2_minus = config->a2_minus;
 
-        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%k, A2-:%k",
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus);
     }

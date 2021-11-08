@@ -28,19 +28,18 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 //! \brief How the configuration data for additive_two_term is laid out in
 //!     SDRAM. The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
-    int32_t a3_plus;
-    int32_t a3_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
+    accum a3_plus;
+    accum a3_minus;
 } additive_two_term_config_t;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
-address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, UNUSED REAL *min_weights) {
+address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP additive two-term weight dependance");
 
@@ -56,6 +55,7 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         dtcm_copy[s].min_weight = config->min_weight;
         dtcm_copy[s].max_weight = config->max_weight;

@@ -129,7 +129,7 @@ static inline bool initialise_synapse_regions(
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(regions.synapse_dynamics, ds_regions),
-            n_neurons, n_synapse_types, min_weights)) {
+            n_neurons, n_synapse_types)) {
         return false;
     }
 

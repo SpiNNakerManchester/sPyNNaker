@@ -28,17 +28,16 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 //! \brief How the configuration data for additive_one_term is laid out in
 //!     SDRAM. The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
 } additive_one_term_config_t;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
-address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, UNUSED REAL *min_weights) {
+address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP additive one-term weight dependence");
 
@@ -52,13 +51,14 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         dtcm_copy[s].min_weight = config->min_weight;
         dtcm_copy[s].max_weight = config->max_weight;
         dtcm_copy[s].a2_plus = config->a2_plus;
         dtcm_copy[s].a2_minus = config->a2_minus;
 
-        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
+        log_debug("\tSynapse type %u: Min weight:%k, Max weight:%k, A2+:%k, A2-:%k",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus);
     }

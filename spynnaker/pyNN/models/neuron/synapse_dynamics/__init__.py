@@ -28,6 +28,7 @@ from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 from .synapse_dynamics_utils import (
     calculate_spike_pair_additive_stdp_weight,
     calculate_spike_pair_multiplicative_stdp_weight)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 
 __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
@@ -40,4 +41,6 @@ __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            # Structural plasticity
            "SynapseDynamicsStructuralCommon",
            "SynapseDynamicsStructuralStatic",
-           "SynapseDynamicsStructuralSTDP"]
+           "SynapseDynamicsStructuralSTDP",
+           # Neuromodulation
+           "SynapseDynamicsNeuromodulation"]
