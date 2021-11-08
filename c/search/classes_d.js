@@ -1,15 +1,21 @@
 var searchData=
 [
-  ['neuron_5fparameters_2585',['neuron_parameters',['../neuron_8c.html#structneuron__parameters',1,'']]],
-  ['neuron_5fprovenance_2586',['neuron_provenance',['../structneuron__provenance.html',1,'']]],
-  ['neuron_5frecording_5fheader_5ft_2587',['neuron_recording_header_t',['../neuron__recording_8c.html#structneuron__recording__header__t',1,'']]],
-  ['neuron_5fregions_2588',['neuron_regions',['../structneuron__regions.html',1,'']]],
-  ['neuron_5ft_2589',['neuron_t',['../neuron__model__lif__impl_8h.html#structneuron__t',1,'']]],
-  ['neurons_5fprovenance_2590',['neurons_provenance',['../c__main__neurons_8c.html#structneurons__provenance',1,'']]],
-  ['nn_2591',['nn',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'spinnaker_packet_control_byte_t']]],
-  ['nn_5fdesc_5ft_2592',['nn_desc_t',['http://spinnakermanchester.github.io/spinnaker_tools/scamp-nn_8c.html',1,'']]],
-  ['node_5ft_2593',['node_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/aliases_8h.html',1,'']]],
-  ['normal_5fclipped_5fboundary_5fparams_2594',['normal_clipped_boundary_params',['../param__generator__normal__clipped__to__boundary_8h.html#structnormal__clipped__boundary__params',1,'']]],
-  ['normal_5fclipped_5fparams_2595',['normal_clipped_params',['../param__generator__normal__clipped_8h.html#structnormal__clipped__params',1,'']]],
-  ['normal_5fparams_2596',['normal_params',['../param__generator__normal_8h.html#structnormal__params',1,'']]]
+  ['neuromodulated_5fsynapse_5ft_2617',['neuromodulated_synapse_t',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulated__synapse__t',1,'']]],
+  ['neuromodulation_5fdata_5ft_2618',['neuromodulation_data_t',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structneuromodulation__data__t',1,'']]],
+  ['neuron_5fparameters_2619',['neuron_parameters',['../neuron_8c.html#structneuron__parameters',1,'']]],
+  ['neuron_5fprovenance_2620',['neuron_provenance',['../structneuron__provenance.html',1,'']]],
+  ['neuron_5frecording_5fheader_5ft_2621',['neuron_recording_header_t',['../neuron__recording_8c.html#structneuron__recording__header__t',1,'']]],
+  ['neuron_5fregions_2622',['neuron_regions',['../structneuron__regions.html',1,'']]],
+  ['neuron_5ft_2623',['neuron_t',['../neuron__model__lif__impl_8h.html#structneuron__t',1,'']]],
+  ['neurons_5fprovenance_2624',['neurons_provenance',['../c__main__neurons_8c.html#structneurons__provenance',1,'']]],
+  ['nm_5ffinal_5fstate_5ft_2625',['nm_final_state_t',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__final__state__t',1,'']]],
+  ['nm_5fparams_5ft_2626',['nm_params_t',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__params__t',1,'']]],
+  ['nm_5fpost_5ftrace_5ft_2627',['nm_post_trace_t',['../post__events__with__da_8h.html#structnm__post__trace__t',1,'']]],
+  ['nm_5fupdate_5fstate_5ft_2628',['nm_update_state_t',['../synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#structnm__update__state__t',1,'']]],
+  ['nn_2629',['nn',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html',1,'spinnaker_packet_control_byte_t']]],
+  ['nn_5fdesc_5ft_2630',['nn_desc_t',['http://spinnakermanchester.github.io/spinnaker_tools/scamp-nn_8c.html',1,'']]],
+  ['node_5ft_2631',['node_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/aliases_8h.html',1,'']]],
+  ['normal_5fclipped_5fboundary_5fparams_2632',['normal_clipped_boundary_params',['../param__generator__normal__clipped__to__boundary_8h.html#structnormal__clipped__boundary__params',1,'']]],
+  ['normal_5fclipped_5fparams_2633',['normal_clipped_params',['../param__generator__normal__clipped_8h.html#structnormal__clipped__params',1,'']]],
+  ['normal_5fparams_2634',['normal_params',['../param__generator__normal_8h.html#structnormal__params',1,'']]]
 ];

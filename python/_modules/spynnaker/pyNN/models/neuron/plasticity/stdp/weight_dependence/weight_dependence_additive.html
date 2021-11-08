@@ -124,25 +124,28 @@
 
 <div class="viewcode-block" id="WeightDependenceAdditive.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">n_weight_terms</span><span class="p">):</span>
-        <span class="c1"># Loop through each synapse type&#39;s weight scale</span>
-        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weight_scales</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">,</span>
+            <span class="n">n_weight_terms</span><span class="p">):</span>
+        <span class="c1"># Loop through each synapse type</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">synapse_weight_scales</span><span class="p">:</span>
 
             <span class="c1"># Scale the weights</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__w_min</span> <span class="o">*</span> <span class="n">w</span><span class="p">)),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__w_min</span> <span class="o">*</span> <span class="n">global_weight_scale</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__w_max</span> <span class="o">*</span> <span class="n">w</span><span class="p">)),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__w_max</span> <span class="o">*</span> <span class="n">global_weight_scale</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">)</span>
 
             <span class="c1"># Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN</span>
             <span class="c1">#                /standardmodels/synapses.html</span>
             <span class="c1"># Pre-multiply A+ and A- by Wmax</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_plus</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__w_max</span> <span class="o">*</span> <span class="n">w</span><span class="p">)),</span>
-                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">A_plus</span> <span class="o">*</span> <span class="n">global_weight_scale</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
-                <span class="n">data</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_minus</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__w_max</span> <span class="o">*</span> <span class="n">w</span><span class="p">)),</span>
-                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span></div>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">A_minus</span> <span class="o">*</span> <span class="n">global_weight_scale</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -104,7 +104,7 @@ $(function() {
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="connection__generator__fixed__total_8h.html">   44</a></span>&#160;<span class="keyword">struct </span><a class="code" href="connection__generator__fixed__total_8h.html#structfixed__total">fixed_total</a> {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">struct </span><a class="code" href="connection__generator__fixed__total_8h.html#structfixed__total__params">fixed_total_params</a> <a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">struct </span><a class="code" href="connection__generator__fixed__total_8h.html#structfixed__total__params">fixed_total_params</a> <a class="code" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    rng_t <a class="code" href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
@@ -132,8 +132,8 @@ $(function() {
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
 <div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="connection__generator__fixed__total_8h.html#a0d3e8f5ac6f3487cc51cf868f75e7619">   82</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="connection__generator__fixed__total_8h.html#a0d3e8f5ac6f3487cc51cf868f75e7619">connection_generator_fixed_total_free</a>(<span class="keywordtype">void</span> *generator) {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">struct </span><a class="code" href="connection__generator__fixed__total_8h.html#structfixed__total">fixed_total</a> *<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a> = generator;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="rng_8c.html#a469702c3bba13b63ccfba049840500d8">rng_free</a>(<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>-&gt;rng);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">struct </span><a class="code" href="connection__generator__fixed__total_8h.html#structfixed__total">fixed_total</a> *<a class="code" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a> = generator;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="rng_8c.html#a469702c3bba13b63ccfba049840500d8">rng_free</a>(<a class="code" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>-&gt;rng);</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a>(generator);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;}</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
@@ -179,7 +179,7 @@ $(function() {
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    }</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">// If not in the pre-population view range, then don&#39;t generate</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">if</span> ((pre_neuron_index &lt; obj-&gt;<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>.pre_lo) ||</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">if</span> ((pre_neuron_index &lt; obj-&gt;<a class="code" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>.pre_lo) ||</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;            (pre_neuron_index &gt; obj-&gt;params.pre_hi)) {</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
@@ -216,7 +216,7 @@ $(function() {
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    uint32_t n_values = slice_hi - slice_lo + 1;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keywordflow">if</span> (!obj-&gt;params.allow_self_connections</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            &amp;&amp; pre_neuron_index &gt;= obj-&gt;params.post_lo</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            &amp;&amp; pre_neuron_index &lt;= obj-&gt;<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>.post_hi) {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            &amp;&amp; pre_neuron_index &lt;= obj-&gt;<a class="code" href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a>.post_hi) {</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        n_values--;</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    uint32_t n_conns = 0;</div>
@@ -298,11 +298,11 @@ $(function() {
 <div class="ttc" id="asark_8h_html_a40ce895f48f22b29d2aefc923b38b280"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a></div><div class="ttdeci">void sark_free(void *ptr)</div></div>
 <div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00080">spike_source_poisson.c:80</a></div></div>
 <div class="ttc" id="aspike__source__poisson_8c_html_a62b426a3cc403e96d3f3c71761cf797d"><div class="ttname"><a href="spike__source__poisson_8c.html#a62b426a3cc403e96d3f3c71761cf797d">rng</a></div><div class="ttdeci">static uint32_t rng(void)</div><div class="ttdoc">Random number generation for the Poisson sources. This is a local version for speed of operation.</div><div class="ttdef"><b>Definition:</b> <a href="spike__source__poisson_8c_source.html#l00220">spike_source_poisson.c:220</a></div></div>
-<div class="ttc" id="asynapse__dynamics__stdp__mad__impl_8c_html_a159669347528cd4f88c368d0d33e4670"><div class="ttname"><a href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a></div><div class="ttdeci">static stdp_params params</div><div class="ttdoc">Configuration parameters.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00046">synapse_dynamics_stdp_mad_impl.c:46</a></div></div>
+<div class="ttc" id="asynapse__dynamics__stdp__common_8h_html_a159669347528cd4f88c368d0d33e4670"><div class="ttname"><a href="synapse__dynamics__stdp__common_8h.html#a159669347528cd4f88c368d0d33e4670">params</a></div><div class="ttdeci">static stdp_params params</div><div class="ttdoc">Configuration parameters.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__dynamics__stdp__common_8h_source.html#l00096">synapse_dynamics_stdp_common.h:96</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -175,7 +175,8 @@
         <span class="k">return</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="TimingDependenceVogels2011.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceVogels2011.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">):</span>
 
         <span class="c1"># Write alpha to spec</span>
         <span class="n">fixed_point_alpha</span> <span class="o">=</span> <span class="n">float_to_fixed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__alpha</span><span class="p">)</span>

@@ -92,6 +92,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a5321486a75826401b258999334c52640"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#a5321486a75826401b258999334c52640">weight_get_final</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> new_state)</td></tr>
 <tr class="memdesc:a5321486a75826401b258999334c52640"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the final weight.  <a href="weight_8h.html#a5321486a75826401b258999334c52640">More...</a><br /></td></tr>
 <tr class="separator:a5321486a75826401b258999334c52640"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a972034e6079f096790f3792953e81244"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#a972034e6079f096790f3792953e81244">weight_decay</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> *state, int32_t <a class="el" href="decay_8h.html#a251df1ff8ee78f551bedbd55c451a859">decay</a>)</td></tr>
+<tr class="memdesc:a972034e6079f096790f3792953e81244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decay the weight inside the state by multiplication.  <a href="weight_8h.html#a972034e6079f096790f3792953e81244">More...</a><br /></td></tr>
+<tr class="separator:a972034e6079f096790f3792953e81244"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac708061b0c6931efe714b246ebea52b8"><td class="memItemLeft" align="right" valign="top">static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#ac708061b0c6931efe714b246ebea52b8">weight_get_update</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> state)</td></tr>
+<tr class="memdesc:ac708061b0c6931efe714b246ebea52b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the weight inside during update in STDP fixed point format.  <a href="weight_8h.html#ac708061b0c6931efe714b246ebea52b8">More...</a><br /></td></tr>
+<tr class="separator:ac708061b0c6931efe714b246ebea52b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>interface for different weight implementations for the weight half of a STDP rule. </p>
@@ -146,7 +152,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__one__term__impl_8c_source.html#l00040">40</a> of file <a class="el" href="weight__additive__one__term__impl_8c_source.html">weight_additive_one_term_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__one__term__impl_8c_source.html#l00043">43</a> of file <a class="el" href="weight__additive__one__term__impl_8c_source.html">weight_additive_one_term_impl.c</a>.</p>
 
 </div>
 </div>
@@ -231,10 +237,90 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a972034e6079f096790f3792953e81244"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a972034e6079f096790f3792953e81244">&#9670;&nbsp;</a></span>weight_decay()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void weight_decay </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>decay</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decay the weight inside the state by multiplication. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The state containing the current weight </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">decay</td><td>The "decay" to multiply the weight by, in STDP fixed point format </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac708061b0c6931efe714b246ebea52b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac708061b0c6931efe714b246ebea52b8">&#9670;&nbsp;</a></span>weight_get_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static accum weight_get_update </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the weight inside during update in STDP fixed point format. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The state containing the current weight </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The weight in s1615 format </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -54,6 +54,8 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">FULL_MASK</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.ordered_set</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="c1">#: number of elements</span>
 <span class="n">ELEMENTS_USED_IN_EACH_BIT_FIELD</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># n words, key, pointer to bitfield</span>
@@ -128,11 +130,13 @@
 
             <span class="c1"># Get the number of likely vertices</span>
             <span class="n">slices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
+
             <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span>
                       <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">:</span>
                 <span class="n">sdram</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slices</span><span class="p">)</span> <span class="o">*</span> <span class="n">N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP</span> <span class="o">*</span>
                           <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">sdram</span></div>
 
 
@@ -234,8 +238,8 @@
 
     <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">bit_field_key_map_region_id</span><span class="p">)</span>
 
-    <span class="c1"># Gather the machine edges that target this core</span>
-    <span class="n">machine_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="c1"># Gather the source vertices that target this core</span>
+    <span class="n">sources</span> <span class="o">=</span> <span class="n">OrderedSet</span><span class="p">()</span>
     <span class="n">seen_app_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
         <span class="n">in_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
@@ -243,15 +247,16 @@
             <span class="n">seen_app_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="o">==</span> <span class="n">vertex_slice</span><span class="p">:</span>
-                    <span class="n">machine_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
+                    <span class="n">sources</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
 
     <span class="c1"># write n keys max atom map</span>
-    <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">machine_edges</span><span class="p">))</span>
+    <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">))</span>
 
     <span class="c1"># load in key to max atoms map</span>
-    <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_edges</span><span class="p">:</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_for_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">))</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">source_vertex</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">source_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">source_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
 
     <span class="c1"># ensure if nothing else that n bitfields in bitfield region set to 0</span>
     <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">bit_field_region_id</span><span class="p">)</span>

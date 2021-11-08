@@ -100,10 +100,10 @@ Variables</h2></td></tr>
 <a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#aff9620807595c2091e6bd5887da64f5b">plasticity_weight_region_data</a></td></tr>
 <tr class="memdesc:aff9620807595c2091e6bd5887da64f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global plasticity parameter data array, in DTCM. <br /></td></tr>
 <tr class="separator:aff9620807595c2091e6bd5887da64f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="memItemLeft" align="right" valign="top"><a id="a04481d5906cf9a60cb1b2c2c1e68de54"></a>
-uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#a04481d5906cf9a60cb1b2c2c1e68de54">weight_multiply_right_shift</a></td></tr>
-<tr class="memdesc:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plasticity multiply shift array, in DTCM. <br /></td></tr>
-<tr class="separator:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62ffb30557cf5bc13faca83484cac280"><td class="memItemLeft" align="right" valign="top"><a id="a62ffb30557cf5bc13faca83484cac280"></a>
+uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#a62ffb30557cf5bc13faca83484cac280">weight_shift</a></td></tr>
+<tr class="memdesc:a62ffb30557cf5bc13faca83484cac280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plasticity multiply shift array, in DTCM. <br /></td></tr>
+<tr class="separator:a62ffb30557cf5bc13faca83484cac280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support code for <a class="el" href="weight__multiplicative__impl_8h.html" title="Multiplicative single-term weight dependence rule.">weight_multiplicative_impl.h</a>. </p>
@@ -123,29 +123,29 @@ uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 </div><div class="memdoc">
 <div class="textblock"><p>How the configuration data for multiplicative is laid out in SDRAM. The layout is an array of these. </p>
 
-<p class="definition">Definition at line <a class="el" href="weight__multiplicative__impl_8c_source.html#l00032">32</a> of file <a class="el" href="weight__multiplicative__impl_8c_source.html">weight_multiplicative_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__multiplicative__impl_8c_source.html#l00033">33</a> of file <a class="el" href="weight__multiplicative__impl_8c_source.html">weight_multiplicative_impl.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a6b5a436053b5ae96b2fe92ccd235f019"></a>int32_t</td>
+<a id="a9f78e3c589f6e047a1d05ea85c8ac524"></a>accum</td>
 <td class="fieldname">
 min_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a707fdfc932e0bba1aaeacc98e8a0ce57"></a>int32_t</td>
+<a id="aba77078923f4469063eaf86de1b9ef70"></a>accum</td>
 <td class="fieldname">
 max_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a9030ddf96da525225ce86dbee665615c"></a>int32_t</td>
+<a id="a7e1debfcab772c541bfea5c7630c9975"></a>accum</td>
 <td class="fieldname">
 a2_plus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a1ee463e8229a23ac9d245da09a123ac0"></a>int32_t</td>
+<a id="aab9960542836841df83aac25fbe55849"></a>accum</td>
 <td class="fieldname">
 a2_minus</td>
 <td class="fielddoc">
@@ -198,14 +198,14 @@ a2_minus</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__multiplicative__impl_8c_source.html#l00042">42</a> of file <a class="el" href="weight__multiplicative__impl_8c_source.html">weight_multiplicative_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__multiplicative__impl_8c_source.html#l00043">43</a> of file <a class="el" href="weight__multiplicative__impl_8c_source.html">weight_multiplicative_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -105,9 +105,15 @@ Functions</h2></td></tr>
 <tr class="memitem:aa995e821053917cb970fffd095992073"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8h.html#aa995e821053917cb970fffd095992073">weight_two_term_apply_potentiation</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> state, int32_t a2_plus, int32_t a3_plus)</td></tr>
 <tr class="memdesc:aa995e821053917cb970fffd095992073"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply the potentiation rule to the weight state.  <a href="weight__additive__two__term__impl_8h.html#aa995e821053917cb970fffd095992073">More...</a><br /></td></tr>
 <tr class="separator:aa995e821053917cb970fffd095992073"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5321486a75826401b258999334c52640"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8h.html#a5321486a75826401b258999334c52640">weight_get_final</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> new_state)</td></tr>
-<tr class="memdesc:a5321486a75826401b258999334c52640"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the final weight.  <a href="weight__additive__two__term__impl_8h.html#a5321486a75826401b258999334c52640">More...</a><br /></td></tr>
-<tr class="separator:a5321486a75826401b258999334c52640"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2b085719288697a428d2106581e2540"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8h.html#ad2b085719288697a428d2106581e2540">weight_get_final</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> state)</td></tr>
+<tr class="memdesc:ad2b085719288697a428d2106581e2540"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the final weight.  <a href="weight__additive__two__term__impl_8h.html#ad2b085719288697a428d2106581e2540">More...</a><br /></td></tr>
+<tr class="separator:ad2b085719288697a428d2106581e2540"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a972034e6079f096790f3792953e81244"><td class="memItemLeft" align="right" valign="top"><a id="a972034e6079f096790f3792953e81244"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>weight_decay</b> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> *state, int32_t <a class="el" href="decay_8h.html#a251df1ff8ee78f551bedbd55c451a859">decay</a>)</td></tr>
+<tr class="separator:a972034e6079f096790f3792953e81244"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac708061b0c6931efe714b246ebea52b8"><td class="memItemLeft" align="right" valign="top"><a id="ac708061b0c6931efe714b246ebea52b8"></a>
+static accum&#160;</td><td class="memItemRight" valign="bottom"><b>weight_get_update</b> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> state)</td></tr>
+<tr class="separator:ac708061b0c6931efe714b246ebea52b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Additive dual-term weight dependence rule. </p>
@@ -131,39 +137,39 @@ Functions</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a36f5f4963507aee1e1b89073beacb446"></a>int32_t</td>
+<a id="a5e836cb37e45b87e7be6b6f8aa4d8712"></a>accum</td>
 <td class="fieldname">
 min_weight</td>
 <td class="fielddoc">
 Minimum weight. </td></tr>
 <tr><td class="fieldtype">
-<a id="a9817170000d877d61456458dd05bc244"></a>int32_t</td>
+<a id="a9bb6d4801276253265ac4a027c9771ed"></a>accum</td>
 <td class="fieldname">
 max_weight</td>
 <td class="fielddoc">
 Maximum weight. </td></tr>
 <tr><td class="fieldtype">
-<a id="a45fa5e6af8e2d8e3b7cc9d1187ea02c0"></a>int32_t</td>
+<a id="a47f87b538e43e839af120a7a83de5549"></a>accum</td>
 <td class="fieldname">
 a2_plus</td>
 <td class="fielddoc">
 Scaling factor for weight delta on potentiation. <p>Amount to move weight on potentiation. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a1bceb56b2b990e4b5f9c53e73b2e7570"></a>int32_t</td>
+<a id="ab2bcedb9602d0d051de12c6fa6847416"></a>accum</td>
 <td class="fieldname">
 a2_minus</td>
 <td class="fielddoc">
 Scaling factor for weight delta on depression. <p>Amount to move weight on depression. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a441609a44c135858dab361177ca9aa78"></a>int32_t</td>
+<a id="a201d7088a2aa9894c7ceddcd87ba8aaf"></a>accum</td>
 <td class="fieldname">
 a3_plus</td>
 <td class="fielddoc">
 Scaling factor for weight delta on potentiation. </td></tr>
 <tr><td class="fieldtype">
-<a id="a2ae152e07fa65df3ce3b142030adae6e"></a>int32_t</td>
+<a id="a6295ace66cb47cb91bcf7bfa02621f82"></a>accum</td>
 <td class="fieldname">
 a3_minus</td>
 <td class="fielddoc">
@@ -189,24 +195,20 @@ Scaling factor for weight delta on depression. </td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="a00e03d7e3edfe78ae928b1e3ce668251"></a>int32_t</td>
+<a id="ad3aa87c77d2dc9e031a628ae3ff71c94"></a>accum</td>
 <td class="fieldname">
-initial_weight</td>
+weight</td>
 <td class="fielddoc">
-The starting weight. </td></tr>
-<tr><td class="fieldtype">
-<a id="ab6618f4c15ae163d34944b87abb1616e"></a>int32_t</td>
-<td class="fieldname">
-a2_plus</td>
-<td class="fielddoc">
-Cumulative potentiation delta. <p>Cumulative potentiation delta (term 1) </p>
+The starting weight. <p>The current weight.</p>
+<p>The weight. </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a7702d7b6ccf0c9b5bf5fd5d56b474069"></a>int32_t</td>
+<a id="aff8688b11fa9ba9fe9bb69c65095d853"></a>uint32_t</td>
 <td class="fieldname">
-a2_minus</td>
+weight_shift</td>
 <td class="fielddoc">
-Cumulative depression delta. <p>Cumulative depression delta (term 1) </p>
+Weight shift to S1615 version. <p>The shift to use when multiplying.</p>
+<p>Shift of weight to and from S1615 format. </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a id="a037ff5bb63dd02afd72abd232bfd09ca"></a>const <a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *</td>
@@ -214,30 +216,6 @@ Cumulative depression delta. <p>Cumulative depression delta (term 1) </p>
 weight_region</td>
 <td class="fielddoc">
 Reference to the configuration data. </td></tr>
-<tr><td class="fieldtype">
-<a id="aff2684eb438bfed48cf8e73a5c420570"></a>int32_t</td>
-<td class="fieldname">
-a3_plus</td>
-<td class="fielddoc">
-Cumulative potentiation delta (term 2) </td></tr>
-<tr><td class="fieldtype">
-<a id="a362de6063e9a54fa204530f8e2c2bdc2"></a>int32_t</td>
-<td class="fieldname">
-a3_minus</td>
-<td class="fielddoc">
-Cumulative depression delta (term 2) </td></tr>
-<tr><td class="fieldtype">
-<a id="a6558f10355845b02cd9316f74d7e92be"></a>int32_t</td>
-<td class="fieldname">
-weight</td>
-<td class="fielddoc">
-The current weight. </td></tr>
-<tr><td class="fieldtype">
-<a id="a7239d63b32b5b4e7d8c2a6b6dd270671"></a>uint32_t</td>
-<td class="fieldname">
-weight_multiply_right_shift</td>
-<td class="fielddoc">
-The shift to use when multiplying. </td></tr>
 </table>
 
 </div>
@@ -287,7 +265,7 @@ The shift to use when multiplying. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The initial weight state. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00068">68</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00064">64</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
 
 </div>
 </div>
@@ -342,7 +320,7 @@ The shift to use when multiplying. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated weight state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00088">88</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00084">84</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
 
 </div>
 </div>
@@ -397,12 +375,12 @@ The shift to use when multiplying. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated weight state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00101">101</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00098">98</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
 
 </div>
 </div>
-<a id="a5321486a75826401b258999334c52640"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5321486a75826401b258999334c52640">&#9670;&nbsp;</a></span>weight_get_final()</h2>
+<a id="ad2b085719288697a428d2106581e2540"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2b085719288697a428d2106581e2540">&#9670;&nbsp;</a></span>weight_get_final()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -414,7 +392,7 @@ The shift to use when multiplying. </td></tr>
           <td class="memname">static weight_t weight_get_final </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td>
-          <td class="paramname"><em>new_state</em></td><td>)</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -428,20 +406,20 @@ The shift to use when multiplying. </td></tr>
 <p>Gets the final weight. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">new_state</td><td>The updated weight state </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">state</td><td>The updated weight state </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The new weight. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00114">114</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8h_source.html#l00112">112</a> of file <a class="el" href="weight__additive__two__term__impl_8h_source.html">weight_additive_two_term_impl.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

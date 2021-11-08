@@ -68,7 +68,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">stdp_typedefs.h File Reference</div>  </div>
 </div><!--header-->
@@ -92,6 +93,15 @@ Macros</h2></td></tr>
 <tr class="memitem:aadb4d7a82820e2de3f998e902b7cd87a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a">STDP_FIXED_MUL_16X16</a>(a,  b)&#160;&#160;&#160;<a class="el" href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">maths_fixed_mul16</a>(a, b, <a class="el" href="stdp__typedefs_8h.html#ad2fac83f5bb9b0f79f346200d9f74024">STDP_FIXED_POINT</a>)</td></tr>
 <tr class="memdesc:aadb4d7a82820e2de3f998e902b7cd87a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply two STDP fixed point numbers.  <a href="stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a">More...</a><br /></td></tr>
 <tr class="separator:aadb4d7a82820e2de3f998e902b7cd87a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae91c823fd0df69e3b7badc884f3b3974"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#ae91c823fd0df69e3b7badc884f3b3974">S1615_TO_STDP_RIGHT_SHIFT</a>&#160;&#160;&#160;4</td></tr>
+<tr class="separator:ae91c823fd0df69e3b7badc884f3b3974"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a904dbd1f4e3e796d09b3af089af85848"><td class="memItemLeft" align="right" valign="top"><a id="a904dbd1f4e3e796d09b3af089af85848"></a>
+static accum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#a904dbd1f4e3e796d09b3af089af85848">mul_accum_fixed</a> (accum a, int32_t stdp_fixed)</td></tr>
+<tr class="memdesc:a904dbd1f4e3e796d09b3af089af85848"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply an accum by an STDP fixed point and return an accum. <br /></td></tr>
+<tr class="separator:a904dbd1f4e3e796d09b3af089af85848"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Basic definitions for STDP. </p>
@@ -138,10 +148,27 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a id="ae91c823fd0df69e3b7badc884f3b3974"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae91c823fd0df69e3b7badc884f3b3974">&#9670;&nbsp;</a></span>S1615_TO_STDP_RIGHT_SHIFT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define S1615_TO_STDP_RIGHT_SHIFT&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The amount of right shift required to take a weight from s1615 format to STDP_FIXED_POINT format (s4,11) </p>
+
+<p class="definition">Definition at line <a class="el" href="stdp__typedefs_8h_source.html#l00043">43</a> of file <a class="el" href="stdp__typedefs_8h_source.html">stdp_typedefs.h</a>.</p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

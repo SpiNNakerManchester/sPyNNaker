@@ -108,12 +108,17 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.write_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span>
+                         <span class="n">synapse_weight_scales</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param list(float) weight_scales:</span>
+<span class="sd">            The specification to write to</span>
+<span class="sd">        :param int region: region ID to write to</span>
+<span class="sd">        :param float global_weight_scale: The weight scale applied globally</span>
+<span class="sd">        :param list(float) synapse_weight_scales:</span>
+<span class="sd">            The total weight scale applied to each synapse including the global</span>
+<span class="sd">            weight scale</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -256,6 +261,15 @@
             <span class="n">row</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span> <span class="o">-</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span>
             <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">words</span></div>
+
+<div class="viewcode-block" id="AbstractSynapseDynamics.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the index of the synapse type based on the name, or None</span>
+<span class="sd">            if the name is not found.</span>
+
+<span class="sd">        :param str target: The name of the synapse</span>
+<span class="sd">        :rtype: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 </pre></div>
 
             <div class="clearer"></div>

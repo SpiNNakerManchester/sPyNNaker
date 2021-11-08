@@ -875,6 +875,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">weight_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_global_weight_scale</span><span class="p">()</span>
         <span class="n">weight_scale_squared</span> <span class="o">=</span> <span class="n">weight_scale</span> <span class="o">*</span> <span class="n">weight_scale</span>
+        <span class="c1"># This only gets ring buffer shifts for neuron synapses</span>
         <span class="n">n_synapse_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span>
         <span class="n">running_totals</span> <span class="o">=</span> <span class="p">[</span><span class="n">RunningStats</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)]</span>
         <span class="n">delay_running_totals</span> <span class="o">=</span> <span class="p">[</span><span class="n">RunningStats</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)]</span>
@@ -886,6 +887,9 @@
 
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
+            <span class="c1"># Skip if this is a synapse dynamics synapse type</span>
+            <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type_from_dynamics</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="n">synapse_type</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span>
             <span class="n">synapse_dynamics</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span>
             <span class="n">connector</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span>
@@ -1010,6 +1014,8 @@
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This will only hold ring buffer scaling for the neuron synapse</span>
+        <span class="c1"># types</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES</span> <span class="o">+</span>
                 <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()))</span></div>
 

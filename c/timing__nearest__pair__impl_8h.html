@@ -102,6 +102,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a02c46ae67288b70c15e59dac89a00046"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing__nearest__pair__impl_8h.html#a02c46ae67288b70c15e59dac89a00046">timing_add_post_spike</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a> last_trace)</td></tr>
 <tr class="memdesc:a02c46ae67288b70c15e59dac89a00046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a post spike to the post trace.  <a href="timing__nearest__pair__impl_8h.html#a02c46ae67288b70c15e59dac89a00046">More...</a><br /></td></tr>
 <tr class="separator:a02c46ae67288b70c15e59dac89a00046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bea916966f35c743fa3fafab145f69d"><td class="memItemLeft" align="right" valign="top"><a id="a2bea916966f35c743fa3fafab145f69d"></a>
+static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>timing_decay_post</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a> last_trace)</td></tr>
+<tr class="separator:a2bea916966f35c743fa3fafab145f69d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a530f515f7e15cce9bbd8e156b03955fa"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing__nearest__pair__impl_8h.html#a530f515f7e15cce9bbd8e156b03955fa">timing_add_pre_spike</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_trace)</td></tr>
 <tr class="memdesc:a530f515f7e15cce9bbd8e156b03955fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a pre spike to the pre trace.  <a href="timing__nearest__pair__impl_8h.html#a530f515f7e15cce9bbd8e156b03955fa">More...</a><br /></td></tr>
 <tr class="separator:a530f515f7e15cce9bbd8e156b03955fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,6 +146,12 @@ o1</td>
 <a id="a21009a6a8730c939387bd21dc8ebdae8"></a>int16_t</td>
 <td class="fieldname">
 o2</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ae5f1ccf222d6fbb835967cf0c39fab9e"></a>uint32_t</td>
+<td class="fieldname">
+last_spike_time</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -319,7 +328,7 @@ r2</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated pre trace </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00072">72</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00078">78</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
 
 </div>
 </div>
@@ -402,7 +411,7 @@ r2</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00089">89</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00095">95</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
 
 </div>
 </div>
@@ -485,14 +494,14 @@ r2</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the updated state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00117">117</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="timing__nearest__pair__impl_8h_source.html#l00123">123</a> of file <a class="el" href="timing__nearest__pair__impl_8h_source.html">timing_nearest_pair_impl.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

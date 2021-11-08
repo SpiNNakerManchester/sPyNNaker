@@ -532,8 +532,9 @@
         <span class="n">incoming_direct_poisson</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
             <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-            <span class="n">connector</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_direct_poisson_source</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">connector</span><span class="p">):</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
+            <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_direct_poisson_source</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">):</span>
                 <span class="c1"># Create the direct Poisson vertices here; the splitter</span>
                 <span class="c1"># for the Poisson will create any others as needed</span>
                 <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fixed_slices</span><span class="p">():</span>
@@ -551,7 +552,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">incoming_direct_poisson</span>
 
-    <span class="k">def</span> <span class="nf">__is_direct_poisson_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">connector</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__is_direct_poisson_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if a given Poisson source can be created by this splitter</span>
 
 <span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:</span>
@@ -559,12 +560,16 @@
 <span class="sd">        :param ~spynnaker.pyNN.models.neural_projections.connectors\</span>
 <span class="sd">                .AbstractConnector:</span>
 <span class="sd">            The connector in use in the Projection</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.neuron.synapse_dynamics\</span>
+<span class="sd">                .AbstractSynapseDynamics:</span>
+<span class="sd">            The synapse dynamics in use in the Projection</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="n">SplitterPoissonDelegate</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="nb">len</span><span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">))</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsStatic</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__get_fixed_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a list of fixed slices from the Application vertex</span>
@@ -602,10 +607,20 @@
         <span class="k">if</span> <span class="n">edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_edges</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{}</span>
 
+        <span class="c1"># If the incoming edge targets the reward or punishment receptors</span>
+        <span class="c1"># then it needs to be treated differently</span>
+        <span class="k">if</span> <span class="n">edge</span><span class="o">.</span><span class="n">is_neuromodulation</span><span class="p">:</span>
+
+            <span class="c1"># In this instance, choose to send to all synapse vertices</span>
+            <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_verts_by_neuron</span><span class="p">[</span><span class="n">neuron</span><span class="p">][</span><span class="n">s_index</span><span class="p">]:</span>
+                    <span class="p">[</span><span class="n">MachineEdge</span><span class="p">]</span> <span class="k">for</span> <span class="n">neuron</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertices</span>
+                    <span class="k">for</span> <span class="n">s_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span><span class="p">)}</span>
+
         <span class="c1"># Pick the same synapse vertex index for each neuron vertex</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_synapse_index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__next_synapse_index</span> <span class="o">=</span> <span class="p">(</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__next_synapse_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_verts_by_neuron</span><span class="p">[</span><span class="n">neuron</span><span class="p">][</span><span class="n">index</span><span class="p">]:</span> <span class="p">[</span><span class="n">MachineEdge</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">neuron</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertices</span><span class="p">}</span></div>
 
@@ -623,6 +638,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_verts_by_neuron</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_max_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_synapse_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the number of synapse vertices per neuron vertex</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">__synapse_references</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

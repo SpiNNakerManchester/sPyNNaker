@@ -68,9 +68,16 @@
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">MatrixGeneratorID</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.synapse_dynamics_neuromodulation</span> <span class="kn">import</span> <span class="n">SynapseDynamicsNeuromodulation</span>
 
 <span class="c1"># How large are the time-stamps stored with each event</span>
 <span class="n">TIME_STAMP_BYTES</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
+
+<span class="c1"># The targets of neuromodulation</span>
+<span class="n">NEUROMODULATION_TARGETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;reward&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;punishment&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseDynamicsSTDP</span><span class="p">(</span>
@@ -90,6 +97,8 @@
         <span class="s2">&quot;__timing_dependence&quot;</span><span class="p">,</span>
         <span class="c1"># weight dependence to use for the STDP rule</span>
         <span class="s2">&quot;__weight_dependence&quot;</span><span class="p">,</span>
+        <span class="c1"># The neuromodulation instance if enabled</span>
+        <span class="s2">&quot;__neuromodulation&quot;</span><span class="p">,</span>
         <span class="c1"># padding to add to a synaptic row for synaptic rewiring</span>
         <span class="s2">&quot;__pad_to_length&quot;</span><span class="p">,</span>
         <span class="c1"># Weight of connections formed by connector</span>
@@ -137,18 +146,38 @@
             <span class="n">delay</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">min_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="n">backprop_delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;All delays must be dendritic!&quot;</span><span class="p">)</span>
 
+<div class="viewcode-block" id="SynapseDynamicsSTDP.merge_neuromodulation"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge_neuromodulation">[docs]</a>    <span class="k">def</span> <span class="nf">merge_neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuromodulation</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span> <span class="o">=</span> <span class="n">neuromodulation</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="o">.</span><span class="n">is_neuromodulation_same_as</span><span class="p">(</span>
+                <span class="n">neuromodulation</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;Neuromodulation must match exactly when using multiple&quot;</span>
+                <span class="s2">&quot; edges to the same Population&quot;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="SynapseDynamicsSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+        <span class="c1"># If dynamics is Neuromodulation, merge with other neuromodulation,</span>
+        <span class="c1"># and then return ourselves, as neuromodulation can&#39;t be used by</span>
+        <span class="c1"># itself</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsNeuromodulation</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">merge_neuromodulation</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
         <span class="c1"># If dynamics is STDP, test if same as</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsSTDP</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
                     <span class="s2">&quot;Synapse dynamics must match exactly when using multiple&quot;</span>
                     <span class="s2">&quot; edges to the same population&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">merge_neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">)</span>
 
             <span class="c1"># If STDP part matches, return the other, as it might also be</span>
             <span class="c1"># structural</span>
@@ -170,7 +199,7 @@
                 <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
                 <span class="n">backprop_delay</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backprop_delay</span><span class="p">)</span>
 
-        <span class="c1"># Otherwise, it is static, so return ourselves</span>
+        <span class="c1"># Otherwise, it is static or neuromodulation, so return ourselves</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
     <span class="nd">@property</span>
@@ -246,6 +275,13 @@
     <span class="k">def</span> <span class="nf">backprop_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">backprop_delay</span><span class="p">)</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: SynapseDynamicsNeuromodulation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span>
+
 <div class="viewcode-block" id="SynapseDynamicsSTDP.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
         <span class="c1"># pylint: disable=protected-access</span>
@@ -269,9 +305,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_stdp_mad&quot;</span>
-        <span class="n">name</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
-        <span class="n">name</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
+        <span class="c1"># Get the suffix values for timing and weight dependence</span>
+        <span class="n">timing_suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
+        <span class="n">weight_suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;_stdp_&quot;</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_stdp_mad_&quot;</span>
+        <span class="n">name</span> <span class="o">+=</span> <span class="n">timing_suffix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">weight_suffix</span>
         <span class="k">return</span> <span class="n">name</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
@@ -281,18 +325,18 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># 32-bits for back-prop delay</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
         <span class="n">size</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">()</span>
         <span class="n">size</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="n">n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+                <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">size</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsSTDP.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>  <span class="n">weight_scales</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param int region: region ID</span>
-<span class="sd">        :param list(float) weight_scales:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SynapseDynamicsSTDP.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPlasticSynapseDynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">):</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing Plastic Parameters&quot;</span><span class="p">)</span>
 
         <span class="c1"># Switch focus to the region:</span>
@@ -302,11 +346,17 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__backprop_delay</span><span class="p">))</span>
 
         <span class="c1"># Write timing dependence parameters to region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">)</span>
 
         <span class="c1"># Write weight dependence information to region</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span></div>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">n_weight_terms</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
+                <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_n_header_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -341,6 +391,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_header_bytes</span> <span class="o">+</span>
             <span class="p">(</span><span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">()</span> <span class="o">*</span>
              <span class="n">BYTES_PER_SHORT</span> <span class="o">*</span> <span class="n">n_connections</span><span class="p">))</span>
+        <span class="c1"># Neuromodulated synapses have the actual weight separately</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">pp_size_bytes</span> <span class="o">+=</span> <span class="n">BYTES_PER_SHORT</span> <span class="o">*</span> <span class="n">n_connections</span>
         <span class="n">pp_size_words</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">pp_size_bytes</span><span class="p">)</span> <span class="o">/</span> <span class="n">BYTES_PER_WORD</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">fp_size_words</span> <span class="o">+</span> <span class="n">pp_size_words</span>
@@ -385,6 +438,10 @@
         <span class="n">synapse_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">synaptic_structure</span>
         <span class="n">n_half_words</span> <span class="o">=</span> <span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">()</span>
         <span class="n">half_word</span> <span class="o">=</span> <span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()</span>
+        <span class="c1"># If neuromodulation, the real weight comes first</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">n_half_words</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">half_word</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">plastic_plastic</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
             <span class="nb">len</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_half_words</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint16&quot;</span><span class="p">)</span>
         <span class="n">plastic_plastic</span><span class="p">[</span><span class="n">half_word</span><span class="p">::</span><span class="n">n_half_words</span><span class="p">]</span> <span class="o">=</span> \
@@ -467,6 +524,9 @@
         <span class="n">synapse_structure</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">synaptic_structure</span>
         <span class="n">n_half_words</span> <span class="o">=</span> <span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">()</span>
         <span class="n">half_word</span> <span class="o">=</span> <span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">n_half_words</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">half_word</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">pp_half_words</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
             <span class="n">pp</span><span class="p">[:</span><span class="n">size</span> <span class="o">*</span> <span class="n">n_half_words</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">)[</span>
                 <span class="n">half_word</span><span class="p">::</span><span class="n">n_half_words</span><span class="p">]</span>
@@ -521,6 +581,8 @@
         <span class="n">bytes_per_pp</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">synapse_structure</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">()</span> <span class="o">*</span>
             <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">bytes_per_pp</span> <span class="o">+=</span> <span class="n">BYTES_PER_SHORT</span>
 
         <span class="c1"># The fixed plastic size per connection is 2 bytes</span>
         <span class="n">bytes_per_fp</span> <span class="o">=</span> <span class="n">BYTES_PER_SHORT</span>
@@ -547,10 +609,14 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span><span class="n">gen_matrix_params</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_matrix_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">synapse_struct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="o">.</span><span class="n">synaptic_structure</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_n_header_bytes</span> <span class="o">//</span> <span class="n">BYTES_PER_SHORT</span><span class="p">,</span>
-            <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">(),</span>
-            <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="n">n_half_words</span> <span class="o">=</span> <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_n_half_words_per_connection</span><span class="p">()</span>
+        <span class="n">half_word</span> <span class="o">=</span> <span class="n">synapse_struct</span><span class="o">.</span><span class="n">get_weight_half_word</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulation</span><span class="p">:</span>
+            <span class="n">n_half_words</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">half_word</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_header_bytes</span> <span class="o">//</span> <span class="n">BYTES_PER_SHORT</span><span class="p">,</span> <span class="n">n_half_words</span><span class="p">,</span> <span class="n">half_word</span><span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateOnMachine</span><span class="o">.</span>

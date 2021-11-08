@@ -145,6 +145,14 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">outgoing_edge_partition</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_map</span><span class="p">([</span><span class="n">MachineEdge</span><span class="p">])</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_synapse_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the number of synapse vertices per neuron vertex</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexSlice.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexSlice.create_machine_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterSlice</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">remaining_constraints</span><span class="p">):</span>

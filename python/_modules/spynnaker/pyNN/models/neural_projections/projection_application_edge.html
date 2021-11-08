@@ -56,8 +56,11 @@
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 
 <span class="n">_DynamicsStructural</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_DynamicsSTDP</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_DynamicsNeuromodulation</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <span class="k">def</span> <span class="nf">are_dynamics_structural</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -68,6 +71,26 @@
             <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
         <span class="n">_DynamicsStructural</span> <span class="o">=</span> <span class="n">AbstractSynapseDynamicsStructural</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">_DynamicsStructural</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">are_dynamics_stdp</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_DynamicsSTDP</span>
+    <span class="k">if</span> <span class="n">_DynamicsSTDP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Avoid import loop by postponing this import</span>
+        <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">SynapseDynamicsSTDP</span><span class="p">)</span>
+        <span class="n">_DynamicsSTDP</span> <span class="o">=</span> <span class="n">SynapseDynamicsSTDP</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">_DynamicsSTDP</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">are_dynamics_neuromodulation</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">_DynamicsNeuromodulation</span>
+    <span class="k">if</span> <span class="n">_DynamicsNeuromodulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Avoid import loop by postponing this import</span>
+        <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">SynapseDynamicsNeuromodulation</span><span class="p">)</span>
+        <span class="n">_DynamicsNeuromodulation</span> <span class="o">=</span> <span class="n">SynapseDynamicsNeuromodulation</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">_DynamicsNeuromodulation</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">ProjectionApplicationEdge</span><span class="p">(</span>
@@ -85,7 +108,8 @@
         <span class="c1"># True if slices have been convered to sorted lists</span>
         <span class="s2">&quot;__slices_list_mode&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__machine_edges_by_slices&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__filter&quot;</span>
+        <span class="s2">&quot;__filter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__is_neuromodulation&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -93,20 +117,17 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractPopulationVertex pre_vertex:</span>
 <span class="sd">        :param AbstractPopulationVertex post_vertex:</span>
-<span class="sd">        :param synapse_information:</span>
+<span class="sd">        :param SynapseInformation synapse_information:</span>
 <span class="sd">            The synapse information on this edge</span>
-<span class="sd">        :type synapse_information:</span>
-<span class="sd">            SynapseInformation or iterable(SynapseInformation)</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
         <span class="c1"># A list of all synapse information for all the projections that are</span>
         <span class="c1"># represented by this edge</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">synapse_information</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="p">[</span><span class="n">synapse_information</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="p">[</span><span class="n">synapse_information</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_neuromodulation</span> <span class="o">=</span> <span class="n">are_dynamics_neuromodulation</span><span class="p">(</span>
+            <span class="n">synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">)</span>
 
         <span class="c1"># The edge from the delay extension of the pre_vertex to the</span>
         <span class="c1"># post_vertex - this might be None if no long delays are present</span>
@@ -126,6 +147,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_information:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+        <span class="n">is_neuromodulation</span> <span class="o">=</span> <span class="n">are_dynamics_neuromodulation</span><span class="p">(</span><span class="n">dynamics</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_neuromodulation</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_neuromodulation</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot mix neuromodulated and non-neuromodulated synapses&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; between the same source Population </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pre_vertex</span><span class="si">}</span><span class="s2"> and&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; target Population </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_post_vertex</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">synapse_information</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -146,6 +174,14 @@
     <span class="nd">@delay_edge</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">delay_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay_edge</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="n">delay_edge</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_neuromodulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Check if this edge is providing neuromodulation</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_neuromodulation</span>
 
 <div class="viewcode-block" id="ProjectionApplicationEdge.set_filter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.set_filter">[docs]</a>    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_filter</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the ability to filter or not</span>

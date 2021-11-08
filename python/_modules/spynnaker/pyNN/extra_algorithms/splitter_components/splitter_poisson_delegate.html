@@ -58,6 +58,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">OneToOneConnector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="n">SynapseDynamicsStatic</span>
 <span class="kn">from</span> <span class="nn">.spynnaker_splitter_slice_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterSliceLegacy</span>
 <span class="kn">from</span> <span class="nn">.abstract_supports_one_to_one_sdram_input</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span>
@@ -88,10 +89,12 @@
             <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
             <span class="n">connector</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
+            <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">)</span> <span class="ow">and</span>
                     <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
                                <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span> <span class="ow">and</span>
-                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)):</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="nb">isinstance</span><span class="p">(</span><span class="n">dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsStatic</span><span class="p">)):</span>
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 

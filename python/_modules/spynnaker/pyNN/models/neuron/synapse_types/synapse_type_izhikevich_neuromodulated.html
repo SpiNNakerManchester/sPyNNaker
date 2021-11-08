@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_izhikevich_neuromodulated &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_izhikevich_neuromodulated</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.synapse_types.synapse_type_izhikevich_neuromodulated</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">.abstract_synapse_type</span> <span class="kn">import</span> <span class="n">AbstractSynapseType</span>
+
+<span class="n">TAU_SYN_E</span> <span class="o">=</span> <span class="s1">&#39;tau_syn_E&#39;</span>
+<span class="n">TAU_SYN_I</span> <span class="o">=</span> <span class="s1">&#39;tau_syn_I&#39;</span>
+<span class="n">ISYN_EXC</span> <span class="o">=</span> <span class="s2">&quot;isyn_exc&quot;</span>
+<span class="n">ISYN_INH</span> <span class="o">=</span> <span class="s2">&quot;isyn_inh&quot;</span>
+
+<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">TAU_SYN_E</span><span class="p">:</span> <span class="s2">&quot;mV&quot;</span><span class="p">,</span>
+    <span class="n">TAU_SYN_I</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span>
+    <span class="n">ISYN_EXC</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">ISYN_INH</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">SynapseTypeExpIzhikevichNeuromodulated</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;_tau_syn_E&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_tau_syn_I&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_isyn_exc&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_isyn_inh&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param float tau_syn_E: :math:`\tau^{syn}_e`</span>
+<span class="sd">        :param float tau_syn_I: :math:`\tau^{syn}_i`</span>
+<span class="sd">        :param float isyn_exc: :math:`I^{syn}_e`</span>
+<span class="sd">        :param float isyn_inh: :math:`I^{syn}_i`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SynapseTypeExpIzhikevichNeuromodulated</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># decay_E</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># init_E</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># isyn_exc</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># decay_I</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">U032</span><span class="p">,</span>    <span class="c1"># init_I</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># isyn_inh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_E</span> <span class="o">=</span> <span class="n">tau_syn_E</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_I</span> <span class="o">=</span> <span class="n">tau_syn_I</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_n_cpu_cycles">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_E</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_I</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.add_state_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_exc</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_inh</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_units">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.has_variable">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int ts: machine time step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
+
+        <span class="n">tsfloat</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="n">decay</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tsfloat</span> <span class="o">/</span> <span class="n">x</span><span class="p">)</span>  <span class="c1"># noqa E731</span>
+        <span class="n">init</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">tsfloat</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tsfloat</span> <span class="o">/</span> <span class="n">x</span><span class="p">))</span>  <span class="c1"># noqa E731</span>
+
+        <span class="c1"># Add the rest of the data</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">decay</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">init</span><span class="p">),</span>
+                <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">],</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">decay</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_I</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span><span class="n">init</span><span class="p">),</span>
+                <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.update_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+
+        <span class="c1"># Read the data</span>
+        <span class="p">(</span><span class="n">_decay_E</span><span class="p">,</span> <span class="n">_init_E</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">,</span> <span class="n">_decay_I</span><span class="p">,</span> <span class="n">_init_I</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
+
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_EXC</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_exc</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">ISYN_INH</span><span class="p">]</span> <span class="o">=</span> <span class="n">isyn_inh</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_n_synapse_types"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_n_synapse_types">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_synapse_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">4</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_synapse_id_by_target">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;reward&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">target</span> <span class="o">==</span> <span class="s2">&quot;punishment&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="SynapseTypeExpIzhikevichNeuromodulated.get_synapse_targets"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.get_synapse_targets">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_synapse_targets</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_synapse_targets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span> <span class="s2">&quot;reward&quot;</span><span class="p">,</span> <span class="s2">&quot;punishment&quot;</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tau_syn_E</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_E</span>
+
+    <span class="nd">@tau_syn_E</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tau_syn_E</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_E</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_E</span> <span class="o">=</span> <span class="n">tau_syn_E</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tau_syn_I</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_I</span>
+
+    <span class="nd">@tau_syn_I</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tau_syn_I</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_syn_I</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tau_syn_I</span> <span class="o">=</span> <span class="n">tau_syn_I</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isyn_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_exc</span>
+
+    <span class="nd">@isyn_exc</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">isyn_exc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_exc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_exc</span> <span class="o">=</span> <span class="n">isyn_exc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">isyn_inh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_inh</span>
+
+    <span class="nd">@isyn_inh</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">isyn_inh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isyn_inh</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_isyn_inh</span> <span class="o">=</span> <span class="n">isyn_inh</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_izhikevich_neuromodulated</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>

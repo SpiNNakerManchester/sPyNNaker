@@ -339,8 +339,9 @@
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_per_ms</span><span class="p">())</span>
 
     <span class="c1"># Scale weights</span>
-    <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight_scales</span><span class="p">[</span>
-        <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type_from_dynamics</span><span class="p">:</span>
+        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">weight_scales</span><span class="p">[</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">])</span>
 
     <span class="c1"># Split the connections up based on the delays</span>
     <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

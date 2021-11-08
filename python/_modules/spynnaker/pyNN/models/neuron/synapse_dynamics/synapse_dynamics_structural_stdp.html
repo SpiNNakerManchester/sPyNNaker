@@ -62,6 +62,7 @@
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_structural_common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_F_REW</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_WEIGHT</span><span class="p">,</span> <span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span>
     <span class="n">DEFAULT_S_MAX</span><span class="p">,</span> <span class="n">SynapseDynamicsStructuralCommon</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.synapse_dynamics_neuromodulation</span> <span class="kn">import</span> <span class="n">SynapseDynamicsNeuromodulation</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseDynamicsStructuralSTDP</span><span class="p">(</span>
@@ -151,6 +152,7 @@
 <span class="sd">        :param delay: The delay of connections formed by the connector</span>
 <span class="sd">            Use ``None`` to get the simulator default minimum delay.</span>
 <span class="sd">        :type delay: float or None</span>
+<span class="sd">        :param bool backprop_delay: Whether back-propagated delays are used</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">,</span> <span class="n">voltage_dependence</span><span class="p">,</span>
@@ -178,6 +180,12 @@
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+        <span class="c1"># If dynamics is Neuromodulation, merge with other neuromodulation,</span>
+        <span class="c1"># and then return ourselves, as neuromodulation can&#39;t be used by</span>
+        <span class="c1"># itself</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsNeuromodulation</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">merge_neuromodulation</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
         <span class="c1"># If other is structural, check structural matches</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">SynapseDynamicsStructuralCommon</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">(</span>

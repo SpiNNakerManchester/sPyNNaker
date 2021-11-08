@@ -3,7 +3,7 @@ var searchData=
   ['background_80',['BACKGROUND',['../delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6aa44b734476c2f3d073ee7aca08660a0e',1,'delay_extension.c']]],
   ['background_5fcallback_81',['background_callback',['../c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9',1,'background_callback(uint timer_count, uint local_time):&#160;c_main.c'],['../delay__extension_8c.html#a49c7afe548d59aec1ea053bdde97724d',1,'background_callback(uint local_time, uint timer_count):&#160;delay_extension.c']]],
   ['background_5fload_5fvalue_82',['background_load_value',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a871f4ae0432c03fd626c3835ef6a5d9d',1,'timer_controller_t']]],
-  ['backprop_5fdelay_83',['backprop_delay',['../synapse__dynamics__stdp__mad__impl_8c.html#a06c22d077ef52c561ae4d0ea9f64d7ff',1,'stdp_params']]],
+  ['backprop_5fdelay_83',['backprop_delay',['../synapse__dynamics__stdp__common_8h.html#a06c22d077ef52c561ae4d0ea9f64d7ff',1,'stdp_params']]],
   ['bank_84',['bank',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#a2623bba0ef9b279cb6d4b12713a8cf4d',1,'sdram_direct_command_t']]],
   ['banks_85',['banks',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/spinn__extra_8h.html#ab369986ad6a0eb8e3cbf911b1237a425',1,'sdram_status_t']]],
   ['base_5fkey_86',['base_key',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__speed__up__packet__gatherer_8c.html#ab440a0a3c2ad7dc2716db4893654dedd',1,'chip_key_data_t']]],

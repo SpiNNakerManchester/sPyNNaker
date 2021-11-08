@@ -112,7 +112,7 @@ $(function() {
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="comment">// Work out the positions of the direct and indirect synaptic matrices</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">// and copy the direct matrix to DTCM</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    uint32_t direct_matrix_size = direct_matrix-&gt;<a class="code" href="direct__synapses_8c.html#a7b6f1aa45c96e6dfe18c9863ced8982a">size</a>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a>(<span class="stringliteral">&quot;Direct matrix malloc size is %d&quot;</span>, direct_matrix_size);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Direct matrix malloc size is %d&quot;</span>, direct_matrix_size);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">if</span> (direct_matrix_size != 0) {</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordtype">void</span> *dtcm_copy = spin1_malloc(direct_matrix_size);</div>
@@ -139,7 +139,6 @@ $(function() {
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
-<div class="ttc" id="adebug_8h_html_af4431e39155e80c53e1f9aab22d5a0ef"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a></div><div class="ttdeci">void log_info(const char *message,...)</div></div>
 <div class="ttc" id="adirect__synapses_8c_html_a009a320a0562e47977f8f408c72e2859"><div class="ttname"><a href="direct__synapses_8c.html#a009a320a0562e47977f8f408c72e2859">single_synaptic_row_t::synapse_datum</a></div><div class="ttdeci">uint32_t synapse_datum</div><div class="ttdoc">The value of the single synapse.</div><div class="ttdef"><b>Definition:</b> <a href="direct__synapses_8c_source.html#l00031">direct_synapses.c:31</a></div></div>
 <div class="ttc" id="adirect__synapses_8c_html_a1b6fa98c7e08a0ef08fc5211be5ae829"><div class="ttname"><a href="direct__synapses_8c.html#a1b6fa98c7e08a0ef08fc5211be5ae829">single_synaptic_row_t::n_plastic</a></div><div class="ttdeci">const uint32_t n_plastic</div><div class="ttdoc">Number of plastic synapses. Always zero.</div><div class="ttdef"><b>Definition:</b> <a href="direct__synapses_8c_source.html#l00028">direct_synapses.c:28</a></div></div>
 <div class="ttc" id="adirect__synapses_8c_html_a3f71526e9df46b5cef9c3b485e15dd6c"><div class="ttname"><a href="direct__synapses_8c.html#a3f71526e9df46b5cef9c3b485e15dd6c">single_synaptic_row_t::n_plastic_controls</a></div><div class="ttdeci">const uint32_t n_plastic_controls</div><div class="ttdoc">Number of plastic controls. Always zero.</div><div class="ttdef"><b>Definition:</b> <a href="direct__synapses_8c_source.html#l00030">direct_synapses.c:30</a></div></div>
@@ -159,7 +158,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

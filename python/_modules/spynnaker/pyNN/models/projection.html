@@ -168,6 +168,11 @@
 
         <span class="c1"># sort out synapse type</span>
         <span class="n">synaptic_type</span> <span class="o">=</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span><span class="n">receptor_type</span><span class="p">)</span>
+        <span class="n">synapse_type_from_dynamics</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">synaptic_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">synaptic_type</span> <span class="o">=</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span>
+                <span class="n">receptor_type</span><span class="p">)</span>
+            <span class="n">synapse_type_from_dynamics</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">synaptic_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;Synapse target </span><span class="si">{}</span><span class="s2"> not found in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -197,7 +202,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">SynapseInformation</span><span class="p">(</span>
             <span class="n">connector</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
             <span class="n">pre_is_view</span><span class="p">,</span> <span class="n">post_is_view</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">,</span>
-            <span class="n">synaptic_type</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">,</span>
+            <span class="n">synaptic_type</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">,</span>
+            <span class="n">synapse_type_from_dynamics</span><span class="p">,</span>
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
 
         <span class="c1"># Set projection information in connector</span>

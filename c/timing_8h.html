@@ -76,8 +76,7 @@ $(function() {
 
 <p>API for timing rules.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="synapse__structure_8h_source.html">neuron/plasticity/stdp/synapse_structure/synapse_structure.h</a>&gt;</code><br />
-</div>
+
 <p><a href="timing_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -91,6 +90,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a02c46ae67288b70c15e59dac89a00046"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing_8h.html#a02c46ae67288b70c15e59dac89a00046">timing_add_post_spike</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a> last_trace)</td></tr>
 <tr class="memdesc:a02c46ae67288b70c15e59dac89a00046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a post spike to the post trace.  <a href="timing_8h.html#a02c46ae67288b70c15e59dac89a00046">More...</a><br /></td></tr>
 <tr class="separator:a02c46ae67288b70c15e59dac89a00046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bea916966f35c743fa3fafab145f69d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing_8h.html#a2bea916966f35c743fa3fafab145f69d">timing_decay_post</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a> last_trace)</td></tr>
+<tr class="memdesc:a2bea916966f35c743fa3fafab145f69d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evolve the post trace without adding a spike.  <a href="timing_8h.html#a2bea916966f35c743fa3fafab145f69d">More...</a><br /></td></tr>
+<tr class="separator:a2bea916966f35c743fa3fafab145f69d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a530f515f7e15cce9bbd8e156b03955fa"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing_8h.html#a530f515f7e15cce9bbd8e156b03955fa">timing_add_pre_spike</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t <a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a>, <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_trace)</td></tr>
 <tr class="memdesc:a530f515f7e15cce9bbd8e156b03955fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a pre spike to the pre trace.  <a href="timing_8h.html#a530f515f7e15cce9bbd8e156b03955fa">More...</a><br /></td></tr>
 <tr class="separator:a530f515f7e15cce9bbd8e156b03955fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,6 +207,59 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Add a post spike to the post trace. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the time of the spike </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">last_time</td><td>the time of the previous spike update </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">last_trace</td><td>the post trace to update </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the updated post trace </dd></dl>
+
+</div>
+</div>
+<a id="a2bea916966f35c743fa3fafab145f69d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bea916966f35c743fa3fafab145f69d">&#9670;&nbsp;</a></span>timing_decay_post()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a> timing_decay_post </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>last_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpost__trace__t">post_trace_t</a>&#160;</td>
+          <td class="paramname"><em>last_trace</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evolve the post trace without adding a spike. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the time of the spike </td></tr>
@@ -435,7 +490,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

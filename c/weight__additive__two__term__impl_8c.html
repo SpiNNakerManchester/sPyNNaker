@@ -100,6 +100,10 @@ Variables</h2></td></tr>
 <a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#aff9620807595c2091e6bd5887da64f5b">plasticity_weight_region_data</a></td></tr>
 <tr class="memdesc:aff9620807595c2091e6bd5887da64f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global plasticity parameter data. <br /></td></tr>
 <tr class="separator:aff9620807595c2091e6bd5887da64f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62ffb30557cf5bc13faca83484cac280"><td class="memItemLeft" align="right" valign="top"><a id="a62ffb30557cf5bc13faca83484cac280"></a>
+uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#a62ffb30557cf5bc13faca83484cac280">weight_shift</a></td></tr>
+<tr class="memdesc:a62ffb30557cf5bc13faca83484cac280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plasticity multiply shift array, in DTCM. <br /></td></tr>
+<tr class="separator:a62ffb30557cf5bc13faca83484cac280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support code for <a class="el" href="weight__additive__two__term__impl_8h.html" title="Additive dual-term weight dependence rule.">weight_additive_two_term_impl.h</a>. </p>
@@ -119,41 +123,41 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <div class="textblock"><p>How the configuration data for additive_two_term is laid out in SDRAM. The layout is an array of these. </p>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00030">30</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00033">33</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a id="af7670fc489d26c3499e4edcd77f7da44"></a>int32_t</td>
+<a id="af59c3217dc01ec728209508b86025f20"></a>accum</td>
 <td class="fieldname">
 min_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a841c6ebf34a7af1173bf1043554690b6"></a>int32_t</td>
+<a id="a3a060013c0ceb0818cef166fd6c2f453"></a>accum</td>
 <td class="fieldname">
 max_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a18be6f995740db876b456e43aef781c3"></a>int32_t</td>
+<a id="a8cb81c14621b9f560199bf383d65221b"></a>accum</td>
 <td class="fieldname">
 a2_plus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a9879dd17a25c30640474b23cb0691cfa"></a>int32_t</td>
+<a id="a4e38ec7a325edf843efab934f5a49d74"></a>accum</td>
 <td class="fieldname">
 a2_minus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a9917203b31458c243e3511fa0048bbbf"></a>int32_t</td>
+<a id="a2d3171b59a5b749cc6e6a881c0d46d1b"></a>accum</td>
 <td class="fieldname">
 a3_plus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a424a6417c0352591015200ad2aa3515e"></a>int32_t</td>
+<a id="ad4a6ae91b77b4187f62fcb267c5c04be"></a>accum</td>
 <td class="fieldname">
 a3_minus</td>
 <td class="fielddoc">
@@ -206,14 +210,14 @@ a3_minus</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00042">42</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="weight__additive__two__term__impl_8c_source.html#l00045">45</a> of file <a class="el" href="weight__additive__two__term__impl_8c_source.html">weight_additive_two_term_impl.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

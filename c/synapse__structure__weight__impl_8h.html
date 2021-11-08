@@ -77,7 +77,8 @@ $(function() {
 
 <p>Synapses just hold weight.  
 <a href="#details">More...</a></p>
-
+<div class="textblock"><code>#include &quot;<a class="el" href="synapse__structure_8h_source.html">synapse_structure.h</a>&quot;</code><br />
+</div>
 <p><a href="synapse__structure__weight__impl_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -115,6 +116,12 @@ Functions</h2></td></tr>
 <tr class="memitem:aead91a129a9df6e8dfcae25ef764e7af"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__structure__weight__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">synapse_structure_get_weight</a> (<a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structplastic__synapse__t">plastic_synapse_t</a> synaptic_word)</td></tr>
 <tr class="memdesc:aead91a129a9df6e8dfcae25ef764e7af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current synaptic weight from the plastic synapse data.  <a href="synapse__structure__weight__impl_8h.html#aead91a129a9df6e8dfcae25ef764e7af">More...</a><br /></td></tr>
 <tr class="separator:aead91a129a9df6e8dfcae25ef764e7af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68ea811bcff6f1ffbd471cf846e04347"><td class="memItemLeft" align="right" valign="top"><a id="a68ea811bcff6f1ffbd471cf846e04347"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_structure_decay_weight</b> (<a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a> *state, uint32_t <a class="el" href="decay_8h.html#a251df1ff8ee78f551bedbd55c451a859">decay</a>)</td></tr>
+<tr class="separator:a68ea811bcff6f1ffbd471cf846e04347"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a382e1f377e5359969deaffc03478f0"><td class="memItemLeft" align="right" valign="top"><a id="a3a382e1f377e5359969deaffc03478f0"></a>
+static accum&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_structure_get_update_weight</b> (<a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a> state)</td></tr>
+<tr class="separator:a3a382e1f377e5359969deaffc03478f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Synapses just hold weight. </p>
@@ -165,7 +172,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The update state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00043">43</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00045">45</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
@@ -202,7 +209,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the final state </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00052">52</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00054">54</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
@@ -239,7 +246,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the final weight </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00061">61</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00063">63</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
@@ -276,7 +283,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the final plastic synapse data, ready to be stored </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00070">70</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00072">72</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
@@ -313,7 +320,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the plastic synapse data </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00079">79</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00081">81</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
@@ -350,14 +357,14 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the current synaptic weight </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00088">88</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synapse__structure__weight__impl_8h_source.html#l00090">90</a> of file <a class="el" href="synapse__structure__weight__impl_8h_source.html">synapse_structure_weight_impl.h</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

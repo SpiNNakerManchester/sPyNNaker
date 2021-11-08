@@ -60,7 +60,9 @@
 <span class="kn">from</span> <span class="nn">.abstract_static_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractStaticSynapseDynamics</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">MatrixGeneratorID</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
+<span class="kn">from</span> <span class="nn">.synapse_dynamics_neuromodulation</span> <span class="kn">import</span> <span class="n">SynapseDynamicsNeuromodulation</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span><span class="p">,</span>\
+    <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 
@@ -98,6 +100,12 @@
 
 <div class="viewcode-block" id="SynapseDynamicsStatic.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+        <span class="c1"># Neuromodulation shouldn&#39;t be used without STDP</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsNeuromodulation</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;Neuromodulation can only be added when an STDP projection&quot;</span>
+                <span class="s2">&quot; has already been added&quot;</span><span class="p">)</span>
+
         <span class="c1"># We can always override a static synapse dynamics with a more</span>
         <span class="c1"># complex model</span>
         <span class="k">return</span> <span class="n">synapse_dynamics</span></div>
@@ -120,7 +128,8 @@
         <span class="k">return</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStatic.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStaticSynapseDynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">):</span>
         <span class="c1"># Nothing to do here</span>
         <span class="k">pass</span></div>
 

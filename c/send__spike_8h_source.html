@@ -126,7 +126,7 @@ $(function() {
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> send_spike(UNUSED uint32_t timer_count, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>,</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        uint32_t neuron_index) {</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="comment">// Do any required synapse processing</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a>(<a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, neuron_index);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a>(<a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, neuron_index);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a>) {</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        send_spike_mc(<a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a> | neuron_index);</div>
@@ -157,11 +157,11 @@ $(function() {
 <div class="ttc" id="aspinnaker_8h_html_a2af81def3304cbcdcd38221bf503ff56"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a2af81def3304cbcdcd38221bf503ff56">T1_COUNT</a></div><div class="ttdeci">#define T1_COUNT</div></div>
 <div class="ttc" id="aspinnaker_8h_html_a641b07dbc5939a3c5ac455e4fc82dcf6"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a641b07dbc5939a3c5ac455e4fc82dcf6">CC_TXKEY</a></div><div class="ttdeci">#define CC_TXKEY</div></div>
 <div class="ttc" id="asynapse__dynamics_8h_html"><div class="ttname"><a href="synapse__dynamics_8h.html">synapse_dynamics.h</a></div><div class="ttdoc">API for synapse dynamics.</div></div>
-<div class="ttc" id="asynapse__dynamics__stdp__mad__impl_8c_html_a5087bc7e79f5dc3850f73239c5c463a3"><div class="ttname"><a href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a></div><div class="ttdeci">void synapse_dynamics_process_post_synaptic_event(uint32_t time, index_t neuron_index)</div><div class="ttdoc">Inform the synapses that the neuron fired.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__dynamics__stdp__mad__impl_8c_source.html#l00362">synapse_dynamics_stdp_mad_impl.c:362</a></div></div>
+<div class="ttc" id="asynapse__dynamics__stdp__izhikevich__neuromodulation_8c_html_a5087bc7e79f5dc3850f73239c5c463a3"><div class="ttname"><a href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a></div><div class="ttdeci">void synapse_dynamics_process_post_synaptic_event(uint32_t time, index_t neuron_index)</div><div class="ttdoc">Inform the synapses that the neuron fired.</div><div class="ttdef"><b>Definition:</b> <a href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c_source.html#l00331">synapse_dynamics_stdp_izhikevich_neuromodulation.c:331</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:50 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

@@ -117,7 +117,7 @@ $(function() {
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="maths_8h.html#structint16__lut">int16_lut</a> *lut = spin1_malloc(size);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span> (lut == <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>) {</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Not enough space to allocate LUT.  Try reducing the timestep,&quot;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            <span class="stringliteral">&quot; the number of neurons per core, or the tau value&quot;</span>);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;            <span class="stringliteral">&quot; the number of neurons per core, or the tau value; size = %u&quot;</span>, size);</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#abe2018e60bb35fb629cdbb057368a2f4">rt_error</a>(<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a3cf9347d757f8d978aa2d35927e21806a66bc0d0be1de9f6afc1787e49ffae339">RTE_SWERR</a>);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(lut, sdram_lut, size);</div>
@@ -156,22 +156,19 @@ $(function() {
 <div class="line"><a name="l00120"></a><span class="lineno"><a class="line" href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">  120</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">inline</span> int32_t <a class="code" href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">maths_fixed_mul16</a>(</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        int32_t a, int32_t b, <span class="keyword">const</span> int32_t fixed_point_position) {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// Multiply lower 16-bits of a and b together</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    int32_t mul = __smulbb(a, b);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="comment">// Shift down</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">return</span> (mul &gt;&gt; fixed_point_position);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;}</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment">//---------------------------------------</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno"><a class="line" href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">  135</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">inline</span> int32_t <a class="code" href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">maths_fixed_mul32</a>(</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        int32_t a, int32_t b, <span class="keyword">const</span> int32_t fixed_point_position) {</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    int32_t mul = a * b;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">// Shift down and return</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">return</span> (mul &gt;&gt; fixed_point_position);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// MATHS_H</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">return</span> __smulbb(a, b) &gt;&gt; fixed_point_position;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;}</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">//---------------------------------------</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno"><a class="line" href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">  132</a></span>&#160;<span class="comment"></span><span class="keyword">static</span> <span class="keyword">inline</span> int32_t <a class="code" href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">maths_fixed_mul32</a>(</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        int32_t a, int32_t b, <span class="keyword">const</span> int32_t fixed_point_position) {</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    int32_t mul = a * b;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">// Shift down and return</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">return</span> (mul &gt;&gt; fixed_point_position);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// MATHS_H</span></div>
 <div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
@@ -182,7 +179,7 @@ $(function() {
 <div class="ttc" id="amaths_8h_html_a510f113b80d885ec2b2e8b80d8cd08b6"><div class="ttname"><a href="maths_8h.html#a510f113b80d885ec2b2e8b80d8cd08b6">maths_copy_int16_lut</a></div><div class="ttdeci">static int16_lut * maths_copy_int16_lut(address_t *address)</div><div class="ttdoc">Copy a Lookup Table from SDRAM to DTCM, updating the address.</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00058">maths.h:58</a></div></div>
 <div class="ttc" id="amaths_8h_html_a684f0b41c83b59209f8ee616a57474ec"><div class="ttname"><a href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">maths_fixed_mul16</a></div><div class="ttdeci">static int32_t maths_fixed_mul16(int32_t a, int32_t b, const int32_t fixed_point_position)</div><div class="ttdoc">multiply two 16-bit fixed point numbers (encoded in int32_t)</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00120">maths.h:120</a></div></div>
 <div class="ttc" id="amaths_8h_html_a7c315224937c5fa8f619c4ed6be5c89d"><div class="ttname"><a href="maths_8h.html#a7c315224937c5fa8f619c4ed6be5c89d">maths_lut_exponential_decay</a></div><div class="ttdeci">static int32_t maths_lut_exponential_decay(uint32_t time, const int16_lut *lut)</div><div class="ttdoc">Get value from lookup table.</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00080">maths.h:80</a></div></div>
-<div class="ttc" id="amaths_8h_html_a9570356b9b13ddd638685b38b66ed6ff"><div class="ttname"><a href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">maths_fixed_mul32</a></div><div class="ttdeci">static int32_t maths_fixed_mul32(int32_t a, int32_t b, const int32_t fixed_point_position)</div><div class="ttdoc">multiply two 32-bit fixed point numbers (encoded in int32_t)</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00135">maths.h:135</a></div></div>
+<div class="ttc" id="amaths_8h_html_a9570356b9b13ddd638685b38b66ed6ff"><div class="ttname"><a href="maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff">maths_fixed_mul32</a></div><div class="ttdeci">static int32_t maths_fixed_mul32(int32_t a, int32_t b, const int32_t fixed_point_position)</div><div class="ttdoc">multiply two 32-bit fixed point numbers (encoded in int32_t)</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00132">maths.h:132</a></div></div>
 <div class="ttc" id="amaths_8h_html_a98d5cfbb988f03dac634156f7dcdc2d7"><div class="ttname"><a href="maths_8h.html#a98d5cfbb988f03dac634156f7dcdc2d7">int16_lut::shift</a></div><div class="ttdeci">uint16_t shift</div><div class="ttdoc">Mapping from time to table index.</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00047">maths.h:47</a></div></div>
 <div class="ttc" id="amaths_8h_html_ab6d1fb27d517365483fc4a8fcb16b598"><div class="ttname"><a href="maths_8h.html#ab6d1fb27d517365483fc4a8fcb16b598">int16_lut::size</a></div><div class="ttdeci">uint16_t size</div><div class="ttdoc">Number of entries in table.</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00046">maths.h:46</a></div></div>
 <div class="ttc" id="amaths_8h_html_structint16__lut"><div class="ttname"><a href="maths_8h.html#structint16__lut">int16_lut</a></div><div class="ttdoc">Lookup Table of 16-bit integers.</div><div class="ttdef"><b>Definition:</b> <a href="maths_8h_source.html#l00045">maths.h:45</a></div></div>
@@ -195,7 +192,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Nov 5 2021 12:52:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Mon Nov 8 2021 08:07:49 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>
