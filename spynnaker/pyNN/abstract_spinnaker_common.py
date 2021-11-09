@@ -37,7 +37,7 @@ from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
     DelaySupportAdder, OnChipBitFieldGenerator,
     RedundantPacketCountReport,
-    SpynnakerDataSpecificationWriter,
+    spynnaker_data_specification_writer,
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
@@ -385,16 +385,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
-        """
-        Overridden by spy which adds placement_order
-
-        :return:
-        """
-        with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
-            writer = SpynnakerDataSpecificationWriter()
-            self._dsg_targets, self._region_sizes = writer(
-                self._placements, self._ipaddress, self._machine,
-                self._max_run_time_steps)
+       with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
+            self._dsg_targets, self._region_sizes = \
+                spynnaker_data_specification_writer(
+                    self._placements, self._ipaddress, self._machine,
+                    self._max_run_time_steps)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(

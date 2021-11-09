@@ -19,7 +19,7 @@ from .redundant_packet_count_report import RedundantPacketCountReport
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
 from .spynnaker_data_specification_writer import (
-    SpynnakerDataSpecificationWriter)
+    spynnaker_data_specification_writer)
 from .spynnaker_machine_bit_field_router_compressor import (
     AbstractMachineBitFieldRouterCompressor,
     SpynnakerMachineBitFieldPairRouterCompressor,
@@ -38,7 +38,7 @@ __all__ = [
     "OnChipBitFieldGenerator",
     "RedundantPacketCountReport",
     "SpYNNakerConnectionHolderGenerator",
-    "SpynnakerDataSpecificationWriter",
+    "spynnaker_data_specification_writer",
     "SpynnakerMachineBitFieldPairRouterCompressor",
     "SpynnakerMachineBitFieldUnorderedRouterCompressor",
     "SpYNNakerNeuronGraphNetworkSpecificationReport",
