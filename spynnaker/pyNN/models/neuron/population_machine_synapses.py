@@ -189,7 +189,8 @@ class PopulationMachineSynapses(
                 size=synapse_dynamics_sz, label='synapseDynamicsParams',
                 reference=self._synapse_references.synapse_dynamics)
             synapse_dynamics.write_parameters(
-                spec, self._synapse_regions.synapse_dynamics, weight_scales)
+                spec, self._synapse_regions.synapse_dynamics,
+                self._app_vertex.weight_scale, weight_scales)
         elif self._synapse_references.synapse_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -249,6 +250,8 @@ class PopulationMachineSynapses(
 
         # Get values
         n_neurons = self._vertex_slice.n_atoms
+        # We only count neuron synapse types here, as this is related to
+        # the ring buffers
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         max_delay = self._app_vertex.splitter.max_support_delay()
 

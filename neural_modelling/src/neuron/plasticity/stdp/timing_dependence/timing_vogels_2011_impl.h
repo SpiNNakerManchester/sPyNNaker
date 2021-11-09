@@ -61,13 +61,9 @@ extern int16_lut *tau_lookup;
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-//! \brief Common code for adding a spike to the trace
-//! \param[in] time: the time of the spike
-//! \param[in] last_time: the time of the previous spike update
-//! \param[in] last_trace: the trace to update
-//! \return the updated trace
-static inline int16_t timing_add_spike(
-        uint32_t time, uint32_t last_time, int16_t last_trace) {
+
+static inline int16_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
@@ -75,10 +71,24 @@ static inline int16_t timing_add_spike(
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
         maths_lut_exponential_decay(delta_time, tau_lookup));
 
+    return (uint16_t) decayed_trace;
+
+}
+
+//! \brief Common code for adding a spike to the trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the trace to update
+//! \return the updated trace
+static inline int16_t timing_add_spike(
+        uint32_t time, uint32_t last_time, int16_t last_trace) {
+
+    // Decay previous trace
+    int32_t decayed_trace = timing_decay_post(time, last_time, last_trace);
+
     // Add new spike to trace
     int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
 
-    log_debug("\tdelta_time=%d, new_trace=%d\n", delta_time, new_trace);
     return (int16_t)new_trace;
 }
 

@@ -463,8 +463,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
             pre_vertex = proj._projection_edge.pre_vertex
-            connector = proj._synapse_information.connector
-            if self.__is_direct_poisson_source(pre_vertex, connector):
+            conn = proj._synapse_information.connector
+            dynamics = proj._synapse_information.synapse_dynamics
+            if self.__is_direct_poisson_source(pre_vertex, conn, dynamics):
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
@@ -482,7 +483,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__poisson_sources.add(pre_vertex)
         return incoming_direct_poisson
 
-    def __is_direct_poisson_source(self, pre_vertex, connector):
+    def __is_direct_poisson_source(self, pre_vertex, connector, dynamics):
         """ Determine if a given Poisson source can be created by this splitter
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:
@@ -490,12 +491,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param ~spynnaker.pyNN.models.neural_projections.connectors\
                 .AbstractConnector:
             The connector in use in the Projection
+        :param ~spynnaker.pyNN.models.neuron.synapse_dynamics\
+                .AbstractSynapseDynamics:
+            The synapse dynamics in use in the Projection
         :rtype: bool
         """
         return (isinstance(pre_vertex, SpikeSourcePoissonVertex) and
                 isinstance(pre_vertex.splitter, SplitterPoissonDelegate) and
                 len(pre_vertex.outgoing_projections) == 1 and
-                isinstance(connector, OneToOneConnector))
+                isinstance(connector, OneToOneConnector) and
+                isinstance(dynamics, SynapseDynamicsStatic))
 
     def __get_fixed_slices(self):
         """ Get a list of fixed slices from the Application vertex
@@ -533,10 +538,18 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if pre_vertex in self.__poisson_sources:
             return []
 
+        # If the incoming edge targets the reward or punishment receptors
+        # then it needs to be treated differently
+        for edge in outgoing_edge_partition.edges:
+            if edge.is_neuromodulation:
+                # In this instance, choose to send to all synapse vertices
+                return [v for s in self.__incoming_vertices for v in s]
+
         # Pick the same synapse vertex index for each neuron vertex
         index = self.__next_synapse_index
         self.__next_synapse_index = (
             (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+
         return self.__incoming_vertices[index]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
@@ -556,6 +569,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__multicast_partitions = []
         self.__sdram_partitions = []
         self.__same_chip_groups = []
+
+    @property
+    def n_synapse_vertices(self):
+        """ Return the number of synapse vertices per neuron vertex
+
+        :rtype: int
+        """
+        return self.__n_synapse_vertices
 
     @property
     def __synapse_references(self):

@@ -344,6 +344,9 @@ void synapses_flush_ring_buffers(timer_t time) {
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back) {
 
+    // By default don't write back
+    *write_back = false;
+
     // Get address of non-plastic region from row
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
 
@@ -359,14 +362,11 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_data,
-                fixed_region, ring_buffers, time)) {
+                fixed_region, ring_buffers, time, write_back)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
                 PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-        // Perform DMA write back
-        *write_back = true;
     }
 
     // Process any fixed synapses

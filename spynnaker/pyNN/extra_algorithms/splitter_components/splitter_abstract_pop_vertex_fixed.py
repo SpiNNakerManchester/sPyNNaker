@@ -391,3 +391,11 @@ class SplitterAbstractPopulationVertexFixed(
         per_core = self.__max_atoms
         self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
                          for i in range(0, n_atoms, per_core)]
+
+    @property
+    def n_synapse_vertices(self):
+        """ Return the number of synapse vertices per neuron vertex
+
+        :rtype: int
+        """
+        return 1

@@ -32,4 +32,4 @@ __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
-           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase", ]
+           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase"]
