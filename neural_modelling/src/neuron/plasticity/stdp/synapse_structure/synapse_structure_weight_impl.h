@@ -33,6 +33,8 @@ typedef weight_state_t update_state_t;
 //! Both the weight and the synaptic word
 typedef weight_t final_state_t;
 
+#include "synapse_structure.h"
+
 //---------------------------------------
 // Synapse interface functions
 //---------------------------------------
@@ -88,6 +90,15 @@ static inline plastic_synapse_t synapse_structure_create_synapse(
 static inline weight_t synapse_structure_get_weight(
         plastic_synapse_t synaptic_word) {
     return synaptic_word;
+}
+
+static inline void synapse_structure_decay_weight(
+        update_state_t *state, uint32_t decay) {
+    return weight_decay(state, decay);
+}
+
+static inline accum synapse_structure_get_update_weight(update_state_t state) {
+    return weight_get_update(state);
 }
 
 #endif  // _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_

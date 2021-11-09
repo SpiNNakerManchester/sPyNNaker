@@ -83,6 +83,11 @@ static inline post_trace_t timing_add_post_spike(
     return window_length;
 }
 
+static inline post_trace_t timing_decay_post(
+        UNUSED uint32_t time, UNUSED uint32_t last_time, post_trace_t last_trace) {
+    return last_trace;
+}
+
 //---------------------------------------
 //! \brief Add a pre spike to the pre trace
 //! \param[in] time: the time of the spike

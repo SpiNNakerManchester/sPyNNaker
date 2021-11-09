@@ -39,6 +39,11 @@ static inline input_t additional_input_get_input_value_as_current(
     return 0;
 }
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Notifies the additional input type that the neuron has spiked
 //! \details Does nothing
 //! \param[in] additional_input: The additional input type pointer to the

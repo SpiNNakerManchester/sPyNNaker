@@ -33,14 +33,17 @@ class SynapseInformation(object):
         "__rng",
         "__synapse_dynamics",
         "__synapse_type",
+        "__receptor_type",
         "__is_virtual_machine",
         "__weights",
         "__delays",
-        "__pre_run_connection_holders"]
+        "__pre_run_connection_holders",
+        "__synapse_type_from_dynamics"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
-                 synapse_dynamics, synapse_type, is_virtual_machine,
+                 synapse_dynamics, synapse_type, receptor_type,
+                 is_virtual_machine, synapse_type_from_dynamics,
                  weights=None, delays=None):
         """
         :param AbstractConnector connector:
@@ -58,7 +61,10 @@ class SynapseInformation(object):
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
         :param int synapse_type: The type of the synapse
+        :param str receptor_type: Description of the receptor (e.g. excitatory)
         :param bool is_virtual_machine: Whether the machine is virtual
+        :param bool synapse_type_from_dynamics:
+            Whether the synapse type came from synapse dynamics
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
@@ -72,9 +78,11 @@ class SynapseInformation(object):
         self.__rng = (rng or NumpyRNG())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
+        self.__receptor_type = receptor_type
         self.__weights = weights
         self.__delays = delays
         self.__is_virtual_machine = is_virtual_machine
+        self.__synapse_type_from_dynamics = synapse_type_from_dynamics
 
         # Make a list of holders to be updated
         self.__pre_run_connection_holders = list()
@@ -162,6 +170,14 @@ class SynapseInformation(object):
         return self.__synapse_type
 
     @property
+    def receptor_type(self):
+        """ A string representing the receptor type
+
+        :rtype: str
+        """
+        return self.__receptor_type
+
+    @property
     def weights(self):
         """ The synaptic weights (if any)
 
@@ -234,3 +250,11 @@ class SynapseInformation(object):
         for holder in self.__pre_run_connection_holders:
             holder.finish()
         del self.__pre_run_connection_holders[:]
+
+    @property
+    def synapse_type_from_dynamics(self):
+        """ Whether the synapse type comes from the synapse dynamics
+
+        :rtype: bool
+        """
+        return self.__synapse_type_from_dynamics
