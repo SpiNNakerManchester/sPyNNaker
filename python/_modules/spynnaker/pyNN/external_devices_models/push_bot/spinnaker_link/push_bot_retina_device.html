@@ -52,14 +52,34 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject</span><span class="p">,</span> <span class="n">supports_injection</span>
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationSpiNNakerLinkVertex</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPushBotRetinaDevice</span><span class="p">)</span>
 
 
-<span class="nd">@supports_injection</span>
+<span class="k">class</span> <span class="nc">DelayedPayloadMultiCastCommand</span><span class="p">(</span><span class="n">MultiCastCommand</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Hack to get the key after the zone allocator is run</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span> <span class="o">=</span> <span class="n">vertex</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_payload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">new_key_command_payload</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_payload</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">payload</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+
 <span class="k">class</span> <span class="nc">PushBotSpiNNakerLinkRetinaDevice</span><span class="p">(</span>
         <span class="n">AbstractPushBotRetinaDevice</span><span class="p">,</span> <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__new_key_command&quot;</span><span class="p">]</span>
@@ -89,11 +109,20 @@
         <span class="c1"># stores for the injection aspects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.routing_info"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info">[docs]</a>    <span class="nd">@inject</span><span class="p">(</span><span class="s2">&quot;RoutingInfos&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">routing_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
+        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span>
+    <span class="p">})</span>
+    <span class="k">def</span> <span class="nf">new_key_command_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Support method to obtain the key after the key allocator has run</span>
+
+<span class="sd">        :param routing_info:</span>
+<span class="sd">        :return: the key</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">key</span></div>
+        <span class="k">return</span> <span class="n">key</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPushBotRetinaDevice</span><span class="o">.</span><span class="n">start_resume_commands</span><span class="p">)</span>
@@ -103,7 +132,8 @@
         <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_resume_commands</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">command</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="o">.</span><span class="n">disable_retina_key</span><span class="p">:</span>
                 <span class="c1"># This has to be stored so that the payload can be updated</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="o">.</span><span class="n">set_retina_key</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="n">DelayedPayloadMultiCastCommand</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="o">.</span><span class="n">set_retina_key_key</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
                 <span class="n">new_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span><span class="p">)</span>
             <span class="n">new_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_commands</span>
