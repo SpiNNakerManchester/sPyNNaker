@@ -37,7 +37,7 @@ class SpynnakerSplitterSelector(SplitterSelector):
         that have not yet been given a splitter object.\
         default for APV is the SplitterAbstractPopulationVertexFixed\
         default for external device splitters are SplitterOneToOneLegacy\
-        default for the rest is the SpynnakerSplitterSliceLegacy.
+        default for the rest is the SpynnakerSplitterFixedLegacy.
 
     :param ApplicationGraph app_graph: app graph
     :raises PacmanConfigurationException: If a bad configuration is set
@@ -117,5 +117,4 @@ class SpynnakerSplitterSelector(SplitterSelector):
         :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
             app vertex
         """
-        # app_vertex.splitter = SpynnakerSplitterSliceLegacy()
         app_vertex.splitter = SplitterPoissonDelegate()
