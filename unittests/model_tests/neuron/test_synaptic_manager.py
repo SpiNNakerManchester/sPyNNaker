@@ -54,7 +54,7 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
+    SplitterAbstractPopulationVertexFixed, SpynnakerSplitterPartitioner)
 from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -97,11 +97,11 @@ def test_write_data_spec():
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     post_pop = p.Population(
         10, p.IF_curr_exp(), label="Post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     proj_one_to_one_1 = p.Projection(
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=1.5, delay=1.0))
@@ -440,12 +440,12 @@ def test_pop_based_master_pop_table_standard(
     post_pop = p.Population(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     p.IF_curr_exp.set_model_max_atoms_per_core(neurons_per_core)
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 

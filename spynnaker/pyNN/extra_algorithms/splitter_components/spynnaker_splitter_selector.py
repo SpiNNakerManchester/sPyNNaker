@@ -35,7 +35,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
 class SpynnakerSplitterSelector(SplitterSelector):
     """ splitter object selector that allocates splitters to app vertices\
         that have not yet been given a splitter object.\
-        default for APV is the SplitterAbstractPopulationVertexSlice\
+        default for APV is the SplitterAbstractPopulationVertexFixed\
         default for external device splitters are SplitterOneToOneLegacy\
         default for the rest is the SpynnakerSplitterSliceLegacy.
 

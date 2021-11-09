@@ -17,7 +17,7 @@ from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexSlice)
+    SplitterAbstractPopulationVertexFixed)
 
 
 def find_good_chip(machine, n_target):
@@ -61,7 +61,7 @@ def do_bitfield_run():
         pop = sim.Population(
             n_neurons, sim.IF_curr_exp(), label="target_{}".format(t),
             additional_parameters={
-                "splitter": SplitterAbstractPopulationVertexSlice()})
+                "splitter": SplitterAbstractPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
         targets.append(pop)
 
