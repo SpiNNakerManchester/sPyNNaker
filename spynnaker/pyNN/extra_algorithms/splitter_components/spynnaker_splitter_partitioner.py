@@ -22,24 +22,17 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
     __slots__ = []
 
-    def __call__(
-            self, app_graph, machine, plan_n_time_steps,
-            pre_allocated_resources=None):
+    def __call__(self, app_graph, plan_n_time_steps):
         """
         :param ApplicationGraph app_graph: app graph
-        :param ~spinn_machine.Machine machine: machine
         :param int plan_n_time_steps: the number of time steps to run for
-        :param pre_allocated_resources: any pre-allocated res to account for
-            before doing any splitting.
-        :type pre_allocated_resources: PreAllocatedResourceContainer or None
         :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
         :raise PacmanPartitionException: when it cant partition
         """
 
         # do partitioning in same way, but in a context of references
         with ReferenceContext():
-            machine_graph, chips_used = super().__call__(
-                app_graph, machine, plan_n_time_steps, pre_allocated_resources)
+            chips_used = super().__call__(app_graph, plan_n_time_steps)
 
         # return the accepted things
-        return machine_graph, chips_used
+        return chips_used
