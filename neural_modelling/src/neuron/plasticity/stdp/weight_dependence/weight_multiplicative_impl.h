@@ -32,19 +32,19 @@
 //---------------------------------------
 //! The configuration of the rule
 typedef struct {
-    int32_t min_weight;    //!< Minimum weight
-    int32_t max_weight;    //!< Maximum weight
+    accum min_weight;    //!< Minimum weight
+    accum max_weight;    //!< Maximum weight
 
-    int32_t a2_plus;       //!< Amount to move weight on potentiation
-    int32_t a2_minus;      //!< Amount to move weight on depression
+    accum a2_plus;       //!< Amount to move weight on potentiation
+    accum a2_minus;      //!< Amount to move weight on depression
 } plasticity_weight_region_data_t;
 
 //! The current state data for the rule
 typedef struct {
-    int32_t weight;        //!< The current weight
+    accum weight;        //!< The current weight
 
     //! The shift to use when multiplying
-    uint32_t weight_multiply_right_shift;
+    uint32_t weight_shift;
     //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
@@ -63,12 +63,12 @@ typedef struct {
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-    extern uint32_t *weight_multiply_right_shift;
+    extern uint32_t *weight_shift;
 
+    accum s1615_weight = kbits(weight << weight_shift[synapse_type]);
     return (weight_state_t) {
-        .weight = (int32_t) weight,
-        .weight_multiply_right_shift =
-                weight_multiply_right_shift[synapse_type],
+        .weight = s1615_weight,
+        .weight_shift = weight_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -81,15 +81,11 @@ static inline weight_state_t weight_get_initial(
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression) {
     // Calculate scale
-    // **NOTE** this calculation must be done at runtime-defined weight
-    // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-            state.weight - state.weight_region->min_weight,
-            state.weight_region->a2_minus, state.weight_multiply_right_shift);
+    accum scale = (state.weight - state.weight_region->min_weight) *
+            state.weight_region->a2_minus;
 
     // Multiply scale by depression and subtract
-    // **NOTE** using standard STDP fixed-point format handles format conversion
-    state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
+    state.weight -= mul_accum_fixed(scale, depression);
     return state;
 }
 //---------------------------------------
@@ -100,27 +96,30 @@ static inline weight_state_t weight_one_term_apply_depression(
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
     // Calculate scale
-    // **NOTE** this calculation must be done at runtime-defined weight
-    // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-            state.weight_region->max_weight - state.weight,
-            state.weight_region->a2_plus, state.weight_multiply_right_shift);
+    accum scale = (state.weight_region->max_weight - state.weight) *
+            state.weight_region->a2_plus;
 
     // Multiply scale by potentiation and add
     // **NOTE** using standard STDP fixed-point format handles format conversion
-    state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+    state.weight += mul_accum_fixed(scale, potentiation);
     return state;
 }
 //---------------------------------------
 /*!
  * \brief Gets the final weight.
- * \param[in] new_state: The updated weight state
+ * \param[in] state: The updated weight state
  * \return The new weight.
  */
-static inline weight_t weight_get_final(weight_state_t new_state) {
-    log_debug("\tnew_weight:%d\n", new_state.weight);
+static inline weight_t weight_get_final(weight_state_t state) {
+    return (weight_t) (bitsk(state.weight) >> state.weight_shift);
+}
 
-    return (weight_t) new_state.weight;
+static inline void weight_decay(weight_state_t *state, int32_t decay) {
+    state->weight = mul_accum_fixed(state->weight, decay);
+}
+
+static inline accum weight_get_update(weight_state_t state) {
+    return state.weight;
 }
 
 #endif  // _WEIGHT_MULTIPLICATIVE_IMPL_H_

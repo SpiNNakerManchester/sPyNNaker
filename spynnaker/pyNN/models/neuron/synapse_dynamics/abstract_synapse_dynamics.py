@@ -70,12 +70,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, region, weight_scales):
+    def write_parameters(self, spec, region, global_weight_scale,
+                         synapse_weight_scales):
         """ Write the synapse parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int region: region ID
-        :param list(float) weight_scales:
+            The specification to write to
+        :param int region: region ID to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
         """
 
     @abstractmethod
@@ -218,3 +223,12 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
             constant_values=0).view("uint32") for row in rows]
         return words
+
+    def get_synapse_id_by_target(self, target):
+        """ Get the index of the synapse type based on the name, or None
+            if the name is not found.
+
+        :param str target: The name of the synapse
+        :rtype: int or None
+        """
+        return None

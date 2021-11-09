@@ -18,11 +18,15 @@ from pacman.model.graphs.machine import MachineEdge
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from pacman.model.graphs.machine import SimpleMachineVertex
+from spynnaker.pyNN.models.neural_projections import SynapseInformation
 
 
 def test_slices():
     unittest_setup()
-    app_edge = ProjectionApplicationEdge(None, None, None)
+    s_info = SynapseInformation(
+        None, None, None, False, False, None, None, None, None, False, False,
+        None, None)
+    app_edge = ProjectionApplicationEdge(None, None, s_info)
     mv0_2 = SimpleMachineVertex(None, None, None, None, Slice(0, 1))
     mv2_4 = SimpleMachineVertex(None, None, None, None, Slice(2, 3))
     mv4_6 = SimpleMachineVertex(None, None, None, None, Slice(4, 5))

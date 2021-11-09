@@ -78,8 +78,8 @@ def test_connector(
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, is_virtual_machine=False, weights=weights,
-            delays=delays)
+            synapse_type=None, receptor_type=None, is_virtual_machine=False,
+            synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
         [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
@@ -123,7 +123,8 @@ def test_connector_split():
         connector=None, pre_population=MockPopulation(n_sources, "Pre"),
         post_population=MockPopulation(n_targets, "Post"),
         prepop_is_view=False, postpop_is_view=False, rng=None,
-        synapse_dynamics=None, synapse_type=None, is_virtual_machine=False,
+        synapse_dynamics=None, synapse_type=None, receptor_type=None,
+        is_virtual_machine=False, synapse_type_from_dynamics=False,
         weights=weight, delays=delay)
     has_block = set()
     try:

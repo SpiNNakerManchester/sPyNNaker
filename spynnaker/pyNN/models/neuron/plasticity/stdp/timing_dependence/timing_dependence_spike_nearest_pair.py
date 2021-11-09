@@ -138,7 +138,8 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, weight_scales):
+    def write_parameters(
+            self, spec, global_weight_scale, synapse_weight_scales):
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
