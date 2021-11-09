@@ -24,16 +24,17 @@
 //---------------------------------------
 //! Global plasticity parameter data array, in DTCM
 plasticity_weight_region_data_t *plasticity_weight_region_data;
+
 //! Plasticity multiply shift array, in DTCM
-uint32_t *weight_multiply_right_shift;
+uint32_t *weight_shift;
 
 //! \brief How the configuration data for multiplicative is laid out in SDRAM.
 //! The layout is an array of these.
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
-    int32_t a2_plus;
-    int32_t a2_minus;
+    accum min_weight;
+    accum max_weight;
+    accum a2_plus;
+    accum a2_minus;
 } multiplicative_config_t;
 
 //---------------------------------------
@@ -53,9 +54,8 @@ address_t weight_initialise(
         log_error("Could not initialise weight region data");
         return NULL;
     }
-    weight_multiply_right_shift =
-            spin1_malloc(sizeof(uint32_t) * n_synapse_types);
-    if (weight_multiply_right_shift == NULL) {
+    weight_shift = spin1_malloc(sizeof(uint32_t) * n_synapse_types);
+    if (weight_shift == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
@@ -68,14 +68,13 @@ address_t weight_initialise(
         dtcm_copy[s].a2_plus = config->a2_plus;
         dtcm_copy[s].a2_minus = config->a2_minus;
 
-        // Calculate the right shift required to fixed-point multiply weights
-        uint32_t shift = weight_multiply_right_shift[s] =
-                16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
+        // Copy weight shift
+        weight_shift[s] = ring_buffer_to_input_buffer_left_shifts[s];
 
         log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
                 " Weight multiply right shift:%u",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
-                dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, shift);
+                dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus, weight_shift[s]);
     }
 
     log_debug("weight_initialise: completed successfully");

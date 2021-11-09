@@ -107,6 +107,14 @@ class SplitterAbstractPopulationVertexSlice(
             self, edge, outgoing_edge_partition, src_machine_vertex):
         return self._get_map([MachineEdge])
 
+    @property
+    def n_synapse_vertices(self):
+        """ Return the number of synapse vertices per neuron vertex
+
+        :rtype: int
+        """
+        return 1
+
     @overrides(AbstractSplitterSlice.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints):

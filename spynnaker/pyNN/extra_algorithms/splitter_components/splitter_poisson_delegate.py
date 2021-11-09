@@ -20,6 +20,7 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
@@ -50,10 +51,12 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
             proj = self._governed_app_vertex.outgoing_projections[0]
             post_vertex = proj._projection_edge.post_vertex
             connector = proj._synapse_information.connector
+            dynamics = proj._synapse_information.synapse_dynamics
             if (isinstance(post_vertex, AbstractPopulationVertex) and
                     isinstance(post_vertex.splitter,
                                AbstractSupportsOneToOneSDRAMInput) and
-                    isinstance(connector, OneToOneConnector)):
+                    isinstance(connector, OneToOneConnector) and
+                    isinstance(dynamics, SynapseDynamicsStatic)):
                 return True
         return False
 
