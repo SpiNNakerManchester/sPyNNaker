@@ -21,6 +21,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 class MatrixGeneratorID(Enum):
     STATIC_MATRIX = 0
     STDP_MATRIX = 1
+    NEUROMODULATION_MATRIX = 2
 
 
 class AbstractGenerateOnMachine(object, metaclass=AbstractBase):

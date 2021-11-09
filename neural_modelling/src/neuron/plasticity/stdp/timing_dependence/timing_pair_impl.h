@@ -48,6 +48,17 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
 }
 
+static inline post_trace_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    extern int16_lut *tau_minus_lookup;
+    // Get time since last spike
+    uint32_t delta_time = time - last_time;
+
+    // Decay previous o1 and o2 traces
+    return (post_trace_t) STDP_FIXED_MUL_16X16(last_trace,
+            maths_lut_exponential_decay(delta_time, tau_minus_lookup));
+}
+
 //---------------------------------------
 //! \brief Add a post spike to the post trace
 //! \param[in] time: the time of the spike
@@ -56,19 +67,13 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-    extern int16_lut *tau_minus_lookup;
-    // Get time since last spike
-    uint32_t delta_time = time - last_time;
 
     // Decay previous o1 and o2 traces
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
-            maths_lut_exponential_decay(delta_time, tau_minus_lookup));
+    int16_t decayed_o1_trace = timing_decay_post(time, last_time, last_trace);
 
     // Add energy caused by new spike to trace
     // **NOTE** o2 trace is pre-multiplied by a3_plus
-    int32_t new_o1_trace = decayed_o1_trace + STDP_FIXED_POINT_ONE;
-
-    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
+    int16_t new_o1_trace = decayed_o1_trace + STDP_FIXED_POINT_ONE;
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added

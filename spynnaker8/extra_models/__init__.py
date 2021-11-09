@@ -13,29 +13,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    TimingDependenceRecurrent as
-    RecurrentRule,
-    TimingDependenceSpikeNearestPair as
-    SpikeNearestPairRule,
-    TimingDependenceVogels2011 as
-    Vogels2011Rule,
-    TimingDependencePfisterSpikeTriplet as
-    PfisterSpikeTriplet)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+from spynnaker8.models.synapse_dynamics.timing_dependence import (
+    TimingDependenceRecurrent as RecurrentRule,
+    TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
+    TimingDependenceVogels2011 as Vogels2011Rule,
+    TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsNeuromodulation as Neuromodulation)
+from spynnaker8.models.synapse_dynamics.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
-    IFCondExpStoc, IFCurrDelta as
-    IFCurDelta, IFCurrExpCa2Adaptive, IFCurrDualExpBase as
-    IF_curr_dual_exp, IzkCondExpBase as
-    Izhikevich_cond, IFCurrExpSEMDBase as
-    IF_curr_exp_sEMD)
+    IFCondExpStoc,
+    IFCurrDelta as IFCurDelta,
+    IFCurrExpCa2Adaptive,
+    IFCurrDualExpBase as IF_curr_dual_exp,
+    IzkCondExpBase as Izhikevich_cond,
+    IFCurrExpSEMDBase as IF_curr_exp_sEMD)
+
+# Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 
 __all__ = [
     # sPyNNaker 8 models
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
+
+    # Neuromodulation synapse dynamics (Mantas Mikaitis)
+    'Neuromodulation',
 
     # sPyNNaker 8 plastic stuff
     'WeightDependenceAdditiveTriplet',
