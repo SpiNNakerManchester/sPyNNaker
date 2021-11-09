@@ -72,12 +72,11 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         "The delay extensions does not record any variables. Therefore "
         "asking for them is deemed an error.")
 
-    def __init__(self, other_splitter):
+    def __init__(self):
         """ splitter for delay extensions
 
-        :param other_splitter: the other splitter to split slices via.
         """
-        super().__init__(other_splitter, self.SPLITTER_NAME)
+        super().__init__(self.SPLITTER_NAME)
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
@@ -88,13 +87,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     def get_in_coming_vertices(self, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
-    @property
-    def source_of_delay_vertex(self):
-        return self._other_splitter.governed_app_vertex
-
     def create_machine_vertices(self, plan_n_timesteps):
         # pylint: disable=arguments-differ
-        pre_slices, is_exact = self._other_splitter.get_out_going_slices()
+        other_splitter = self._governed_app_vertex.source_vertex.splitter
+        pre_slices, is_exact = other_splitter.get_out_going_slices()
 
         # check for exacts.
         if not is_exact:
@@ -106,17 +102,19 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             vertex = self.create_machine_vertex(
                 vertex_slice, index,
                 self.DELAY_EXTENSION_SLICE_LABEL.format(
-                    self._other_splitter.governed_app_vertex, vertex_slice),
+                    other_splitter.governed_app_vertex, vertex_slice),
                 get_remaining_constraints(self._governed_app_vertex))
             self._governed_app_vertex.remember_machine_vertex(vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
-        return self._other_splitter.get_in_coming_slices()
+        other_splitter = self._governed_app_vertex.source_vertex.splitter
+        return other_splitter.get_in_coming_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_slices)
     def get_out_going_slices(self):
-        return self._other_splitter.get_out_going_slices()
+        other_splitter = self._governed_app_vertex.source_vertex.splitter
+        return other_splitter.get_out_going_slices()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
