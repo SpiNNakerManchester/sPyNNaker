@@ -49,5 +49,5 @@ def spynnaker_data_specification_writer(
             placement_order.append(placement)
     placement_order.extend(delay_extensions)
 
-    graph_data_specification_writer(
+    return graph_data_specification_writer(
         placements, hostname, machine, data_n_timesteps, placement_order)
