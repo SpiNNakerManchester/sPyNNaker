@@ -33,7 +33,8 @@
 //!     How to interpret the values from the ring buffers
 //! \return Whether the initialisation succeeded.
 bool synapse_dynamics_initialise(
-        address_t address, uint32_t n_neurons, uint32_t n_synapse_types);
+        address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
+        REAL *min_weights);
 
 //! \brief Process the dynamics of the synapses
 //! \param[in,out] plastic_region_data: Where the plastic data is

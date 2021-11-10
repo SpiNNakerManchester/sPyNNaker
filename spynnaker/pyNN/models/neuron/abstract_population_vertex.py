@@ -907,6 +907,7 @@ class AbstractPopulationVertex(
 
             weight_max = synapse_dynamics.get_weight_maximum(
                 connector, synapse_info)
+            weight_max *= weight_scale
 
             weight_scale_limit = float(DataType.S1615.scale)
             if weight_scale_limit * min_weights[synapse_type] < weight_max:

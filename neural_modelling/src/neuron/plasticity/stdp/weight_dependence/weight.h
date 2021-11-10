@@ -45,7 +45,8 @@
  * \param[in] min_weights: The value of the weight of the LSB of the weight
  * \return the end of the weight region as an absolute SDRAM memory address.
  */
-address_t weight_initialise(address_t address, uint32_t n_synapse_types);
+address_t weight_initialise(
+        address_t address, uint32_t n_synapse_types, REAL *min_weights);
 
 /*!
  * \brief Gets the initial weight state.

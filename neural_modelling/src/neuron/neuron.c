@@ -120,7 +120,7 @@ bool neuron_initialise(
     n_synapse_types = params->n_synapse_types;
 
     // Set up ring buffer left shifts
-    uint32_t min_weights_bytes = n_synapse_types * sizeof(uint32_t);
+    uint32_t min_weights_bytes = n_synapse_types * sizeof(REAL);
     min_weights = spin1_malloc(min_weights_bytes);
     if (min_weights == NULL) {
         log_error("Not enough memory to allocate min_weights");

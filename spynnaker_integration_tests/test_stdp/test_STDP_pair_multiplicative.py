@@ -171,7 +171,7 @@ def potentiation_and_depression():
     assert(numpy.allclose(weights, new_weight_exact, rtol=0.001))
 
 
-class TestSTDPPairAdditive(BaseTestCase):
+class TestSTDPPairMultiplicative(BaseTestCase):
 
     def test_potentiation_and_depression(self):
         self.runsafe(potentiation_and_depression)

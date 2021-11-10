@@ -19,7 +19,7 @@ import numpy
 import unittest
 
 
-class TestSTDPNearestPairAdditive(BaseTestCase):
+class TestSTDPNearestPairMultiplicative(BaseTestCase):
 
     def potentiation_and_depression(self):
         p.setup(1)
@@ -136,6 +136,8 @@ class TestSTDPNearestPairAdditive(BaseTestCase):
 
         target_spikes = [1014, 1032, 1053]
         self.assertListEqual(list(post_spikes), target_spikes)
+
+        print("weights, new_weight_exact: ", weights[0], new_weight_exact)
 
         self.assertTrue(numpy.allclose(
                         weights[0], new_weight_exact, atol=0.001))

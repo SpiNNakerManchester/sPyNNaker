@@ -275,15 +275,20 @@ bool synapses_initialise(
     uint32_t log_max_delay = params->log_max_delay;
 
     // Set up min_weights
-    min_weights = spin1_malloc(n_synapse_types * sizeof(REAL));
+    uint32_t min_weights_bytes = n_synapse_types * sizeof(REAL);
+    min_weights = spin1_malloc(min_weights_bytes);
     if (min_weights == NULL) {
         log_error("Not enough memory to allocate min weights");
         return false;
     }
 
     // read in min_weights
-    spin1_memcpy(min_weights, synapse_params_address, n_synapse_types * sizeof(REAL));
+    spin1_memcpy(min_weights, params->min_weights, min_weights_bytes);
     *min_weights_out = min_weights;
+    for (uint32_t s = 0; s < n_synapse_types; s++) {
+        log_info("synapse initialise, min_weights_out[%u] = %k %k",
+                s, min_weights_out[s], min_weights[s]);
+    }
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();

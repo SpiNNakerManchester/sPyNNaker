@@ -36,10 +36,14 @@ typedef struct {
     accum a3_minus;
 } additive_two_term_config_t;
 
+//! Plasticity min_weight array, in DTCM
+REAL *min_weight;
+
 //---------------------------------------
 // Functions
 //---------------------------------------
-address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
+address_t weight_initialise(
+        address_t address, uint32_t n_synapse_types, REAL *min_weights) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP additive two-term weight dependance");
 
@@ -56,6 +60,12 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
         return NULL;
     }
 
+    min_weight = spin1_malloc(sizeof(REAL) * n_synapse_types);
+    if (min_weight == NULL) {
+        log_error("Could not initialise weight region data");
+        return NULL;
+    }
+
     for (uint32_t s = 0; s < n_synapse_types; s++, config++) {
         dtcm_copy[s].min_weight = config->min_weight;
         dtcm_copy[s].max_weight = config->max_weight;
@@ -64,11 +74,13 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types) {
         dtcm_copy[s].a3_plus = config->a3_plus;
         dtcm_copy[s].a3_minus = config->a3_minus;
 
-        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
+        min_weight[s] = min_weights[s];
+
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d, min_weight %k"
                 " A3+:%d, A3-:%d",
                 s, dtcm_copy[s].min_weight, dtcm_copy[s].max_weight,
                 dtcm_copy[s].a2_plus, dtcm_copy[s].a2_minus,
-                dtcm_copy[s].a3_plus, dtcm_copy[s].a3_minus);
+                dtcm_copy[s].a3_plus, dtcm_copy[s].a3_minus, min_weight[s]);
     }
     log_debug("weight_initialise: completed successfully");
 
