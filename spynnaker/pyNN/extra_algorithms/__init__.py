@@ -21,9 +21,8 @@ from .spynnaker_connection_holder_generations import (
 from .spynnaker_data_specification_writer import (
     spynnaker_data_specification_writer)
 from .spynnaker_machine_bit_field_router_compressor import (
-    AbstractMachineBitFieldRouterCompressor,
-    SpynnakerMachineBitFieldPairRouterCompressor,
-    SpynnakerMachineBitFieldUnorderedRouterCompressor)
+    spynnaker_machine_bitfield_ordered_covering_compressor,
+    spynnaker_machine_bitField_pair_router_compressor)
 from .spynnaker_neuron_network_specification_report import (
     SpYNNakerNeuronGraphNetworkSpecificationReport)
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
@@ -31,7 +30,6 @@ from .synapse_expander import synapse_expander
 from .delay_support_adder import DelaySupportAdder
 
 __all__ = [
-    "AbstractMachineBitFieldRouterCompressor",
     "DelaySupportAdder",
     "finish_connection_holders",
     "GraphEdgeWeightUpdater",
@@ -39,8 +37,8 @@ __all__ = [
     "RedundantPacketCountReport",
     "SpYNNakerConnectionHolderGenerator",
     "spynnaker_data_specification_writer",
-    "SpynnakerMachineBitFieldPairRouterCompressor",
-    "SpynnakerMachineBitFieldUnorderedRouterCompressor",
+    "spynnaker_machine_bitField_pair_router_compressor",
+    "spynnaker_machine_bitfield_ordered_covering_compressor",
     "SpYNNakerNeuronGraphNetworkSpecificationReport",
     "SpYNNakerSynapticMatrixReport",
     "synapse_expander"]
