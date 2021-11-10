@@ -385,7 +385,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
-       with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
+        with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
             self._dsg_targets, self._region_sizes = \
                 spynnaker_data_specification_writer(
                     self._placements, self._ipaddress, self._machine,
