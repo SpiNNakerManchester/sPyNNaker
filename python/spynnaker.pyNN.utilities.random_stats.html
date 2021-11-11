@@ -53,48 +53,48 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">AbstractRandomStats</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">AbstractRandomStats</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Statistics about PyNN RandomDistribution objects</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cumulative distribution function value for the value v</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">high</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the high cutoff value of the distribution, or None if the            distribution is unbounded</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">low</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the low cutoff value of the distribution, or None if the            distribution is unbounded</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the mean of the distribution</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ppf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.ppf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the percent point function value for the probability p</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.std"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">std</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.std"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the standard deviation of the distribution</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the variance of the distribution</p>
 </dd></dl>
 
@@ -102,7 +102,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsBinomialImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsBinomialImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for binomial distributions</p>
 <dl class="py method">
@@ -151,7 +151,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsExponentialImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsExponentialImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for exponential distributions</p>
 <dl class="py method">
@@ -200,7 +200,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsGammaImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsGammaImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for gamma distributions</p>
 <dl class="py method">
@@ -249,7 +249,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsLogNormalImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsLogNormalImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for log normal distributions</p>
 <dl class="py method">
@@ -298,7 +298,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsNormalClippedImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsNormalClippedImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for normal distributions that        are clipped to a boundary (redrawn)</p>
 <dl class="py method">
@@ -347,7 +347,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsNormalImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsNormalImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for normal distributions</p>
 <dl class="py method">
@@ -396,7 +396,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsPoissonImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsPoissonImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for poisson distributions</p>
 <dl class="py method">
@@ -445,7 +445,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsRandIntImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsRandIntImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for uniform distributions</p>
 <dl class="py method">
@@ -494,7 +494,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsScipyImpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsScipyImpl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>A Random Statistics object that uses scipy directly</p>
 <dl class="py method">
@@ -543,7 +543,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsUniformImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsUniformImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for uniform distributions</p>
 <dl class="py method">
@@ -592,7 +592,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsVonmisesImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.random_stats.</span></span><span class="sig-name descname"><span class="pre">RandomStatsVonmisesImpl</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.random_stats.AbstractRandomStats</span></code></a></p>
 <p>An implementation of AbstractRandomStats for vonmises distributions</p>
 <dl class="py method">
@@ -709,7 +709,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
     </div>
   </body>
 </html>

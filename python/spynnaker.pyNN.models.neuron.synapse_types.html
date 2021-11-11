@@ -13,7 +13,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.threshold_types package" href="spynnaker.pyNN.models.neuron.threshold_types.html" />
@@ -55,7 +55,7 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">AbstractSynapseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">AbstractSynapseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent</span></code></a></p>
 <p>Represents the synapse types supported.</p>
 <dl class="field-list simple">
@@ -66,7 +66,7 @@ they appear</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_n_synapse_types">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_n_synapse_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_n_synapse_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_synapse_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_n_synapse_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of synapse types supported.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -80,7 +80,7 @@ they appear</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_id_by_target">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_synapse_id_by_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_id_by_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_synapse_id_by_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_id_by_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the ID of a synapse given the name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -94,7 +94,7 @@ they appear</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_targets">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_synapse_targets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_synapse_targets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_targets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the target names of the synapse type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -110,7 +110,7 @@ they appear</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_exp_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inh_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inh_exp_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc_exp_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inh_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inh_exp_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -154,7 +154,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.exc_response">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">exc_response</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.exc_response" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exc_response</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.exc_response" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -264,17 +264,17 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.inh_response">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">inh_response</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.inh_response" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inh_response</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.inh_response" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_E">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_E" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_I">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_I" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha.tau_syn_I" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -296,7 +296,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeDelta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <p>This represents a synapse type with two delta synapses</p>
 <dl class="field-list simple">
@@ -437,12 +437,12 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_exc">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_exc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_exc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_inh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_inh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta.isyn_inh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -464,7 +464,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeDualExponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeDualExponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -613,32 +613,32 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_exc2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_inh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_I">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -660,7 +660,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeExpIzhikevichNeuromodulated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -801,22 +801,22 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_exc">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_exc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_exc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_inh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_inh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.isyn_inh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_E">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_E" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_I">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_I" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExpIzhikevichNeuromodulated.tau_syn_I" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -838,7 +838,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeExponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeExponential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -983,22 +983,22 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_exc">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_inh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_E">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_I">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1020,7 +1020,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeSEMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc2_old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.</span></span><span class="sig-name descname"><span class="pre">SynapseTypeSEMD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_syn_E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_E2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_syn_I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_exc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isyn_inh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplicator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exc2_old</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaling_factor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1070,7 +1070,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.exc2_old">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">exc2_old</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.exc2_old" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exc2_old</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.exc2_old" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1180,42 +1180,42 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_exc2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_exc2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_exc2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_inh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_inh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isyn_inh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.isyn_inh" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.multiplicator">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">multiplicator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.multiplicator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">multiplicator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.multiplicator" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">scaling_factor</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scaling_factor</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.scaling_factor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_E2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_E2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_I">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_I" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_syn_I</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.tau_syn_I" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1306,7 +1306,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – </p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
     </div>
   </body>
 </html>

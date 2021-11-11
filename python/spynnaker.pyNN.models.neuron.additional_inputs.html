@@ -13,7 +13,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.builds package" href="spynnaker.pyNN.models.neuron.builds.html" />
@@ -55,7 +55,7 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.additional_inputs" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.</span></span><span class="sig-name descname"><span class="pre">AbstractAdditionalInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.</span></span><span class="sig-name descname"><span class="pre">AbstractAdditionalInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></p>
 <p>Represents a possible additional independent input for a model.</p>
 <dl class="field-list simple">
@@ -68,7 +68,7 @@ they appear</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.</span></span><span class="sig-name descname"><span class="pre">AdditionalInputCa2Adaptive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_ca2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_ca2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_alpha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.</span></span><span class="sig-name descname"><span class="pre">AdditionalInputCa2Adaptive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau_ca2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_ca2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_alpha</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -169,7 +169,7 @@ they appear</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_alpha">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">i_alpha</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_alpha" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">i_alpha</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_alpha" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(I_{\alpha}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -180,7 +180,7 @@ they appear</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_ca2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">i_ca2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_ca2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">i_ca2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_ca2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(I_{\mathrm{Ca}^{+2}}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -191,7 +191,7 @@ they appear</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.tau_ca2">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_ca2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.tau_ca2" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_ca2</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.tau_ca2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(\tau_{\mathrm{Ca}^{+2}}\)</span></p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -288,7 +288,7 @@ they appear</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
     </div>
   </body>
 </html>

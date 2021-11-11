@@ -53,7 +53,7 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractAcceptsIncomingSynapses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractAcceptsIncomingSynapses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates an application vertex that can be a post-vertex in a PyNN        projection.</p>
 <div class="admonition note">
@@ -62,13 +62,13 @@
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">clear_connection_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.clear_connection_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_connection_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.clear_connection_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the connection data stored in the vertex so far.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_connections_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_connections_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_connections_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_connections_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the connections from the machine post-run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -84,7 +84,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_synapse_id_by_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_synapse_id_by_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the ID of a synapse given the name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -98,7 +98,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">set_synapse_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_synapse_dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_accepts_incoming_synapses.html#AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the synapse dynamics of this vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -128,12 +128,12 @@ instance of AbstractSpynnakerSplitterDelay</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractContainsUnits</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractContainsUnits</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates an application vertex class that can describe the units of        some of its variables.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_units</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_contains_units.html#AbstractContainsUnits.get_units"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits.get_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get units for a given variable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -152,12 +152,12 @@ instance of AbstractSpynnakerSplitterDelay</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractHasDelayStages</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractHasDelayStages</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates that this object (an application vertex) has delay stages        that are used to increase the space required for bitfields in         <a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region"><code class="xref py py-func docutils literal notranslate"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region()</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_delay_stages</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_delay_stages</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractHasDelayStages.n_delay_stages" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum number of delay stages required by any connection            out of this delay extension vertex</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -170,14 +170,14 @@ instance of AbstractSpynnakerSplitterDelay</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractMaxSpikes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractMaxSpikes</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that can describe the maximum rate that it sends spikes.</p>
 <p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">SynapticManager</span></code> assumes that all machine vertexes
 share the same synapse_information will have the same rates.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">max_spikes_per_second</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_second"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_spikes_per_second</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_second"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_second" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get maximum expected number of spikes per second</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -194,7 +194,7 @@ share the same synapse_information will have the same rates.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">max_spikes_per_ts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_spikes_per_ts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_max_spikes.html#AbstractMaxSpikes.max_spikes_per_ts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractMaxSpikes.max_spikes_per_ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get maximum expected number of spikes per timestep</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -207,12 +207,12 @@ share the same synapse_information will have the same rates.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractPopulationInitializable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractPopulationInitializable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates that this application vertex has properties that can be        initialised by a PyNN Population</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.get_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the value for any variable whose in initialize_parameters.keys</p>
 <p>Should return the current value not the default one.</p>
 <p>Must support the variable as listed in initialize_parameters.keys,
@@ -253,7 +253,7 @@ for all. See:
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">initial_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initial_values</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initial_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dict containing the initial values of the state variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -264,7 +264,7 @@ for all. See:
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_population_initializable.html#AbstractPopulationInitializable.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the initial value of one of the state variables of the neurons            in this population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -278,7 +278,7 @@ for all. See:
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">initialize_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable.initialize_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>List the parameters that are initializable.</p>
 <p>If “foo” is initializable there should be a setter <code class="docutils literal notranslate"><span class="pre">initialize_foo</span></code>
 and a getter property <code class="docutils literal notranslate"><span class="pre">foo_init</span></code></p>
@@ -296,7 +296,7 @@ and a getter property <code class="docutils literal notranslate"><span class="pr
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractPopulationSettable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractPopulationSettable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.abstract_models.AbstractSettable</span></code></a></p>
 <p>Indicates that some properties of this application vertex can be        accessed from the PyNN population set and get methods.</p>
 <dl class="py method">
@@ -320,7 +320,7 @@ as this is just a pass through method</p></li>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_atoms</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_atoms</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable.n_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>” See             <code class="xref py py-meth docutils literal notranslate"><span class="pre">n_atoms()</span></code></p>
 </dd></dl>
 
@@ -343,12 +343,12 @@ as this is just a pass through method</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractReadParametersBeforeSet</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractReadParametersBeforeSet</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A vertex whose parameters must be read before any can be set.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">read_parameters_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet.read_parameters_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_parameters_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_read_parameters_before_set.html#AbstractReadParametersBeforeSet.read_parameters_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractReadParametersBeforeSet.read_parameters_from_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the parameters from the machine before any are changed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -368,12 +368,12 @@ as this is just a pass through method</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSettable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractSettable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractSettable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates that some properties of this object can be accessed from        the PyNN population set and get methods.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.get_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a property</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -387,7 +387,7 @@ as this is just a pass through method</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_settable.html#AbstractSettable.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSettable.set_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set a property</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -403,7 +403,7 @@ as this is just a pass through method</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractSynapseExpandable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractSynapseExpandable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Indicates a class (a         <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code></a>)         that has may need to run the SYNAPSE_EXPANDER aplx</p>
 <div class="admonition note">
@@ -414,7 +414,7 @@ which needs a different expander aplx</p>
 </div>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.connection_generator_region">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">connection_generator_region</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.connection_generator_region" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connection_generator_region</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.connection_generator_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>The region containing the parameters of synaptic expansion</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -428,7 +428,7 @@ which needs a different expander aplx</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">gen_on_machine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.gen_on_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gen_on_machine</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.gen_on_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.gen_on_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the synapses of a the slice of this vertex should be             generated on the machine.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -444,7 +444,7 @@ app_vertex’s synapse_manager</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">read_generated_connection_holders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.read_generated_connection_holders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_generated_connection_holders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_synapse_expandable.html#AbstractSynapseExpandable.read_generated_connection_holders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractSynapseExpandable.read_generated_connection_holders" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill in the connection holders</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -460,12 +460,12 @@ app_vertex’s synapse_manager</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractWeightUpdatable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">AbstractWeightUpdatable</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object whose weight can be updated.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">update_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable.update_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_weight</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/abstract_weight_updatable.html#AbstractWeightUpdatable.update_weight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable.update_weight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the weight.</p>
 </dd></dl>
 
@@ -473,17 +473,17 @@ app_vertex’s synapse_manager</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasSynapses">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">HasSynapses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">HasSynapses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasSynapses.clear_connection_cache">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">clear_connection_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/has_synapses.html#HasSynapses.clear_connection_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">clear_connection_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/has_synapses.html#HasSynapses.clear_connection_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.clear_connection_cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flush the cache of connection information; needed for a second run</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasSynapses.get_connections_from_machine">
-<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">get_connections_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/has_synapses.html#HasSynapses.get_connections_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_connections_from_machine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transceiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/has_synapses.html#HasSynapses.get_connections_from_machine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses.get_connections_from_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the connections from the machine for this vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -501,7 +501,7 @@ app_vertex’s synapse_manager</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">ReceivesSynapticInputsOverSDRAM</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">ReceivesSynapticInputsOverSDRAM</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.abstract_supports_sdram_edges.AbstractSupportsSDRAMEdges</span></code></p>
 <p>An object that receives synaptic inputs over SDRAM.</p>
 <p>The number of neurons to be sent per synapse type is rounded up to be
@@ -513,12 +513,12 @@ accumulated weight value for the timestep, scaled with the given weight
 scales.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT">
-<span class="sig-name descname"><span class="pre">N_BYTES_PER_INPUT</span></span><em class="property"> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">N_BYTES_PER_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_bytes_for_transfer</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_bytes_for_transfer</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>The number of bytes to be sent over the channel.  This will be</dt><dd><p>calculated using the above numbers, but also rounded up to a number
 of words, and with the number of neurons rounded up to a power of 2</p>
@@ -533,7 +533,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_neurons">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_target_neurons</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_neurons" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_target_neurons</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_neurons" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of neurons expecting to receive input</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -544,7 +544,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_synapse_types">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_target_synapse_types</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_synapse_types" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_target_synapse_types</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.n_target_synapse_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of synapse types expecting to receive input</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -555,7 +555,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.weight_scales">
-<em class="property"><span class="pre">abstract</span> <span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">weight_scales</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.weight_scales" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight_scales</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.ReceivesSynapticInputsOverSDRAM.weight_scales" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>A list of scale factors to be applied to weights that get passed</dt><dd><p>over SDRAM, one for each synapse type.</p>
 </dd>
@@ -571,7 +571,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.SendsSynapticInputsOverSDRAM">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">SendsSynapticInputsOverSDRAM</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.SendsSynapticInputsOverSDRAM" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">SendsSynapticInputsOverSDRAM</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.SendsSynapticInputsOverSDRAM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.abstract_supports_sdram_edges.AbstractSupportsSDRAMEdges</span></code></p>
 <p>A marker interface for an object that sends synaptic inputs over SDRAM</p>
 </dd></dl>
@@ -646,7 +646,7 @@ of words, and with the number of neurons rounded up to a power of 2</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
     </div>
   </body>
 </html>

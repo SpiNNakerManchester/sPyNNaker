@@ -13,7 +13,7 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.populations package" href="spynnaker.pyNN.models.populations.html" />
@@ -55,7 +55,7 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.threshold_types" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">AbstractThresholdType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">AbstractThresholdType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent</span></code></a></p>
 <p>Represents types of threshold for a neuron (e.g., stochastic).</p>
 <dl class="field-list simple">
@@ -68,7 +68,7 @@ they appear</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeMaassStochastic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">du_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_thresh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeMaassStochastic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">du_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau_th</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_thresh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType</span></code></a></p>
 <p>A stochastic threshold.</p>
 <p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical     microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.     <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1003311">doi:10.1371/journal.pcbi.1003311</a></p>
@@ -108,7 +108,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.du_th">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">du_th</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.du_th" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">du_th</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.du_th" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(du_{thresh}\)</span></p>
 </dd></dl>
 
@@ -176,7 +176,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.tau_th">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau_th</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.tau_th" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tau_th</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.tau_th" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(\tau_{thresh}\)</span></p>
 </dd></dl>
 
@@ -197,7 +197,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.v_thresh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">v_thresh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.v_thresh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v_thresh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic.v_thresh" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(V_{thresh}\)</span></p>
 </dd></dl>
 
@@ -205,7 +205,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeStatic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_thresh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.</span></span><span class="sig-name descname"><span class="pre">ThresholdTypeStatic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_thresh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType</span></code></a></p>
 <p>A threshold that is a static value.</p>
 <dl class="field-list simple">
@@ -315,7 +315,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.v_thresh">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">v_thresh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.v_thresh" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v_thresh</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.v_thresh" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(V_{thresh}\)</span></p>
 </dd></dl>
 
@@ -392,7 +392,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
     </div>
   </body>
 </html>
