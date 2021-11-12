@@ -47,12 +47,17 @@ class AbstractSDRAMSynapseDynamics(AbstractSynapseDynamics):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, region, weight_scales):
+    def write_parameters(self, spec, region, global_weight_scale,
+                         synapse_weight_scales):
         """ Write the synapse parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int region: region ID
-        :param list(float) weight_scales:
+            The specification to write to
+        :param int region: region ID to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
         """
 
     @abstractmethod

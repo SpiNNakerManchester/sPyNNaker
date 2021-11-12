@@ -47,6 +47,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractproperty
+    def weight(self):
+        """ The weight of connections
+        """
+
+    @abstractproperty
     def delay(self):
         """ The delay of connections
         """
@@ -54,11 +59,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
     @abstractmethod
     def set_delay(self, delay):
         """ Set the delay
-        """
-
-    @abstractproperty
-    def weight(self):
-        """ The weight of connections
         """
 
     def get_delay_maximum(self, connector, synapse_info):

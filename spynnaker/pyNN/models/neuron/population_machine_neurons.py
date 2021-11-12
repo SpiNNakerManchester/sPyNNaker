@@ -20,7 +20,7 @@ from spinn_utilities.overrides import overrides
 
 from pacman.utilities.utility_calls import get_field_based_keys
 
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
@@ -107,28 +107,29 @@ class PopulationMachineNeurons(
         :rtype: .NeuronRegions
         """
 
-    def _parse_neuron_provenance(self, label, names, provenance_data):
+    def _parse_neuron_provenance(
+            self, label, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
 
         :param str label: The label of the node
-        :param list(str) names: The hierarchy of names for the provenance data
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
         :return: a list of provenance data items
         :rtype: iterator of ProvenanceDataItem
         """
         neuron_prov = NeuronProvenance(*provenance_data)
-
-        yield ProvenanceDataItem(
-            names + ["Last_timer_tic_the_core_ran_to"],
-            neuron_prov.current_timer_tick)
-        yield self._app_vertex.get_tdma_provenance_item(
-            names, label, neuron_prov.n_tdma_misses)
-        yield ProvenanceDataItem(
-            names + ["Earliest_send_time"], neuron_prov.earliest_send)
-        yield ProvenanceDataItem(
-            names + ["Latest_Send_time"], neuron_prov.latest_send)
-
-        return NeuronProvenance.N_ITEMS
+        self._app_vertex.get_tdma_provenance_item(
+            x, y, p, label, neuron_prov.n_tdma_misses)
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, "Last_timer_tic_the_core_ran_to",
+                neuron_prov.current_timer_tick)
+            db.insert_core(
+                x, y, p, "Earliest_send_time", neuron_prov.earliest_send)
+            db.insert_core(
+                x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
     def _write_neuron_data_spec(self, spec, routing_info, ring_buffer_shifts):
         """ Write the data specification of the neuron data
@@ -199,6 +200,8 @@ class PopulationMachineNeurons(
         spec.write_value(data=2**get_n_bits(n_atoms))
 
         # Write the ring buffer data
+        # This is only the synapse types that need a ring buffer i.e. not
+        # those stored in synapse dynamics
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)

@@ -18,8 +18,11 @@ from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 _DynamicsStructural = None
+_DynamicsSTDP = None
+_DynamicsNeuromodulation = None
 
 
 def are_dynamics_structural(synapse_dynamics):
@@ -30,6 +33,26 @@ def are_dynamics_structural(synapse_dynamics):
             AbstractSynapseDynamicsStructural)
         _DynamicsStructural = AbstractSynapseDynamicsStructural
     return isinstance(synapse_dynamics, _DynamicsStructural)
+
+
+def are_dynamics_stdp(synapse_dynamics):
+    global _DynamicsSTDP
+    if _DynamicsSTDP is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            SynapseDynamicsSTDP)
+        _DynamicsSTDP = SynapseDynamicsSTDP
+    return isinstance(synapse_dynamics, _DynamicsSTDP)
+
+
+def are_dynamics_neuromodulation(synapse_dynamics):
+    global _DynamicsNeuromodulation
+    if _DynamicsNeuromodulation is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            SynapseDynamicsNeuromodulation)
+        _DynamicsNeuromodulation = SynapseDynamicsNeuromodulation
+    return isinstance(synapse_dynamics, _DynamicsNeuromodulation)
 
 
 class ProjectionApplicationEdge(
@@ -47,7 +70,8 @@ class ProjectionApplicationEdge(
         # True if slices have been convered to sorted lists
         "__slices_list_mode",
         "__machine_edges_by_slices",
-        "__filter"
+        "__filter",
+        "__is_neuromodulation"
     ]
 
     def __init__(
@@ -55,20 +79,17 @@ class ProjectionApplicationEdge(
         """
         :param AbstractPopulationVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
-        :param synapse_information:
+        :param SynapseInformation synapse_information:
             The synapse information on this edge
-        :type synapse_information:
-            SynapseInformation or iterable(SynapseInformation)
         :param str label:
         """
         super().__init__(pre_vertex, post_vertex, label=label)
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
-        if hasattr(synapse_information, '__iter__'):
-            self.__synapse_information = synapse_information
-        else:
-            self.__synapse_information = [synapse_information]
+        self.__synapse_information = [synapse_information]
+        self.__is_neuromodulation = are_dynamics_neuromodulation(
+            synapse_information.synapse_dynamics)
 
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
@@ -88,6 +109,13 @@ class ProjectionApplicationEdge(
         """
         :param SynapseInformation synapse_information:
         """
+        dynamics = synapse_information.synapse_dynamics
+        is_neuromodulation = are_dynamics_neuromodulation(dynamics)
+        if is_neuromodulation != self.__is_neuromodulation:
+            raise SynapticConfigurationException(
+                "Cannot mix neuromodulated and non-neuromodulated synapses"
+                f" between the same source Population {self._pre_vertex} and"
+                f" target Population {self._post_vertex}")
         self.__synapse_information.append(synapse_information)
 
     @property
@@ -108,6 +136,14 @@ class ProjectionApplicationEdge(
     @delay_edge.setter
     def delay_edge(self, delay_edge):
         self.__delay_edge = delay_edge
+
+    @property
+    def is_neuromodulation(self):
+        """ Check if this edge is providing neuromodulation
+
+        :rtype: bool
+        """
+        return self.__is_neuromodulation
 
     def set_filter(self, do_filter):
         """ Set the ability to filter or not
@@ -216,13 +252,5 @@ class ProjectionApplicationEdge(
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
-        prov_items = list()
         for synapse_info in self.synapse_information:
-            prov_items.extend(
-                synapse_info.connector.get_provenance_data(synapse_info))
-            for machine_edge in self.machine_edges:
-                prov_items.extend(
-                    synapse_info.synapse_dynamics.get_provenance_data(
-                        machine_edge.pre_vertex.label,
-                        machine_edge.post_vertex.label))
-        return prov_items
+            synapse_info.connector.get_provenance_data(synapse_info)

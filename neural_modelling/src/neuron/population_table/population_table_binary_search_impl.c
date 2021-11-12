@@ -84,8 +84,8 @@ typedef union {
     extra_info extra;
 } address_list_entry;
 
-// An Invalid address and row length; used to keep indices aligned between
-// delayed and undelayed tables
+//! \brief An Invalid address and row length
+//! \details Used to keep indices aligned between delayed and undelayed tables
 #define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
 
 //! \brief The memory layout in SDRAM of the first part of the population table
@@ -213,9 +213,9 @@ static inline uint32_t get_neuron_id(
 }
 
 //! \brief Get the neuron id of the neuron on the source core, for a spike with
-//         extra info
+//!        extra info
 //! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
+//! \param[in] extra: the extra info entry
 //! \param[in] spike: the spike received
 //! \return the source neuron id local to the core
 static inline uint32_t get_local_neuron_id(
@@ -456,9 +456,9 @@ bool population_table_initialise(
             n_address_list_bytes);
 
     // Store the base address
-    log_info("The stored synaptic matrix base address is located at: 0x%08x",
+    log_debug("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
-    log_info("The direct synaptic matrix base address is located at: 0x%08x",
+    log_debug("The direct synaptic matrix base address is located at: 0x%08x",
             direct_rows_address);
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;

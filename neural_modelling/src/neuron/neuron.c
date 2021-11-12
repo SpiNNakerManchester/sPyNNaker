@@ -66,9 +66,7 @@ struct neuron_parameters {
 };
 
 //! \brief does the memory copy for the neuron parameters
-//! \param[in] address: the address where the neuron parameters are stored
-//!     in SDRAM
-//! \return bool which is true if the mem copy's worked, false otherwise
+//! \return true if the memory copies worked, false otherwise
 static bool neuron_load_neuron_parameters(void) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
@@ -136,7 +134,8 @@ bool neuron_initialise(
     // Store where the actual neuron parameters start, which is after the keys
     saved_params_address = &neuron_keys_sdram[n_neurons];
 
-    log_info("\t n_neurons = %u, peak %u", n_neurons, n_neurons_peak);
+    log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
+            n_neurons, n_neurons_peak, n_synapse_types);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {

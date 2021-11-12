@@ -43,10 +43,16 @@
 #include "elimination/elimination.h"
 #include "formation/formation.h"
 
-// define values used in recording
-#define ELIM_FLAG 0
-#define FORM_FLAG 1
+//! values used in recording
+enum {
+    //! Elimination flag
+    ELIM_FLAG = 0,
+    //! Formation flag
+    FORM_FLAG = 1
+};
+//! How much to shift post-IDs by
 #define ID_SHIFT 1
+//! How much to shift pre-IDs by
 #define PRE_ID_SHIFT 9
 
 //-----------------------------------------------------------------------------
@@ -88,8 +94,8 @@ typedef struct structural_recording_values_t {
     uint32_t value;
 } structural_recording_values_t;
 
+//! Working buffer for the recording of structural changes
 structural_recording_values_t structural_recording_values;
-
 
 //! Timer callbacks since last rewiring
 static uint32_t last_rewiring_time = 0;
@@ -162,7 +168,7 @@ bool synaptogenesis_dynamics_initialise(
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    log_info("Rewiring period %u, fast=%u, n_states=%u",
+    log_debug("Rewiring period %u, fast=%u, n_states=%u",
             rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
@@ -209,7 +215,7 @@ bool synaptogenesis_dynamics_initialise(
     rewiring_recording_index = *recording_regions_used;
     *recording_regions_used = rewiring_recording_index + 1;
 
-    log_info("The rewiring_recording_index is %u", rewiring_recording_index);
+    log_debug("The rewiring_recording_index is %u", rewiring_recording_index);
 
     return true;
 }

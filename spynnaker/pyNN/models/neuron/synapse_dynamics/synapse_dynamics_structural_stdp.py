@@ -24,6 +24,7 @@ from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
     DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -106,6 +107,7 @@ class SynapseDynamicsStructuralSTDP(
         :param delay: The delay of connections formed by the connector
             Use ``None`` to get the simulator default minimum delay.
         :type delay: float or None
+        :param bool backprop_delay: Whether back-propagated delays are used
         """
         super().__init__(
             timing_dependence, weight_dependence, voltage_dependence,
@@ -127,6 +129,12 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.merge)
     def merge(self, synapse_dynamics):
+        # If dynamics is Neuromodulation, merge with other neuromodulation,
+        # and then return ourselves, as neuromodulation can't be used by
+        # itself
+        if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
+            super().merge_neuromodulation(synapse_dynamics)
+            return self
         # If other is structural, check structural matches
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             if not SynapseDynamicsStructuralCommon.is_same_as(

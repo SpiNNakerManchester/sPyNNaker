@@ -301,8 +301,9 @@ def get_synapses(
         connections["delay"] * machine_time_step_per_ms())
 
     # Scale weights
-    connections["weight"] = (connections["weight"] * weight_scales[
-        synapse_info.synapse_type])
+    if not synapse_info.synapse_type_from_dynamics:
+        connections["weight"] = (connections["weight"] * weight_scales[
+            synapse_info.synapse_type])
 
     # Split the connections up based on the delays
     if max_delay is not None:

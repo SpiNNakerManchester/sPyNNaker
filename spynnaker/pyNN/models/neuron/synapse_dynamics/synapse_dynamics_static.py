@@ -22,7 +22,9 @@ from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from spynnaker.pyNN.exceptions import InvalidParameterType,\
+    SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -60,6 +62,12 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
+        # Neuromodulation shouldn't be used without STDP
+        if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
+            raise SynapticConfigurationException(
+                "Neuromodulation can only be added when an STDP projection"
+                " has already been added")
+
         # We can always override a static synapse dynamics with a more
         # complex model
         return synapse_dynamics
@@ -78,7 +86,8 @@ class SynapseDynamicsStatic(
         return 0
 
     @overrides(AbstractStaticSynapseDynamics.write_parameters)
-    def write_parameters(self, spec, region, weight_scales):
+    def write_parameters(
+            self, spec, region, global_weight_scale, synapse_weight_scales):
         # Nothing to do here
         pass
 

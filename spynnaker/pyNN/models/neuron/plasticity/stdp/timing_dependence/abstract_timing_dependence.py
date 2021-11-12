@@ -58,12 +58,16 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, weight_scales):
+    def write_parameters(
+            self, spec, global_weight_scale, synapse_weight_scales):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param weight_scales: (unused?)
-        :type weight_scales: dict(SynapseInformation, float)
+            The specification to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
         """
 
     @abstractproperty
@@ -80,14 +84,3 @@ class AbstractTimingDependence(object, metaclass=AbstractBase):
 
         :rtype: iterable(str)
         """
-
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-
-        :param str pre_population_label: label of pre.
-        :param str post_population_label: label of post.
-        :rtype:
-            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        # pylint: disable=unused-argument
-        return []

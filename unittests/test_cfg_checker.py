@@ -30,11 +30,5 @@ class TestCfgChecker(unittest.TestCase):
         spynnaker = os.path.join(parent, "spynnaker")
         spy8 = os.path.join(parent, "spynnaker8")
         spynnaker_it = os.path.join(parent, "spynnaker_integration_tests")
-        repeaters = [
-            "application_to_machine_graph_algorithms",
-            "machine_graph_to_machine_algorithms",
-            "machine_graph_to_virtual_machine_algorithms",
-            "loading_algorithms"]
         run_config_checks(
-            directories=[spynnaker, spy8, spynnaker_it, unittests],
-            repeaters=repeaters)
+            directories=[spynnaker, spy8, spynnaker_it, unittests])

@@ -43,6 +43,7 @@ install_requires = [
     'SpiNNaker_DataSpecification == 1!6.0.1',
     'spalloc == 1!6.0.1',
     'SpiNNFrontEndCommon == 1!6.0.1',
+    'pyparsing>=2.2.1,<3.0.0',
     "numpy > 1.13, < 1.20; python_version == '3.6'",
     "numpy > 1.13, < 1.21; python_version == '3.7'",
     "numpy; python_version >= '3.8'",
