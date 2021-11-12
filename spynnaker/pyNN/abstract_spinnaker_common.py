@@ -517,15 +517,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
-    def _execute_splitter_partitioner(self, pre_allocated_resources):
+    def _execute_splitter_partitioner(self):
         if not self._application_graph.n_vertices:
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
-            if self._machine:
-                machine = self._machine
-            else:
-                machine = self._max_machine
             partitioner = SpynnakerSplitterPartitioner()
-            self._machine_graph, self._n_chips_needed = partitioner(
-                self._application_graph, machine, self._plan_n_timesteps,
-                pre_allocated_resources)
+            partitioner(self._application_graph, self._plan_n_timesteps)

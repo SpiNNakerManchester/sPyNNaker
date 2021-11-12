@@ -164,7 +164,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
-    def create_machine_vertices(self, plan_n_timesteps):
+    def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
         label = app_vertex.label
         constraints = get_remaining_constraints(app_vertex)
@@ -232,6 +232,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_resources, label, index, rb_shifts,
                 weight_scales, constraints)
+            chip_counter.add_core(neuron_resources)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -244,6 +245,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     vertex_slice, all_syn_block_sz, structural_sz,
                     lead_synapse_resources, label, rb_shifts, weight_scales,
                     synapse_vertices, neuron_vertex, constraints)
+            chip_counter.add_core(lead_synapse_resources)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
@@ -251,6 +253,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     syn_label, i, vertex_slice, synapse_references,
                     shared_synapse_resources, feedback_partition,
                     synapse_vertices, neuron_vertex, constraints)
+                chip_counter.add_core(shared_synapse_resources)
 
             # Add resources for Poisson vertices up to core limit
             poisson_vertices = incoming_direct_poisson[vertex_slice]
@@ -258,6 +261,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             added_poisson_vertices = list()
             for poisson_vertex, _possion_edge in poisson_vertices:
                 added_poisson_vertices.append(poisson_vertex)
+                chip_counter.add_core(poisson_vertex.resources_required)
 
             # Create an SDRAM edge partition
             sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
@@ -284,7 +288,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             [self.__synapse_verts_by_neuron[neuron][index]
                 for neuron in self.__neuron_vertices]
             for index in range(self.__n_synapse_vertices)]
-        return True
 
     def __add_poisson_multicast(
             self, poisson_vertex, synapse_vertices, machine_graph, app_edge):

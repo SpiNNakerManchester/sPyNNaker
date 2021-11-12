@@ -89,7 +89,6 @@ def test_write_data_spec():
     unittest_setup()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    machine = virtual_machine(2, 2)
 
     p.setup(1.0)
     load_config()
@@ -125,7 +124,7 @@ def test_write_data_spec():
         delay_adder = DelaySupportAdder()
         delay_adder.__call__(app_graph)
         partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        partitioner.__call__(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
         n_keys_mapper = EdgeToNKeysMapper()
         n_keys_map = n_keys_mapper.__call__(machine_graph)
@@ -457,7 +456,7 @@ def test_pop_based_master_pop_table_standard(
         delay_adder = DelaySupportAdder()
         delay_adder.__call__(app_graph)
         partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        partitioner.__call__(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
         n_keys_mapper = EdgeToNKeysMapper()
         n_keys_map = n_keys_mapper.__call__(machine_graph)

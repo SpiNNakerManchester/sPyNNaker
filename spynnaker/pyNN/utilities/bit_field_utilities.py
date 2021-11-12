@@ -55,7 +55,7 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
         app_edge = proj._projection_edge
         if app_edge not in seen_app_edges:
             seen_app_edges.add(app_edge)
-            slices, _ = app_edge.pre_vertex.splitter.get_out_going_slices()
+            slices = app_edge.pre_vertex.splitter.get_out_going_slices()
             n_machine_vertices = len(slices)
 
             atoms_per_core = max(
@@ -91,7 +91,7 @@ def get_estimated_sdram_for_key_region(incoming_projections):
             seen_app_edges.add(in_edge)
 
             # Get the number of likely vertices
-            slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
+            slices = in_edge.pre_vertex.splitter.get_out_going_slices()
 
             sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                       BYTES_PER_WORD)

@@ -68,14 +68,14 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     @overrides(SpynnakerSplitterFixedLegacy.create_machine_vertices)
-    def create_machine_vertices(self, plan_n_timesteps):
+    def create_machine_vertices(self, chip_counter):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
-            return 0
+            return
 
         # If we passed this part, use the super class
         return super(SplitterPoissonDelegate, self).create_machine_vertices(
-            plan_n_timesteps)
+            chip_counter)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):

@@ -172,8 +172,7 @@ class DelaySupportAdder(object):
                 app_edge.pre_vertex, label=delay_name)
 
             # set trackers
-            delay_app_vertex.splitter = (
-                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter))
+            delay_app_vertex.splitter = SplitterDelayVertexSlice()
             app_graph.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)

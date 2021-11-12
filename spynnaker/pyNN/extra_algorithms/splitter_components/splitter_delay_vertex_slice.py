@@ -30,7 +30,6 @@ from pacman.utilities.algorithm_utilities.\
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -87,15 +86,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     def get_in_coming_vertices(self, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
-    def create_machine_vertices(self, plan_n_timesteps):
+    def create_machine_vertices(self, chip_counter):
         # pylint: disable=arguments-differ
         other_splitter = self._governed_app_vertex.source_vertex.splitter
-        pre_slices, is_exact = other_splitter.get_out_going_slices()
-
-        # check for exacts.
-        if not is_exact:
-            raise SpynnakerSplitterConfigurationException(
-                self.NEED_EXACT_ERROR_MESSAGE)
+        pre_slices = other_splitter.get_out_going_slices()
 
         # create vertices correctly
         for index, vertex_slice in enumerate(pre_slices):
@@ -105,6 +99,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
                     other_splitter.governed_app_vertex, vertex_slice),
                 get_remaining_constraints(self._governed_app_vertex))
             self._governed_app_vertex.remember_machine_vertex(vertex)
+            chip_counter.add_core(vertex.resources_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
