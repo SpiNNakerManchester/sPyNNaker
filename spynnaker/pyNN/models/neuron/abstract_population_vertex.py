@@ -335,6 +335,15 @@ class AbstractPopulationVertex(
         return self.__all_single_syn_sz
 
     @property
+    def direct_matrix_size(self):
+        """ The size of the direct matrix region in bytes
+
+        :rtype: int
+        """
+        # An additional word is used for the size of the region
+        return self.__all_single_syn_sz + BYTES_PER_WORD
+
+    @property
     def incoming_spike_buffer_size(self):
         """ The size of the incoming spike buffer to be used on the cores
 

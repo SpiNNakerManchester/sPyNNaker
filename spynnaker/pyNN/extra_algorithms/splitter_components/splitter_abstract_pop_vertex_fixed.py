@@ -300,7 +300,7 @@ class SplitterAbstractPopulationVertexFixed(
             self.__all_syn_block_size(vertex_slice))
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.direct_matrix,
-            app_vertex.all_single_syn_size)
+            app_vertex.direct_matrix_size)
         sdram.add_cost(
             PopulationMachineVertex.SYNAPSE_REGIONS.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
