@@ -38,7 +38,7 @@ from spynnaker.pyNN.extra_algorithms import (
     DelaySupportAdder, on_chip_bitfield_generator,
     RedundantPacketCountReport,
     spynnaker_data_specification_writer,
-    SpYNNakerNeuronGraphNetworkSpecificationReport)
+    spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
         spynnaker_machine_bitfield_ordered_covering_compressor,
@@ -464,8 +464,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 "SpYNNakerNeuronGraphNetworkSpecificationReport") as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
-            report = SpYNNakerNeuronGraphNetworkSpecificationReport()
-            report(self._application_graph)
+            spynnaker_neuron_graph_network_specification_report(
+                self._application_graph)
 
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
                extend_doc=False)
