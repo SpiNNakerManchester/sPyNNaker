@@ -140,6 +140,9 @@ class SPIFRetinaDevice(
     #: The number of X values per row
     X_PER_ROW = 4
 
+    #: The number of devices in existence, to work out the key
+    __n_devices = 0
+
     __slots__ = [
         "__spif_mask",
         "__index_by_slice",
@@ -151,7 +154,8 @@ class SPIFRetinaDevice(
         "__input_x_shift"]
 
     def __init__(self, pipe, width, height, sub_width, sub_height,
-                 base_key=None, input_x_shift=16, input_y_shift=0):
+                 base_key=None, input_x_shift=16, input_y_shift=0,
+                 board_address=None, chip_coords=None):
         """
 
         :param int pipe: Which pipe on SPIF the retina is connected to
@@ -171,6 +175,19 @@ class SPIFRetinaDevice(
             The shift to get the x coordinate from the input keys sent to SPIF
         :param int input_y_shift:
             The shift to get the y coordinate from the input keys sent to SPIF
+        :param board_address:
+            The IP address of the board to which the FPGA is connected, or None
+            to use the default board or chip_coords.  Note chip_coords will be
+            used first if both are specified, with board_address then being
+            used if the coordinates don't connect to an FPGA.
+        :type board_address: str or None
+        :param chip_coords:
+            The coordinates of the chip to which the FPGA is connected, or
+            None to use the default board or board_address.   Note chip_coords
+            will be used first if board_address is also specified, with
+            board_address then being used if the coordinates don't connect to
+            an FPGA.
+        :
         """
         # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
@@ -183,8 +200,9 @@ class SPIFRetinaDevice(
 
         # Call the super
         super().__init__(
-            width, height, sub_width, sub_height, self.__incoming_fpgas,
-            self.__outgoing_fpga)
+            width, height, sub_width, sub_height,
+            self.__incoming_fpgas(board_address, chip_coords),
+            self.__outgoing_fpga(board_address, chip_coords))
 
         # The mask is going to be made up of:
         # | K | P | Y_I | Y_0 | Y_F | X_I | X_0 | X_F |
@@ -212,7 +230,10 @@ class SPIFRetinaDevice(
         self.__index_by_slice = dict()
 
         self.__pipe = pipe
-        self.__base_key = base_key if base_key is not None else pipe
+        self.__base_key = base_key
+        if self.__base_key is None:
+            self.__base_key = self.__n_devices
+        self.__n_devices += 1
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
@@ -226,22 +247,21 @@ class SPIFRetinaDevice(
     def __unsigned(self, n):
         return n & 0xFFFFFFFF
 
-    @property
-    def __incoming_fpgas(self):
+    def __incoming_fpgas(self, board_address, chip_coords):
         """ Get the incoming FPGA connections
 
         :rtype: list(FPGAConnection)
         """
         # We use every other odd link
-        return [FPGAConnection(0, i, None) for i in range(1, 16, 2)]
+        return [FPGAConnection(0, i, board_address, chip_coords)
+                for i in range(1, 16, 2)]
 
-    @property
-    def __outgoing_fpga(self):
+    def __outgoing_fpga(self, board_address, chip_coords):
         """ Get the outgoing FPGA connection
 
         :rtype: FGPA_Connection
         """
-        return FPGAConnection(0, 15, None)
+        return FPGAConnection(0, 15, board_address, chip_coords)
 
     def __fpga_indices(self, fpga_link_id):
         # We use every other odd link, so we can work out the "index" of the
