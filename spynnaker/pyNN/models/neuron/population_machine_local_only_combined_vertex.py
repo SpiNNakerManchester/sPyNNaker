@@ -20,8 +20,8 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
@@ -181,31 +181,35 @@ class PopulationMachineLocalOnlyCombinedVertex(
         return name + app_vertex.synapse_executable_suffix + ext
 
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
-    def parse_extra_provenance_items(self, label, names, provenance_data):
+    def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         proc_offset = NeuronProvenance.N_ITEMS
         end_proc_offset = proc_offset + LocalOnlyProvenance.N_ITEMS
-        yield from self._parse_neuron_provenance(
-            label, names, provenance_data[:NeuronProvenance.N_ITEMS])
-        yield from self._parse_local_only_provenance(
-            label, names, provenance_data[proc_offset:end_proc_offset])
+        self._parse_neuron_provenance(
+            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+        self._parse_local_only_provenance(
+            label, x, y, p, provenance_data[proc_offset:end_proc_offset])
 
         main_prov = MainProvenance(*provenance_data[-MainProvenance.N_ITEMS:])
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_MAX_QUEUED_NAME],
-            main_prov.max_background_queued,
-            main_prov.max_background_queued > 1,
-            f"A maximum of {main_prov.max_background_queued} background"
-            f" tasks were queued on {label}.  Try increasing the"
-            " time_scale_factor located within the .spynnaker.cfg file or"
-            " in the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.BACKGROUND_OVERLOADS_NAME],
-            main_prov.n_background_overloads,
-            main_prov.n_background_overloads > 0,
-            "The background queue overloaded "
-            f"{main_prov.n_background_overloads} times on {label}."
-            " Try increasing the time_scale_factor located within"
-            " the .spynnaker.cfg file or in the pynn.setup() method.")
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.BACKGROUND_MAX_QUEUED_NAME,
+                main_prov.max_background_queued)
+            if main_prov.max_background_queued > 1:
+                db.insert_report(
+                    f"A maximum of {main_prov.max_background_queued}"
+                    f" background tasks were queued on {label}.  Try"
+                    " increasing the time_scale_factor located within the"
+                    " .spynnaker.cfg file or in the pynn.setup() method.")
+            db.insert_core(
+                x, y, p, self.BACKGROUND_OVERLOADS_NAME,
+                main_prov.n_background_overloads)
+
+            if main_prov.n_background_overloads > 0:
+                db.insert_report(
+                    "The background queue overloaded "
+                    f"{main_prov.n_background_overloads} times on {label}."
+                    " Try increasing the time_scale_factor located within"
+                    " the .spynnaker.cfg file or in the pynn.setup() method.")
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):
@@ -285,46 +289,53 @@ class PopulationMachineLocalOnlyCombinedVertex(
         self.__change_requires_neuron_parameters_reload = new_value
 
     def _parse_local_only_provenance(
-            self, label, names, provenance_data):
+            self, label, x, y, p, provenance_data):
         """ Extract and yield local-only provenance
 
         :param str label: The label of the node
-        :param list(str) names: The hierarchy of names for the provenance data
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
         :param list(int) provenance_data: A list of data items to interpret
         :return: a list of provenance data items
         :rtype: iterator of ProvenanceDataItem
         """
         prov = LocalOnlyProvenance(*provenance_data)
 
-        yield ProvenanceDataItem(
-            names + [self.MAX_SPIKES_PER_TIME_STEP_NAME],
-            prov.max_spikes_per_timestep, report=False)
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.MAX_SPIKES_PER_TIME_STEP_NAME,
+                prov.max_spikes_per_timestep)
+            db.insert_core(
+                x, y, p, self.INPUT_BUFFER_FULL_NAME,
+                prov.n_spikes_lost_from_input)
+            db.insert_core(
+                x, y, p, self.N_LATE_SPIKES_NAME,
+                prov.n_spikes_dropped)
+            db.insert_core(
+                x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
+                prov.max_size_input_buffer)
 
-        yield ProvenanceDataItem(
-            names + [self.INPUT_BUFFER_FULL_NAME],
-            prov.n_spikes_lost_from_input,
-            prov.n_spikes_lost_from_input > 0,
-            f"The input buffer for {label} lost packets on "
-            f"{prov.n_spikes_lost_from_input} occasions. This is often a "
-            "sign that the system is running too quickly for the number of "
-            "neurons per core.  Please increase the timer_tic or"
-            " time_scale_factor or decrease the number of neurons per core.")
+            if prov.n_spikes_lost_from_input > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{prov.n_spikes_lost_from_input} occasions. This is "
+                    "often sign that the system is running too quickly for "
+                    "the number of neurons per core.  Please increase the "
+                    "timer_tic or time_scale_factor or decrease the number "
+                    "of neurons per core.")
 
-        late_message = (
-            f"On {label}, {prov.n_spikes_dropped} packets were dropped "
-            "from the input buffer, because they arrived too late to be "
-            "processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method."
-            if self._app_vertex.drop_late_spikes else
-            f"On {label}, {prov.n_spikes_dropped} packets arrived too "
-            "late to be processed in a given time step. Try increasing the "
-            "time_scale_factor located within the .spynnaker.cfg file or in "
-            "the pynn.setup() method.")
-        yield ProvenanceDataItem(
-            names + [self.N_LATE_SPIKES_NAME], prov.n_spikes_dropped,
-            prov.n_spikes_dropped > 0, late_message)
-
-        yield ProvenanceDataItem(
-            names + [self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME],
-            prov.max_size_input_buffer, report=False)
+            if prov.n_spikes_dropped > 0:
+                if self._app_vertex.drop_late_spikes:
+                    db.insert_report(
+                        f"On {label}, {prov.n_spikes_dropped} packets were "
+                        "dropped from the input buffer, because they arrived "
+                        "too late to be processed in a given time step. Try "
+                        "increasing the time_scale_factor located within the "
+                        ".spynnaker.cfg file or in the pynn.setup() method.")
+                else:
+                    db.insert_report(
+                        f"On {label}, {prov.n_spikes_dropped} packets arrived "
+                        "too late to be processed in a given time step. Try "
+                        "increasing the time_scale_factor located within the "
+                        ".spynnaker.cfg file or in the pynn.setup() method.")

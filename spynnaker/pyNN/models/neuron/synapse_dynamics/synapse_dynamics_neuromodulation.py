@@ -261,7 +261,3 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
         return NEUROMODULATION_TARGETS.get(target, None)
-
-    @overrides(AbstractPlasticSynapseDynamics.are_weights_signed)
-    def are_weights_signed(self):
-        return False
