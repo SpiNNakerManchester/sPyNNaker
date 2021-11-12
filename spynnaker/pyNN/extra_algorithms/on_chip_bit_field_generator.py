@@ -54,8 +54,29 @@ def _percent(amount, total):
         return 0.0
     return (100.0 * amount) / float(total)
 
+def on_chip_bitfield_generator(placements, app_graph, executable_finder,
+            transceiver, machine_graph, routing_infos):
+    """ Loads and runs the bit field generator on chip.
 
-class OnChipBitFieldGenerator(object):
+    :param ~pacman.model.placements.Placements placements: placements
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        the app graph
+    :param executable_finder: the executable finder
+    :type executable_finder:
+        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        the SpiNNMan instance
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        the machine graph
+    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+        the key to edge map
+    """
+    generator = _OnChipBitFieldGenerator(
+        placements, executable_finder, transceiver)
+    generator(app_graph, executable_finder, machine_graph, routing_infos)
+
+
+class _OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
     """
 
@@ -90,9 +111,7 @@ class OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __call__(
-            self, placements, app_graph, executable_finder,
-            transceiver, machine_graph, routing_infos):
+    def __init__(self, placements, executable_finder, transceiver):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -113,6 +132,23 @@ class OnChipBitFieldGenerator(object):
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
+    def __call__(
+            self, app_graph, executable_finder, machine_graph, routing_infos):
+        """ Loads and runs the bit field generator on chip.
+
+        :param ~pacman.model.placements.Placements placements: placements
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
+        :param executable_finder: the executable finder
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpiNNMan instance
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine graph
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            the key to edge map
+        """
         # progress bar
         progress = ProgressBar(
             app_graph.n_vertices + machine_graph.n_vertices + 1,
@@ -122,12 +158,12 @@ class OnChipBitFieldGenerator(object):
         expander_cores = self._calculate_core_data(app_graph, progress)
 
         # load data
-        bit_field_app_id = transceiver.app_id_tracker.get_new_id()
+        bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
         progress.update(1)
 
         # run app
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, transceiver,
+            expander_cores, bit_field_app_id, self.__txrx,
             executable_finder,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,

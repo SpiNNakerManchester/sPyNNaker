@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .connection_holder_finisher import finish_connection_holders
 from .graph_edge_weight_updater import GraphEdgeWeightUpdater
-from .on_chip_bit_field_generator import OnChipBitFieldGenerator
+from .on_chip_bit_field_generator import on_chip_bitfield_generator
 from .redundant_packet_count_report import RedundantPacketCountReport
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
@@ -33,7 +33,7 @@ __all__ = [
     "DelaySupportAdder",
     "finish_connection_holders",
     "GraphEdgeWeightUpdater",
-    "OnChipBitFieldGenerator",
+    "on_chip_bitfield_generator",
     "RedundantPacketCountReport",
     "SpYNNakerConnectionHolderGenerator",
     "spynnaker_data_specification_writer",

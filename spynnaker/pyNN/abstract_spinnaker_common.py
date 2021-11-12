@@ -35,7 +35,7 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
-    DelaySupportAdder, OnChipBitFieldGenerator,
+    DelaySupportAdder, on_chip_bitfield_generator,
     RedundantPacketCountReport,
     spynnaker_data_specification_writer,
     SpYNNakerNeuronGraphNetworkSpecificationReport)
@@ -443,8 +443,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
             if timer.skip_if_virtual_board():
                 return
-            generator = OnChipBitFieldGenerator()
-            generator(
+            on_chip_bitfield_generator(
                 self.placements, self.application_graph,
                 self._executable_finder,  self._txrx, self._machine_graph,
                 self._routing_infos)
