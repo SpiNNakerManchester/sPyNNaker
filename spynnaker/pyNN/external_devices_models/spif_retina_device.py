@@ -187,7 +187,7 @@ class SPIFRetinaDevice(
             will be used first if board_address is also specified, with
             board_address then being used if the coordinates don't connect to
             an FPGA.
-        :
+        :type chip_coords: tuple(int, int) or None
         """
         # Do some checks
         if sub_width < self.X_MASK or sub_height < self.Y_MASK:
