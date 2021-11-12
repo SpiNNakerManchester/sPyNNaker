@@ -348,8 +348,8 @@ class SPIFRetinaDevice(
                         for i in range(self.__pipe, self.__pipe + 8))
         commands.extend(set_input_mask(i, self.__spif_mask)
                         for i in range(self.__pipe, self.__pipe + 8))
-        commands.extend(set_input_route(i + self.__pipe, i)
-                        for i in range(8))
+        commands.extend(set_input_route(i, i)
+                        for i in range(self._pipe, self.__pipe + 8))
 
         # Send the start signal
         commands.append(_SpiNNFPGARegister.START.cmd())
