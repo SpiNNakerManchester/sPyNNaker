@@ -17,6 +17,8 @@ import os
 import unittest
 import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
+from spinn_front_end_common.utilities.report_functions.\
+    router_collision_potential_report import COLLISION_REPORT
 from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
 from spinn_front_end_common.utilities.globals_variables import (
@@ -68,6 +70,7 @@ class TestDebug(BaseTestCase):
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             NetworkSpecification._FILENAME,
+            COLLISION_REPORT,
             # write_provenance_data
             "provenance_data",
             # write_tag_allocation_reports

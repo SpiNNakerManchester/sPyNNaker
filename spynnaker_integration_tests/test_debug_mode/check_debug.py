@@ -19,6 +19,8 @@ import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
+from spinn_front_end_common.utilities.report_functions.\
+    router_collision_potential_report import COLLISION_REPORT
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
@@ -72,6 +74,7 @@ class CheckDebug(BaseTestCase):
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
             NetworkSpecification._FILENAME,
+            COLLISION_REPORT,
             # write_provenance_data
             "provenance_data",
             # write_tag_allocation_reports
