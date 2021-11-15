@@ -88,14 +88,14 @@ def redundant_packet_count_report():
                          f" {file_name}:")
 
 
-def _create_views(self):
+def _create_views():
     with ProvenanceWriter() as db:
         with db.transaction() as cur:
             cur.execute(REDUNDANCY_BY_CORE)
             cur.execute(REDUNDANCY_SUMMARY)
 
 
-def _write_report(self, output):
+def _write_report(output):
     reader = ProvenanceReader()
     for data in reader.run_query("select * from redundancy_by_core"):
         (x, y, p, source, received, filtered, invalid, failed,
