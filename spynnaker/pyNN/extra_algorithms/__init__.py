@@ -27,14 +27,14 @@ from .spynnaker_neuron_network_specification_report import (
     spynnaker_neuron_graph_network_specification_report)
 from .spynnaker_synaptic_matrix_report import SpYNNakerSynapticMatrixReport
 from .synapse_expander import synapse_expander
-from .delay_support_adder import DelaySupportAdder
+from .delay_support_adder import delay_support_adder
 
 __all__ = [
-    "DelaySupportAdder",
+    "delay_support_adder",
     "finish_connection_holders",
     "GraphEdgeWeightUpdater",
     "on_chip_bitfield_generator",
-    "RedundantPacketCountReport",
+    "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",
     "spynnaker_data_specification_writer",
     "spynnaker_machine_bitField_pair_router_compressor",

@@ -35,7 +35,7 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
-    DelaySupportAdder, on_chip_bitfield_generator,
+    delay_support_adder, on_chip_bitfield_generator,
     redundant_packet_count_report,
     spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
@@ -500,8 +500,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                adder = DelaySupportAdder()
-                adder(self._application_graph)
+                delay_support_adder(self._application_graph)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
