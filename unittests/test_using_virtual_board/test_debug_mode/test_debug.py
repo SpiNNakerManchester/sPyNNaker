@@ -23,8 +23,7 @@ from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.\
-    spynnaker_neuron_network_specification_report import (
-    _GRAPH_FORMAT, _GRAPH_NAME)
+    spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
 import spynnaker8 as sim
 
 

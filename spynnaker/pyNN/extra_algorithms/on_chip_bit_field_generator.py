@@ -54,8 +54,10 @@ def _percent(amount, total):
         return 0.0
     return (100.0 * amount) / float(total)
 
-def on_chip_bitfield_generator(placements, app_graph, executable_finder,
-            transceiver, machine_graph, routing_infos):
+
+def on_chip_bitfield_generator(
+        placements, app_graph, executable_finder, transceiver,
+        machine_graph, routing_infos):
     """ Loads and runs the bit field generator on chip.
 
     :param ~pacman.model.placements.Placements placements: placements
