@@ -232,8 +232,8 @@ class SPIFRetinaDevice(
         self.__pipe = pipe
         self.__base_key = base_key
         if self.__base_key is None:
-            self.__base_key = self.__n_devices
-        self.__n_devices += 1
+            self.__base_key = SPIFRetinaDevice.__n_devices
+        SPIFRetinaDevice.__n_devices += 1
 
         # Generate the shifts and masks to convert the SPIF Ethernet inputs to
         # PYX format
