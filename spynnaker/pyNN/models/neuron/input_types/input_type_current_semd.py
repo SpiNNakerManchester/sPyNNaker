@@ -35,10 +35,16 @@ class InputTypeCurrentSEMD(AbstractInputType):
 
     def __init__(self, multiplicator, inh_input_previous):
         """
-        :param float multiplicator:
-        :param float inh_input_previous:
+        :param multiplicator:
+        :type multiplicator:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param inh_input_previous:
+        :type inh_input_previous:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
         """
-        super(InputTypeCurrentSEMD, self).__init__([
+        super().__init__([
             DataType.S1615,   # multiplicator
             DataType.S1615])  # inh_input_previous
         self.__multiplicator = multiplicator
@@ -83,17 +89,9 @@ class InputTypeCurrentSEMD(AbstractInputType):
     def multiplicator(self):
         return self.__multiplicator
 
-    @multiplicator.setter
-    def multiplicator(self, multiplicator):
-        self.__multiplicator = multiplicator
-
     @property
     def inh_input_previous(self):
         return self.__inh_input_previous
-
-    @inh_input_previous.setter
-    def inh_input_previous(self, inh_input_previous):
-        self.__inh_input_previous = inh_input_previous
 
     def get_global_weight_scale(self):
         return 1.0

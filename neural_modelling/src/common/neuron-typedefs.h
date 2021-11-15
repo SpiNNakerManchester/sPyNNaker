@@ -95,8 +95,28 @@ static inline payload_t spike_payload(UNUSED spike_t s) {
 #endif /*SPIKES_WITH_PAYLOADS*/
 #endif /*__SPIKE_T__*/
 
-//! The type of a synaptic row
-typedef address_t synaptic_row_t;
+//! \brief The type of a synaptic row.
+//! \details There is no definition of `struct synaptic row` because it is a
+//!     form of memory structure that C cannot encode as a single `struct`.
+//!
+//! It's actually this, with multiple variable length arrays intermixed with
+//! size counts:
+//! ~~~~~~{.c}
+//! struct synaptic_row {
+//!     uint32_t n_plastic_synapse_words;
+//!     uint32_t plastic_synapse_data[n_plastic_synapse_words]; // VLA
+//!     uint32_t n_fixed_synapse_words;
+//!     uint32_t n_plastic_controls;
+//!     uint32_t fixed_synapse_data[n_fixed_synapse_words]; // VLA
+//!     control_t plastic_control_data[n_plastic_controls]; // VLA
+//! }
+//! ~~~~~~
+//!
+//! The relevant implementation structures are:
+//! * ::synapse_row_plastic_part_t
+//! * ::synapse_row_fixed_part_t
+//! * ::single_synaptic_row_t
+typedef struct synaptic_row *synaptic_row_t;
 
 //! The type of an input
 typedef REAL input_t;

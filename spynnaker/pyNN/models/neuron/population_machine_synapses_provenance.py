@@ -1,0 +1,194 @@
+# Copyright (c) 2017-2020The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import ctypes
+from spinn_utilities.abstract_base import abstractproperty
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
+
+
+class SynapseProvenance(ctypes.LittleEndianStructure):
+    """ Provenance items from synapse processing
+    """
+    _fields_ = [
+        # A count of presynaptic events.
+        ("n_pre_synaptic_events", ctypes.c_uint32),
+        # A count of synaptic saturations.
+        ("n_saturations", ctypes.c_uint32),
+        # The number of STDP weight saturations.
+        ("n_plastic_saturations", ctypes.c_uint32),
+        # The number of searches of the population table that hit nothing
+        ("n_ghost_searches", ctypes.c_uint32),
+        # The number of bitfields that couldn't fit in DTCM
+        ("n_failed_bitfield_reads", ctypes.c_uint32),
+        # The number of population table hits on INVALID entries
+        ("n_invalid_pop_table_hits", ctypes.c_uint32),
+        # The number of spikes that didn't transfer empty rows
+        ("n_filtered_by_bitfield", ctypes.c_uint32),
+        # Custom provenance from SpiNNCer
+        ("max_spikes_in_a_tick", ctypes.c_uint32),
+        ("max_dmas_in_a tick", ctypes.c_uint32),
+        ("max_pipeline_restarts", ctypes.c_uint32),
+        ("timer_callback_completed", ctype.c_uint32),
+        ("spikes_pipeline_activated", ctype.c_uint32),
+        # Max flushed spikes in a timestep
+        ("max_flushed_spikes", ctype.c_uint32),
+        # Total flushed spikes
+        ("total_flushed_spikes", ctype.c_uint32)
+    ]
+
+    N_ITEMS = len(_fields_)
+
+
+class PopulationMachineSynapsesProvenance(object):
+    """ Mix-in to add synapse provenance gathering without other synapse things
+    """
+
+    # This MUST stay empty to allow mixing with other things with slots
+    __slots__ = []
+
+    TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
+    SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
+    SATURATED_PLASTIC_WEIGHTS_NAME = (
+        "Times_plastic_synaptic_weights_have_saturated")
+    GHOST_SEARCHES = "Number of failed pop table searches"
+    BIT_FIELDS_NOT_READ = "N bit fields not able to be read into DTCM"
+    INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
+    BIT_FIELD_FILTERED_PACKETS = \
+        "How many packets were filtered by the bitfield filterer."
+    # Custom provenance from SpiNNCer
+    MAX_SPIKES_IN_A_TICK = "Maximum number of spikes in a timer tick"
+    MAX_DMAS_IN_A_TICK = "Maximum number of DMAs in a timer tick"
+    MAX_PIPELINE_RESTARTS = "Maximum pipeline restarts"
+    TIMER_CALLBACK_COMPLETED = "Was the timer callback completed?"
+    SPIKES_PIPELINE_ACTIVATED = "Was the spikes pipeline activated?"
+    # Flushed spikes
+    MAX_FLUSHED_SPIKES = "Maximum number of spikes flushed in a timer tick"
+    TOTAL_FLUSHED_SPIKES = "Total number of spikes flushed"
+
+    @abstractproperty
+    def _app_vertex(self):
+        """ The application vertex of the machine vertex.
+
+        :note: This is likely to be available via the MachineVertex.
+
+        :rtype: AbstractPopulationVertex
+        """
+
+    def _parse_synapse_provenance(self, label,  x, y, p, provenance_data):
+        """ Extract and yield synapse provenance
+
+        :param str label: The label of the node
+        :param int x: x coordinate of the chip where this core
+        :param int y: y coordinate of the core where this core
+        :param int p: virtual id of the core
+        :param list(int) provenance_data: A list of data items to interpret
+        :return: a list of provenance data items
+        :rtype: iterator of ProvenanceDataItem
+        """
+        synapse_prov = SynapseProvenance(*provenance_data)
+
+        with ProvenanceWriter() as db:
+            db.insert_core(
+                x, y, p, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME,
+                synapse_prov.n_pre_synaptic_events)
+
+            db.insert_core(
+                x, y, p, self.SATURATION_COUNT_NAME,
+                synapse_prov.n_saturations)
+            if synapse_prov.n_saturations > 0:
+                db.insert_report(
+                    f"The weights from the synapses for {label} saturated "
+                    f"{synapse_prov.n_saturations} times. ")
+
+            db.insert_core(
+                x, y, p, self.SATURATED_PLASTIC_WEIGHTS_NAME,
+                synapse_prov.n_plastic_saturations)
+            if synapse_prov.n_plastic_saturations > 0:
+                db.insert_report(
+                    f"The weights from the plastic synapses for {label} "
+                    f"saturated {synapse_prov.n_plastic_saturations} times. ")
+
+            db.insert_core(
+                x, y, p, self.GHOST_SEARCHES, synapse_prov.n_ghost_searches)
+            if synapse_prov.n_ghost_searches > 0:
+                db.insert_report(
+                    f"The number of failed population table searches for "
+                    f"{label} was {synapse_prov.n_ghost_searches}. ")
+
+            db.insert_core(
+                x, y, p, self.BIT_FIELDS_NOT_READ,
+                synapse_prov.n_failed_bitfield_reads)
+            if synapse_prov.n_failed_bitfield_reads:
+                db.insert_report(
+                    f"On {label}, the filter for stopping redundant DMAs "
+                    f"couldn't be fully filled in; it failed to read "
+                    f"{synapse_prov.n_failed_bitfield_reads} entries. "
+                    "Try reducing neurons per core.")
+
+            db.insert_core(
+                x, y, p, self.INVALID_MASTER_POP_HITS,
+                synapse_prov.n_invalid_pop_table_hits)
+            if synapse_prov.n_invalid_pop_table_hits > 0:
+                db.insert_report(
+                    f"On {label}, there were "
+                    f"{synapse_prov.n_invalid_pop_table_hits} keys received "
+                    f"that had no master pop entry for them.")
+
+            db.insert_core(
+                x, y, p, self.BIT_FIELD_FILTERED_PACKETS,
+                synapse_prov.n_filtered_by_bitfield)
+
+            # SpiNNCer
+            db.insert_core(
+                x, y, p, self.MAX_SPIKES_IN_A_TICK,
+                synpase_prov.max_spikes_in_a_tick)
+            if synapse_prov.max_spikes_in_a_tick > 200:
+                db.insert_report(
+                    f"Max number of spikes for {label} was "
+                    f"{synapse_prov.max_spikes_in_a_tick}. Empirically, we "
+                    f"can deal with ~200 for real time performance using a "
+                    f"1.0 ms timestep.")
+
+            db.insert_core(
+                x, y, p, self.MAX_DMAS_IN_A_TICK,
+                synapse_prov.max_dmas_in_a_tick)
+
+            db.insert_core(
+                x, y, p, self.MAX_PIPELINE_RESTARTS,
+                synapse_prov.max_pipeline_restarts)
+
+            db.insert_core(
+                x, y, p, self.TIMER_CALLBACK_COMPLETED,
+                synapse_prov.timer_callback_completed)
+
+            db.insert_core(
+                x, y, p, self.SPIKES_PIPELINE_ACTIVATED,
+                synapse_prov.spikes_pipeline_activated)
+
+            # FLUSHED SPIKES
+            db.insert_core(
+                x, y, p, self.MAX_FLUSHED_SPIKES,
+                synapse_prov.max_flushed_spikes)
+            if synapse_prov.max_flushed_spikes > 0:
+                db.insert_report(
+                    f"Max number of flushed spikes for {label} was "
+                    f"was {synapse_prov.max_flushed_spikes}.")
+
+            db.insert_core(
+                x, y, p, self.TOTAL_FLUSHED_SPIKES,
+                synapse_prov.total_flushed_spikes)
+            if synapse_prov.total_flushed_spikes > 0:
+                db.insert_report(
+                    f"Total number of flushed spikes for {label} was "
+                    f"{synapse_prov.total_flushed_spikes}.")

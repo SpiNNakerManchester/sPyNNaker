@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.defaults import default_initial_values,\
-    default_parameters
+from spynnaker.pyNN.models.defaults import (
+    default_initial_values, default_parameters)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
@@ -26,8 +25,6 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
-
-logger = logging.getLogger(__name__)
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
@@ -90,7 +87,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         self._translator = translator
         self._create_edges = create_edges
 
-        super(ExternalDeviceLifControl, self).__init__(
+        super().__init__(
             model_name="ExternalDeviceLifControl",
             binary="external_device_lif_control.aplx",
             neuron_model=neuron_model, input_type=input_type,
@@ -100,7 +97,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep, drop_late_spikes):
+            n_steps_per_timestep, drop_late_spikes, splitter):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
                 "Number of neurons does not match number of devices in {}"
@@ -111,4 +108,4 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
             incoming_spike_buffer_size, constraints,
-            drop_late_spikes)
+            drop_late_spikes, splitter)

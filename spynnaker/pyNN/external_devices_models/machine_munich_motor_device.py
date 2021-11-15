@@ -25,13 +25,12 @@ from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.interface.provenance import \
-    ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.utility_objs import (
-    ExecutableType, ProvenanceDataItem)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 
@@ -52,23 +51,22 @@ class MachineMunichMotorDevice(
 
     MOTOR_PARTITION_ID = "MOTOR"
 
-    N_ATOMS = 6
+    # By asking for this number of keys, we will get a mask of 0xFFFFF800,
+    # which works with the motor control protocol correctly
+    _MOTOR_N_KEYS = 2048
 
-    SYSTEM_REGION = 0
-    PARAMS_REGION = 1
-    PROVENANCE_REGION = 2
+    _N_ATOMS = 6
 
-    PROVENANCE_ELEMENTS = 1
+    _SYSTEM_REGION = 0
+    _PARAMS_REGION = 1
+    _PROVENANCE_REGION = 2
 
-    PARAMS_SIZE = 7 * BYTES_PER_WORD
+    _PROVENANCE_ELEMENTS = 1
 
+    _PARAMS_SIZE = 7 * BYTES_PER_WORD
+
+    #: The name of the provenance item saying that packets were lost.
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
-    INPUT_BUFFER_FULL_MESSAGE = (
-        "The input buffer for {} on {}, {}, {} lost packets on {} "
-        "occasions. This is often a sign that the system is running "
-        "too quickly for the number of neurons per core.  Please "
-        "increase the timer_tic or time_scale_factor or decrease the "
-        "number of neurons per core.")
 
     def __init__(
             self, speed, sample_time, update_time, delay_time,
@@ -85,9 +83,9 @@ class MachineMunichMotorDevice(
         :param constraints:
         :param app_vertex:
         """
-        super(MachineMunichMotorDevice, self).__init__(
+        super().__init__(
             label=label, constraints=constraints, app_vertex=app_vertex,
-            vertex_slice=Slice(0, self.N_ATOMS-1))
+            vertex_slice=Slice(0, self._N_ATOMS - 1))
         self.__speed = speed
         self.__sample_time = sample_time
         self.__update_time = update_time
@@ -100,8 +98,8 @@ class MachineMunichMotorDevice(
     def resources_required(self):
         return ResourceContainer(
             sdram=ConstantSDRAM(
-                SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE +
-                self.get_provenance_data_size(self.PROVENANCE_ELEMENTS)),
+                SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
+                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS)),
             dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
@@ -115,51 +113,36 @@ class MachineMunichMotorDevice(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
     def _provenance_region_id(self):
-        return self.PROVENANCE_REGION
+        return self._PROVENANCE_REGION
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return self.PROVENANCE_ELEMENTS
+        return self._PROVENANCE_ELEMENTS
 
-    @overrides(ProvidesProvenanceDataFromMachineImpl.
-               get_provenance_data_from_machine)
-    def get_provenance_data_from_machine(self, transceiver, placement):
-        # get prov data
-        provenance_data = self._read_provenance_data(transceiver, placement)
-        # get system level prov
-        provenance_items = self._read_basic_provenance_items(
-            provenance_data, placement)
-        # get left over prov
-        provenance_data = self._get_remaining_provenance_data_items(
-            provenance_data)
-        # stuff for making prov data items
-        label, x, y, p, names = self._get_placement_details(placement)
+    @overrides(
+        ProvidesProvenanceDataFromMachineImpl.parse_extra_provenance_items)
+    def parse_extra_provenance_items(
+            self, label, x, y, p, provenance_data):
+        n_buffer_overflows, = provenance_data
 
-        # get the only app level prov item
-        n_buffer_overflows = provenance_data[0]
+        with ProvenanceWriter() as db:
+            db.insert_core(x, y, p, self.INPUT_BUFFER_FULL_NAME,
+                           n_buffer_overflows)
+            if n_buffer_overflows > 0:
+                db.insert_report(
+                    f"The input buffer for {label} lost packets on "
+                    f"{n_buffer_overflows} occasions. "
+                    "This is often a sign that the system is running too "
+                    "quickly for the number of neurons per core.  "
+                    "Please increase the timer_tic or time_scale_factor "
+                    "or decrease the number of neurons per core.")
 
-        # build it
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
-            n_buffer_overflows, report=n_buffer_overflows > 0,
-            message=self.INPUT_BUFFER_FULL_MESSAGE.format(
-                label, x, y, p, n_buffer_overflows)))
-        return provenance_items
-
-    @inject_items({
-        "routing_info": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor"
-    })
+    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "machine_time_step", "time_scale_factor"
-        })
-    def generate_data_specification(
-            self, spec, placement, routing_info,
-            machine_time_step, time_scale_factor):
+        additional_arguments={"routing_info"})
+    def generate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -169,10 +152,9 @@ class MachineMunichMotorDevice(
         spec.comment("\n*** Spec for robot motor control ***\n\n")
 
         # handle simulation data
-        spec.switch_write_focus(self.SYSTEM_REGION)
+        spec.switch_write_focus(self._SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            placement.vertex.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            placement.vertex.get_binary_file_name()))
 
         # Get the key
         edge_key = routing_info.get_first_key_from_pre_vertex(
@@ -182,7 +164,7 @@ class MachineMunichMotorDevice(
                 "This motor should have one outgoing edge to the robot")
 
         # write params to memory
-        spec.switch_write_focus(region=self.PARAMS_REGION)
+        spec.switch_write_focus(region=self._PARAMS_REGION)
         spec.write_value(data=edge_key)
         spec.write_value(data=self.__speed)
         spec.write_value(data=self.__sample_time)
@@ -208,9 +190,16 @@ class MachineMunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            self.SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
+            self._SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
-            self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
+            self._PARAMS_REGION, self._PARAMS_SIZE, label='params')
 
         self.reserve_provenance_data_region(spec)
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, _partition):
+        if _partition == self.MOTOR_PARTITION_ID:
+            return self._MOTOR_N_KEYS
+        return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
+            _partition)

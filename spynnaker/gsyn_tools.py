@@ -54,7 +54,7 @@ def check_sister_gysn(sister, n_neurons, runtime, gsyn):
     """ Compare an arrays of conductances with baseline data from a file next\
         to a specified module. For testing.
 
-    :param sister: A module. The file read from will be ``gsyn.data`` \
+    :param sister: A module. The file read from will be ``gsyn.data``
         adjacent to this module.
     :param n_neurons: The number of neurons that produced the data.
     :param runtime: The length of time that the generated data represents.

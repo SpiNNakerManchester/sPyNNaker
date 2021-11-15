@@ -13,22 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.machine.machine_vertex import MachineVertex
 
 SYNAPSE_EXPANDER_APLX = "synapse_expander.aplx"
 
 
-@add_metaclass(AbstractBase)
-class AbstractSynapseExpandable(object):
-    """ Indicates a class (most likely a MachineVertex) that has may need to\
-        run the SYNAPSE_EXPANDER aplx
-
-    Cores that do not use the synapse_manager should not implement this
-    API even though their app vertex may hold a synapse_manager
+@require_subclass(MachineVertex)
+class AbstractSynapseExpandable(object, metaclass=AbstractBase):
+    """ Indicates a class (a \
+        :py:class:`~pacman.model.graphs.machine.MachineVertex`) \
+        that has may need to run the SYNAPSE_EXPANDER aplx
 
     .. note::
-        This is NOT implemented by the DelayExtensionMachineVertex
+        This is *not* implemented by the
+        :py:class:`~.DelayExtensionMachineVertex`,
         which needs a different expander aplx
     """
 
@@ -36,22 +37,28 @@ class AbstractSynapseExpandable(object):
 
     @abstractmethod
     def gen_on_machine(self):
-        """
-        True if the synapses of a the slice of this vertex should be generated
-        on the machine.
+        """ True if the synapses of a the slice of this vertex should be \
+            generated on the machine.
 
         .. note::
             The typical implementation for this method will be to ask the
             app_vertex's synapse_manager
+
+        :rtype: bool
+        """
+
+    @abstractproperty
+    def connection_generator_region(self):
+        """ The region containing the parameters of synaptic expansion
+
+        :rtype: int
+
+        :rtype: bool
         """
 
     @abstractmethod
     def read_generated_connection_holders(self, transceiver, placement):
         """ Fill in the connection holders
-
-        .. note::
-            The typical implementation for this method will be to ask the
-            app_vertex's synapse_manager
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How the data is to be read

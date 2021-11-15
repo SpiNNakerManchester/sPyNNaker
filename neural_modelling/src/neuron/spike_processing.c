@@ -28,23 +28,13 @@
 #include <common/in_spikes.h>
 #include <recording.h>
 
-// Custom provenance from SpiNNCer
-// counter for number of spikes between timer events
-uint32_t spikes_this_tick = 0;
-uint32_t dmas_this_tick = 0;
-uint32_t pipeline_restarts_this_tick = 0;
-uint32_t spike_pipeline_deactivation_time = 0;
-
-// FLUSH SPIKES variables needed
-static uint32_t total_flushed_spikes;
-static uint32_t max_flushed_spikes;
 extern bool timer_callback_active;
 
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
     //! Address in SDRAM to write back plastic region to
-    address_t sdram_writeback_address;
+    synaptic_row_t sdram_writeback_address;
 
     //! \brief Key of originating spike
     //! \details used to allow row data to be re-used for multiple spikes
@@ -54,7 +44,7 @@ typedef struct dma_buffer {
     uint32_t n_bytes_transferred;
 
     //! Row data
-    address_t row;
+    synaptic_row_t row;
 } dma_buffer;
 
 //! The number of DMA Buffers to use
@@ -86,15 +76,17 @@ static uint32_t buffer_being_read;
 //! Number of outstanding synaptogenic rewirings
 static volatile uint32_t rewires_to_do = 0;
 
-//! The number of rewires to do when the DMA completes.  When a DMA is first set
-//! up, only this or dma_n_spikes can be 1 with the other being 0.
+//! \brief The number of rewires to do when the DMA completes.
+//! \details When a DMA is first set up, only this or ::dma_n_spikes can be 1
+//!     with the other being 0.
 static uint32_t dma_n_rewires;
 
-//! The number of spikes to do when the DMA completes.  When a DMA is first set
-//! up, only this or dma_n_rewires can be 1 with the other being 0.
+//! \brief The number of spikes to do when the DMA completes.
+//! \details When a DMA is first set up, only this or ::dma_n_rewires can be 1
+//!     with the other being 0.
 static uint32_t dma_n_spikes;
 
-//! the number of dma completes (used in provenance generation)
+//! the number of DMA completes (used in provenance generation)
 static uint32_t dma_complete_count;
 
 //! the number of spikes that were processed (used in provenance generation)
@@ -103,21 +95,33 @@ static uint32_t spike_processing_count;
 //! The number of successful rewires
 static uint32_t n_successful_rewires;
 
-//! count how many packets were lost from the input buffer because of late
-//! arrival
+//! \brief How many packets were lost from the input buffer because of
+//!     late arrival
 static uint32_t count_input_buffer_packets_late;
 
 //! tracker of how full the input buffer got.
 static uint32_t biggest_fill_size_of_input_buffer;
 
-//! bool that governs if we should clear packets from the input buffer at the
-//! end of a timer tick.
+//! \brief Whether if we should clear packets from the input buffer at the
+//!     end of a timer tick.
 static bool clear_input_buffers_of_late_packets;
+
+static uint32_t max_spikes_in_a_tick;
+static uint32_t max_dmas_in_a_tick;
+static uint32_t dma_complete_count;
+static uint32_t max_pipeline_restarts;
+static uint32_t spike_pipeline_deactivation_time = 0;
+static uint32_t timer_callback_completed = 0;
+
+static uint32_t max_flushed_spikes;
+static uint32_t total_flushed_spikes;
 
 //! the number of packets received this time step
 static struct {
     uint32_t time;
     uint32_t packets_this_time_step;
+    uint32_t dmas_this_time_step;
+    uint32_t pipeline_restarts;s
 } p_per_ts_struct;
 
 //! the region to record the packets per timestep in
@@ -126,15 +130,15 @@ static uint32_t p_per_ts_region;
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
-//! \param[in] row_address: Where in SDRAM to read the row from
+//! \param[in] row: Where in SDRAM to read the row from
 //! \param[in] n_bytes_to_transfer: The size of the synaptic row
 //! \param[in] spike: The spike that triggered this read
 static inline void do_dma_read(
-        address_t row_address, size_t n_bytes_to_transfer, spike_t spike) {
+        synaptic_row_t row, size_t n_bytes_to_transfer, spike_t spike) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
-    next_buffer->sdram_writeback_address = row_address;
+    next_buffer->sdram_writeback_address = row;
     next_buffer->originating_spike = spike;
     next_buffer->n_bytes_transferred = n_bytes_to_transfer;
 
@@ -142,7 +146,7 @@ static inline void do_dma_read(
     // buffer
     buffer_being_read = next_buffer_to_fill;
     while (!spin1_dma_transfer(
-            DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
+            DMA_TAG_READ_SYNAPTIC_ROW, row, next_buffer->row, DMA_READ,
             n_bytes_to_transfer)) {
         // Do Nothing
     }
@@ -150,7 +154,7 @@ static inline void do_dma_read(
 }
 
 //! \brief Check if there is anything to do. If not, DMA is not busy
-//! \param[out] row_address:
+//! \param[out] row:
 //!     The address of the synaptic row that has been processed
 //! \param[out] n_bytes_to_transfer: The size of the processed synaptic row
 //! \param[out] spike: The spike being processed
@@ -158,7 +162,7 @@ static inline void do_dma_read(
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
 //! \return True if there's something to do
 static inline bool is_something_to_do(
-        address_t *row_address, size_t *n_bytes_to_transfer,
+        synaptic_row_t *row, size_t *n_bytes_to_transfer,
         spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
@@ -167,7 +171,7 @@ static inline bool is_something_to_do(
     while (rewires_to_do) {
         rewires_to_do--;
         spin1_mode_restore(cpsr);
-        if (synaptogenesis_dynamics_rewire(time, spike, row_address,
+        if (synaptogenesis_dynamics_rewire(time, spike, row,
                 n_bytes_to_transfer)) {
             *n_rewire += 1;
             return true;
@@ -177,8 +181,7 @@ static inline bool is_something_to_do(
 
     // Is there another address in the population table?
     spin1_mode_restore(cpsr);
-    if (population_table_get_next_address(
-            spike, row_address, n_bytes_to_transfer)) {
+    if (population_table_get_next_address(spike, row, n_bytes_to_transfer)) {
         *n_process_spike += 1;
         return true;
     }
@@ -196,7 +199,7 @@ static inline bool is_something_to_do(
         // as this can be slow
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
-                *spike, row_address, n_bytes_to_transfer)) {
+                *spike, row, n_bytes_to_transfer)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
@@ -226,10 +229,11 @@ static inline bool is_something_to_do(
 //! \param[in,out] n_rewires: Accumulator of number of rewirings
 //! \param[in,out] n_synapse_processes:
 //!     Accumulator of number of synapses processed
-static void setup_synaptic_dma_read(dma_buffer *current_buffer,
+//! \return Whether an actual DMA was set up or not
+static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
     // Set up to store the DMA location and size to read
-    address_t row_address;
+    synaptic_row_t row;
     size_t n_bytes_to_transfer;
     spike_t spike;
     dma_n_spikes = 0;
@@ -237,10 +241,10 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
-    while (!setup_done && is_something_to_do(&row_address,
-            &n_bytes_to_transfer, &spike, &dma_n_rewires, &dma_n_spikes)) {
+    while (!setup_done && is_something_to_do(&row, &n_bytes_to_transfer,
+            &spike, &dma_n_rewires, &dma_n_spikes)) {
         if (current_buffer != NULL &&
-                current_buffer->sdram_writeback_address == row_address) {
+                current_buffer->sdram_writeback_address == row) {
             // If we can reuse the row, add on what we can use it for
             // Note that only one of these will have a value of 1 with the
             // other being set to 0, but we add both as it is simple
@@ -251,7 +255,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         } else if (n_bytes_to_transfer == 0) {
             // If the row is in DTCM, process the row now
             synaptic_row_t single_fixed_synapse =
-                    direct_synapses_get_direct_synapse(row_address);
+                    direct_synapses_get_direct_synapse(row);
             bool write_back;
             synapses_process_synaptic_row(
                     time, single_fixed_synapse, &write_back);
@@ -259,7 +263,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_spikes = 0;
         } else {
             // If the row is in SDRAM, set up the transfer and we are done
-            do_dma_read(row_address, n_bytes_to_transfer, spike);
+            do_dma_read(row, n_bytes_to_transfer, spike);
             setup_done = true;
         }
 
@@ -267,6 +271,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         // processing and not the surplus DMA requests.
         spike_processing_count++;
     }
+    return setup_done;
 }
 
 //! \brief Set up a DMA write of synaptic data.
@@ -281,16 +286,17 @@ static inline void setup_synaptic_dma_write(
     // Get the number of plastic bytes and the write back address from the
     // synaptic row
     size_t write_size = buffer->n_bytes_transferred;
-    address_t sdram_start_address = buffer->sdram_writeback_address;
-    address_t dtcm_start_address = buffer->row;
+    void *sdram_start_address = buffer->sdram_writeback_address;
+    void *dtcm_start_address = buffer->row;
     if (plastic_only) {
         write_size = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
-        sdram_start_address = synapse_row_plastic_region(sdram_start_address);
-        dtcm_start_address = synapse_row_plastic_region(dtcm_start_address);
+        sdram_start_address = synapse_row_plastic_region(
+                buffer->sdram_writeback_address);
+        dtcm_start_address = synapse_row_plastic_region(buffer->row);
     }
 
     log_debug("Writing back %u bytes of plastic region to %08x for spike %u",
-              write_size, sdram_start_address, buffer->originating_spike);
+            write_size, sdram_start_address, buffer->originating_spike);
 
     // Start transfer
     while (!spin1_dma_transfer(DMA_TAG_WRITE_PLASTIC_REGION, sdram_start_address,
@@ -299,41 +305,17 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-static void multicast_packet_received_callback(uint key, uint payload) {
-    p_per_ts_struct.packets_this_time_step += 1;
-
-    // Increment the count of number of spikes received this tick by this core
-    spikes_this_tick++;
-
-    // handle the 2 cases separately
-    if (payload == 0) {
-        log_debug(
-            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-        // set to 1 to work with the loop.
-        payload = 1;
-    } else {
-        log_debug(
-            "Received spike %x with payload %d at %d, DMA Busy = %d",
-            key, payload, time, dma_busy);
-    }
-
-    // cycle through the packet insertion
-    for (uint count = payload; count > 0; count--) {
-        in_spikes_add_spike(key);
-    }
-
+//! \brief Start the DMA processing loop if not already running
+static inline void start_dma_loop(void) {
     // If we're not already processing synaptic DMAs,
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
     if (!dma_busy) {
         log_debug("Sending user event for new spike");
+        // Only set busy if successful.
+        // NOTE: Counts when unsuccessful are handled by the API
         if (spin1_trigger_user_event(0, 0)) {
             dma_busy = true;
-        } else {
-            log_warning("Could not trigger user event\n");
         }
     }
 
@@ -360,14 +342,43 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 //    }
 }
 
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param[in] unused: Only specified to match API
+static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    if (in_spikes_add_spike(key)) {
+        start_dma_loop();
+    }
+}
+
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param[in] payload: the payload of the packet. The count.
+static void multicast_packet_pl_received_callback(uint key, uint payload) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
+        key, payload, time, dma_busy);
+
+    // cycle through the packet insertion
+    bool added = false;
+    for (uint count = payload; count > 0; count--) {
+        added = in_spikes_add_spike(key);
+    }
+    if (added) {
+        start_dma_loop();
+    }
+}
+
 //! \brief Called when a DMA completes
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
 static void dma_complete_callback(UNUSED uint unused, uint tag) {
 
     // increment the dma complete count for provenance generation
-    dmas_this_tick++;
-    dma_complete_count++;
+    p_per_ts_struct.dmas_this_time_step += 1;
+    dma_complete_count += 1;
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
@@ -390,7 +401,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     bool plastic_only = true;
 
     // If rewiring, do rewiring first
-//    for (uint32_t i = 0; i < n_rewires; i++) {
+//    for (uint32_t i = n_rewires; i > 0; i--) {
 //        if (synaptogenesis_row_restructure(time, current_buffer->row)) {
 //            write_back = true;
 //            plastic_only = false;
@@ -414,9 +425,10 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
                     current_buffer->row);
 
             // Print out the row for debugging
+            address_t row = (address_t) current_buffer->row;
             for (uint32_t i = 0;
                     i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
+                log_error("%u: 0x%08x", i, row[i]);
             }
             rt_error(RTE_SWERR);
         }
@@ -439,7 +451,7 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     dma_n_spikes = 0;
 
     // Increment counter for spike processing pipeline restarts
-    pipeline_restarts_this_tick++;
+    p_per_ts_struct.pipeline_restarts++;
 
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
@@ -453,9 +465,13 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-
-//! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
+    uint32_t n_spikes = in_spikes_size();
+    if (clear_input_buffers_of_late_packets) {
+        spin1_dma_flush();
+        in_spikes_clear();
+        dma_busy = false;
+    }
 
     // Record the number of packets received last timer tick
     p_per_ts_struct.time = time;
@@ -463,11 +479,7 @@ void spike_processing_clear_input_buffer(timer_t time) {
     p_per_ts_struct.packets_this_time_step = 0;
 
     // Record the count whether clearing or not for provenance
-    count_input_buffer_packets_late += in_spikes_size();
-//
-//    if (clear_input_buffers_of_late_packets) {
-//        in_spikes_clear();
-//    }
+    count_input_buffer_packets_late += n_spikes;
 }
 
 bool spike_processing_initialise( // EXPORTED
@@ -502,7 +514,7 @@ bool spike_processing_initialise( // EXPORTED
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(MCPL_PACKET_RECEIVED,
-            multicast_packet_received_callback, mc_packet_callback_priority);
+            multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
@@ -510,86 +522,60 @@ bool spike_processing_initialise( // EXPORTED
     return true;
 }
 
-uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
-    // Check for buffer overflow
-    return in_spikes_get_n_buffer_overflows();
+void spike_processing_store_provenance(struct spike_processing_provenance *prov) {
+    prov->n_input_buffer_overflows = in_spikes_get_n_buffer_overflows();
+    prov->n_dmas_complete = dma_complete_count;
+    prov->n_spikes_processed = spike_processing_count;
+    prov->n_rewires = n_successful_rewires;
+    prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
+    prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
+    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
+    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
+    prov->max_pipeline_restarts = max_pipeline_restarts;
+    prov->timer_callback_completed = timer_callback_completed;
+    prov->spike_pipeline_deactivated = spike_pipeline_deactivation_time;
+    prov->max_flushed_spikes = max_flushed_spikes;
+    prov->total_flushed_spikes = total_flushed_spikes;
 }
 
-uint32_t spike_processing_get_dma_complete_count(void) {
-    return dma_complete_count;
-}
-
-uint32_t spike_processing_get_spike_processing_count(void) {
-    return spike_processing_count;
-}
-
-uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
-    return n_successful_rewires;
-}
-
-uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
-    return count_input_buffer_packets_late;
-}
-
-uint32_t spike_processing_get_max_filled_input_buffer_size(void) { // EXPORTED
-    return biggest_fill_size_of_input_buffer;
-}
-
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
     // disable interrupts
     uint cpsr = spin1_int_disable();
     rewires_to_do += number_of_rewires;
-
-    // If we're not already processing synaptic DMAs,
-    // flag pipeline as busy and trigger a feed event
-    if (!dma_busy) {
-        log_debug("Sending user event for rewiring");
-        if (spin1_trigger_user_event(0, 0)) {
-            dma_busy = true;
-        } else {
-            log_debug("Could not trigger user event\n");
-        }
-    }
+    start_dma_loop();
     // enable interrupts
     spin1_mode_restore(cpsr);
     return true;
 }
 
 // Custom provenance from SpiNNCer
-uint32_t spike_processing_get_and_reset_spikes_this_tick(){
-
-	uint32_t spikes_to_return = spikes_this_tick;
-	spikes_this_tick = 0;
-
-	return spikes_to_return;
+void spike_processing_get_and_reset_spikes_this_tick(){
+	if (p_per_ts_struct.packets_this_time_step > max_spikes_in_a_tick) {
+		max_spikes_in_a_tick = p_per_ts_struct.packets_this_time_step;
+	}
 }
 
-uint32_t spike_processing_get_and_reset_dmas_this_tick(){
-
-	uint32_t dmas_to_return = dmas_this_tick;
-	dmas_this_tick = 0;
-
-	return dmas_to_return;
+void spike_processing_get_and_reset_dmas_this_tick(){
+	if (p_per_ts_struct.dmas_this_time_step > max_dmas_in_a_tick){
+		max_dmas_in_a_tick = p_per_ts_struct.dmas_this_time_step;
+	}
 }
 
-uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick(){
-	uint32_t pipeline_restarts_to_return = pipeline_restarts_this_tick;
-	pipeline_restarts_this_tick = 0;
-
-	return pipeline_restarts_to_return;
+void spike_processing_get_and_reset_pipeline_restarts_this_tick(){
+	if (p_per_ts_struct.pipeline_restarts > max_pipeline_restarts) {
+		max_pipeline_restarts = p_per_ts_struct.pipeline_restarts;
+	}
 }
 
-uint32_t spike_processing_get_pipeline_deactivation_time(){
-	return spike_pipeline_deactivation_time;
-}
-
-// FLUSH SPIKES
-uint32_t spike_processing_get_total_flushed_spikes(){
-	return total_flushed_spikes;
-}
-
-uint32_t spike_processing_get_max_flushed_spikes(){
-	return max_flushed_spikes;
-}
+//uint32_t spike_processing_get_pipeline_deactivation_time(){
+//	return spike_pipeline_deactivation_time;
+//}
+//
+//// FLUSH SPIKES
+//uint32_t spike_processing_get_total_flushed_spikes(){
+//	return total_flushed_spikes;
+//}
+//
+//uint32_t spike_processing_get_max_flushed_spikes(){
+//	return max_flushed_spikes;
+//}

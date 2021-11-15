@@ -65,9 +65,6 @@ extern uint8_t **neuron_recording_indexes;
 //! The index to record each bitfield variable to for each neuron
 extern uint8_t **bitfield_recording_indexes;
 
-//! The number of recordings outstanding
-extern volatile uint32_t n_recordings_outstanding;
-
 //! An array of recording information structures
 extern recording_info_t *recording_info;
 
@@ -79,11 +76,6 @@ extern uint8_t **recording_values;
 
 //! An array of spaces into which bitfields can be written
 extern uint32_t **bitfield_values;
-
-//! \brief function to handle when a recording stage finished
-static void recording_done_callback(void) {
-    n_recordings_outstanding -= 1;
-}
 
 //! \brief stores a recording of a value of any type, except bitfield;
 //!        use the functions below for common types as these will be faster.
@@ -146,7 +138,6 @@ static inline void neuron_recording_record_int32(
     data[index] = value;
 }
 
-
 //! \brief stores a recording of a set bit; this is the only way to set a bit
 //!        in a bitfield; neuron_recording_record_value doesn't work for this!
 //! \param[in] var_index: which bitfield recording variable to write this is
@@ -162,18 +153,16 @@ static inline void neuron_recording_record_bit(
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
+
     for (uint32_t i = N_RECORDED_VARS; i > 0; i--) {
         recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
         if (rec_info->count == rec_info->rate) {
             // Reset the count
             rec_info->count = 1;
-            // Note we are recording
-            n_recordings_outstanding += 1;
             // Set the time and record the data
             rec_info->values->time = time;
-            recording_record_and_notify(
-                i - 1, rec_info->values, rec_info->size, recording_done_callback);
+            recording_record(i - 1, rec_info->values, rec_info->size);
         } else {
 
             // Not recording this time, so increment by specified amount
@@ -191,13 +180,9 @@ static inline void neuron_recording_record(uint32_t time) {
             if (empty_bit_field(bf_info->values->bits, bf_info->n_words)) {
                 continue;
             }
-            // Note we are recording
-            n_recordings_outstanding += 1;
             // Set the time and record the data (note index is after recorded_vars)
             bf_info->values->time = time;
-            recording_record_and_notify(
-                i + N_RECORDED_VARS - 1, bf_info->values, bf_info->size,
-                recording_done_callback);
+            recording_record(i + N_RECORDED_VARS - 1, bf_info->values, bf_info->size);
         } else {
 
             // Not recording this time, so increment by specified amount
@@ -208,12 +193,6 @@ static inline void neuron_recording_record(uint32_t time) {
 
 //! \brief sets up state for next recording.
 static inline void neuron_recording_setup_for_next_recording(void) {
-    // Wait until recordings have completed, to ensure the recording space
-    // can be re-written
-    while (n_recordings_outstanding > 0) {
-        wait_for_interrupt();
-    }
-
     // Reset the bitfields before starting if a beginning of recording
     for (uint32_t i = N_BITFIELD_VARS; i > 0; i--) {
         bitfield_info_t *b_info = &bitfield_info[i - 1];
@@ -230,17 +209,12 @@ bool neuron_recording_reset(uint32_t n_neurons);
 
 //! \brief sets up the recording stuff
 //! \param[in] recording_address: sdram location for the recording data
-//! \param[out] recording_flags: Output of flags which can be used to check if
-//!            a channel is enabled for recording
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \param[out] n_rec_regions_used: Output the number of regions used by neuron
 //!            recording
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
-        void *recording_address, uint32_t *recording_flags,
-        uint32_t n_neurons, uint32_t *n_rec_regions_used);
-
-//! \brief finishes recording
-void neuron_recording_finalise(void);
+        void *recording_address, uint32_t n_neurons,
+        uint32_t *n_rec_regions_used);
 
 #endif //_NEURON_RECORDING_H_

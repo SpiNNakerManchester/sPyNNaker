@@ -26,6 +26,7 @@
 
 #include "matrix_generators/matrix_generator_static.h"
 #include "matrix_generators/matrix_generator_stdp.h"
+#include "matrix_generators/matrix_generator_neuromodulation.h"
 #include <delay_extension/delay_extension.h>
 
 //! The "hashes" for synaptic matrix generators
@@ -34,6 +35,8 @@ enum {
     STATIC_MATRIX_GENERATOR,
     //! Generate a synaptic matrix with STDP
     PLASTIC_MATRIX_GENERATOR,
+    //! Generate a synaptic matrix for Neuromodulation
+    NEUROMODULATION_MATRIX_GENERATOR,
     /**
      * \brief The number of known generators
      */
@@ -80,7 +83,11 @@ static const struct matrix_generator_info matrix_generators[] = {
     {PLASTIC_MATRIX_GENERATOR,
             matrix_generator_stdp_initialize,
             matrix_generator_stdp_write_row,
-            matrix_generator_stdp_free}
+            matrix_generator_stdp_free},
+    {NEUROMODULATION_MATRIX_GENERATOR,
+            matrix_generator_neuromodulation_initialize,
+            matrix_generator_neuromodulation_write_row,
+            matrix_generator_neuromodulation_free}
 };
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
@@ -134,6 +141,7 @@ void matrix_generator_free(matrix_generator_t generator) {
  * \param[in] delays: Pointer to table of delays
  * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_per_stage: max delay ina  given delay stage
  */
 static void matrix_generator_write_row(
         matrix_generator_t generator,
@@ -143,13 +151,13 @@ static void matrix_generator_write_row(
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage) {
+        uint32_t max_stage, uint32_t max_delay_per_stage) {
     generator->type->write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
-            n_pre_neurons, pre_neuron_index,
-            max_row_n_words, max_delayed_row_n_words,
-            n_synapse_type_bits, n_synapse_index_bits,
-            synapse_type, n_synapses, indices, delays, weights, max_stage);
+            n_pre_neurons, pre_neuron_index, max_row_n_words,
+            max_delayed_row_n_words, n_synapse_type_bits, n_synapse_index_bits,
+            synapse_type, n_synapses, indices, delays, weights, max_stage,
+            max_delay_per_stage);
 }
 
 // ---------------------------------------------------------------------
@@ -199,7 +207,8 @@ bool matrix_generator_generate(
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
         param_generator_t delay_generator, param_generator_t weight_generator,
-        uint32_t max_stage, accum timestep_per_delay) {
+        uint32_t max_stage, uint32_t max_delay_in_a_stage,
+        accum timestep_per_delay) {
     // Go through and generate connections for each pre-neuron
     uint32_t n_connections = 0;
     for (uint32_t i = 0; i < pre_slice_count; i++) {
@@ -214,6 +223,13 @@ bool matrix_generator_generate(
                 pre_neuron_index, post_slice_start, post_slice_count,
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
+
+        for (uint32_t j = 0; j < n_indices; j++) {
+            if (indices[j] >= post_slice_count) {
+                log_error("Index %u out of bounds for %u neurons", indices[j], post_slice_count);
+                rt_error(RTE_SWERR);
+            }
+        }
 
         accum delay_params[n_indices], weight_params[n_indices];
         uint16_t delays[n_indices], weights[n_indices];
@@ -238,7 +254,8 @@ bool matrix_generator_generate(
                 pre_slice_count, pre_neuron_index - pre_slice_start,
                 max_row_n_words, max_delayed_row_n_words,
                 n_synapse_type_bits, n_synapse_index_bits,
-                synapse_type, n_indices, indices, delays, weights, max_stage);
+                synapse_type, n_indices, indices, delays, weights, max_stage,
+                max_delay_in_a_stage);
 
         n_connections += n_indices;
     }

@@ -40,6 +40,6 @@ elimination_params_t *synaptogenesis_elimination_init(uint8_t **data);
 //! \return if row was modified
 static inline bool synaptogenesis_elimination_rule(
         current_state_t *current_state, const elimination_params_t *params,
-        uint32_t time, address_t row);
+        uint32_t time, synaptic_row_t row);
 
 #endif // _ELIMINATION_H_

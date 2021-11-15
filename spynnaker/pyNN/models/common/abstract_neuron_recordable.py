@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractNeuronRecordable(object):
+@require_subclass(ApplicationVertex)
+class AbstractNeuronRecordable(object, metaclass=AbstractBase):
     """ Indicates that a variable (e.g., membrane voltage) can be recorded\
         from this object.
     """
@@ -69,8 +70,8 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, buffer_manager):
         """ Get the recorded data
 
         :param str variable: PyNN name of the variable
@@ -79,7 +80,6 @@ class AbstractNeuronRecordable(object):
         :param buffer_manager:
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int machine_time_step: microseconds
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """

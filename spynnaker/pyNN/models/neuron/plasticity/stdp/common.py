@@ -14,13 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-import logging
 import numpy
 import matplotlib.pyplot as plt
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
-logger = logging.getLogger(__name__)
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
 

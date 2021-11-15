@@ -34,6 +34,7 @@
 typedef struct post_trace_t {
     int16_t o1;
     int16_t o2;
+    uint32_t last_spike_time;
 } post_trace_t;
 
 //! The type of pre-spike traces
@@ -70,6 +71,33 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
     return (post_trace_t) {.o1 = 0, .o2 = 0};
 }
 
+static inline post_trace_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    // Get time since last spike
+    uint32_t delta_time = time - last_time;
+
+    // Decay previous o1 trace
+    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_trace.o1,
+        maths_lut_exponential_decay(delta_time, tau_minus_lookup));
+
+    // If we have already added on the last spike effect, just decay
+    // (as it's sampled BEFORE the spike),
+    // otherwise, add on energy caused by last spike and decay that
+    int32_t new_o2 = 0;
+    int32_t next_spike_time = last_trace.last_spike_time;
+    if (last_trace.last_spike_time == 0) {
+        int32_t decay = maths_lut_exponential_decay(delta_time, tau_y_lookup);
+        new_o2 = STDP_FIXED_MUL_16X16(last_trace.o2, decay);
+    } else {
+        uint32_t o2_delta = time - last_trace.last_spike_time;
+        int32_t decay = maths_lut_exponential_decay(o2_delta, tau_y_lookup);
+        new_o2 = STDP_FIXED_MUL_16X16(last_trace.o2 + STDP_FIXED_POINT_ONE, decay);
+        next_spike_time = 0;
+    }
+    return (post_trace_t) {.o1 = decayed_o1, .o2 = new_o2,
+        .last_spike_time = next_spike_time};
+}
+
 //---------------------------------------
 //! \brief Add a post spike to the post trace
 //! \param[in] time: the time of the spike
@@ -78,27 +106,14 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-    // Get time since last spike
-    uint32_t delta_time = time - last_time;
 
-    // Decay previous o1 trace and add energy caused by new spike
-    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_trace.o1,
-        maths_lut_exponential_decay(delta_time, tau_minus_lookup));
-    int32_t new_o1 = decayed_o1 + STDP_FIXED_POINT_ONE;
-
-    // If this is the 1st post-synaptic event, o2 trace is zero
-    // (as it's sampled BEFORE the spike),
-    // otherwise, add on energy caused by last spike and decay that
-    int32_t new_o2 = (last_time == 0) ? 0 :
-        STDP_FIXED_MUL_16X16(
-            last_trace.o2 + STDP_FIXED_POINT_ONE,
-            maths_lut_exponential_decay(delta_time, tau_y_lookup));
-
-    log_debug("\tdelta_time=%d, o1=%d, o2=%d\n", delta_time, new_o1, new_o2);
+    post_trace_t next_trace = timing_decay_post(time, last_time, last_trace);
+    next_trace.o1 += STDP_FIXED_POINT_ONE;
+    next_trace.last_spike_time = time;
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) {.o1 = new_o1, .o2 = new_o2};
+    return next_trace;
 }
 
 //---------------------------------------

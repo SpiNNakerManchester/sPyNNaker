@@ -57,7 +57,7 @@ typedef input_type_t *input_type_pointer_t;
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
 static input_t *input_type_get_input_value(
-        input_t *restrict value, const input_type_t *input_type,
+        input_t *restrict value, input_type_t *input_type,
         uint16_t num_receptors);
 
 //! \brief Converts an excitatory input into an excitatory current

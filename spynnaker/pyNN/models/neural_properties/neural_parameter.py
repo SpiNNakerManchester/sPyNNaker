@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import Iterator
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
 
 
-class _Range_Iterator(Iterator):
+class _Range_Iterator(object):
+    """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList` \
+        which is range based
+    """
     __slots__ = [
         "__cmd_pair",
         "__datatype",
@@ -29,9 +31,7 @@ class _Range_Iterator(Iterator):
         "__stop_range"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`
-            which is range based
-
+        """
         :param ~spinn_utilities.ranged.AbstractList value:
             The abstract list holding the data
         :param ~data_specification.enums.DataType datatype:
@@ -65,7 +65,9 @@ class _Range_Iterator(Iterator):
         return self.__cmd_pair
 
 
-class _Get_Iterator(Iterator):
+class _Get_Iterator(object):
+    """ Iterator over a standard collection that supports ``__getitem__``
+    """
     __slots__ = [
         "__datatype",
         "__index",
@@ -74,8 +76,7 @@ class _Get_Iterator(Iterator):
         "__value"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator over a standard collection that supports __getitem__
-
+        """
         :param value: The list holding the data
         :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray
         :param ~data_specification.enums.DataType datatype:
@@ -101,20 +102,19 @@ class _Get_Iterator(Iterator):
         return cmd_pair
 
 
-class _SingleValue_Iterator(Iterator):
+class _SingleValue_Iterator(object):
+    """ Iterator that repeats the single values the required number of times.
+
+    Allows a single Value parameter to be treated the same as parameters with
+    len. Caches `cmd_word_list` and `cmd_string` so they are only created once.
+    """
     __slots__ = [
         "__cmd_pair",
         "__index",
         "__stop"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator that repeats the single values the required number of\
-            times.
-
-        Allows a single Value parameter to be treated the same as parameters\
-        with len. \
-        Caches `cmd_word_list` and `cmd_string` so they are only created once.
-
+        """
         :param value: The simple value that is the data for each element
         :type value: int or float or bool
         :param ~data_specification.enums.DataType datatype:
@@ -146,10 +146,10 @@ class NeuronParameter(object):
 
     def __init__(self, value, data_type):
         """
-        :param value: what the value of the parameter is; if a list or array,\
+        :param value: what the value of the parameter is; if a list or array,
             potentially provides a different value for each neuron
-        :type value: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or \
+        :type value: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
             ~spinn_utilities.ranged.AbstractList
         :param ~data_specification.enums.DataType data_type:
             The serialization type of the parameter in the neuron model.
@@ -164,8 +164,8 @@ class NeuronParameter(object):
         """ What the value of the parameter is; if a list or array,\
             potentially provides a different value for each neuron.
 
-        :rtype: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or \
+        :rtype: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
             ~spinn_utilities.ranged.AbstractList
         """
         return self.__value
@@ -186,9 +186,9 @@ class NeuronParameter(object):
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to eventually write to.
             (Note that this does not actually do the write).
-        :return: Iterator that produces a command to write to the\
+        :return: Iterator that produces a command to write to the
             specification for each element in the slice.
-        :rtype: six.Iterator(tuple(bytearray, str))
+        :rtype: iterator(tuple(bytearray, str))
         """
         if isinstance(self.__value, AbstractList):
             return _Range_Iterator(

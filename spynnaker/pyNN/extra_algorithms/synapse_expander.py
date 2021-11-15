@@ -13,24 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
-
+from spinn_utilities.log import FormatAdapter
+from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.system_control_logic import \
     run_system_application
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex, DELAY_EXPANDER_APLX)
+from spinn_front_end_common.utilities.helpful_functions import (
+    write_address_to_user1)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def synapse_expander(
-        placements, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf):
+        placements, transceiver, executable_finder, extract_iobuf):
     """ Run the synapse expander.
 
     .. note::
@@ -40,10 +41,9 @@ def synapse_expander(
         Where all vertices are on the machine.
     :param ~spinnman.transceiver.Transceiver transceiver:
         How to talk to the machine.
-    :param str provenance_file_path: Where provenance data should be written.
     :param executable_finder:
         How to find the synapse expander binaries.
-    :param extract_iobuf: bool flag for extracting iobuf
+    :param bool extract_iobuf: flag for extracting iobuf
     :type executable_finder:
         ~spinn_utilities.executable_finder.ExecutableFinder
     """
@@ -52,22 +52,33 @@ def synapse_expander(
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        placements, synapse_bin, delay_bin)
+        placements, synapse_bin, delay_bin, transceiver)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
     expander_app_id = transceiver.app_id_tracker.get_new_id()
     run_system_application(
-        expander_cores, expander_app_id, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf, None,
-        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt",
-        progress_bar=progress, logger=logger)
+        expander_cores, expander_app_id, transceiver, executable_finder,
+        extract_iobuf, None, [CPUState.FINISHED], False,
+        "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
+        logger=logger)
     progress.end()
     _fill_in_connection_data(expanded_pop_vertices, transceiver)
 
 
-def _plan_expansion(placements, synapse_expander_bin,
-                    delay_expander_bin):
+def _plan_expansion(
+        placements, synapse_expander_bin, delay_expander_bin, transceiver):
+    """ Plan the expansion of synapses and set up the regions using USER1
+
+    :param ~pacman.model.placements.Placements: The placements of the vertices
+    :param str synapse_expander_bin: The binary name of the synapse expander
+    :param str delay_expander_bin: The binary name of the delay expander
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine
+    :return: The places to load the synapse expander and delay expander
+        executables, and the target machine vertices to read synapses back from
+    :rtype: (ExecutableTargets, list(MachineVertex, Placement))
+    """
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
@@ -83,6 +94,11 @@ def _plan_expansion(placements, synapse_expander_bin,
                     placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
                 expanded_pop_vertices.append((vertex, placement))
+                # Write the region to USER1, as that is the best we can do
+                write_address_to_user1(
+                    transceiver, placement.x, placement.y, placement.p,
+                    vertex.connection_generator_region)
+
         elif isinstance(vertex, DelayExtensionMachineVertex):
             if vertex.gen_on_machine():
                 expander_cores.add_processor(
@@ -95,6 +111,11 @@ def _plan_expansion(placements, synapse_expander_bin,
 
 def _fill_in_connection_data(expanded_pop_vertices, transceiver):
     """ Once expander has run, fill in the connection data
+
+    :param list(MachineVertex, Placement) expanded_pop_vertices:
+        List of machine vertices to read data from
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine
 
     :rtype: None
     """

@@ -15,9 +15,9 @@
 
 from pyNN.random import NumpyRNG
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine, SynapseDynamicsStatic)
 
 
 class SynapseInformation(object):
@@ -33,30 +33,38 @@ class SynapseInformation(object):
         "__rng",
         "__synapse_dynamics",
         "__synapse_type",
+        "__receptor_type",
         "__is_virtual_machine",
         "__weights",
         "__delays",
-        "__pre_run_connection_holders"]
+        "__pre_run_connection_holders",
+        "__synapse_type_from_dynamics"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
-                 synapse_dynamics, synapse_type, is_virtual_machine,
+                 synapse_dynamics, synapse_type, receptor_type,
+                 is_virtual_machine, synapse_type_from_dynamics,
                  weights=None, delays=None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
-        :param PyNNPopulationCommon pre_population:
-            The population sending spikes to the synapse
-        :param PyNNPopulationCommon post_population:
-            The population hosting the synapse
-        :param bool prepop_is_view: Whether the prepopulation is a view
-        :param bool postpop_is_view: Whether the postpopulation is a view
+        :param pre_population: The population sending spikes to the synapse
+        :type pre_population: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
+        :param post_population: The population hosting the synapse
+        :type post_population: ~spynnaker.pyNN.models.populations.Population
+            or ~spynnaker.pyNN.models.populations.PopulationView
+        :param bool prepop_is_view: Whether the ``pre_population`` is a view
+        :param bool postpop_is_view: Whether the ``post_population`` is a view
         :param rng: Seeded random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
-        :param AbstractSynapseType synapse_type: The type of the synapse
+        :param int synapse_type: The type of the synapse
+        :param str receptor_type: Description of the receptor (e.g. excitatory)
         :param bool is_virtual_machine: Whether the machine is virtual
+        :param bool synapse_type_from_dynamics:
+            Whether the synapse type came from synapse dynamics
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
@@ -70,9 +78,11 @@ class SynapseInformation(object):
         self.__rng = (rng or NumpyRNG())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
+        self.__receptor_type = receptor_type
         self.__weights = weights
         self.__delays = delays
         self.__is_virtual_machine = is_virtual_machine
+        self.__synapse_type_from_dynamics = synapse_type_from_dynamics
 
         # Make a list of holders to be updated
         self.__pre_run_connection_holders = list()
@@ -89,7 +99,8 @@ class SynapseInformation(object):
     def pre_population(self):
         """ The population sending spikes to the synapse
 
-        :rtype: PyNNPopulationCommon
+        :rtype: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__pre_population
 
@@ -97,7 +108,8 @@ class SynapseInformation(object):
     def post_population(self):
         """ The population hosting the synapse
 
-        :rtype: PyNNPopulationCommon
+        :rtype: ~spynnaker.pyNN.models.populations.Population or
+            ~spynnaker.pyNN.models.populations.PopulationView
         """
         return self.__post_population
 
@@ -119,7 +131,7 @@ class SynapseInformation(object):
 
     @property
     def prepop_is_view(self):
-        """ Whether the prepopulation is a view
+        """ Whether the :py:meth:`pre_population` is a view
 
         :rtype: bool
         """
@@ -127,7 +139,7 @@ class SynapseInformation(object):
 
     @property
     def postpop_is_view(self):
-        """ Whether the postpopulation is a view
+        """ Whether the :py:meth:`post_population` is a view
 
         :rtype: bool
         """
@@ -153,9 +165,17 @@ class SynapseInformation(object):
     def synapse_type(self):
         """ The type of the synapse
 
-        :rtype: AbstractSynapseType
+        :rtype: int
         """
         return self.__synapse_type
+
+    @property
+    def receptor_type(self):
+        """ A string representing the receptor type
+
+        :rtype: str
+        """
+        return self.__receptor_type
 
     @property
     def weights(self):
@@ -174,10 +194,10 @@ class SynapseInformation(object):
         return self.__delays
 
     def may_generate_on_machine(self):
-        """ Do we describe a collection of synapses whose synaptic matrix may
-            be generated on SpiNNaker instead of needing to be calculated in
-            this process and uploaded? This depends on the connector, the
-            definitions of the weights and delays, and the dynamics of the
+        """ Do we describe a collection of synapses whose synaptic matrix may\
+            be generated on SpiNNaker instead of needing to be calculated in\
+            this process and uploaded? This depends on the connector, the\
+            definitions of the weights and delays, and the dynamics of the\
             synapses.
 
         :return: True if the synaptic matrix may be generated on machine (or
@@ -194,6 +214,18 @@ class SynapseInformation(object):
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
             self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
+
+    def may_use_direct_matrix(self):
+        """ Do the properties of the synaptic information allow it to use the
+            direct matrix?
+
+        :rtype: bool
+        """
+        return (
+            isinstance(self.__connector, OneToOneConnector) and
+            isinstance(self.__synapse_dynamics,
+                       SynapseDynamicsStatic) and
+            not self.prepop_is_view and not self.postpop_is_view)
 
     @property
     def pre_run_connection_holders(self):
@@ -218,3 +250,11 @@ class SynapseInformation(object):
         for holder in self.__pre_run_connection_holders:
             holder.finish()
         del self.__pre_run_connection_holders[:]
+
+    @property
+    def synapse_type_from_dynamics(self):
+        """ Whether the synapse type comes from the synapse dynamics
+
+        :rtype: bool
+        """
+        return self.__synapse_type_from_dynamics

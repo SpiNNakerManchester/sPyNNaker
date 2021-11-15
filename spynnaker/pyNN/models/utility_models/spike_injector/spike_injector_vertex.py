@@ -14,17 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpikeInjectorVertex(
@@ -45,17 +47,18 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag):
+            reserve_reverse_ip_tag, splitter):
         # pylint: disable=too-many-arguments
         self.__receive_port = None
         self.__virtual_key = None
 
-        super(SpikeInjectorVertex, self).__init__(
+        super().__init__(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints,
-            enable_injection=True)
+            enable_injection=True,
+            splitter=splitter)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
@@ -94,18 +97,17 @@ class SpikeInjectorVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return get_simulator().machine_time_step
+        return machine_time_step()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, placements, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
-                else 0,
-            machine_time_step)
+                else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements):
@@ -118,8 +120,7 @@ class SpikeInjectorVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        constraints = ReverseIpTagMultiCastSource\
-            .get_outgoing_partition_constraints(self, partition)
+        constraints = super().get_outgoing_partition_constraints(partition)
         constraints.append(ContiguousKeyRangeContraint())
         return constraints
 

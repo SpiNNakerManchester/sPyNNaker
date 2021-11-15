@@ -17,56 +17,44 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: C Actions
-
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-20.04
-
     steps:
-    - name: Install Ubuntu dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install vera++ doxygen gcc-arm-none-eabi --fix-missing
-
-    - name: Set up Python 3.6
-      # Note: Python is needed for spinn_utilities.make_tools when building
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-
     - name: Checkout
       uses: actions/checkout@v2
-
     - name: Checkout SupportScripts
       uses: actions/checkout@v2
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
-
+    - name: Set up Python 3.8
+      # Note: Python is needed for spinn_utilities.make_tools when building
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: doxygen gcc-arm-none-eabi
     - name: Checkout SpiNNaker Dependencies
-      run: |
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/spinn_common.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+      uses: ./support/actions/checkout-spinn-deps
+      with:
         # Note: SpiNNUtils needed for spinn_utilities.make_tools
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
-
-    - name: Set SPINN_DIRS and NEURAL_MODELLING
+        repositories: spinnaker_tools spinn_common SpiNNFrontEndCommon SpiNNUtils
+    - name: Set environment variables
       run: |
-        echo "Set SPINN_DIRS to $PWD/spinnaker_tools"
         echo "SPINN_DIRS=$PWD/spinnaker_tools" >> $GITHUB_ENV
-        echo "Set NEURAL_MODELLING to $PWD/neural_modelling"
         echo "NEURAL_MODELLING_DIRS=$PWD/neural_modelling" >> $GITHUB_ENV
-
     - name: Install SpiNNUtils
       run: python setup.py install
       working-directory: SpiNNUtils
 
     - name: Lint C code using Vera++
-      # Note: run this before building to avoid linting modified_src directories
-      run: support/run-vera.sh neural_modelling/src
+      uses: ./support/actions/vera
+      with:
+        base-dir: neural_modelling/src
 
     - name: Build C dependencies
       run: |

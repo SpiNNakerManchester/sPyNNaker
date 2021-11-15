@@ -12,10 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -48,15 +48,32 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
         """
-        :param float a: :math:`a`
-        :param float b: :math:`b`
-        :param float c: :math:`c`
-        :param float d: :math:`d`
-        :param float v_init: :math:`v_{init}`
-        :param float u_init: :math:`u_{init}`
-        :param float i_offset: :math:`I_{offset}`
+        :param a: :math:`a`
+        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param b: :math:`b`
+        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param c: :math:`c`
+        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param d: :math:`d`
+        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param v_init: :math:`v_{init}`
+        :type v_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param u_init: :math:`u_{init}`
+        :type u_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
         """
-        super(NeuronModelIzh, self).__init__(
+        super().__init__(
             [DataType.S1615,   # a
              DataType.S1615,   # b
              DataType.S1615,   # c
@@ -137,10 +154,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         return self.__a
 
-    @a.setter
-    def a(self, a):
-        self.__a = a
-
     @property
     def b(self):
         """ Settable model parameter: :math:`b`
@@ -148,10 +161,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         :rtype: float
         """
         return self.__b
-
-    @b.setter
-    def b(self, b):
-        self.__b = b
 
     @property
     def c(self):
@@ -161,10 +170,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         return self.__c
 
-    @c.setter
-    def c(self, c):
-        self.__c = c
-
     @property
     def d(self):
         """ Settable model parameter: :math:`d`
@@ -172,10 +177,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         :rtype: float
         """
         return self.__d
-
-    @d.setter
-    def d(self, d):
-        self.__d = d
 
     @property
     def i_offset(self):
@@ -185,10 +186,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         return self.__i_offset
 
-    @i_offset.setter
-    def i_offset(self, i_offset):
-        self.__i_offset = i_offset
-
     @property
     def v_init(self):
         """ Settable model parameter: :math:`v_{init}`
@@ -197,10 +194,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         return self.__v_init
 
-    @v_init.setter
-    def v_init(self, v_init):
-        self.__v_init = v_init
-
     @property
     def u_init(self):
         """ Settable model parameter: :math:`u_{init}`
@@ -208,7 +201,3 @@ class NeuronModelIzh(AbstractNeuronModel):
         :rtype: float
         """
         return self.__u_init
-
-    @u_init.setter
-    def u_init(self, u_init):
-        self.__u_init = u_init

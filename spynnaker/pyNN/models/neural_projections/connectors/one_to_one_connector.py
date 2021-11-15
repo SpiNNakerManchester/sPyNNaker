@@ -13,42 +13,62 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
+import math
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
+from spinn_utilities.safe_eval import SafeEval
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
-
-logger = logging.getLogger(__name__)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
                         AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
-        connect cell i in the presynaptic pynn_population.py to cell i in the\
-        postsynaptic pynn_population.py for all i.
+        connect cell *i* in the presynaptic population to cell *i* in\
+        the postsynaptic population, for all *i*.
     """
-    __slots__ = ["__random_number_class"]
+    __slots__ = []
 
-    def __init__(self, random_number_class,
-                 safe=True, callback=None, verbose=False):
+    def __init__(self, safe=True, callback=None, verbose=False):
         """
-        :param type random_number_class:
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
-        self.__random_number_class = random_number_class
-        super(OneToOneConnector, self).__init__(safe, callback, verbose)
+        # pylint: disable=useless-super-delegation
+        super().__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays,
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -60,9 +80,17 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
         delays = synapse_info.delays
 
+        if isinstance(delays, str):
+            d = self._get_distances(delays, synapse_info)
+            delays = _expr_context.eval(delays, d=d)
+            if ((min_delay <= min(delays) <= max_delay) and (
+                    min_delay <= max(delays) <= max_delay)):
+                return 1
+            else:
+                return 0
         if numpy.isscalar(delays):
             return int(min_delay <= delays <= max_delay)
-        if isinstance(delays, self.__random_number_class):
+        if isinstance(delays, RandomDistribution):
             return 1
 
         slice_min_delay = min(delays)
@@ -81,7 +109,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
             synapse_info.weights,
-            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons),
+            synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -102,11 +131,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -180,45 +211,49 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         return self._view_params_bytes
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+    def could_connect(
+            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+        pre_slice = src_machine_vertex.vertex_slice
+        post_slice = dest_machine_vertex.vertex_slice
         # Filter edge if both are views and outside limits
-        if (_synapse_info.prepop_is_view and
-                _synapse_info.postpop_is_view):
-            pre_lo = _synapse_info.pre_population._indexes[0]
-            pre_hi = _synapse_info.pre_population._indexes[-1]
-            post_lo = _synapse_info.post_population._indexes[0]
-            post_hi = _synapse_info.post_population._indexes[-1]
-            if ((_pre_slice.hi_atom - pre_lo <
-                    _post_slice.lo_atom - post_lo) or
-                    (_pre_slice.lo_atom - pre_lo >
-                     _post_slice.hi_atom - post_lo) or
-                    (_pre_slice.hi_atom < pre_lo) or
-                    (_pre_slice.lo_atom > pre_hi) or
-                    (_post_slice.hi_atom < post_lo) or
-                    (_post_slice.lo_atom > post_hi)):
+        if (synapse_info.prepop_is_view and
+
+                synapse_info.postpop_is_view):
+            pre_lo = synapse_info.pre_population._indexes[0]
+            pre_hi = synapse_info.pre_population._indexes[-1]
+            post_lo = synapse_info.post_population._indexes[0]
+            post_hi = synapse_info.post_population._indexes[-1]
+            if ((pre_slice.hi_atom - pre_lo <
+                    post_slice.lo_atom - post_lo) or
+                    (pre_slice.lo_atom - pre_lo >
+                     post_slice.hi_atom - post_lo) or
+                    (pre_slice.hi_atom < pre_lo) or
+                    (pre_slice.lo_atom > pre_hi) or
+                    (post_slice.hi_atom < post_lo) or
+                    (post_slice.lo_atom > post_hi)):
                 return False
         # Filter edge if pre-pop is outside limit and post_lo is bigger
         # than n_pre_neurons
-        elif _synapse_info.prepop_is_view:
-            pre_lo = _synapse_info.pre_population._indexes[0]
-            pre_hi = _synapse_info.pre_population._indexes[-1]
-            if ((_pre_slice.hi_atom - pre_lo < _post_slice.lo_atom) or
-                    (_pre_slice.lo_atom - pre_lo > _post_slice.hi_atom) or
-                    (_pre_slice.hi_atom < pre_lo) or
-                    (_pre_slice.lo_atom > pre_hi)):
+        elif synapse_info.prepop_is_view:
+            pre_lo = synapse_info.pre_population._indexes[0]
+            pre_hi = synapse_info.pre_population._indexes[-1]
+            if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom) or
+                    (pre_slice.lo_atom - pre_lo > post_slice.hi_atom) or
+                    (pre_slice.hi_atom < pre_lo) or
+                    (pre_slice.lo_atom > pre_hi)):
                 return False
         # Filter edge if post-pop is outside limit and pre_lo is bigger
         # than n_post_neurons
-        elif _synapse_info.postpop_is_view:
-            post_lo = _synapse_info.post_population._indexes[0]
-            post_hi = _synapse_info.post_population._indexes[-1]
-            if ((_pre_slice.hi_atom < _post_slice.lo_atom - post_lo) or
-                    (_pre_slice.lo_atom > _post_slice.hi_atom - post_lo) or
-                    (_post_slice.hi_atom < post_lo) or
-                    (_post_slice.lo_atom > post_hi)):
+        elif synapse_info.postpop_is_view:
+            post_lo = synapse_info.post_population._indexes[0]
+            post_hi = synapse_info.post_population._indexes[-1]
+            if ((pre_slice.hi_atom < post_slice.lo_atom - post_lo) or
+                    (pre_slice.lo_atom > post_slice.hi_atom - post_lo) or
+                    (post_slice.hi_atom < post_lo) or
+                    (post_slice.lo_atom > post_hi)):
                 return False
         # Filter edge in the usual scenario with normal populations
-        elif _pre_slice.hi_atom < _post_slice.lo_atom or \
-                _pre_slice.lo_atom > _post_slice.hi_atom:
+        elif pre_slice.hi_atom < post_slice.lo_atom or \
+                pre_slice.lo_atom > post_slice.hi_atom:
             return False
         return True

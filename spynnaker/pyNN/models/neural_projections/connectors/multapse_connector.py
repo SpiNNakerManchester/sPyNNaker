@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import math
 import numpy.random
-from six import raise_from
-from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -30,8 +27,6 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
@@ -50,25 +45,35 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         "__synapses_per_edge",
         "__with_replacement"]
 
-    def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, callback=None,
-                 verbose=False, rng=None):
+    def __init__(self, n, allow_self_connections=True,
+                 with_replacement=True, safe=True,
+                 verbose=False, rng=None, callback=None):
         """
-        :param int num_synapses:
+        :param int n:
             This is the total number of synapses in the connection.
         :param bool allow_self_connections:
             Allow a neuron to connect to itself or not.
         :param bool with_replacement:
             When selecting, allow a neuron to be re-selected or not.
         :param bool safe:
-        :param callable callback: Ignored
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(MultapseConnector, self).__init__(safe, callback, verbose)
-        self.__num_synapses = num_synapses
+        super().__init__(safe, callback, verbose)
+        # We absolutely require an integer at this point!
+        self.__num_synapses = self._roundsize(n, "MultapseConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_slices = None
@@ -76,7 +81,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         self.__synapses_per_edge = None
         self._rng = rng
 
-    @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
 
@@ -85,11 +89,33 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         :param list(float) prob_connect: The probability of connection
         :rtype: ~numpy.ndarray
         """
+        # Below is how numpy does multinomial internally...
+        size = len(prob_connect)
+        multinomial = numpy.zeros(size, int)
+        total = 1.0
+        dn = num_synapses
+        for j in range(0, size - 1):
+            multinomial[j] = self._rng.next(
+                1, distribution="binomial",
+                parameters={'n': dn, 'p': prob_connect[j] / total})
+            dn = dn - multinomial[j]
+            if dn <= 0:
+                break
+            total = total - prob_connect[j]
+        if dn > 0:
+            multinomial[size - 1] = dn
+
+        return multinomial
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays, self.__num_synapses)
+            synapse_info.delays, self.__num_synapses, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays, self.__num_synapses, synapse_info)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         """
@@ -111,10 +137,16 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
                 pre.n_atoms * post.n_atoms / float(n_connections)
                 if pre and post else 0
                 for pre in pre_slices for post in post_slices]
-            self.__synapses_per_edge = self.get_rng_next(
-                self.__num_synapses, prob_connect)
+            # Use the multinomial directly if possible
+            if (hasattr(self._rng, "rng") and
+                    hasattr(self._rng.rng, "multinomial")):
+                self.__synapses_per_edge = self._rng.rng.multinomial(
+                    self.__num_synapses, prob_connect)
+            else:
+                self.__synapses_per_edge = self.get_rng_next(
+                    self.__num_synapses, prob_connect)
             if sum(self.__synapses_per_edge) != self.__num_synapses:
-                raise Exception("{} of {} synapses generated".format(
+                raise SpynnakerException("{} of {} synapses generated".format(
                     sum(self.__synapses_per_edge), self.__num_synapses))
             self.__pre_slices = pre_slices
             self.__post_slices = post_slices
@@ -160,7 +192,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -172,7 +204,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
-            synapse_info.weights, self.__num_synapses)
+            synapse_info.weights, self.__num_synapses, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -211,21 +243,23 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
-        except Exception as e:  # pylint: disable=broad-except
-            raise_from(SpynnakerException(
+        except Exception as e:
+            raise SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
-                "reduce the value specified in the connector"), e)
+                "reduce the value specified in the connector") from e
 
         # Set up synaptic block
         block["source"] = pairs[chosen, 0]
         block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections,
+            [connection_slice], pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -292,29 +326,26 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         if synapse_info.prepop_is_view:
             pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
                 synapse_info.pre_population._indexes, pre_vertex_slice)
+            post_size, post_view_lo, post_view_hi = self._get_connection_param(
+                synapse_info.post_population._indexes, post_vertex_slice)
+
+            # only select the relevant pre- and post-slices
+            view_pre_slices = self._get_view_slices(
+                pre_slices, pre_view_lo, pre_view_hi)
+            view_post_slices = self._get_view_slices(
+                post_slices, post_view_lo, post_view_hi)
         else:
             pre_size = pre_vertex_slice.n_atoms
             pre_view_lo = 0
             pre_view_hi = synapse_info.n_pre_neurons - 1
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        if synapse_info.postpop_is_view:
-            post_size, post_view_lo, post_view_hi = self._get_connection_param(
-                synapse_info.post_population._indexes, post_vertex_slice)
-        else:
             post_size = post_vertex_slice.n_atoms
             post_view_lo = 0
             post_view_hi = synapse_info.n_post_neurons - 1
+            view_pre_slices = pre_slices
+            view_post_slices = post_slices
 
+        params.extend([pre_view_lo, pre_view_hi])
         params.extend([post_view_lo, post_view_hi])
-
-        # only select the relevant pre- and post-slices
-        view_pre_slices = self._get_view_slices(
-            pre_slices, pre_view_lo, pre_view_hi)
-
-        view_post_slices = self._get_view_slices(
-            post_slices, post_view_lo, post_view_hi)
 
         self._update_synapses_per_post_vertex(
             view_pre_slices, view_post_slices)
@@ -326,7 +357,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             pre_size * post_size])
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
-        return numpy.array(params, dtype="uint32")
+        return numpy.array(params, dtype=numpy.uint32)
 
     @property
     @overrides(

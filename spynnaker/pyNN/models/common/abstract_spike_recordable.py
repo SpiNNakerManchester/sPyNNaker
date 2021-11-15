@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractSpikeRecordable(object):
+@require_subclass(ApplicationVertex)
+class AbstractSpikeRecordable(object, metaclass=AbstractBase):
     """ Indicates that spikes can be recorded from this object.
     """
 
@@ -61,7 +62,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes(self, placements, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         """ Get the recorded spikes from the object
 
         :param ~pacman.model.placements.Placements placements:
@@ -69,9 +70,7 @@ class AbstractSpikeRecordable(object):
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param int machine_time_step:
-            the time step of the simulation, in microseconds
-        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """

@@ -62,7 +62,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     log_info("lut size %d", size);
     if (lut == NULL) {
         log_error("Not enough space to allocate LUT.  Try reducing the timestep,"
-            " the number of neurons per core, or the tau value");
+            " the number of neurons per core, or the tau value; size = %u", size);
         rt_error(RTE_SWERR);
     }
     spin1_memcpy(lut, sdram_lut, size);
@@ -147,10 +147,7 @@ static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
 static inline int32_t maths_fixed_mul16(
         int32_t a, int32_t b, const int32_t fixed_point_position) {
     // Multiply lower 16-bits of a and b together
-    int32_t mul = __smulbb(a, b);
-
-    // Shift down
-    return (mul >> fixed_point_position);
+    return __smulbb(a, b) >> fixed_point_position;
 }
 
 //---------------------------------------

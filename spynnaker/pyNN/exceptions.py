@@ -59,6 +59,11 @@ class DelayExtensionException(ConfigurationException):
     """
 
 
+class SpynnakerSplitterConfigurationException(ConfigurationException):
+    """ Raised when a splitter configuration fails.
+    """
+
+
 class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised.
     """
@@ -72,7 +77,7 @@ class SynapseRowTooBigException(SpynnakerException):
         :param max_size: the maximum permitted size of row
         :param message: the excepton message
         """
-        super(SynapseRowTooBigException, self).__init__(message)
+        super().__init__(message)
         self._max_size = max_size
 
     @property

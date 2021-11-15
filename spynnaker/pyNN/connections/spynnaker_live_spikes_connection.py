@@ -45,7 +45,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
             by default)
         """
         # pylint: disable=too-many-arguments
-        super(SpynnakerLiveSpikesConnection, self).__init__(
+        super().__init__(
             live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)
 

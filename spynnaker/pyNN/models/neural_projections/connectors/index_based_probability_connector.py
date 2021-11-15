@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import math
 import numpy
 from numpy import (
@@ -25,7 +24,6 @@ from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 
-logger = logging.getLogger(__name__)
 # support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
@@ -50,20 +48,30 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         :param str index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,
-            that can be parsed by eval(), that computes a probability dist.
+            that can be parsed by eval(), that computes a probability dist;
+            the indices will be given as variables ``i`` and ``j`` when the
+            expression is evaluated.
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
         :param bool safe:
-        :param callable callback: Ignored
+            Whether to check that weights and delays have valid values.
+            If ``False``, this check is skipped.
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         """
-        super(IndexBasedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self._rng = rng
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
@@ -88,7 +96,18 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(
+            synapse_info.delays, n_connections, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        self._update_probs_from_index_expression(synapse_info)
+        n_connections = utility_calls.get_probable_minimum_selected(
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            numpy.amax(self.__probs))
+        return self._get_delay_minimum(
+            synapse_info.delays, n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -105,7 +124,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -121,7 +140,8 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
-        return self._get_weight_maximum(synapse_info.weights, n_connections)
+        return self._get_weight_maximum(
+            synapse_info.weights, n_connections, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -152,11 +172,11 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

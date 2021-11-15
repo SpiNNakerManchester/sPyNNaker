@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
-@add_metaclass(AbstractBase)
-class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
+class AbstractPlasticSynapseDynamics(
+        AbstractSynapseDynamics, metaclass=AbstractBase):
     """ Synapses which change over time
     """
     # pylint: disable=too-many-arguments

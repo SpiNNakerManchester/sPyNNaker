@@ -22,8 +22,6 @@
 #ifndef _TIMING_H_
 #define _TIMING_H_
 
-#include <neuron/plasticity/stdp/synapse_structure/synapse_structure.h>
-
 //! \brief Initialise the timing dependence state (global) from SDRAM
 //! \param[in] address: Location in SDRAM of timing data
 //! \return address of first word after the timing data
@@ -39,6 +37,14 @@ static post_trace_t timing_get_initial_post_trace(void);
 //! \param[in] last_trace: the post trace to update
 //! \return the updated post trace
 static post_trace_t timing_add_post_spike(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace);
+
+//! \brief Evolve the post trace without adding a spike
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the post trace to update
+//! \return the updated post trace
+static post_trace_t timing_decay_post(
         uint32_t time, uint32_t last_time, post_trace_t last_trace);
 
 //! \brief Add a pre spike to the pre trace

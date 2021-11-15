@@ -14,11 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
-import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-logger = logging.getLogger(__name__)
 
 # structure of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
 # K = ignored key at the top of the command
@@ -274,19 +271,20 @@ class RetinaPayload(Enum):
         return self._n_payload_bytes
 
 
+class MUNICH_MODES(Enum):
+    """types of modes supported by this protocol"""
+    RESET_TO_DEFAULT = 0
+    PUSH_BOT = 1
+    SPOMNIBOT = 2
+    BALL_BALANCER = 3
+    MY_ORO_BOTICS = 4
+    FREE = 5
+
+
 class MunichIoSpiNNakerLinkProtocol(object):
     """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
-
-    class MODES(Enum):
-        """types of modes supported by this protocol"""
-        RESET_TO_DEFAULT = 0
-        PUSH_BOT = 1
-        SPOMNIBOT = 2
-        BALL_BALANCER = 3
-        MY_ORO_BOTICS = 4
-        FREE = 5
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
@@ -298,8 +296,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-        :param MODES mode:
-            The mode of operation of the protocol
+        :param mode: The mode of operation of the protocol
+        :type modes:
+            ~spynnaker.pyNN.protocols.MUNICH_MODES
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
         :param int uart_id: The ID of the UART when needed
@@ -322,7 +321,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def mode(self):
         """
-        :rtype: MODES
+        :rtype: ~spynnaker.pyNN.protocols.MUNICH_MODES
         """
         return self.__mode
 
@@ -651,7 +650,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=payload, time=time)
 
     def _check_for_pushbot_mode(self):
-        if self.__mode is not self.MODES.PUSH_BOT:
+        if self.__mode is not MUNICH_MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
                 "message is invalid for mode {}".format(self.__mode))

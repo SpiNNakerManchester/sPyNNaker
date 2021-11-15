@@ -32,9 +32,10 @@ formation_params_t *synaptogenesis_formation_init(uint8_t **data) {
         rt_error(RTE_SWERR);
     }
     spin1_memcpy(form_params, *data, data_size);
-    log_info("Formation distance dependent %u bytes, grid=(%u, %u), %u ff probs, %u lat probs",
+    log_debug("Formation distance dependent %u bytes, grid=(%u, %u), %u ff probs, %u lat probs",
             data_size, form_params->grid_x, form_params->grid_y,
             form_params->ff_prob_size, form_params->lat_prob_size);
+
     *data += data_size;
 
     return form_params;

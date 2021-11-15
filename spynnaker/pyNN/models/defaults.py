@@ -14,20 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import inspect
-try:
-    from inspect import getfullargspec
-except ImportError:
-    # Python 2.7 hack
-    from inspect import getargspec as getfullargspec
 from spinn_utilities.log import FormatAdapter
 import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
-
-
-def _get_args(func):
-    # So we have a disable in one place, not many
-    return getfullargspec(func)  # pylint: disable=deprecated-method
 
 
 def _check_args(args_to_find, default_args, init):
@@ -48,7 +38,7 @@ def get_dict_from_init(init, skip=None, include=None):
     :return: an initialisation dictionary
     :rtype: dict(str, Any)
     """
-    init_args = _get_args(init)
+    init_args = inspect.getfullargspec(init)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
     default_args = ([] if init_args.args is None else
@@ -84,7 +74,7 @@ def default_parameters(parameters):
 
         # Set the parameters of the method to be used later
         method._parameters = frozenset(parameters)
-        method_args = _get_args(method)
+        method_args = inspect.getfullargspec(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params
@@ -120,7 +110,7 @@ def default_initial_values(state_variables):
 
         # Store the state variables of the method to be used later
         method._state_variables = frozenset(state_variables)
-        method_args = _get_args(method)
+        method_args = inspect.getfullargspec(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params

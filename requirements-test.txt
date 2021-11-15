@@ -14,12 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -r requirements.txt
+SpiNNakerTestBase == 1!6.0.1
 flake8
 coverage >= 4.4, < 5.0
 # pytest will be brought in by pytest-cov
 pytest-cov
 pytest-timeout
-sphinx==1.5.3
+pytest-forked
+pytest-progress
+sphinx >= 4
 testfixtures
 statistics
 mock
+graphviz

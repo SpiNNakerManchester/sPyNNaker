@@ -21,7 +21,7 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
     """
 
     def __init__(self):
-        super(KeySpaceTracker, self).__init__(0, FULL_MASK)
+        super().__init__(0, FULL_MASK)
 
     def allocate_keys(self, r_info):
         """ Allocate all the keys in the routing information

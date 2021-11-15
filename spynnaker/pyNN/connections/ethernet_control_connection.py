@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.connections import LiveEventConnection
-
-logger = logging.getLogger(__name__)
 
 
 class EthernetControlConnection(LiveEventConnection):
@@ -38,7 +35,7 @@ class EthernetControlConnection(LiveEventConnection):
         :param str local_host: The optional host to listen on
         :param int local_port: The optional port to listen on
         """
-        super(EthernetControlConnection, self).__init__(
+        super().__init__(
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
         self.__translators = dict()
@@ -52,7 +49,7 @@ class EthernetControlConnection(LiveEventConnection):
         :param AbstractEthernetTranslator translator:
             The translator of multicast to control commands
         """
-        super(EthernetControlConnection, self).add_receive_label(label)
+        super().add_receive_label(label)
         self.__translators[label] = translator
         self.add_receive_callback(label, self._translate, translate_key=False)
 

@@ -237,12 +237,6 @@ TAB_SIZE               = 4
 
 ALIASES                =
 
-# This tag can be used to specify a number of word-keyword mappings (TCL only).
-# A mapping has the form "name=value". For example adding "class=itcl::class"
-# will allow you to use the command class in the itcl::class meaning.
-
-TCL_SUBST              =
-
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
 # only. Doxygen will then generate output that is more tailored for C. For
 # instance, some of the names that are used will be different. The list of all
@@ -250,26 +244,6 @@ TCL_SUBST              =
 # The default value is: NO.
 
 OPTIMIZE_OUTPUT_FOR_C  = YES
-
-# Set the OPTIMIZE_OUTPUT_JAVA tag to YES if your project consists of Java or
-# Python sources only. Doxygen will then generate output that is more tailored
-# for that language. For instance, namespaces will be presented as packages,
-# qualified scopes will look different, etc.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_JAVA   = NO
-
-# Set the OPTIMIZE_FOR_FORTRAN tag to YES if your project consists of Fortran
-# sources. Doxygen will then generate output that is tailored for Fortran.
-# The default value is: NO.
-
-OPTIMIZE_FOR_FORTRAN   = NO
-
-# Set the OPTIMIZE_OUTPUT_VHDL tag to YES if your project consists of VHDL
-# sources. Doxygen will then generate output that is tailored for VHDL.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_VHDL   = NO
 
 # Doxygen selects the parser to use depending on the extension of the files it
 # parses. With this tag you can assign which parser to use for a given
@@ -285,7 +259,7 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
 
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = h=C
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -653,7 +627,7 @@ SHOW_FILES             = YES
 # Folder Tree View (if specified).
 # The default value is: YES.
 
-SHOW_NAMESPACES        = YES
+SHOW_NAMESPACES        = NO
 
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
@@ -992,13 +966,6 @@ VERBATIM_HEADERS       = YES
 # The default value is: YES.
 
 ALPHABETICAL_INDEX     = YES
-
-# The COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns in
-# which the alphabetical index list will be split.
-# Minimum value: 1, maximum value: 20, default value: 5.
-# This tag requires that the tag ALPHABETICAL_INDEX is set to YES.
-
-COLS_IN_ALPHA_INDEX    = 5
 
 # In case all classes in a project start with a common prefix, all classes will
 # be put under the same header in the alphabetical index. The IGNORE_PREFIX tag

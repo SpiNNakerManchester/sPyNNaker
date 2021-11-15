@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractEthernetSensor(object):
+class AbstractEthernetSensor(object, metaclass=AbstractBase):
     __slots__ = []
 
     @abstractmethod
@@ -54,5 +52,5 @@ class AbstractEthernetSensor(object):
         """ Get a Database Connection instance that this device uses\
             to inject packets
 
-        :rtype: SpynnakerLiveSpikesConnection
+        :rtype: ~spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection
         """

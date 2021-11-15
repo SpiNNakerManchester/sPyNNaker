@@ -34,6 +34,10 @@ struct formation_params;
 //! Flag: Is connection lateral?
 #define IS_CONNECTION_LAT 1
 
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
 //! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
     uint8_t pop_index;
@@ -77,6 +81,7 @@ typedef struct {
     uint32_t machine_no_atoms;
     uint32_t low_atom;
     uint32_t high_atom;
+    uint32_t with_replacement;
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed;
     mars_kiss64_seed_t local_seed;
@@ -89,6 +94,8 @@ typedef struct {
     mars_kiss64_seed_t *local_seed;
     //! Low atom copied from rewiring data
     uint32_t post_low_atom;
+    // with_replacement copied from rewiring data
+    uint32_t with_replacement;
     // what are the currently selecting pre- and post-synaptic neurons
     uint32_t pre_syn_id;
     uint32_t post_syn_id;
@@ -186,10 +193,11 @@ static inline bool sp_structs_get_sub_pop_info(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
+
     current_state->post_to_pre_table_entry->neuron_index = 0xFFFF;
     return true;
 }
@@ -199,7 +207,7 @@ static inline bool sp_structs_remove_synapse(
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added
 static inline bool sp_structs_add_synapse(
-        current_state_t *restrict current_state, address_t restrict row) {
+        current_state_t *restrict current_state, synaptic_row_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
     uint32_t actual_delay;
@@ -210,7 +218,7 @@ static inline bool sp_structs_add_synapse(
 
     if (!synapse_dynamics_add_neuron(
             current_state->post_syn_id, row, appr_scaled_weight, actual_delay,
-            current_state->pre_population_info->connection_type)) {
+			current_state->pre_population_info->connection_type)) {
         return false;
     }
 
@@ -236,8 +244,7 @@ static inline bool sp_structs_add_synapse(
 //!     configuration region.
 static inline uint8_t *sp_structs_read_in_common(
         address_t sdram_sp_address, rewiring_data_t *rewiring_data,
-        pre_pop_info_table_t *pre_info,
-        post_to_pre_entry **post_to_pre_table) {
+        pre_pop_info_table_t *pre_info, post_to_pre_entry **post_to_pre_table) {
     uint8_t *data = (uint8_t *) sdram_sp_address;
     spin1_memcpy(rewiring_data, data, sizeof(rewiring_data_t));
     data += sizeof(rewiring_data_t);
@@ -281,9 +288,9 @@ static inline uint8_t *sp_structs_read_in_common(
 
     for (uint32_t i=0; i < n_elements; i++){
         log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
-                i, post_to_pre_table[i]->pop_index,
-                post_to_pre_table[i]->sub_pop_index,
-                post_to_pre_table[i]->neuron_index);
+                i, (*post_to_pre_table)[i].pop_index,
+                (*post_to_pre_table)[i].sub_pop_index,
+                (*post_to_pre_table)[i].neuron_index);
     }
     data += n_elements * sizeof(post_to_pre_entry);
     return (uint8_t *) data;

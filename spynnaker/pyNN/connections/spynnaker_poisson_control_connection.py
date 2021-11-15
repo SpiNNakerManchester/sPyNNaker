@@ -33,7 +33,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """
         :param iterable(str) poisson_labels:
             Labels of Poisson populations to be controlled
-        :param str local_host: Optional specification of the local hostname or\
+        :param str local_host: Optional specification of the local hostname or
             IP address of the interface to listen on
         :param int local_port:
             Optional specification of the local port to listen on. Must match
@@ -59,7 +59,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
                 {label: control
                  for label, control in zip(poisson_labels, control_labels)})
 
-        super(SpynnakerPoissonControlConnection, self).__init__(
+        super().__init__(
             live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
@@ -96,20 +96,19 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label, start_callback):
-        super(SpynnakerPoissonControlConnection, self).add_start_callback(
+        super().add_start_callback(
             self.__control_label(label), functools.partial(
                 self._start_callback_wrapper, start_callback))
 
     @overrides(LiveEventConnection.add_start_resume_callback)
     def add_start_resume_callback(self, label, start_resume_callback):
-        super(SpynnakerPoissonControlConnection, self)\
-            .add_start_resume_callback(
+        super().add_start_resume_callback(
             self.__control_label(label), functools.partial(
                 self._start_callback_wrapper, start_resume_callback))
 
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
-        super(SpynnakerPoissonControlConnection, self).add_init_callback(
+        super().add_init_callback(
             self.__control_label(label), functools.partial(
                 self._init_callback_wrapper, init_callback))
 
@@ -121,7 +120,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     @overrides(LiveEventConnection.add_pause_stop_callback)
     def add_pause_stop_callback(self, label, pause_stop_callback):
-        super(SpynnakerPoissonControlConnection, self).add_pause_stop_callback(
+        super().add_pause_stop_callback(
             self.__control_label(label), functools.partial(
                 self._stop_callback_wrapper, pause_stop_callback))
 

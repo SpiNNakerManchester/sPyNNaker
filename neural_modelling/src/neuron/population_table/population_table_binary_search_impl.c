@@ -84,9 +84,18 @@ typedef union {
     extra_info extra;
 } address_list_entry;
 
-// An Invalid address and row length; used to keep indices aligned between
-// delayed and undelayed tables
+//! \brief An Invalid address and row length
+//! \details Used to keep indices aligned between delayed and undelayed tables
 #define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
+
+//! \brief The memory layout in SDRAM of the first part of the population table
+//!     configuration. Address list data (array of ::address_and_row_length) is
+//!     packed on the end.
+typedef struct {
+    uint32_t table_length;
+    uint32_t addr_list_length;
+    master_population_table_entry data[];
+} pop_table_config_t;
 
 //! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
@@ -113,7 +122,8 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 
 //! The number of relevant items remaining in the ::address_list
-static uint16_t items_to_go = 0;
+//! NOTE: Exported for speed of check
+uint16_t items_to_go = 0;
 
 //! The bitfield map
 static bit_field_t *connectivity_bit_field = NULL;
@@ -143,9 +153,8 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 }
 
 //! \brief Get the standard address offset out of an entry
-//!
-//! The address is in units of four words, so this multiplies by 16 (= up
-//! shifts by 4)
+//! \details The address is in units of four words, so this multiplies by 16
+//!     (= up shifts by 4)
 //! \param[in] entry: the table entry
 //! \return a row address (which is an offset)
 static inline uint32_t get_offset(address_and_row_length entry) {
@@ -185,6 +194,15 @@ static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
     return get_core_index(extra, spike) * extra.n_neurons;
 }
 
+//! \brief Get the total number of bits in bitfields for cores which came before
+//!        this core.
+//! \param[in] extra: The extra info entry
+//! \param[in] spike: The spike received
+//! \return the base bitfield bit index of this core
+static inline uint32_t get_bitfield_sum(extra_info extra, spike_t spike) {
+    return get_core_index(extra, spike) * extra.n_words * BITS_PER_WORD;
+}
+
 //! \brief Get the source neuron ID for a spike given its table entry (without extra info)
 //! \param[in] entry: the table entry
 //! \param[in] spike: the spike
@@ -195,9 +213,9 @@ static inline uint32_t get_neuron_id(
 }
 
 //! \brief Get the neuron id of the neuron on the source core, for a spike with
-//         extra info
+//!        extra info
 //! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
+//! \param[in] extra: the extra info entry
 //! \param[in] spike: the spike received
 //! \return the source neuron id local to the core
 static inline uint32_t get_local_neuron_id(
@@ -205,30 +223,10 @@ static inline uint32_t get_local_neuron_id(
     return spike & ~(entry.mask | (extra.core_mask << extra.mask_shift));
 }
 
-//! \brief Get the full source neuron id for a spike with extra info
-//! \param[in] entry: the table entry
-//! \param[in] extra_info: the extra info entry
-//! \param[in] spike: the spike received
-//! \return the source neuron id
-static inline uint32_t get_extended_neuron_id(
-        master_population_table_entry entry, extra_info extra, spike_t spike) {
-    uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
-    uint32_t neuron_id = local_neuron_id + get_core_sum(extra, spike);
-#ifdef DEBUG
-    uint32_t n_neurons = get_n_neurons(extra);
-    if (local_neuron_id > n_neurons) {
-        log_error("Spike %u is outside of expected neuron id range"
-            "(neuron id %u of maximum %u)", spike, local_neuron_id, n_neurons);
-        rt_error(RTE_SWERR);
-    }
-#endif
-    return neuron_id;
-}
-
 //! \brief Prints the master pop table.
-//!
-//! For debugging
+//! \details For debugging
 static inline void print_master_population_table(void) {
+#if log_level >= LOG_DEBUG
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
@@ -238,8 +236,8 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u",
-                    extra.core_mask, extra.mask_shift, extra.n_neurons);
+            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
+                    extra.core_mask, extra.mask_shift, extra.n_neurons, extra.n_words);
         }
         for (uint16_t j = start; j < (start + count); j++) {
             address_and_row_length addr = address_list[j].addr;
@@ -255,6 +253,7 @@ static inline void print_master_population_table(void) {
         }
     }
     log_info("Population table has %u entries", master_population_table_length);
+#endif
 }
 
 //! \brief Check if the entry is a match for the given key
@@ -294,6 +293,9 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
 
 bool population_table_load_bitfields(filter_region_t *filter_region) {
 
+    if (master_population_table_length == 0) {
+        return true;
+    }
     // try allocating DTCM for starting array for bitfields
     connectivity_bit_field =
             spin1_malloc(sizeof(bit_field_t) * master_population_table_length);
@@ -352,7 +354,7 @@ bool population_table_load_bitfields(filter_region_t *filter_region) {
                      sizeof(bit_field_t) * n_words_total);
              if (connectivity_bit_field[mp_i] == NULL) {
                  // If allocation fails, we can still continue
-                 log_info(
+                 log_debug(
                          "Could not initialise bit field for key %d, packets with "
                          "that key will use a DMA to check if the packet targets "
                          "anything within this core. Potentially slowing down the "
@@ -411,14 +413,14 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
 
-    master_population_table_length = table_address[0];
+    master_population_table_length = config->table_length;
     log_debug("Master pop table length is %d\n", master_population_table_length);
     log_debug("Master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
-    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     log_debug("Pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
@@ -430,7 +432,7 @@ bool population_table_initialise(
         }
     }
 
-    uint32_t address_list_length = table_address[1];
+    uint32_t address_list_length = config->addr_list_length;
     uint32_t n_address_list_bytes =
             address_list_length * sizeof(address_list_entry);
 
@@ -449,15 +451,14 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &table_address[2],
-            n_master_pop_bytes);
-    spin1_memcpy(address_list, &table_address[2 + n_master_pop_words],
+    spin1_memcpy(master_population_table, config->data, n_master_pop_bytes);
+    spin1_memcpy(address_list, &config->data[master_population_table_length],
             n_address_list_bytes);
 
     // Store the base address
-    log_info("The stored synaptic matrix base address is located at: 0x%08x",
+    log_debug("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
-    log_info("The direct synaptic matrix base address is located at: 0x%08x",
+    log_debug("The direct synaptic matrix base address is located at: 0x%08x",
             direct_rows_address);
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
@@ -469,7 +470,8 @@ bool population_table_initialise(
 }
 
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
+        spike_t spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer) {
     // locate the position in the binary search / array
     log_debug("Searching for key %d", spike);
 
@@ -486,21 +488,26 @@ bool population_table_get_first_address(
     log_debug("position = %d", position);
 
     master_population_table_entry entry = master_population_table[position];
+
+    #if LOG_LEVEL >= LOG_DEBUG
     if (entry.count == 0) {
         log_debug("Spike %u (= %x): Population found in master population"
                 "table but count is 0", spike, spike);
     }
+    #endif
 
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
-    uint32_t bits_offset = 0;
+    uint32_t bit_field_id = 0;
     if (entry.extra_info_flag) {
         extra_info extra = address_list[next_item++].extra;
-        bits_offset = get_core_index(extra, spike) * extra.n_words;
-        last_neuron_id = get_extended_neuron_id(entry, extra, spike);
+        uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
+        last_neuron_id = local_neuron_id + get_core_sum(extra, spike);
+        bit_field_id = local_neuron_id + get_bitfield_sum(extra, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
+        bit_field_id = last_neuron_id;
     }
 
     // check we have a entry in the bit field for this (possible not to due to
@@ -512,9 +519,10 @@ bool population_table_get_first_address(
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(
-                &connectivity_bit_field[position][bits_offset], last_neuron_id)) {
+                connectivity_bit_field[position], bit_field_id)) {
             log_debug("Tested and was not set");
             bit_field_filtered_packets += 1;
+            items_to_go = 0;
             return false;
         }
         log_debug("Was set, carrying on");
@@ -542,9 +550,10 @@ bool population_table_get_first_address(
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer) {
+        spike_t *spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer) {
     // If there are no more items in the list, return false
-    if (items_to_go <= 0) {
+    if (items_to_go == 0) {
         return false;
     }
 
@@ -556,10 +565,9 @@ bool population_table_get_next_address(
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
             if (item.is_single) {
-                *row_address = (address_t) (get_direct_address(item) +
+                *row_address = (synaptic_row_t) (get_direct_address(item) +
                     (last_neuron_id * sizeof(uint32_t)));
                 *n_bytes_to_transfer = 0;
-                is_valid = true;
             } else {
 
                 uint32_t row_length = get_row_length(item);
@@ -567,16 +575,15 @@ bool population_table_get_next_address(
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
                 uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
 
-                *row_address = (address_t) (block_address + neuron_offset);
+                *row_address = (synaptic_row_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_debug(
-                    "neuron_id = %u, block_address = 0x%.8x,"
-                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                    last_neuron_id, block_address, row_length, *row_address,
-                    *n_bytes_to_transfer);
+                log_debug("neuron_id = %u, block_address = 0x%.8x, "
+                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                        last_neuron_id, block_address, row_length, *row_address,
+                        *n_bytes_to_transfer);
                 *spike = last_spike;
-                is_valid = true;
             }
+            is_valid = true;
         }
 
         next_item++;

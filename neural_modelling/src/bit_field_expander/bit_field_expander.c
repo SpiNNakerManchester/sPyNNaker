@@ -83,7 +83,7 @@ uint32_t n_vertex_regions = 0;
 bit_field_t* fake_bit_fields;
 
 //! Holds SDRAM read row
-uint32_t * row_data;
+synaptic_row_t row_data;
 
 //! Says if we should run
 bool can_run = true;
@@ -271,9 +271,8 @@ bool process_synaptic_row(synaptic_row_t row) {
     }
 
     // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
-    uint32_t fixed_synapse =
-            synapse_row_num_fixed_synapses(fixed_region_address);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
+    uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     if (fixed_synapse == 0) {
         log_debug("Plastic and fixed do not have entries, so can be pruned");
         return false;
@@ -284,13 +283,13 @@ bool process_synaptic_row(synaptic_row_t row) {
 }
 
 //! \brief Do an SDRAM read to get synaptic row.
-//! \param[in] row_address: the SDRAM address to read
+//! \param[in] row: the SDRAM address to read
 //! \param[in] n_bytes_to_transfer:
 //!     how many bytes to read to get the synaptic row
 //! \return Whether there is target
 static bool do_sdram_read_and_test(
-        address_t row_address, uint32_t n_bytes_to_transfer) {
-    spin1_memcpy(row_data, row_address, n_bytes_to_transfer);
+        synaptic_row_t row, uint32_t n_bytes_to_transfer) {
+    spin1_memcpy(row_data, row, n_bytes_to_transfer);
     log_debug("Process synaptic row");
     return process_synaptic_row(row_data);
 }
@@ -388,10 +387,10 @@ bool generate_bit_field(void) {
 
             // used to store the row from the master pop / synaptic matrix,
             // not going to be used in reality.
-            address_t row_address;
+            synaptic_row_t row;
             if (!bit_found) {
                 if (population_table_get_first_address(
-                        new_key, &row_address, &n_bytes_to_transfer)) {
+                        new_key, &row, &n_bytes_to_transfer)) {
                     log_debug("%d", neuron_id);
 
                     // This is a direct row to process, so will have 1 target,
@@ -403,11 +402,11 @@ bool generate_bit_field(void) {
                         // sdram read (faking dma transfer)
                         log_debug("DMA read synapse");
                         bit_found = do_sdram_read_and_test(
-                                row_address, n_bytes_to_transfer);
+                                row, n_bytes_to_transfer);
                     }
 
                     while (!bit_found && population_table_get_next_address(
-                            &new_key, &row_address, &n_bytes_to_transfer)){
+                            &new_key, &row, &n_bytes_to_transfer)){
                         log_debug("%d", neuron_id);
 
                         // This is a direct row to process, so will have 1
@@ -419,7 +418,7 @@ bool generate_bit_field(void) {
                             // sdram read (faking dma transfer)
                             log_debug("DMA read synapse");
                             bit_found = do_sdram_read_and_test(
-                                    row_address, n_bytes_to_transfer);
+                                    row, n_bytes_to_transfer);
                         }
                     }
                 }

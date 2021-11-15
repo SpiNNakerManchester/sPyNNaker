@@ -13,102 +13,113 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-import struct
-import logging
-import os
 from collections import defaultdict
-
-from spinn_front_end_common.abstract_models import \
-    AbstractSupportsBitFieldGeneration
+import os
+import struct
+from spinn_utilities.config_holder import get_config_bool
+from spinn_utilities.progress_bar import ProgressBar
+from spinnman.model import ExecutableTargets
+from spinnman.model.enums import CPUState
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.helpful_functions import n_word_struct
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 
-from spinn_utilities.progress_bar import ProgressBar
+_THREE_WORDS = struct.Struct("<III")
+# bits in a word
+_BITS_IN_A_WORD = 32
+# bit to mask a bit
+_BIT_MASK = 1
 
-from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
 
-logger = logging.getLogger(__name__)
+def _bit_for_neuron_id(bitfield, neuron_id):
+    """ Get the bit for a neuron in the bitfield.
+
+    :param list(int) bitfield:
+        the block of words which represent the bitfield
+    :param int neuron_id: the neuron id to find the bit in the bitfield
+    :return: the bit (``0`` or ``1``)
+    :rtype: int
+    """
+    word_id, bit_in_word = divmod(neuron_id, _BITS_IN_A_WORD)
+    return (bitfield[word_id] >> bit_in_word) & _BIT_MASK
+
+
+def _percent(amount, total):
+    if total == 0:
+        return 0.0
+    return (100.0 * amount) / float(total)
 
 
 class OnChipBitFieldGenerator(object):
-    """ Executes bitfield and routing table entries for atom based routing
+    """ Executes bitfield and routing table entries for atom based routing.
     """
 
-    __slots__ = ()
+    __slots__ = ("__aplx", "__placements", "__txrx")
 
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
 
-    # the number of bytes needed to read the user2 register
-    _USER_BYTES = 4
-
-    # n key to n neurons maps size in words
-    _N_KEYS_DATA_SET_IN_WORDS = 1
-
-    # bits in a word
-    _BITS_IN_A_WORD = 32
-
-    # bit to mask a bit
-    _BIT_MASK = 1
-
-    # n region data sets size in words
-    _N_REGION_DATA_SETS_IN_WORDS = 1
-
-    # n elements in each key to n atoms map
-    _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
-
-    _BYTES_PER_FILTER = 12
-
-    # skip merged and redundant counts.
-    _OFFSET_TO_N_BIT_FIELD_IN_BYTES = 2 * BYTES_PER_WORD
-
-    # 1. merged bitfields, 2. redundant bitfields. 3 total bitfields
-    _SIZE_OF_FILTER_REGION_IN_BYTES = 3 * BYTES_PER_WORD
-
-    _ONE_WORDS = struct.Struct("<I")
-
-    # bit field report file name
+    # bit field report file names
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
     _BIT_FIELD_SUMMARY_REPORT_FILENAME = "bit_field_summary.rpt"
+
+    # Bottom 30 bits
+    _N_WORDS_MASK = 0x3FFFFFFF
 
     # binary name
     _BIT_FIELD_EXPANDER_APLX = "bit_field_expander.aplx"
 
+    # Messages used to build the summary report
+    _PER_CORE_SUMMARY = (
+        "Vertex on {}:{}:{} ({}) has total incoming packet count of {} and "
+        "a redundant packet count of {}, making a redundant packet rate of "
+        "{}%\n")
+    _PER_CHIP_SUMMARY = (
+        "Chip {}:{} has a total incoming packet count of {} and a redundant "
+        "packet count of {} given a redundancy rate of {}%\n")
+    _OVERALL_SUMMARY = (
+        "Overall, the application has estimated {} packets flying around of "
+        "which {} are redundant at reception. This is {}% of the packets\n")
+
+    # Messages used to build the detailed report
+    _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
+    _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
+
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver,
-            write_bit_field_generator_iobuf, generating_bitfield_report,
-            default_report_folder, machine_graph, routing_infos,
-            generating_bit_field_summary_report):
-        """ loads and runs the bit field generator on chip
+            transceiver, machine_graph, routing_infos):
+        """ Loads and runs the bit field generator on chip.
 
-        :param placements: placements
-        :param app_graph: the app graph
+        :param ~pacman.model.placements.Placements placements: placements
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
         :param executable_finder: the executable finder
-        :param provenance_file_path: the path to where provenance data items\
-                                     is written
-        :param transceiver: the SpiNNMan instance
-        :param write_bit_field_generator_iobuf: bool flag for report
-        :param generating_bitfield_report: bool flag for report
-        :param default_report_folder: the file path for reports
-        :param machine_graph: the machine graph
-        :param routing_infos: the key to edge map
-        :param generating_bit_field_summary_report: bool flag for making \
-        summary report
-        :rtype: None
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpiNNMan instance
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine graph
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            the key to edge map
         """
+        self.__txrx = transceiver
+        self.__placements = placements
+        self.__aplx = executable_finder.get_executable_path(
+            self._BIT_FIELD_EXPANDER_APLX)
 
         # progress bar
         progress = ProgressBar(
-            len(app_graph.vertices) + len(machine_graph.vertices) + 1,
+            app_graph.n_vertices + machine_graph.n_vertices + 1,
             "Running bitfield generation on chip")
 
         # get data
-        expander_cores = self._calculate_core_data(
-            app_graph, placements, progress, executable_finder, transceiver)
+        expander_cores = self._calculate_core_data(app_graph, progress)
 
         # load data
         bit_field_app_id = transceiver.app_id_tracker.get_new_id()
@@ -117,289 +128,203 @@ class OnChipBitFieldGenerator(object):
         # run app
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder,
-            write_bit_field_generator_iobuf, self._check_for_success,
-            [CPUState.FINISHED], False,
+            executable_finder,
+            get_config_bool("Reports", "write_bit_field_iobuf"),
+            self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()
 
         # read in bit fields for debugging purposes
-        if generating_bitfield_report:
-            self._read_back_bit_fields(
-                app_graph, transceiver, placements,
-                default_report_folder, self._BIT_FIELD_REPORT_FILENAME)
-        if generating_bit_field_summary_report:
-            self._read_back_and_summarise_bit_fields(
-                app_graph, transceiver, placements,
-                default_report_folder, self._BIT_FIELD_SUMMARY_REPORT_FILENAME)
+        if get_config_bool("Reports", "generate_bit_field_report"):
+            self._full_report_bit_fields(app_graph, os.path.join(
+                report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
+            self._summary_report_bit_fields(app_graph, os.path.join(
+                report_default_directory(),
+                self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
-    def _read_back_and_summarise_bit_fields(
-            self, app_graph, transceiver, placements,
-            default_report_folder, bit_field_summary_report_name):
+    def _summary_report_bit_fields(self, app_graph, file_path):
         """ summary report of the bitfields that were generated
 
-        :param app_graph: app graph
-        :param transceiver: the SPiNNMan instance
-        :param placements: The placements
-        :param default_report_folder:the file path for where reports are.
-        :param bit_field_summary_report_name: the name of the summary file
-        :rtype: None
+        :param ~.ApplicationGraph app_graph: app graph
+        :param str file_path: Where to write to
         """
-        progress = ProgressBar(
-            len(app_graph.vertices),
-            "reading back bitfields from chip for summary report")
-
         chip_packet_count = defaultdict(int)
         chip_redundant_count = defaultdict(int)
-
-        file_path = os.path.join(
-            default_report_folder, bit_field_summary_report_name)
+        progress = ProgressBar(
+            app_graph.n_vertices,
+            "reading back bitfields from chip for summary report")
         with open(file_path, "w") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
-                local_total = 0
-                local_redundant = 0
-
                 # get machine verts
-                for vertex in app_vertex.machine_vertices:
-                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                        placement = placements.get_placement_of_vertex(vertex)
-
-                        # get bitfield address
-                        bit_field_address = vertex.bit_field_base_address(
-                            transceiver, placement)
-
-                        # read how many bitfields there are
-                        n_bit_field_entries = struct.unpack(
-                            "<I", transceiver.read_memory(
-                                placement.x, placement.y,
-                                bit_field_address +
-                                self._OFFSET_TO_N_BIT_FIELD_IN_BYTES,
-                                BYTES_PER_WORD))[0]
-                        reading_address = (
-                            bit_field_address +
-                            self._SIZE_OF_FILTER_REGION_IN_BYTES)
-
-                        # read in each bitfield
-                        for _bit_field_index in range(0, n_bit_field_entries):
-                            # master pop key, n words and read pointer
-                            _master_pop_key, n_words_to_read, read_pointer = \
-                                struct.unpack("<III", transceiver.read_memory(
-                                    placement.x, placement.y,
-                                    reading_address,
-                                    self._BYTES_PER_FILTER))
-                            reading_address += self._BYTES_PER_FILTER
-
-                            # get bitfield words
-                            bit_field = struct.unpack(
-                                "<{}I".format(n_words_to_read),
-                                transceiver.read_memory(
-                                    placement.x, placement.y, read_pointer,
-                                    n_words_to_read * BYTES_PER_WORD))
-
-                            n_neurons = n_words_to_read * self._BITS_IN_A_WORD
-                            for neuron_id in range(0, n_neurons):
-                                if (self._bit_for_neuron_id(
-                                        bit_field, neuron_id) == 0):
-                                    chip_redundant_count[
-                                        placement.x, placement.y] += 1
-                                    local_redundant += 1
-                                chip_packet_count[
-                                    placement.x, placement.y] += 1
-                                local_total += 1
-
-                        redundant_packet_percentage = 0
-                        if local_total != 0:
-                            redundant_packet_percentage = (
-                                (100.0 / float(local_total)) *
-                                float(local_redundant))
-
-                        output.write(
-                            "vertex on {}:{}:{} has total incoming packet "
-                            "count of {} and a redundant packet count of {}. "
-                            "Making a redundant packet percentage of "
-                            "{}\n".format(
-                                placement.x, placement.y, placement.p,
-                                local_total, local_redundant,
-                                redundant_packet_percentage))
-                        output.flush()
+                for placement in self.__bitfield_placements(app_vertex):
+                    local_total = 0
+                    local_redundant = 0
+                    xy = (placement.x, placement.y)
+                    for _, n_neurons, bitfield in self.__bitfields(placement):
+                        for neuron_id in range(n_neurons):
+                            if not _bit_for_neuron_id(bitfield, neuron_id):
+                                chip_redundant_count[xy] += 1
+                                local_redundant += 1
+                        local_total += n_neurons
+                    chip_packet_count[xy] = local_total
+                    output.write(self._PER_CORE_SUMMARY.format(
+                        placement.x, placement.y, placement.p,
+                        placement.vertex.label,
+                        local_total, local_redundant,
+                        _percent(local_redundant, local_total)))
 
             output.write("\n\n\n")
 
             # overall summary
             total_packets = 0
             total_redundant_packets = 0
-            for (x, y) in chip_packet_count:
-                output.write(
-                    "chip {}:{} has a total incoming packet count of {} and "
-                    "a redundant packet count of {} given a redundant "
-                    "percentage of {} \n".format(
-                        x, y, chip_packet_count[(x, y)],
-                        chip_redundant_count[(x, y)],
-                        ((100.0 / float(chip_packet_count[(x, y)])) *
-                         float(chip_redundant_count[(x, y)]))))
+            for xy in chip_packet_count:
+                x, y = xy
+                output.write(self._PER_CHIP_SUMMARY.format(
+                    x, y, chip_packet_count[xy], chip_redundant_count[xy],
+                    _percent(chip_redundant_count[xy], chip_packet_count[xy])))
+                total_packets += chip_packet_count[xy]
+                total_redundant_packets += chip_redundant_count[xy]
 
-                total_packets += chip_packet_count[(x, y)]
-                total_redundant_packets += chip_redundant_count[(x, y)]
+            output.write(self._OVERALL_SUMMARY.format(
+                total_packets, total_redundant_packets,
+                _percent(total_redundant_packets, total_packets)))
 
-            percentage = 0.0
-            if total_packets:
-                percentage = (100.0 * total_redundant_packets) / total_packets
-
-            output.write(
-                "overall the application has estimated {} packets flying "
-                "around of which {} are redundant at reception. this is "
-                "{}% of the packets".format(
-                    total_packets, total_redundant_packets, percentage))
-
-    def _read_back_bit_fields(
-            self, app_graph, transceiver, placements,
-            default_report_folder, bit_field_report_name):
+    def _full_report_bit_fields(self, app_graph, file_path):
         """ report of the bitfields that were generated
 
-        :param app_graph: app graph
-        :param transceiver: the SPiNNMan instance
-        :param placements: The placements
-        :param default_report_folder:the file path for where reports are.
-        :param bit_field_report_name: the name of the file
-        :rtype: None
+        :param ~.ApplicationGraph app_graph: app graph
+        :param str file_path: Where to write to
         """
-
-        # generate file
         progress = ProgressBar(
-            len(app_graph.vertices), "reading back bitfields from chip")
-
-        file_path = os.path.join(default_report_folder, bit_field_report_name)
+            app_graph.n_vertices, "reading back bitfields from chip")
         with open(file_path, "w") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts
-                for machine_vertex in app_vertex.machine_vertices:
-                    if isinstance(machine_vertex,
-                                  AbstractSupportsBitFieldGeneration):
-                        self.__read_back_single_core_data(
-                            machine_vertex, placements, transceiver, output)
+                for placement in self.__bitfield_placements(app_vertex):
+                    self.__read_back_single_core_data(placement, output)
 
-    def __read_back_single_core_data(self, vertex, placements, transceiver, f):
-        placement = placements.get_placement_of_vertex(vertex)
-        f.write("For core {}:{}:{}. Bitfields as follows: \n\n".format(
-            placement.x, placement.y, placement.p))
+    def __read_back_single_core_data(self, placement, f):
+        """
+        :param ~.Placement placement:
+        :param f:
+        """
+        f.write(self._CORE_DETAIL.format(
+            placement.x, placement.y, placement.p, placement.vertex.label))
 
+        for master_pop_key, n_bits, bitfield in self.__bitfields(placement):
+            # put into report
+            for neuron_id in range(n_bits):
+                f.write(self._FIELD_DETAIL.format(
+                    master_pop_key, neuron_id,
+                    _bit_for_neuron_id(bitfield, neuron_id)))
+
+    def __bitfield_placements(self, app_vertex):
+        """ The placements of the machine vertices of the given app vertex \
+            that support the AbstractSupportsBitFieldGeneration protocol.
+
+        :param ~.ApplicationVertex app_vertex:
+        :rtype: iterable(~.Placement)
+        """
+        for vertex in app_vertex.machine_vertices:
+            if isinstance(vertex, AbstractSupportsBitFieldGeneration):
+                yield self.__placements.get_placement_of_vertex(vertex)
+
+    def __bitfields(self, placement):
+        """ Reads back the bitfields that have been placed on a vertex.
+
+        :param ~.Placement placement:
+            The vertex must support AbstractSupportsBitFieldGeneration
+        :returns: sequence of (master population key, num bits, bitfield data)
+        :rtype: iterable(tuple(int,int,list(int)))
+        """
         # get bitfield address
-        bit_field_address = vertex.bit_field_base_address(
-            transceiver, placement)
+        address = placement.vertex.bit_field_base_address(
+            self.__txrx, placement)
 
-        # read how many bitfields there are
-        n_bit_field_entries, = struct.unpack("<I", transceiver.read_memory(
-            placement.x, placement.y, bit_field_address, BYTES_PER_WORD))
-        reading_address = bit_field_address + BYTES_PER_WORD
+        # read how many bitfields there are; header of filter_region_t
+        _merged, _redundant, total = _THREE_WORDS.unpack(
+            self.__txrx.read_memory(
+                placement.x, placement.y, address, _THREE_WORDS.size))
+        address += _THREE_WORDS.size
 
         # read in each bitfield
-        for _bit_field_index in range(0, n_bit_field_entries):
-
-            # master pop key, n words and read pointer
-            master_pop_key, n_words_to_read, read_pointer = struct.unpack(
-                "<III", transceiver.read_memory(
-                    placement.x, placement.y, reading_address,
-                    self._BYTES_PER_FILTER))
-            reading_address += self._BYTES_PER_FILTER
+        for _bit_field_index in range(total):
+            # master pop key, n words and read pointer; filter_info_t
+            master_pop_key, n_words, read_pointer = _THREE_WORDS.unpack(
+                self.__txrx.read_memory(
+                    placement.x, placement.y, address, _THREE_WORDS.size))
+            address += _THREE_WORDS.size
+            # Mask off merged and all_ones flag bits
+            n_words &= self._N_WORDS_MASK
 
             # get bitfield words
-            bit_field = struct.unpack(
-                "<{}I".format(n_words_to_read),
-                transceiver.read_memory(
-                    placement.x, placement.y, read_pointer,
-                    n_words_to_read * BYTES_PER_WORD))
+            if n_words:
+                bitfield = n_word_struct(n_words).unpack(
+                    self.__txrx.read_memory(
+                        placement.x, placement.y, read_pointer,
+                        n_words * BYTES_PER_WORD))
+            else:
+                bitfield = []
+            yield master_pop_key, n_words * _BITS_IN_A_WORD, bitfield
 
-            # put into report
-            for neuron_id in range(0, n_words_to_read * self._BITS_IN_A_WORD):
-                f.write("for key {} neuron id {} has bit {} set \n".format(
-                    master_pop_key, neuron_id,
-                    self._bit_for_neuron_id(bit_field, neuron_id)))
-
-    def _bit_for_neuron_id(self, bit_field, neuron_id):
-        """ locate the bit for the neuron in the bitfield
-
-        :param bit_field: the block of words which represent the bitfield
-        :param neuron_id: the neuron id to find the bit in the bitfield
-        :return: the bit
-        """
-        word_id = int(math.floor(neuron_id // self._BITS_IN_A_WORD))
-        bit_in_word = neuron_id % self._BITS_IN_A_WORD
-        flag = (bit_field[word_id] >> bit_in_word) & self._BIT_MASK
-        return flag
-
-    def _calculate_core_data(
-            self, app_graph, placements, progress,
-            executable_finder, transceiver):
+    def _calculate_core_data(self, app_graph, progress):
         """ gets the data needed for the bit field expander for the machine
 
-        :param app_graph: app graph
-        :param placements: placements
-        :param progress: progress bar
-        :param executable_finder: where to find the executable
-        :param transceiver: spinnman instance
+        :param ~.ApplicationGraph app_graph: app graph
+        :param ~.ProgressBar progress: progress bar
         :return: data and expander cores
+        :rtype: ~.ExecutableTargets
         """
-
         # cores to place bitfield expander
         expander_cores = ExecutableTargets()
 
         # bit field expander executable file path
-        bit_field_expander_path = executable_finder.get_executable_path(
-            self._BIT_FIELD_EXPANDER_APLX)
-
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
-            for machine_vertex in app_vertex.machine_vertices:
-                if (isinstance(
-                        machine_vertex, AbstractSupportsBitFieldGeneration)):
-                    self.__write_single_core_data(
-                        machine_vertex, placements, transceiver,
-                        bit_field_expander_path, expander_cores)
+            for placement in self.__bitfield_placements(app_vertex):
+                self.__write_single_core_data(placement, expander_cores)
 
         return expander_cores
 
-    def __write_single_core_data(
-            self, vertex, placements, transceiver, bit_field_expander_path,
-            expander_cores):
-        placement = placements.get_placement_of_vertex(vertex)
-
+    def __write_single_core_data(self, placement, expander_cores):
+        """
+        :param ~.Placement placement:
+        :param ~.ExecutableTargets expander_cores:
+        """
         # check if the chip being considered already.
         expander_cores.add_processor(
-            bit_field_expander_path, placement.x, placement.y,
-            placement.p, executable_type=ExecutableType.SYSTEM)
+            self.__aplx, placement.x, placement.y, placement.p,
+            executable_type=ExecutableType.SYSTEM)
 
-        bit_field_builder_region = vertex.bit_field_builder_region(
-            transceiver, placement)
+        bit_field_builder_region = placement.vertex.bit_field_builder_region(
+            self.__txrx, placement)
         # update user 1 with location
         user_1_base_address = \
-            transceiver.get_user_1_register_address_from_core(placement.p)
-        transceiver.write_memory(
+            self.__txrx.get_user_1_register_address_from_core(placement.p)
+        self.__txrx.write_memory(
             placement.x, placement.y, user_1_base_address,
-            self._ONE_WORDS.pack(bit_field_builder_region),
-            self._USER_BYTES)
+            bit_field_builder_region)
 
-    def _check_for_success(self, executable_targets, transceiver):
+    def __check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
-        :param executable_targets: cores to load bitfield on
-        :param transceiver: SpiNNMan instance
-        :rtype: None
+        :param ~.ExecutableTargets executable_targets:
+            cores to load bitfield on
+        :param ~.Transceiver transceiver: SpiNNMan instance
+        :rtype: bool
         """
-
         for core_subset in executable_targets.all_core_subsets:
             x = core_subset.x
             y = core_subset.y
             for p in core_subset.processor_ids:
                 # Read the result from USER0 register
-                user_2_base_address = \
-                    transceiver.get_user_2_register_address_from_core(p)
-                result = struct.unpack(
-                    "<I", transceiver.read_memory(
-                        x, y, user_2_base_address, self._USER_BYTES))[0]
+                result = transceiver.read_word(
+                    x, y, transceiver.get_user_2_register_address_from_core(p))
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:

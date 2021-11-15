@@ -27,11 +27,11 @@
 //!     the DTCM address for the direct matrix
 //! \return true if successful, false otherwise.
 bool direct_synapses_initialise(
-        address_t direct_matrix_address, address_t *direct_synapses_address);
+        void *direct_matrix_address, address_t *direct_synapses_address);
 
 //! \brief Get the synapse for a given direct synaptic row.
 //! \param[in] row_address: the row address to read.
 //! \return the synaptic row synapse data.
-synaptic_row_t direct_synapses_get_direct_synapse(address_t row_address);
+synaptic_row_t direct_synapses_get_direct_synapse(void *row_address);
 
 #endif /* _DIRECT_SYNAPSES_H_ */

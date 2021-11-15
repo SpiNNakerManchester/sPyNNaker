@@ -13,21 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractPopulationInitializable(object):
-    """ Indicates that this object has properties that can be initialised by a\
-        PyNN Population
+@require_subclass(ApplicationVertex)
+class AbstractPopulationInitializable(object, metaclass=AbstractBase):
+    """ Indicates that this application vertex has properties that can be\
+        initialised by a PyNN Population
     """
 
     __slots__ = ()
 
     @abstractmethod
-    def initialize(self, variable, value):
+    def initialize(self, variable, value, selector=None):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
@@ -47,8 +48,8 @@ class AbstractPopulationInitializable(object):
     def get_initial_values(self, selector=None):
         """ A dict containing the initial values of the state variables.
 
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
+        :param selector: a description of the subrange to accept, or ``None``
+            for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         :rtype: dict(str,Any)
@@ -68,29 +69,10 @@ class AbstractPopulationInitializable(object):
 
         Should return the current value not the default one.
 
-        Must support the variable as listed in initialize_parameters.keys, \
+        Must support the variable as listed in initialize_parameters.keys,
         ideally also with ``_init`` removed or added.
 
         :param str variable: variable name with or without ``_init``
-        :param selector: a description of the subrange to accept, or None for
-            all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
-        :return: A list or an Object which act like a list
-        :rtype: iterable
-        """
-
-    @abstractmethod
-    def set_initial_value(self, variable, value, selector=None):
-        """ Sets the value for any variable whose in \
-            initialize_parameters.keys
-
-        Must support the variable as listed in initialize_parameters.keys,\
-        ideally also with ``_init`` removed or added
-
-        :param str variable: variable name with or without ``_init``
-        :param value: New value for the variable
-        :type value: int or float or list(int) or list(float)
         :param selector: a description of the subrange to accept, or None for
             all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -103,7 +85,7 @@ class AbstractPopulationInitializable(object):
     def initialize_parameters(self):
         """ List the parameters that are initializable.
 
-        If "foo" is initializable there should be a setter ``initialize_foo``\
+        If "foo" is initializable there should be a setter ``initialize_foo``
         and a getter property ``foo_init``
 
         :return: list of property names

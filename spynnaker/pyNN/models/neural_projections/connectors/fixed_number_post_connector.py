@@ -12,9 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import print_function
-import logging
 import math
 import numpy
 from spinn_utilities.overrides import overrides
@@ -28,8 +25,6 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
@@ -47,8 +42,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         "__post_connector_seed"]
 
     def __init__(
-            self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, callback=None, verbose=False, rng=None):
+            self, n, allow_self_connections=True, safe=True, verbose=False,
+            with_replacement=False, rng=None, callback=None):
         """
         :param int n:
             number of random post-synaptic neurons connected to pre-neurons.
@@ -56,22 +51,31 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
+        :param bool safe:
+            Whether to check that weights and delays have valid values;
+            if ``False``, this check is skipped.
+        :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
         :param bool with_replacement:
             this flag determines how the random selection of post-synaptic
-            neurons is performed; if true, then every post-synaptic neuron
+            neurons is performed; if ``True``, then every post-synaptic neuron
             can be chosen on each occasion, and so multiple connections
-            between neuron pairs are possible; if false, then once a
+            between neuron pairs are possible; if ``False``, then once a
             post-synaptic neuron has been connected to a pre-neuron, it can't
             be connected again.
-        :param bool safe:
-        :param callable callback: Ignored
-        :param bool verbose:
         :param rng:
-            Seeded random number generator, or None to make one when needed
+            Seeded random number generator, or ``None`` to make one when
+            needed.
         :type rng: ~pyNN.random.NumpyRNG or None
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
-        self.__n_post = n
+        super().__init__(safe, callback, verbose)
+        self.__n_post = self._roundsize(n, "FixedNumberPostConnector")
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
@@ -79,9 +83,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         self.__post_connector_seed = dict()
         self._rng = rng
 
-    def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
         if (not self.__with_replacement and
                 self.__n_post > synapse_info.n_post_neurons):
             raise SpynnakerException(
@@ -98,7 +101,14 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(
+            synapse_info.delays, n_connections, synapse_info)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        n_connections = synapse_info.n_pre_neurons * self.__n_post
+        return self._get_delay_minimum(
+            synapse_info.delays, n_connections, synapse_info)
 
     def _get_post_neurons(self, synapse_info):
         """
@@ -212,7 +222,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            n_connections, min_delay, max_delay)
+            n_connections, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -227,7 +237,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_weight_maximum(synapse_info.weights, n_connections)
+        return self._get_weight_maximum(
+            synapse_info.weights, n_connections, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -260,11 +271,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
         block["weight"] = self._generate_weights(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -294,8 +305,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         # The same seed needs to be sent to each of the slices
         key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
-            self.__post_connector_seed[key] = [
-                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+            self.__post_connector_seed[
+                key] = utility_calls.create_mars_kiss_seeds(self._rng)
 
         # Only deal with self-connections if the two populations are the same
         self_connections = True

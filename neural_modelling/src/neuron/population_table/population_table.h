@@ -39,7 +39,10 @@ extern uint32_t failed_bit_field_reads;
 //!     they don't hit anything
 extern uint32_t bit_field_filtered_packets;
 
-//! \brief Sets up the table
+//! \brief The number of addresses from the same spike left to process
+extern uint16_t items_to_go;
+
+//! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data
 //! \param[in] synapse_rows_address: The address of the start of the synapse
 //!                                  data
@@ -63,7 +66,14 @@ bool population_table_load_bitfields(filter_region_t *filter_region);
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
+
+//! \brief Determine if there are more items with the same key
+//! \return Whether there are more items
+static inline bool population_table_is_next(void) {
+    return items_to_go > 0;
+}
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
@@ -72,7 +82,7 @@ bool population_table_get_first_address(
 //! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
-
+        spike_t *spike, synaptic_row_t* row_address,
+        size_t* n_bytes_to_transfer);
 
 #endif // _POPULATION_TABLE_H_

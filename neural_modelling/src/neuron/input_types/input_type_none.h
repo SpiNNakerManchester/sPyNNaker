@@ -44,7 +44,7 @@ struct input_type_t {
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
 static inline input_t *input_type_get_input_value(
-        UNUSED input_t *restrict value, UNUSED const input_type_t *input_type,
+        UNUSED input_t *restrict value, UNUSED input_type_t *input_type,
         UNUSED uint16_t num_receptors) {
     return 0;
 }

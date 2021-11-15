@@ -15,15 +15,13 @@
 
 from collections import defaultdict
 import sys
-from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spynnaker.pyNN.models.defaults import get_dict_from_init
 
 
-@add_metaclass(AbstractBase)
-class AbstractPyNNModel(object):
+class AbstractPyNNModel(object, metaclass=AbstractBase):
     """ A Model that can be passed in to a Population object in PyNN
     """
 
@@ -37,7 +35,7 @@ class AbstractPyNNModel(object):
         :param n_atoms: The new maximum, or None for the largest possible
         :type n_atoms: int or None
         """
-        AbstractPyNNModel._max_atoms_per_core[cls] = n_atoms
+        AbstractPyNNModel._max_atoms_per_core[cls] = int(n_atoms)
 
     @classmethod
     def get_max_atoms_per_core(cls):

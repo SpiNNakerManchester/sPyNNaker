@@ -21,41 +21,50 @@
 #include <spin1_api.h>
 #include <common/neuron-typedefs.h>
 
-//! The size of the fixed synapse buffer, in words
-#define SIZE_OF_SINGLE_FIXED_SYNAPSE 4
+//! \brief The type of a singleton synaptic row.
+//! \details The counts are constant. See ::synapse_row_plastic_part_t and
+//!     ::synapse_row_fixed_part_t for what this is a packed version of.
+typedef struct single_synaptic_row_t {
+    const uint32_t n_plastic;   //!< Number of plastic synapses. Always zero
+    const uint32_t n_fixed;     //!< Number of fixed synapses. Always one
+    const uint32_t n_plastic_controls; //!< Number of plastic controls. Always zero
+    uint32_t synapse_datum;     //!< The value of the single synapse
+} single_synaptic_row_t;
 
 //! Working buffer for direct synapse access
-static uint32_t single_fixed_synapse[SIZE_OF_SINGLE_FIXED_SYNAPSE];
+static single_synaptic_row_t single_fixed_synapse = {0, 1, 0, 0};
+
+//! The layout of the direct matrix region
+typedef struct {
+    const uint32_t size;        //!< Size of data, _not_ number of elements
+    const uint32_t data[];      //!< Direct matrix data
+} direct_matrix_data_t;
 
 bool direct_synapses_initialise(
-        address_t direct_matrix_address, address_t *direct_synapses_address) {
+        void *direct_matrix_address, address_t *direct_synapses_address) {
+    direct_matrix_data_t *direct_matrix = direct_matrix_address;
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
-    uint32_t direct_matrix_size = direct_matrix_address[0];
-    log_info("Direct matrix malloc size is %d", direct_matrix_size);
+    uint32_t direct_matrix_size = direct_matrix->size;
+    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
-        *direct_synapses_address = spin1_malloc(direct_matrix_size);
-        if (*direct_synapses_address == NULL) {
+        void *dtcm_copy = spin1_malloc(direct_matrix_size);
+        if (dtcm_copy == NULL) {
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
         log_debug("Copying %u bytes of direct synapses to 0x%08x",
-                direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(*direct_synapses_address, &direct_matrix_address[1],
-                direct_matrix_size);
+                direct_matrix_size, dtcm_copy);
+        spin1_memcpy(dtcm_copy, direct_matrix->data, direct_matrix_size);
+        *direct_synapses_address = dtcm_copy;
     }
-
-    // Set up for single fixed synapses
-    // (data that is consistent per direct row)
-    single_fixed_synapse[0] = 0;
-    single_fixed_synapse[1] = 1;
-    single_fixed_synapse[2] = 0;
 
     return true;
 }
 
-synaptic_row_t direct_synapses_get_direct_synapse(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    return (synaptic_row_t) single_fixed_synapse;
+synaptic_row_t direct_synapses_get_direct_synapse(void *row_address) {
+    uint32_t *data = row_address;
+    single_fixed_synapse.synapse_datum = *data;
+    return (synaptic_row_t) &single_fixed_synapse;
 }

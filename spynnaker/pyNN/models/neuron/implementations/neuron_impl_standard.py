@@ -19,8 +19,9 @@ from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step)
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
@@ -187,7 +188,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
         # Work out the time step per step
-        ts = globals_variables.get_simulator().machine_time_step
+        ts = machine_time_step()
         ts /= self.__n_steps_per_timestep
         items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
         items.extend(
@@ -224,15 +225,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
         for component in self.__components:
             if hasattr(component, key):
                 return getattr(component, key)
-        # ... or fail
-        raise AttributeError("'{}' object has no attribute {}".format(
-            self.__class__.__name__, key))
-
-    def __setitem__(self, key, value):
-        # Find the property in the components...
-        for component in self.__components:
-            if hasattr(component, key):
-                return setattr(component, key, value)
         # ... or fail
         raise AttributeError("'{}' object has no attribute {}".format(
             self.__class__.__name__, key))

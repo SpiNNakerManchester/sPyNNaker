@@ -66,4 +66,19 @@ static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
  */
 static weight_t weight_get_final(weight_state_t new_state);
 
+/*!
+ * \brief Decay the weight inside the state by multiplication
+ * \param[in] state The state containing the current weight
+ * \param[in] decay The "decay" to multiply the weight by, in STDP fixed point
+ *                  format
+ */
+static void weight_decay(weight_state_t *state, int32_t decay);
+
+/*!
+ * \brief Get the weight inside during update in STDP fixed point format
+ * \param[in] state The state containing the current weight
+ * \return The weight in s1615 format
+ */
+static accum weight_get_update(weight_state_t state);
+
 #endif // _WEIGHT_H_

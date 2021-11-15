@@ -15,17 +15,16 @@
 
 from enum import Enum
 import numpy
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 class MatrixGeneratorID(Enum):
     STATIC_MATRIX = 0
     STDP_MATRIX = 1
+    NEUROMODULATION_MATRIX = 2
 
 
-@add_metaclass(AbstractBase)
-class AbstractGenerateOnMachine(object):
+class AbstractGenerateOnMachine(object, metaclass=AbstractBase):
     """ A synapse dynamics that can be generated on the machine.
     """
     __slots__ = []
@@ -52,7 +51,7 @@ class AbstractGenerateOnMachine(object):
 
         :rtype: ~numpy.ndarray(uint32)
         """
-        return numpy.zeros(0, dtype="uint32")
+        return numpy.zeros(0, dtype=numpy.uint32)
 
     @property
     def gen_matrix_params_size_in_bytes(self):

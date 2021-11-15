@@ -13,142 +13,85 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# This workflow will install Python dependencies, run tests, lint and rat with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow will install Python dependencies, run tests, lint and rat with
+# a variety of Python versions. For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Note that documentation building is done in parallel (with testing) because
+# that takes a long time in sPyNNaker right now.
 
 name: Python Actions
-
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
 
     steps:
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
     - name: Checkout
       uses: actions/checkout@v2
-
     - name: Checkout SupportScripts
       uses: actions/checkout@v2
       with:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
-    - name: Checkout Spinnaker Dependencies
-      run: |
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNUtils.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMachine.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/SpiNNMan.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/PACMAN.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/DataSpecification.git
-        support/gitclone2.sh https://github.com/SpiNNakerManchester/spalloc.git
-        support/gitclone2.sh git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
-
-    - name: Install -pip
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0'
-
-    - name: Install SpiNNUtils
-      run: python setup.py install
-      working-directory: SpiNNUtils
-
-    - name: Install SpiNNMachine
-      run: python setup.py install
-      working-directory: SpiNNMachine
-
-    - name: Install SpiNNMan
-      run: python setup.py install
-      working-directory: SpiNNMan
-
-    - name: preinstall pacman requirements (2.7 only)
-      if: matrix.python-version == 2.7
-      run: pip install -r requirements.txt
-      working-directory: PACMAN
-
-    - name: Install PACMAN
-      run: python setup.py install
-      working-directory: PACMAN
-
-    - name: Install DataSpecification
-      run: python setup.py install
-      working-directory: DataSpecification
-
-    - name: Install spalloc
-      run: python setup.py install
-      working-directory: spalloc
-
-    - name: preinstall SpiNNFrontEndCommon requirements (2.7 Only)
-      if: matrix.python-version == 2.7
-      run: pip install -r requirements.txt
-      working-directory: SpiNNFrontEndCommon
-
-    - name: Install SpiNNFrontEndCommon
-      run: python setup.py install
-      working-directory: SpiNNFrontEndCommon
-
-    - name: Preinstall requirements (2.7 Only)
-      if: matrix.python-version == 2.7
-      run: pip install -r requirements.txt
-
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: >
+          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
+          SpiNNFrontEndCommon TestBase
+        install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
     - name: Setup
-      run: python setup.py develop
-
-    - name: Install requirements-test
-      run: pip install -r requirements-test.txt
+      uses: ./support/actions/run-setup
 
     - name: Create a spynnaker.cfg
-      run: |
-        echo '[Machine]' > ~/.spynnaker.cfg
-        echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
-        echo "version = $SPINNAKER_BOARD_VERSION" >> ~/.spynnaker.cfg
-        echo '[Database]' >> ~/.spynnaker.cfg
-        echo '[Simulation]' >> ~/.spynnaker.cfg
-        echo '[Buffers]' >> ~/.spynnaker.cfg
-      env:
-        SPINNAKER_BOARD_ADDRESS: spinn-4.cs.man.ac.uk
-        SPINNAKER_BOARD_VERSION: 5
-
-    - name: Test with pytest and coverage
-      if: matrix.python-version == 3.6
-      run: pytest unittests --cov spynnaker
-
+      uses: ./support/actions/configure-spynnaker
+      with:
+        board-address: spinn-4.cs.man.ac.uk
     - name: Test with pytest
-      if: matrix.python-version != 3.6
-      run: pytest unittests
+      uses: ./support/actions/pytest
+      with:
+        tests: unittests
+        coverage: ${{ matrix.python-version == 3.8 }}
+        cover-packages: spynnaker
+        coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 spynnaker unittests
+      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
 
     - name: Lint with pylint
-      # Broken in 2.7 as it can not find data_specification.exceptions
-      if: matrix.python-version != 2.7
-      # Note that there's special conditioning of the return code of pylint
-      run: pylint --output-format=colorized --disable=R,C spynnaker || exit $(($? & 35))
+      uses: ./support/actions/pylint
+      with:
+        package: spynnaker spynnaker8
 
     - name: Run rat copyright enforcement
-      if: matrix.python-version == 3.6
-      run: |
-        support/rat.sh download
-        support/rat.sh run
+      if: matrix.python-version == 3.8
+      uses: ./support/actions/check-copyrights
 
-    - name: Build documentation with sphinx
-      if: matrix.python-version == 3.6
-      run: sphinx-build -W -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-      working-directory: doc/source
+    - name: Validate all XML
+      if: matrix.python-version == 3.8
+      uses: ./support/actions/validate-xml
+      with:
+        base-path: spynnaker
 
-    - name: Run coveralls and report coverage
-      if: matrix.python-version == 3.6
-      env:
-        COVERALLS_SERVICE_NAME: 'GitHub CI'
-        COVERALLS_REPO_TOKEN : ${{ secrets.COVERALLS_REPO_TOKEN }}
-        NODE_COVERALLS_DEBUG: 1
-      run: coveralls
+    - name: Build documentation with sphinx (3.8 only)
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source

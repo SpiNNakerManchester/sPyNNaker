@@ -16,10 +16,12 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
-from .delayed_machine_edge import DelayedMachineEdge
+from spynnaker.pyNN.models.neural_projections\
+    .projection_application_edge import are_dynamics_structural
 
 
 class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
+
     __slots__ = [
         "__synapse_information",
         "__machine_edges_by_slices",
@@ -33,16 +35,20 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             The delay extension at the start of the edge
         :param AbstractPopulationVertex post_vertex:
             The target of the synapses
-        :param SynapseInformation synapse_information:
+        :param synapse_information:
             The synapse information on this edge
+        :type synapse_information:
+            SynapseInformation or iterable(SynapseInformation)
         :param ProjectionApplicationEdge undelayed_edge:
             The edge that is used for projections without extended delays
         :param str label:
             The edge label
         """
-        super(DelayedApplicationEdge, self).__init__(
-            pre_vertex, post_vertex, label=label)
-        self.__synapse_information = [synapse_information]
+        super().__init__(pre_vertex, post_vertex, label=label)
+        if hasattr(synapse_information, '__iter__'):
+            self.__synapse_information = synapse_information
+        else:
+            self.__synapse_information = [synapse_information]
         self.__undelayed_edge = undelayed_edge
 
         # Keep the machine edges by pre- and post-slice
@@ -69,36 +75,32 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         """
         return self.__undelayed_edge
 
-    @overrides(ApplicationEdge._create_machine_edge)
-    def _create_machine_edge(self, pre_vertex, post_vertex, label):
-        edge = DelayedMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, self, label)
+    @overrides(ApplicationEdge.remember_associated_machine_edge)
+    def remember_associated_machine_edge(self, machine_edge):
+        super().remember_associated_machine_edge(machine_edge)
         self.__machine_edges_by_slices[
-            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
-        # Set the undelayed machine vertex if it already exists
-        undelayed = self.__undelayed_edge._get_machine_edge(
-            pre_vertex, post_vertex)
-        if undelayed is not None:
-            undelayed.delay_edge = edge
-            edge.undelayed_edge = undelayed
-        return edge
+            machine_edge.pre_vertex.vertex_slice,
+            machine_edge.post_vertex.vertex_slice] = machine_edge
 
-    def _get_machine_edge(self, pre_vertex, post_vertex):
+    def get_machine_edge(self, pre_vertex, post_vertex):
         """ Get a specific machine edge from this edge
 
         :param DelayExtensionMachineVertex pre_vertex:
             The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertes:
+        :param PopulationMachineVertex post_vertex:
             The vertex at the end of the machine edge
-        :rtype: DelayedMachineEdge or None
+        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
         """
         return self.__machine_edges_by_slices.get(
-            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
 
     @overrides(AbstractSlicesConnect.could_connect)
-    def could_connect(self, pre_slice, post_slice):
+    def could_connect(self, src_machine_vertex, dest_machine_vertex):
         for synapse_info in self.__synapse_information:
+            # Structual Plasticity can learn connection not originally included
+            if are_dynamics_structural(synapse_info.synapse_dynamics):
+                return True
             if synapse_info.connector.could_connect(
-                    synapse_info, pre_slice, post_slice):
+                    synapse_info, src_machine_vertex, dest_machine_vertex):
                 return True
         return False

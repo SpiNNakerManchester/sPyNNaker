@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -25,8 +24,6 @@ from .abstract_connector_supports_views_on_machine import (
 
 N_GEN_PARAMS = 1
 
-logger = logging.getLogger(__file__)
-
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                         AbstractConnectorSupportsViewsOnMachine):
@@ -37,18 +34,26 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     __slots__ = [
         "__allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, callback=None,
-                 verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True,
+                 verbose=None, callback=None):
         """
         :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this
             flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
         :param bool safe:
-        :param callable callback: Ignored
+            If ``True``, check that weights and delays have valid values.
+            If ``False``, this check is skipped.
         :param bool verbose:
+            Whether to output extra information about the connectivity to a
+            CSV file
+        :param callable callback:
+            if given, a callable that display a progress bar on the terminal.
+
+            .. note::
+                Not supported by sPyNNaker.
         """
-        super(AllToAllConnector, self).__init__(safe, callback, verbose)
+        super().__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(
@@ -77,7 +82,15 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            synapse_info.n_pre_neurons * synapse_info.n_post_neurons)
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info)
+
+    @overrides(AbstractConnector.get_delay_minimum)
+    def get_delay_minimum(self, synapse_info):
+        return self._get_delay_minimum(
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -91,7 +104,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, min_delay, max_delay)
+            post_vertex_slice.n_atoms, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -101,7 +114,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
-        return self._get_weight_maximum(synapse_info.weights, n_conns)
+        return self._get_weight_maximum(
+            synapse_info.weights, n_conns, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -135,11 +149,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 pre_vertex_slice.n_atoms)
         block["weight"] = self._generate_weights(
-            n_connections, connection_slices, pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, connection_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, connection_slices, pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, connection_slices,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

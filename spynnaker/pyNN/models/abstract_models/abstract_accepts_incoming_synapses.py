@@ -13,13 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.exceptions import PacmanConfigurationException
+from pacman.model.graphs.application import ApplicationVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractAcceptsIncomingSynapses(object):
-    """ Indicates an object that can be a post-vertex in a PyNN projection.
+@require_subclass(ApplicationVertex)
+class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
+    """ Indicates an application vertex that can be a post-vertex in a PyNN\
+        projection.
+
+    .. note::
+        See :py:meth:`verify_splitter`
     """
     __slots__ = ()
 
@@ -36,14 +42,6 @@ class AbstractAcceptsIncomingSynapses(object):
         """ Set the synapse dynamics of this vertex.
 
         :param AbstractSynapseDynamics synapse_dynamics:
-        """
-
-    @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """ Get the maximum delay supported by this vertex.
-
-        :param int machine_time_step: microseconds
-        :rtype: int
         """
 
     @abstractmethod
@@ -66,3 +64,25 @@ class AbstractAcceptsIncomingSynapses(object):
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    def verify_splitter(self, splitter):
+        """
+        Check that the splitter implements the API(s) expected by the\
+        SynapticMatrices
+
+        Any Vertex that implements this api should override
+        ApplicationVertex.splitter method to also call this function
+
+        :param splitter: the splitter
+        :type splitter:
+            ~spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay
+        :raises PacmanConfigurationException: if the splitter is not an
+            instance of AbstractSpynnakerSplitterDelay
+        """
+        # Delayed import to avoid cicular dependency
+        from spynnaker.pyNN.extra_algorithms.splitter_components import (
+            AbstractSpynnakerSplitterDelay)
+        if not isinstance(splitter, AbstractSpynnakerSplitterDelay):
+            raise PacmanConfigurationException(
+                "The splitter needs to be an instance of "
+                "----------------AbstractSpynnakerSplitterDelay")

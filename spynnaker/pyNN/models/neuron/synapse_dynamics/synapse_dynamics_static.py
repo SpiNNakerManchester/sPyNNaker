@@ -14,13 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from spynnaker.pyNN.exceptions import InvalidParameterType,\
+    SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -41,19 +45,29 @@ class SynapseDynamicsStatic(
         # delay of connections
         "__delay"]
 
-    def __init__(self, weight=0.0, delay=1.0, pad_to_length=None):
+    def __init__(self, weight=StaticSynapse.default_parameters['weight'],
+                 delay=None, pad_to_length=None):
         """
         :param float weight:
-        :param float delay:
+        :param delay: Use ``None`` to get the simulator default minimum delay.
+        :type delay: float or None
         :param int pad_to_length:
         """
         self.__change_requires_mapping = True
         self.__weight = weight
+        if delay is None:
+            delay = get_simulator().min_delay
         self.__delay = delay
         self.__pad_to_length = pad_to_length
 
     @overrides(AbstractStaticSynapseDynamics.merge)
     def merge(self, synapse_dynamics):
+        # Neuromodulation shouldn't be used without STDP
+        if isinstance(synapse_dynamics, SynapseDynamicsNeuromodulation):
+            raise SynapticConfigurationException(
+                "Neuromodulation can only be added when an STDP projection"
+                " has already been added")
+
         # We can always override a static synapse dynamics with a more
         # complex model
         return synapse_dynamics
@@ -76,7 +90,8 @@ class SynapseDynamicsStatic(
         return 0
 
     @overrides(AbstractStaticSynapseDynamics.write_parameters)
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(
+            self, spec, region, global_weight_scale, synapse_weight_scales):
         # Nothing to do here
         pass
 
@@ -100,7 +115,7 @@ class SynapseDynamicsStatic(
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
-            ((connections["delay"].astype("uint32") & 0xF) <<
+            (connections["delay"].astype("uint32") <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
@@ -162,9 +177,8 @@ class SynapseDynamicsStatic(
         connections["target"] = (
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
-        connections["delay"] = (data >> (n_neuron_id_bits +
-                                         n_synapse_type_bits)) & 0xF
-        connections["delay"][connections["delay"] == 0] = 16
+        connections["delay"] = (data & 0xFFFF) >> (
+            n_neuron_id_bits + n_synapse_type_bits)
 
         return connections
 

@@ -25,10 +25,6 @@
 
 #include <common-typedefs.h>
 
-// Constants
-//! Length of a single delay stage, in basic timesteps
-#define DELAY_STAGE_LENGTH  16
-
 //! region identifiers
 typedef enum region_identifiers {
     //! General simulation system control
@@ -52,6 +48,8 @@ struct delay_parameters {
     uint32_t incoming_mask;       //!< Mask to filter delay_parameters::incoming_key
     uint32_t n_atoms;             //!< Number of atoms
     uint32_t n_delay_stages;      //!< Number of delay stages
+    uint32_t n_delay_in_a_stage;  //!< Number of delays in a given stage
+    uint32_t clear_packets;       //!< Clear packets each timestep?
     uint32_t delay_blocks[];      //!< Descriptions of delays to apply
 };
 

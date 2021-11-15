@@ -29,8 +29,11 @@ class AbstractPushBotRetinaDevice(
         """
         :param protocol:
         :type protocol:
-            MunichIoEthernetProtocol or MunichIoSpiNNakerLinkProtocol
-        :param PushBotRetinaResolution resolution:
+            MunichIoEthernetProtocol or
+            ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol
+        :param resolution:
+        :type resolution:
+            ~spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution
         """
         self._protocol = protocol
         self._resolution = resolution
