@@ -73,7 +73,7 @@ def on_chip_bitfield_generator(placements, app_graph, executable_finder,
     """
     generator = _OnChipBitFieldGenerator(
         placements, executable_finder, transceiver)
-    generator(app_graph, executable_finder, machine_graph, routing_infos)
+    generator._run(app_graph, executable_finder, machine_graph, routing_infos)
 
 
 class _OnChipBitFieldGenerator(object):
@@ -132,7 +132,7 @@ class _OnChipBitFieldGenerator(object):
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
-    def __call__(
+    def _run(
             self, app_graph, executable_finder, machine_graph, routing_infos):
         """ Loads and runs the bit field generator on chip.
 
