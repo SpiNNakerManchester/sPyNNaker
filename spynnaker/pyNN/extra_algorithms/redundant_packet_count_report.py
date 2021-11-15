@@ -72,7 +72,7 @@ _N_PROV_ITEMS_NEEDED = 4
 _MAX = 100
 
 
-def redundant_packet_count_report(object):
+def redundant_packet_count_report():
     """
 
     :return:
