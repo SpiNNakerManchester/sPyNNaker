@@ -15,7 +15,7 @@
 from .connection_holder_finisher import finish_connection_holders
 from .graph_edge_weight_updater import GraphEdgeWeightUpdater
 from .on_chip_bit_field_generator import on_chip_bitfield_generator
-from .redundant_packet_count_report import RedundantPacketCountReport
+from .redundant_packet_count_report import redundant_packet_count_report
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
 from .spynnaker_data_specification_writer import (

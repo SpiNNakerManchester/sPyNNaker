@@ -36,7 +36,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
     DelaySupportAdder, on_chip_bitfield_generator,
-    RedundantPacketCountReport,
+    redundant_packet_count_report,
     spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
@@ -482,8 +482,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_cfg_false(
                     "Reports", "write_redundant_packet_count_report"):
                 return
-            report = RedundantPacketCountReport()
-            report()
+            redundant_packet_count_report()
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):

@@ -67,70 +67,71 @@ REDUNDANCY_SUMMARY = (
     "FROM redundancy_by_core")
 
 
-class RedundantPacketCountReport(object):
+_FILE_NAME = "redundant_packet_count.rpt"
+_N_PROV_ITEMS_NEEDED = 4
+_MAX = 100
 
-    _FILE_NAME = "redundant_packet_count.rpt"
-    _N_PROV_ITEMS_NEEDED = 4
-    _MAX = 100
 
-    def __call__(self):
-        """
+def redundant_packet_count_report(object):
+    """
 
-        :return:
-        """
-        file_name = os.path.join(report_default_directory(), self._FILE_NAME)
+    :return:
+    """
+    file_name = os.path.join(report_default_directory(), _FILE_NAME)
 
-        self._create_views()
-        try:
-            with open(file_name, "w") as f:
-                self._write_report(f)
-        except Exception:  # pylint: disable=broad-except
-            logger.exception("Generate_placement_reports: Can't open file"
-                             " {} for writing.", self._FILE_NAME)
+    try:
+        _create_views()
+        with open(file_name, "w") as f:
+            _write_report(f)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.exception(f"Error {e} doing redundant_packet_count_report"
+                         f" {file_name}:")
 
-    def _create_views(self):
-        with ProvenanceWriter() as db:
-            with db.transaction() as cur:
-                cur.execute(REDUNDANCY_BY_CORE)
-                cur.execute(REDUNDANCY_SUMMARY)
 
-    def _write_report(self, output):
-        reader = ProvenanceReader()
-        for data in reader.run_query("select * from redundancy_by_core"):
-            (x, y, p, source, received, filtered, invalid, failed,
-                redundant, total, percent) = data
-            output.write(f"\ncore {source} \n")
-            output.write(f"    {total} packets received. \n")
-            output.write(f"    {redundant} were detected as "
-                         "redundant packets by the bitfield filter. \n")
-            output.write(
-                f"    {filtered} were detected as having no targets "
-                f"after the DMA stage. \n")
-            output.write(
-                f"    {invalid} were detected as packets which "
-                f"we should not have received in the first place. \n")
-            output.write(f"    Overall this makes a redundant percentage of "
-                         f"{percent}\n")
-        data = reader.run_query("select * from redundancy_summary")
-        (sum_total, max_total, min_total, avg_total,
-            sum_reduant, max_redundant, min_redundant, avg_redundant,
-            max_percent, min_percent, avg_percent, global_percent) = data[0]
-        output.write(f"\nThe total packets flown in system was "
-                     f"{sum_total}\n")
-        output.write(f"    The max, min and avergae per core was {max_total}, "
-                     f"{min_total}, {avg_total} packets.\n")
-        output.write(f"The total redundant packets was "
-                     f"{sum_reduant}\n")
-        output.write(f"    The max, min and avergae per core was "
-                     f"{max_redundant}, {min_redundant}, {avg_redundant} "
-                     f"packets.\n")
+def _create_views(self):
+    with ProvenanceWriter() as db:
+        with db.transaction() as cur:
+            cur.execute(REDUNDANCY_BY_CORE)
+            cur.execute(REDUNDANCY_SUMMARY)
+
+
+def _write_report(self, output):
+    reader = ProvenanceReader()
+    for data in reader.run_query("select * from redundancy_by_core"):
+        (x, y, p, source, received, filtered, invalid, failed,
+            redundant, total, percent) = data
+        output.write(f"\ncore {source} \n")
+        output.write(f"    {total} packets received. \n")
+        output.write(f"    {redundant} were detected as "
+                     "redundant packets by the bitfield filter. \n")
         output.write(
-            f"The percentages of redundant packets was {global_percent}\n")
-        output.write(f"    The max and min percentages of redundant "
-                     f"packets are {max_percent} and {min_percent}. \n")
+            f"    {filtered} were detected as having no targets "
+            f"after the DMA stage. \n")
         output.write(
-            f"    The average redundant percentages from each "
-            f"core were {avg_percent} accordingly.\n")
+            f"    {invalid} were detected as packets which "
+            f"we should not have received in the first place. \n")
+        output.write(f"    Overall this makes a redundant percentage of "
+                     f"{percent}\n")
+    data = reader.run_query("select * from redundancy_summary")
+    (sum_total, max_total, min_total, avg_total,
+        sum_reduant, max_redundant, min_redundant, avg_redundant,
+        max_percent, min_percent, avg_percent, global_percent) = data[0]
+    output.write(f"\nThe total packets flown in system was "
+                 f"{sum_total}\n")
+    output.write(f"    The max, min and avergae per core was {max_total}, "
+                 f"{min_total}, {avg_total} packets.\n")
+    output.write(f"The total redundant packets was "
+                 f"{sum_reduant}\n")
+    output.write(f"    The max, min and avergae per core was "
+                 f"{max_redundant}, {min_redundant}, {avg_redundant} "
+                 f"packets.\n")
+    output.write(
+        f"The percentages of redundant packets was {global_percent}\n")
+    output.write(f"    The max and min percentages of redundant "
+                 f"packets are {max_percent} and {min_percent}. \n")
+    output.write(
+        f"    The average redundant percentages from each "
+        f"core were {avg_percent} accordingly.\n")
 
 
 if __name__ == '__main__':
