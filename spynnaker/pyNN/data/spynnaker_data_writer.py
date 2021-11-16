@@ -28,12 +28,12 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     """
 
-    __spy_data2 = _SpynnakerDataModel()
+    __spy_data = _SpynnakerDataModel()
 
     @overrides(FecDataWriter.setup)
     def setup(self):
         FecDataWriter.setup(self)
-        self.__spy_data2._clear()
+        self.__spy_data._clear()
 
     @overrides(FecDataWriter.mock)
     def mock(self):
@@ -48,4 +48,4 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         :type min_delay: int or None
         :return:
         """
-        self.__spy_data2._min_delay = min_delay
+        self.__spy_data._min_delay = min_delay
