@@ -79,7 +79,7 @@ class SpynnakerDataView(FecDataView):
         """
         if self.__spy_data._min_delay is not None:
             return self.__spy_data._min_delay
-        return self.machine_time_step
+        return self.get_machine_time_step()
 
     @property
     def min_delay(self):
