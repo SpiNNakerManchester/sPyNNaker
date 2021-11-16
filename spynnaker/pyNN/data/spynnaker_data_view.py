@@ -82,7 +82,7 @@ class SpynnakerDataView(FecDataView):
             return self.__spy_data._min_delay
         if self.has_machine_time_step():
             return self.machine_time_step
-        raise self.status.exception("min_delay")
+        raise self.exception("min_delay")
 
     def has_min_delay(self):
         if self.__spy_data._min_delay is not None:
