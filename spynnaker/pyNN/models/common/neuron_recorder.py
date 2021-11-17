@@ -75,15 +75,15 @@ class NeuronRecorder(object):
     _N_BYTES_PER_ENUM = BYTES_PER_WORD
 
     #: size of a index in terms of position into recording array
-    _N_BYTES_PER_INDEX = DataType.UINT8.size  # currently uint8
+    _N_BYTES_PER_INDEX = DataType.UINT16.size  # currently uint16
 
     #: size of the counter for spike recording
     _N_BYTES_PER_COUNT = BYTES_PER_WORD
 
     #: size of the increment for spike recording
     _N_BYTES_PER_INCREMENT = BYTES_PER_WORD
-
     _N_BYTES_PER_SIZE = BYTES_PER_WORD
+
     # sampling temporal value size (how many ticks between recordings)
     _N_CPU_CYCLES_PER_NEURON = 8
     _N_BYTES_PER_POINTER = BYTES_PER_WORD
@@ -1118,33 +1118,18 @@ class NeuronRecorder(object):
         """
         # This calculates the size of the metadata only; thus no reference to
         # per-timestep variables which have no metadata
-        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
-        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
+        n_bytes_for_indices = n_indices * self._N_BYTES_PER_INDEX
         var_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
-             self._N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
+             self._N_BYTES_PER_ENUM + n_bytes_for_indices) *
             (len(self.__sampling_rates) - len(self.__bitfield_variables)))
         bitfield_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
-             n_bytes_for_n_neurons) *
+             n_bytes_for_indices) *
             len(self.__bitfield_variables))
         return ((self._N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
                 bitfield_bytes)
-
-    def _get_fixed_sdram_usage(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
-        """
-        fixed_sdram = 0
-        # Recording rate for each neuron
-        fixed_sdram += self._N_BYTES_PER_RATE
-        # Number of recording neurons
-        fixed_sdram += self._N_BYTES_PER_INDEX
-        # index_parameters one per neuron
-        # even if not recording as also act as a gate
-        fixed_sdram += self._N_BYTES_PER_INDEX * vertex_slice.n_atoms
-        return fixed_sdram
 
     def get_variable_sdram_usage(self, vertex_slice):
         """
@@ -1155,7 +1140,6 @@ class NeuronRecorder(object):
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
-            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
             if rate > 0:
                 fixed_sdram += self._SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
@@ -1218,6 +1202,17 @@ class NeuronRecorder(object):
         return n_neurons * self._N_CPU_CYCLES_PER_NEURON * \
             len(self.recording_variables)
 
+    def __ceil_n_indices(self, n_neurons):
+        """ The number of indices rounded up to a whole number of words
+
+        :param int n_neurons: The number of neurons to account for
+        :rtype: int
+        """
+        # Assumes that BYTES_PER_WORD is divisible by _N_BYTES_PER_INDEX
+        n_bytes = n_neurons * self._N_BYTES_PER_INDEX
+        ceil_bytes = int(math.ceil(n_bytes / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return ceil_bytes // self._N_BYTES_PER_INDEX
+
     def __add_indices(self, data, variable, rate, n_recording, vertex_slice):
         """
         :param list(~numpy.ndarray) data:
@@ -1226,19 +1221,16 @@ class NeuronRecorder(object):
         :param int n_recording:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
-        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        n_indices = self.__ceil_n_indices(vertex_slice.n_atoms)
         if rate == 0:
-            data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
+            data.append(numpy.zeros(n_indices, dtype="uint16").view("uint32"))
         elif self.__indexes[variable] is None:
-            data.append(numpy.arange(
-                n_bytes_for_n_neurons, dtype="uint8").view("uint32"))
+            data.append(numpy.arange(n_indices, dtype="uint16").view("uint32"))
         else:
             indexes = self.__indexes[variable]
             local_index = 0
             local_indexes = list()
-            for index in range(n_bytes_for_n_neurons):
+            for index in range(n_indices):
                 if index + vertex_slice.lo_atom in indexes:
                     local_indexes.append(local_index)
                     local_index += 1
@@ -1246,7 +1238,7 @@ class NeuronRecorder(object):
                     # write to one beyond recording range
                     local_indexes.append(n_recording)
             data.append(
-                numpy.array(local_indexes, dtype="uint8").view("uint32"))
+                numpy.array(local_indexes, dtype="uint16").view("uint32"))
 
     def _get_data(self, vertex_slice):
         """
