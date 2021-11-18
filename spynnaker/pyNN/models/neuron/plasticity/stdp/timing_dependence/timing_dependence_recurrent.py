@@ -18,8 +18,8 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_per_ms)
+
+from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
@@ -161,7 +161,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        time_step_per_ms = machine_time_step_per_ms()
+        time_step_per_ms = SpynnakerDataView().simulation_time_step_per_ms
 
         mean_pre_timesteps = float(self.__mean_pre_window * time_step_per_ms)
         mean_post_timesteps = float(self.__mean_post_window * time_step_per_ms)

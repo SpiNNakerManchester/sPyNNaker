@@ -17,7 +17,8 @@ import numpy
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms, machine_time_step_per_ms)
+    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -298,7 +299,7 @@ def get_synapses(
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(
-        connections["delay"] * machine_time_step_per_ms())
+        connections["delay"] * SpynnakerDataView().simulation_time_step_per_ms)
 
     # Scale weights
     if not synapse_info.synapse_type_from_dynamics:
@@ -673,7 +674,7 @@ def _rescale_connections(
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
-    connections["delay"] /= machine_time_step_per_ms()
+    connections["delay"] /= SpynnakerDataView().simulation_time_step_per_ms
     # Undo the weight scaling
     connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections
