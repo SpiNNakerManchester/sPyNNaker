@@ -16,8 +16,6 @@
 import math
 import numpy
 import matplotlib.pyplot as plt
-from data_specification.enums import DataType
-# from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
@@ -83,15 +81,15 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
 def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
     # Add this to function arguments in the future
-    machine_time_step = 1.0
+    # machine_time_step = 1.0
     sin_pwr = 20
 
     # Calculate required time constant
     time_constant = peak_time / math.atan(sin_pwr)
     inv_tau = (1.0 / float(time_constant))  # * (machine_time_step / 1000.0)
 
-    #         # calculate time of peak (from differentiating kernel and setting to zero)
-    #         kernel_peak_time = math.atan(20) / inv_tau
+    # calculate time of peak (from differentiating kernel and setting to zero)
+    # kernel_peak_time = math.atan(20) / inv_tau
 
     # evaluate peak value of kernel to normalise LUT
     kernel_peak_value = (math.exp(-peak_time * inv_tau) *
@@ -114,7 +112,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         else:
             # Evaluate kernel
             exp_float = (math.exp(-value) * math.sin(value) **
-                sin_pwr / kernel_peak_value) * kernel_scaling
+                         sin_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -173,7 +171,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
     # Add this to function arguments in the future
-    machine_time_step = 1.0
+    # machine_time_step = 1.0
     cos_pwr = 2
 
     # Calculate required time constant
@@ -202,7 +200,7 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
         else:
             # Evaluate kernel
             exp_float = (math.exp(-abs(value * beta)) * math.cos(value) **
-                cos_pwr / kernel_peak_value) * kernel_scaling
+                         cos_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)

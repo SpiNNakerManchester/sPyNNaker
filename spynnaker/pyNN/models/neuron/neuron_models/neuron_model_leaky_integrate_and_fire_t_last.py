@@ -127,7 +127,7 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
-        state_varaibles[T_LAST] = t_last
+        state_variables[T_LAST] = t_last
 
     @property
     def v_init(self):

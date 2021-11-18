@@ -224,6 +224,7 @@ class PopulationMachineVertex(
 
         # Reunite title and extension and return
         return name + app_vertex.synapse_executable_suffix + ext
+
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(
             self, label, x, y, p, provenance_data):

@@ -134,7 +134,7 @@ class SpikeSourcePoissonVertex(
         self.__n_data_specs = 0
 
         # check for changes parameters
-        self.__change_requires_mapping = False #True
+        self.__change_requires_mapping = False  # True
 #        self.__change_requires_neuron_parameters_reload = False
 
         self.__spike_recorder = MultiSpikeRecorder()

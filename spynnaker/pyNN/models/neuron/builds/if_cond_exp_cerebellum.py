@@ -1,3 +1,17 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models \
@@ -7,6 +21,7 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 MAX_ATOMS_PER_CORE = 128
+
 
 class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
@@ -27,7 +42,6 @@ class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeConductance(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(v_thresh)
-
 
         super(IFCondExpCerebellum, self).set_model_max_atoms_per_core(
             n_atoms=MAX_ATOMS_PER_CORE)

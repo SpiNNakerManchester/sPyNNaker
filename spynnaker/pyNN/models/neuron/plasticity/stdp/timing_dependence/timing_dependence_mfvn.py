@@ -1,3 +1,17 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.globals_variables import (
@@ -14,6 +28,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 LUT_SIZE = 256
+
 
 class TimingDependenceMFVN(AbstractTimingDependence):
     __slots__ = [
@@ -101,13 +116,14 @@ class TimingDependenceMFVN(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-
-        # Here we will record the last 16 spikes, these will be 32-bit quantities,
-        return (16 * 4) + (2 * 16) # 16 4-byte entries, plus one counter for the number of spikes
+        # Here we will record the last 16 spikes,
+        # these will be 32-bit quantities,
+        # 16 4-byte entries, plus one counter for the number of spikes
+        return (16 * 4) + (2 * 16)
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return BYTES_PER_WORD * LUT_SIZE #in bytes: 256 * 16 bit values
+        return BYTES_PER_WORD * LUT_SIZE
 
     @property
     def n_weight_terms(self):

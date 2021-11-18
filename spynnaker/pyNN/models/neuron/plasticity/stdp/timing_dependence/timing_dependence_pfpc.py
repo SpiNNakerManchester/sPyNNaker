@@ -1,9 +1,22 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step_ms)
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_SHORT, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import write_pfpc_lut
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -107,29 +120,11 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        # in bytes: 256 * 16 bit values ?
         return BYTES_PER_WORD * len(self._tau_plus_data)
 
     @property
     def n_weight_terms(self):
         return 1
-
-    # @overrides(AbstractTimingDependence.write_parameters)
-    # def write_parameters(self, spec, machine_time_step, weight_scales):
-    #     # Check timestep is valid
-    #     if machine_time_step != 1000:
-    #         raise NotImplementedError(
-    #             "exp_sin LUT generation currently only supports 1ms timesteps")
-    #
-    #     # Write exp_sin lookup table
-    #     self._tau_plus_last_entry = write_pfpc_lut(
-    #         spec,
-    #         peak_time=self._t_peak,
-    #         time_probe=None,
-    #         lut_size=LUT_SIZE,
-    #         shift=0,
-    #         kernel_scaling=self._kernel_scaling
-    #     )
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(
