@@ -360,11 +360,9 @@ class FromListConnector(AbstractConnector):
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = (numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                    MICRO_TO_MILLISECOND_CONVERSION /
-                    view.simulation_time_step_us)) *
-                    (view.simulation_time_step_us /
-                     MICRO_TO_MILLISECOND_CONVERSION))
+                numpy.array(self.__conn_list[:, delay_column]) *
+                    view.simulation_time_step_per_ms) *
+                    view.simulation_time_step_ms)
         except ValueError:
             pass
 

@@ -237,9 +237,7 @@ class SynapseDynamicsStructuralCommon(
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
-            delay_scale = (
-                    MICRO_TO_MILLISECOND_CONVERSION /
-                    SpynnakerDataView().simulation_time_step_us)
+            delay_scale = SpynnakerDataView().simulation_time_step_per_ms
             if isinstance(dynamics.initial_delay, collections.Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
@@ -439,7 +437,7 @@ class SynapseDynamicsStructuralCommon(
         max_rewires_per_ts = 1
         view = SpynnakerDataView()
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                view.simulation_time_step_us / MICRO_TO_MILLISECOND_CONVERSION):
+                view.simulation_time_step_ms):
             # fast rewiring, so need to set max_rewires_per_ts
             max_rewires_per_ts = int(view.simulation_time_step_us / (
                 self.p_rew * MICRO_TO_SECOND_CONVERSION))

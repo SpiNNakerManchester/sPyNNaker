@@ -652,8 +652,7 @@ class SpikeSourcePoissonMachineVertex(
     @staticmethod
     def _convert_ms_to_n_timesteps(value):
         return numpy.round(
-            value * (MICRO_TO_MILLISECOND_CONVERSION /
-                     SpynnakerDataView().simulation_time_step_us)
+            value * SpynnakerDataView().simulation_time_step_per_ms
         ).astype("uint32")
 
     def poisson_param_region_address(self, placement, transceiver):
