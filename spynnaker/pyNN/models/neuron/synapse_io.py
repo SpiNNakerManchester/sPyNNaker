@@ -16,8 +16,6 @@
 import numpy
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
@@ -133,7 +131,8 @@ def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
     :param int post_vertex_max_delay_ticks: post vertex max delay
     :rtype: int
     """
-    return post_vertex_max_delay_ticks * machine_time_step_ms()
+    return (post_vertex_max_delay_ticks *
+            SpynnakerDataView().simulation_time_step_ms)
 
 
 def get_max_row_info(

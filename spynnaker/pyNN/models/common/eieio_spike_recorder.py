@@ -19,10 +19,9 @@ import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spynnaker.pyNN.models.common import recording_utils
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.data import SpynnakerDataView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -147,7 +146,7 @@ class EIEIOSpikeRecorder(object):
         offset = 0
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= machine_time_step_ms()
+            time *= SpynnakerDataView().simulation_time_step_ms
             data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(

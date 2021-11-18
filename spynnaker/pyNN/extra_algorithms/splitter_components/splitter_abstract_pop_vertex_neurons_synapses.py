@@ -27,8 +27,6 @@ from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge)
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import get_remaining_constraints
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -780,7 +778,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
                 s_info.connector, s_info)
             max_delay_ms = max(max_delay_ms, proj_max_delay)
-        max_delay_steps = math.ceil(max_delay_ms / machine_time_step_ms())
+        max_delay_steps = math.ceil(
+            max_delay_ms / SpynnakerDataView().simulation_time_step_ms)
         max_delay_bits = get_n_bits(max_delay_steps)
 
         # Find the maximum possible delay

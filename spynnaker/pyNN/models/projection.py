@@ -23,7 +23,7 @@ from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, machine_time_step_ms)
+    get_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -153,7 +153,7 @@ class Projection(object):
             synapse_dynamics.set_delay(
                 numpy.rint(numpy.array(synapse_dynamics.delay) *
                            SpynnakerDataView().simulation_time_step_per_ms) *
-                machine_time_step_ms())
+                SpynnakerDataView().simulation_time_step_ms)
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)

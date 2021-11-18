@@ -22,10 +22,9 @@ from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -96,7 +95,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = machine_time_step_ms()
+        self.__min_delay = SpynnakerDataView().simulation_time_step_ms
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
