@@ -23,7 +23,8 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, machine_time_step)
+    get_simulator)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
@@ -168,7 +169,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
+        return SpynnakerDataView().simulation_time_step_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager):

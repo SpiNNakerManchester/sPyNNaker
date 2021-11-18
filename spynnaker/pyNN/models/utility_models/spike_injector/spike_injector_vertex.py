@@ -20,9 +20,8 @@ from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
@@ -97,7 +96,7 @@ class SpikeInjectorVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
+        return SpynnakerDataView().simulation_time_step_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager):

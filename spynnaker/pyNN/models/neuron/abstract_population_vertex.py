@@ -42,9 +42,7 @@ from spinn_front_end_common.interface.buffer_management\
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
-
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
     NeuronRecorder)
@@ -782,7 +780,8 @@ class AbstractPopulationVertex(
         :rtype: float
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
+        steps_per_second = (MICRO_TO_SECOND_CONVERSION /
+                            SpynnakerDataView().simulation_time_step_us)
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -845,7 +844,8 @@ class AbstractPopulationVertex(
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
+        steps_per_second = (MICRO_TO_SECOND_CONVERSION /
+                            SpynnakerDataView().simulation_time_step_us)
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
