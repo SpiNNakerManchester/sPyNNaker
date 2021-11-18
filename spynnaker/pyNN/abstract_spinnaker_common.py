@@ -196,12 +196,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         return changed, data_changed
 
-    @property
-    def min_delay(self):
-        """ The minimum supported delay, in milliseconds.
-        """
-        return self._data_writer.min_delay
-
     def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
             raise NotImplementedError(
