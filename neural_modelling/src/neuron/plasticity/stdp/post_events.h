@@ -66,7 +66,7 @@ typedef struct {
 // Inline functions
 //---------------------------------------
 
-#if LOG_LEVEL >= LOG_DEBUG
+//#if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print a post-synaptic event history
 //! \param[in] events: The history
 static inline void print_event_history(const post_event_history_t *events) {
@@ -76,7 +76,7 @@ static inline void print_event_history(const post_event_history_t *events) {
                 i, events->times[i], events->traces[i]);
     }
 }
-#endif
+//#endif
 
 //! \brief Initialise an array of post-synaptic event histories
 //! \param[in] n_neurons: Number of neurons

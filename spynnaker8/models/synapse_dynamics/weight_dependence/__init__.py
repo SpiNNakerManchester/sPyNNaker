@@ -24,7 +24,7 @@ from .weight_dependence_additive import WeightDependenceAdditive
 from .weight_dependence_multiplicative import WeightDependenceMultiplicative
 from .weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
 from .weight_dependence_pfpc import WeightDependencePFPC
-from .weight_dependence_mfvn import import WeightDependenceMFVN
+from .weight_dependence_mfvn import WeightDependenceMFVN
 
 __all__ = ["WeightDependenceAdditive", "WeightDependenceMultiplicative",
            "WeightDependenceAdditiveTriplet", "WeightDependencePFPC",

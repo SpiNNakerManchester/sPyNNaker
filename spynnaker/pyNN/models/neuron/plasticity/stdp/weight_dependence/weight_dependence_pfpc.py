@@ -7,33 +7,33 @@ from .abstract_weight_dependence import AbstractWeightDependence
 class WeightDependencePFPC(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
-        "_w_max",
-        "_w_min",
-        "_pot_alpha"
+        "__w_max",
+        "__w_min",
+        "__pot_alpha"
         ]
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0, pot_alpha=0.01):
         super(WeightDependencePFPC, self).__init__()
-        self._w_min = w_min
-        self._w_max = w_max
-        self._pot_alpha = pot_alpha
+        self.__w_min = w_min
+        self.__w_max = w_max
+        self.__pot_alpha = pot_alpha
 
     @property
     def w_min(self):
-        return self._w_min
+        return self.__w_min
 
     @property
     def w_max(self):
-        return self._w_max
+        return self.__w_max
 
     @property
     def pot_alpha(self):
-        return self._pot_alpha
-    
+        return self.__pot_alpha
+
     @pot_alpha.setter
     def pot_alpha(self, new_value):
-        self._pot_alpha = new_value
+        self.__pot_alpha = new_value
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
@@ -59,29 +59,39 @@ class WeightDependencePFPC(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         # Loop through each synapse type's weight scale
-        for w in weight_scales:
+        for _ in synapse_weight_scales:
+
+            print("PFPC, writing values min, max, pot_alpha, A_minus ",
+                  self.__w_min, self.__w_max, self.__pot_alpha, self.A_minus)
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self._w_min * w)), data_type=DataType.INT32)
+                data=self.__w_min * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self._w_max * w)), data_type=DataType.INT32)
+                data=self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
-            # Pre-multiply weight parameters by Wmax
+            # Pre-multiply weight parameters by Wmax?
+            # I don't know what's going on here, this is weird
+            # If this works the parameter needs renaming on the C side
+            # otherwise it's just confusing
             spec.write_value(
-                data=int(round(self._pot_alpha * w)),
-                data_type=DataType.INT32)
+                data=self.__pot_alpha * global_weight_scale,
+                data_type=DataType.S1615)
 
             # This parameter is actually currently unused
+            # (I'm not convinced that's true...)
             spec.write_value(
-                data=int(round(self.A_minus * w)),
-                data_type=DataType.INT32)
+                data=self.A_minus * global_weight_scale,
+                data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):
-        return self._w_max
+        return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):

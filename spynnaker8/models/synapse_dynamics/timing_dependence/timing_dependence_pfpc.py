@@ -30,14 +30,14 @@ class TimingDependencePFPC(_BaseClass):
 
     def __init__(
             self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01, A_minus=0.01,
-            t_peak=100, alpha=1.0):
+            t_peak=100, kernel_scaling=1.0):
         r"""
         :param float tau_plus: :math:`\tau_+`
         :param float tau_minus: :math:`\tau_-`
         :param float A_plus: :math:`A^+`
         :param float A_minus: :math:`A^-`
         :param float t_peak: :math:`t_\mathrm{peak}`
-        :param float alpha: :math:`alpha'
+        :param float kernel_scaling:
         """
         moved_in_v6("spynnaker8.models.synapse_dynamics.timing_dependence."
                     "TimingDependencePFPC",
@@ -45,4 +45,4 @@ class TimingDependencePFPC(_BaseClass):
                     "timing_dependence.TimingDependencePFPC")
         super(TimingDependencePFPC, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
-            A_minus=A_minus, t_peak=t_peak, alpha=alpha)
+            A_minus=A_minus, t_peak=t_peak, kernel_scaling=kernel_scaling)

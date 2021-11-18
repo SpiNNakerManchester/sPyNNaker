@@ -121,7 +121,7 @@ static struct {
     uint32_t time;
     uint32_t packets_this_time_step;
     uint32_t dmas_this_time_step;
-    uint32_t pipeline_restarts;s
+    uint32_t pipeline_restarts;
 } p_per_ts_struct;
 
 //! the region to record the packets per timestep in
@@ -498,8 +498,7 @@ bool spike_processing_initialise( // EXPORTED
                 i, dma_buffers[i].row);
     }
     dma_busy = false;
-    clear_input_buffers_of_late_packets =
-        false;
+    clear_input_buffers_of_late_packets = clear_input_buffers_of_late_packets_init;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
     p_per_ts_region = packets_per_timestep_region;
@@ -549,19 +548,19 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
 }
 
 // Custom provenance from SpiNNCer
-void spike_processing_get_and_reset_spikes_this_tick(){
+void spike_processing_get_and_reset_spikes_this_tick(void ) {
 	if (p_per_ts_struct.packets_this_time_step > max_spikes_in_a_tick) {
 		max_spikes_in_a_tick = p_per_ts_struct.packets_this_time_step;
 	}
 }
 
-void spike_processing_get_and_reset_dmas_this_tick(){
+void spike_processing_get_and_reset_dmas_this_tick(void) {
 	if (p_per_ts_struct.dmas_this_time_step > max_dmas_in_a_tick){
 		max_dmas_in_a_tick = p_per_ts_struct.dmas_this_time_step;
 	}
 }
 
-void spike_processing_get_and_reset_pipeline_restarts_this_tick(){
+void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
 	if (p_per_ts_struct.pipeline_restarts > max_pipeline_restarts) {
 		max_pipeline_restarts = p_per_ts_struct.pipeline_restarts;
 	}

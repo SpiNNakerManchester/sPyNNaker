@@ -26,9 +26,9 @@ typedef int16_t pre_trace_t;
 #define EXP_SIN_LUT_SIZE 256
 
 // Helper macros for looking up decays
-#define EXP_SIN_LOOKUP(time) \
-    maths_lut_exponential_decay_time_shifted( \
-        time, TAU_PLUS_TIME_SHIFT, EXP_SIN_LUT_SIZE,  exp_sin_lookup)
+//#define EXP_SIN_LOOKUP(time) maths_lut_exponential_decay(time, exp_sin_lookup)
+//    maths_lut_exponential_decay_time_shifted( \
+//        time, TAU_PLUS_TIME_SHIFT, EXP_SIN_LUT_SIZE, exp_sin_lookup)
 //#define DECAY_LOOKUP_TAU_MINUS(time) \
 //    maths_lut_exponential_decay( \
 //        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
@@ -36,14 +36,25 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_t exp_sin_lookup[EXP_SIN_LUT_SIZE];
+//extern int16_t exp_sin_lookup[EXP_SIN_LUT_SIZE];
 //extern int16_lut *exp_sin_lookup;
 
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace() {
+static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
+}
+
+static inline post_trace_t timing_decay_post(
+        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    extern int16_lut *exp_sin_lookup;
+    // Get time since last spike
+    uint32_t delta_time = time - last_time;
+
+    // Decay previous o1 and o2 traces
+    return (post_trace_t) STDP_FIXED_MUL_16X16(last_trace,
+            maths_lut_exponential_decay(delta_time, exp_sin_lookup));
 }
 
 //---------------------------------------
@@ -141,6 +152,7 @@ static inline update_state_t timing_apply_post_spike(
     use(last_post_time);
     use(&last_pre_trace);
     use(&last_post_trace);
+    extern int16_lut *exp_sin_lookup;
 
 
 
@@ -155,7 +167,14 @@ static inline update_state_t timing_apply_post_spike(
 
     if (time_since_last_pre < 255){
 
-        uint32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
+//        int32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
+//        int32_t multiplier = STDP_FIXED_MUL_16X16(last_pre_trace,
+//                maths_lut_exponential_decay_time_shifted(
+//                        time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_sin_lookup));
+        int32_t multiplier = maths_lut_exponential_decay_time_shifted(
+                time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_sin_lookup);
+//        int32_t multiplier = STDP_FIXED_MUL_16X16(last_pre_trace,
+//                maths_lut_exponential_decay(time_since_last_pre, exp_sin_lookup));
 
         if (print_plasticity){
         	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
@@ -181,7 +200,7 @@ static inline update_state_t timing_apply_post_spike(
 //        // Apply potentiation to state (which is a weight_state)
 //        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
 //    } else {
-        return previous_state;
+    return previous_state;
     //}
 }
 

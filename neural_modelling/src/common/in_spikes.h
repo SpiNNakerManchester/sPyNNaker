@@ -138,7 +138,7 @@ static inline spike_t in_spikes_value_at_index(uint32_t index) {
 }
 
 // FLUSH SPIKES
-static inline uint32_t in_spikes_flush_buffer() {
+static inline uint32_t in_spikes_flush_buffer(void) {
 
 	uint32_t num_spikes_left = circular_buffer_size(buffer);
 	circular_buffer_clear(buffer);

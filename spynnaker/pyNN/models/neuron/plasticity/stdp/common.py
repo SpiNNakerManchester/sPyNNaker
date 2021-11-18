@@ -17,7 +17,7 @@ import math
 import numpy
 import matplotlib.pyplot as plt
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+# from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
@@ -34,25 +34,25 @@ def float_to_fixed(value, fixed_point_one):
     return int(round(float(value) * float(fixed_point_one)))
 
 
-def get_lut_provenance(
-        pre_population_label, post_population_label, rule_name, entry_name,
-        param_name, last_entry):
-    # pylint: disable=too-many-arguments
-    top_level_name = "{}_{}_STDP_{}".format(
-        pre_population_label, post_population_label, rule_name)
-    report = False
-    if last_entry is not None:
-        report = last_entry > 0
-    return ProvenanceDataItem(
-        [top_level_name, entry_name], last_entry, report=report,
-        message=(
-            "The last entry in the STDP exponential lookup table for the {}"
-            " parameter of the {} between {} and {} was {} rather than 0,"
-            " indicating that the lookup table was not big enough at this"
-            " timestep and value.  Try reducing the parameter value, or"
-            " increasing the timestep".format(
-                param_name, rule_name, pre_population_label,
-                post_population_label, last_entry)))
+# def get_lut_provenance(
+#         pre_population_label, post_population_label, rule_name, entry_name,
+#         param_name, last_entry):
+#     # pylint: disable=too-many-arguments
+#     top_level_name = "{}_{}_STDP_{}".format(
+#         pre_population_label, post_population_label, rule_name)
+#     report = False
+#     if last_entry is not None:
+#         report = last_entry > 0
+#     return ProvenanceDataItem(
+#         [top_level_name, entry_name], last_entry, report=report,
+#         message=(
+#             "The last entry in the STDP exponential lookup table for the {}"
+#             " parameter of the {} between {} and {} was {} rather than 0,"
+#             " indicating that the lookup table was not big enough at this"
+#             " timestep and value.  Try reducing the parameter value, or"
+#             " increasing the timestep".format(
+#                 param_name, rule_name, pre_population_label,
+#                 post_population_label, last_entry)))
 
 
 def get_exp_lut_array(time_step, time_constant, shift=0):
@@ -113,7 +113,8 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
             exp_float = 0
         else:
             # Evaluate kernel
-            exp_float = (math.exp(-value) * math.sin(value) ** sin_pwr / kernel_peak_value) * kernel_scaling
+            exp_float = (math.exp(-value) * math.sin(value) **
+                sin_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -151,12 +152,22 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                                         99, 115, 135, 140, 150])
         print("LUT VALUES TO COMPARE TO SPINNAKER:")
         print("TIME DELTAS | FIXED MULTIPLIERS | FLOAT MULTIPLIERS")
-        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values], out_float[compare_t_values]):
+        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values],
+                            out_float[compare_t_values]):
             print("{:8} | {:8} | {:8.4f}".format(x, y, z))
 
         return t, out_float
     else:
-        spec.write_array(final_exp_fix, data_type=DataType.INT16)
+        header = numpy.array([len(final_exp_fix), shift], dtype="uint16")
+        array_to_write = numpy.concatenate((
+            header,
+            numpy.array(final_exp_fix).astype("uint16"))).view("uint32")
+        #
+        # spec.write_array(array_to_write)
+        print("pfpc_lut: ", array_to_write)
+        print("header: ", header)
+        return array_to_write
+        # spec.write_array(final_exp_fix, data_type=DataType.INT16)
 
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
@@ -190,7 +201,8 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
             exp_float = 0
         else:
             # Evaluate kernel
-            exp_float = (math.exp(-abs(value * beta)) * math.cos(value) ** cos_pwr / kernel_peak_value) * kernel_scaling
+            exp_float = (math.exp(-abs(value * beta)) * math.cos(value) **
+                cos_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
         exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -222,9 +234,17 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                                         99, 115, 135, 140, 150])
         print("LUT VALUES TO COMPARE TO SPINNAKER:")
         print("TIME DELTAS | FIXED MULTIPLIERS | FLOAT MULTIPLIERS")
-        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values], out_float[compare_t_values]):
+        for x, y, z, in zip(compare_t_values, out_fixed[compare_t_values],
+                            out_float[compare_t_values]):
             print("{:8} | {:8} | {:8.4f}".format(x, y, z))
         # plt.show()
         return plot_times, out_float
     else:
-        spec.write_array(final_exp_fix, data_type=DataType.INT16)
+        header = numpy.array([len(final_exp_fix), shift], dtype="uint16")
+        array_to_write = numpy.concatenate((
+            header,
+            numpy.array(final_exp_fix).astype("uint16"))).view("uint32")
+        spec.write_array(array_to_write)
+        print("mfvn_lut: ", array_to_write)
+        print("header: ", header)
+        # spec.write_array(final_exp_fix, data_type=DataType.INT16)

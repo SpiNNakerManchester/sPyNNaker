@@ -61,7 +61,7 @@ static inline void send_spike_mc(uint32_t key) {
 //! \param[in] timer_count The global timer count when the time step started
 //! \param[in] time The current time step
 //! \param[in] The neuron index to send
-static inline void send_spike(UNUSED uint32_t timer_count, uint32_t time,
+static inline void send_spike(UNUSED uint32_t timer_count, UNUSED uint32_t time,
         uint32_t neuron_index) {
     // Do any required synapse processing
 //    synapse_dynamics_process_post_synaptic_event(time, neuron_index);

@@ -89,28 +89,28 @@ void spike_processing_clear_input_buffer(timer_t time);
 
 //! \brief get number of spikes received since last timer event
 //! \return uint32_t number of spikes
-uint32_t spike_processing_get_and_reset_spikes_this_tick();
+void spike_processing_get_and_reset_spikes_this_tick(void);
 
 //! \brief get number of dmas completed since last timer event
 //! \return uint32_t number of DMAs
-uint32_t spike_processing_get_and_reset_dmas_this_tick();
+void spike_processing_get_and_reset_dmas_this_tick(void);
 
 //! \brief get number of time pipeline was restarted since last timer event
 //! \return uint32_t number of pipeline restarts
-uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick();
+void spike_processing_get_and_reset_pipeline_restarts_this_tick(void);
 
-//! \brief get time from T1 clock at which spike pipeline completed
-//! \return uint32_t pipeline deactivation time
-uint32_t spike_processing_get_pipeline_deactivation_time();
-
-// FLUSH SPIKES
-//! \brief returns the total unprocessed spikes from a simulation
-//! \return total unprocessed spikes
-uint32_t spike_processing_get_total_flushed_spikes();
-
-//! \brief returns the maximum unprocessed spikes from a single
-//! simulation timestep.
-//! \return maximum unprocessed spikes from a single timestep.
-uint32_t spike_processing_get_max_flushed_spikes();
+////! \brief get time from T1 clock at which spike pipeline completed
+////! \return uint32_t pipeline deactivation time
+//uint32_t spike_processing_get_pipeline_deactivation_time();
+//
+//// FLUSH SPIKES
+////! \brief returns the total unprocessed spikes from a simulation
+////! \return total unprocessed spikes
+//uint32_t spike_processing_get_total_flushed_spikes();
+//
+////! \brief returns the maximum unprocessed spikes from a single
+////! simulation timestep.
+////! \return maximum unprocessed spikes from a single timestep.
+//uint32_t spike_processing_get_max_flushed_spikes();
 
 #endif // _SPIKE_PROCESSING_H_

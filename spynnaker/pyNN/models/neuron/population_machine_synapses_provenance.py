@@ -35,16 +35,20 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         ("n_invalid_pop_table_hits", ctypes.c_uint32),
         # The number of spikes that didn't transfer empty rows
         ("n_filtered_by_bitfield", ctypes.c_uint32),
-        # Custom provenance from SpiNNCer
+        # Custom provenance from SpiNNCer - max spikes in a tick
         ("max_spikes_in_a_tick", ctypes.c_uint32),
-        ("max_dmas_in_a tick", ctypes.c_uint32),
+        # max dmas in a tick
+        ("max_dmas_in_a_tick", ctypes.c_uint32),
+        # max pipeline restarts
         ("max_pipeline_restarts", ctypes.c_uint32),
-        ("timer_callback_completed", ctype.c_uint32),
-        ("spikes_pipeline_activated", ctype.c_uint32),
+        # timer callback completed?
+        ("timer_callback_completed", ctypes.c_uint32),
+        # spikes pipeline activated?
+        ("spikes_pipeline_activated", ctypes.c_uint32),
         # Max flushed spikes in a timestep
-        ("max_flushed_spikes", ctype.c_uint32),
+        ("max_flushed_spikes", ctypes.c_uint32),
         # Total flushed spikes
-        ("total_flushed_spikes", ctype.c_uint32)
+        ("total_flushed_spikes", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -152,7 +156,7 @@ class PopulationMachineSynapsesProvenance(object):
             # SpiNNCer
             db.insert_core(
                 x, y, p, self.MAX_SPIKES_IN_A_TICK,
-                synpase_prov.max_spikes_in_a_tick)
+                synapse_prov.max_spikes_in_a_tick)
             if synapse_prov.max_spikes_in_a_tick > 200:
                 db.insert_report(
                     f"Max number of spikes for {label} was "

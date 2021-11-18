@@ -20,6 +20,16 @@
 #include "post_events.h"
 #include "synapse_dynamics_stdp_common.h"
 
+//! \brief The type of history data of pre-events
+//!
+//! This data is stored in SDRAM in the plastic part of the synaptic matrix
+typedef struct {
+    //! The event time
+    uint32_t prev_time;
+    //! The event trace
+    pre_trace_t prev_trace;
+} pre_event_history_t;
+
 //! The format of the plastic data region of a synaptic row
 struct synapse_row_plastic_data_t {
     //! The pre-event history

@@ -59,7 +59,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *sdram_lut = (int16_lut *) *address;
     uint32_t size = sizeof(int16_lut) + (sdram_lut->size * sizeof(int16_t));
     int16_lut *lut = spin1_malloc(size);
-    log_info("lut size %d", size);
+    log_info("lut size %d sdram_lut size %d", size, sdram_lut->size);
     if (lut == NULL) {
         log_error("Not enough space to allocate LUT.  Try reducing the timestep,"
             " the number of neurons per core, or the tau value; size = %u", size);
@@ -74,28 +74,28 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     return lut;
 }
 
-//---------------------------------------
-// Plasticity maths function inline implementation
-//---------------------------------------
-static inline address_t maths_copy_int16_lut_with_size(
-        address_t start_address, uint32_t num_entries, int16_t *lut) {
-    // Pad to number of words
-    const uint32_t num_words =
-            (num_entries / 2) + (((num_entries & 1) != 0) ? 1 : 0);
-
-    // Copy entries to LUT
-    spin1_memcpy(lut, start_address, sizeof(int16_t) * num_entries);
-
-    // Return address after words
-    return start_address + num_words;
-}
+////---------------------------------------
+//// Plasticity maths function inline implementation
+////---------------------------------------
+//static inline address_t maths_copy_int16_lut_with_size(
+//        address_t *start_address, uint32_t num_entries, int16_t *lut) {
+//    // Pad to number of words
+//    const uint32_t num_words =
+//            (num_entries / 2) + (((num_entries & 1) != 0) ? 1 : 0);
+//
+//    // Copy entries to LUT
+//    spin1_memcpy(lut, start_address, sizeof(int16_t) * num_entries);
+//
+//    // Return address after words
+//    return start_address + num_words;
+//}
 
 //! \brief Get value from lookup table
 //! \param[in] time: The time that we are mapping
 //! \param[in] lut: The lookup table (result of maths_copy_int16_lut())
 //! \return The value from the LUT, or zero if out of range
 static inline int32_t maths_lut_exponential_decay(
-        uint32_t time, const int16_lut *lut) {
+        const uint32_t time, const int16_lut *lut) {
     // Calculate lut index
     uint32_t lut_index = time >> lut->shift;
 
@@ -104,13 +104,17 @@ static inline int32_t maths_lut_exponential_decay(
 }
 
 static inline int32_t maths_lut_exponential_decay_time_shifted(
-        uint32_t time, const uint32_t time_shift, const uint32_t lut_size,
-        const int16_t *lut) {
+        const uint32_t time, const uint32_t time_shift, const int16_lut *lut) {
+
+    //        uint32_t time, const uint32_t time_shift, const uint32_t lut_size,
+    //        const int16_t *lut) {
+
     // Calculate lut index
-    uint32_t lut_index = time >> time_shift;
+    uint32_t lut_index = (time >> lut->shift) >> time_shift;
 
     // Return value from LUT
-    return (lut_index < lut_size) ? lut[lut_index] : 0;
+//    return (lut_index < lut_size) ? lut[lut_index] : 0;
+    return (lut_index < lut->size) ? lut->values[lut_index] : 0;
 }
 
 //! \brief Clamp to fit in number of bits

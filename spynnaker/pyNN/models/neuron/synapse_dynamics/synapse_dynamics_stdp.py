@@ -609,3 +609,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
+
+    def get_provenance_data(self, synapse_info):
+        self.__timing_dependence.get_provenance_data(synapse_info)
+        # self.__weight_dependence.get_provenance_data(synapse_info)

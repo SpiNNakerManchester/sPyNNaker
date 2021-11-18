@@ -211,8 +211,6 @@ static inline bool process_fixed_synapses(
         // overflow into the weight at worst but can't affect the lower bits.
         uint32_t ring_buffer_index = (synaptic_word + masked_time) & ring_buffer_mask;
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
-        uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-        		synaptic_word, synapse_type_index_mask);
 
         // ***********************************
         // For Cerebellum plasticity
@@ -225,13 +223,7 @@ static inline bool process_fixed_synapses(
         	// io_printf(IO_BUF, "\nSpike on type: %u at time: %u\n", type, time);
         	synapse_dynamics_process_post_synaptic_event(time, neuron_index);
         }
-
         // ***********************************
-
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay + time, combined_synapse_neuron_index,
-                synapse_type_index_bits);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
