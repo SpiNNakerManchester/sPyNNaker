@@ -41,12 +41,13 @@ struct synapse_row_plastic_data_t {
 void _print_pre_event_history(pre_event_history_t pre_eve_hist){
 
 	io_printf(IO_BUF, "\n\n************************\n\n");
-	io_printf(IO_BUF, "Number recorded MF spikes: %u\n", pre_eve_hist.num_recorded_mf_spikes_minus_one);
+	io_printf(IO_BUF, "Number recorded MF spikes: %u\n",
+	        pre_eve_hist.num_recorded_mf_spikes_minus_one);
 	io_printf(IO_BUF, "Prev time: %u\n",
 			pre_eve_hist.mf_times[pre_eve_hist.num_recorded_mf_spikes_minus_one]);
 
-	for (int i =0; i < NUM_MF_SPIKES_TO_RECORD; i ++){
-		io_printf(IO_BUF, "    Entry %u: %u\n", i ,pre_eve_hist.mf_times[i]);
+	for (int i = 0; i < NUM_MF_SPIKES_TO_RECORD; i++){
+		io_printf(IO_BUF, "    Entry %u: %u\n", i , pre_eve_hist.mf_times[i]);
 	}
 }
 
@@ -161,10 +162,11 @@ static inline final_state_t plasticity_update_synapse(
 				);
     	}
 
+    	// Some of these variables aren't used
     	current_state = timing_apply_post_spike(
     			delayed_mf_time, *fwd_post_window.next_trace,
 				(time+delay_dendritic - delayed_mf_time),
-				last_pre_trace, fwd_post_window.prev_time, fwd_post_window.prev_trace, // these variables aren't used
+				last_pre_trace, fwd_post_window.prev_time, fwd_post_window.prev_trace,
 				current_state);
 
     	fwd_post_window = post_events_next_delayed(fwd_post_window, delayed_mf_time);

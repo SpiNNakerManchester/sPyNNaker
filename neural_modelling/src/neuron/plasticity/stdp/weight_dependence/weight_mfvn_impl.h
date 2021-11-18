@@ -57,7 +57,7 @@ static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression_multiplier) {
 	if (print_plasticity){
 		io_printf(IO_BUF, "\n      Do Depression\n");
-		io_printf(IO_BUF, "          Weight prior to depression: %u\n",state.weight);
+		io_printf(IO_BUF, "          Weight prior to depression: %u\n", state.weight);
 	}
 
     // Calculate scale
@@ -94,7 +94,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 	}
 
 //    state.a2_plus += state.weight_region->a2_plus;
-    state.weight += state.weight_region->a2_plus; // mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
+    state.weight += state.weight_region->a2_plus;
     state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
 
     return state;
@@ -106,7 +106,6 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
 
     // first do Depression (as this would have happened first)
-
 
 //    // Now do potentiation (check against lower limit)
 //    int32_t scaled_a2_plus = STDP_FIXED_MUL_16X16(

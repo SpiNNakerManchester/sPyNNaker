@@ -15,7 +15,7 @@ typedef struct {
     accum min_weight;
     accum max_weight;
 
-    accum a2_plus;
+    accum a2_plus; // Note: this value is pot_alpha from the python side
     accum a2_minus;
 } plasticity_weight_region_data_t;
 
@@ -55,7 +55,7 @@ static inline weight_state_t weight_one_term_apply_depression(
 
 	if (print_plasticity){
 		io_printf(IO_BUF, "\n            Do Depression\n");
-		io_printf(IO_BUF, "                  Weight prior to depression: %u\n",state.weight);
+		io_printf(IO_BUF, "                  Weight prior to depression: %u\n", state.weight);
 	}
 
     // Calculate scale
@@ -73,7 +73,7 @@ static inline weight_state_t weight_one_term_apply_depression(
     state.weight = kbits(MAX(bitsk(state.weight), bitsk(state.weight_region->min_weight)));
 
     if (print_plasticity){
-    	io_printf(IO_BUF, "                  Weight after depression: %u\n\n",state.weight);
+    	io_printf(IO_BUF, "                  Weight after depression: %u\n\n", state.weight);
     }
 
     return state;
@@ -84,7 +84,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
     use(potentiation);
 	// add fixed amount
 //    state.a2_plus += state.weight_region->a2_plus;
-    state.weight += state.weight_region->a2_plus; //mul_accum_fixed(state.weight_region->a2_plus, a2_plus);
+    state.weight += state.weight_region->a2_plus;
     state.weight = kbits(MIN(bitsk(state.weight), bitsk(state.weight_region->max_weight)));
 
     return state;
@@ -95,7 +95,6 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
 
     // first do Depression (as this would have happened first)
-
 
 //    // Now do potentiation (check against lower limit)
 //    int32_t scaled_a2_plus = STDP_FIXED_MUL_16X16(

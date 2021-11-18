@@ -54,8 +54,8 @@ void _print_pre_event_history(pre_event_history_t pre_eve_hist){
 	io_printf(IO_BUF, "Prev time: %u\n",
 			pre_eve_hist.pf_times[pre_eve_hist.num_recorded_pf_spikes_minus_one]);
 
-	for (int i =0; i < NUM_PF_SPIKES_TO_RECORD; i ++){
-		io_printf(IO_BUF, "    Entry %u: %u\n", i ,pre_eve_hist.pf_times[i]);
+	for (int i = 0; i < NUM_PF_SPIKES_TO_RECORD; i ++){
+		io_printf(IO_BUF, "    Entry %u: %u\n", i, pre_eve_hist.pf_times[i]);
 	}
 
 }

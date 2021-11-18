@@ -23,21 +23,7 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 // Exponential decay lookup parameters
 #define TAU_PLUS_TIME_SHIFT 0
-#define EXP_SIN_LUT_SIZE 256
-
-// Helper macros for looking up decays
-//#define EXP_SIN_LOOKUP(time) maths_lut_exponential_decay(time, exp_sin_lookup)
-//    maths_lut_exponential_decay_time_shifted( \
-//        time, TAU_PLUS_TIME_SHIFT, EXP_SIN_LUT_SIZE, exp_sin_lookup)
-//#define DECAY_LOOKUP_TAU_MINUS(time) \
-//    maths_lut_exponential_decay( \
-//        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
-
-//---------------------------------------
-// Externals
-//---------------------------------------
-//extern int16_t exp_sin_lookup[EXP_SIN_LUT_SIZE];
-//extern int16_lut *exp_sin_lookup;
+//#define EXP_SIN_LUT_SIZE 256
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -114,9 +100,6 @@ static inline update_state_t timing_apply_pre_spike(
     }
 
     return weight_one_term_apply_potentiation(previous_state, 0);
-
-
-
 //
 //    // Get time of event relative to last post-synaptic event
 //    uint32_t time_since_last_post = time - last_post_time;
@@ -154,8 +137,6 @@ static inline update_state_t timing_apply_post_spike(
     use(&last_post_trace);
     extern int16_lut *exp_sin_lookup;
 
-
-
     // This is where we lookup the value of e^(-x) * sin(x)^20
 
     // Get time of event relative to last pre-synaptic event
@@ -166,7 +147,6 @@ static inline update_state_t timing_apply_post_spike(
     }
 
     if (time_since_last_pre < 255){
-
 //        int32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
 //        int32_t multiplier = STDP_FIXED_MUL_16X16(last_pre_trace,
 //                maths_lut_exponential_decay_time_shifted(
@@ -181,8 +161,6 @@ static inline update_state_t timing_apply_post_spike(
         }
 
         return weight_one_term_apply_depression(previous_state, multiplier);
-
-
     }
 
     if (print_plasticity){
