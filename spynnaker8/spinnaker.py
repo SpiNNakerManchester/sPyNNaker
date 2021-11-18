@@ -167,20 +167,21 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
 
     @property
     def dt(self):
-        """ The machine time step in milliseconds
+        """ The simulation time step in milliseconds
 
         :return: the machine time step
         :rtype: float
         """
-        return self.machine_time_step_ms
+        return self._data_writer.simulation_time_step_ms
 
     @dt.setter
     def dt(self, new_value):
-        """ The machine time step in milliseconds
+        """ We do not support setting dt/ time step except during setup
 
         :param float new_value: new value for machine time step in microseconds
         """
-        self.machine_time_step = new_value * MICRO_TO_MILLISECOND_CONVERSION
+        raise NotImplementedError(
+            "We do not support setting dt/ time step except during setup")
 
     @property
     def t(self):
@@ -189,7 +190,8 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return self._current_run_timesteps * self.machine_time_step_ms
+        return (self._current_run_timesteps *
+                self._data_writer.simulation_time_step_ms)
 
     @property
     def segment_counter(self):
