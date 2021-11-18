@@ -47,7 +47,7 @@ void _print_pre_event_history(pre_event_history_t pre_eve_hist){
 			pre_eve_hist.mf_times[pre_eve_hist.num_recorded_mf_spikes_minus_one]);
 
 	for (int i = 0; i < NUM_MF_SPIKES_TO_RECORD; i++){
-		io_printf(IO_BUF, "    Entry %u: %u\n", i , pre_eve_hist.mf_times[i]);
+		io_printf(IO_BUF, "    Entry %u: %u\n", i, pre_eve_hist.mf_times[i]);
 	}
 }
 

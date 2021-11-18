@@ -197,7 +197,7 @@ void timer_callback(uint timer_count, UNUSED uint unused) {
     spike_processing_get_and_reset_pipeline_restarts_this_tick();
 
     // cache and flush spike counters
-    // /localhome/mbax3pb2/py3_venv/spinnaker/sPyNNaker/neural_modelling/src/neuron/spike_profiling.h
+    // functions in file neural_modelling/src/neuron/spike_profiling.h
 	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
 			&spike_cache);
 	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
