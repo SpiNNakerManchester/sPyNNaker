@@ -32,6 +32,7 @@ from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
@@ -125,8 +126,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             n_boards_required=n_boards_required,
             front_end_versions=versions)
 
+        self._data_writer = SpynnakerDataWriter()
+
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
+
         self.set_up_machine_specifics(hostname)
 
         logger.info(f'Setting time scale factor to '
@@ -148,11 +152,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # Get the standard values
         if timestep is None:
             self.set_up_timings(timestep, time_scale_factor)
+            self._data_writer.set_up_timings_and_delay(
+                timestep, time_scale_factor, min_delay)
         else:
             self.set_up_timings(
                 math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor)
-
+            self._data_writer.set_up_timings_and_delay(
+                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                time_scale_factor, min_delay)
         # Sort out the minimum delay
         if (min_delay is not None and
                 min_delay < self.machine_time_step_ms):
