@@ -557,13 +557,12 @@ class SpikeSourcePoissonMachineVertex(
         view = SpynnakerDataView()
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=view.simulation_time_step_us / MICRO_TO_SECOND_CONVERSION,
+            data=view.simulation_time_step_s,
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=int(
-                MICRO_TO_SECOND_CONVERSION / view.simulation_time_step_us))
+            data=int(view.simulation_time_step_per_s))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -725,8 +724,7 @@ class SpikeSourcePoissonMachineVertex(
             self._app_vertex.rates.set_value_by_id(
                 i,
                 spikes_per_tick *
-                (MICRO_TO_SECOND_CONVERSION /
-                 SpynnakerDataView.simulation_time_step_us))
+                SpynnakerDataView.simulation_time_step_per_s)
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded

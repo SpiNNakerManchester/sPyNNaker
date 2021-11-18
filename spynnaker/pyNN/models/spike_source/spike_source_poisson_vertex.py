@@ -422,8 +422,7 @@ class SpikeSourcePoissonVertex(
                 machine_vertex.set_reload_required(True)
 
     def max_spikes_per_ts(self):
-        ts_per_second = (MICRO_TO_SECOND_CONVERSION /
-                         SpynnakerDataView().simulation_time_step_us)
+        ts_per_second = SpynnakerDataView().simulation_time_step_per_s
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
