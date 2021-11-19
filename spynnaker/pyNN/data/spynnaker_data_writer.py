@@ -69,11 +69,11 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
                 f'must at least simulation time step in microseconds: '
                 f'{self.get_simulation_time_step_ms()}')
 
-        raw = self.get_simulation_time_step_ms() / min_delay
+        raw = min_delay / self.get_simulation_time_step_ms()
         rounded = round(raw)
         if abs(rounded - raw) > 0.00001:
             raise ConfigurationException(
-                f'invalid min_delay {min_delay }'
+                f'invalid min_delay {min_delay} '
                 f'must at multiple of simulation time step in microseconds '
                 f' {self.get_simulation_time_step_ms()}')
 

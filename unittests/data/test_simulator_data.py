@@ -60,6 +60,10 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(ConfigurationException):
             writer.set_up_timings_and_delay(1000, 1, 1.5)
 
+        writer.set_up_timings_and_delay(1000, 1, 2)
+        with self.assertRaises(ConfigurationException):
+            writer.set_up_timings_and_delay(2000, 1, 1)
+
         with self.assertRaises(TypeError):
             writer.set_up_timings_and_delay(1000, 1, "baocn")
 
