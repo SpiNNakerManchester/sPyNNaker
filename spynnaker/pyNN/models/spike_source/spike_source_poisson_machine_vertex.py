@@ -721,7 +721,7 @@ class SpikeSourcePoissonMachineVertex(
             self._app_vertex.rates.set_value_by_id(
                 i,
                 spikes_per_tick *
-                SpynnakerDataView.simulation_time_step_per_s)
+                SpynnakerDataView().simulation_time_step_per_s)
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
