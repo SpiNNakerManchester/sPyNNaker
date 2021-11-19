@@ -167,7 +167,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
                     db.insert_report(
                         f"The last entry in the STDP exponential lookup table "
                         f"for the tau_plus parameter of the"
-                        f"{self.__class__.__name} between "
+                        f"{self.__class__.__name__} between "
                         f"{synapse_info.pre_population.label} and "
                         f"{synapse_info.post_population.label} was {tauplus} "
                         f"rather than 0, indicating that the lookup table was "
@@ -184,7 +184,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
                     db.insert_report(
                         f"The last entry in the STDP exponential lookup table "
                         f"for the tau_minus parameter of the "
-                        f"{self.__class__.__name} between "
+                        f"{self.__class__.__name__} between "
                         f"{synapse_info.pre_population.label} and "
                         f"{synapse_info.post_population.label} was {tauminus} "
                         f"rather than 0, indicating that the lookup table was "

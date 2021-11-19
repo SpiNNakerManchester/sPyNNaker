@@ -131,11 +131,11 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
 
     @property
     def v_init(self):
-        return self._v
+        return self._v_init
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v = v_init
+        self._v_init = v_init
 
     @property
     def v_rest(self):

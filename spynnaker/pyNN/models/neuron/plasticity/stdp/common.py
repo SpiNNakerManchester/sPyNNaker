@@ -21,15 +21,15 @@ import matplotlib.pyplot as plt
 STDP_FIXED_POINT_ONE = (1 << 11)
 
 
-# def float_to_fixed(value):
-#     """
-#     :param float value:
-#     :rtype: int
-#     """
-#     return int(round(float(value) * STDP_FIXED_POINT_ONE))
+def float_to_fixed(value):
+    """
+    :param float value:
+    :rtype: int
+    """
+    return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
-def float_to_fixed(value, fixed_point_one):
-    return int(round(float(value) * float(fixed_point_one)))
+# def float_to_fixed(value, fixed_point_one):
+#     return int(round(float(value) * float(fixed_point_one)))
 
 
 # def get_lut_provenance(
@@ -115,7 +115,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                          sin_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
-        exp_fix = float_to_fixed(exp_float, fixed_point_one)
+        exp_fix = float_to_fixed(exp_float)
 
         if spec is None:  # in testing mode so print
             out_float.append(exp_float)
@@ -203,7 +203,7 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                          cos_pwr / kernel_peak_value) * kernel_scaling
 
         # Convert to fixed-point
-        exp_fix = float_to_fixed(exp_float, fixed_point_one)
+        exp_fix = float_to_fixed(exp_float)
 
         if spec is None:  # in testing mode so print
             out_float.append(exp_float)
