@@ -41,8 +41,8 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                              "TvN", "Vthre",
                              "err_func", "isyn_exc", "isyn_inh"})
     def __init__(self,
-                 a=0.,
-                 b=0.,
+                 a=4.,
+                 b=20.,
                  tauw=1.0,
                  Trefrac=5.0,
                  Vreset=-65.,
@@ -122,7 +122,8 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  sample=1000,
                  err_func=0.):
         # pylint: disable=too-many-arguments, too-many-locals
-        w = Ve * b * tauw + a * (El-muV0)
+        #muVV = ((muGe*Erev_exc + muGi*Erev_inh + Gl*El - Ve*tauw*(b) + a*El) /muG)/ (1+a/muG)
+        #w = Ve * b * tauw + a * (El-muV0)
         neuron_model = MeanfieldOfAdexNetwork(a, b, tauw, Trefrac,
                                               Vreset, delta_v, ampnoise,
                                               Timescale_inv, Ve, Vi, w)

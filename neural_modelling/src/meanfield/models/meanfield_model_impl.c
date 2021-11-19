@@ -33,29 +33,7 @@ static const global_neuron_params_t *global_params;
  * use cases 1.85 gives slightly better spike timings.
  */
 //static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
-/*
-/////////////////////////////////////////////////////////////
-#if 0
-// definition for Izhikevich neuron
-static inline void neuron_ode(
-        REAL t, REAL stateVar[], REAL dstateVar_dt[],
-        neuron_t *neuron, REAL input_this_timestep) {
-    REAL V_now = stateVar[1];
-    REAL U_now = stateVar[2];
-    log_debug(" sv1 %9.4k  V %9.4k --- sv2 %9.4k  U %9.4k\n", stateVar[1],
-            neuron->V, stateVar[2], neuron->U);
 
-    // Update V
-    dstateVar_dt[1] =
-            REAL_CONST(140.0)
-            + (REAL_CONST(5.0) + REAL_CONST(0.0400) * V_now) * V_now - U_now
-            + input_this_timestep;
-
-    // Update U
-    dstateVar_dt[2] = neuron->A * (neuron->B * V_now - U_now);
-}
-#endif
-*/
 
 //! \brief The original model uses 0.04, but this (1 ULP larger?) gives better
 //! numeric stability.
@@ -63,38 +41,70 @@ static inline void neuron_ode(
 //! Thanks to Mantas Mikaitis for this!
 //static const REAL MAGIC_MULTIPLIER = REAL_CONST(0.040008544921875);
 
-
-/* ####################################################################
-    reuse of izk for meanfields
-    ###################################################################
-    */
-
 void error_function(REAL argument, mathsbox_t *restrict mathsbox){
-/*
- *   Error function with integral computing by midpoint method
+/****************************************************************************
+ *   Error function with integral computing by midpoint method OK
  *   Will do the Simpson if ITCM is ok
  *   
- *   Sampling of error function is maybe connected to the time_step need to investigate.
- */
+ *   Sampling of error function is maybe connected to the time_step need to
+ *   investigate.
+ *  
+ *    expk take  : ~ 570 bytes
+      sqrtk take : ~1250 bytes
+ *****************************************************************************/
     mathsbox->err_func = 0.;
     REAL step = argument/mathsbox->error_func_sample;
     REAL x;
     REAL t;
-    //REAL Pi = 3.1415927;// here was a k
+    REAL Pi = REAL_CONST(3.1415927);// here was a k
     REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
-    REAL Erf = ZERO;//mathsbox->err_func;
+    REAL Erf = ZERO;
     REAL Erfc = ZERO;
     
     for(x=0; x<=argument; x+=step){
-        //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM
+        
+        //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM because of expk and sqrtk
         t = x + REAL_HALF(step);
         Erf +=  step*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
+        //Erf +=  step*two_over_sqrt_Pi*(-(t*t));//TEST
+        //Erf +=  step*(REAL_CONST(2.)/sqrtk(Pi))*expk(-(t*t)); // TEST sqrtk ONE
     }
     Erfc = ONE-Erf;
 
     mathsbox->err_func = Erfc;
 
 }
+
+/*
+double square_root_of(REAL number)
+{
+     /*! square root method take from Quake III Arena 
+     * source code, attribute to John Carmack.
+     * Under GNU GPL licence.
+     *
+     * Implement here just to see if something was lighter than sqrt.c
+     *
+     */
+/*    
+    REAL x, y, f;
+    REAL i;
+    f = REAL_CONST(1.5);
+    
+    x = REAL_HALF(number);
+    y = number;
+    
+    i = *(REAL *) &y;
+    i = 0x5f3759df - (i >> 1);
+    y = *(REAL *) &i;
+    y = y * (f - (x * y * y));
+    y = y * (f - (x * y * y));
+    
+    return number*y;
+    
+}
+*/
+
+
 
 
 void threshold_func(ParamsFromNetwork_t *restrict pNetwork, pFitPolynomial_t *restrict Pfit)
@@ -161,11 +171,7 @@ void threshold_func(ParamsFromNetwork_t *restrict pNetwork, pFitPolynomial_t *re
 
 void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *restrict pNetwork)
 {
-
-    //REAL Fe, Fi;
-    //REAL muGe, muGi, muG;
-    //REAL Ue, Ui;
-    //REAL Tm, Tv;
+    // Need some comments
     
     REAL gei = pNetwork->gei;
     REAL pconnec = pNetwork->pconnec;
@@ -180,15 +186,7 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *rest
     REAL Ee = pNetwork->Ee;
     REAL Cm = pNetwork->Cm;
     
-    
-    
-    //REAL muV = pNetwork->muV;
-    //REAL muGn = pNetwork->muGn;
-    //REAL sV = pNetwork->sV;
-    //REAL TvN = pNetwork->TvN;
-    
-    // here TOTAL (sum over synapses) excitatory and inhibitory input
-
+        
     REAL Fe = Ve * (REAL_CONST(1.)-gei)*pconnec*Ntot; // default is 1 !!
     REAL Fi = Vi * gei*pconnec*Ntot;
     
@@ -217,15 +215,16 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *rest
     
 
    /*
-   normalement sqrt((Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
-                 Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm)))
+   normaly sqrt(REAL_HALF(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm)))
    
-   doit trouver une bonne fonction pour faire sqrt ...
-   |->sqrtk() ne fonctionne pas !!!
+   need find a good sqrt function ...
+   |->sqrtk() takes too much ITCM !!!
     */
     
-    pNetwork->sV = Fe*(Ue*Te)*(Ue*Te)/REAL_CONST(2.)/(Te+Tm)\
-               + Fi*(Ti*Ui)*(Ti*Ui)/REAL_CONST(2.)/(Ti+Tm);
+    
+    REAL sV_sqr = REAL_HALF(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm));//ITCM with err_func also, 1272 bytes over
+    
+    pNetwork->sV = sV_sqr; // square_root_of(sV_sqr);
 
     
     
@@ -244,10 +243,9 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *rest
     if (Tv < ACS_DBL_TINY){
         Tv += ACS_DBL_TINY;
     }
-    /*
-    pNetwork->TvN = Tv*Gl/Cm; // Thomas : Heu, useless no??
-    */
-    pNetwork->TvN = Tv;
+    
+    pNetwork->TvN = Tv*Gl/Cm; // Thomas : Heu, useless no?? |resp-> TvN is a dimensional so usefull var
+    
     
 
 }
@@ -263,8 +261,6 @@ void TF(REAL Ve, REAL Vi, REAL W,
     parameters are put in local in order to make the code clear.
 
 */
-    
-    
     
     
     if (pNetwork->Fout_th != ZERO){
@@ -292,18 +288,21 @@ void TF(REAL Ve, REAL Vi, REAL W,
     }
     //factor = REAL_HALF(Gl/(pNetwork->TvN * Cm));
     REAL argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137)*pNetwork->sV);
+    
 
     error_function(argument, mathsbox);
 
-    /*
+    
     REAL Gl = pNetwork->Gl;
     REAL Cm = pNetwork->Cm;
+    /*
     pNetwork->Fout_th = (HALF*Gl) * mathsbox->err_func / (Cm*pNetwork->TvN);// In fact = 1/(2.*Tv) * err_func , that's it'!!!
     If remove that's will do less instruction
     
     Put TvN<-:Tv because Tv not in pNetwork
+    REMOVE this correction bcs TvN adimensional so usefull
     */
-    pNetwork->Fout_th = (HALF*pNetwork->TvN) * mathsbox->err_func ;
+    pNetwork->Fout_th = (HALF*Gl) * mathsbox->err_func / (Cm*pNetwork->TvN);
 
 
     if (pNetwork->Fout_th < ACS_DBL_TINY){
@@ -330,15 +329,6 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     REAL tauw = meanfield->tauw;
     REAL T_inv = meanfield->Timescale_inv;
     REAL b = meanfield->b;
-
-    /*
-    if (h=0.){
-        lastW = meanfield->Ve*tauw*b;
-    }
-    else{
-        lastW = meanfield->w;
-    }
-    */
                
     
     TF(lastVe, lastVi, lastW, pNetwork, Pfit_exc, mathsbox);    
@@ -348,13 +338,13 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     TF(lastVe, lastVi, lastW, pNetwork, Pfit_inh, mathsbox);
     REAL lastTF_inh = pNetwork->Fout_th;
     
-/*
+/******************************************************
  *   EULER Explicite method
  *   It's very instable if for now h<0.2 for 20ms
  *   
  *   NEED to give also the error of the method here :
  *   0.5*h^2*u''(t_n) + o(h^2)
- */
+ *******************************************************/
     
     /*
     
@@ -369,12 +359,10 @@ void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
     
     */
     
-/*
- *  RUNGE-KUTTA 2nd order Midpoint
- */
+/***********************************
+ *  RUNGE-KUTTA 2nd order Midpoint *
+ ***********************************/
     
-    
-    //cut more the equation for underflowed ITCM!!
     REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
     REAL alpha_exc = lastVe + h*k1_exc;
     REAL k2_exc = (lastTF_exc - alpha_exc )*T_inv;
