@@ -33,7 +33,6 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.utilities import constants
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
     DelaySupportAdder, OnChipBitFieldGenerator,
@@ -146,7 +145,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor, min_delay)
 
-     # Check the combination of machine time step and time scale factor
+        # Check the combination of machine time step and time scale factor
         if (self._data_writer.simulation_time_step_ms *
                 self._data_writer.time_scale_factor < 1):
             if not get_config_bool(

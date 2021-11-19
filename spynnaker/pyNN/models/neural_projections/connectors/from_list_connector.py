@@ -15,8 +15,6 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
@@ -361,8 +359,8 @@ class FromListConnector(AbstractConnector):
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) *
-                    view.simulation_time_step_per_ms) *
-                    view.simulation_time_step_ms)
+                view.simulation_time_step_per_ms) *
+                view.simulation_time_step_ms)
         except ValueError:
             pass
 

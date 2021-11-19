@@ -33,7 +33,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
+    SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (

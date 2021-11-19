@@ -22,8 +22,7 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_SECOND_CONVERSION, SIMULATION_N_BYTES, BYTES_PER_WORD,
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_SHORT)
+    SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
@@ -457,9 +456,7 @@ class SpikeSourcePoissonMachineVertex(
              for s in starts_split[:-1]])
 
         # Compute the spikes per tick for each rate for each atom
-        spikes_per_tick = rates * (
-                SpynnakerDataView().simulation_time_step_us /
-                MICRO_TO_SECOND_CONVERSION)
+        spikes_per_tick = rates * SpynnakerDataView().simulation_time_step_s
         # Determine the properties of the sources
         is_fast_source = spikes_per_tick >= self.SLOW_RATE_PER_TICK_CUTOFF
         is_faster_source = spikes_per_tick >= self.FAST_RATE_PER_TICK_CUTOFF

@@ -63,7 +63,6 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(TypeError):
             writer.set_up_timings_and_delay(1000, 1, "baocn")
 
-
     def test_dict(self):
         view = SpynnakerDataView()
         writer = SpynnakerDataWriter()
