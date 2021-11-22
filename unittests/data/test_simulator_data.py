@@ -31,7 +31,7 @@ class TestSimulatorData(unittest.TestCase):
         # Use manual_check to verify this without dependency
         writer.setup()
         self.assertIn("run_1", view.report_default_directory)
-        self.assertIn("provenance_data", view.provenance_file_path)
+        self.assertIn("provenance_data", view.provenance_dir_path)
         with self.assertRaises(SimulatorDataNotYetAvialable):
             view.simulation_time_step_us
         with self.assertRaises(SimulatorDataNotYetAvialable):
