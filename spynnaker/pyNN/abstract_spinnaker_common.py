@@ -119,9 +119,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             database_socket_addresses=database_socket_addresses,
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            front_end_versions=versions)
-
-        self._data_writer = SpynnakerDataWriter()
+            front_end_versions=versions,
+            data_writer=SpynnakerDataWriter())
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
