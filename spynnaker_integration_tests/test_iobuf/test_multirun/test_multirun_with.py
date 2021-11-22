@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.data import FecDataView
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -30,7 +30,7 @@ class TestIobuffMultirun(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, min_delay=1.0)
-        prov_path = globals_variables.app_provenance_file_path()
+        prov_path = FecDataView().app_provenance_dir_path
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 
@@ -59,8 +59,7 @@ class TestIobuffMultirun(BaseTestCase):
         sim.reset()
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
-        prov_patha = \
-            globals_variables.app_provenance_file_path()
+        prov_patha = FecDataView().app_provenance_dir_path
         self.assertNotEqual(prov_path, prov_patha)
         size6 = self.check_size(prov_patha, placement)
         # Should write the same thing again

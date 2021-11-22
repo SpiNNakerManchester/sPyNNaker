@@ -17,7 +17,7 @@
 Synfirechain-like example
 """
 import os
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.data import FecDataView
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -32,7 +32,7 @@ class TestNoIobufDuringRun(BaseTestCase):
         sim.setup(timestep=1.0, min_delay=1.0)
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(500)
-        prov_path = globals_variables.app_provenance_file_path()
+        prov_path = FecDataView().app_provenance_dir_path
 
         self.assertFalse(self.check_for_iobufs(prov_path))
         sim.end()

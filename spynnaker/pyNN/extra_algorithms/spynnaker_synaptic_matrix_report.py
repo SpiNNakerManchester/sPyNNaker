@@ -18,8 +18,7 @@ import os
 import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
@@ -53,7 +52,8 @@ class SpYNNakerSynapticMatrixReport(object):
                 "connection holder data to be generated")
 
         # generate folder for synaptic reports
-        top_level_folder = os.path.join(report_default_directory(), _DIRNAME)
+        top_level_folder = os.path.join(
+            SpynnakerDataView().run_dir_path, _DIRNAME)
         if not os.path.exists(top_level_folder):
             os.mkdir(top_level_folder)
 

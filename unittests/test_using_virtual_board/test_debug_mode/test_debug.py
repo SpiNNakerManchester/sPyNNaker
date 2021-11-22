@@ -19,9 +19,8 @@ import spinn_front_end_common.utilities.report_functions.reports as \
     reports_names
 from spinn_front_end_common.utilities.report_functions import (
     NetworkSpecification)
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import \
     SpYNNakerNeuronGraphNetworkSpecificationReport
@@ -93,7 +92,7 @@ class TestDebug(BaseTestCase):
         pop.get_data("v")
         sim.end()
 
-        found = os.listdir(report_default_directory())
+        found = os.listdir(SpynnakerDataView().run_dir_path)
         print(found)
         for report in reports:
             self.assertIn(report, found)

@@ -26,8 +26,7 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -136,12 +135,12 @@ class OnChipBitFieldGenerator(object):
         progress.end()
 
         # read in bit fields for debugging purposes
+        run_dir_path = SpynnakerDataView().run_dir_path
         if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
-                report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
+                run_dir_path, self._BIT_FIELD_REPORT_FILENAME))
             self._summary_report_bit_fields(app_graph, os.path.join(
-                report_default_directory(),
-                self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
+                run_dir_path, self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
     def _summary_report_bit_fields(self, app_graph, file_path):
         """ summary report of the bitfields that were generated

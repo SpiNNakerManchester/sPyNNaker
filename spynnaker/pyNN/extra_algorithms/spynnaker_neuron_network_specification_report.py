@@ -17,8 +17,7 @@ import os
 from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -88,7 +87,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         # write dot file and generate pdf
         file_to_output = os.path.join(
-            report_default_directory(), self._GRAPH_NAME)
+            SpynnakerDataView().run_dir_path, self._GRAPH_NAME)
         try:
             dot_diagram.render(file_to_output, view=False, format=graph_format)
         except exeNotFoundExn:
