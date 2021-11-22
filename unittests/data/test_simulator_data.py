@@ -18,11 +18,15 @@ from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException, SimulatorDataNotYetAvialable)
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 
 
 class TestSimulatorData(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_setup(self):
         view = SpynnakerDataView()
@@ -30,7 +34,7 @@ class TestSimulatorData(unittest.TestCase):
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         writer.setup()
-        self.assertIn("run_1", view.report_default_directory)
+        self.assertIn("run_1", view.run_dir_path)
         self.assertIn("provenance_data", view.provenance_dir_path)
         with self.assertRaises(SimulatorDataNotYetAvialable):
             view.simulation_time_step_us
