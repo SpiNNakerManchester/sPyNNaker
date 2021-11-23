@@ -111,6 +111,7 @@ class AbstractPopulationVertex(
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__drop_late_spikes",
+        "__rb_left_shifts",
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
@@ -138,7 +139,8 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter):
+            neuron_impl, pynn_model, drop_late_spikes, splitter,
+            rb_left_shifts):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -195,6 +197,8 @@ class AbstractPopulationVertex(
         if self.__drop_late_spikes is None:
             self.__drop_late_spikes = get_config_bool(
                 "Simulation", "drop_late_spikes")
+
+        self.__rb_left_shifts = rb_left_shifts
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
@@ -369,6 +373,17 @@ class AbstractPopulationVertex(
         :rtype: bool
         """
         return self.__drop_late_spikes
+
+    @property
+    def rb_left_shifts(self):
+        """ ring buffer left shifts (for use by user)
+
+        :rtype: bool
+        """
+        return self.__rb_left_shifts
+
+    def set_rb_left_shifts(self, rb_left_shifts):
+        self.__rb_left_shifts = rb_left_shifts
 
     def set_has_run(self):
         """ Set the flag has run so initialize only affects state variables

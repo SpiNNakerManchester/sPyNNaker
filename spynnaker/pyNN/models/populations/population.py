@@ -1130,7 +1130,7 @@ class Population(PopulationBase):
 
         # Setting custom RB LS
         if rb_left_shifts is not None:
-            self.__vertex.rb_left_shifts = rb_left_shifts
+            self.__vertex.set_rb_left_shifts(rb_left_shifts)
         # Introspect properties of the vertex
         self.__vertex_population_settable = \
             isinstance(self.__vertex, AbstractPopulationSettable)

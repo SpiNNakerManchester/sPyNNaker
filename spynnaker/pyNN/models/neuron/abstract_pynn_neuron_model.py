@@ -25,7 +25,7 @@ DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
-    "splitter": None
+    "splitter": None, "rb_left_shifts": None
 }
 
 
@@ -59,10 +59,10 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size, drop_late_spikes,
-            splitter):
+            splitter, rb_left_shifts):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return AbstractPopulationVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size, self.__model,
-            self, drop_late_spikes, splitter)
+            self, drop_late_spikes, splitter, rb_left_shifts)
