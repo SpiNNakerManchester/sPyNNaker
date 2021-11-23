@@ -15,7 +15,7 @@
 
 from spinnaker_testbase import BaseTestCase
 import spynnaker8 as sim
-from spinn_front_end_common.utilities import FecTimer
+from spinn_front_end_common.data import FecTimer
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .key_constraint_adder import KeyConstraintAdder
 
