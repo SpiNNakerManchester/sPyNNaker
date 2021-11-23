@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spinn_utilities.exceptions import DataNotYetAvialable
 from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException, SimulatorDataNotYetAvialable)
+    ConfigurationException)
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
@@ -36,9 +37,9 @@ class TestSimulatorData(unittest.TestCase):
         writer.setup()
         self.assertIn("run_1", view.run_dir_path)
         self.assertIn("provenance_data", view.provenance_dir_path)
-        with self.assertRaises(SimulatorDataNotYetAvialable):
+        with self.assertRaises(DataNotYetAvialable):
             view.simulation_time_step_us
-        with self.assertRaises(SimulatorDataNotYetAvialable):
+        with self.assertRaises(DataNotYetAvialable):
             view.min_delay
         self.assertFalse(view.has_min_delay())
         writer.set_up_timings(100, 10)
@@ -49,7 +50,7 @@ class TestSimulatorData(unittest.TestCase):
     def test_min_delay(self):
         writer = SpynnakerDataWriter()
         writer.setup()
-        with self.assertRaises(SimulatorDataNotYetAvialable):
+        with self.assertRaises(DataNotYetAvialable):
             writer.min_delay
 
         writer.set_up_timings_and_delay(500, 1, 0.5)

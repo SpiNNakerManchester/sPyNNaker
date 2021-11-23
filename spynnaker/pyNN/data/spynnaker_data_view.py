@@ -95,7 +95,7 @@ class SpynnakerDataView(FecDataView):
         """
         value = self.get_min_delay()
         if value is None:
-            raise self.exception("min_delay")
+            raise self._exception("min_delay")
         return value
 
     def has_min_delay(self):
