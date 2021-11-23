@@ -15,6 +15,7 @@
 
 import os
 from spinn_front_end_common.data import FecDataView
+from spinn_front_end_common.utilities import globals_variables
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
