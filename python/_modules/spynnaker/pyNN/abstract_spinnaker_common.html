@@ -73,18 +73,18 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DelaySupportAdder</span><span class="p">,</span> <span class="n">OnChipBitFieldGenerator</span><span class="p">,</span>
-    <span class="n">RedundantPacketCountReport</span><span class="p">,</span>
-    <span class="n">SpynnakerDataSpecificationWriter</span><span class="p">,</span>
-    <span class="n">SpYNNakerNeuronGraphNetworkSpecificationReport</span><span class="p">)</span>
+    <span class="n">delay_support_adder</span><span class="p">,</span> <span class="n">on_chip_bitfield_generator</span><span class="p">,</span>
+    <span class="n">redundant_packet_count_report</span><span class="p">,</span>
+    <span class="n">spynnaker_data_specification_writer</span><span class="p">,</span>
+    <span class="n">spynnaker_neuron_graph_network_specification_report</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.</span>\
     <span class="n">spynnaker_machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">,</span>
-        <span class="n">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">,)</span>
+        <span class="n">spynnaker_machine_bitfield_ordered_covering_compressor</span><span class="p">,</span>
+        <span class="n">spynnaker_machine_bitField_pair_router_compressor</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.connection_holder_finisher</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">finish_connection_holders</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.splitter_components</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SpynnakerSplitterPartitioner</span><span class="p">,</span> <span class="n">SpynnakerSplitterSelector</span><span class="p">)</span>
+    <span class="n">spynnaker_splitter_partitioner</span><span class="p">,</span> <span class="n">spynnaker_splitter_selector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.synapse_expander</span> <span class="kn">import</span> <span class="n">synapse_expander</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
@@ -423,16 +423,11 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_graph_data_specification_writer</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_execute_graph_data_specification_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Overridden by spy which adds placement_order</span>
-
-<span class="sd">        :return:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="s2">&quot;Spynnaker data specification writer&quot;</span><span class="p">):</span>
-            <span class="n">writer</span> <span class="o">=</span> <span class="n">SpynnakerDataSpecificationWriter</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_sizes</span> <span class="o">=</span> <span class="n">writer</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_sizes</span> <span class="o">=</span> \
+                <span class="n">spynnaker_data_specification_writer</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_execute_spynnaker_ordered_covering_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
@@ -441,8 +436,7 @@
                 <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
                 <span class="k">return</span>
-            <span class="n">compressor</span> <span class="o">=</span> <span class="n">SpynnakerMachineBitFieldOrderedCoveringCompressor</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_provenance</span> <span class="o">=</span> <span class="n">compressor</span><span class="p">(</span>
+            <span class="n">spynnaker_machine_bitfield_ordered_covering_compressor</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
@@ -456,8 +450,7 @@
                 <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
                 <span class="k">return</span>
-            <span class="n">compressor</span> <span class="o">=</span> <span class="n">SpynnakerMachineBitFieldPairRouterCompressor</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_compressor_provenance</span> <span class="o">=</span> <span class="n">compressor</span><span class="p">(</span>
+            <span class="n">spynnaker_machine_bitField_pair_router_compressor</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
@@ -488,8 +481,7 @@
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Execute on chip bitfield generator&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
                 <span class="k">return</span>
-            <span class="n">generator</span> <span class="o">=</span> <span class="n">OnChipBitFieldGenerator</span><span class="p">()</span>
-            <span class="n">generator</span><span class="p">(</span>
+            <span class="n">on_chip_bitfield_generator</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_graph</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">)</span>
@@ -510,8 +502,8 @@
                 <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_network_graph&quot;</span><span class="p">):</span>
                 <span class="k">return</span>
-            <span class="n">report</span> <span class="o">=</span> <span class="n">SpYNNakerNeuronGraphNetworkSpecificationReport</span><span class="p">()</span>
-            <span class="n">report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+            <span class="n">spynnaker_neuron_graph_network_specification_report</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_extra_mapping_algorithms</span><span class="p">,</span>
                <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -528,14 +520,12 @@
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span>
                     <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">):</span>
                 <span class="k">return</span>
-            <span class="n">report</span> <span class="o">=</span> <span class="n">RedundantPacketCountReport</span><span class="p">()</span>
-            <span class="n">report</span><span class="p">()</span>
+            <span class="n">redundant_packet_count_report</span><span class="p">()</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_splitter_selector</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_execute_splitter_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;Spynnaker splitter selector&quot;</span><span class="p">):</span>
-            <span class="n">selector</span> <span class="o">=</span> <span class="n">SpynnakerSplitterSelector</span><span class="p">()</span>
-            <span class="n">selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+            <span class="n">spynnaker_splitter_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_delay_support_adder</span><span class="p">,</span>
                <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -548,8 +538,7 @@
             <span class="k">return</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">:</span>
-                <span class="n">adder</span> <span class="o">=</span> <span class="n">DelaySupportAdder</span><span class="p">()</span>
-                <span class="n">adder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
+                <span class="n">delay_support_adder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
                 <span class="k">return</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Unexpected cfg setting delay_support_adder: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -563,10 +552,10 @@
                 <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_machine</span>
-            <span class="n">partitioner</span> <span class="o">=</span> <span class="n">SpynnakerSplitterPartitioner</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_chips_needed</span> <span class="o">=</span> <span class="n">partitioner</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan_n_timesteps</span><span class="p">,</span>
-                <span class="n">pre_allocated_resources</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_chips_needed</span> <span class="o">=</span> \
+                <span class="n">spynnaker_splitter_partitioner</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan_n_timesteps</span><span class="p">,</span>
+                    <span class="n">pre_allocated_resources</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

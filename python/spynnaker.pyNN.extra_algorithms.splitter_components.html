@@ -937,14 +937,21 @@ edge type/down-stream splitter.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSplitterPartitioner</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.operations.partition_algorithms.splitter_partitioner.SplitterPartitioner</span></code></p>
-<p>a splitter partitioner that’s bespoke for spynnaker vertices.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plan_n_time_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_allocated_resources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_partitioner.html#SpynnakerSplitterPartitioner.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSplitterSliceLegacy</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.partitioner_splitters.splitter_slice_legacy.SplitterSliceLegacy</span></code>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>splitter_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_partitioner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plan_n_time_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_allocated_resources</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner" title="Permalink to this definition">¶</a></dt>
+<dd><p>a splitter partitioner that’s bespoke for spynnaker vertices.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p></li>
@@ -963,125 +970,19 @@ before doing any splitting.</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.create_machine_edge">
-<span class="sig-name descname"><span class="pre">create_machine_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_edge_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_outgoing_edge_partition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_tracker</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_partitioner.html#SpynnakerSplitterPartitioner.create_machine_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterPartitioner.create_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create the machine edge (if needed) and add it to the graph.</p>
-<p>Some implementations of this method are able to detect that the
-requested edge is not actually needed so never create or add it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>src_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – Src machine vertex of a edge</p></li>
-<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – Dest machine vertex of a edge</p></li>
-<li><p><strong>common_edge_type</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineEdge" title="(in PACMAN v6.0)"><em>MachineEdge</em></a>) – The edge type to build</p></li>
-<li><p><strong>app_edge</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationEdge" title="(in PACMAN v6.0)"><em>ApplicationEdge</em></a>) – The app edge this machine edge is to be associated with.</p></li>
-<li><p><strong>machine_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v6.0)"><em>MachineGraph</em></a>) – Machine graph to add edge to.</p></li>
-<li><p><strong>app_outgoing_edge_partition</strong> (<em>OutgoingEdgePartition</em>) – Partition</p></li>
-<li><p><strong>resource_tracker</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.utilities.utility_objs/#pacman.utilities.utility_objs.ResourceTracker" title="(in PACMAN v6.0)"><em>ResourceTracker</em></a>) – The resource tracker.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSplitterSelector</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.interface.splitter_selectors.splitter_selector.SplitterSelector</span></code></p>
-<p>splitter object selector that allocates splitters to app vertices        that have not yet been given a splitter object.        default for APV is the SplitterAbstractPopulationVertexSlice        default for external device splitters are SplitterOneToOneLegacy        default for the rest is the SpynnakerSplitterSliceLegacy.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>PacmanConfigurationException</strong> – If a bad configuration is set</p>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.PROGRESS_BAR_NAME">
-<span class="sig-name descname"><span class="pre">PROGRESS_BAR_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Adding</span> <span class="pre">Splitter</span> <span class="pre">selectors</span> <span class="pre">where</span> <span class="pre">appropriate'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.PROGRESS_BAR_NAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.__call__" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a splitter to every vertex that doesn’t already have one.</p>
+<blockquote>
+<div><p>default for APV is the SplitterAbstractPopulationVertexSlice        default for external device splitters are SplitterOneToOneLegacy        default for the rest is the SpynnakerSplitterSliceLegacy.</p>
+</div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>PacmanConfigurationException</strong> – If a bad configuration is set</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.abstract_pop_heuristic">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">abstract_pop_heuristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.abstract_pop_heuristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.abstract_pop_heuristic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign the splitter for APV. Allows future overrides</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app vertex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.external_fpga_link_heuristic">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">external_fpga_link_heuristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.external_fpga_link_heuristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.external_fpga_link_heuristic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign the splitter for FPGA link vertices. Allows future overrides</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app vertex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.external_spinnaker_link_heuristic">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">external_spinnaker_link_heuristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.external_spinnaker_link_heuristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.external_spinnaker_link_heuristic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign the splitter for SpiNNaker link vertices.            Allows future overrides</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app vertex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.spike_source_array_heuristic">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spike_source_array_heuristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.spike_source_array_heuristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.spike_source_array_heuristic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign the splitter for SSA. Allows future overrides</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app vertex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.spike_source_poisson_heuristic">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spike_source_poisson_heuristic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/spynnaker_splitter_selector.html#SpynnakerSplitterSelector.spike_source_poisson_heuristic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSelector.spike_source_poisson_heuristic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign the splitter for SSP. Allows future overrides</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>app_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v6.0)"><em>ApplicationGraph</em></a>) – app vertex</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">SpynnakerSplitterSliceLegacy</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SpynnakerSplitterSliceLegacy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.partitioner_splitters.splitter_slice_legacy.SplitterSliceLegacy</span></code>, <a class="reference internal" href="#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay" title="spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay</span></code></a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>splitter_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
