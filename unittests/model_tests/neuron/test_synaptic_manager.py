@@ -35,7 +35,7 @@ from data_specification import (
 from data_specification.constants import MAX_MEM_REGIONS
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.interface_functions import (
-    EdgeToNKeysMapper)
+    edge_to_n_keys_mapper)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -54,8 +54,8 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexSlice, SpynnakerSplitterPartitioner)
-from spynnaker.pyNN.extra_algorithms import DelaySupportAdder
+    SplitterAbstractPopulationVertexSlice, spynnaker_splitter_partitioner)
+from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
@@ -122,13 +122,11 @@ def test_write_data_spec():
         "ApplicationGraph": app_graph
     }
     with (injection_context(context)):
-        delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph)
-        partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        delay_support_adder(app_graph)
+        machine_graph, _ = spynnaker_splitter_partitioner(
+            app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        n_keys_map = edge_to_n_keys_mapper(machine_graph)
         routing_info = allocator.__call__(
             machine_graph, n_keys_map, flexible=False)
 
@@ -458,13 +456,11 @@ def test_pop_based_master_pop_table_standard(
         "ApplicationGraph": app_graph
     }
     with (injection_context(context)):
-        delay_adder = DelaySupportAdder()
-        delay_adder.__call__(app_graph)
-        partitioner = SpynnakerSplitterPartitioner()
-        machine_graph, _ = partitioner.__call__(app_graph, machine, 100)
+        delay_support_adder(app_graph)
+        machine_graph, _ = spynnaker_splitter_partitioner(
+            app_graph, machine, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
+        n_keys_map = edge_to_n_keys_mapper(machine_graph)
         routing_info = allocator.__call__(
             machine_graph, n_keys_map, flexible=False)
 
