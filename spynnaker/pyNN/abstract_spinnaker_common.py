@@ -35,18 +35,18 @@ from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
-    DelaySupportAdder, OnChipBitFieldGenerator,
-    RedundantPacketCountReport,
-    SpynnakerDataSpecificationWriter,
-    SpYNNakerNeuronGraphNetworkSpecificationReport)
+    delay_support_adder, on_chip_bitfield_generator,
+    redundant_packet_count_report,
+    spynnaker_data_specification_writer,
+    spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_machine_bit_field_router_compressor import (
-        SpynnakerMachineBitFieldOrderedCoveringCompressor,
-        SpynnakerMachineBitFieldPairRouterCompressor,)
+        spynnaker_machine_bitfield_ordered_covering_compressor,
+        spynnaker_machine_bitField_pair_router_compressor)
 from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SpynnakerSplitterPartitioner, SpynnakerSplitterSelector)
+    spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -345,16 +345,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
-        """
-        Overridden by spy which adds placement_order
-
-        :return:
-        """
         with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
-            writer = SpynnakerDataSpecificationWriter()
-            self._dsg_targets, self._region_sizes = writer(
-                self._placements, self._ipaddress, self._machine,
-                self._max_run_time_steps)
+            self._dsg_targets, self._region_sizes = \
+                spynnaker_data_specification_writer(
+                    self._placements, self._ipaddress, self._machine,
+                    self._max_run_time_steps)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
@@ -363,8 +358,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 as timer:
             if timer.skip_if_virtual_board():
                 return
-            compressor = SpynnakerMachineBitFieldOrderedCoveringCompressor()
-            self._compressor_provenance = compressor(
+            spynnaker_machine_bitfield_ordered_covering_compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
@@ -378,8 +372,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 as timer:
             if timer.skip_if_virtual_board():
                 return
-            compressor = SpynnakerMachineBitFieldPairRouterCompressor()
-            self._compressor_provenance = compressor(
+            spynnaker_machine_bitField_pair_router_compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
@@ -410,8 +403,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
             if timer.skip_if_virtual_board():
                 return
-            generator = OnChipBitFieldGenerator()
-            generator(
+            on_chip_bitfield_generator(
                 self.placements, self.application_graph,
                 self._executable_finder,  self._txrx, self._machine_graph,
                 self._routing_infos)
@@ -432,8 +424,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 "SpYNNakerNeuronGraphNetworkSpecificationReport") as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
-            report = SpYNNakerNeuronGraphNetworkSpecificationReport()
-            report(self._application_graph)
+            spynnaker_neuron_graph_network_specification_report(
+                self._application_graph)
 
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
                extend_doc=False)
@@ -450,14 +442,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_cfg_false(
                     "Reports", "write_redundant_packet_count_report"):
                 return
-            report = RedundantPacketCountReport()
-            report()
+            redundant_packet_count_report()
 
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
         with FecTimer(MAPPING, "Spynnaker splitter selector"):
-            selector = SpynnakerSplitterSelector()
-            selector(self._application_graph)
+            spynnaker_splitter_selector(self._application_graph)
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
                extend_doc=False)
@@ -470,8 +460,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                adder = DelaySupportAdder()
-                adder(self._application_graph)
+                delay_support_adder(self._application_graph)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
@@ -485,7 +474,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 machine = self._machine
             else:
                 machine = self._max_machine
-            partitioner = SpynnakerSplitterPartitioner()
-            self._machine_graph, self._n_chips_needed = partitioner(
-                self._application_graph, machine, self._plan_n_timesteps,
-                pre_allocated_resources)
+            self._machine_graph, self._n_chips_needed = \
+                spynnaker_splitter_partitioner(
+                    self._application_graph, machine, self._plan_n_timesteps,
+                    pre_allocated_resources)
