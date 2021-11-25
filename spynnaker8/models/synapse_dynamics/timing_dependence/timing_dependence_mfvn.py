@@ -43,4 +43,4 @@ class TimingDependenceMFVN(_BaseClass):
                     "timing_dependence.TimingDependenceMFVN")
         super(TimingDependenceMFVN, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
-            A_minus=A_minus, beta=beta, sigma=sigma, kernel_scaling=alpha)
+            A_minus=A_minus, beta=beta, sigma=sigma, alpha=alpha)

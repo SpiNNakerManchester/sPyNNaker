@@ -40,10 +40,10 @@ class TimingDependencePFPC(AbstractTimingDependence):
         "__a_plus",
         "__a_minus",
         "_t_peak",
-        "_kernel_scaling"]
+        "_alpha"]
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0, A_plus=0.01,
-                 A_minus=0.01, t_peak=100, kernel_scaling=1.0):
+                 A_minus=0.01, t_peak=100, alpha=1.0):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 
@@ -51,7 +51,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
         self.__a_minus = A_minus
 
         self._t_peak = t_peak
-        self._kernel_scaling = kernel_scaling
+        self._alpha = alpha
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -60,7 +60,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
         self._tau_plus_data = write_pfpc_lut(
             dummy_spec, peak_time=self._t_peak,
             time_probe=None, lut_size=LUT_SIZE,
-            shift=0, kernel_scaling=self._kernel_scaling)
+            shift=0, kernel_scaling=self._alpha)
         self._tau_minus_data = None
 
     @property

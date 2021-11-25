@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker8.models.synapse_dynamics.timing_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceRecurrent as RecurrentRule,
     TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
     TimingDependenceVogels2011 as Vogels2011Rule,
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsNeuromodulation as Neuromodulation)
-from spynnaker8.models.synapse_dynamics.weight_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
@@ -37,18 +37,14 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp_cerebellum import \
     IFCondExpCerebellum
 # Cerebellum Plasticity
-from spynnaker8.models.synapse_dynamics.timing_dependence\
-    .timing_dependence_pfpc import TimingDependencePFPC as \
-    TimingDependencePFPC
-from spynnaker8.models.synapse_dynamics.timing_dependence\
-    .timing_dependence_mfvn import TimingDependenceMFVN as \
-    TimingDependenceMFVN
-from spynnaker8.models.synapse_dynamics.weight_dependence\
-    .weight_dependence_mfvn import \
-    WeightDependenceMFVN as WeightDependenceMFVN
-from spynnaker8.models.synapse_dynamics.weight_dependence\
-    .weight_dependence_pfpc import \
-    WeightDependencePFPC as WeightDependencePFPC
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependencePFPC as TimingDependencePFPC)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceMFVN as TimingDependenceMFVN)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceMFVN as WeightDependenceMFVN)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependencePFPC as WeightDependencePFPC)
 
 __all__ = [
     # sPyNNaker 8 models

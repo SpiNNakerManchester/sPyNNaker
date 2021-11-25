@@ -45,4 +45,4 @@ class TimingDependencePFPC(_BaseClass):
                     "timing_dependence.TimingDependencePFPC")
         super(TimingDependencePFPC, self).__init__(
             tau_plus=tau_plus, tau_minus=tau_minus, A_plus=A_plus,
-            A_minus=A_minus, t_peak=t_peak, kernel_scaling=alpha)
+            A_minus=A_minus, t_peak=t_peak, alpha=alpha)
