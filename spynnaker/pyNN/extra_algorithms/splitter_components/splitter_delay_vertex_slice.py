@@ -60,9 +60,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         "DelayExtensionVertex. Please use the correct splitter for "
         "your vertex and try again.")
 
-    DELAY_EXTENSION_SLICE_LABEL = (
-        "DelayExtensionsMachineVertex for {} with slice {}")
-
     NEED_EXACT_ERROR_MESSAGE = (
         "DelayExtensionsSplitters need exact incoming slices. Please fix "
         "and try again")
@@ -83,21 +80,20 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
-        return self._governed_app_vertex.machine_vertices
+    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
+        # Only connect to the source that matches the current slice
+        return [self._machine_vertex_by_slice[pre_m_vertex.vertex_slice]]
 
     def create_machine_vertices(self, chip_counter):
         # pylint: disable=arguments-differ
-        other_splitter = self._governed_app_vertex.source_vertex.splitter
-        pre_slices = other_splitter.get_out_going_slices()
+        source_app_vertex = self._governed_app_vertex.source_vertex
+        slices = source_app_vertex.splitter.get_out_going_slices()
+        constraints = get_remaining_constraints(self._governed_app_vertex)
 
         # create vertices correctly
-        for index, vertex_slice in enumerate(pre_slices):
+        for vertex_slice in slices:
             vertex = self.create_machine_vertex(
-                vertex_slice, index,
-                self.DELAY_EXTENSION_SLICE_LABEL.format(
-                    other_splitter.governed_app_vertex, vertex_slice),
-                get_remaining_constraints(self._governed_app_vertex))
+                source_app_vertex, vertex_slice, constraints)
             self._governed_app_vertex.remember_machine_vertex(vertex)
             chip_counter.add_core(vertex.resources_required)
 
@@ -119,22 +115,22 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
     def create_machine_vertex(
-            self, vertex_slice, index, label, remaining_constraints):
+            self, source_app_vertex, vertex_slice, remaining_constraints):
         """ creates a delay extension machine vertex and adds to the tracker.
 
-        :param Slice vertex_slice: vertex slice
-        :param str label:  human readable label for machine vertex.
+        :param MachineVertex source_vertex: The source of the delay
         :param remaining_constraints: none partitioner constraints.
         :type remaining_constraints:
             iterable(~pacman.model.constraints.AbstractConstraint)
         :return: machine vertex
         :rtype: DelayExtensionMachineVertex
         """
+        label = f"Delay extension for {source_app_vertex}"
         resources = self.get_resources_used_by_atoms(vertex_slice)
 
         machine_vertex = DelayExtensionMachineVertex(
-            resources, label, remaining_constraints,
-            self._governed_app_vertex, vertex_slice, index)
+            resources, label, vertex_slice, remaining_constraints,
+            self._governed_app_vertex)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
@@ -252,3 +248,11 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
         self._machine_vertex_by_slice = dict()
+
+    def get_machine_vertex(self, vertex_slice):
+        """ Get a delay extension machine vertex for a given vertex slice
+
+        :param Slice vertex_slice: The slice to get the data for
+        :rtype: DelayExtensionMachineVertex
+        """
+        return self._machine_vertex_by_slice[vertex_slice]

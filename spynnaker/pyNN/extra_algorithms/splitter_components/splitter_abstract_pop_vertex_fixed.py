@@ -122,7 +122,7 @@ class SplitterAbstractPopulationVertexFixed(
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

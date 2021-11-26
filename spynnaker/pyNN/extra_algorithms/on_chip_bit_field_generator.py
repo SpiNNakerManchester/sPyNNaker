@@ -90,9 +90,7 @@ class OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __call__(
-            self, placements, app_graph, executable_finder,
-            transceiver, machine_graph, routing_infos):
+    def __call__(self, placements, app_graph, executable_finder, transceiver):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -103,10 +101,6 @@ class OnChipBitFieldGenerator(object):
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            the machine graph
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-            the key to edge map
         """
         self.__txrx = transceiver
         self.__placements = placements
@@ -115,7 +109,7 @@ class OnChipBitFieldGenerator(object):
 
         # progress bar
         progress = ProgressBar(
-            app_graph.n_vertices + machine_graph.n_vertices + 1,
+            app_graph.n_vertices + 1,
             "Running bitfield generation on chip")
 
         # get data

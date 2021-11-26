@@ -32,8 +32,12 @@ class SynapticMatrix(object):
         "__poptable",
         # The synapse info used to generate the matrices
         "__synapse_info",
-        # The machine edge these matrices are for
-        "__machine_edge",
+        # The index of the source machine vertex
+        "__pre_index",
+        # The source machine vertex slice these matrices are for
+        "__pre_slice",
+        # The target machine vertex slice these matrices are for
+        "__post_slice",
         # The app edge of the machine edge
         "__app_edge",
         # The number of synapse types
@@ -74,17 +78,18 @@ class SynapticMatrix(object):
         "__delay_received_block"
     ]
 
-    def __init__(self, poptable, synapse_info, machine_edge,
-                 app_edge, n_synapse_types, max_row_info, routing_info,
-                 delay_routing_info, weight_scales, all_syn_block_sz,
-                 all_single_syn_sz, is_direct_capable):
+    def __init__(self, poptable, synapse_info, pre_index, pre_slice,
+                 post_slice, app_edge, n_synapse_types, max_row_info,
+                 routing_info, delay_routing_info, weight_scales,
+                 all_syn_block_sz, all_single_syn_sz, is_direct_capable):
         """
         :param MasterPopTableAsBinarySearch poptable:
             The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
-        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
-            The projection machine edge
+        :param int pre_index: The index of the pre vertex
+        :param Slice pre_slice: The slice of the pre vertex
+        :param Slice post_slice: The slice of the post vertex
         :param ProjectionApplicationEdge app_edge:
             The projection application edge
         :param int n_synapse_types: The number of synapse types accepted
@@ -104,7 +109,9 @@ class SynapticMatrix(object):
         """
         self.__poptable = poptable
         self.__synapse_info = synapse_info
-        self.__machine_edge = machine_edge
+        self.__pre_index = pre_index
+        self.__pre_slice = pre_slice
+        self.__post_slice = post_slice
         self.__app_edge = app_edge
         self.__n_synapse_types = n_synapse_types
         self.__max_row_info = max_row_info
@@ -117,14 +124,12 @@ class SynapticMatrix(object):
 
         # The matrix size can be calculated up-front; use for checking later
         self.__matrix_size = (
-            self.__max_row_info.undelayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms)
+            self.__max_row_info.undelayed_max_bytes * self.__pre_slice.n_atoms)
         self.__delay_matrix_size = (
-            self.__max_row_info.delayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
+            self.__max_row_info.delayed_max_bytes * self.__pre_slice.n_atoms *
             self.__app_edge.n_delay_stages)
         self.__single_matrix_size = (
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
+            self.__pre_slice.n_atoms *
             BYTES_PER_WORD)
 
         self.__index = None
@@ -159,10 +164,8 @@ class SynapticMatrix(object):
             self.__app_edge.pre_vertex.splitter.get_out_going_slices()
         post_slices =\
             self.__app_edge.post_vertex.splitter.get_in_coming_slices()
-        pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
-        post_vertex_slice = self.__machine_edge.post_vertex.vertex_slice
         connections = self.__synapse_info.connector.create_synaptic_block(
-            pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
+            pre_slices, post_slices, self.__pre_slice, self.__post_slice,
             self.__synapse_info.synapse_type, self.__synapse_info)
 
         # Get the row data; note that we use the availability of the routing
@@ -172,7 +175,7 @@ class SynapticMatrix(object):
          delay_stages) = get_synapses(
             connections, self.__synapse_info, self.__app_edge.n_delay_stages,
             self.__n_synapse_types, self.__weight_scales, self.__app_edge,
-            pre_vertex_slice, post_vertex_slice, self.__max_row_info,
+            self.__pre_slice, self.__post_slice, self.__max_row_info,
             self.__routing_info is not None,
             self.__delay_routing_info is not None)
 
@@ -180,13 +183,12 @@ class SynapticMatrix(object):
         if isinstance(self.__synapse_info.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             self.__synapse_info.synapse_dynamics.set_connections(
-                connections, post_vertex_slice, self.__app_edge,
-                self.__synapse_info, self.__machine_edge)
+                connections, self.__post_slice, self.__app_edge,
+                self.__synapse_info, self.__pre_index, self.__pre_slice)
 
         if self.__app_edge.delay_edge is not None:
-            pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
             self.__app_edge.delay_edge.pre_vertex.add_delays(
-                pre_vertex_slice, delayed_source_ids, delay_stages)
+                self.__pre_slice, delayed_source_ids, delay_stages)
         elif delayed_source_ids.size != 0:
             raise Exception(
                 "Found delayed source IDs but no delay "
@@ -375,8 +377,7 @@ class SynapticMatrix(object):
             self.__max_row_info.delayed_max_n_synapses,
             self.__app_edge.pre_vertex.splitter.get_out_going_slices(),
             self.__app_edge.post_vertex.splitter.get_in_coming_slices(),
-            self.__machine_edge.pre_vertex.vertex_slice,
-            self.__machine_edge.post_vertex.vertex_slice,
+            self.__pre_slice, self.__post_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
             self.__app_edge.post_vertex.splitter.max_support_delay())
 
@@ -392,8 +393,7 @@ class SynapticMatrix(object):
                 self.__max_row_info.delayed_max_n_synapses,
                 self.__app_edge.pre_vertex.splitter.get_out_going_slices(),
                 self.__app_edge.post_vertex.splitter.get_in_coming_slices(),
-                self.__machine_edge.pre_vertex.vertex_slice,
-                self.__machine_edge.post_vertex.vertex_slice,
+                self.__pre_slice, self.__post_slice,
                 self.__synapse_info, self.__app_edge.n_delay_stages + 1,
                 self.__app_edge.post_vertex.splitter.max_support_delay())
         elif self.__max_row_info.delayed_max_n_synapses != 0:
@@ -452,8 +452,6 @@ class SynapticMatrix(object):
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
-        pre_slice = self.__machine_edge.pre_vertex.vertex_slice
-        post_slice = self.__machine_edge.post_vertex.vertex_slice
         connections = list()
 
         if self.__syn_mat_offset is not None:
@@ -465,7 +463,7 @@ class SynapticMatrix(object):
                     transceiver, placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, pre_slice, post_slice,
+                self.__synapse_info, self.__pre_slice, self.__post_slice,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
                 False, splitter.max_support_delay()))
@@ -475,7 +473,7 @@ class SynapticMatrix(object):
                 transceiver, placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, pre_slice, post_slice,
+                self.__synapse_info, self.__pre_slice, self.__post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block,
                 True, splitter.max_support_delay()))

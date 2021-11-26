@@ -26,7 +26,7 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
         """
         :param ApplicationGraph app_graph: app graph
         :param int plan_n_time_steps: the number of time steps to run for
-        :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
+        :rtype: int
         :raise PacmanPartitionException: when it cant partition
         """
 

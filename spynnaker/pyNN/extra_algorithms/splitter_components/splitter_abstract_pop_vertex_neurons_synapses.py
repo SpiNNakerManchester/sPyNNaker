@@ -289,25 +289,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 for neuron in self.__neuron_vertices]
             for index in range(self.__n_synapse_vertices)]
 
-    def __add_poisson_multicast(
-            self, poisson_vertex, synapse_vertices, machine_graph, app_edge):
-        """ Add an edge from a one-to-one Poisson source to one of the
-            synapse vertices using multicast
-
-        :param MachineVertex poisson_vertex:
-            The Poisson machine vertex to use as a source
-        :param list(MachineVertex) synapse_vertices:
-            The list of synapse vertices that can be used as targets
-        :param MachineGraph machine_graph: The machine graph to add the edge to
-        :param ProjectionEdge app_edge: The application edge of the connection
-        """
-        post_vertex = synapse_vertices[self.__next_synapse_index]
-        self.__next_synapse_index = (
-            (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
-        edge = MachineEdge(poisson_vertex, post_vertex, app_edge=app_edge,
-                           label=f"Machine edge for {app_edge.label}")
-        machine_graph.add_edge(edge, SPIKE_PARTITION_ID)
-
     def __add_neuron_core(
             self, vertex_slice, neuron_resources, label, index, rb_shifts,
             weight_scales, constraints):
@@ -404,8 +385,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             References to the synapse regions
         :param list(~pacman.model.resources.ResourceContainer) all_resources:
             A list to add the resources of the vertex to
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The graph to add the core to
         :param list(~pacman.model.graphs.machine.MachineVertex) \
                 synapse_vertices:
             A list to add the core to
@@ -531,7 +510,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
         # If the edge is delayed, get the real edge
         pre_vertex = outgoing_edge_partition.pre_vertex
         if isinstance(pre_vertex, DelayExtensionVertex):

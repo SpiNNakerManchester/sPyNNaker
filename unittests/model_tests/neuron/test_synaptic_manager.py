@@ -21,7 +21,6 @@ import numpy
 import pytest
 
 from spinn_machine import SDRAM
-from spinn_machine.virtual_machine import virtual_machine
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
@@ -34,8 +33,6 @@ from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.interface.interface_functions import (
-    EdgeToNKeysMapper)
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -87,6 +84,7 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    SDRAM()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
@@ -126,10 +124,7 @@ def test_write_data_spec():
         partitioner = SpynnakerSplitterPartitioner()
         partitioner.__call__(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
-        routing_info = allocator.__call__(
-            machine_graph, n_keys_map, flexible=False)
+        routing_info = allocator.__call__(app_graph, flexible=False)
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -400,10 +395,10 @@ def test_set_synapse_dynamics():
         ([], range(10), 1000, 100, True, 20),
         # All undelayed and delayed edges exist
         (range(10), range(10), 1000, 100, True, 20),
-        # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ([0, 1, 2, 3, 4], [], 1000, 100, False, None),
-        # Only delayed, some edges are filtered (app keys shouldn't work)
-        ([], [5, 6, 7, 8, 9], 1000, 100, False, 20),
+        # Only undelayed, some connections missing but app keys can still work
+        ([0, 1, 2, 3, 4], [], 1000, 100, True, None),
+        # Only delayed, some connections missing but app keys can still work
+        ([], [5, 6, 7, 8, 9], 1000, 100, True, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
         ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 20),
@@ -421,7 +416,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
-    machine = virtual_machine(12, 12)
+    SDRAM()
 
     # Build a from list connector with the delays we want
     connections = []
@@ -458,10 +453,7 @@ def test_pop_based_master_pop_table_standard(
         partitioner = SpynnakerSplitterPartitioner()
         partitioner.__call__(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
-        n_keys_mapper = EdgeToNKeysMapper()
-        n_keys_map = n_keys_mapper.__call__(machine_graph)
-        routing_info = allocator.__call__(
-            machine_graph, n_keys_map, flexible=False)
+        routing_info = allocator.__call__(app_graph, flexible=False)
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice

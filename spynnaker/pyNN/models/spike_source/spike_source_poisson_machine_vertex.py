@@ -264,18 +264,15 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "routing_info", "graph", "first_machine_time_step"})
+            "routing_info", "first_machine_time_step"})
     def regenerate_data_specification(
-            self, spec, placement, routing_info, graph,
-            first_machine_time_step):
+            self, spec, placement, routing_info, first_machine_time_step):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
@@ -285,8 +282,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # write parameters
         self._write_poisson_parameters(
-            spec=spec, graph=graph, placement=placement,
-            routing_info=routing_info)
+            spec=spec, placement=placement, routing_info=routing_info)
 
         # write rates
         self._write_poisson_rates(spec, first_machine_time_step)
@@ -297,23 +293,20 @@ class SpikeSourcePoissonMachineVertex(
     @inject_items({
         "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "routing_info", "data_n_time_steps", "graph",
-            "first_machine_time_step"
+            "routing_info", "data_n_time_steps", "first_machine_time_step"
         }
     )
     def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps, graph,
+            self, spec, placement, routing_info, data_n_time_steps,
             first_machine_time_step):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param int data_n_time_steps:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
@@ -338,8 +331,7 @@ class SpikeSourcePoissonMachineVertex(
             recorded_region_sizes))
 
         # write parameters
-        self._write_poisson_parameters(
-            spec, graph, placement, routing_info)
+        self._write_poisson_parameters(spec, placement, routing_info)
 
         # write rates
         self._write_poisson_rates(spec, first_machine_time_step)
@@ -502,12 +494,11 @@ class SpikeSourcePoissonMachineVertex(
             for i, d in enumerate(core_data_split[:-1])])
         spec.write_array(final_data)
 
-    def _write_poisson_parameters(self, spec, graph, placement, routing_info):
+    def _write_poisson_parameters(self, spec, placement, routing_info):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param ~pacman.model.placements.Placement placement:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
