@@ -32,7 +32,8 @@ class AbstractPyNNMeanfieldModelStandard(AbstractPyNNNeuronModel):
     default_population_parameters = _population_parameters
 
     def __init__(
-            self, model_name, binary, neuron_model, config,
+        self, model_name, binary, neuron_model,
+        params_from_network, p_fit_polynomial_exc, p_fit_polynomial_inh,
         mathsbox, input_type, synapse_type, threshold_type,
         additional_input_type=None):
         """
@@ -49,7 +50,9 @@ class AbstractPyNNMeanfieldModelStandard(AbstractPyNNNeuronModel):
         :type additional_input_type: AbstractAdditionalInput or None
         """
         super().__init__(MeanfieldImplStandard(
-            model_name, binary, neuron_model, config, mathsbox, input_type,
+            model_name, binary, neuron_model,
+            params_from_network, p_fit_polynomial_exc, p_fit_polynomial_inh,
+            mathsbox, input_type,
             synapse_type, threshold_type, additional_input_type))
 
     @overrides(AbstractPyNNNeuronModel.create_vertex,

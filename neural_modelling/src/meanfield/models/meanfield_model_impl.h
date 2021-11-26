@@ -21,6 +21,7 @@
 #define _MEANFIELD_MODEL_IMPL_H_
 
 #include "../../meanfield/models/meanfield_model.h"
+//#include <sqrt.h>
 
 typedef struct meanfield_t {
     // TODO: Parameters - make sure these match with the Python code,
@@ -32,17 +33,15 @@ typedef struct meanfield_t {
     REAL b;
     REAL tauw;
     REAL Trefrac;
-    REAL Vthre;
     REAL Vreset;
     REAL delta_v;
     REAL ampnoise;
     REAL Timescale_inv;
     
-    REAL Ve; // will be used as a vector !!! OR Ve and Vi
-    //REAL Vi;
-    
-    //vector V = {Ve, Vi};
-    
+    REAL Ve; 
+    REAL Vi;
+    REAL w;
+        
     REAL this_h;
         
     

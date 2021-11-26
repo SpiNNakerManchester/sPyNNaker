@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 
 ###--Meanfield Params--###
-NBR = "nbr"
+#NBR = "nbr"
 A = "a"
 B = "b"
 TAUW = "tauw"
@@ -31,10 +31,12 @@ DELTA_V = "delta_v"
 AMPNOISE = "ampnoise"
 TIMESCALE_INV = "Timescale_inv"
 VE = "Ve"
+VI = "Vi"
+W = "w"
 
 UNITS = {
     ###--Meanfield--###
-    NBR: "",
+    #NBR: "",
     A: "nS",
     B: "nS",
     TAUW: "ms",
@@ -44,49 +46,31 @@ UNITS = {
     AMPNOISE: "Hz",
     TIMESCALE_INV: "Hz",
     VE: "Hz",
+    VI: "Hz",
+    W: "pA",
 }
 
 
-class MeanfieldModelEitn(AbstractNeuronModel):
-    """ Model of meanfield due to Destehexe et al
+class MeanfieldOfAdexNetwork(AbstractNeuronModel):
+    """ Model of meanfield due to A.Destehexe et al
     """
     __slots__ = [
-        "_nbr", "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
-        "_ampnoise", "_Timescale_inv", "_Ve_init"
+        "_a", "_b", "_tauw", "_Trefrac", "_Vreset", "_delta_v",
+        "_ampnoise", "_Timescale_inv", "_Ve_init", "_Vi_init", "_w_init"
     ]
 
-    def __init__(self, nbr, a, b, tauw,
+    def __init__(self, a, b, tauw,
                  Trefrac, Vreset, delta_v,
-                 ampnoise, Timescale_inv, Ve_init):
+                 ampnoise, Timescale_inv,
+                 Ve_init, Vi_init, w_init):
         """
         :param a: :math:`a`
         :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
-        :param b: :math:`b`
-        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param c: :math:`c`
-        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param d: :math:`d`
-        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param v_init: :math:`v_{init}`
-        :type v_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param u_init: :math:`u_{init}`
-        :type u_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param i_offset: :math:`I_{offset}`
-        :type i_offset:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        
         """
         super().__init__(
-            [DataType.UINT32, #nbr
-            DataType.S1615, #a
+            [DataType.S1615, #a DataType.UINT32, #nbr
             DataType.S1615, #b
             DataType.S1615, #tauw
             DataType.S1615, #Trefrac
@@ -95,9 +79,10 @@ class MeanfieldModelEitn(AbstractNeuronModel):
             DataType.S1615, #ampnoise
             DataType.S1615, #Timescale_inv
             DataType.S1615, #Ve
+            DataType.S1615, #Vi
+            DataType.S1615, #W
             DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
-        self._nbr = nbr
         self._a = a
         self._b = b
         self._tauw = tauw
@@ -107,6 +92,8 @@ class MeanfieldModelEitn(AbstractNeuronModel):
         self._ampnoise = ampnoise
         self._Timescale_inv = Timescale_inv
         self._Ve_init = Ve_init
+        self._Vi_init = Vi_init
+        self._w_init = w_init
 
     @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -116,7 +103,7 @@ class MeanfieldModelEitn(AbstractNeuronModel):
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         ###--neuron--###
-        parameters[NBR] = self._nbr
+        #parameters[NBR] = self._nbr
         parameters[A] = self._a
         parameters[B] = self._b
         parameters[TAUW] = self._tauw
@@ -129,8 +116,9 @@ class MeanfieldModelEitn(AbstractNeuronModel):
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[VE] = self._Ve_init
-        #state_variables[U] = self.__u_init
-
+        state_variables[VI] = self._Vi_init
+        state_variables[W] = self._w_init
+        
     @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
@@ -153,11 +141,13 @@ class MeanfieldModelEitn(AbstractNeuronModel):
 
         # Add the rest of the data
         return [
-            parameters[NBR],parameters[A],parameters[B],parameters[TAUW],
+            parameters[A],parameters[B],parameters[TAUW],
             parameters[TREFRAC],
             parameters[VRESET],parameters[DELTA_V],parameters[AMPNOISE],
             parameters[TIMESCALE_INV],
             state_variables[VE],
+            state_variables[VI],
+            state_variables[W],            
             float(ts) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
@@ -165,21 +155,24 @@ class MeanfieldModelEitn(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        (_nbr, _a, _b, _tauw,
+        #(#_nbr,
+        (_a, _b, _tauw,
         _Trefrac, _Vreset, _delta_v,
-        _ampnoise, _Timescale_inv, Ve, _this_h) = values
+        _ampnoise, _Timescale_inv, Ve, Vi, w, _this_h) = values
 
         # Copy the changed data only
         state_variables[VE] = Ve
+        state_variables[VI] = Vi
+        state_variables[W] = w
         #state_variables[U] = u
 
 ################
 ###--Meanfield--###
 ################
 
-    @property
-    def nbr(self):
-        return self._nbr
+   # @property
+   # def nbr(self):
+    #    return self._nbr
 
 
     @property
@@ -222,3 +215,18 @@ class MeanfieldModelEitn(AbstractNeuronModel):
         """
         return self._Ve_init
 
+    @property
+    def Vi_init(self):
+        """ Settable model parameter: :math:`V_{i}`
+
+        :rtype: float
+        """
+        return self._Vi_init    
+
+    @property
+    def w_init(self):
+        """ Settable model parameter: :math:`w`
+
+        :rtype: float
+        """
+        return self._w_init    

@@ -38,19 +38,6 @@ GL = "Gl"
 CM = "Cm"
 EL = "El"
 
-###--transfert function inputs from 'data_test/'+NRN1+'_'+NTWK+'_fit.npy' --###
-P0 = "p0"
-P1 = "p1"
-P2 = "p2"
-P3 = "p3"
-P4 = "p4"
-P5 = "p5"
-P6 = "p6"
-P7 = "p7"
-P8 = "p8"
-P9 = "p9"
-P10 = "p10"
-
 MUV = "muV"
 MUV0 = "muV0"
 DMUV0 = "DmuV0"
@@ -85,18 +72,6 @@ UNITS = {
     GL: "Gl",
     CM: "pF",
     EL: "mV",    
-    #TF inputs
-    P0 : "",
-    P1 : "",
-    P2 : "",
-    P3 : "",
-    P4 : "",
-    P5 : "",
-    P6 : "",
-    P7 : "",
-    P8 : "",
-    P9 : "",
-    P10 : "",
     VTHRE: "mV",
     MUV : "",
     MUV0 : "",
@@ -113,7 +88,7 @@ UNITS = {
 }
 
 
-class Config(AbstractInputType):
+class ParamsFromNetwork(AbstractInputType):
     """ Model of neuron due to Eugene M. Izhikevich et al
     """
     __slots__ = [
@@ -121,8 +96,6 @@ class Config(AbstractInputType):
         "_Erev_exc", "_Erev_inh", "_Ntot",
         "_gei", "_ext_drive", "_afferent_exc_fraction",
         "_Gl", "_Cm", "_El",
-        "_p0", "_p1", "_p2", "_p3", "_p4", "_p5",
-        "_p6", "_p7", "_p8", "_p9", "_p10",
         "_Vthre", "_muV", "_muV0", "_DmuV0", "_sV", "_sV0", "_DsV0",
         "_muGn", "_TvN", "_TvN0", "_DTvN0", "_Vthre", "_Fout_th",
     ]
@@ -134,8 +107,6 @@ class Config(AbstractInputType):
                  Ntot, gei, ext_drive,
                  afferent_exc_fraction,
                  Gl, Cm, El,
-                 p0, p1, p2, p3, p4, p5,
-                 p6, p7, p8, p9, p10,
                  muV, muV0,DmuV0,
                  sV, sV0, DsV0,
                  muGn,
@@ -145,27 +116,7 @@ class Config(AbstractInputType):
         :param a: :math:`a`
         :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
             (mapping) function
-        :param b: :math:`b`
-        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param c: :math:`c`
-        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param d: :math:`d`
-        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param v_init: :math:`v_{init}`
-        :type v_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param u_init: :math:`u_{init}`
-        :type u_init:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
-        :param i_offset: :math:`I_{offset}`
-        :type i_offset:
-            float, iterable(float), ~pyNN.random.RandomDistribution or
-            (mapping) function
+        
         """
         super().__init__(
             
@@ -184,18 +135,6 @@ class Config(AbstractInputType):
              DataType.S1615, #Gm
              DataType.S1615, #Cl
              DataType.S1615, #El
-             ###--TF inputs--###
-             DataType.S031, #p0
-             DataType.S031, #p1
-             DataType.S031, #p2
-             DataType.S031, #p3
-             DataType.S031, #p4
-             DataType.S031, #p5
-             DataType.S031, #p6
-             DataType.S031, #p7
-             DataType.S031, #p8
-             DataType.S031, #p9
-             DataType.S031, #p10
              DataType.S1615,   # muV
              DataType.S1615,   # muV0
              DataType.S1615,   # DmuV0
@@ -223,17 +162,6 @@ class Config(AbstractInputType):
         self._Gl = Gl
         self._Cm = Cm
         self._El = El        
-        self._p0 = p0
-        self._p1 = p1
-        self._p2 = p2
-        self._p3 = p3
-        self._p4 = p4
-        self._p5 = p5
-        self._p6 = p6
-        self._p7 = p7
-        self._p8 = p8
-        self._p9 = p9
-        self._p10 = p10        
         self._muV = muV
         self._muV0 = muV0
         self._DmuV0 = DmuV0
@@ -269,18 +197,7 @@ class Config(AbstractInputType):
         parameters[GL] = self._Gl
         parameters[CM] = self._Cm
         parameters[EL] = self._El
-        ###--TF inputs--###
-        parameters[P0] = self._p0
-        parameters[P1] = self._p1
-        parameters[P2] = self._p2
-        parameters[P3] = self._p3
-        parameters[P4] = self._p4
-        parameters[P5] = self._p5
-        parameters[P6] = self._p6
-        parameters[P7] = self._p7
-        parameters[P8] = self._p8
-        parameters[P9] = self._p9
-        parameters[P10] = self._p10
+        #parameters[MUV] = self._muV
         parameters[MUV0] = self._muV0
         parameters[DMUV0] = self._DmuV0
         parameters[SV0] = self._sV0
@@ -332,17 +249,6 @@ class Config(AbstractInputType):
                 parameters[GL],
                 parameters[CM],
                 parameters[EL],
-                parameters[P0],#TF input
-                parameters[P1],
-                parameters[P2],
-                parameters[P3],
-                parameters[P4],
-                parameters[P5],
-                parameters[P6],
-                parameters[P7],
-                parameters[P8],
-                parameters[P9],
-                parameters[P10],
                 state_variables[MUV],
                 parameters[MUV0],
                 parameters[DMUV0],
@@ -365,8 +271,6 @@ class Config(AbstractInputType):
         _Erev_exc, _Erev_inh, _Ntot, _gei, _ext_drive,
         _afferent_exc_fraction,
         _Gl, _Cm, _El,
-        _p0, _p1, _p2, _p3, _p4,
-        _p5, _p6, _p7, _p8, _p9, _p10,
         muV, _muV0, _DmuV0,
         sV, _sV0, _DsV0,
         muGn,
@@ -447,59 +351,6 @@ class Config(AbstractInputType):
     @property
     def El(self):
         return self._El
-
-###################
-###--TF inputs--###
-###################
-
-    @property
-    def p0(self):
-        return self._p0
-        
-    @property
-    def p1(self):
-        return self._p1
-
-    @property
-    def p2(self):
-        return self._p2
-
-    @property
-    def p3(self):
-        return self._p3
-
-    @property
-    def p4(self):
-        return self._p4
-
-    @property
-    def p5(self):
-        return self._p5
-        
-    @property
-    def p6(self):
-        return self._p6
-
-    @property
-    def p6(self):
-        return self._p6
-
-    @property
-    def p7(self):
-        return self._p7
-
-    @property
-    def p8(self):
-        return self._p8
-
-    @property
-    def p9(self):
-        return self._p9
-
-    @property
-    def p10(self):
-        return self._p10
-        
         
     @property
     def muV(self):

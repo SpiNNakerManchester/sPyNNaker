@@ -37,7 +37,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         "__model_name",
         "__binary",
         "__neuron_model",
-        "__config",
+        "__params_from_network",
+        "__p_fit_polynomial_exc",
+        "__p_fit_polynomial_inh",
         "__mathsbox",
         "__input_type",
         "__synapse_type",
@@ -47,47 +49,30 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         "__n_steps_per_timestep"
     ]
 
-    # _RECORDABLES = ["Ve", "gsyn_exc", "gsyn_inh"]
-    _RECORDABLES = ["Ve", "muV", "sV", "muGn", "TvN", "Vthre",
-                    "Fout_th", "err_func",  "gsyn_exc", "gsyn_inh"]
+    _RECORDABLES = ["Ve", "Vi", "w", "gsyn_exc", "gsyn_inh"]
 
-    # _RECORDABLE_DATA_TYPES = {
-    #     "Ve": DataType.S1615,
-    #     "gsyn_exc": DataType.S1615,
-    #     "gsyn_inh": DataType.S1615
-    # }
     _RECORDABLE_DATA_TYPES = {
         "Ve": DataType.S1615,
-        "muV": DataType.S1615,
-        "sV": DataType.S1615,
-        "muGn": DataType.S1615,
-        "TvN": DataType.S1615,
-        "Vthre": DataType.S1615,
-        "Fout_th": DataType.S1615,
-        "err_func": DataType.S1615,
+        "Vi": DataType.S1615,
+        "w": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    # _RECORDABLE_UNITS = {
-    #     'Ve': 'mV',
-    #     'gsyn_exc': "uS",
-    #     'gsyn_inh': "uS"
-    # }
     _RECORDABLE_UNITS = {
-        'Ve': 'mV',
-        'muV': "uS",
-        'sV': "uS",
-        'TvN': 'mV',
-        'Vthre': "uS",
-        'Fout_th': "uS",
-        'err_func': 'mV',
+        'Ve': 'Hz',
+        'Vi': 'Hz',
+        'w': "pA",
         'gsyn_exc': "uS",
         'gsyn_inh': "uS"
     }
 
     def __init__(
-            self, model_name, binary, neuron_model, config, mathsbox,
+            self, model_name, binary, neuron_model,
+            params_from_network,
+            p_fit_polynomial_exc,
+            p_fit_polynomial_inh,
+            mathsbox,
             input_type, synapse_type, threshold_type,
             additional_input_type=None):
         """
@@ -103,7 +88,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         self.__model_name = model_name
         self.__binary = binary
         self.__neuron_model = neuron_model
-        self.__config = config
+        self.__params_from_network = params_from_network
+        self.__p_fit_polynomial_exc = p_fit_polynomial_exc
+        self.__p_fit_polynomial_inh = p_fit_polynomial_inh
         self.__mathsbox = mathsbox
         self.__input_type = input_type
         self.__synapse_type = synapse_type
@@ -112,8 +99,14 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         self.__n_steps_per_timestep = _DEFAULT_N_STEPS_PER_TIMESTEP
 
         self.__components = [
-            self.__neuron_model, self.__config, self.__mathsbox,
-            self.__input_type, self.__threshold_type, self.__synapse_type]
+            self.__neuron_model,
+            self.__params_from_network,
+            self.__p_fit_polynomial_exc,
+            self.__p_fit_polynomial_inh,
+            self.__mathsbox,
+            self.__input_type,
+            self.__threshold_type,
+            self.__synapse_type]
         if self.__additional_input_type is not None:
             self.__components.append(self.__additional_input_type)
 
@@ -139,7 +132,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
     def get_n_cpu_cycles(self, n_neurons):
         total = self.__neuron_model.get_n_cpu_cycles(n_neurons)
         total += self.__synapse_type.get_n_cpu_cycles(n_neurons)
-        total += self.__config.get_n_cpu_cycles(n_neurons)
+        total += self.__params_from_network.get_n_cpu_cycles(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_n_cpu_cycles(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_n_cpu_cycles(n_neurons)
         total += self.__input_type.get_n_cpu_cycles(n_neurons)
         total += self.__mathsbox.get_n_cpu_cycles(n_neurons)
         total += self.__threshold_type.get_n_cpu_cycles(n_neurons)
@@ -152,7 +147,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         total = _N_STEPS_PER_TIMESTEP_SIZE
         total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__config.get_dtcm_usage_in_bytes(n_neurons)
+        total += self.__params_from_network.get_dtcm_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_dtcm_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__mathsbox.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_dtcm_usage_in_bytes(n_neurons)
@@ -166,7 +163,9 @@ class MeanfieldImplStandard(AbstractNeuronImpl):
         total = _N_STEPS_PER_TIMESTEP_SIZE
         total += self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_sdram_usage_in_bytes(n_neurons)
-        total += self.__config.get_sdram_usage_in_bytes(n_neurons)
+        total += self.__params_from_network.get_sdram_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_exc.get_sdram_usage_in_bytes(n_neurons)
+        total += self.__p_fit_polynomial_inh.get_sdram_usage_in_bytes(n_neurons)
         total += self.__input_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__mathsbox.get_sdram_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_sdram_usage_in_bytes(n_neurons)

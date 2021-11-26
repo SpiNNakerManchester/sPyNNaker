@@ -20,8 +20,10 @@
 #include "../../meanfield/models/meanfield_model_impl.h"
 
 #include <debug.h>
-#include "../../meanfield/models/config.h"
+#include "../../meanfield/models/params_from_network.h"
 #include "../../meanfield/models/mathsbox.h"
+#include "../../meanfield/models/P_fit_polynomial.h"
+//#include "../../common/maths-util.h" // i.o to use SQRT(x) and SQR(a)
 
 //! The global parameters of the Izhekevich neuron model
 static const global_neuron_params_t *global_params;
@@ -31,29 +33,7 @@ static const global_neuron_params_t *global_params;
  * use cases 1.85 gives slightly better spike timings.
  */
 //static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
-/*
-/////////////////////////////////////////////////////////////
-#if 0
-// definition for Izhikevich neuron
-static inline void neuron_ode(
-        REAL t, REAL stateVar[], REAL dstateVar_dt[],
-        neuron_t *neuron, REAL input_this_timestep) {
-    REAL V_now = stateVar[1];
-    REAL U_now = stateVar[2];
-    log_debug(" sv1 %9.4k  V %9.4k --- sv2 %9.4k  U %9.4k\n", stateVar[1],
-            neuron->V, stateVar[2], neuron->U);
 
-    // Update V
-    dstateVar_dt[1] =
-            REAL_CONST(140.0)
-            + (REAL_CONST(5.0) + REAL_CONST(0.0400) * V_now) * V_now - U_now
-            + input_this_timestep;
-
-    // Update U
-    dstateVar_dt[2] = neuron->A * (neuron->B * V_now - U_now);
-}
-#endif
-*/
 
 //! \brief The original model uses 0.04, but this (1 ULP larger?) gives better
 //! numeric stability.
@@ -61,34 +41,80 @@ static inline void neuron_ode(
 //! Thanks to Mantas Mikaitis for this!
 //static const REAL MAGIC_MULTIPLIER = REAL_CONST(0.040008544921875);
 
-
-/* ####################################################################
-    reuse of izk for meanfields
-    ###################################################################
-    */
-
-void error_function( REAL x, REAL factor, mathsbox_t *restrict mathsbox){
-//devra coder fonction powerof
-
-    REAL dt = x/mathsbox->error_func_sample;
+void error_function(REAL argument, mathsbox_t *restrict mathsbox){
+/****************************************************************************
+ *   Error function with integral computing by midpoint method OK
+ *   Will do the Simpson if ITCM is ok
+ *   
+ *   Sampling of error function is maybe connected to the time_step need to
+ *   investigate.
+ *  
+ *    expk take  : ~ 570 bytes
+      sqrtk take : ~1250 bytes
+ *****************************************************************************/
+    mathsbox->err_func = 0.;
+    REAL step = argument/mathsbox->error_func_sample;
+    REAL x;
     REAL t;
-    REAL Pi = 3.1415927k;
-    REAL Erfc = mathsbox->err_func;
-    for(t=0; t==x; t+=dt){
-        //Erfc += dt; //test otherwise IDTM overload
-        //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one
-        Erfc += factor+t*t;//fake one
+    REAL Pi = REAL_CONST(3.1415927);// here was a k
+    REAL two_over_sqrt_Pi = REAL_CONST(1.128379167); //APPROXIMATION
+    REAL Erf = ZERO;
+    REAL Erfc = ZERO;
+    
+    for(x=0; x<=argument; x+=step){
+        
+        //Erfc +=  factor*(2/sqrtk(Pi))*expk(-(t*t)); // the real one overflowed ITCM because of expk and sqrtk
+        t = x + REAL_HALF(step);
+        Erf +=  step*two_over_sqrt_Pi*expk(-(t*t)); //working like this one
+        //Erf +=  step*two_over_sqrt_Pi*(-(t*t));//TEST
+        //Erf +=  step*(REAL_CONST(2.)/sqrtk(Pi))*expk(-(t*t)); // TEST sqrtk ONE
     }
+    Erfc = ONE-Erf;
 
     mathsbox->err_func = Erfc;
 
-    //return Erfc;
-
 }
 
-
-void threshold_func(config_t *restrict config)
+/*
+double square_root_of(REAL number)
 {
+     /*! square root method take from Quake III Arena 
+     * source code, attribute to John Carmack.
+     * Under GNU GPL licence.
+     *
+     * Implement here just to see if something was lighter than sqrt.c
+     *
+     */
+/*    
+    REAL x, y, f;
+    REAL i;
+    f = REAL_CONST(1.5);
+    
+    x = REAL_HALF(number);
+    y = number;
+    
+    i = *(REAL *) &y;
+    i = 0x5f3759df - (i >> 1);
+    y = *(REAL *) &i;
+    y = y * (f - (x * y * y));
+    y = y * (f - (x * y * y));
+    
+    return number*y;
+    
+}
+*/
+
+
+
+
+void threshold_func(ParamsFromNetwork_t *restrict pNetwork, pFitPolynomial_t *restrict Pfit)
+{
+    /*
+        threshold function coming from :
+        Neural Computation 31, 653–680 (2019) doi:10.1162/neco_a_01173
+        where P's are polynomials parameters involve in a 
+        voltage-effective threshold.
+    */
     /*
     setting by default to True the square
     because when use by external modules, coeff[5:]=np.zeros(3)
@@ -97,152 +123,111 @@ void threshold_func(config_t *restrict config)
     /*NEED TO AVOID DIVISION AS POSSIBLE
         but not for now
     */
-    /*
-    config->muV0=-0.06;
-    config->DmuV0=0.01;
+   
+    REAL muV0 = pNetwork->muV0;
+    REAL DmuV0 = pNetwork->DmuV0;
 
-    config->sV0=0.004;
-    config->DsV0=0.006;
+    REAL sV0 = pNetwork->sV0;
+    REAL DsV0 = pNetwork->DsV0;
 
-    config->TvN0=0.5;
-    config->DTvN0=1.;
+    REAL TvN0 = pNetwork->TvN0;
+    REAL DTvN0 = pNetwork->DTvN0;
 
-    config->muV=0.;
-    config->sV=0.;
-    config->muGn=0.;
-    config->TvN=0.;
-    config->Vthre=0.;
-    config->Fout_th=0.;
-    */
+    REAL muV = pNetwork->muV;
+    REAL sV = pNetwork->sV;
+    //REAL muGn = pNetwork->muGn;
+    REAL TvN = pNetwork->TvN;
+    REAL Vthre = pNetwork->Vthre;
+    //REAL Fout_th = pNetwork->Fout_th;
+    
+    REAL P0 = Pfit->P0;
+    REAL P1 = Pfit->P1;
+    REAL P2 = Pfit->P2;
+    REAL P3 = Pfit->P3;
+    //REAL P4 = Pfit->P4;
+    REAL P5 = Pfit->P5;
+    REAL P6 = Pfit->P6;
+    REAL P7 = Pfit->P7;
+    REAL P8 = Pfit->P8;
+    REAL P9 = Pfit->P9;
+    REAL P10 = Pfit->P10;
 
     //        + 0.\ //P4*np.log(muGn)
-    /*
-    config->Vthre = config->P0\
-        + config->P1*(config->muV-config->muV0)/config->DmuV0\
-        + config->P2*(config->sV-config->sV0)/config->DsV0\
-        + config->P3*(config->TvN-config->TvN0)/config->DTvN0\
-        + config->P5*((config->muV-config->muV0)/config->DmuV0)*((config->muV-config->muV0)/config->DmuV0)\
-        + config->P6*((config->sV-config->sV0)/config->DsV0)*((config->sV-config->sV0)/config->DsV0)\
-        + config->P7*((config->TvN-config->TvN0)/config->DTvN0)*((config->TvN-config->TvN0)/config->DTvN0)\
-        + config->P8*(config->muV-config->muV0)/config->DmuV0*(config->sV-config->sV0)/config->DsV0\
-        + config->P9*(config->muV-config->muV0)/config->DmuV0*(config->TvN-config->TvN0)/config->DTvN0\
-        + config->P10*(config->sV-config->sV0)/config->DsV0*(config->TvN-config->TvN0)/config->DTvN0;
-        */
+    
+    Vthre = P0\
+        + P1*(muV-muV0)/DmuV0\
+        + P2*(sV-sV0)/DsV0\
+        + P3*(TvN-TvN0)/DTvN0\
+        + P5*((muV-muV0)/DmuV0)*((muV-muV0)/DmuV0)\
+        + P6*((sV-sV0)/DsV0)*((sV-sV0)/DsV0)\
+        + P7*((TvN-TvN0)/DTvN0)*((TvN-TvN0)/DTvN0)\
+        + P8*((muV-muV0)/DmuV0)*((sV-sV0)/DsV0)\
+        + P9*((muV-muV0)/DmuV0)*((TvN-TvN0)/DTvN0)\
+        + P10*((sV-sV0)/DsV0)*((TvN-TvN0)/DTvN0);
 
-    config->Vthre = config->P0;
-
-    //return config->Vthre;
+    pNetwork->Vthre = Vthre;
 
     }
 
-/*
-    REAL ONE get_fluct_regime_varsup
-*/
-/*
-void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
+void get_fluct_regime_varsup(REAL Ve, REAL Vi, REAL W, ParamsFromNetwork_t *restrict pNetwork)
 {
-    //takes 880 bytes overflowed ITCM
+    // Need some comments
+    
+    REAL gei = pNetwork->gei;
+    REAL pconnec = pNetwork->pconnec;
+    REAL Ntot = pNetwork->Ntot;
+    REAL Qe = pNetwork->Qe;
+    REAL Qi = pNetwork->Qi;
+    REAL Te = pNetwork->Te;
+    REAL Ti = pNetwork->Ti;
+    REAL Gl = pNetwork->Gl;
+    REAL El = pNetwork->El;
+    REAL Ei = pNetwork->Ei;
+    REAL Ee = pNetwork->Ee;
+    REAL Cm = pNetwork->Cm;
+    
+        
+    REAL Fe = Ve * (REAL_CONST(1.)-gei)*pconnec*Ntot; // default is 1 !!
+    REAL Fi = Vi * gei*pconnec*Ntot;
+    
+    /* normaly = Ve*Te*Qe*Ke with Ke = p*N_exc what it is?
+        -> here N_exc = (1-gei)*Ntot*pconnec
+        So give the same
+    */
+    REAL muGe = Qe*Te*Fe; //=Ve*Qe*Te*Ke
+    REAL muGi = Qi*Ti*Fi;
 
-    REAL Fe;
-    REAL Fi;
-    REAL muGe, muGi, muG;
-    REAL Ue, Ui;
-    REAL Tm, Tv;
-
-
-    // here TOTAL (sum over synapses) excitatory and inhibitory input
-
-    Fe = Ve * (1.-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
-    Fi = Vi * params->gei*params->pconnec*params->Ntot;
-
-    muGe = params->Qe*params->Te*Ve;
-    muGi = params->Qi*params->Ti*Vi;
-
-    muG = params->Gl+muGe+muGi;
-
-    params->muV = (muGe*params->Ee+muGi*params->Ei+params->Gl*params->El)/muG;
-
-
-    params->muGn = muG/params->Gl;
-
-    Tm = params->Cm/muG;
-
-    Ue = params->Qe/muG*(params->Ee-params->muV);
-    Ui = params->Qi/muG*(params->Ei-params->muV);
-
-
-   //PENSEZ a enlever autant de division que possible
-
-    params->sV = sqrtk(Fe*(Ue*params->Te)*(Ue*params->Te)/2./(params->Te+Tm)+\
-                 Fi*(params->Ti*Ui)*(params->Ti*Ui)/2./(params->Ti+Tm));
-
-    if (params->sV < 1e-8){
-        params->sV = 1e-8;
+    REAL muG = Gl + muGe + muGi;
+    
+    if (muG < ACS_DBL_TINY){
+        muG += ACS_DBL_TINY;
     }
 
-    if (Fe<1e-9)//just to insure a non zero division,
-    {
-        Fe += 1e-9;
-    }
-    else if (Fi<1e-9)
-    {
-        Fi += 1e-9;
-    }
-
-    Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) + Fi*(params->Ti*Ui)*(params->Ti*Ui))\
-        /(Fe*(Ue*params->Te)*(Ue*params->Te)/(params->Te+Tm)\
-          + Fi*(params->Ti*Ui)*(params->Ti*Ui)/(params->Ti+Tm));
-
-    params->TvN = Tv*params->Gl/params->Cm;
-
-    //return params->muV;//, sV+1e-12, muGn, TvN
-}
-*/
+    pNetwork->muV = (muGe*Ee + muGi*Ei + Gl*El - W)/muG; //Thomas : maybe will add explicitely a and b?
 
 
-// FAKE ONE get_fluct_regime_varsup
-//where all division are removed
+    pNetwork->muGn = muG/Gl;
 
-void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
-{
-    //takes 880 bytes overflowed ITCM
+    REAL Tm = Cm/muG;
 
-    REAL Fe;
-    REAL Fi;
-    REAL muGe, muGi, muG;
-    REAL Ue, Ui;
-    REAL Tm, Tv;
+    REAL Ue = Qe*(Ee-pNetwork->muV)/muG;
+    REAL Ui = Qi*(Ei-pNetwork->muV)/muG;
+    
 
+   /*
+   normaly sqrt(REAL_HALF(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm)))
+   
+   need find a good sqrt function ...
+   |->sqrtk() takes too much ITCM !!!
+    */
+    
+    
+    REAL sV_sqr = REAL_HALF(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm));//ITCM with err_func also, 1272 bytes over
+    
+    pNetwork->sV = sV_sqr; // square_root_of(sV_sqr);
 
-    // here TOTAL (sum over synapses) excitatory and inhibitory input
-
-    Fe = Ve * (ONE-params->gei)*params->pconnec*params->Ntot; // default is 1 !!
-    Fi = Vi * params->gei*params->pconnec*params->Ntot;
-
-    muGe = params->Qe*params->Te*Ve;
-    muGi = params->Qi*params->Ti*Vi;
-
-    muG = params->Gl+muGe+muGi;
-
-    params->muV = (muGe*params->Ee+muGi*params->Ei+params->Gl*params->El); //fake one
-
-    params->muGn = muG; //fake one
-
-    Tm = params->Cm/muG; //fake one
-
-    Ue = params->Qe; //fake one
-    Ui = params->Qi; //fake one
-
-
-   //PENSEZ a enlever autant de division que possible
-
-    params->sV = Fe*(Ue*params->Te)*(Ue*params->Te)+\
-                 Fi*(params->Ti*Ui)*(params->Ti*Ui);// fake one
-
-    if (params->sV < ACS_DBL_TINY){
-        params->sV = ACS_DBL_TINY;
-    }
-
+    
+    
     if (Fe<ACS_DBL_TINY)//just to insure a non zero division,
     {
         Fe += ACS_DBL_TINY;
@@ -251,121 +236,153 @@ void get_fluct_regime_varsup(REAL Ve, REAL Vi, config_t *restrict params)
     {
         Fi += ACS_DBL_TINY;
     }
+    
+    REAL Tv = ( Fe*(Ue*Te)*(Ue*Te) + Fi*(Ti*Ui)*(Ti*Ui))\
+        /(Fe*(Ue*Te)*(Ue*Te)/(Te+Tm) + Fi*(Ti*Ui)*(Ti*Ui)/(Ti+Tm));
+    
+    if (Tv < ACS_DBL_TINY){
+        Tv += ACS_DBL_TINY;
+    }
+    
+    pNetwork->TvN = Tv*Gl/Cm; // Thomas : Heu, useless no?? |resp-> TvN is a dimensional so usefull var
+    
+    
 
-    Tv = ( Fe*(Ue*params->Te)*(Ue*params->Te) +\
-          Fi*(params->Ti*Ui)*(params->Ti*Ui)); //fake one
-
-    params->TvN = Tv*params->Gl; //fake one
-
-
-    //return params->muV;//, sV+1e-12, muGn, TvN
 }
 
-//END of the get_fluct_regime_varsup FAKE
 
-
-
-void TF(REAL Ve, REAL Vi, meanfield_t *meanfield, config_t *restrict config,
+void TF(REAL Ve, REAL Vi, REAL W,
+        ParamsFromNetwork_t *restrict pNetwork,
+        pFitPolynomial_t *restrict Pfit,
         mathsbox_t *restrict mathsbox){
 
-// argument are fe, fi and pseq_params
-//   problem is to implement it with params and instruction coming from
-//   DTCM and ITCM.
-//   when get_fluct_regime_varsup is ON  takes 1360 bytes overflowed ITCM
+/*
+    State-variables are directly connected to the struct
+    parameters are put in local in order to make the code clear.
 
-
-    REAL limit;
-    REAL argument;
+*/
+    
+    
+    if (pNetwork->Fout_th != ZERO){
+        pNetwork->Fout_th = ACS_DBL_TINY;
+    }
 
     if (Ve < ACS_DBL_TINY){
-        Ve = ACS_DBL_TINY;
+        Ve += ACS_DBL_TINY;
     }
     if (Vi < ACS_DBL_TINY){
-        Vi = ACS_DBL_TINY;
+        Vi += ACS_DBL_TINY;
     }
 
-    get_fluct_regime_varsup(Ve, Vi, config);
-    threshold_func(config);
+    get_fluct_regime_varsup(Ve, Vi, W, pNetwork);
+    threshold_func(pNetwork, Pfit);
 
-    if (config->sV<REAL_CONST(1e-4)){
-        config->sV = REAL_CONST(1e-4);
+    
+    /*
+    normalement sqrt:
+        argument = (pNetwork->Vthre - pNetwork->muV)/sqrtk(REAL_CONST(2.))/pNetwork->sV;
+
+    */
+    if (pNetwork->sV<ACS_DBL_TINY){
+        pNetwork->sV += ACS_DBL_TINY;
     }
+    //factor = REAL_HALF(Gl/(pNetwork->TvN * Cm));
+    REAL argument = (pNetwork->Vthre - pNetwork->muV)/(REAL_CONST(1.4142137)*pNetwork->sV);
+    
 
-    limit = 10;//REAL_HALF(config->Gl/(config->TvN * config->Cm));
-    argument = config->Vthre;//(config->Vthre - config->muV)/sqrtk(REAL_CONST(2.))/config->sV;
+    error_function(argument, mathsbox);
 
-//    config->Fout_th = error_function(factor, argument, mathsbox);
-    error_function(limit, argument, mathsbox);
+    
+    REAL Gl = pNetwork->Gl;
+    REAL Cm = pNetwork->Cm;
+    /*
+    pNetwork->Fout_th = (HALF*Gl) * mathsbox->err_func / (Cm*pNetwork->TvN);// In fact = 1/(2.*Tv) * err_func , that's it'!!!
+    If remove that's will do less instruction
+    
+    Put TvN<-:Tv because Tv not in pNetwork
+    REMOVE this correction bcs TvN adimensional so usefull
+    */
+    pNetwork->Fout_th = (HALF*Gl) * mathsbox->err_func / (Cm*pNetwork->TvN);
 
 
-    if (config->Fout_th < ACS_DBL_TINY){
-        config->Fout_th = ACS_DBL_TINY;
+    if (pNetwork->Fout_th < ACS_DBL_TINY){
+        pNetwork->Fout_th += ACS_DBL_TINY;
     }
-
-    //return config->Fout_th;
+    
 }
 
 
-void RK2_midpoint_MF(REAL h, meanfield_t *meanfield, config_t *restrict config,
-        mathsbox_t *restrict mathsbox) {
-/* need to input T_inv time scale where the 1/T will be done (and rounding)
-on the user computer before send it to the DTCM.
-*/
+void RK2_midpoint_MF(REAL h, meanfield_t *meanfield,
+                     ParamsFromNetwork_t *restrict pNetwork,
+                     pFitPolynomial_t *restrict Pfit_exc,
+                     pFitPolynomial_t *restrict Pfit_inh,
+                     mathsbox_t *restrict mathsbox) {
+    
+    /* Propose for now a=0
+    *
+    */
+
     REAL lastVe = meanfield->Ve;
+    REAL lastVi = meanfield->Vi;
+    REAL lastW = meanfield->w;
+    
+    REAL tauw = meanfield->tauw;
     REAL T_inv = meanfield->Timescale_inv;
-    //TF(lastVe,1.,meanfield, config, mathsbox);
-    REAL lastTF = ONE; //config->Fout_th;
+    REAL b = meanfield->b;
+               
+    
+    TF(lastVe, lastVi, lastW, pNetwork, Pfit_exc, mathsbox);    
+    REAL lastTF_exc = pNetwork->Fout_th;
+    
+    
+    TF(lastVe, lastVi, lastW, pNetwork, Pfit_inh, mathsbox);
+    REAL lastTF_inh = pNetwork->Fout_th;
+    
+/******************************************************
+ *   EULER Explicite method
+ *   It's very instable if for now h<0.2 for 20ms
+ *   
+ *   NEED to give also the error of the method here :
+ *   0.5*h^2*u''(t_n) + o(h^2)
+ *******************************************************/
+    
+    /*
+    
+    REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
+    meanfield->Ve += h * k1_exc ;
+    
+    REAL k1_inh = (lastTF_inh - lastVi)*T_inv;
+    meanfield->Vi += h * k1_inh ;
+    
+    REAL k1_W = -lastW/tauw + meanfield->b * lastVe;
+    meanfield->w += h * k1_W;
+    
+    */
+    
+/***********************************
+ *  RUNGE-KUTTA 2nd order Midpoint *
+ ***********************************/
+    
+    REAL k1_exc = (lastTF_exc - lastVe)*T_inv;
+    REAL alpha_exc = lastVe + h*k1_exc;
+    REAL k2_exc = (lastTF_exc - alpha_exc )*T_inv;
+    
+    meanfield->Ve += REAL_HALF(h*(k1_exc + k2_exc));
+        
+    REAL k1_inh = (lastTF_inh - lastVi)*T_inv;
+    REAL alpha_inh = lastVi + h*k1_inh;
+    REAL k2_inh = (lastTF_inh - alpha_inh)*T_inv;
+    
+    meanfield->Vi += REAL_HALF(h*(k1_inh + k2_inh));
+    
+    REAL k1_W = -lastW/tauw + b * lastVe;
+    REAL alpha_w = lastW + h*k1_W;
+    REAL k2_W = -alpha_w/tauw + b * lastVe;
+ 
+    meanfield->w += REAL_HALF(h*(k1_W+k2_W));
 
-    //configVe stand for TF1 i.e TF for exitatory pop. SO configVi is for TF2
-    //In fact no configVe and configVi just config, all in the same file.
 
-
-    /*meanfield->Ve += lastVe\
-        + REAL_HALF(TF(lastVe,1,meanfield, config, mathsbox) - lastVe)\
-        *(REAL_CONST(2.0)-h)*h;
-        */
-
-    meanfield->Ve += lastVe + (REAL_HALF(lastTF - lastVe) * (REAL_CONST(2.0)-h) * h);
-    meanfield->Ve =  meanfield->Ve * T_inv;
 }
-
-
-/*##############################################################################
-end of reuse
-#################################################################################
-*/
-
-/*!
- * \brief Midpoint is best balance between speed and accuracy so far.
- * \details From ODE solver comparison work, paper shows that Trapezoid version
- *      gives better accuracy at small speed cost
- * \param[in] h: threshold
- * \param[in,out] neuron: The model being updated
- * \param[in] input_this_timestep: the input
- */
-/*static inline void rk2_kernel_midpoint(
-        REAL h, neuron_t *neuron, REAL input_this_timestep) {
-    // to match Mathematica names
-    REAL lastV1 = neuron->V;
-    REAL lastU1 = neuron->U;
-    REAL a = neuron->A;
-    REAL b = neuron->B;
-
-    REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
-    REAL alpha = pre_alph
-            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * lastV1) * lastV1;
-    REAL eta = lastV1 + REAL_HALF(h * alpha);
-
-    // could be represented as a long fract?
-    REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
-
-    neuron->V += h * (pre_alph - beta
-            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * eta) * eta);
-
-    neuron->U += a * h * (-lastU1 - beta + b * eta);
-}
-*/
-
 
 void meanfield_model_set_global_neuron_params(
         const global_neuron_params_t *params) {
@@ -376,12 +393,16 @@ void meanfield_model_set_global_neuron_params(
   and maybe is there some contamanation from the neightbourest neighbour MF!
 */
 state_t meanfield_model_state_update(
-        meanfield_t *restrict meanfield, config_t *restrict config, mathsbox_t *restrict mathsbox){
+    meanfield_t *restrict meanfield,
+    ParamsFromNetwork_t *restrict pNetwork,
+    pFitPolynomial_t *restrict Pfit_exc,
+    pFitPolynomial_t *restrict Pfit_inh,
+    mathsbox_t *restrict mathsbox){
     /*
         uint16_t num_excitatory_inputs, const input_t *exc_input,
 		uint16_t num_inhibitory_inputs, const input_t *inh_input,
 		input_t external_bias, meanfield_t *restrict meanfield,
-        config_t *restrict config) {
+        ParamsFromNetwork_t *restrict pNetwork) {
     REAL total_exc = 0;
     REAL total_inh = 0;
 
@@ -397,7 +418,12 @@ state_t meanfield_model_state_update(
     */
 
     // the best AR update so far
-    RK2_midpoint_MF(meanfield->this_h, meanfield, config, mathsbox);
+    RK2_midpoint_MF(meanfield->this_h,
+                    meanfield,
+                    pNetwork,
+                    Pfit_exc,
+                    Pfit_inh,
+                    mathsbox);
     meanfield->this_h = global_params->machine_timestep_ms;
 
     return meanfield->Ve;
@@ -419,17 +445,27 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield) {
 }
 
 //change name neuron -> meanfield and membrane -> rate
-state_t meanfield_model_get_firing_rate(const meanfield_t *meanfield) {
+state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield) {
     return meanfield->Ve;
 }
 
+state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield) {
+    return meanfield->Vi;
+}
+
+state_t meanfield_model_get_adaptation_W(const meanfield_t *meanfield){
+    return meanfield->w;
+}
+
+
 void meanfield_model_print_state_variables(const meanfield_t *meanfield) {
     log_debug("Ve = %11.4k ", meanfield->Ve);
-    //log_debug("U = %11.4k ", meanfield->Vi);
+    log_debug("Vi = %11.4k ", meanfield->Vi);
+    log_debug("W = %11.4k ", meanfield->w);
 }
 
 void meanfield_model_print_parameters(const meanfield_t *meanfield) {
-    log_debug("Ve = %11.4k ", meanfield->Ve);
+    //log_debug("Ve = %11.4k ", meanfield->Ve);
     //log_debug("Vi = %11.4k ", meanfield->Vi);
     //log_debug("B = %11.4k ", neuron->B);
     //log_debug("C = %11.4k ", neuron->C);

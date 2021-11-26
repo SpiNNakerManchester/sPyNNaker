@@ -120,10 +120,16 @@ else
 		endif
 		
 		
-		ifndef CONFIG_H
-		    $(error CONFIG_H is not set.  Please select an input type header file)
+		ifndef PARAMS_FROM_NETWORK_H
+		    $(error PARAMS_FROM_NETWORK_H is not set.  Please select an input type header file)
 		else
-		    CONFIG_H := $(call replace_source_dirs,$(CONFIG_H))
+		    PARAMS_FROM_NETWORK_H := $(call replace_source_dirs,$(PARAMS_FROM_NETWORK_H))
+		endif
+		
+		ifndef P_FIT_POLYNOMIAL_H
+		    $(error P_FIT_POLYNOMIAL_H is not set.  Please select an input type header file)
+		else
+		    P_FIT_POLYNOMIAL_H := $(call replace_source_dirs,$(P_FIT_POLYNOMIAL_H))
 		endif
 		
 		ifndef INPUT_TYPE_H
@@ -153,7 +159,8 @@ else
 		MEANFIELD_INCLUDES := \
 	      -include $(MEANFIELD_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(CONFIG_H)\
+	      -include $(PARAMS_FROM_NETWORK_H)\
+          -include $(P_FIT_POLYNOMIAL_H)\
           -include $(MATHSBOX_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \

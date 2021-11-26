@@ -14,8 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
-from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldModelEitn
-from spynnaker.pyNN.models.neuron.neuron_models import Config
+from spynnaker.pyNN.models.neuron.neuron_models import MeanfieldOfAdexNetwork
+from spynnaker.pyNN.models.neuron.neuron_models import ParamsFromNetwork
+from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialExc
+from spynnaker.pyNN.models.neuron.neuron_models import pFitPolynomialInh
 from spynnaker.pyNN.models.neuron.neuron_models import Mathsbox
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
@@ -31,58 +33,25 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
     :param a: :math:`a`
     :type a: float, iterable(float), ~pyNN.random.RandomDistribution
         or (mapping) function
-    :param b: :math:`b`
-    :type b: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param c: :math:`c`
-    :type c: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param d: :math:`d`
-    :type d: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param i_offset: :math:`I_{offset}`
-    :type i_offset: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param u: :math:`u_{init} = \\delta V_{init}`
-    :type u: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param v: :math:`v_{init} = V_{init}`
-    :type v: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param tau_syn_E: :math:`\\tau^{syn}_e`
-    :type tau_syn_E: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param tau_syn_I: :math:`\\tau^{syn}_i`
-    :type tau_syn_I: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param e_rev_E: :math:`E^{rev}_e`
-    :type e_rev_E: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param e_rev_I: :math:`E^{rev}_i`
-    :type e_rev_I: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param isyn_exc: :math:`I^{syn}_e`
-    :type isyn_exc: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
-    :param isyn_inh: :math:`I^{syn}_i`
-    :type isyn_inh: float, iterable(float), ~pyNN.random.RandomDistribution
-        or (mapping) function
     """
 
     # noinspection PyPep8Naming
-    @default_initial_values({"Ve", "muV", "sV", "muGn", "TvN", "Vthre",
-                             "Fout_th", "err_func", "isyn_exc", "isyn_inh"})
+    @default_initial_values({"Ve", "Vi", "w", "Fout_th",
+                             "muV", "sV", "muGn",
+                             "TvN", "Vthre",
+                             "err_func", "isyn_exc", "isyn_inh"})
     def __init__(self,
-                 nbr=1,
-                 a=0,
-                 b=0,
-                 tauw=1.,
+                 a=4.,
+                 b=20.,
+                 tauw=1.0,
                  Trefrac=5.0,
                  Vreset=-65.,
                  delta_v=-0.5,
                  ampnoise=0.0,
-                 Timescale_inv=0.5,
-                 Ve=0.,
+                 Timescale_inv=200,
+                 Ve=9.,
+                 Vi=23.,
+                 w=0.25,
 
                  pconnec=0.05,
                  q_exc=1.5,
@@ -99,18 +68,6 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Gl=10.,
                  Cm=200.,
                  El=-70.,
-
-                 p0=-0.0515518,
-                 p1=0.00455197,
-                 p2=-0.00760625,
-                 p3=0.00094851,
-                 p4=0.001,
-                 p5=-0.0009863,
-                 p6=-0.0026474,
-                 p7=-0.0135417,
-                 p8=0.0028742,
-                 p9=0.0029213,
-                 p10=-0.014084,
 
                  muV=0.,
                  muV0=-0.06,
@@ -129,6 +86,31 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  Vthre=-50.,
                  Fout_th=0.,
 
+                 p0_exc=-0.0515518,
+                 p1_exc=0.00455197,
+                 p2_exc=-0.00760625,
+                 p3_exc=0.00094851,
+                 p4_exc=0.001,
+                 p5_exc=-0.0009863,
+                 p6_exc=-0.0026474,
+                 p7_exc=-0.0135417,
+                 p8_exc=0.0028742,
+                 p9_exc=0.0029213,
+                 p10_exc=-0.014084,
+                 
+                 p0_inh=-0.0496832,
+                 p1_inh=0.00412289,
+                 p2_inh=-0.0054849,
+                 p3_inh=-0.0013451,
+                 p4_inh=0.001,
+                 p5_inh=-0.0010459,
+                 p6_inh=0.00306102,
+                 p7_inh=-0.0084485,
+                 p8_inh=-0.0025717,
+                 p9_inh=0.00179862,
+                 p10_inh=-0.013830,
+
+
                  tau_syn_E=5.0,
                  tau_syn_I=5.0,
                  e_rev_E=0.0,
@@ -137,25 +119,33 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
                  isyn_exc=0.0,
                  isyn_inh=0.0,
 
-                 sample=100,
+                 sample=1000,
                  err_func=0.):
         # pylint: disable=too-many-arguments, too-many-locals
-        neuron_model = MeanfieldModelEitn(nbr, a, b, tauw, Trefrac,
-                                          Vreset, delta_v, ampnoise,
-                                          Timescale_inv, Ve)
-        config = Config(pconnec, q_exc, q_inh,
-                        Tsyn_exc, Tsyn_inh,
-                        Erev_exc, Erev_inh,
-                        Ntot, gei, ext_drive,
-                        afferent_exc_fraction,
-                        Gl, Cm, El,
-                        p0, p1, p2, p3, p4, p5,
-                        p6, p7, p8, p9, p10,
-                        muV, muV0,DmuV0,
-                        sV, sV0, DsV0,
-                        muGn,
-                        TvN, TvN0, DTvN0,
-                        Vthre, Fout_th)
+        #muVV = ((muGe*Erev_exc + muGi*Erev_inh + Gl*El - Ve*tauw*(b) + a*El) /muG)/ (1+a/muG)
+        #w = Ve * b * tauw + a * (El-muV0)
+        neuron_model = MeanfieldOfAdexNetwork(a, b, tauw, Trefrac,
+                                              Vreset, delta_v, ampnoise,
+                                              Timescale_inv, Ve, Vi, w)
+        params_from_network = ParamsFromNetwork(pconnec, q_exc, q_inh,
+                                                Tsyn_exc, Tsyn_inh,
+                                                Erev_exc, Erev_inh,
+                                                Ntot, gei, ext_drive,
+                                                afferent_exc_fraction,
+                                                Gl, Cm, El,
+                                                muV, muV0, DmuV0,
+                                                sV, sV0, DsV0,
+                                                muGn,
+                                                TvN, TvN0, DTvN0,
+                                                Vthre, Fout_th)
+        p_fit_polynomial_exc = pFitPolynomialExc(p0_exc, p1_exc, p2_exc,
+                                              p3_exc, p4_exc, p5_exc, 
+                                              p6_exc, p7_exc, p8_exc,
+                                              p9_exc, p10_exc)
+        p_fit_polynomial_inh = pFitPolynomialInh(p0_inh, p1_inh, p2_inh,
+                                              p3_inh, p4_inh, p5_inh,
+                                              p6_inh, p7_inh, p8_inh,
+                                              p9_inh, p10_inh)
         mathsbox = Mathsbox(sample, err_func)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
@@ -165,6 +155,11 @@ class MeanfieldBase(AbstractPyNNMeanfieldModelStandard):
         super().__init__(
             model_name="meanfield_model_cond",
             binary="meanfield_model_cond.aplx",
-            neuron_model=neuron_model, config=config, mathsbox=mathsbox,
-            input_type=input_type, synapse_type=synapse_type,
+            neuron_model=neuron_model,
+            params_from_network=params_from_network,
+            p_fit_polynomial_exc = p_fit_polynomial_exc, 
+            p_fit_polynomial_inh = p_fit_polynomial_inh, 
+            mathsbox=mathsbox,
+            input_type=input_type,
+            synapse_type=synapse_type,
             threshold_type=threshold_type)

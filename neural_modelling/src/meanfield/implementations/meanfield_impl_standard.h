@@ -24,7 +24,8 @@
 
 // Includes for model parts used in this implementation
 #include <meanfield/models/meanfield_model_impl.h>
-#include <meanfield/models/config.h>
+#include <meanfield/models/params_from_network.h>
+#include <meanfield/models/P_fit_polynomial.h>
 #include <meanfield/models/mathsbox.h>
 
 #include <meanfield/input_types/input_type.h>
@@ -40,13 +41,15 @@
 //! Indices for recording of words
 enum word_recording_indices {
     //! V (somatic potential) recording index
-    V_RECORDING_INDEX = 0,
+    VE_RECORDING_INDEX = 0,
+    VI_RECORDING_INDEX = 1,
+    W_RECORDING_INDEX = 2,
     //! Gsyn_exc (excitatory synaptic conductance/current) recording index
-    GSYN_EXC_RECORDING_INDEX = 1,
+    GSYN_EXC_RECORDING_INDEX = 3,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
-    GSYN_INH_RECORDING_INDEX = 2,
+    GSYN_INH_RECORDING_INDEX = 4,
     //! Number of recorded word-sized state variables
-    N_RECORDED_VARS = 10
+    N_RECORDED_VARS = 5
 };
 
 //! Indices for recording of bitfields
@@ -66,13 +69,15 @@ enum bitfield_recording_indices {
     };*/
 
 
-//! Array of meanfield states -> will be change in future
+//! Array of meanfield states -> will be change in future , the future is now!!
 static meanfield_t *meanfield_array;
 
-static config_t *config_array;
+static ParamsFromNetwork_t *pNetwork_array;
 
 static mathsbox_t *mathsbox_array;
 
+static pFitPolynomial_t *Pfit_exc_array;
+static pFitPolynomial_t *Pfit_inh_array;
 
 //! Input states array
 static input_type_t *input_type_array;
@@ -136,17 +141,35 @@ static bool meanfield_impl_initialise(uint32_t n_meanfields) {
     }
 
     // Allocate DTCM for config array and copy block of data
-    if (sizeof(config_t)) {
-        config_array = spin1_malloc(n_meanfields * sizeof(config_t));
-        if (config_array == NULL) {
+    if (sizeof(ParamsFromNetwork_t)) {
+        pNetwork_array = spin1_malloc(n_meanfields * sizeof(ParamsFromNetwork_t));
+        if (pNetwork_array == NULL) {
             log_error("Unable to allocate config array - Out of DTCM");
             return false;
         }
     }
-
+    
+    // Allocate DTCM for P fit from polyomial for exc array and copy block of data
+    if (sizeof(pFitPolynomial_t)) {
+        Pfit_exc_array = spin1_malloc(n_meanfields * sizeof(pFitPolynomial_t));
+        if (Pfit_exc_array == NULL) {
+            log_error("Unable to allocate Pfit_exc_array - Out of DTCM");
+            return false;
+        }
+    }
+    
+    // Allocate DTCM for P fit from polyomial for exc array and copy block of data
+    if (sizeof(pFitPolynomial_t)) {
+        Pfit_inh_array = spin1_malloc(n_meanfields * sizeof(pFitPolynomial_t));
+        if (Pfit_inh_array == NULL) {
+            log_error("Unable to allocate Pfit_inh_array - Out of DTCM");
+            return false;
+        }
+    }
+    
     // Allocate DTCM for mathsbox array and copy block of data
     if (sizeof(mathsbox_t)) {
-        mathsbox_array = spin1_malloc(n_meanfields * sizeof(config_t));
+        mathsbox_array = spin1_malloc(n_meanfields * sizeof(mathsbox_t));
         if (mathsbox_array == NULL) {
             log_error("Unable to allocate mathsbox array - Out of DTCM");
             return false;
@@ -254,13 +277,27 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_meanfields * sizeof(meanfield_t));
     }
 
-    if (sizeof(config_t)) {
+    if (sizeof(ParamsFromNetwork_t)) {
         log_debug("reading config parameters");
-        spin1_memcpy(config_array, &address[next],
-                n_meanfields * sizeof(config_t));
-        next += n_words_needed(n_meanfields * sizeof(config_t));
+        spin1_memcpy(pNetwork_array, &address[next],
+                n_meanfields * sizeof(ParamsFromNetwork_t));
+        next += n_words_needed(n_meanfields * sizeof(ParamsFromNetwork_t));
     }
-
+    
+    if (sizeof(pFitPolynomial_t)) {
+        log_debug("reading pFitPolynomial exc parameters");
+        spin1_memcpy(Pfit_exc_array, &address[next],
+                n_meanfields * sizeof(pFitPolynomial_t));
+        next += n_words_needed(n_meanfields * sizeof(pFitPolynomial_t));
+    }
+    
+    if (sizeof(pFitPolynomial_t)) {
+        log_debug("reading pFitPolynomial inh parameters");
+        spin1_memcpy(Pfit_inh_array, &address[next],
+                n_meanfields * sizeof(pFitPolynomial_t));
+        next += n_words_needed(n_meanfields * sizeof(pFitPolynomial_t));
+    }
+    
     if (sizeof(mathsbox_t)) {
         log_debug("reading mathsbox parameters");
         spin1_memcpy(mathsbox_array, &address[next],
@@ -315,8 +352,11 @@ static void neuron_impl_do_timestep_update(
         // Get the neuron itself
         meanfield_t *this_meanfield = &meanfield_array[meanfield_index];
 
-        // Get the config and mathsbox params for this neuron
-        config_t *config_types = &config_array[meanfield_index];
+        // Get the Params from network and mathsbox params for this neuron
+        ParamsFromNetwork_t *pNetwork_types = &pNetwork_array[meanfield_index];
+        pFitPolynomial_t *Pfit_exc_types = &Pfit_exc_array[meanfield_index];
+        pFitPolynomial_t *Pfit_inh_types = &Pfit_inh_array[meanfield_index];
+        
         mathsbox_t *mathsbox_types = &mathsbox_array[meanfield_index];
 
         // Get the input_type parameters and voltage for this neuron
@@ -336,7 +376,12 @@ static void neuron_impl_do_timestep_update(
         // and because the index doesn't actually matter
         for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
             // Get the voltage->firing rate
-            state_t firing_rate = meanfield_model_get_firing_rate(this_meanfield);
+            state_t firing_rate_Ve = meanfield_model_get_firing_rate_Ve(
+                this_meanfield);
+            state_t firing_rate_Vi = meanfield_model_get_firing_rate_Vi(
+                this_meanfield);
+            
+            state_t adaptation_W = meanfield_model_get_adaptation_W(this_meanfield);
 
             // Get the exc and inh values from the synapses
             input_t exc_values[NUM_EXCITATORY_RECEPTORS];
@@ -363,10 +408,14 @@ static void neuron_impl_do_timestep_update(
                 total_inh += inh_input_values[i];
             }
 
-            // Do recording if on the first step
+            // Do recording if on the first step 
             if (i_step == n_steps_per_timestep) {
                 neuron_recording_record_accum(
-                        V_RECORDING_INDEX, meanfield_index, firing_rate);
+                        VE_RECORDING_INDEX, meanfield_index, firing_rate_Ve);
+                neuron_recording_record_accum(
+                        VI_RECORDING_INDEX, meanfield_index, firing_rate_Vi);
+                neuron_recording_record_accum(
+                        W_RECORDING_INDEX, meanfield_index, adaptation_W);
                 neuron_recording_record_accum(
                         GSYN_EXC_RECORDING_INDEX, meanfield_index, total_exc);
                 neuron_recording_record_accum(
@@ -375,19 +424,19 @@ static void neuron_impl_do_timestep_update(
 
             // Call functions to convert exc_input and inh_input to current
             input_type_convert_excitatory_input_to_current(
-                    exc_input_values, input_types, firing_rate);
+                    exc_input_values, input_types, firing_rate_Ve);
             input_type_convert_inhibitory_input_to_current(
-                    inh_input_values, input_types, firing_rate);
-
+                    inh_input_values, input_types, firing_rate_Vi);
+            
 //            input_t external_bias += additional_input_get_input_value_as_current(
 //                    additional_inputs, firing_rate);
 
             // update neuron parameters
-            state_t result = meanfield_model_state_update(
-                this_meanfield, config_types, mathsbox_types);
-
-            //reinitialise Fout_th
-            config_types->Fout_th = 0.0; // I don't understand what this does
+            state_t result = meanfield_model_state_update(this_meanfield,
+                                                          pNetwork_types,
+                                                          Pfit_exc_types,
+                                                          Pfit_inh_types,
+                                                          mathsbox_types);
 
             // determine if a spike should occur
             bool spike_now =
@@ -411,7 +460,7 @@ static void neuron_impl_do_timestep_update(
 
             // Shape the existing input according to the included rule
             synapse_types_shape_input(the_synapse_type);
-            if (config_types->Fout_th==0.0) {
+            if (pNetwork_types->Fout_th==0.0) {
                 has_spiked = true;
             }
         }
@@ -452,12 +501,14 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_meanfields * sizeof(meanfield_t));
     }
 
-    if (sizeof(config_t)) {
+    /*
+    if (sizeof(ParamsFromNetwork_t)) {
         log_debug("writing input type parameters");
-        spin1_memcpy(&address[next], config_array,
-                n_meanfields * sizeof(config_t));
-        next += n_words_needed(n_meanfields * sizeof(config_t));
+        spin1_memcpy(&address[next], pNetwork_array,
+                n_meanfields * sizeof(ParamsFromNetwork_t));
+        next += n_words_needed(n_meanfields * sizeof(ParamsFromNetwork_t));
     }
+    */
 
 }
 

@@ -33,9 +33,13 @@ struct meanfield_t;
 typedef struct meanfield_t meanfield_t;
 typedef struct meanfield_t* meanfield_pointer_t;
 
-struct config_t;
-typedef struct config_t config_t;
-typedef struct config_t* config_pointer_t;
+struct ParamsFromNetwork_t;
+typedef struct ParamsFromNetwork_t ParamsFromNetwork_t;
+typedef struct ParamsFromNetwork_t* ParamsFromNetwork_pointer_t;
+
+struct pFitPolynomial_t;
+typedef struct pFitPolynomial_t pFitPolynomial_t;
+typedef struct pFitPolynomial_t* pFitPolynomial_pointer_t;
 
 struct mathsbox_t;
 typedef struct mathsbox_t mathsbox_t;
@@ -78,7 +82,11 @@ state_t meanfield_model_state_update(
 
 
 state_t meanfield_model_state_update(
-        meanfield_t *restrict meanfield, config_t *restrict config, mathsbox_t *restrict mathsbox);
+    meanfield_t *restrict meanfield,
+    ParamsFromNetwork_t *restrict params_from_network,
+    pFitPolynomial_t *restrict Pfit_exc,
+    pFitPolynomial_t *restrict Pfit_inh,
+    mathsbox_t *restrict mathsbox);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in, out] neuron pointer to a neuron parameter struct which contains
@@ -90,7 +98,9 @@ void neuron_model_has_spiked(meanfield_t *restrict meanfield);
 //!     all the parameters for a specific neuron
 //! \return the membrane voltage for a given neuron with the neuron
 //!     parameters specified in neuron
-state_t meanfield_model_get_firing_rate(const meanfield_t *meanfield);
+state_t meanfield_model_get_firing_rate_Ve(const meanfield_t *meanfield);
+state_t meanfield_model_get_firing_rate_Vi(const meanfield_t *meanfield);
+state_t meanfield_model_get_adaptation_W(const meanfield_t *meanfield);
 
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
