@@ -72,17 +72,6 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(TypeError):
             writer.set_up_timings_and_delay(1000, 1, "baocn")
 
-    def test_dict(self):
-        view = SpynnakerDataView()
-        writer = SpynnakerDataWriter()
-        writer.setup()
-
-        self.assertFalse("APPID" in view)
-        with self.assertRaises(KeyError):
-            view["APPID"]
-        writer.set_app_id(8)
-        self.assertEqual(8, view["APPID"])
-
     def test_mock(self):
         view = SpynnakerDataView()
         writer = SpynnakerDataWriter()
