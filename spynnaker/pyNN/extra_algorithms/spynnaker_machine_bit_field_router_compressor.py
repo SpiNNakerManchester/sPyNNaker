@@ -111,7 +111,7 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, transceiver, machine, app_id, machine_graph,
+        routing_tables, transceiver, machine, machine_graph,
         placements, executable_finder, routing_infos, executable_targets,
         read_expander_iobuf):
     """ entrance for routing table compression with bit field
@@ -121,7 +121,6 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
         ~pacman.model.routing_tables.MulticastRoutingTables
     :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
-    :param int app_id: app id of the application
     :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         machine graph
     :param ~pacman.model.placements.Placements placements:
@@ -136,7 +135,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor(
-            routing_tables, transceiver, machine, app_id, machine_graph,
+            routing_tables, transceiver, machine, machine_graph,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
@@ -151,7 +150,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
 
 
 def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables, transceiver, machine, app_id, machine_graph,
+        routing_tables, transceiver, machine, machine_graph,
         placements, executable_finder, routing_infos, executable_targets,
         read_expander_iobuf):
     """ entrance for routing table compression with bit field
@@ -161,7 +160,6 @@ def spynnaker_machine_bitField_pair_router_compressor(
         ~pacman.model.routing_tables.MulticastRoutingTables
     :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
-    :param int app_id: app id of the application
     :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         machine graph
     :param ~pacman.model.placements.Placements placements:
@@ -176,7 +174,7 @@ def spynnaker_machine_bitField_pair_router_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor(
-            routing_tables, transceiver, machine, app_id, machine_graph,
+            routing_tables, transceiver, machine, machine_graph,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
