@@ -112,6 +112,9 @@ static uint32_t dma_complete_count;
 static uint32_t max_pipeline_restarts;
 static uint32_t spike_pipeline_deactivation_time = 0;
 static uint32_t timer_callback_completed = 0;
+static uint32_t spikes_this_time_step; // needed because packets gets reset?
+static uint32_t dmas_this_time_step;
+static uint32_t pipeline_restarts;
 
 static uint32_t max_flushed_spikes;
 static uint32_t total_flushed_spikes;
@@ -120,8 +123,6 @@ static uint32_t total_flushed_spikes;
 static struct {
     uint32_t time;
     uint32_t packets_this_time_step;
-    uint32_t dmas_this_time_step;
-    uint32_t pipeline_restarts;
 } p_per_ts_struct;
 
 //! the region to record the packets per timestep in
@@ -347,6 +348,7 @@ static inline void start_dma_loop(void) {
 //! \param[in] unused: Only specified to match API
 static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
     p_per_ts_struct.packets_this_time_step += 1;
+    spikes_this_time_step += 1;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
     if (in_spikes_add_spike(key)) {
         start_dma_loop();
@@ -358,6 +360,7 @@ static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
 //! \param[in] payload: the payload of the packet. The count.
 static void multicast_packet_pl_received_callback(uint key, uint payload) {
     p_per_ts_struct.packets_this_time_step += 1;
+    spikes_this_time_step += 1;
     log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
         key, payload, time, dma_busy);
 
@@ -377,7 +380,7 @@ static void multicast_packet_pl_received_callback(uint key, uint payload) {
 static void dma_complete_callback(UNUSED uint unused, uint tag) {
 
     // increment the dma complete count for provenance generation
-    p_per_ts_struct.dmas_this_time_step += 1;
+    dmas_this_time_step += 1;
     dma_complete_count += 1;
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
@@ -451,7 +454,7 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     dma_n_spikes = 0;
 
     // Increment counter for spike processing pipeline restarts
-    p_per_ts_struct.pipeline_restarts++;
+    pipeline_restarts++;
 
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
@@ -549,21 +552,24 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
 
 // Custom provenance from SpiNNCer
 void spike_processing_get_and_reset_spikes_this_tick(void ) {
-	if (p_per_ts_struct.packets_this_time_step > max_spikes_in_a_tick) {
-		max_spikes_in_a_tick = p_per_ts_struct.packets_this_time_step;
+	if (spikes_this_time_step > max_spikes_in_a_tick) {
+		max_spikes_in_a_tick = spikes_this_time_step;
 	}
+	spikes_this_time_step = 0;
 }
 
 void spike_processing_get_and_reset_dmas_this_tick(void) {
-	if (p_per_ts_struct.dmas_this_time_step > max_dmas_in_a_tick){
-		max_dmas_in_a_tick = p_per_ts_struct.dmas_this_time_step;
+	if (dmas_this_time_step > max_dmas_in_a_tick){
+		max_dmas_in_a_tick = dmas_this_time_step;
 	}
+	dmas_this_time_step = 0;
 }
 
 void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
-	if (p_per_ts_struct.pipeline_restarts > max_pipeline_restarts) {
-		max_pipeline_restarts = p_per_ts_struct.pipeline_restarts;
+	if (pipeline_restarts > max_pipeline_restarts) {
+		max_pipeline_restarts = pipeline_restarts;
 	}
+	pipeline_restarts = 0;
 }
 
 //uint32_t spike_processing_get_pipeline_deactivation_time(){
