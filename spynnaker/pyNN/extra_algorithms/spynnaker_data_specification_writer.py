@@ -20,7 +20,7 @@ from spynnaker.pyNN.models.utility_models.delays import (
 
 
 def spynnaker_data_specification_writer(
-        placements, hostname, machine, data_n_timesteps):
+        placements, hostname, machine):
     """
     Executes data specification generation for sPyNNaker
 
@@ -29,8 +29,6 @@ def spynnaker_data_specification_writer(
     :param str hostname: SpiNNaker machine name
     :param ~spinn_machine.Machine machine:
         the python representation of the SpiNNaker machine
-    :param int data_n_timesteps:
-        The number of timesteps for which data space will been reserved
     :return: DSG targets (map of placement tuple and filename)
     :rtype:
         tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
@@ -50,4 +48,4 @@ def spynnaker_data_specification_writer(
     placement_order.extend(delay_extensions)
 
     return graph_data_specification_writer(
-        placements, hostname, machine, data_n_timesteps, placement_order)
+        placements, hostname, machine, placement_order)

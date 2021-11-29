@@ -21,6 +21,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
+from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
@@ -944,7 +945,7 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def get_region_sizes(self, vertex_slice, n_machine_time_steps):
+    def get_region_sizes(self, vertex_slice):
         """ Get the sizes of the regions for the variables, whether they are
             recorded or not, with those that are not having a size of 0
 
@@ -957,7 +958,7 @@ class NeuronRecorder(object):
                 self.__sampling_rates, self.__events_per_core_variables,
                 self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
-                variable, vertex_slice, n_machine_time_steps))
+                variable, vertex_slice))
         return values
 
     def write_neuron_recording_region(
@@ -1072,18 +1073,17 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(
-            self, variable, vertex_slice, n_machine_time_steps):
+            self, variable, vertex_slice):
         """ Returns the SDRAM used for this many time steps for a variable
 
         If required the total is rounded up so the space will always fit
 
         :param str variable: The PyNN variable name to get buffered sdram of
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int n_machine_time_steps:
-            how many machine time steps to run for
         :return: data size
         :rtype: int
         """
+        n_machine_time_steps = FecDataView().max_run_time_steps
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
             item = self.get_buffered_sdram_per_record(variable, vertex_slice)

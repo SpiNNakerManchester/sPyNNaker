@@ -20,6 +20,7 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
@@ -271,24 +272,23 @@ class PopulationMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "routing_info", "data_n_time_steps"
+            "routing_info"
         })
     def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
+            self, spec, placement, routing_info):
         """
         :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
         """
         # pylint: disable=arguments-differ
+        data_n_time_steps = FecDataView().max_run_time_steps
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps))
+            self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
         self._write_neuron_data_spec(

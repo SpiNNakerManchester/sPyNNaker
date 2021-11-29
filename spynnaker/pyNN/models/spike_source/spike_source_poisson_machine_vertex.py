@@ -307,23 +307,20 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
         "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "routing_info", "data_n_time_steps", "graph",
-            "first_machine_time_step"
+            "routing_info", "graph", "first_machine_time_step"
         }
     )
     def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps, graph,
+            self, spec, placement, routing_info, graph,
             first_machine_time_step):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param int data_n_time_steps:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
         """
@@ -344,7 +341,8 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self._app_vertex.get_recording_sdram_usage(self.vertex_slice)
-        recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
+        recorded_region_sizes = [sdram.get_total_sdram(
+            SpynnakerDataView().max_run_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
