@@ -100,36 +100,3 @@ class SpynnakerDataView(FecDataView):
 
     def has_min_delay(self):
         return self.get_min_delay() is not None
-
-    @overrides(FecDataView.items)
-    def items(self):
-        """
-        Lists the keys of the data currently available.
-
-        Keys exposed this way are limited to the ones needed for injection
-
-        :return: List of the keys for which there is data
-        :rtype: list(str)
-        :raise KeyError:  Amethod this call depends on could raise this
-            exception, but that indicates a programming mismatch
-        """
-        results = super.items(self)
-        # MinDelay is not required for injection
-        # ONLY included (possibly temporary) to show test extended method
-        for key in ["MinDelay"]:
-            item = self._unchecked_getitem(key)
-            if item is not None:
-                results.append((key, item))
-        return results
-
-    @overrides(FecDataView._unchecked_getitem)
-    def _unchecked_getitem(self, item):
-        # MinDelay is not required for injection
-        # ONLY included (possibly temporary) to show test extended method
-        if item == "MinDelay":
-            if self.has_min_delay():
-                return self.min_delay
-            else:
-                return None
-
-        return FecDataView._unchecked_getitem(self, item)
