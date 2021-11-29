@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
-from .spynnaker_splitter_partitioner import SpynnakerSplitterPartitioner
-from .spynnaker_splitter_selector import SpynnakerSplitterSelector
+from .spynnaker_splitter_partitioner import spynnaker_splitter_partitioner
+from .spynnaker_splitter_selector import spynnaker_splitter_selector
 from .splitter_abstract_pop_vertex_fixed import (
     SplitterAbstractPopulationVertexFixed)
 from .splitter_delay_vertex_slice import SplitterDelayVertexSlice
@@ -28,7 +28,7 @@ from .abstract_supports_one_to_one_sdram_input import (
 
 __all__ = [
     'AbstractSpynnakerSplitterDelay', 'SplitterAbstractPopulationVertexFixed',
-    'SplitterDelayVertexSlice', 'SpynnakerSplitterPartitioner',
-    'SpynnakerSplitterSelector', 'SpynnakerSplitterFixedLegacy',
+    'SplitterDelayVertexSlice', 'spynnaker_splitter_partitioner',
+    'spynnaker_splitter_selector', 'SpynnakerSplitterFixedLegacy',
     'SplitterAbstractPopulationVertexNeuronsSynapses',
     'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput']

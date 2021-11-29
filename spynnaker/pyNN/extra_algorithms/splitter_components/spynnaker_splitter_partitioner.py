@@ -12,27 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms import splitter_partitioner
 from data_specification import ReferenceContext
 
 
-class SpynnakerSplitterPartitioner(SplitterPartitioner):
+def spynnaker_splitter_partitioner(app_graph, plan_n_time_steps):
     """ a splitter partitioner that's bespoke for spynnaker vertices.
+
+    :param ApplicationGraph app_graph: app graph
+    :param int plan_n_time_steps: the number of time steps to run for
+    :rtype: int
     """
-
-    __slots__ = []
-
-    def __call__(self, app_graph, plan_n_time_steps):
-        """
-        :param ApplicationGraph app_graph: app graph
-        :param int plan_n_time_steps: the number of time steps to run for
-        :rtype: int
-        :raise PacmanPartitionException: when it cant partition
-        """
-
-        # do partitioning in same way, but in a context of references
-        with ReferenceContext():
-            chips_used = super().__call__(app_graph, plan_n_time_steps)
-
-        # return the accepted things
-        return chips_used
+    with ReferenceContext():
+        return splitter_partitioner(app_graph, plan_n_time_steps)

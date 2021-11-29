@@ -18,7 +18,7 @@ from pacman.model.graphs.application import (
 from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
     SplitterOneToOneLegacy)
 from spinn_front_end_common.interface.splitter_selectors import (
-    SplitterSelector)
+    vertex_selector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from .splitter_abstract_pop_vertex_fixed import (
@@ -31,10 +31,12 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 
+PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 
-class SpynnakerSplitterSelector(SplitterSelector):
-    """ splitter object selector that allocates splitters to app vertices\
-        that have not yet been given a splitter object.\
+
+def spynnaker_splitter_selector(app_graph):
+    """ Add a splitter to every vertex that doesn't already have one.
+
         default for APV is the SplitterAbstractPopulationVertexFixed\
         default for external device splitters are SplitterOneToOneLegacy\
         default for the rest is the SpynnakerSplitterFixedLegacy.
@@ -42,79 +44,36 @@ class SpynnakerSplitterSelector(SplitterSelector):
     :param ApplicationGraph app_graph: app graph
     :raises PacmanConfigurationException: If a bad configuration is set
     """
+    progress_bar = ProgressBar(
+        string_describing_what_being_progressed=PROGRESS_BAR_NAME,
+        total_number_of_things_to_do=len(app_graph.vertices))
 
-    PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
+    for app_vertex in progress_bar.over(app_graph.vertices):
+        spynakker_vertex_selector(app_vertex)
 
-    def __call__(self, app_graph):
-        """ Add a splitter to every vertex that doesn't already have one.
 
-        :param ApplicationGraph app_graph: app graph
-        :raises PacmanConfigurationException: If a bad configuration is set
-        """
+def spynakker_vertex_selector(app_vertex):
+    """ main point for selecting a splitter object for a given app vertex.
 
-        progress_bar = ProgressBar(
-            string_describing_what_being_progressed=self.PROGRESS_BAR_NAME,
-            total_number_of_things_to_do=len(app_graph.vertices))
+    Will delegate to the none spynakker slector if no heuristic is known for
+    the app vertex.
 
-        for app_vertex in progress_bar.over(app_graph.vertices):
-            if app_vertex.splitter is None:
-                if isinstance(app_vertex, AbstractPopulationVertex):
-                    self.abstract_pop_heuristic(app_vertex)
-                elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
-                    self.external_spinnaker_link_heuristic(app_vertex)
-                elif isinstance(app_vertex, ApplicationFPGAVertex):
-                    self.external_fpga_link_heuristic(app_vertex)
-                elif isinstance(app_vertex, SpikeSourceArrayVertex):
-                    self.spike_source_array_heuristic(app_vertex)
-                elif isinstance(app_vertex, SpikeSourcePoissonVertex):
-                    self.spike_source_poisson_heuristic(app_vertex)
-                else:  # go to basic selector. it might know what to do
-                    self.vertex_selector(app_vertex)
-            if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
-                app_vertex.verify_splitter(app_vertex.splitter)
-
-    @staticmethod
-    def abstract_pop_heuristic(app_vertex):
-        """ Assign the splitter for APV. Allows future overrides
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
-            app vertex
-        """
-        app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
-
-    @staticmethod
-    def external_spinnaker_link_heuristic(app_vertex):
-        """ Assign the splitter for SpiNNaker link vertices.\
-            Allows future overrides
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
-            app vertex
-        """
-        app_vertex.splitter = SplitterOneToOneLegacy()
-
-    @staticmethod
-    def external_fpga_link_heuristic(app_vertex):
-        """ Assign the splitter for FPGA link vertices. Allows future overrides
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
-            app vertex
-        """
-        app_vertex.splitter = SplitterOneToOneLegacy()
-
-    @staticmethod
-    def spike_source_array_heuristic(app_vertex):
-        """ Assign the splitter for SSA. Allows future overrides
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
-            app vertex
-        """
-        app_vertex.splitter = SpynnakerSplitterFixedLegacy()
-
-    @staticmethod
-    def spike_source_poisson_heuristic(app_vertex):
-        """ Assign the splitter for SSP. Allows future overrides
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_vertex:
-            app vertex
-        """
-        app_vertex.splitter = SplitterPoissonDelegate()
+    :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        app vertex to give a splitter object to
+    :rtype: None
+    """
+    if app_vertex.splitter is None:
+        if isinstance(app_vertex, AbstractPopulationVertex):
+            app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+        elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
+            app_vertex.splitter = SplitterOneToOneLegacy()
+        elif isinstance(app_vertex, ApplicationFPGAVertex):
+            app_vertex.splitter = SplitterOneToOneLegacy()
+        elif isinstance(app_vertex, SpikeSourceArrayVertex):
+            app_vertex.splitter = SpynnakerSplitterFixedLegacy()
+        elif isinstance(app_vertex, SpikeSourcePoissonVertex):
+            app_vertex.splitter = SplitterPoissonDelegate()
+        else:  # go to basic selector. it might know what to do
+            vertex_selector(app_vertex)
+    if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
+        app_vertex.verify_splitter(app_vertex.splitter)
