@@ -112,12 +112,12 @@ static uint32_t dma_complete_count;
 static uint32_t max_pipeline_restarts;
 static uint32_t spike_pipeline_deactivation_time = 0;
 static uint32_t timer_callback_completed = 0;
-static uint32_t spikes_this_time_step; // needed because packets gets reset?
-static uint32_t dmas_this_time_step;
-static uint32_t pipeline_restarts;
+static uint32_t spikes_this_time_step = 0; // needed because packets gets reset?
+static uint32_t dmas_this_time_step = 0;
+static uint32_t pipeline_restarts = 0;
 
-static uint32_t max_flushed_spikes;
-static uint32_t total_flushed_spikes;
+static uint32_t max_flushed_spikes = 0;
+static uint32_t total_flushed_spikes = 0;
 
 //! the number of packets received this time step
 static struct {

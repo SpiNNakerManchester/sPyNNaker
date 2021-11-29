@@ -35,20 +35,6 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         ("n_invalid_pop_table_hits", ctypes.c_uint32),
         # The number of spikes that didn't transfer empty rows
         ("n_filtered_by_bitfield", ctypes.c_uint32),
-        # Custom provenance from SpiNNCer - max spikes in a tick
-        ("max_spikes_in_a_tick", ctypes.c_uint32),
-        # max dmas in a tick
-        ("max_dmas_in_a_tick", ctypes.c_uint32),
-        # max pipeline restarts
-        ("max_pipeline_restarts", ctypes.c_uint32),
-        # timer callback completed?
-        ("timer_callback_completed", ctypes.c_uint32),
-        # spikes pipeline activated?
-        ("spikes_pipeline_activated", ctypes.c_uint32),
-        # Max flushed spikes in a timestep
-        ("max_flushed_spikes", ctypes.c_uint32),
-        # Total flushed spikes
-        ("total_flushed_spikes", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -70,15 +56,6 @@ class PopulationMachineSynapsesProvenance(object):
     INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
     BIT_FIELD_FILTERED_PACKETS = \
         "How many packets were filtered by the bitfield filterer."
-    # Custom provenance from SpiNNCer
-    MAX_SPIKES_IN_A_TICK = "Maximum number of spikes in a timer tick"
-    MAX_DMAS_IN_A_TICK = "Maximum number of DMAs in a timer tick"
-    MAX_PIPELINE_RESTARTS = "Maximum pipeline restarts"
-    TIMER_CALLBACK_COMPLETED = "Was the timer callback completed?"
-    SPIKES_PIPELINE_ACTIVATED = "Was the spikes pipeline activated?"
-    # Flushed spikes
-    MAX_FLUSHED_SPIKES = "Maximum number of spikes flushed in a timer tick"
-    TOTAL_FLUSHED_SPIKES = "Total number of spikes flushed"
 
     @abstractproperty
     def _app_vertex(self):
@@ -152,47 +129,3 @@ class PopulationMachineSynapsesProvenance(object):
             db.insert_core(
                 x, y, p, self.BIT_FIELD_FILTERED_PACKETS,
                 synapse_prov.n_filtered_by_bitfield)
-
-            # SpiNNCer
-            db.insert_core(
-                x, y, p, self.MAX_SPIKES_IN_A_TICK,
-                synapse_prov.max_spikes_in_a_tick)
-            if synapse_prov.max_spikes_in_a_tick > 200:
-                db.insert_report(
-                    f"Max number of spikes for {label} was "
-                    f"{synapse_prov.max_spikes_in_a_tick}. Empirically, we "
-                    f"can deal with ~200 for real time performance using a "
-                    f"1.0 ms timestep.")
-
-            db.insert_core(
-                x, y, p, self.MAX_DMAS_IN_A_TICK,
-                synapse_prov.max_dmas_in_a_tick)
-
-            db.insert_core(
-                x, y, p, self.MAX_PIPELINE_RESTARTS,
-                synapse_prov.max_pipeline_restarts)
-
-            db.insert_core(
-                x, y, p, self.TIMER_CALLBACK_COMPLETED,
-                synapse_prov.timer_callback_completed)
-
-            db.insert_core(
-                x, y, p, self.SPIKES_PIPELINE_ACTIVATED,
-                synapse_prov.spikes_pipeline_activated)
-
-            # FLUSHED SPIKES
-            db.insert_core(
-                x, y, p, self.MAX_FLUSHED_SPIKES,
-                synapse_prov.max_flushed_spikes)
-            if synapse_prov.max_flushed_spikes > 0:
-                db.insert_report(
-                    f"Max number of flushed spikes for {label} was "
-                    f"was {synapse_prov.max_flushed_spikes}.")
-
-            db.insert_core(
-                x, y, p, self.TOTAL_FLUSHED_SPIKES,
-                synapse_prov.total_flushed_spikes)
-            if synapse_prov.total_flushed_spikes > 0:
-                db.insert_report(
-                    f"Total number of flushed spikes for {label} was "
-                    f"{synapse_prov.total_flushed_spikes}.")
