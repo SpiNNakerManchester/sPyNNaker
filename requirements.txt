@@ -33,6 +33,5 @@ pynn >= 0.9.1, < 0.10
 lazyarray >= 0.2.9, <= 0.4.0
 appdirs >= 1.4.2 , < 2.0.0
 neo >= 0.5.2, < 0.10.0
-pandas
 # csa  # needed but excluded due to readthedocs
 # spinnaker_tools
