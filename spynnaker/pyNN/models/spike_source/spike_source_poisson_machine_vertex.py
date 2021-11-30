@@ -261,13 +261,11 @@ class SpikeSourcePoissonMachineVertex(
     def max_spikes_per_ts(self):
         return self.app_vertex.max_spikes_per_ts()
 
-    @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
-    @overrides(AbstractRewritesDataSpecification.reload_required,
-               additional_arguments={"first_machine_time_step"})
-    def reload_required(self, first_machine_time_step):
+    @overrides(AbstractRewritesDataSpecification.reload_required)
+    def reload_required(self):
         # pylint: disable=arguments-differ
         return (self.__change_requires_neuron_parameters_reload or
-                first_machine_time_step == 0)
+                SpynnakerDataView().first_machine_time_step == 0)
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
@@ -275,19 +273,16 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "graph": "MachineGraph",
-        "first_machine_time_step": "FirstMachineTimeStep"})
+        "graph": "MachineGraph"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "routing_info", "graph", "first_machine_time_step"})
+            "routing_info", "graph"})
     def regenerate_data_specification(
-            self, spec, placement, routing_info, graph,
-            first_machine_time_step):
+            self, spec, placement, routing_info, graph):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
-        :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
@@ -300,7 +295,7 @@ class SpikeSourcePoissonMachineVertex(
             routing_info=routing_info)
 
         # write rates
-        self._write_poisson_rates(spec, first_machine_time_step)
+        self._write_poisson_rates(spec)
 
         # end spec
         spec.end_specification()
@@ -308,21 +303,17 @@ class SpikeSourcePoissonMachineVertex(
     @inject_items({
         "routing_info": "RoutingInfos",
         "graph": "MachineGraph",
-        "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "routing_info", "graph", "first_machine_time_step"
-        }
+            "routing_info", "graph"}
     )
     def generate_data_specification(
-            self, spec, placement, routing_info, graph,
-            first_machine_time_step):
+            self, spec, placement, routing_info, graph):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
-        :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
@@ -351,7 +342,7 @@ class SpikeSourcePoissonMachineVertex(
             spec, graph, placement, routing_info)
 
         # write rates
-        self._write_poisson_rates(spec, first_machine_time_step)
+        self._write_poisson_rates(spec)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -402,14 +393,11 @@ class SpikeSourcePoissonMachineVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_poisson_rates(
-            self, spec, first_machine_time_step):
+    def _write_poisson_rates(self, spec):
         """ Generate Rate data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param int first_machine_time_step:
-            First machine time step to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
                      .format(self.vertex_slice.n_atoms))
@@ -501,6 +489,7 @@ class SpikeSourcePoissonMachineVertex(
         # Work out the index where the core should start based on the given
         # first timestep
         ends_scaled_split = numpy.array_split(ends_scaled, splits)
+        first_machine_time_step = SpynnakerDataView().first_machine_time_step
         indices = [numpy.argmax(e > first_machine_time_step)
                    for e in ends_scaled_split[:-1]]
 
