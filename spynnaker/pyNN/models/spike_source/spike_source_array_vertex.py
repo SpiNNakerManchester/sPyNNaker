@@ -104,7 +104,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(int spike_times:
         """
-        current_time = SpynnakerDataView().current_run_times_ms
+        current_time = SpynnakerDataView().current_run_time_ms
         for i in range(len(spike_times)):
             if spike_times[i] < current_time:
                 logger.warning(
@@ -122,7 +122,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(iterable(int) spike_times:
         """
-        current_time = FecDataView().current_run_times_ms
+        current_time = FecDataView().current_run_time_ms
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
             for i in range(len(id_times)):

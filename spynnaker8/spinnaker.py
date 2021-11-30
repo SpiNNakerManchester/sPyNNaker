@@ -188,7 +188,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return (self._data_writer.current_run_timesteps_ms)
+        return (self._data_writer.current_run_time_ms)
 
     @property
     def segment_counter(self):

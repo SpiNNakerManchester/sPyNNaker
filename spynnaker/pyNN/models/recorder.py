@@ -466,7 +466,7 @@ class Recorder(object):
                 self.__read_in_spikes(
                     segment=segment,
                     spikes=self.get_spikes(),
-                    t=SpynnakerDataView().current_run_times_ms,
+                    t=SpynnakerDataView().current_run_time_ms,
                     n_neurons=self.__population.size,
                     recording_start_time=self._recording_start_time,
                     sampling_interval=self.__spike_sampling_interval,
