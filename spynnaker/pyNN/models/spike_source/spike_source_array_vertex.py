@@ -22,8 +22,6 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
@@ -122,7 +120,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(iterable(int) spike_times:
         """
-        current_time = FecDataView().current_run_time_ms
+        current_time = SpynnakerDataView().current_run_time_ms
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
             for i in range(len(id_times)):

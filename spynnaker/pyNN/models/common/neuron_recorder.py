@@ -21,7 +21,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
-from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
@@ -1083,7 +1082,7 @@ class NeuronRecorder(object):
         :return: data size
         :rtype: int
         """
-        n_machine_time_steps = FecDataView().max_run_time_steps
+        n_machine_time_steps = SpynnakerDataView().max_run_time_steps
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
             item = self.get_buffered_sdram_per_record(variable, vertex_slice)
