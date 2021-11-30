@@ -188,7 +188,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the current runtime already executed
         :rtype: float
         """
-        return (self._current_run_timesteps *
+        return (self._data_writer.current_run_timesteps *
                 self._data_writer.simulation_time_step_ms)
 
     @property
