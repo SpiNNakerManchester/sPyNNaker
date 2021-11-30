@@ -20,7 +20,6 @@ from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
-from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_neurons import (
