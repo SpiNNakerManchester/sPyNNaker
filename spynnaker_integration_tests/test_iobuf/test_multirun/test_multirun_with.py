@@ -19,6 +19,7 @@ import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 
+
 class TestIobuffMultirun(BaseTestCase):
 
     def check_size(self, prov_path, placement):

@@ -21,6 +21,7 @@ import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 
+
 class TestNoIobufDuringRun(BaseTestCase):
 
     def check_for_iobufs(self, prov_path):
