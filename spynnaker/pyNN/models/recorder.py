@@ -22,6 +22,7 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
 from spynnaker.pyNN.utilities.constants import (
@@ -248,8 +249,9 @@ class Recorder(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
+            view = SpynnakerDataView()
             results = self.__vertex.get_data(
-                variable, sim.no_machine_time_steps, sim.placements,
+                variable, view.current_run_timesteps, sim.placements,
                 sim.buffer_manager)
             (data, indexes, sampling_interval) = results
 
@@ -464,7 +466,7 @@ class Recorder(object):
                 self.__read_in_spikes(
                     segment=segment,
                     spikes=self.get_spikes(),
-                    t=get_simulator().get_current_time(),
+                    t=SpynnakerDataView().current_run_times_ms,
                     n_neurons=self.__population.size,
                     recording_start_time=self._recording_start_time,
                     sampling_interval=self.__spike_sampling_interval,
