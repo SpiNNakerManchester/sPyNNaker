@@ -284,7 +284,6 @@ class PopulationMachineVertex(
         :param routing_info: (injected)
         """
         # pylint: disable=arguments-differ
-        data_n_time_steps = FecDataView().max_run_time_steps
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
             self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
