@@ -60,14 +60,14 @@ class TestLiveGatherTranslator(BaseTestCase):
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 5)
 
         pop = p.Population(
-            25, p.SpikeSourceArray([[i * 10] for i in range(25)]))
+            25, p.SpikeSourceArray([[1000 + (i * 10)] for i in range(25)]))
         p.external_devices.activate_live_output_for(
             pop, port=self.conn.local_port, translate_keys=True,
             database_notify_port_num=db_conn.local_port, tag=1,
             use_prefix=True, key_prefix=self.PREFIX,
             prefix_type=EIEIOPrefix.UPPER_HALF_WORD)
 
-        p.run(500)
+        p.run(1500)
 
         p.end()
         self.listener.close()
@@ -76,7 +76,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         self.assertGreater(len(self.stored_data), 0)
         for key, time in self.stored_data:
             self.assertEqual(key >> 16, self.PREFIX)
-            self.assertEqual((key & 0xFFFF) * 10, time)
+            self.assertEqual(1000 + ((key & 0xFFFF) * 10), time)
 
     def test_live_spike_receive_translated(self):
         self.runsafe(self.live_spike_receive_translated)
