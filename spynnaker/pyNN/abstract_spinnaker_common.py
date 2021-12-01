@@ -169,27 +169,24 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             logger.warning(
                 "****************************************************")
 
-    def _detect_if_graph_has_changed(self, reset_flags=True):
+    def _detect_if_graph_has_changed(self):
         """ Iterate though the graph and look for changes.
 
         :param bool reset_flags:
         """
-        changed, data_changed = super()._detect_if_graph_has_changed(
-            reset_flags)
+        changed, data_changed = super()._detect_if_graph_has_changed()
 
         # Additionally check populations for changes
         for population in self._populations:
             if population.requires_mapping:
                 changed = True
-            if reset_flags:
-                population.mark_no_changes()
+            population.mark_no_changes()
 
         # Additionally check projections for changes
         for projection in self._projections:
             if projection.requires_mapping:
                 changed = True
-            if reset_flags:
-                projection.mark_no_changes()
+            projection.mark_no_changes()
 
         return changed, data_changed
 
@@ -372,7 +369,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 return
             spynnaker_machine_bitField_pair_router_compressor(
                 self._router_tables, self._txrx, self._machine,
-                self._machine_graph, self._placements, self._executable_finder,
+                self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
