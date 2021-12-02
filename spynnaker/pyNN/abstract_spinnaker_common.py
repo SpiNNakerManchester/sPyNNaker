@@ -399,13 +399,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             on_chip_bitfield_generator(
-                self.placements, self.application_graph,
-                self._executable_finder,  self._txrx, self._machine_graph,
-                self._routing_infos)
+                self.placements, self._executable_finder,  self._txrx)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):
-            finish_connection_holders(self.application_graph)
+            finish_connection_holders()
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
@@ -419,8 +417,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 "SpYNNakerNeuronGraphNetworkSpecificationReport") as timer:
             if timer.skip_if_cfg_false("Reports", "write_network_graph"):
                 return
-            spynnaker_neuron_graph_network_specification_report(
-                self._application_graph)
+            spynnaker_neuron_graph_network_specification_report()
 
     @overrides(AbstractSpinnakerBase._do_extra_mapping_algorithms,
                extend_doc=False)
@@ -442,7 +439,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
         with FecTimer(MAPPING, "Spynnaker splitter selector"):
-            spynnaker_splitter_selector(self._application_graph)
+            spynnaker_splitter_selector()
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
                extend_doc=False)
@@ -455,21 +452,22 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                delay_support_adder(self._application_graph)
+                delay_support_adder()
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self, pre_allocated_resources):
-        if not self._application_graph.n_vertices:
+        if not self._data_writer.runtime_graph.n_vertices:
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
             if self._machine:
                 machine = self._machine
             else:
                 machine = self._max_machine
-            self._machine_graph, self._n_chips_needed = \
+            machine_graph, self._n_chips_needed = \
                 spynnaker_splitter_partitioner(
-                    self._application_graph, machine, self._plan_n_timesteps,
+                    self._data_writer.graph, machine, self._plan_n_timesteps,
                     pre_allocated_resources)
+            self._data_writer.set_runtime_machine_graph(machine_graph)

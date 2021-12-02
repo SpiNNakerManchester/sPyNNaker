@@ -12,17 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spinn_utilities.progress_bar import ProgressBar
 
 
-def finish_connection_holders(application_graph):
+def finish_connection_holders():
     """ Finishes the connection holders after data has been generated within\
         them, allowing any waiting callbacks to be called.
 
     :param ~pacman.model.graphs.application.ApplicationGraph application_graph:
     """
-    edges = application_graph.edges
+    edges = SpynnakerDataView().runtime_graph.edges
     progress = ProgressBar(len(edges), "Finalising Retrieved Connections")
     for edge in progress.over(edges):
         if isinstance(edge, ProjectionApplicationEdge):
