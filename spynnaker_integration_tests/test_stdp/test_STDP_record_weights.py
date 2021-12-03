@@ -19,7 +19,7 @@ from spinnaker_testbase import BaseTestCase
 # Parameters:
 simulationParameters = {"simTime": 10, "timeStep": 1.0}
 popNeurons = {"ILayer": 2, "LIFLayer": 2}
-ILSpike = [[1, 6, 11, 16, 21],[]]
+ILSpike = [[1, 6, 11, 16, 21], []]
 neuronParameters = {
     "LIFL": {"cm": 0.27, "i_offset": 0.0, "tau_m": 10.0, "tau_refrac": 1.0,
              "tau_syn_E": 0.3, "tau_syn_I": 0.3, "v_reset": -60.0,
@@ -62,7 +62,7 @@ def record_weights_using_callback():
     ######################################
 
     # ILayer-LIFLayer -> statics
-    ILayer_LIFLayer_conn = sim.Projection(
+    sim.Projection(
         ILayer, LIFLayer, sim.OneToOneConnector(),
         synapse_type=sim.StaticSynapse(
             weight=synParameters["IL-LIFL"]["initWeight"],
@@ -166,7 +166,7 @@ def record_weights_using_multirun():
     ######################################
 
     # ILayer-LIFLayer -> statics
-    ILayer_LIFLayer_conn = sim.Projection(
+    sim.Projection(
         ILayer, LIFLayer, sim.OneToOneConnector(),
         synapse_type=sim.StaticSynapse(
             weight=synParameters["IL-LIFL"]["initWeight"],
@@ -230,7 +230,6 @@ class TestSTDPRecordWeights(BaseTestCase):
 
         assert(all(wc[0] == wm[0] for wc, wm in zip(w_callback, w_multirun)))
         assert(all(wc[1] == wm[1] for wc, wm in zip(w_callback, w_multirun)))
-
 
     def test_STDP_record_weights(self):
         self.runsafe(self.do_run)
