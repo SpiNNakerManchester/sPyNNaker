@@ -43,18 +43,20 @@ class TestLiveGatherTranslator(BaseTestCase):
             self.stored_data.append((key, time))
             print(f"Received key {hex(key)} at time {time}")
 
-    def start_callback(self):
+    def database_callback(self, db_reader):
+        ip_addr = db_reader.get_ip_address(0, 0)
+        self.conn = UDPSCAMPConnection(remote_host=ip_addr)
+        print(f"Listening on port {self.conn.local_port}")
+        self.listener = ConnectionListener(self.conn)
+        self.listener.add_callback(self.recv)
         reprogram_tag(self.conn, tag=1, strip=True)
         self.listener.start()
 
     def live_spike_receive_translated(self):
         self.stored_data = list()
-        self.conn = UDPSCAMPConnection(remote_host="192.168.240.253")
-        print(f"Listening on port {self.conn.local_port}")
-        self.listener = ConnectionListener(self.conn)
-        self.listener.add_callback(self.recv)
 
-        db_conn = DatabaseConnection(self.start_callback, local_port=None)
+        db_conn = DatabaseConnection(local_port=None)
+        db_conn.add_database_callback(self.database_callback)
 
         p.setup(1.0)
         p.set_number_of_neurons_per_core(p.SpikeSourceArray, 5)
@@ -62,7 +64,7 @@ class TestLiveGatherTranslator(BaseTestCase):
         pop = p.Population(
             25, p.SpikeSourceArray([[1000 + (i * 10)] for i in range(25)]))
         p.external_devices.activate_live_output_for(
-            pop, port=self.conn.local_port, translate_keys=True,
+            pop, translate_keys=True,
             database_notify_port_num=db_conn.local_port, tag=1,
             use_prefix=True, key_prefix=self.PREFIX,
             prefix_type=EIEIOPrefix.UPPER_HALF_WORD)
