@@ -355,9 +355,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
                 self._router_tables, self._txrx, self._machine,
-                self._machine_graph, self._placements, self._executable_finder,
-                self._routing_infos, self._executable_targets,
-                get_config_bool("Reports", "write_expander_iobuf"))
+                self._placements, self._executable_finder, self._routing_infos,
+                self._executable_targets)
             self._multicast_routes_loaded = True
             return None
 
@@ -370,8 +369,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             spynnaker_machine_bitField_pair_router_compressor(
                 self._router_tables, self._txrx, self._machine,
                 self._placements, self._executable_finder,
-                self._routing_infos, self._executable_targets,
-                get_config_bool("Reports", "write_expander_iobuf"))
+                self._routing_infos, self._executable_targets)
             self._multicast_routes_loaded = True
             return None
 
