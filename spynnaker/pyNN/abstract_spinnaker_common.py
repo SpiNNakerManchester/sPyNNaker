@@ -466,6 +466,5 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 machine = self._max_machine
             machine_graph, self._n_chips_needed = \
                 spynnaker_splitter_partitioner(
-                    self._data_writer.runtime_graph, machine,
-                    self._plan_n_timesteps, pre_allocated_resources)
+                    machine, self._plan_n_timesteps, pre_allocated_resources)
             self._data_writer.set_runtime_machine_graph(machine_graph)

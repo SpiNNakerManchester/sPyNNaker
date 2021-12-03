@@ -126,8 +126,7 @@ def test_write_data_spec():
     SpynnakerDataWriter()._set_runtime_graph(app_graph)
     with (injection_context(context)):
         delay_support_adder()
-        machine_graph, _ = spynnaker_splitter_partitioner(
-            app_graph, machine, 100)
+        machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
         allocator = ZonedRoutingInfoAllocator()
         SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
         n_keys_map = edge_to_n_keys_mapper()
@@ -459,8 +458,7 @@ def test_pop_based_master_pop_table_standard(
     SpynnakerDataWriter().start_run()
     with (injection_context(context)):
         delay_support_adder()
-        machine_graph, _ = spynnaker_splitter_partitioner(
-            app_graph, machine, 100)
+        machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
         allocator = ZonedRoutingInfoAllocator()
         SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
         n_keys_map = edge_to_n_keys_mapper()
