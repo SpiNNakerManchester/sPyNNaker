@@ -106,7 +106,8 @@ class ExternalDeviceLifControlVertex(
         super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter)
+            neuron_impl, pynn_model, drop_late_spikes, splitter,
+            rb_left_shifts)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ
