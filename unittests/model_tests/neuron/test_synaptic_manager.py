@@ -27,7 +27,6 @@ from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
-from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from data_specification import (
@@ -119,18 +118,14 @@ def test_write_data_spec():
         p.StaticSynapse())
 
     app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
     SpynnakerDataWriter().start_run()
     SpynnakerDataWriter()._set_runtime_graph(app_graph)
-    with (injection_context(context)):
-        delay_support_adder()
-        machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
-        n_keys_map = edge_to_n_keys_mapper()
-        routing_info = allocator.__call__(n_keys_map, flexible=False)
+    delay_support_adder()
+    machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
+    allocator = ZonedRoutingInfoAllocator()
+    SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
+    n_keys_map = edge_to_n_keys_mapper()
+    routing_info = allocator.__call__(n_keys_map, flexible=False)
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -450,18 +445,14 @@ def test_pop_based_master_pop_table_standard(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
     app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
     SpynnakerDataWriter()._set_runtime_graph(app_graph)
     SpynnakerDataWriter().start_run()
-    with (injection_context(context)):
-        delay_support_adder()
-        machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
-        n_keys_map = edge_to_n_keys_mapper()
-        routing_info = allocator.__call__(n_keys_map, flexible=False)
+    delay_support_adder()
+    machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
+    allocator = ZonedRoutingInfoAllocator()
+    SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
+    n_keys_map = edge_to_n_keys_mapper()
+    routing_info = allocator.__call__(n_keys_map, flexible=False)
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice

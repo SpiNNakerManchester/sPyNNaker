@@ -16,7 +16,6 @@ import math
 
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
@@ -33,6 +32,7 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -91,12 +91,10 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def source_of_delay_vertex(self):
         return self._other_splitter.governed_app_vertex
 
-    @inject_items({"app_graph": "ApplicationGraph"})
-    @overrides(
-        AbstractDependentSplitter.create_machine_vertices,
-        additional_arguments=["app_graph"])
-    def create_machine_vertices(
-            self, resource_tracker, machine_graph, app_graph):
+    @overrides(AbstractDependentSplitter.create_machine_vertices)
+    def create_machine_vertices(self, resource_tracker, machine_graph):
+
+        app_graph = SpynnakerDataView().runtime_graph
         # pylint: disable=arguments-differ
         pre_slices, is_exact = self._other_splitter.get_out_going_slices()
 
