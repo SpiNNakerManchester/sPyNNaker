@@ -21,6 +21,7 @@
 #define _NEURON_MODEL_LIF_CURR_IMPL_H_
 
 #include "neuron_model.h"
+#include "round.h"
 
 /////////////////////////////////////////////////////////////
 //! definition for LIF neuron parameters

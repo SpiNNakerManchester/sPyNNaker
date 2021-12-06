@@ -18,7 +18,6 @@
 //! \file
 //! \brief Leaky Integrate and Fire neuron implementation
 #include "neuron_model_lif_impl.h"
-#include "round.h"
 
 #include <debug.h>
 
