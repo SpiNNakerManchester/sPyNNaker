@@ -130,8 +130,7 @@ def test_write_data_spec():
         allocator = ZonedRoutingInfoAllocator()
         SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
         n_keys_map = edge_to_n_keys_mapper()
-        routing_info = allocator.__call__(
-            machine_graph, n_keys_map, flexible=False)
+        routing_info = allocator.__call__(n_keys_map, flexible=False)
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -462,8 +461,7 @@ def test_pop_based_master_pop_table_standard(
         allocator = ZonedRoutingInfoAllocator()
         SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
         n_keys_map = edge_to_n_keys_mapper()
-        routing_info = allocator.__call__(
-            machine_graph, n_keys_map, flexible=False)
+        routing_info = allocator.__call__(n_keys_map, flexible=False)
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
