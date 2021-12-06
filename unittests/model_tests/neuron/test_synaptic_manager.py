@@ -216,7 +216,8 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        rb_left_shifts=None)
 
     static = SynapseDynamicsStatic()
     stdp = SynapseDynamicsSTDP(
@@ -326,7 +327,8 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        rb_left_shifts=None)
 
     # STDP followed by structural STDP should result in Structural STDP
     post_app_vertex.synapse_dynamics = stdp
@@ -348,7 +350,8 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        rb_left_shifts=None)
 
     # Static followed by static structural should result in static
     # structural
@@ -385,7 +388,8 @@ def test_set_synapse_dynamics():
     post_app_vertex = post_app_model.create_vertex(
         n_neurons=10, label="post", constraints=None, spikes_per_second=None,
         ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None)
+        n_steps_per_timestep=1, drop_late_spikes=True, splitter=None,
+        rb_left_shifts=None)
     post_app_vertex.synapse_dynamics = static_struct
     post_app_vertex.synapse_dynamics = stdp_struct
 
