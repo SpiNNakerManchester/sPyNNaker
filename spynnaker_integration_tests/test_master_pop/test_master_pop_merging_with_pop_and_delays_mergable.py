@@ -24,7 +24,7 @@ def fancy_do_load(graph_changed):
     with FecTimer("WEIRD", "KeyConstraintAdder"):
         simulator = get_simulator()
         adder = KeyConstraintAdder()
-        adder(simulator.machine_graph)
+        adder()
     simulator.do_load_normal(graph_changed)
 
 

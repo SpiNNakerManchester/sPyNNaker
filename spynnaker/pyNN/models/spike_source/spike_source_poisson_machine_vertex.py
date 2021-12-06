@@ -217,12 +217,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
     def is_in_injection_mode(self):
-        # pylint: disable=no-value-for-parameter
-        return self._is_in_injection_mode()
-
-    @inject_items({"graph": "MachineGraph"})
-    def _is_in_injection_mode(self, graph):
-        # pylint: disable=arguments-differ
+        graph = SpynnakerDataView().runtime_machine_graph
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
@@ -272,17 +267,15 @@ class SpikeSourcePoissonMachineVertex(
         self.__change_requires_neuron_parameters_reload = new_value
 
     @inject_items({
-        "routing_info": "RoutingInfos",
-        "graph": "MachineGraph"})
+        "routing_info": "RoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "routing_info", "graph"})
+            "routing_info"})
     def regenerate_data_specification(
-            self, spec, placement, routing_info, graph):
+            self, spec, placement, routing_info):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
@@ -291,8 +284,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # write parameters
         self._write_poisson_parameters(
-            spec=spec, graph=graph, placement=placement,
-            routing_info=routing_info)
+            spec=spec, placement=placement, routing_info=routing_info)
 
         # write rates
         self._write_poisson_rates(spec)
@@ -302,18 +294,15 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "graph": "MachineGraph",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "graph"}
+        additional_arguments={"routing_info"}
     )
     def generate_data_specification(
-            self, spec, placement, routing_info, graph):
+            self, spec, placement, routing_info):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
@@ -338,8 +327,7 @@ class SpikeSourcePoissonMachineVertex(
             recorded_region_sizes))
 
         # write parameters
-        self._write_poisson_parameters(
-            spec, graph, placement, routing_info)
+        self._write_poisson_parameters(spec, placement, routing_info)
 
         # write rates
         self._write_poisson_rates(spec)
@@ -499,12 +487,11 @@ class SpikeSourcePoissonMachineVertex(
             for i, d in enumerate(core_data_split[:-1])])
         spec.write_array(final_data)
 
-    def _write_poisson_parameters(self, spec, graph, placement, routing_info):
+    def _write_poisson_parameters(self, spec, placement, routing_info):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param ~pacman.model.placements.Placement placement:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
@@ -523,6 +510,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
+        graph = SpynnakerDataView().runtime_machine_graph
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:

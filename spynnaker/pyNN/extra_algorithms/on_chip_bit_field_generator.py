@@ -54,27 +54,19 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-def on_chip_bitfield_generator(
-        placements, app_graph, executable_finder, transceiver,
-        machine_graph, routing_infos):
+def on_chip_bitfield_generator(placements, executable_finder, transceiver):
     """ Loads and runs the bit field generator on chip.
 
     :param ~pacman.model.placements.Placements placements: placements
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
     :param executable_finder: the executable finder
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
     :param ~spinnman.transceiver.Transceiver transceiver:
         the SpiNNMan instance
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        the machine graph
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        the key to edge map
     """
     generator = _OnChipBitFieldGenerator(
         placements, executable_finder, transceiver)
-    generator._run(app_graph, executable_finder, machine_graph, routing_infos)
+    generator._run(executable_finder)
 
 
 class _OnChipBitFieldGenerator(object):
@@ -125,31 +117,25 @@ class _OnChipBitFieldGenerator(object):
             the SpiNNMan instance
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-            the key to edge map
         """
         self.__txrx = transceiver
         self.__placements = placements
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
-    def _run(
-            self, app_graph, executable_finder, machine_graph, routing_infos):
+    def _run(self, executable_finder):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            the machine graph
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-            the key to edge map
         """
+        view = SpynnakerDataView()
+        app_graph = view.runtime_graph
+        machine_graph = view.runtime_machine_graph
         # progress bar
         progress = ProgressBar(
             app_graph.n_vertices + machine_graph.n_vertices + 1,

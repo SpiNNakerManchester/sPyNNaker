@@ -25,6 +25,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 
 #  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
 #  6. n_delay_stages, 7. the number of delay supported by each delay stage
@@ -241,16 +242,12 @@ class DelayExtensionMachineVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @inject_items({
-        "machine_graph": "MachineGraph",
         "routing_infos": "RoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "machine_graph", "routing_infos"})
-    def generate_data_specification(
-            self, spec, placement, machine_graph, routing_infos):
+        additional_arguments={"routing_infos"})
+    def generate_data_specification(self, spec, placement, routing_infos):
         """
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         """
         # pylint: disable=arguments-differ
@@ -289,8 +286,8 @@ class DelayExtensionMachineVertex(
 
         incoming_key = 0
         incoming_mask = 0
-        incoming_edges = machine_graph.get_edges_ending_at_vertex(
-            vertex)
+        graph = SpynnakerDataView().runtime_machine_graph
+        incoming_edges = graph.get_edges_ending_at_vertex(vertex)
 
         for incoming_edge in incoming_edges:
             incoming_slice = incoming_edge.pre_vertex.vertex_slice

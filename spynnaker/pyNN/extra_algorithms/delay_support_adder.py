@@ -30,15 +30,13 @@ from spynnaker.pyNN.utilities import constants
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def delay_support_adder(app_graph):
+def delay_support_adder():
     """ adds the delay extensions to the app graph, now that all the\
         splitter objects have been set.
 
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
     """
     adder = _DelaySupportAdder()
-    adder._run(app_graph)
+    adder._run()
 
 
 class _DelaySupportAdder(object):
@@ -78,14 +76,12 @@ class _DelaySupportAdder(object):
         self._delay_post_edge_map = dict()
         self._delay_pre_edges = list()
 
-    def _run(self, app_graph):
+    def _run(self):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
         """
-
+        app_graph = SpynnakerDataView().runtime_graph
         # progress abr and data holders
         progress = ProgressBar(
             len(list(app_graph.outgoing_edge_partitions)),

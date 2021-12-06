@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -89,7 +90,7 @@ def __machine_expandables(cores, placements):
 
 def _rerun_synaptic_cores(
         synaptic_expander_rerun_cores, transceiver, executable_finder,
-        needs_sync_barrier, read_expander_iobuf):
+        needs_sync_barrier):
     """ reruns the synaptic expander
 
     :param ~.ExecutableTargets synaptic_expander_rerun_cores:
@@ -98,22 +99,21 @@ def _rerun_synaptic_cores(
     :param ~.ExecutableFinder executable_finder:
         finder of binary file paths
     :param bool needs_sync_barrier:
-    :param bool read_expander_iobuf: whether to read off iobuf if needed
     """
     if synaptic_expander_rerun_cores.total_processors:
         logger.info("rerunning synaptic expander")
         expander_app_id = transceiver.app_id_tracker.get_new_id()
         run_system_application(
             synaptic_expander_rerun_cores, expander_app_id, transceiver,
-            executable_finder, read_expander_iobuf,
+            executable_finder,
+            get_config_bool("Reports", "write_expander_iobuf"),
             None, [CPUState.FINISHED], needs_sync_barrier,
             _RERUN_IOBUF_NAME_PATTERN)
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, transceiver, machine, machine_graph,
-        placements, executable_finder, routing_infos, executable_targets,
-        read_expander_iobuf):
+        routing_tables, transceiver, machine,
+        placements, executable_finder, routing_infos, executable_targets,):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
@@ -121,8 +121,6 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
         ~pacman.model.routing_tables.MulticastRoutingTables
     :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
     :param ~pacman.model.placements.Placements placements:
         placements on machine
     :param executable_finder: where are binaries are located
@@ -131,11 +129,10 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     :param ~pacman.model.routing_info.RoutingInfo routing_infos:
     :type retry_count: int or None
     :param bool read_algorithm_iobuf: flag saying if read iobuf
-    :param bool read_expander_iobuf: reads the synaptic expander iobuf.
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor(
-            routing_tables, transceiver, machine, machine_graph,
+            routing_tables, transceiver, machine,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
@@ -145,14 +142,12 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
 
     # just rerun the synaptic expander for safety purposes
     _rerun_synaptic_cores(
-        expander_chip_cores, transceiver, executable_finder, True,
-        read_expander_iobuf)
+        expander_chip_cores, transceiver, executable_finder, True)
 
 
 def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables, transceiver, machine, machine_graph,
-        placements, executable_finder, routing_infos, executable_targets,
-        read_expander_iobuf):
+        routing_tables, transceiver, machine,
+        placements, executable_finder, routing_infos, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
@@ -160,8 +155,6 @@ def spynnaker_machine_bitField_pair_router_compressor(
         ~pacman.model.routing_tables.MulticastRoutingTables
     :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        machine graph
     :param ~pacman.model.placements.Placements placements:
         placements on machine
     :param executable_finder: where are binaries are located
@@ -170,11 +163,10 @@ def spynnaker_machine_bitField_pair_router_compressor(
     :param ~pacman.model.routing_info.RoutingInfo routing_infos:
     :type retry_count: int or None
     :param bool read_algorithm_iobuf: flag saying if read iobuf
-    :param bool read_expander_iobuf: reads the synaptic expander iobuf.
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor(
-            routing_tables, transceiver, machine, machine_graph,
+            routing_tables, transceiver, machine,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
@@ -184,5 +176,4 @@ def spynnaker_machine_bitField_pair_router_compressor(
 
     # just rerun the synaptic expander for safety purposes
     _rerun_synaptic_cores(
-        expander_chip_cores, transceiver, executable_finder, True,
-        read_expander_iobuf)
+        expander_chip_cores, transceiver, executable_finder, True)

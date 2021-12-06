@@ -46,17 +46,16 @@ def _get_diagram(label):
             graphviz.backend.ExecutableNotFound)
 
 
-def spynnaker_neuron_graph_network_specification_report(application_graph):
+def spynnaker_neuron_graph_network_specification_report():
     """
     Produces a report describing the graph created from the neural \
         populations and projections.
 
     :param str report_folder: the report folder to put figure into
-    :param ~pacman.model.graphs.application.ApplicationGraph \
-            application_graph:
-        the app graph
     """
     # create holders for data
+    view = SpynnakerDataView()
+    application_graph = view.runtime_graph
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str("Reports", "network_graph_format")
@@ -83,8 +82,7 @@ def spynnaker_neuron_graph_network_specification_report(application_graph):
         application_graph, dot_diagram, vertex_ids, progress)
 
     # write dot file and generate pdf
-    file_to_output = os.path.join(
-        SpynnakerDataView().run_dir_path, _GRAPH_NAME)
+    file_to_output = os.path.join(view.run_dir_path, _GRAPH_NAME)
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exeNotFoundExn:

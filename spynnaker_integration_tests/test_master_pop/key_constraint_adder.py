@@ -18,6 +18,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 from pacman.model.graphs.machine import MulticastEdgePartition
@@ -26,6 +27,7 @@ from pacman.model.graphs.machine import MulticastEdgePartition
 class KeyConstraintAdder(object):
 
     def __call__(self, machine_graph):
+        machine_graph = SpynnakerDataView().runtime_machine_graph
         for outgoing_partition in machine_graph.outgoing_edge_partitions:
             if not isinstance(outgoing_partition, MulticastEdgePartition):
                 continue
