@@ -49,7 +49,8 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, constraints=None, splitter=None):
+            drop_late_spikes=None, constraints=None, splitter=None,
+            rb_left_shifts=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
