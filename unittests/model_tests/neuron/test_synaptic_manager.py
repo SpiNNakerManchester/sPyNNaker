@@ -117,9 +117,8 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
     SpynnakerDataWriter().start_run()
-    SpynnakerDataWriter()._set_runtime_graph(app_graph)
+    SpynnakerDataWriter().clone_graphs()
     delay_support_adder()
     machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
     allocator = ZonedRoutingInfoAllocator()
@@ -444,8 +443,6 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
-    SpynnakerDataWriter()._set_runtime_graph(app_graph)
     SpynnakerDataWriter().start_run()
     delay_support_adder()
     machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
