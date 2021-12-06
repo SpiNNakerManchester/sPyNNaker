@@ -116,7 +116,8 @@
             <span class="n">prefix_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message_type</span><span class="o">=</span><span class="n">EIEIOType</span><span class="o">.</span><span class="n">KEY_32_BIT</span><span class="p">,</span>
             <span class="n">right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">use_payload_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">payload_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">payload_right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">payload_right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">translate_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Output the spikes from a given population from SpiNNaker as they\</span>
 <span class="sd">            occur in the simulation.</span>
 
@@ -169,6 +170,9 @@
 <span class="sd">        :param str label: The label of the gatherer vertex</span>
 <span class="sd">        :param list(str) partition_ids:</span>
 <span class="sd">            The names of the partitions to create edges for</span>
+<span class="sd">        :param bool translate_keys:</span>
+<span class="sd">            Whether the incoming keys from the cores should be translated</span>
+<span class="sd">            to global keys rather than core-based keys</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, protected-access</span>
         <span class="c1"># get default params if none set</span>
@@ -184,7 +188,7 @@
             <span class="n">right_shift</span><span class="p">,</span> <span class="n">payload_as_time_stamps</span><span class="p">,</span> <span class="n">use_payload_prefix</span><span class="p">,</span>
             <span class="n">payload_prefix</span><span class="p">,</span> <span class="n">payload_right_shift</span><span class="p">,</span>
             <span class="n">number_of_packets_sent_per_time_step</span><span class="p">,</span>
-            <span class="n">partition_ids</span><span class="o">=</span><span class="p">[</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">])</span>
+            <span class="n">partition_ids</span><span class="o">=</span><span class="p">[</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">],</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">notify</span><span class="p">:</span>
             <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_database_socket_address</span><span class="p">(</span>
@@ -233,7 +237,7 @@
             <span class="n">right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">use_payload_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">payload_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">payload_right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">partition_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">partition_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an edge from a vertex to the live packet gatherer, builds as\</span>
 <span class="sd">            needed and has all the parameters for the creation of the live\</span>
 <span class="sd">            packet gatherer if needed.</span>
@@ -258,6 +262,7 @@
 <span class="sd">        :param int payload_right_shift:</span>
 <span class="sd">        :param int number_of_packets_sent_per_time_step:</span>
 <span class="sd">        :param list(str) partition_ids:</span>
+<span class="sd">        :param bool translate_keys:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">LivePacketGatherParameters</span><span class="p">(</span>
@@ -270,7 +275,7 @@
             <span class="n">payload_right_shift</span><span class="o">=</span><span class="n">payload_right_shift</span><span class="p">,</span>
             <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="p">(</span>
                 <span class="n">number_of_packets_sent_per_time_step</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">lpg_label</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">lpg_label</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
 
         <span class="c1"># add to the tracker</span>
         <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">add_live_packet_gatherer_parameters</span><span class="p">(</span>
@@ -376,7 +381,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
     </div>
   </body>
 </html>
