@@ -928,7 +928,12 @@ class AbstractPopulationVertex(
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
             # This is to deal with very small weights that are floored to 0
-            mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
+            if min_max_weight[synapse_type] != 0:
+                mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
+            else:
+                # if it is zero then can't take logs...
+                small = 1.0 / 65536.0
+                mmw = 2**math.floor(math.log(small, 2))
             max_weights[synapse_type] = min(mmw * 2 ** 15,
                                             max_weights[synapse_type])
 
