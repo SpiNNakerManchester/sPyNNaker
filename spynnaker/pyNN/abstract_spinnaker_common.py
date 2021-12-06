@@ -165,26 +165,26 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         else:
             self.__min_delay = self.machine_time_step_ms
 
-        # Sort out the maximum delay
-        natively_supported_delay_for_models = \
-            constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extension_max_supported_delay = (
-            constants.MAX_DELAY_BLOCKS *
-            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
-        max_delay_tics_supported = \
-            natively_supported_delay_for_models + \
-            delay_extension_max_supported_delay
-        if (max_delay is not None and max_delay * 1000.0 >
-                max_delay_tics_supported * machine_time_step):
-            raise ConfigurationException(
-                "Pacman does not support max delays above {} ms with the "
-                "current machine time step".format(
-                    max_delay_tics_supported * self.machine_time_step_ms))
-        if max_delay is not None:
-            self.__max_delay = max_delay
-        else:
-            self.__max_delay = (
-                max_delay_tics_supported * self.machine_time_step_ms)
+        # # Sort out the maximum delay
+        # natively_supported_delay_for_models = \
+        #     constants.MAX_SUPPORTED_DELAY_TICS
+        # delay_extension_max_supported_delay = (
+        #     constants.MAX_DELAY_BLOCKS *
+        #     constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+        # max_delay_tics_supported = \
+        #     natively_supported_delay_for_models + \
+        #     delay_extension_max_supported_delay
+        # if (max_delay is not None and max_delay * 1000.0 >
+        #         max_delay_tics_supported * machine_time_step):
+        #     raise ConfigurationException(
+        #         "Pacman does not support max delays above {} ms with the "
+        #         "current machine time step".format(
+        #             max_delay_tics_supported * self.machine_time_step_ms))
+        # if max_delay is not None:
+        #     self.__max_delay = max_delay
+        # else:
+        #     self.__max_delay = (
+        #         max_delay_tics_supported * self.machine_time_step_ms)
 
         # Sort out the time scale factor if not user specified
         # (including config)

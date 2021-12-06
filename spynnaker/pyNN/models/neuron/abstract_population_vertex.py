@@ -860,6 +860,7 @@ class AbstractPopulationVertex(
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
+        min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information

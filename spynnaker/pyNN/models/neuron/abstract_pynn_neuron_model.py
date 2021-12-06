@@ -25,7 +25,7 @@ DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
     "incoming_spike_buffer_size": None, "drop_late_spikes": None,
-    "splitter": None
+    "splitter": None, "rb_left_shifts": None
 }
 
 
