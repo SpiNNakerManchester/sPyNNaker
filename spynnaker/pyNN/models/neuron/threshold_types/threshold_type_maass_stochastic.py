@@ -29,7 +29,12 @@ UNITS = {
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
-    """ A stochastic threshold
+    """ A stochastic threshold.
+
+    Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical \
+    microcircuit models. *PLoS Computational Biology.* 2013;9(11):e1003311. \
+    `doi:10.1371/journal.pcbi.1003311 \
+    <https://doi.org/10.1371/journal.pcbi.1003311>`_
     """
     __slots__ = [
         "__du_th",
@@ -37,7 +42,19 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         "__v_thresh"]
 
     def __init__(self, du_th, tau_th, v_thresh):
-        super(ThresholdTypeMaassStochastic, self).__init__([
+        r"""
+        :param du_th: :math:`du_{thresh}`
+        :type du_th: float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_th: :math:`\tau_{thresh}`
+        :type tau_th: float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param v_thresh: :math:`V_{thresh}`
+        :type v_thresh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        """
+        super().__init__([
             DataType.S1615,   # 1 / du_th
             DataType.S1615,   # 1 / tau_th
             DataType.S1615,   # v_thresh
@@ -79,30 +96,25 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
+        pass
 
     @property
     def v_thresh(self):
+        """
+        :math:`V_{thresh}`
+        """
         return self.__v_thresh
-
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh
 
     @property
     def du_th(self):
+        """
+        :math:`du_{thresh}`
+        """
         return self.__du_th
-
-    @du_th.setter
-    def du_th(self, du_th):
-        self.__du_th = du_th
 
     @property
     def tau_th(self):
+        r"""
+        :math:`\tau_{thresh}`
+        """
         return self.__tau_th
-
-    @tau_th.setter
-    def tau_th(self, tau_th):
-        self.__tau_th = tau_th

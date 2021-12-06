@@ -15,43 +15,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Input type is standard conductance-based model
 #ifndef _INPUT_TYPE_CONDUCTANCE_H_
 #define _INPUT_TYPE_CONDUCTANCE_H_
-
-#ifndef NUM_EXCITATORY_RECEPTORS
-#define NUM_EXCITATORY_RECEPTORS 1
-#error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
-	shaping include
-#endif
-
-#ifndef NUM_INHIBITORY_RECEPTORS
-#define NUM_INHIBITORY_RECEPTORS 1
-#error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
-	shaping include
-#endif
 
 #include "input_type.h"
 #include "round.h"
 
+//! Conductance input parameters
 typedef struct input_type_t {
-    // reversal voltage - Excitatory [mV]
+    //! reversal voltage - Excitatory [mV]
     REAL     V_rev_E;
-    // reversal voltage - Inhibitory [mV]
+    //! reversal voltage - Inhibitory [mV]
     REAL     V_rev_I;
 } input_type_t;
 
-
-static inline input_t* input_type_get_input_value(
-        input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
-    use(input_type);
+//! \brief Gets the actual input value. This allows any scaling to take place
+//! \param[in,out] value: The array of the receptor-based values of the input
+//!     before scaling
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] num_receptors: The number of receptors.
+//!     The size of the \p value array.
+//! \return Pointer to array of values of the receptor-based input after
+//!     scaling
+static inline input_t *input_type_get_input_value(
+        input_t *restrict value, UNUSED input_type_t *input_type,
+        uint16_t num_receptors) {
     for (int i = 0; i < num_receptors; i++) {
         value[i] = value[i] >> 5;
     }
     return &value[0];
 }
 
+//! \brief Converts an excitatory input into an excitatory current
+//! \param[in,out] exc_input: Pointer to array of excitatory inputs from
+//!     different receptors this timestep. Note that this will already have
+//!     been scaled by input_type_get_input_value()
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] membrane_voltage: The membrane voltage to use for the input
 static inline void input_type_convert_excitatory_input_to_current(
-        input_t* exc_input, input_type_pointer_t input_type,
+        input_t *restrict exc_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
         // accum = accum * (accum - accum)
@@ -63,8 +67,14 @@ static inline void input_type_convert_excitatory_input_to_current(
     }
 }
 
+//! \brief Converts an inhibitory input into an inhibitory current
+//! \param[in,out] inh_input: Pointer to array of inhibitory inputs from
+//!     different receptors this timestep. Note that this will already have
+//!     been scaled by input_type_get_input_value()
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] membrane_voltage: The membrane voltage to use for the input
 static inline void input_type_convert_inhibitory_input_to_current(
-        input_t* inh_input, input_type_pointer_t input_type,
+        input_t *restrict inh_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++) {
         // accum = accum * (accum - accum)

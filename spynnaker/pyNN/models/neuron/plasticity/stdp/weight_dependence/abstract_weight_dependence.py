@@ -13,24 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractWeightDependence(object):
+class AbstractWeightDependence(object, metaclass=AbstractBase):
     __slots__ = ()
-
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-
-        :param pre_population_label: label of pre.
-        :param post_population_label: label of post.
-        :return: the provenance data of the weight dependency
-        """
-        # pylint: disable=unused-argument
-        return list()
 
     @abstractmethod
     def get_parameter_names(self):
@@ -42,27 +30,47 @@ class AbstractWeightDependence(object):
     @abstractmethod
     def is_same_as(self, weight_dependence):
         """ Determine if this weight dependence is the same as another
+
+        :param AbstractWeightDependence weight_dependence:
+        :rtype: bool
         """
 
     @abstractproperty
     def vertex_executable_suffix(self):
         """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
         """
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         """ Get the amount of SDRAM used by the parameters of this rule
+
+        :param int n_synapse_types:
+        :param int n_weight_terms:
+        :rtype: int
         """
 
     @abstractmethod
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         """ Write the parameters of the rule to the spec
-        """
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The specification to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
+        :param int n_weight_terms: The number of terms used by the synapse rule
+       """
 
     @abstractproperty
     def weight_maximum(self):
         """ The maximum weight that will ever be set in a synapse as a result\
             of this rule
+
+        :rtype: float
         """

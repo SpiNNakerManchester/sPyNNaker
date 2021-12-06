@@ -23,12 +23,18 @@ UNITS = {V_THRESH: "mV"}
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
-    """ A threshold that is a static value
+    """ A threshold that is a static value.
     """
     __slots__ = ["__v_thresh"]
 
     def __init__(self, v_thresh):
-        super(ThresholdTypeStatic, self).__init__([
+        """
+        :param v_thresh: :math:`V_{thresh}`
+        :type v_thresh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        """
+        super().__init__([
             DataType.S1615])  # v_thresh
         self.__v_thresh = v_thresh
 
@@ -61,14 +67,11 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_v_thresh,) = values
+        pass
 
     @property
     def v_thresh(self):
+        """
+        :math:`V_{thresh}`
+        """
         return self.__v_thresh
-
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh

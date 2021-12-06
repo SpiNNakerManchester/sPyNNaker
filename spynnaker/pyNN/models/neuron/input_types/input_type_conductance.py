@@ -34,7 +34,19 @@ class InputTypeConductance(AbstractInputType):
         "__e_rev_I"]
 
     def __init__(self, e_rev_E, e_rev_I):
-        super(InputTypeConductance, self).__init__([
+        """
+        :param e_rev_E: Reversal potential for excitatory input;
+            :math:`E^{rev}_e`
+        :type e_rev_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param e_rev_I: Reversal potential for inhibitory input;
+            :math:`E^{rev}_i`
+        :type e_rev_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        """
+        super().__init__([
             DataType.S1615,   # e_rev_E
             DataType.S1615])  # e_rev_I
         self.__e_rev_E = e_rev_E
@@ -70,9 +82,7 @@ class InputTypeConductance(AbstractInputType):
 
     @overrides(AbstractInputType.update_values)
     def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_e_rev_E, _e_rev_I) = values
+        pass
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
@@ -80,16 +90,14 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self):
+        """
+        :math:`E_{{rev}_e}`
+        """
         return self.__e_rev_E
-
-    @e_rev_E.setter
-    def e_rev_E(self, e_rev_E):
-        self.__e_rev_E = e_rev_E
 
     @property
     def e_rev_I(self):
+        """
+        :math:`E_{{rev}_i}`
+        """
         return self.__e_rev_I
-
-    @e_rev_I.setter
-    def e_rev_I(self, e_rev_I):
-        self.__e_rev_I = e_rev_I

@@ -16,33 +16,53 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Number-Post (fan-out) Connection generator implementation
- *!        Each post-neuron is connected to exactly n_pre pre-neurons (chosen at random)
+ * \file
+ * \brief Fixed-Number-Post (fan-out) Connection generator implementation
+ *
+ * Each post-neuron is connected to exactly n_pre pre-neurons (chosen at random)
  */
 
 #include <log.h>
 #include <synapse_expander/rng.h>
 
-/**
- *! \brief The parameters that can be copied from SDRAM
- */
+//! The parameters that can be copied from SDRAM.
 struct fixed_post_params {
+    //! Low index of range of pre-neuron population
+    uint32_t pre_lo;
+    //! High index of range of pre-neuron population
+    uint32_t pre_hi;
+    //! Low index of range of post-neuron population
+    uint32_t post_lo;
+    //! High index of range of post-neuron population
+    uint32_t post_hi;
+    //! Do we allow self connections?
     uint32_t allow_self_connections;
+    //! Do we allow any neuron to be multiply connected by this connector?
     uint32_t with_replacement;
+    //! Number of connections (= number of post neurons we care about)
     uint32_t n_post;
+    //! Total number of post neurons
     uint32_t n_post_neurons;
 };
 
 /**
- *! \brief The data to be passed around.  This includes the parameters, and the
- *!        RNG of the connector
+ * \brief The state of this connection generator.
+ *
+ * This includes the parameters, and the RNG of the connector.
  */
 struct fixed_post {
+    //! Parameters read from SDRAM
     struct fixed_post_params params;
+    //! Configured random number generator
     rng_t rng;
 };
 
+/**
+ * \brief Initialise the fixed-post connection generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *connection_generator_fixed_post_initialise(address_t *region) {
     // Allocate memory for the parameters
     struct fixed_post *obj = spin1_malloc(sizeof(struct fixed_post));
@@ -54,36 +74,73 @@ static void *connection_generator_fixed_post_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Number Post Connector, allow self connections = %u, "
+    log_debug("Fixed Number Post Connector, pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_post = %u, n post neurons = %u",
+			obj->params.pre_lo, obj->params.pre_hi,
+			obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_post,
             obj->params.n_post_neurons);
     return obj;
 }
 
-static void connection_generator_fixed_post_free(void *data) {
-    struct fixed_post *obj = data;
+/**
+ * \brief Free the fixed-post connection generator
+ * \param[in] generator: The data to free
+ */
+static void connection_generator_fixed_post_free(void *generator) {
+    struct fixed_post *obj = generator;
     rng_free(obj->rng);
-    sark_free(data);
+    sark_free(generator);
 }
 
+/**
+ * \brief Generates a uniformly-distributed random number
+ * \param[in,out] obj: the generator containing the RNG
+ * \param[in] range: the (_upper, exclusive_) limit of the range of random
+ *      numbers that may be generated. Should be in range 0..65536
+ * \return a random integer in the given input range.
+ */
 static uint32_t post_random_in_range(struct fixed_post *obj, uint32_t range) {
     uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
     return (u01 * range) >> 15;
 }
 
+/**
+ * \brief Generate connections with the fixed-post connection generator
+ * \param[in] generator: The generator to use to generate connections
+ * \param[in] pre_slice_start: The start of the slice of the pre-population
+ *                             being generated
+ * \param[in] pre_slice_count: The number of neurons in the slice of the
+ *                             pre-population being generated
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] post_slice_start: The start of the slice of the post-population
+ *                              being generated
+ * \param[in] post_slice_count: The number of neurons in the slice of the
+ *                              post-population being generated
+ * \param[in] max_row_length: The maximum number of connections to generate
+ * \param[in,out] indices: An array into which the core-relative post-indices
+ *                         should be placed.  This will be initialised to be
+ *                         \p max_row_length in size
+ * \return The number of connections generated
+ */
 static uint32_t connection_generator_fixed_post_generate(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
-    use(pre_slice_count);
-
     // If there are no connections to be made, return 0
-    struct fixed_post *obj = data;
+    struct fixed_post *obj = generator;
     if (max_row_length == 0 || obj->params.n_post == 0) {
         return 0;
+    }
+
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->params.pre_lo) ||
+    		(pre_neuron_index > obj->params.pre_hi)) {
+    	return 0;
     }
 
     // Get how many values can be sampled from
@@ -157,11 +214,13 @@ static uint32_t connection_generator_fixed_post_generate(
         }
     }
 
-    // Loop over the full indices array, and only keep indices on this post-slice
+    // Loop over the full indices array, and only keep indices that are on this
+    // post-slice and within the range of the specified post-population view
     uint32_t count_indices = 0;
     for (uint32_t i = 0; i < n_conns; i++) {
-        uint32_t j = full_indices[i];
+        uint32_t j = full_indices[i] + obj->params.post_lo;
         if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
+//        		(j >= obj->params.post_lo) && (j <= obj->params.post_hi)) {
             indices[count_indices] = j - post_slice_start; // On this slice!
             count_indices++;
         }

@@ -13,14 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-six
-enum34
 lxml
--e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=spinn_utilities
+-e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=SpiNNUtilities
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
--e git+https://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master#egg=spinn_storage_handlers
 -e git+https://github.com/SpiNNakerManchester/SpiNNMan.git@master#egg=spinnman
--e git+https://github.com/SpiNNakerManchester/PACMAN.git@master#egg=pacman
--e git+https://github.com/SpiNNakerManchester/DataSpecification.git@master#egg=data_specification
+-e git+https://github.com/SpiNNakerManchester/PACMAN.git@master#egg=spinnaker-pacman
+-e git+https://github.com/SpiNNakerManchester/DataSpecification.git@master#egg=spinnaker-dataspecification
 -e git+https://github.com/SpiNNakerManchester/spalloc.git@master#egg=spalloc
--e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master#egg=spinn_front_end_common
+-e git+https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master#egg=spinnfrontendcommon

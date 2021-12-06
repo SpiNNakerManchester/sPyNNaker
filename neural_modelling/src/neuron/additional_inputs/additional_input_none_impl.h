@@ -15,25 +15,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of "no-such-input" additional input
 #ifndef _ADDITIONAL_INPUT_TYPE_NONE_H_
 #define _ADDITIONAL_INPUT_TYPE_NONE_H_
 
 #include "additional_input.h"
 
-typedef struct additional_input_t {
-} additional_input_t;
+//! An empty additional input that makes no contribution
+struct additional_input_t {
+};
 
-static input_t additional_input_get_input_value_as_current(
-        additional_input_pointer_t additional_input,
-        state_t membrane_voltage) {
-    use(additional_input);
-    use(membrane_voltage);
+//! \brief Gets the value of current provided by the additional input this
+//!     timestep
+//! \details Does nothing
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
+//! \param[in] membrane_voltage: The membrane voltage of the neuron
+//! \return The value of the input after scaling
+static inline input_t additional_input_get_input_value_as_current(
+        UNUSED struct additional_input_t *additional_input,
+        UNUSED state_t membrane_voltage) {
     return 0;
 }
 
-static void additional_input_has_spiked(
-        additional_input_pointer_t additional_input) {
-    use(additional_input);
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Notifies the additional input type that the neuron has spiked
+//! \details Does nothing
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
+static inline void additional_input_has_spiked(
+        UNUSED struct additional_input_t *additional_input) {
 }
 
 #endif // _ADDITIONAL_INPUT_TYPE_NONE_H_

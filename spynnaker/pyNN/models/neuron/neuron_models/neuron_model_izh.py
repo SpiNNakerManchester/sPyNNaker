@@ -12,10 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from .abstract_neuron_model import AbstractNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 A = 'a'
 B = 'b'
@@ -37,12 +40,40 @@ UNITS = {
 
 
 class NeuronModelIzh(AbstractNeuronModel):
+    """ Model of neuron due to Eugene M. Izhikevich et al
+    """
     __slots__ = [
         "__a", "__b", "__c", "__d", "__v_init", "__u_init", "__i_offset"
     ]
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
-        super(NeuronModelIzh, self).__init__(
+        """
+        :param a: :math:`a`
+        :type a: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param b: :math:`b`
+        :type b: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param c: :math:`c`
+        :type c: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param d: :math:`d`
+        :type d: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param v_init: :math:`v_{init}`
+        :type v_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param u_init: :math:`u_{init}`
+        :type u_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        """
+        super().__init__(
             [DataType.S1615,   # a
              DataType.S1615,   # b
              DataType.S1615,   # c
@@ -60,12 +91,12 @@ class NeuronModelIzh(AbstractNeuronModel):
         self.__v_init = v_init
         self.__u_init = u_init
 
-    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 150 * n_neurons
 
-    @overrides(AbstractNeuronModel.add_parameters)
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[A] = self.__a
         parameters[B] = self.__b
@@ -73,36 +104,39 @@ class NeuronModelIzh(AbstractNeuronModel):
         parameters[D] = self.__d
         parameters[I_OFFSET] = self.__i_offset
 
-    @overrides(AbstractNeuronModel.add_state_variables)
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[U] = self.__u_init
 
-    @overrides(AbstractNeuronModel.get_units)
+    @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
 
-    @overrides(AbstractNeuronModel.has_variable)
+    @overrides(AbstractStandardNeuronComponent.has_variable)
     def has_variable(self, variable):
         return variable in UNITS
 
     @overrides(AbstractNeuronModel.get_global_values)
     def get_global_values(self, ts):
         # pylint: disable=arguments-differ
-        return [float(ts) / 1000.0]
+        return [float(ts) / MICRO_TO_MILLISECOND_CONVERSION]
 
-    @overrides(AbstractNeuronModel.get_values)
+    @overrides(AbstractStandardNeuronComponent.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
             state_variables[V], state_variables[U], parameters[I_OFFSET],
-            float(ts) / 1000.0
+            float(ts) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
-    @overrides(AbstractNeuronModel.update_values)
+    @overrides(AbstractStandardNeuronComponent.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
@@ -114,56 +148,56 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def a(self):
-        return self.__a
+        """ Settable model parameter: :math:`a`
 
-    @a.setter
-    def a(self, a):
-        self.__a = a
+        :rtype: float
+        """
+        return self.__a
 
     @property
     def b(self):
-        return self.__b
+        """ Settable model parameter: :math:`b`
 
-    @b.setter
-    def b(self, b):
-        self.__b = b
+        :rtype: float
+        """
+        return self.__b
 
     @property
     def c(self):
-        return self.__c
+        """ Settable model parameter: :math:`c`
 
-    @c.setter
-    def c(self, c):
-        self.__c = c
+        :rtype: float
+        """
+        return self.__c
 
     @property
     def d(self):
-        return self.__d
+        """ Settable model parameter: :math:`d`
 
-    @d.setter
-    def d(self, d):
-        self.__d = d
+        :rtype: float
+        """
+        return self.__d
 
     @property
     def i_offset(self):
-        return self.__i_offset
+        """ Settable model parameter: :math:`I_{offset}`
 
-    @i_offset.setter
-    def i_offset(self, i_offset):
-        self.__i_offset = i_offset
+        :rtype: float
+        """
+        return self.__i_offset
 
     @property
     def v_init(self):
-        return self.__v_init
+        """ Settable model parameter: :math:`v_{init}`
 
-    @v_init.setter
-    def v_init(self, v_init):
-        self.__v_init = v_init
+        :rtype: float
+        """
+        return self.__v_init
 
     @property
     def u_init(self):
-        return self.__u_init
+        """ Settable model parameter: :math:`u_{init}`
 
-    @u_init.setter
-    def u_init(self, u_init):
-        self.__u_init = u_init
+        :rtype: float
+        """
+        return self.__u_init

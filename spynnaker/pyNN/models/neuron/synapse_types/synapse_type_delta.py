@@ -34,7 +34,17 @@ class SynapseTypeDelta(AbstractSynapseType):
         "__isyn_inh"]
 
     def __init__(self, isyn_exc, isyn_inh):
-        super(SynapseTypeDelta, self).__init__([
+        """
+        :param isyn_exc: :math:`I^{syn}_e`
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        """
+        super().__init__([
             DataType.S1615,   # isyn_exc
             DataType.S1615])  # isyn_inh
         self.__isyn_exc = isyn_exc
@@ -63,13 +73,11 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
         # Add the rest of the data
         return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (isyn_exc, isyn_inh) = values
 
@@ -96,14 +104,6 @@ class SynapseTypeDelta(AbstractSynapseType):
     def isyn_exc(self):
         return self.__isyn_exc
 
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
-
     @property
     def isyn_inh(self):
         return self.__isyn_inh
-
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh

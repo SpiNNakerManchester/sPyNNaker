@@ -15,18 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Standard layout of DSG regions in neuron code.
+//!
+//! Note that not all models use all of these regions, but they all use the same
+//! region identifier mapping.
 #pragma once
 
-typedef enum regions_e {
-    SYSTEM_REGION,            // 0
-    NEURON_PARAMS_REGION,     // 1
-    SYNAPSE_PARAMS_REGION,    // 2
-    POPULATION_TABLE_REGION,  // 3
-    SYNAPTIC_MATRIX_REGION,   // 4
-    SYNAPSE_DYNAMICS_REGION,  // 5
-    RECORDING_REGION,         // 6
-    PROVENANCE_DATA_REGION,   // 7
-    PROFILER_REGION,          // 8
-    CONNECTOR_BUILDER_REGION, // 9
-    DIRECT_MATRIX_REGION      // 10
+//! DSG region identifiers
+typedef enum neuron_regions_e {
+    SYSTEM_REGION,              //!< simulation system; 0
+    NEURON_PARAMS_REGION,       //!< neuron parameters; 1
+    SYNAPSE_PARAMS_REGION,      //!< synapse parameters; 2
+    POPULATION_TABLE_REGION,    //!< master population table; 3
+    SYNAPTIC_MATRIX_REGION,     //!< synaptic matrix; 4
+    SYNAPSE_DYNAMICS_REGION,    //!< synapse dynamics; 5
+    STRUCTURAL_DYNAMICS_REGION, //!< structural dynamics; 6
+    NEURON_RECORDING_REGION,    //!< recording; 7
+    PROVENANCE_DATA_REGION,     //!< provenance; 8
+    PROFILER_REGION,            //!< profiling; 9
+    CONNECTOR_BUILDER_REGION,   //!< connection building; 10
+    DIRECT_MATRIX_REGION,       //!< direct synaptic matrix; 11
+    BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 12
+    BIT_FIELD_BUILDER,          //!< bitfield builder parameters; 13
+    BIT_FIELD_KEY_MAP,          //!< bitfield key map; 14
+    RECORDING_REGION            //!< general recording data; 15
 } regions_e;

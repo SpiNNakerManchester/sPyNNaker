@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from enum import Enum
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 class SendType(Enum):
@@ -29,8 +28,7 @@ class SendType(Enum):
     SEND_TYPE_UFRACT = 5
 
 
-@add_metaclass(AbstractBase)
-class AbstractMulticastControllableDevice(object):
+class AbstractMulticastControllableDevice(object, metaclass=AbstractBase):
     """ A device that can be controlled by sending multicast packets to it,\
         either directly, or via Ethernet using an AbstractEthernetTranslator
     """
@@ -85,12 +83,13 @@ class AbstractMulticastControllableDevice(object):
     def device_control_send_type(self):
         """ The type of data to be sent.
 
-        :rtype: :py:class:`.SendType`
+        :rtype: SendType
         """
 
     @property
     def device_control_scaling_factor(self):  # pragma: no cover
-        """The scaling factor used to send the payload to this device.
+        """ The scaling factor used to send the payload to this device.
 
-        :rtype: int"""
+        :rtype: int
+        """
         return 1

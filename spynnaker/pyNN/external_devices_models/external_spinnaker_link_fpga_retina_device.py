@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -27,8 +26,6 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
-
-logger = logging.getLogger(__name__)
 
 
 def get_y_from_fpga_retina(key, mode):
@@ -88,13 +85,13 @@ class ExternalFPGARetinaDevice(
             self, mode, retina_key, spinnaker_link_id, polarity,
             label=None, board_address=None):
         """
-        :param mode: The retina "mode"
-        :param retina_key: The value of the top 16-bits of the key
-        :param spinnaker_link_id: \
+        :param str mode: The retina "mode"
+        :param int retina_key: The value of the top 16-bits of the key
+        :param int spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param polarity: The "polarity" of the retina data
-        :param label:
-        :param board_address:
+        :param str polarity: The "polarity" of the retina data
+        :param str label:
+        :param str board_address:
         """
         # pylint: disable=too-many-arguments
         self.__polarity = polarity
@@ -106,7 +103,7 @@ class ExternalFPGARetinaDevice(
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self.__fixed_mask = self._get_mask(mode)
 
-        super(ExternalFPGARetinaDevice, self).__init__(
+        super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, max_atoms_per_core=fixed_n_neurons,
             board_address=board_address)

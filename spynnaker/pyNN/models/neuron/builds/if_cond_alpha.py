@@ -25,6 +25,10 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 @defaults
 class IFCondAlpha(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an alpha-shaped current input.
+
+    .. warning::
+
+        Not currently supported by the tool chain.
     """
 
     # noinspection PyPep8Naming

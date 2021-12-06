@@ -18,6 +18,12 @@ import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 
 def check_gsyn(gsyn1, gsyn2):
+    """ Compare two arrays of conductances. For testing.
+
+    :param gsyn1: An array of conductances.
+    :param gsyn2: An array of conductances.
+    :raise Exception: If the arrays differ.
+    """
     if len(gsyn1) != len(gsyn2):
         raise Exception("Length of gsyn does not match expected {} but "
                         "found {}".format(len(gsyn1), len(gsyn2)))
@@ -30,11 +36,30 @@ def check_gsyn(gsyn1, gsyn2):
 
 
 def check_path_gysn(path, n_neurons, runtime, gsyn):
+    """ Compare an arrays of conductances with baseline data from a file. \
+        For testing.
+
+    :param path: A file path.
+    :param n_neurons: The number of neurons that produced the data.
+    :param runtime: The length of time that the generated data represents.
+    :param gsyn: An array of conductances.
+    :raise Exception: If the arrays differ.
+    """
     gsyn2 = utility_calls.read_in_data_from_file(
         path, 0, n_neurons, 0, runtime, True)
     check_gsyn(gsyn, gsyn2)
 
 
 def check_sister_gysn(sister, n_neurons, runtime, gsyn):
+    """ Compare an arrays of conductances with baseline data from a file next\
+        to a specified module. For testing.
+
+    :param sister: A module. The file read from will be ``gsyn.data``
+        adjacent to this module.
+    :param n_neurons: The number of neurons that produced the data.
+    :param runtime: The length of time that the generated data represents.
+    :param gsyn: An array of conductances.
+    :raise Exception: If the arrays differ.
+    """
     path = os.path.join(os.path.dirname(os.path.abspath(sister)), "gsyn.data")
     check_path_gysn(path, n_neurons, runtime, gsyn)

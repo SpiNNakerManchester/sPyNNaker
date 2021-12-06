@@ -13,19 +13,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.require_subclass import require_subclass
+from pacman.model.graphs.application import ApplicationVertex
 
 
-@add_metaclass(AbstractBase)
-class AbstractContainsUnits(object):
+@require_subclass(ApplicationVertex)
+class AbstractContainsUnits(object, metaclass=AbstractBase):
+    """ Indicates an application vertex class that can describe the units of\
+        some of its variables.
+    """
 
     __slots__ = ()
 
     @abstractmethod
     def get_units(self, variable):
-        """ Get units for a given variable
+        """ Get units for a given variable.
 
-        :param variable: the variable to find units from
+        :param str variable: the variable to find units from
         :return: the units as a string.
+        :rtype: str
         """

@@ -15,17 +15,20 @@
 
 import logging
 import numpy
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    get_simulator, machine_time_step)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _as_numpy_ticks(times, time_step):
@@ -36,7 +39,10 @@ def _as_numpy_ticks(times, time_step):
 def _send_buffer_times(spike_times, time_step):
     # Convert to ticks
     if len(spike_times) and hasattr(spike_times[0], "__len__"):
-        return [_as_numpy_ticks(times, time_step) for times in spike_times]
+        data = []
+        for times in spike_times:
+            data.append(_as_numpy_ticks(times, time_step))
+        return data
     else:
         return _as_numpy_ticks(spike_times, time_step)
 
@@ -52,21 +58,21 @@ class SpikeSourceArrayVertex(
 
     def __init__(
             self, n_neurons, spike_times, constraints, label,
-            max_atoms_per_core, model):
+            max_atoms_per_core, model, splitter):
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
-
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times
         time_step = self.get_spikes_sampling_interval()
 
-        super(SpikeSourceArrayVertex, self).__init__(
+        super().__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
-            send_buffer_partition_id=constants.SPIKE_PARTITION_ID)
+            send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
+            splitter=splitter)
 
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
@@ -87,7 +93,45 @@ class SpikeSourceArrayVertex(
     def spike_times(self):
         """ The spike times of the spike source array
         """
-        return self._spike_times
+        return list(self._spike_times)
+
+    def _to_early_spikes_single_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(int spike_times:
+        """
+        current_time = get_simulator().get_current_time()
+        for i in range(len(spike_times)):
+            if spike_times[i] < current_time:
+                logger.warning(
+                    "SpikeSourceArray {} has spike_times that are lower than "
+                    "the current time {} For example {} - "
+                    "these will be ignored.".format(
+                        self, current_time, float(spike_times[i])))
+                return
+
+    def _check_spikes_double_list(self, spike_times):
+        """
+        Checks if there is one or more spike_times before the current time
+
+        Logs a warning for the first oen found
+
+        :param iterable(iterable(int) spike_times:
+        """
+        current_time = get_simulator().get_current_time()
+        for neuron_id in range(0, self.n_atoms):
+            id_times = spike_times[neuron_id]
+            for i in range(len(id_times)):
+                if id_times[i] < current_time:
+                    logger.warning(
+                       "SpikeSourceArray {} has spike_times that are lower "
+                       "than the current time {} For example {} - "
+                       "these will be ignored.".format(
+                            self, current_time, float(id_times[i])))
+                    return
 
     @spike_times.setter
     def spike_times(self, spike_times):
@@ -96,6 +140,12 @@ class SpikeSourceArrayVertex(
 
         """
         time_step = self.get_spikes_sampling_interval()
+        # warn the user if they are asking for a spike time out of range
+        if spike_times:  # in case of empty list do not check
+            if hasattr(spike_times[0], '__iter__'):
+                self._check_spikes_double_list(spike_times)
+            else:
+                self._to_early_spikes_single_list(spike_times)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._spike_times = spike_times
 
@@ -118,24 +168,20 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return machine_time_step()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager, 0,
-            placements, graph_mapper, self,
+            self.label, buffer_manager, 0, placements, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
-                else 0,
-            machine_time_step)
+                else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+    def clear_spike_recording(self, buffer_manager, placements):
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
@@ -146,7 +192,7 @@ class SpikeSourceArrayVertex(
 
         The output may be customised by specifying a different template\
         together with an associated template engine\
-        (see ``pyNN.descriptions``).
+        (see :py:mod:`pyNN.descriptions`).
 
         If template is None, then a dictionary containing the template\
         context will be returned.
@@ -163,3 +209,21 @@ class SpikeSourceArrayVertex(
             "parameters": parameters,
         }
         return context
+
+    @overrides(SimplePopulationSettable.set_value_by_selector)
+    def set_value_by_selector(self, selector, key, value):
+        if key == "spike_times":
+            old_values = self.get_value(key)
+            if isinstance(old_values, RangedListOfList):
+                ranged_list = old_values
+            else:
+                # Keep all the setting stuff in one place by creating a
+                # RangedListofLists
+                ranged_list = RangedListOfList(
+                    size=self.n_atoms, value=old_values)
+            ranged_list.set_value_by_selector(
+                selector, value, ranged_list.is_list(value, self.n_atoms))
+            self.set_value(key, ranged_list)
+        else:
+            SimplePopulationSettable.set_value_by_selector(
+                self, selector, key, value)

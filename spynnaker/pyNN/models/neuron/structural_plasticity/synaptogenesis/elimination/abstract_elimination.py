@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractElimination(object):
+class AbstractElimination(object, metaclass=AbstractBase):
     """ An elimination rule
     """
 
@@ -28,16 +26,23 @@ class AbstractElimination(object):
     @abstractproperty
     def vertex_executable_suffix(self):
         """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
         """
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self):
         """ Get the amount of SDRAM used by the parameters of this rule
+
+        :rtype: int
         """
 
     @abstractmethod
     def write_parameters(self, spec, weight_scale):
         """ Write the parameters of the rule to the spec
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param float weight_scale:
         """
 
     @abstractmethod

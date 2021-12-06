@@ -15,51 +15,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Random partner selection rule
 #ifndef _RANDOM_SELECTION_IMPL_H_
 #define _RANDOM_SELECTION_IMPL_H_
 
 #include "partner.h"
 #include <neuron/spike_processing.h>
 
-// Include debug header for log_info etc
-#include <debug.h>
-
-static inline void partner_spike_received(uint32_t time, spike_t spike) {
-    use(time);
-    use(spike);
+//! \brief Notifies the rule that a spike has been received
+//! \details Not used by this rule
+//! \param[in] time: The time that the spike was received at
+//! \param[in] spike:
+//!     The spike that was received (includes the sending neuron ID)
+static inline void partner_spike_received(
+        UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
-extern rewiring_data_t rewiring_data;
-extern pre_pop_info_table_t pre_info;
-
+//! \brief Choose the potential (remote) synaptic partner
+//! \param[in] time: The current time
+//! \param[out] population_id: The ID of the other population
+//! \param[out] sub_population_id: The ID of the subpopulation (corresponds to
+//!     remote SpiNNaker core handling the population)
+//! \param[out] neuron_id: The ID of the neuron within the subpopulation
+//! \param[out] spike: The spike that made this a meaningful choice.
+//!     This rule synthesises this.
+//! \param[out] m_pop_index: The master population table index.
+//! \return True if a choice was made
 static inline bool potential_presynaptic_partner(
-        uint32_t time, uint32_t *population_id, uint32_t *sub_population_id,
-        uint32_t *neuron_id, spike_t *spike, uint32_t *m_pop_index) {
-    use(time);
-    *population_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * pre_info.no_pre_pops;
-    pre_info_t* preapppop_info =
-        pre_info.prepop_info[*population_id];
+        UNUSED uint32_t time, uint32_t *restrict population_id,
+        uint32_t *restrict sub_population_id, uint32_t *restrict neuron_id,
+        spike_t *restrict spike, uint32_t *restrict m_pop_index) {
+    extern rewiring_data_t rewiring_data;
+    extern pre_pop_info_table_t pre_info;
+
+    uint32_t pop_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+            pre_info.no_pre_pops;
+    *population_id = pop_id;
+    pre_info_t *preapppop_info = pre_info.prepop_info[pop_id];
 
     // Select presynaptic sub-population
-    *neuron_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * preapppop_info->total_no_atoms;
+    uint32_t n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+            preapppop_info->total_no_atoms;
+    uint32_t subpop_id = 0;
     uint32_t sum = 0;
     for (uint32_t i = 0; i < preapppop_info->no_pre_vertices; i++) {
         sum += preapppop_info->key_atom_info[i].n_atoms;
-        if (sum >= *neuron_id) {
-            *sub_population_id = i;
+        if (sum >= n_id) {
+            subpop_id = i;
             break;
         }
     }
+    *sub_population_id = subpop_id;
 
     // Select a presynaptic neuron ID
-    *neuron_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-        preapppop_info->key_atom_info[*sub_population_id].n_atoms;
+    n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+            preapppop_info->key_atom_info[subpop_id].n_atoms;
 
-    *spike = preapppop_info->key_atom_info[*sub_population_id].key | *neuron_id;
-
-    *m_pop_index = preapppop_info->key_atom_info[*sub_population_id].m_pop_index;
+    *neuron_id = n_id;
+    *spike = preapppop_info->key_atom_info[subpop_id].key | n_id;
+    *m_pop_index = preapppop_info->key_atom_info[subpop_id].m_pop_index;
     return true;
 }
 

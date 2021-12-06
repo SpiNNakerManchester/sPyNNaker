@@ -15,46 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
- *
- * SUMMARY
- *  \brief This file contains the static impl of synaptogenesis.
- *  No functionality is gained with this class
- *
+/*!
+ * \file
+ * \brief This file contains the static (non-)implementation of synaptogenesis.
+ * \details No functionality is gained with this class.
  */
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address) {
-    use(sdram_sp_address);
-    return sdram_sp_address;
+bool synaptogenesis_dynamics_initialise(
+        UNUSED address_t sdram_sp_address, uint32_t *recording_regions_used) {
+    // The recording region is defined even if unused, so this value needs to
+    // be incremented in order for the recording region IDs to match up
+    *recording_regions_used += 1;
+    return true;
 }
 
-bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes) {
-    use(time);
-    use(spike);
-    use(synaptic_row_address);
-    use(n_bytes);
+bool synaptogenesis_dynamics_rewire(
+        UNUSED uint32_t time, UNUSED spike_t *spike,
+        UNUSED synaptic_row_t *synaptic_row, UNUSED uint32_t *n_bytes) {
     return false;
 }
 
-bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
-    use(time);
-    use(row);
+bool synaptogenesis_row_restructure(
+        UNUSED uint32_t time, UNUSED synaptic_row_t row) {
     return false;
 }
 
-int32_t synaptogenesis_rewiring_period(void) {
-    return -1;
+void synaptogenesis_spike_received(UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
-bool synaptogenesis_is_fast(void) {
-    return false;
+uint32_t synaptogenesis_n_updates(void) {
+    return 0;
 }
 
-void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
-    use(time);
-    use(spike);
+void print_post_to_pre_entry(void) {
+    return;
 }

@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief An implementation of random number generation
+ * \file
+ * \brief An implementation of random number generation
  */
 #include "rng.h"
 #include <random.h>
@@ -26,7 +26,7 @@
 #include "common_mem.h"
 
 /**
- *! \brief The Random number generator parameters
+ * \brief The Random number generator parameters
  */
 struct rng {
     mars_kiss64_seed_t seed;

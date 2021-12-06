@@ -35,18 +35,26 @@ MODELS = IF_curr_exp \
          IF_cond_exp_stdp_mad_nearest_pair_additive \
 	     IF_curr_alpha \
 	     IF_curr_alpha_stdp_mad_pair_additive \
+         IF_cond_alpha \
          IF_cond_exp_structural_last_neuron_distance_weight \
-         IF_curr_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_random_distance_weight \
-         IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
-         IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
-         IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight \
-         IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_sEMD \
          IZK_curr_exp_stdp_mad_pair_additive \
          IZK_cond_exp_stdp_mad_pair_additive \
-         IF_cond_alpha
+         IF_curr_exp_stdp_izhikevich_neuromodulation_pair_additive \
+         IF_curr_exp_stdp_izhikevich_neuromodulation_pair_multiplicative \
+         IF_cond_exp_stdp_izhikevich_neuromodulation_pair_additive \
+         IZK_curr_exp_stdp_izhikevich_neuromodulation_pair_additive \
+         IZK_curr_exp_stdp_izhikevich_neuromodulation_pair_multiplicative \
+         IZK_cond_exp_stdp_izhikevich_neuromodulation_pair_additive \
+         IZK_cond_exp_stdp_izhikevich_neuromodulation_pair_multiplicative \
+         IF_curr_exp_stdp_izhikevich_neuromodulation_vogels_2011_additive \
+         IF_curr_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
+         IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
+         IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
+         IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
+         IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done

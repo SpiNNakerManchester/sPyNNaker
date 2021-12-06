@@ -25,11 +25,15 @@ class RangedDictVertexSlice(object):
         "__ranged_dict", "__vertex_slice"]
 
     def __init__(self, ranged_dict, vertex_slice):
+        """
+        :param ~spinn_utilities.ranged.RangeDictionary ranged_dict:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        """
         self.__ranged_dict = ranged_dict
         self.__vertex_slice = vertex_slice
 
     def __getitem__(self, key):
-        if not isinstance(key, "str"):
+        if not isinstance(key, str):
             raise KeyError("Key must be a string")
         return _RangedListVertexSlice(
             self.__ranged_dict[key], self.__vertex_slice)

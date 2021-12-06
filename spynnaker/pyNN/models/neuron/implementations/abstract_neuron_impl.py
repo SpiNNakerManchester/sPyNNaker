@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 
 
-@add_metaclass(AbstractBase)
-class AbstractNeuronImpl(object):
+class AbstractNeuronImpl(object, metaclass=AbstractBase):
     """ An abstraction of a whole neuron model including all parts
     """
 
@@ -43,8 +41,7 @@ class AbstractNeuronImpl(object):
     def get_n_cpu_cycles(self, n_neurons):
         """ Get the number of CPU cycles required to update the state
 
-        :param n_neurons: The number of neurons to get the cycles for
-        :type n_neurons: int
+        :param int n_neurons: The number of neurons to get the cycles for
         :rtype: int
         """
 
@@ -52,8 +49,7 @@ class AbstractNeuronImpl(object):
     def get_dtcm_usage_in_bytes(self, n_neurons):
         """ Get the DTCM memory usage required
 
-        :param n_neurons: The number of neurons to get the usage for
-        :type n_neurons: int
+        :param int n_neurons: The number of neurons to get the usage for
         :rtype: int
         """
 
@@ -61,8 +57,7 @@ class AbstractNeuronImpl(object):
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the SDRAM memory usage required
 
-        :param n_neurons: The number of neurons to get the usage for
-        :type n_neurons: int
+        :param int n_neurons: The number of neurons to get the usage for
         :rtype: int
         """
 
@@ -82,10 +77,9 @@ class AbstractNeuronImpl(object):
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the id of a synapse given the name
+        """ Get the ID of a synapse given the name
 
-        :param target: The name of the synapse
-        :type target: str
+        :param str target: The name of the synapse
         :rtype: int
         """
 
@@ -93,30 +87,35 @@ class AbstractNeuronImpl(object):
     def get_synapse_targets(self):
         """ Get the target names of the synapse type
 
-        :rtype: array of str
+        :rtype: list(str)
         """
 
     @abstractmethod
     def get_recordable_variables(self):
         """ Get the names of the variables that can be recorded in this model
 
-        :rtype: list of str
+        :rtype: list(str)
         """
 
     @abstractmethod
     def get_recordable_units(self, variable):
         """ Get the units of the given variable that can be recorded
 
-        :param variable: The name of the variable
-        :type variable: str
+        :param str variable: The name of the variable
+        """
+
+    @abstractmethod
+    def get_recordable_data_types(self):
+        """ Get the data type of the variables that can be recorded
+
+        :return: dict of name of variable to DataType of variable
         """
 
     @abstractmethod
     def is_recordable(self, variable):
         """ Determine if the given variable can be recorded
 
-        :param variable: The name of the variable being requested
-        :type variable: str
+        :param str variable: The name of the variable
         :rtype: bool
         """
 
@@ -125,8 +124,7 @@ class AbstractNeuronImpl(object):
         """ Get the index of the variable in the list of variables that can be\
             recorded
 
-        :param variable: The name of the variable
-        :type variable: str
+        :param str variable: The name of the variable
         :rtype: int
         """
 
@@ -134,9 +132,8 @@ class AbstractNeuronImpl(object):
     def add_parameters(self, parameters):
         """ Add the initial values of the parameters to the parameter holder
 
-        :param parameters: A holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param ~spinn_utilities.ranged.RangeDictionary parameters:
+            A holder of the parameters
         """
 
     @abstractmethod
@@ -144,48 +141,45 @@ class AbstractNeuronImpl(object):
         """ Add the initial values of the state variables to the state\
             variables holder
 
-        :param state_variables: A holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
+            A holder of the state variables
         """
 
     @abstractmethod
     def get_data(self, parameters, state_variables, vertex_slice):
-        """ Get the data to be written to the machine for this model
+        """ Get the data *to be written to the machine* for this model
 
-        :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy array of uint32
+        :param ~spinn_utilities.ranged.RangeDictionary parameters:
+            The holder of the parameters
+        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
+            The holder of the state variables
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to generate parameters for
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
 
     @abstractmethod
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-        """ Read the parameters and state variables of the model from the\
-            given data
+        """ Read the parameters and state variables of the model\
+            *from the given data* (read from the machine)
 
         :param data: The data to be read
-        :param offset: The offset where the data should be read from
-        :param vertex_slice: The slice of the vertex to read parameters for
-        :param parameters: The holder of the parameters to update
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
-        :param state_variables: The holder of the state variables to update
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type data: bytearray or bytes or memoryview
+        :param int offset: The offset where the data should be read from
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to read parameters for
+        :param ~spinn_utilities.ranged.RangeDictionary parameters:
+            The holder of the parameters to update
+        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
+            The holder of the state variables to update
         """
 
     @abstractmethod
     def get_units(self, variable):
         """ Get the units of the given variable
 
-        :param variable: The name of the variable
-        :type variable: str
+        :param str variable: The name of the variable
         """
 
     @abstractproperty

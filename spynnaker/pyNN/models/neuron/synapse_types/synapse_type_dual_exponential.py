@@ -47,7 +47,33 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh):
-        super(SynapseTypeDualExponential, self).__init__(
+        r"""
+        :param tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :type tau_syn_E:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :type tau_syn_E2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_exc: :math:`I^{syn}_{e_1}`
+        :type isyn_exc:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_exc2: :math:`I^{syn}_{e_2}`
+        :type isyn_exc2:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh:
+            float, iterable(float), ~pyNN.random.RandomDistribution
+            or (mapping) function
+        """
+        super().__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
              DataType.S1615,   # isyn_exc
@@ -90,6 +116,9 @@ class SynapseTypeDualExponential(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param int ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         tsfloat = float(ts) / 1000.0
@@ -140,46 +169,22 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def tau_syn_E(self):
         return self.__tau_syn_E
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self.__tau_syn_E = tau_syn_E
-
     @property
     def tau_syn_E2(self):
         return self.__tau_syn_E2
-
-    @tau_syn_E2.setter
-    def tau_syn_E2(self, tau_syn_E2):
-        self.__tau_syn_E2 = tau_syn_E2
 
     @property
     def tau_syn_I(self):
         return self.__tau_syn_I
 
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self.__tau_syn_I = tau_syn_I
-
     @property
     def isyn_exc(self):
         return self.__isyn_exc
-
-    @isyn_exc.setter
-    def isyn_exc(self, isyn_exc):
-        self.__isyn_exc = isyn_exc
 
     @property
     def isyn_inh(self):
         return self.__isyn_inh
 
-    @isyn_inh.setter
-    def isyn_inh(self, isyn_inh):
-        self.__isyn_inh = isyn_inh
-
     @property
     def isyn_exc2(self):
         return self.__isyn_exc2
-
-    @isyn_exc2.setter
-    def isyn_exc2(self, isyn_exc2):
-        self.__isyn_exc2 = isyn_exc2

@@ -15,9 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Profiler tags
-#define PROFILER_TIMER                    0
-#define PROFILER_PROB_FUNC                1
-//#define PROFILER_INCOMING_SPIKE           2
-//#define PROFILER_PROCESS_FIXED_SYNAPSES   3
-//#define PROFILER_PROCESS_PLASTIC_SYNAPSES 4
+//! \file
+//! \brief Tags for profiling of the spike source poisson
+
+//! Profiler tags
+enum ssp_profiler_tags {
+    PROFILER_TIMER = 0,
+    PROFILER_PROB_FUNC = 1,
+#if 0
+    PROFILER_INCOMING_SPIKE = 2,
+    PROFILER_PROCESS_FIXED_SYNAPSES = 3,
+    PROFILER_PROCESS_PLASTIC_SYNAPSES = 4,
+#endif
+};

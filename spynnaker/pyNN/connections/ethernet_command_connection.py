@@ -31,18 +31,20 @@ class EthernetCommandConnection(DatabaseConnection):
             self, translator, command_containers=None, local_host=None,
             local_port=NOTIFY_PORT):
         """
-        :param translator:\
+        :param AbstractEthernetTranslator translator:
             A translator of multicast commands to device commands
-        :param command_containers:\
-            A list of instances of AbstractSendMeMulticastCommandsVertex that\
-            have commands to be sent at the start and end of simulation
-        :param local_host:\
+        :param command_containers:
+            A list of vertices that have commands to be sent at the start \
+            and end of simulation
+        :type command_containers:
+            list(~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex)
+        :param str local_host:
             The optional host to listen on for the start/resume message
-        :param local_port:\
+        :param int local_port:
             The optional port to listen on for the stop/pause message
         """
 
-        super(EthernetCommandConnection, self).__init__(
+        super().__init__(
             start_resume_callback_function=self._start_resume_callback,
             stop_pause_callback_function=self._stop_pause_callback,
             local_host=local_host, local_port=local_port)
@@ -56,9 +58,11 @@ class EthernetCommandConnection(DatabaseConnection):
     def add_command_container(self, command_container):
         """ Add a command container.
 
-        :param command_container:\
-            An instance of AbstractSendMeMulticastCommandsVertex that\
-            has commands to be sent at the start and end of simulation
+        :param command_container:
+            A vertex that has commands to be sent at the start and end of \
+            simulation
+        :type command_container:
+            ~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex
         """
         if not isinstance(
                 command_container, AbstractSendMeMulticastCommandsVertex):

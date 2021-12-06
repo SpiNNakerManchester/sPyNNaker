@@ -22,6 +22,10 @@ _population_parameters = dict(
 _population_parameters["n_steps_per_timestep"] = 1
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
+    """ A neuron model that follows the sPyNNaker standard composed model \
+        pattern for point neurons.
+    """
+
     __slots__ = []
 
     default_population_parameters = _population_parameters
@@ -29,7 +33,20 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     def __init__(
             self, model_name, binary, neuron_model, input_type,
             synapse_type, threshold_type, additional_input_type=None):
-        AbstractPyNNNeuronModel.__init__(self, NeuronImplStandard(
+        """
+        :param str model_name: Name of the model.
+        :param str binary: Name of the implementation executable.
+        :param AbstractNeuronModel neuron_model: The model of the neuron soma
+        :param AbstractInputType input_type: The model of synaptic input types
+        :param AbstractSynapseType synapse_type:
+            The model of the synapses' dynamics
+        :param AbstractThresholdType threshold_type:
+            The model of the firing threshold
+        :param additional_input_type:
+            The model (if any) of additional environmental inputs
+        :type additional_input_type: AbstractAdditionalInput or None
+        """
+        super().__init__(NeuronImplStandard(
             model_name, binary, neuron_model, input_type, synapse_type,
             threshold_type, additional_input_type))
 
@@ -38,9 +55,11 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep):
+            n_steps_per_timestep, drop_late_spikes, splitter,
+            rb_left_shifts):
         # pylint: disable=arguments-differ
         self._model.n_steps_per_timestep = n_steps_per_timestep
-        return super(AbstractPyNNNeuronModelStandard, self).create_vertex(
+        return super().create_vertex(
             n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size)
+            ring_buffer_sigma, incoming_spike_buffer_size, drop_late_spikes,
+            splitter, rb_left_shifts)

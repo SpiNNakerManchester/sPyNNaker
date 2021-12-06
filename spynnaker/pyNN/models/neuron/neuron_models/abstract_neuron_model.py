@@ -14,13 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, Struct)
+    AbstractStandardNeuronComponent)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.struct import Struct
 
 
-class AbstractNeuronModel(AbstractStandardNeuronComponent):
+class AbstractNeuronModel(
+        AbstractStandardNeuronComponent, metaclass=AbstractBase):
     """ Represents a neuron model.
     """
 
@@ -28,14 +31,16 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
 
     def __init__(self, data_types, global_data_types=None):
         """
-        :param data_types:\
-            A list of data types in the neuron structure, in the order that\
+        :param list(~data_specification.enums.DataType) data_types:
+            A list of data types in the neuron structure, in the order that
             they appear
-        :param global_data_types:\
-            A list of data types in the neuron global structure, in the order\
+        :param global_data_types:
+            A list of data types in the neuron global structure, in the order
             that they appear
+        :type global_data_types:
+            list(~data_specification.enums.DataType) or None
         """
-        super(AbstractNeuronModel, self).__init__(data_types)
+        super().__init__(data_types)
         if global_data_types is None:
             global_data_types = []
         self.__global_struct = Struct(global_data_types)
@@ -43,34 +48,39 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
     @property
     def global_struct(self):
         """ Get the global parameters structure
+
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__global_struct
 
+    @property
+    def __global_size(self):
+        """ size of the global data, in bytes
+        """
+        return self.__global_struct.get_size_in_whole_words() * BYTES_PER_WORD
+
     @overrides(AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes)
     def get_dtcm_usage_in_bytes(self, n_neurons):
-        usage = super(AbstractNeuronModel, self).get_dtcm_usage_in_bytes(
-            n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() *
-                        BYTES_PER_WORD)
+        usage = super().get_dtcm_usage_in_bytes(n_neurons)
+        return usage + self.__global_size
 
     @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
-        usage = super(AbstractNeuronModel, self).get_sdram_usage_in_bytes(
-            n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() *
-                        BYTES_PER_WORD)
+        usage = super().get_sdram_usage_in_bytes(n_neurons)
+        return usage + self.__global_size
 
-    def get_global_values(self, ts):
+    def get_global_values(self, ts):  # pylint: disable=unused-argument
         """ Get the global values to be written to the machine for this model
 
+        :param float ts: The time to advance the model at each call
         :return: A list with the same length as self.global_struct.field_types
-        :rtype: A list of single values
+        :rtype: list(int or float) or ~numpy.ndarray
         """
         return numpy.zeros(0, dtype="uint32")
 
     @overrides(AbstractStandardNeuronComponent.get_data)
     def get_data(self, parameters, state_variables, vertex_slice, ts):
-        super_data = super(AbstractNeuronModel, self).get_data(
+        super_data = super().get_data(
             parameters, state_variables, vertex_slice, ts)
         values = self.get_global_values(ts)
         global_data = self.__global_struct.get_data(values)
@@ -79,9 +89,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
     @overrides(AbstractStandardNeuronComponent.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-
         # Assume that the global data doesn't change
-        offset += (self.__global_struct.get_size_in_whole_words() *
-                   BYTES_PER_WORD)
-        return super(AbstractNeuronModel, self).read_data(
+        offset += self.__global_size
+        return super().read_data(
             data, offset, vertex_slice, parameters, state_variables)

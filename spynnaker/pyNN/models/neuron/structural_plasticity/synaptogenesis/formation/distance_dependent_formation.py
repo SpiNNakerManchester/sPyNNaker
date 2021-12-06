@@ -14,8 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
-from pacman.model.decorators.overrides import overrides
+from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+# 6 32-bit words (grid_x, grid_y, grid_x_recip, grid_y_recep, ff_prob_size,
+#                 lat_prob_size)
+_PARAMS_SIZE_IN_BYTES = 6 * BYTES_PER_WORD
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -33,20 +39,20 @@ class DistanceDependentFormation(AbstractFormation):
     ]
 
     def __init__(
-            self, grid=numpy.array([16, 16]), p_form_forward=0.16,
+            self, grid=(16, 16), p_form_forward=0.16,
             sigma_form_forward=2.5, p_form_lateral=1.0,
             sigma_form_lateral=1.0):
         """
-
         :param grid: (x, y) dimensions of the grid of distance
-        :param p_form_forward:\
+        :type grid: tuple(int,int) or list(int) or ~numpy.ndarray(int)
+        :param float p_form_forward:
             The peak probability of formation on feed-forward connections
-        :param sigma_form_forward:\
+        :param float sigma_form_forward:
             The spread of probability with distance of formation on\
             feed-forward connections
-        :param p_form_lateral:\
+        :param float p_form_lateral:
             The peak probability of formation on lateral connections
-        :param sigma_form_lateral:\
+        :param float sigma_form_lateral:
             The spread of probability with distance of formation on\
             lateral connections
         """
@@ -70,18 +76,17 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (4 + 4 + 4 + 4 + len(self.__ff_distance_probabilities) * 2 +
+        return (_PARAMS_SIZE_IN_BYTES +
+                len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
 
     def generate_distance_probability_array(self, probability, sigma):
         """ Generate the exponentially decaying probability LUTs.
 
-        :param probability: peak probability
-        :type probability: float
-        :param sigma: spread
-        :type sigma: float
+        :param float probability: peak probability
+        :param float sigma: spread
         :return: distance-dependent probabilities
-        :rtype: numpy.ndarray(float)
+        :rtype: ~numpy.ndarray(float)
         """
         euclidian_distances = numpy.ones(self.__grid ** 2) * numpy.nan
         for row in range(euclidian_distances.shape[0]):
@@ -118,14 +123,12 @@ class DistanceDependentFormation(AbstractFormation):
         """ Compute the distance between points x0 and x1 place on the grid\
             using periodic boundary conditions.
 
-        :param x0: first point in space
-        :type x0: np.ndarray of ints
-        :param x1: second point in space
-        :type x1: np.ndarray of ints
-        :param grid: shape of grid
-        :type grid: np.ndarray of ints
-        :param metric: distance metric, i.e. euclidian or manhattan
-        :type metric: str
+        :param ~numpy.ndarray(int) x0: first point in space
+        :param ~numpy.ndarray(int) x1: second point in space
+        :param ~numpy.ndarray(int) grid: shape of grid
+        :param str metric:
+            distance metric, i.e. ``euclidian`` or ``manhattan`` or
+            ``equidistant``
         :return: the distance
         :rtype: float
         """
@@ -150,6 +153,11 @@ class DistanceDependentFormation(AbstractFormation):
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):
         spec.write_array(self.__grid)
+        # Work out the reciprocal, but zero them if >= 1 as they are not
+        # representable as S031 in that case, and not used anyway
+        recip = 1 / self.__grid
+        recip[recip >= 1.0] = 0
+        spec.write_array(DataType.S031.encode_as_numpy_int_array(recip))
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view("<u4"))

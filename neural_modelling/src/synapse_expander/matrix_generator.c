@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief The implementation of the matrix generator
+ * \file
+ * \brief The implementation of the matrix generator
  */
 #include "matrix_generator.h"
 #include <spin1_api.h>
@@ -26,83 +26,46 @@
 
 #include "matrix_generators/matrix_generator_static.h"
 #include "matrix_generators/matrix_generator_stdp.h"
+#include "matrix_generators/matrix_generator_neuromodulation.h"
 #include <delay_extension/delay_extension.h>
 
+//! The "hashes" for synaptic matrix generators
 enum {
+    //! Generate a pure static synaptic matrix
     STATIC_MATRIX_GENERATOR,
+    //! Generate a synaptic matrix with STDP
     PLASTIC_MATRIX_GENERATOR,
+    //! Generate a synaptic matrix for Neuromodulation
+    NEUROMODULATION_MATRIX_GENERATOR,
     /**
-     *! \brief The number of known generators
+     * \brief The number of known generators
      */
     N_MATRIX_GENERATORS
 };
 
 /**
- *! \brief A "class" for matrix generators
+ * \brief A "class" for matrix generators
  */
 typedef struct matrix_generator_info {
     /**
-     *! \brief The hash of the generator
-     *! For now, hash is just an index agreed between Python and here.
+     * \brief The hash of the generator
+     *
+     * For now, hash is just an index agreed between Python and here.
      */
     generator_hash_t hash;
 
-    /**
-     *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
-     */
+    //! Initialise the generator
     initialize_func *initialize;
 
-    /**
-     *! \brief Generate a row of a matrix with a matrix generator
-     *! \param[in] data The data for the matrix generator, returned by the
-     *!                 initialise function
-     *! \param[in] synaptic_matrix The address of the synaptic matrix to
-     *!                            write to
-     *! \param[in] delayed_synaptic_matrix The address of the synaptic matrix to
-     *!                                    write delayed connections to
-     *! \param[in] max_row_n_words The maximum number of words in a normal row
-     *! \param[in] max_delayed_row_n_words The maximum number of words in a
-     *!                                     delayed row
-     *! \param[in] max_row_n_synapses The maximum number of synapses in a
-     *!                               normal row
-     *! \param[in] max_delayed_row_n_synapses The maximum number of synapses in
-     *!                                       a delayed row
-     *! \param[in] n_synapse_type_bits The number of bits used for the
-     *!                                synapse type
-     *! \param[in] n_synapse_index_bits The number of bits used for the
-     *!                                 neuron id
-     *! \param[in] synapse_type The synapse type of each connection
-     *! \param[in] weight_scales An array of weight scales, one for each synapse
-     *!                          type
-     *! \param[in] post_slice_start The start of the slice of the
-     *!                             post-population being generated
-     *! \param[in] post_slice_count The number of neurons in the slice of the
-     *!                             post-population being generated
-     *! \param[in] pre_slice_start The start of the slice of the pre-population
-     *!                            being generated
-     *! \param[in] pre_slice_count The number of neurons in the slice of the
-     *!                            pre-population being generated
-     *! \param[in] connection_generator The generator of connections
-     *! \param[in] delay_generator The generator of delay values
-     *! \param[in] weight_generator The generator of weight values
-     *! \param[in] max_stage The maximum delay stage to support
-     *! \param[in] timestep_per_delay The delay value multiplier to get to
-     *!                               timesteps
-     */
+    //! Generate a row of a matrix with a matrix generator
     generate_row_func *write_row;
 
-    /**
-     *! \brief Free any data for the generator
-     *! \param[in] data The data to free
-     */
+    //! Free any data for the generator
     free_func *free;
 } matrix_generator_info;
 
 /**
- *! \brief The data for a matrix generator
+ * \brief The data for a matrix generator
  */
 struct matrix_generator {
     const matrix_generator_info *type;
@@ -110,7 +73,7 @@ struct matrix_generator {
 };
 
 /**
- *! \brief An Array of known generators
+ * \brief An Array of known generators
  */
 static const struct matrix_generator_info matrix_generators[] = {
     {STATIC_MATRIX_GENERATOR,
@@ -120,7 +83,11 @@ static const struct matrix_generator_info matrix_generators[] = {
     {PLASTIC_MATRIX_GENERATOR,
             matrix_generator_stdp_initialize,
             matrix_generator_stdp_write_row,
-            matrix_generator_stdp_free}
+            matrix_generator_stdp_free},
+    {NEUROMODULATION_MATRIX_GENERATOR,
+            matrix_generator_neuromodulation_initialize,
+            matrix_generator_neuromodulation_write_row,
+            matrix_generator_neuromodulation_free}
 };
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
@@ -155,6 +122,27 @@ void matrix_generator_free(matrix_generator_t generator) {
     sark_free(generator);
 }
 
+/**
+ * \brief Generate a row of a synaptic matrix
+ * \param[in] generator: The matrix generator
+ * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
+ * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
+ *                                      write delayed connections to
+ * \param[in] n_pre_neurons: The number of pre neurons to generate for
+ * \param[in] pre_neuron_index: The index of the first pre neuron
+ * \param[in] max_row_n_words: The maximum number of words in a normal row
+ * \param[in] max_delayed_row_n_words: The maximum number of words in a
+ *                                     delayed row
+ * \param[in] n_synapse_type_bits: The number of bits used for the synapse type
+ * \param[in] n_synapse_index_bits: The number of bits used for the neuron id
+ * \param[in] synapse_type: The synapse type of each connection
+ * \param[in] n_synapses: The number of synapses
+ * \param[in] indices: Pointer to table of indices
+ * \param[in] delays: Pointer to table of delays
+ * \param[in] weights: Pointer to table of weights
+ * \param[in] max_stage: The maximum delay stage to support
+ * \param[in] max_delay_per_stage: max delay ina  given delay stage
+ */
 static void matrix_generator_write_row(
         matrix_generator_t generator,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
@@ -163,17 +151,21 @@ static void matrix_generator_write_row(
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage) {
+        uint32_t max_stage, uint32_t max_delay_per_stage) {
     generator->type->write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
-            n_pre_neurons, pre_neuron_index,
-            max_row_n_words, max_delayed_row_n_words,
-            n_synapse_type_bits, n_synapse_index_bits,
-            synapse_type, n_synapses, indices, delays, weights, max_stage);
+            n_pre_neurons, pre_neuron_index, max_row_n_words,
+            max_delayed_row_n_words, n_synapse_type_bits, n_synapse_index_bits,
+            synapse_type, n_synapses, indices, delays, weights, max_stage,
+            max_delay_per_stage);
 }
 
 // ---------------------------------------------------------------------
 
+//! \brief Rescales a delay to account for timesteps and type-converts it
+//! \param[in] delay: the delay to rescale
+//! \param[in] timestep_per_delay: The timestep unit
+//! \return the rescaled delay
 static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     delay = delay * timestep_per_delay;
     if (delay < 0) {
@@ -186,16 +178,22 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     return delay_int;
 }
 
-static inline uint16_t rescale_weight(accum weight, uint32_t weight_scale) {
+//! \brief Rescales a weight to account for weight granularity and
+//!     type-converts it
+//! \param[in] weight: the weight to rescale
+//! \param[in] weight_scale: The weight scaling factor
+//! \return the rescaled weight
+static inline uint16_t rescale_weight(accum weight, unsigned long accum weight_scale) {
     if (weight < 0) {
         weight = -weight;
     }
-    weight = weight * weight_scale;
-    uint16_t weight_int = (uint16_t) weight;
-    if (weight != weight_int) {
-        log_debug("Rounded weight %k to %u", weight, weight_int);
+    accum weight_scaled = weight * weight_scale;
+    uint16_t weight_int = (uint16_t) weight_scaled;
+    if (weight_scaled != weight_int) {
+        log_debug("Rounded weight %k to %u (scale is %k)",
+                weight_scaled, weight_int, weight_scale);
     }
-    return weight;
+    return weight_int;
 }
 
 bool matrix_generator_generate(
@@ -204,12 +202,13 @@ bool matrix_generator_generate(
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, uint32_t *weight_scales,
+        uint32_t synapse_type, unsigned long accum *weight_scales,
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
         param_generator_t delay_generator, param_generator_t weight_generator,
-        uint32_t max_stage, accum timestep_per_delay) {
+        uint32_t max_stage, uint32_t max_delay_in_a_stage,
+        accum timestep_per_delay) {
     // Go through and generate connections for each pre-neuron
     uint32_t n_connections = 0;
     for (uint32_t i = 0; i < pre_slice_count; i++) {
@@ -225,21 +224,28 @@ bool matrix_generator_generate(
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
-        accum params[n_indices];
+        for (uint32_t j = 0; j < n_indices; j++) {
+            if (indices[j] >= post_slice_count) {
+                log_error("Index %u out of bounds for %u neurons", indices[j], post_slice_count);
+                rt_error(RTE_SWERR);
+            }
+        }
+
+        accum delay_params[n_indices], weight_params[n_indices];
         uint16_t delays[n_indices], weights[n_indices];
 
         // Generate delays for each index
         param_generator_generate(
-                delay_generator, n_indices, pre_neuron_index, indices, params);
+                delay_generator, n_indices, pre_neuron_index, indices, delay_params);
         for (uint32_t j = 0; j < n_indices; j++) {
-            delays[j] = rescale_delay(params[j], timestep_per_delay);
+            delays[j] = rescale_delay(delay_params[j], timestep_per_delay);
         }
 
         // Generate weights for each index
         param_generator_generate(
-                weight_generator, n_indices, pre_neuron_index, indices, params);
+                weight_generator, n_indices, pre_neuron_index, indices, weight_params);
         for (uint32_t j = 0; j < n_indices; j++) {
-            weights[j] = rescale_weight(params[j], weight_scales[synapse_type]);
+            weights[j] = rescale_weight(weight_params[j], weight_scales[synapse_type]);
         }
 
         // Write row
@@ -248,7 +254,8 @@ bool matrix_generator_generate(
                 pre_slice_count, pre_neuron_index - pre_slice_start,
                 max_row_n_words, max_delayed_row_n_words,
                 n_synapse_type_bits, n_synapse_index_bits,
-                synapse_type, n_indices, indices, delays, weights, max_stage);
+                synapse_type, n_indices, indices, delays, weights, max_stage,
+                max_delay_in_a_stage);
 
         n_connections += n_indices;
     }

@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractEthernetController(object):
+class AbstractEthernetController(object, metaclass=AbstractBase):
     """ A controller that can send multicast packets which can be received\
         over Ethernet and translated to control an external device
     """
@@ -28,14 +26,15 @@ class AbstractEthernetController(object):
     def get_message_translator(self):
         """ Get the translator of messages
 
-        :rtype:\
-            :py:class:`spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator`
+        :rtype: AbstractEthernetTranslator
         """
 
     @abstractmethod
     def get_external_devices(self):
         """ Get the external devices that are to be controlled by the\
             controller
+
+        :rtype: iterable(AbstractMulticastControllableDevice)
         """
 
     @abstractmethod

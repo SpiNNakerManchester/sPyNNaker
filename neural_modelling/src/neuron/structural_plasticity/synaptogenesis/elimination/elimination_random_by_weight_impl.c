@@ -15,18 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for elimination_random_by_weight_impl.h
 #include "elimination_random_by_weight_impl.h"
 
-struct elimination_params *synaptogenesis_elimination_init(uint8_t **data) {
-    struct elimination_params *elim_params = spin1_malloc(sizeof(struct elimination_params));
+elimination_params_t *synaptogenesis_elimination_init(uint8_t **data) {
+    elimination_params_t *elim_params =
+            spin1_malloc(sizeof(elimination_params_t));
     if (elim_params == NULL) {
         log_error("Out of memory when allocating parameters");
         rt_error(RTE_SWERR);
     }
-    spin1_memcpy(elim_params, *data, sizeof(struct elimination_params));
-    log_info("Elimination random by weight prob_dep=%u prob_pot=%u thresh=%u",
-            elim_params->prob_elim_depression, elim_params->prob_elim_potentiation,
+    spin1_memcpy(elim_params, *data, sizeof(elimination_params_t));
+    log_debug("Elimination random by weight prob_dep=%u prob_pot=%u thresh=%u",
+            elim_params->prob_elim_depression,
+            elim_params->prob_elim_potentiation,
             elim_params->threshold);
-    *data += sizeof(struct elimination_params);
+    *data += sizeof(elimination_params_t);
     return elim_params;
 }

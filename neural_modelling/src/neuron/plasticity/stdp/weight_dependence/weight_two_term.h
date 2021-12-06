@@ -15,14 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief API for dual-term weight dependence rules
 #ifndef _WEIGHT_TWO_TERM_H_
 #define _WEIGHT_TWO_TERM_H_
 
 #include "weight.h"
 
+//! \brief Apply the depression rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] depression_1: The amount of depression to apply to term 1
+//! \param[in] depression_2: The amount of depression to apply to term 2
+//! \return the updated weight state
 static weight_state_t weight_two_term_apply_depression(
         weight_state_t state, int32_t depression_1, int32_t depression_2);
 
+//! \brief Apply the potentiation rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] potentiation_1: The amount of potentiation to apply to term 1
+//! \param[in] potentiation_2: The amount of potentiation to apply to term 2
+//! \return the updated weight state
 static weight_state_t weight_two_term_apply_potentiation(
         weight_state_t state, int32_t potentiation_1, int32_t potentiation_2);
 

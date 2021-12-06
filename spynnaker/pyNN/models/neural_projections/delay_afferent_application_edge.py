@@ -13,16 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
-from .delay_afferent_machine_edge import DelayAfferentMachineEdge
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 
 
-class DelayAfferentApplicationEdge(ApplicationEdge):
+class DelayAfferentApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     __slots__ = ()
 
-    def __init__(self, prevertex, delayvertex, label=None):
-        super(DelayAfferentApplicationEdge, self).__init__(
-            prevertex, delayvertex, label=label)
+    def __init__(self, pre_vertex, delay_vertex, label=None):
+        """
+        :param AbstractPopulationVertex pre_vertex:
+        :param DelayExtensionVertex delay_vertex:
+        :param str label:
+        """
+        super().__init__(pre_vertex, delay_vertex, label=label)
 
-    def create_machine_edge(self, pre_vertex, post_vertex, label):
-        return DelayAfferentMachineEdge(pre_vertex, post_vertex, label)
+    @overrides(AbstractSlicesConnect.could_connect)
+    def could_connect(self, src_machine_vertex, dest_machine_vertex):
+        pre_slice = src_machine_vertex.vertex_slice
+        post_slice = dest_machine_vertex.vertex_slice
+        return ((pre_slice.lo_atom == post_slice.lo_atom) and
+                (post_slice.hi_atom == pre_slice.hi_atom))

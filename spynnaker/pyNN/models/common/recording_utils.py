@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import division
-import logging
+import os
 import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -22,14 +21,16 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
-logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
-_SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
 def get_recording_region_size_in_bytes(
         n_machine_time_steps, bytes_per_timestep):
-    """ Get the size of a recording region in bytes
+    """ Get the size of a recording region in bytes.
+
+    :param int n_machine_time_steps:
+    :param int bytes_per_timestep:
+    :rtype: int
     """
     if n_machine_time_steps is None:
         raise Exception(
@@ -39,15 +40,19 @@ def get_recording_region_size_in_bytes(
 
 
 def get_data(transceiver, placement, region, region_size):
-    """ Get the recorded data from a region
+    """ Get the recorded data from a region.
+
+    :param ~spinnman.transceiver.Transceiver transceiver:
+    :param ~pacman.model.placements.Placement placement:
+    :param int region:
+    :param int region_size:
+    :rtype: tuple(bytearray, int)
     """
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        transceiver.read_memory(
-            placement.x, placement.y, region_base_address,
-            BYTES_PER_WORD))[0]
+    number_of_bytes_written = transceiver.read_word(
+        placement.x, placement.y, region_base_address)
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - BYTES_PER_WORD
@@ -64,17 +69,18 @@ def get_data(transceiver, placement, region, region_size):
 
 
 def pull_off_cached_lists(no_loads, cache_file):
-    """ Extracts numpy based data from a  file
+    """ Extracts numpy based data from a file
 
-    :param no_loads: the number of numpy elements in the file
-    :param cache_file: the file to extract from
+    :param int no_loads: the number of numpy elements in the file
+    :param ~io.FileIO cache_file: the file to extract from
     :return: The extracted data
+    :rtype: ~numpy.ndarray
     """
     cache_file.seek(0)
     if no_loads == 1:
         values = numpy.load(cache_file)
         # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, _SEEK_END)
+        cache_file.seek(0, os.SEEK_END)
         return values
     elif no_loads == 0:
         return []
@@ -83,11 +89,17 @@ def pull_off_cached_lists(no_loads, cache_file):
     for _ in range(0, no_loads):
         lists.append(numpy.load(cache_file))
     # Seek to the end of the file (for windows compatibility)
-    cache_file.seek(0, _SEEK_END)
+    cache_file.seek(0, os.SEEK_END)
     return numpy.concatenate(lists)
 
 
 def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
+    """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
+    :rtype: bool
+    """
     if space_needed == 0:
         return False
     if not enable_buffered_recording:
@@ -98,6 +110,12 @@ def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
 
 
 def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
+    """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
+    :rtype: int
+    """
     if space_needed == 0:
         return 0
     if not enable_buffered_recording:
@@ -108,10 +126,10 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
 
 
 def make_missing_string(missing):
-    missing_str = ""
-    separator = ""
-    for placement in missing:
-        missing_str += "{}({}, {}, {})".format(
-            separator, placement.x, placement.y, placement.p)
-        separator = "; "
-    return missing_str
+    """
+    :param iterable(~pacman.model.placements.Placement) missing:
+    :rtype: str
+    """
+    return "; ".join(
+        "({}, {}, {})".format(placement.x, placement.y, placement.p)
+        for placement in missing)

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -25,8 +24,6 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
-
-logger = logging.getLogger(__name__)
 
 
 class ExternalDeviceLifControlVertex(
@@ -52,18 +49,29 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            constraints=None):
+            drop_late_spikes=None, constraints=None, splitter=None):
         """
-        :param n_neurons: The number of neurons in the population
-        :param devices:\
-            The AbstractMulticastControllableDevice instances to be controlled\
+        :param list(AbstractMulticastControllableDevice) devices:
+            The AbstractMulticastControllableDevice instances to be controlled
             by the population
-        :param create_edges:\
-            True if edges to the devices should be added by this dev (set\
+        :param bool create_edges:
+            True if edges to the devices should be added by this dev (set
             to False if using the dev over Ethernet using a translator)
-        :param translator:\
-            Translator to be used when used for Ethernet communication.  Must\
+        :param int max_atoms_per_core:
+        :param AbstractNeuronImpl neuron_impl:
+        :param pynn_model:
+        :param translator:
+            Translator to be used when used for Ethernet communication.  Must
             be provided if the dev is to be controlled over Ethernet.
+        :type translator: AbstractEthernetTranslator or None
+        :param float spikes_per_second:
+        :param str label:
+        :param float ring_buffer_sigma:
+        :param int incoming_spike_buffer_size:
+        :param splitter: splitter from app to machine
+        :type splitter: None or
+            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -94,10 +102,10 @@ class ExternalDeviceLifControlVertex(
         if create_edges:
             self.__dependent_vertices = devices
 
-        super(ExternalDeviceLifControlVertex, self).__init__(
+        super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model)
+            neuron_impl, pynn_model, drop_late_spikes, splitter)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ

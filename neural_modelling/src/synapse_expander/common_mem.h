@@ -20,12 +20,19 @@
 
 #include <common-typedefs.h>
 
+//! \file
+//! \brief Utility functions for working with memory.
+
 /**
- *! \brief A small and fast version of memcpy; pointers must be aligned and a
- *! whole number of words must be being copied.
+ * \brief A small and fast version of `memcpy()`.
+ * \details Both pointers must be aligned and a whole number of words must be
+ *      being copied. The areas of memory must not overlap.
+ * \param[out] to: Where to copy to. Must be word-aligned.
+ * \param[in] from: Where to copy from. Must be word-aligned.
+ * \param[in] num_bytes: The number of bytes to copy. Must be a multiple of 4.
  */
 static inline void fast_memcpy(
-        void *restrict to, const void *restrict from, uint32_t num_bytes) {
+        void *restrict to, const void *restrict from, size_t num_bytes) {
     uint32_t *to_ptr = to;
     const uint32_t *from_ptr = from;
     while (num_bytes) {

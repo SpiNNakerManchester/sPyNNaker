@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file
+ * \brief Parameter generator implementation for convolution kernels
+ */
 #include <stdfix.h>
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>
@@ -22,40 +26,61 @@
 #include <synapse_expander/common_mem.h>
 #include <synapse_expander/generator_types.h>
 
-static initialize_func param_generator_kernel_initialize;
-static free_func param_generator_kernel_free;
-static generate_param_func param_generator_kernel_generate;
-
+//! Convolution kernel parameter generator configuration
 struct param_generator_kernel {
     uint16_t commonWidth;
     uint16_t commonHeight;
 
+    //! Prepopulation grid width
     uint16_t preWidth;
+    //! Prepopulation grid height
     uint16_t preHeight;
+    //! Postpopulation grid width
     uint16_t postWidth;
+    //! Postpopulation grid height
     uint16_t postHeight;
 
+    //! Prepopulation grid X offset
     uint16_t startPreWidth;
+    //! Prepopulation grid Y offset
     uint16_t startPreHeight;
+    //! Postpopulation grid X offset
     uint16_t startPostWidth;
+    //! Postpopulation grid Y offset
     uint16_t startPostHeight;
 
+    //! Prepopulation grid X step
     uint16_t stepPreWidth;
+    //! Prepopulation grid Y step
     uint16_t stepPreHeight;
+    //! Postpopulation grid X step
     uint16_t stepPostWidth;
+    //! Postpopulation grid Y step
     uint16_t stepPostHeight;
 
+    //! Convolution kernel grid width
     uint16_t kernelWidth;
+    //! Convolution kernel grid height
     uint16_t kernelHeight;
 
+    //! Offset into the postpopulation that the current core's slice starts at
     uint32_t post_slice_start;
 };
 
+//! Implementation of the state of the convolution kernel parameter generator
 struct all_kernel_params {
+    //! Configuration descriptor
     struct param_generator_kernel params;
+    //! Array of values in the convolution kernel
     accum *values;
 };
 
+/**
+ * \brief How to initialise the convolution kernel parameter generator
+ * \param[in,out] region: Region to read setup from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *param_generator_kernel_initialize(address_t *region) {
     struct all_kernel_params *obj = spin1_malloc(sizeof(struct all_kernel_params));
     struct param_generator_kernel *params_sdram = (void *) *region;
@@ -71,18 +96,37 @@ static void *param_generator_kernel_initialize(address_t *region) {
     return obj;
 }
 
-static void param_generator_kernel_free(void *data) {
-    sark_free(data);
+/**
+ * \brief How to free any data for the convolution kernel parameter generator
+ * \param[in] generator: The generator to free
+ */
+static void param_generator_kernel_free(void *generator) {
+    sark_free(generator);
 }
 
-static void param_generator_kernel_generate(void *data, uint32_t n_synapses,
+/**
+ * \brief How to generate values with the convolution kernel parameter generator
+ * \param[in] generator: The generator to use to generate values
+ * \param[in] n_synapses: The number of values to generate
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] indices: The \p n_indices post-neuron indices for each connection
+ * \param[out] values: An array into which to place the values; will be
+ *                     \p n_indices in size
+ */
+static void param_generator_kernel_generate(
+        void *generator, uint32_t n_synapses,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
-    struct all_kernel_params *obj = data;
+    struct all_kernel_params *obj = generator;
     struct param_generator_kernel *params = &obj->params;
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, params->preWidth, &pre_c);
+
+    // Check whether these coordinates should be included based on step functions
+    if (!(((pre_r - params->startPreHeight) % params->stepPreHeight == 0) &&
+    		((pre_c - params->startPreWidth) % params->stepPreWidth == 0))) {
+    	return;
+    }
 
     uint16_t hlf_kw = params->kernelWidth >> 1;
     uint16_t hlf_kh = params->kernelHeight >> 1;
@@ -101,7 +145,7 @@ static void param_generator_kernel_generate(void *data, uint32_t n_synapses,
 
         //move common to pre coords
         pre_in_post_world(
-                pac_r, pac_c, params->startPreHeight, params->startPreHeight,
+                pac_r, pac_c, params->startPreHeight, params->startPreWidth,
                 params->stepPreHeight, params->stepPreWidth, &pap_r, &pap_c);
 
         int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;

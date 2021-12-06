@@ -16,8 +16,10 @@
  */
 
 /**
- *! \file
- *! \brief Common functions for matrix generation
+ * \dir
+ * \brief Synaptic matrix generators
+ * \file
+ * \brief Common functions for matrix generation
  */
 
 #ifndef __MATRIX_GENERATOR_COMMON_H__
@@ -26,12 +28,7 @@
 #include <debug.h>
 
 /**
- *! \brief The maximum delay value that can be represented on core
- */
-#define MAX_DELAY 64
-
-/**
- *! \brief A converted final delay value and delay stage
+ * \brief A converted final delay value and delay stage
  */
 struct delay_value {
     uint16_t delay;
@@ -39,11 +36,15 @@ struct delay_value {
 };
 
 /**
- *! \brief Get a converted delay value and stage
- *! \param[in] The value to convert
- *! \param[in] The maximum delay stage allowed
+ * \brief Get a converted delay value and stage
+ * \param[in] delay_value: The value to convert
+ * \param[in] max_stage: The maximum delay stage allowed
+ * \param[in] max_delay_per_stage: The max delay in a delay stage
+ * \return The converted delay value
  */
-static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
+static struct delay_value get_delay(
+        uint16_t delay_value, uint32_t max_stage,
+        uint32_t max_delay_per_stage) {
     uint16_t delay = delay_value;
 
     // Ensure delay is at least 1
@@ -53,15 +54,15 @@ static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
     }
 
     // Ensure that the delay is less than the maximum
-    uint16_t stage = (delay - 1) / MAX_DELAY;
+    uint16_t stage = (delay - 1) / max_delay_per_stage;
     if (stage >= max_stage) {
         log_debug("Delay of %u is too big", delay);
         stage = max_stage - 1;
-        delay = (stage * MAX_DELAY);
+        delay = (stage * max_delay_per_stage);
     }
 
     // Get the remainder of the delay
-    delay = ((delay - 1) % MAX_DELAY) + 1;
+    delay = ((delay - 1) % max_delay_per_stage) + 1;
     return (struct delay_value) {.delay = delay, .stage = stage};
 }
 

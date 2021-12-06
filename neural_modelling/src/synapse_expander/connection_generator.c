@@ -16,7 +16,7 @@
  */
 
 /**
- *! \file
+ * \file
  * \brief The implementation of the functions in connection_generator.h
  */
 
@@ -33,78 +33,42 @@
 #include "connection_generators/connection_generator_fixed_post.h"
 #include "connection_generators/connection_generator_kernel.h"
 
+//! \brief Known "hashes" of connection generators
+//!
+//! For now, hash is just an index agreed between Python and here
 enum {
-    ONE_TO_ONE,
-    ALL_TO_ALL,
-    FIXED_PROBABILITY,
-    FIXED_TOTAL,
-    FIXED_PRE,
-    FIXED_POST,
-    KERNEL,
-    /**
-     *! \brief The number of known generators
-     */
-    N_CONNECTION_GENERATORS
+    ONE_TO_ONE,            //!< One-to-one connection generator
+    ALL_TO_ALL,            //!< All-to-all connection generator
+    FIXED_PROBABILITY,     //!< Fixed probability connection generator
+    FIXED_TOTAL,           //!< Fixed total connections connection generator
+    FIXED_PRE,             //!< Fixed pre-size connection generator
+    FIXED_POST,            //!< Fixed post-size connection generator
+    KERNEL,                //!< Convolution kernel connection generator
+    N_CONNECTION_GENERATORS//!< The number of known generators
 };
 
-/**
- *! \brief A "class" for connection generators
- */
+//! \brief A "class" for connection generators
 typedef struct connection_generator_info {
-    /**
-     *! \brief The hash of the generator.
-     *! For now, hash is just an index agreed between Python and here
-     */
+    //! The hash of the generator.
     generator_hash_t hash;
 
-    /**
-     *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
-     */
+    //! \brief Initialises the generator
     initialize_func *initialize;
 
-    /**
-     *! \brief Generate connections
-     *! \param[in] data The data for the connection generator, returned by the
-     *!                 initialise function
-     *! \param[in] pre_slice_start The start of the slice of the pre-population
-     *!                            being generated
-     *! \param[in] pre_slice_count The number of neurons in the slice of the
-     *!                            pre-population being generated
-     *! \param[in] pre_neuron_index The index of the neuron in the
-     *!                             pre-population being generated
-     *! \param[in] post_slice_start The start of the slice of the
-     *!                             post-population being generated
-     *! \param[in] post_slice_count The number of neurons in the slice of the
-     *!                             post-population being generated
-     *! \param[in] max_row_length The maximum number of connections to generate
-     *! \param[in/out] indices An array into which the core-relative
-     *!                        post-indices should be placed.  This will be
-     *!                        initialised to be max_row_length in size
-     *! \return The number of connections generated
-     */
+    //! \brief Generate connections
     generate_connection_func *generate;
 
-    /**
-     *! \brief Free any data for the generator
-     *! \param[in] data The data to free
-     */
+    //! \brief Frees any data for the generator
     free_func *free;
 } connection_generator_info;
 
-/**
- *! \brief The data for a connection generator
- */
+//! \brief The data for a connection generator
 struct connection_generator {
     const connection_generator_info *type;
     void *data;
 };
 
-/**
- *! \brief An Array of known generators
- */
+//! \brief An Array of known generators
 static const connection_generator_info connection_generators[] = {
     {ONE_TO_ONE,
             connection_generator_one_to_one_initialise,

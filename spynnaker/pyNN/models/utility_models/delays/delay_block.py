@@ -25,8 +25,12 @@ class DelayBlock(object):
         "__delay_per_stage",
         "__n_delay_stages"]
 
-    def __init__(
-            self, n_delay_stages, delay_per_stage, vertex_slice):
+    def __init__(self, n_delay_stages, delay_per_stage, vertex_slice):
+        """
+        :param int n_delay_stages:
+        :param int delay_per_stage:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        """
         self.__delay_per_stage = delay_per_stage
         self.__n_delay_stages = n_delay_stages
         n_words_per_row = int(math.ceil(vertex_slice.n_atoms / 32.0))
@@ -34,10 +38,16 @@ class DelayBlock(object):
             (n_delay_stages, n_words_per_row), dtype="uint32")
 
     def add_delay(self, source_id, stage):
-        word_id = int(source_id / 32.0)
-        bit_id = int(source_id - (word_id * 32))
+        """
+        :param int source_id:
+        :param int stage:
+        """
+        word_id, bit_id = divmod(source_id, 32)
         self.__delay_block[int(stage - 1)][word_id] |= (1 << bit_id)
 
     @property
     def delay_block(self):
+        """
+        :rtype: ~numpy.ndarray
+        """
         return self.__delay_block

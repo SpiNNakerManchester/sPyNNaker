@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Post-synaptic events
 #ifndef _POST_EVENTS_H_
 #define _POST_EVENTS_H_
 
@@ -28,24 +30,35 @@
 //---------------------------------------
 // Macros
 //---------------------------------------
+//! Maximum number of post-synaptic events supported
 #define MAX_POST_SYNAPTIC_EVENTS 16
 
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! Trace history of post-synaptic events
 typedef struct {
+    //! Number of events stored (minus one)
     uint32_t count_minus_one;
-
+    //! Event times
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
+    //! Event traces
     post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
 } post_event_history_t;
 
+//! Post event window description
 typedef struct {
+    //! The previous post-synaptic event trace
     post_trace_t prev_trace;
+    //! The previous post-synaptic event time
     uint32_t prev_time;
+    //! The next post-synaptic event trace
     const post_trace_t *next_trace;
+    //! The next post-synaptic event time
     const uint32_t *next_time;
+    //! The number of events
     uint32_t num_events;
+    //! Whether the previous post-synaptic event is valid (based on time)
     uint32_t prev_time_valid;
 } post_event_window_t;
 
@@ -53,14 +66,21 @@ typedef struct {
 // Inline functions
 //---------------------------------------
 
+#if LOG_LEVEL >= LOG_DEBUG
+//! \brief Print a post-synaptic event history
+//! \param[in] events: The history
 static inline void print_event_history(const post_event_history_t *events) {
-    log_info("      ##  printing entire post event history  ##");
+    log_debug("      ##  printing entire post event history  ##");
     for (uint32_t i = 0; i <= events->count_minus_one; i++) {
-        log_info("post event: %u, time: %u, trace: %u",
+        log_debug("post event: %u, time: %u, trace: %u",
                 i, events->times[i], events->traces[i]);
     }
 }
+#endif
 
+//! \brief Initialise an array of post-synaptic event histories
+//! \param[in] n_neurons: Number of neurons
+//! \return The array
 static inline post_event_history_t *post_events_init_buffers(
         uint32_t n_neurons) {
     post_event_history_t *post_event_history =
@@ -84,6 +104,11 @@ static inline post_event_history_t *post_events_init_buffers(
 }
 
 //---------------------------------------
+//! \brief Get the post-synaptic event window
+//! \param[in] events: The post-synaptic event history
+//! \param[in] begin_time: The start of the window
+//! \param[in] end_time: The end of the window
+//! \return The window
 static inline post_event_window_t post_events_get_window_delayed(
         const post_event_history_t *events, uint32_t begin_time,
         uint32_t end_time) {
@@ -91,6 +116,7 @@ static inline post_event_window_t post_events_get_window_delayed(
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
     const uint32_t *event_time = end_event_time;
+    const post_trace_t *event_trace = events->traces + count;
 
     post_event_window_t window;
     do {
@@ -99,33 +125,32 @@ static inline post_event_window_t post_events_get_window_delayed(
             end_event_time = event_time;
         }
 
-        // Cache pointer to this event as potential
-        // Next event and go back one event
+        // Cache pointer to this event as potential next event and go back one
+        // event.
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
-    }
+        window.next_trace = event_trace--;
 
-    // Keep looping while event occurred after start
-    // Of window and we haven't hit beginning of array
-    while (*event_time > begin_time && event_time != events->times);
+        // Keep looping while event occurred after start of window and we
+        // haven't hit beginning of array...
+    } while (*event_time > begin_time && event_time != events->times);
 
     // Deference event to use as previous
     window.prev_time = *event_time;
+    window.prev_trace = *event_trace;
     window.prev_time_valid = event_time != events->times;
 
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
-
-    // Using num_events, find next and previous traces
-    const post_trace_t *end_event_trace = events->traces + count;
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
 
     // Return window
     return window;
 }
 
 //---------------------------------------
+//! \brief Advance a post-synaptic event window to the next event
+//! \param[in] window: The window to advance
+//! \return the advanced window
 static inline post_event_window_t post_events_next(
         post_event_window_t window) {
     // Update previous time and increment next time
@@ -141,6 +166,10 @@ static inline post_event_window_t post_events_next(
 }
 
 //---------------------------------------
+//! \brief Add a post-synaptic event to the history
+//! \param[in] time: the time of the event
+//! \param[in,out] events: the history to add to
+//! \param[in] trace: the trace of the event
 static inline void post_events_add(
         uint32_t time, post_event_history_t *events, post_trace_t trace) {
     if (events->count_minus_one < MAX_POST_SYNAPTIC_EVENTS - 1) {
@@ -163,22 +192,29 @@ static inline void post_events_add(
     }
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
+//! \brief Print the post-synaptic event history
+//! \param[in] post_event_history: the history
+//! \param[in] begin_time: The start time of the history
+//! \param[in] end_time: The end time of the history
+//! \param[in] delay_dendritic: The amount of dendritic delay
 static inline void print_delayed_window_events(
-        post_event_history_t *post_event_history,
+        const post_event_history_t *post_event_history,
         uint32_t begin_time, uint32_t end_time, uint32_t delay_dendritic) {
-    log_debug("     ##  printing post window  ##");
+    log_info("     ##  printing post window  ##");
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, begin_time, end_time);
 
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time =
                 *post_window.next_time + delay_dendritic;
-        log_debug("post spike: %u, time: %u, trace: %u",
+        log_info("post spike: %u, time: %u, trace: %u",
                 post_window.num_events, delayed_post_time,
                 *post_window.next_trace);
 
         post_window = post_events_next(post_window);
     }
 }
+#endif
 
 #endif  // _POST_EVENTS_H_

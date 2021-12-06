@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class AbstractSettable(object):
+class AbstractSettable(object, metaclass=AbstractBase):
     """ Indicates that some properties of this object can be accessed from\
-        the PyNN population set and get methods
+        the PyNN population set and get methods.
     """
 
     __slots__ = ()
@@ -28,12 +26,16 @@ class AbstractSettable(object):
     @abstractmethod
     def get_value(self, key):
         """ Get a property
+
+        :param str key: the name of the property
+        :rtype: Any or float or int or list(float) or list(int)
         """
 
     @abstractmethod
     def set_value(self, key, value):
         """ Set a property
 
-        :param key: the name of the parameter to change
+        :param str key: the name of the parameter to change
         :param value: the new value of the parameter to assign
+        :type value: Any or float or int or list(float) or list(int)
         """

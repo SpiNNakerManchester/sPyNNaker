@@ -24,11 +24,14 @@ _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
+    """ An triplet-based additive weight dependence STDP rule.
+    """
     __slots__ = [
         "__a3_minus",
         "__a3_plus",
         "__w_max",
         "__w_min"]
+    __PARAM_NAMES = ('w_min', 'w_max', 'A3_plus', 'A3_minus')
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
                           'A3_minus': 0.01}
@@ -39,7 +42,13 @@ class WeightDependenceAdditiveTriplet(
             w_max=default_parameters['w_max'],
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
-        super(WeightDependenceAdditiveTriplet, self).__init__()
+        """
+        :param float w_min: :math:`w^{min}`
+        :param float w_max: :math:`w^{max}`
+        :param float A3_plus: :math:`A_3^+`
+        :param float A3_minus: :math:`A_3^-`
+        """
+        super().__init__()
         self.__w_min = w_min
         self.__w_max = w_max
         self.__a3_plus = A3_plus
@@ -47,18 +56,34 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_min(self):
+        """ :math:`w^{min}`
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self):
+        """ :math:`w^{max}`
+
+        :rtype: float
+        """
         return self.__w_max
 
     @property
     def A3_plus(self):
+        """ :math:`A_3^+`
+
+        :rtype: float
+        """
         return self.__a3_plus
 
     @property
     def A3_minus(self):
+        """ :math:`A_3^-`
+
+        :rtype: float
+        """
         return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)
@@ -75,6 +100,10 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "additive"
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
@@ -87,37 +116,43 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
 
-        # Loop through each synapse type's weight scale
-        for w in weight_scales:
+        # Loop through each synapse type
+        for _ in synapse_weight_scales:
 
             # Scale the weights
-            spec.write_value(
-                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
-            spec.write_value(
-                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
+            spec.write_value(data=self.__w_min * global_weight_scale,
+                             data_type=DataType.S1615)
+            spec.write_value(data=self.__w_max * global_weight_scale,
+                             data_type=DataType.S1615)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self.A_plus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.A_plus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.A_minus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.A_minus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.__a3_plus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.__a3_plus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
             spec.write_value(
-                data=int(round(self.__a3_minus * self.__w_max * w)),
-                data_type=DataType.INT32)
+                data=self.__a3_minus * self.__w_max * global_weight_scale,
+                data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):
+        """ The maximum weight that will ever be set in a synapse as a result\
+            of this rule
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A3_plus', 'A3_minus']
+        return self.__PARAM_NAMES

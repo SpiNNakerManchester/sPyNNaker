@@ -23,6 +23,7 @@ from .external_device_lif_control import ExternalDeviceLifControl
 from .external_spinnaker_link_cochlea_device import ExternalCochleaDevice
 from .external_spinnaker_link_fpga_retina_device import (
     ExternalFPGARetinaDevice)
+from .machine_munich_motor_device import MachineMunichMotorDevice
 from .munich_spinnaker_link_motor_device import MunichMotorDevice
 from .munich_spinnaker_link_retina_device import MunichRetinaDevice
 from .threshold_type_multicast_device_control import (
@@ -32,5 +33,6 @@ __all__ = ["AbstractEthernetController", "AbstractEthernetSensor",
            "AbstractEthernetTranslator", "ArbitraryFPGADevice",
            "AbstractMulticastControllableDevice", "ExternalDeviceLifControl",
            "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
+           "MachineMunichMotorDevice",
            "MunichMotorDevice", "MunichRetinaDevice",
            "ThresholdTypeMulticastDeviceControl"]
