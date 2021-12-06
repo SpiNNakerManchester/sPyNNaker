@@ -21,6 +21,7 @@ _population_parameters = dict(
     AbstractPyNNNeuronModel.default_population_parameters)
 _population_parameters["n_steps_per_timestep"] = 1
 
+
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     """ A neuron model that follows the sPyNNaker standard composed model \
         pattern for point neurons.

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from enum import Enum
 import math
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_KB)
@@ -60,7 +59,7 @@ SCALE = WEIGHT_FLOAT_TO_FIXED_SCALE * NA_TO_PA_SCALE
 #: natively supported delays for all abstract_models
 MAX_SUPPORTED_DELAY_TICS = 64
 MAX_DELAY_BLOCKS = 64
-DELAY_MASK = (1 << int(math.log2(MAX_SUPPORTED_DELAY_TICS))) -1
+DELAY_MASK = (1 << int(math.log2(MAX_SUPPORTED_DELAY_TICS))) - 1
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
 #: the minimum supported delay slot between two neurons

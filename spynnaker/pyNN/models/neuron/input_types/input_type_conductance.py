@@ -86,7 +86,8 @@ class InputTypeConductance(AbstractInputType):
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
-        return float(2**5)  # IMPLICIT WEIGHT SCALING -- the default in main branch is 2**10
+        # IMPLICIT WEIGHT SCALING -- the default in main branch is 2**10
+        return float(2**5)
 
     @property
     def e_rev_E(self):
