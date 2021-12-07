@@ -75,7 +75,7 @@ class SpynnakerDataView(FecDataView):
         Typically simulation_time_step_per_ms but may be a positive multiple
 
         :rtype: float
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the min_delay is currently unavailable
         """
         if self.__spy_data._min_delay is not None:
@@ -89,7 +89,7 @@ class SpynnakerDataView(FecDataView):
         Typically simulation_time_step_per_ms but may be a positive multiple
 
         :rtype: float
-        :raises SpinnFrontEndException:
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the min_delay is currently unavailable
         """
         value = self.get_min_delay()
