@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy
-from itertools import zip_longest
 
 from pacman.model.graphs.common.slice import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
