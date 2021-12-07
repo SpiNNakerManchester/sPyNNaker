@@ -399,26 +399,26 @@ def test_set_synapse_dynamics():
     "neurons_per_core,expect_app_keys,max_delay", [
         # Only undelayed, all edges exist
         (range(10), [], 1000, 100, True, None),
-        # Only delayed, all edges exist
-        ([], range(10), 1000, 100, True, 20),
+        # Only delayed, all edges exist (note max_delay=20 on master)
+        ([], range(10), 1000, 100, True, 100),
         # All undelayed and delayed edges exist
-        (range(10), range(10), 1000, 100, True, 20),
+        (range(10), range(10), 1000, 100, True, 100),
         # Only undelayed, some edges are filtered (app keys shouldn't work)
         ([0, 1, 2, 3, 4], [], 1000, 100, False, None),
         # Only delayed, some edges are filtered (app keys shouldn't work)
-        ([], [5, 6, 7, 8, 9], 1000, 100, False, 20),
+        ([], [5, 6, 7, 8, 9], 1000, 100, False, 100),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
-        ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 20),
+        ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 100),
         # Both delayed and undelayed, some delayed edges don't exist
         # (app keys work because all undelayed exist)
-        (range(10), [4, 5, 6, 7], 1000, 100, True, 20),
+        (range(10), [4, 5, 6, 7], 1000, 100, True, 100),
         # Should work but number of neurons don't work out
         (range(5), [], 10000, 2048, False, None),
         # Should work but number of cores doesn't work out
         (range(2000), [], 10000, 5, False, None),
         # Should work but number of neurons with delays don't work out
-        ([], range(4), 1024, 256, False, 144)
+        ([], range(4), 1024, 256, False, 576)  # 144 on master
     ])
 def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
