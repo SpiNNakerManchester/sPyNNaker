@@ -183,9 +183,9 @@ class FromListConnector(AbstractConnector):
             mask = ((self.__delays >= min_delay) &
                     (self.__delays <= max_delay))
         if mask is None:
-            conns = self.__conn_list
+            conns = self.__conn_list.copy()
         else:
-            conns = self.__conn_list[mask]
+            conns = self.__conn_list[mask].copy()
         if conns.size == 0:
             return 0
 
