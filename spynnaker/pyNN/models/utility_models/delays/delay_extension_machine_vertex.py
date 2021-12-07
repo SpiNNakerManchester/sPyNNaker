@@ -312,7 +312,7 @@ class DelayExtensionMachineVertex(
             self._DELAY_EXTENSION_REGIONS.TDMA_REGION.value)
         spec.write_array(
             self._app_vertex.generate_tdma_data_specification_data(
-                self.__source_vertex.index))
+                self.index))
 
         # End-of-Spec:
         spec.end_specification()

@@ -190,6 +190,8 @@ class NeuronRecorder(object):
     def _max_recording_per_slice(self, variable, n_atoms):
         """
         """
+        if variable not in self.__sampling_rates:
+            return None
         if self.__sampling_rates[variable] == 0:
             return 0
         if self.__indexes[variable] is None:
