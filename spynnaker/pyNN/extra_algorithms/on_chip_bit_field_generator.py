@@ -150,8 +150,7 @@ class _OnChipBitFieldGenerator(object):
 
         # run app
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, self.__txrx,
-            executable_finder,
+            expander_cores, bit_field_app_id, executable_finder,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
@@ -332,7 +331,7 @@ class _OnChipBitFieldGenerator(object):
             placement.x, placement.y, user_1_base_address,
             bit_field_builder_region)
 
-    def __check_for_success(self, executable_targets, transceiver):
+    def __check_for_success(self, executable_targets):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
@@ -341,6 +340,7 @@ class _OnChipBitFieldGenerator(object):
         :param ~.Transceiver transceiver: SpiNNMan instance
         :rtype: bool
         """
+        transceiver = SpynnakerDataView().transceiver
         for core_subset in executable_targets.all_core_subsets:
             x = core_subset.x
             y = core_subset.y

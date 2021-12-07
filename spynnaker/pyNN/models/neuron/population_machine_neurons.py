@@ -20,6 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -211,14 +212,12 @@ class PopulationMachineNeurons(
         spec.write_array(neuron_data)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
+    def read_parameters_from_machine(self, placement, vertex_slice):
 
         # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
-                placement, self._neuron_regions.neuron_params,
-                transceiver)
+                placement, self._neuron_regions.neuron_params)
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
@@ -235,7 +234,7 @@ class PopulationMachineNeurons(
             vertex_slice) - neurons_pre_size
 
         # get data from the machine
-        byte_array = transceiver.read_memory(
+        byte_array = SpynnakerDataView().transceiver.read_memory(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 

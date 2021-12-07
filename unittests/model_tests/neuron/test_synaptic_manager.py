@@ -61,7 +61,7 @@ from spynnaker.pyNN.config_setup import unittest_setup
 import spynnaker8 as p
 
 
-class MockTransceiverRawData(object):
+class MockTransceiverRawData(Transceiver):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
@@ -152,12 +152,12 @@ def test_write_data_spec():
         region = executor.get_region(r)
         if region is not None:
             all_data.extend(region.region_data)
-    transceiver = MockTransceiverRawData(all_data)
+    SpynnakerDataWriter().set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
     try:
         connections_1 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_1._projection_edge,
                 proj_one_to_one_1._synapse_information))
 
@@ -168,7 +168,7 @@ def test_write_data_spec():
 
         connections_2 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_2._projection_edge,
                 proj_one_to_one_2._synapse_information))
 
@@ -179,7 +179,7 @@ def test_write_data_spec():
 
         connections_3 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_all_to_all._projection_edge,
                 proj_all_to_all._synapse_information))
 
@@ -190,7 +190,7 @@ def test_write_data_spec():
 
         connections_4 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_from_list._projection_edge,
                 proj_from_list._synapse_information))
 

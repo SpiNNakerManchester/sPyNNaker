@@ -954,7 +954,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placements, app_edge, synapse_info):
+            self, placements, app_edge, synapse_info):
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
@@ -966,7 +966,7 @@ class AbstractPopulationVertex(
             if isinstance(post_vertex, HasSynapses):
                 placement = placements.get_placement_of_vertex(post_vertex)
                 connections.extend(post_vertex.get_connections_from_machine(
-                    transceiver, placement, app_edge, synapse_info))
+                    placement, app_edge, synapse_info))
         return numpy.concatenate(connections)
 
     def get_synapse_params_size(self):

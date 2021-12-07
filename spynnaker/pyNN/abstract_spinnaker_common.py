@@ -389,7 +389,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             synapse_expander(
-                self.placements, self._txrx, self._executable_finder,
+                self.placements, self._executable_finder,
                 get_config_bool("Reports", "write_expander_iobuf"))
 
     def _execute_on_chip_bit_field_generator(self):

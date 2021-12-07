@@ -208,11 +208,10 @@ class SpikeSourcePoissonMachineVertex(
         return []
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
-    def get_recording_region_base_address(self, txrx, placement):
+    def get_recording_region_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
-            txrx)
+            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
 
     @property
     @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
@@ -626,26 +625,23 @@ class SpikeSourcePoissonMachineVertex(
             value * SpynnakerDataView().simulation_time_step_per_ms
         ).astype("uint32")
 
-    def poisson_param_region_address(self, placement, transceiver):
+    def poisson_param_region_address(self, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value,
-            transceiver)
+            self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
 
-    def poisson_rate_region_address(self, placement, transceiver):
+    def poisson_rate_region_address(self, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement,
-            self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value,
-            transceiver)
+            self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
     @overrides(
         AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
-
+            self, placement, vertex_slice):
+        transceiver = SpynnakerDataView().transceiver
         # locate SDRAM address where parameters are stored
-        poisson_params = self.poisson_param_region_address(
-            placement, transceiver)
+        poisson_params = self.poisson_param_region_address(placement)
         seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(
             placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
             self.SEED_SIZE_BYTES))
@@ -653,7 +649,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = (
-            self.poisson_rate_region_address(placement, transceiver))
+            self.poisson_rate_region_address(placement))
 
         # get size of poisson params
         size_of_region = get_rates_bytes(vertex_slice, self._app_vertex.rates)

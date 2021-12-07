@@ -29,6 +29,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 
@@ -66,7 +67,7 @@ def _locate_expander_rerun_targets(
             executable_type=ExecutableType.SYSTEM)
         # Write the region to USER1, as that is the best we can do
         write_address_to_user1(
-            transceiver, placement.x, placement.y, placement.p,
+            placement.x, placement.y, placement.p,
             placement.vertex.connection_generator_region)
     return new_cores
 
@@ -102,10 +103,9 @@ def _rerun_synaptic_cores(
     """
     if synaptic_expander_rerun_cores.total_processors:
         logger.info("rerunning synaptic expander")
-        expander_app_id = transceiver.app_id_tracker.get_new_id()
+        expander_app_id = SpynnakerDataView().get_new_id()
         run_system_application(
-            synaptic_expander_rerun_cores, expander_app_id, transceiver,
-            executable_finder,
+            synaptic_expander_rerun_cores, expander_app_id, executable_finder,
             get_config_bool("Reports", "write_expander_iobuf"),
             None, [CPUState.FINISHED], needs_sync_barrier,
             _RERUN_IOBUF_NAME_PATTERN)

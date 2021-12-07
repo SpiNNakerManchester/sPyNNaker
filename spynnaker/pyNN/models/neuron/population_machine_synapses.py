@@ -126,28 +126,25 @@ class PopulationMachineSynapses(
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_filter)
+            placement=placement, region=self._synapse_regions.bitfield_filter)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                key_to_atom_map_region_base_address)
     def key_to_atom_map_region_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_key_map)
+            placement=placement, region=self._synapse_regions.bitfield_key_map)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
     def bit_field_builder_region(self, transceiver, placement):
         return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
+            placement=placement,
             region=self._synapse_regions.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
     def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.synaptic_matrix)
+            placement=placement, region=self._synapse_regions.synaptic_matrix)
         return [(
             self._synaptic_matrices.host_generated_block_addr +
             synaptic_matrix_base_address,
@@ -271,9 +268,8 @@ class PopulationMachineSynapses(
         return self._synaptic_matrices.gen_on_machine
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
-    def read_generated_connection_holders(self, transceiver, placement):
-        self._synaptic_matrices.read_generated_connection_holders(
-            transceiver, placement)
+    def read_generated_connection_holders(self, placement):
+        self._synaptic_matrices.read_generated_connection_holders(placement)
 
     @property
     @overrides(AbstractSynapseExpandable.connection_generator_region)
@@ -281,11 +277,9 @@ class PopulationMachineSynapses(
         return self._synapse_regions.connection_builder
 
     def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info):
+            self, placement, app_edge, synapse_info):
         """ Get the connections from the machine for this vertex.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the connection data
         :param ~pacman.model.placement.Placement placements:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
@@ -294,7 +288,7 @@ class PopulationMachineSynapses(
             The specific projection within the edge
         """
         return self._synaptic_matrices.get_connections_from_machine(
-            transceiver, placement, app_edge, synapse_info)
+            placement, app_edge, synapse_info)
 
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
