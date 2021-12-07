@@ -32,7 +32,6 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.interface_functions import (
     edge_to_n_keys_mapper)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
