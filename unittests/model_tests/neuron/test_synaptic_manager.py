@@ -444,6 +444,7 @@ def test_pop_based_master_pop_table_standard(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
     SpynnakerDataWriter().start_run()
+    SpynnakerDataWriter().clone_graphs()
     delay_support_adder()
     machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
     allocator = ZonedRoutingInfoAllocator()
