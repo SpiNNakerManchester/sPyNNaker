@@ -264,8 +264,7 @@ class _OnChipBitFieldGenerator(object):
         :rtype: iterable(tuple(int,int,list(int)))
         """
         # get bitfield address
-        address = placement.vertex.bit_field_base_address(
-            self.__txrx, placement)
+        address = placement.vertex.bit_field_base_address(placement)
 
         # read how many bitfields there are; header of filter_region_t
         _merged, _redundant, total = _THREE_WORDS.unpack(

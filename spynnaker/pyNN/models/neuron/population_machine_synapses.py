@@ -124,7 +124,7 @@ class PopulationMachineSynapses(
             self._synapse_references.connection_builder)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
-    def bit_field_base_address(self, transceiver, placement):
+    def bit_field_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
 
@@ -142,7 +142,7 @@ class PopulationMachineSynapses(
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
+    def regeneratable_sdram_blocks_and_sizes(self, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.synaptic_matrix)
         return [(

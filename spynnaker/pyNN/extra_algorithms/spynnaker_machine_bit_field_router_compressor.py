@@ -40,14 +40,12 @@ _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
 
 
 def _locate_expander_rerun_targets(
-        bitfield_targets, executable_finder, placements,
-        transceiver):
+        bitfield_targets, executable_finder, placements):
     """ removes host based cores for synaptic matrix regeneration
 
     :param ~.ExecutableTargets bitfield_targets: the cores that were used
     :param ~.ExecutableFinder executable_finder: way to get binary path
     :param ~.Placements placements: placements on machine
-    :param ~.Transceiver transceiver: spinnman instance
     :return: new targets for synaptic expander
     :rtype: ~.ExecutableTargets
     """
@@ -90,13 +88,12 @@ def __machine_expandables(cores, placements):
 
 
 def _rerun_synaptic_cores(
-        synaptic_expander_rerun_cores, transceiver, executable_finder,
+        synaptic_expander_rerun_cores, executable_finder,
         needs_sync_barrier):
     """ reruns the synaptic expander
 
     :param ~.ExecutableTargets synaptic_expander_rerun_cores:
         the cores to rerun the synaptic matrix generator for
-    :param ~.Transceiver transceiver: spinnman instance
     :param ~.ExecutableFinder executable_finder:
         finder of binary file paths
     :param bool needs_sync_barrier:
@@ -112,14 +109,13 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, transceiver, machine,
+        routing_tables, machine,
         placements, executable_finder, routing_infos, executable_targets,):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
     :type routing_tables:
         ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
     :param ~pacman.model.placements.Placements placements:
         placements on machine
@@ -132,28 +128,25 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor(
-            routing_tables, transceiver, machine,
+            routing_tables, machine,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets, executable_finder, placements,
-        transceiver)
+        compressor_executable_targets, executable_finder, placements)
 
     # just rerun the synaptic expander for safety purposes
-    _rerun_synaptic_cores(
-        expander_chip_cores, transceiver, executable_finder, True)
+    _rerun_synaptic_cores(expander_chip_cores, executable_finder, True)
 
 
 def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables, transceiver, machine,
+        routing_tables, machine,
         placements, executable_finder, routing_infos, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
     :type routing_tables:
         ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
     :param ~spinn_machine.Machine machine: spinnMachine instance
     :param ~pacman.model.placements.Placements placements:
         placements on machine
@@ -166,14 +159,12 @@ def spynnaker_machine_bitField_pair_router_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor(
-            routing_tables, transceiver, machine,
+            routing_tables, machine,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets, executable_finder, placements,
-        transceiver)
+        compressor_executable_targets, executable_finder, placements)
 
     # just rerun the synaptic expander for safety purposes
-    _rerun_synaptic_cores(
-        expander_chip_cores, transceiver, executable_finder, True)
+    _rerun_synaptic_cores(expander_chip_cores, executable_finder, True)
