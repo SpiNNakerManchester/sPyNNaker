@@ -266,6 +266,9 @@ static void neuron_impl_do_timestep_update(
                 &additional_input_array[neuron_index];
         synapse_param_t *the_synapse_type =
                 &neuron_synapse_shaping_params[neuron_index];
+
+        bool spike = false;
+
         // Loop however many times requested; do this in reverse for efficiency,
         // and because the index doesn't actually matter
         for (uint32_t i_step = n_steps_per_timestep; i_step > 0; i_step--) {
@@ -328,6 +331,8 @@ static void neuron_impl_do_timestep_update(
             // If spike occurs, communicate to relevant parts of model
             if (spike_now) {
 
+                spike = true;
+
                 // Call relevant model-based functions
                 // Tell the neuron model
                 neuron_model_has_spiked(this_neuron);
@@ -335,11 +340,11 @@ static void neuron_impl_do_timestep_update(
                 // Tell the additional input
                 additional_input_has_spiked(additional_inputs);
 
-                // Record the spike
-                neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
-
-                // Send the spike
-                send_spike(timer_count, time, neuron_index);
+//                // Record the spike
+//                neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+//
+//                // Send the spike
+//                send_spike(timer_count, time, neuron_index);
             }
 
             // Shape the existing input according to the included rule
@@ -349,6 +354,14 @@ static void neuron_impl_do_timestep_update(
     #if LOG_LEVEL >= LOG_DEBUG
         neuron_model_print_state_variables(this_neuron);
     #endif // LOG_LEVEL >= LOG_DEBUG
+
+        if (spike) {
+            // Record the spike
+            neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+
+            // Send the spike
+            send_spike(timer_count, time, neuron_index);
+        }
     }
 }
 
@@ -364,8 +377,8 @@ static void neuron_impl_store_neuron_parameters(
     // Skip over the steps per timestep
     next += 1;
 
-    // Skip over the steps per timestep
-    next += 1;
+//    // Skip over the steps per timestep
+//    next += 1;
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
@@ -416,37 +429,22 @@ static void neuron_impl_store_neuron_parameters(
 void neuron_impl_print_inputs(uint32_t n_neurons) {
     bool empty = true;
     for (index_t i = 0; i < n_neurons; i++) {
-<<<<<<< HEAD
-        empty = empty && (0 == bitsk(
-                synapse_types_get_excitatory_input(&neuron_synapse_shaping_params[i])
-                - synapse_types_get_inhibitory_input(&neuron_synapse_shaping_params[i])));
-=======
         synapse_param_t *params = &neuron_synapse_shaping_params[i];
         empty = empty && (0 == bitsk(
                 synapse_types_get_excitatory_input(params)
                 - synapse_types_get_inhibitory_input(params)));
->>>>>>> refs/remotes/origin/master
     }
 
     if (!empty) {
         log_debug("-------------------------------------\n");
 
         for (index_t i = 0; i < n_neurons; i++) {
-<<<<<<< HEAD
-            input_t input =
-                    synapse_types_get_excitatory_input(&neuron_synapse_shaping_params[i])
-                    - synapse_types_get_inhibitory_input(&neuron_synapse_shaping_params[i]);
-            if (bitsk(input) != 0) {
-                log_debug("%3u: %12.6k (= ", i, input);
-                synapse_types_print_input(&neuron_synapse_shaping_params[i]);
-=======
             synapse_param_t *params = &neuron_synapse_shaping_params[i];
             input_t input = synapse_types_get_excitatory_input(params)
                     - synapse_types_get_inhibitory_input(params);
             if (bitsk(input) != 0) {
                 log_debug("%3u: %12.6k (= ", i, input);
                 synapse_types_print_input(params);
->>>>>>> refs/remotes/origin/master
                 log_debug(")\n");
             }
         }

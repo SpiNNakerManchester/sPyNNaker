@@ -195,7 +195,11 @@ class PopulationMachineNeurons(
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
-        spec.write_value(data=2**get_n_bits(n_atoms))
+        # Write the peak neurons (closest above power of 2 of n_atoms)
+        if (n_atoms == 1):
+            spec.write_value(data=n_atoms)
+        else:
+            spec.write_value(data=2**get_n_bits(n_atoms))
 
         # Write the ring buffer data
         # This is only the synapse types that need a ring buffer i.e. not
