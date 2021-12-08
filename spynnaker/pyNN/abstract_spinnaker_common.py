@@ -445,8 +445,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 return
             on_chip_bitfield_generator(
                 self.placements, self.application_graph,
-                self._executable_finder,  self._txrx, self._machine_graph,
-                self._routing_infos)
+                self._executable_finder,  self._txrx)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

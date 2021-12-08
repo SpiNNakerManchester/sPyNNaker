@@ -205,7 +205,7 @@ class SynapticMatrixApp(object):
 
         # There must be the same number of pre and post vertices for
         # direct to work
-        if len(post_m_vertices) != self.__m_vertices:
+        if len(post_m_vertices) != len(self.__m_vertices):
             return False
         next_single_addr = single_addr
         for m_vertex, post_vertex in zip(self.__m_vertices, post_m_vertices):
