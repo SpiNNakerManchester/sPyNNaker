@@ -225,10 +225,10 @@ class SpikeSourcePoissonMachineVertex(
         return len(in_edges) == 1
 
     @overrides(AbstractHasProfileData.get_profile_data)
-    def get_profile_data(self, transceiver, placement):
+    def get_profile_data(self, placement):
         return get_profiling_data(
             self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
-            self.PROFILE_TAG_LABELS, transceiver, placement)
+            self.PROFILE_TAG_LABELS, placement)
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)

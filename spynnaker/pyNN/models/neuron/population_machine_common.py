@@ -113,10 +113,9 @@ class PopulationMachineCommon(
             placement, self.__regions.recording)
 
     @overrides(AbstractHasProfileData.get_profile_data)
-    def get_profile_data(self, transceiver, placement):
+    def get_profile_data(self, placement):
         return get_profiling_data(
-            self.__regions.profile, self.__profile_tags, transceiver,
-            placement)
+            self.__regions.profile, self.__profile_tags, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
