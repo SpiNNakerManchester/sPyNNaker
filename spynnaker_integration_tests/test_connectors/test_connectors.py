@@ -15,7 +15,7 @@
 
 import numpy
 import spynnaker8 as sim
-from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
 from pyNN.random import NumpyRNG
@@ -256,7 +256,8 @@ class ConnectorsTest(BaseTestCase):
                               label="test")
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
-        machine_graph = globals_variables.get_simulator()._machine_graph
+        # As outside of run we have to use unprotected method
+        machine_graph = SpynnakerDataWriter().get_runtime_machine_graph()
         projection_edges = [edge for edge in machine_graph.edges if (
             edge.label == 'machine_edge_for_test')]
         sim.end()
