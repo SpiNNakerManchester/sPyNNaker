@@ -16,6 +16,7 @@
 import numpy
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 
@@ -437,11 +438,9 @@ class SynapticMatrix(object):
         return self.__delay_index
 
     def read_connections(
-            self, transceiver, placement, synapses_address, single_address):
+            self, placement, synapses_address, single_address):
         """ Read the connections from the machine
 
-        :param ~spinnman.transciever.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :param int synapses_address:
@@ -458,11 +457,9 @@ class SynapticMatrix(object):
 
         if self.__syn_mat_offset is not None:
             if self.__is_single:
-                block = self.__get_single_block(
-                    transceiver, placement, single_address)
+                block = self.__get_single_block(placement, single_address)
             else:
-                block = self.__get_block(
-                    transceiver, placement, synapses_address)
+                block = self.__get_block(placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
@@ -471,8 +468,7 @@ class SynapticMatrix(object):
                 False, splitter.max_support_delay()))
 
         if self.__delay_syn_mat_offset is not None:
-            block = self.__get_delayed_block(
-                transceiver, placement, synapses_address)
+            block = self.__get_delayed_block(placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
                 self.__synapse_info, pre_slice, post_slice,
@@ -488,11 +484,9 @@ class SynapticMatrix(object):
         self.__received_block = None
         self.__delay_received_block = None
 
-    def __get_block(self, transceiver, placement, synapses_address):
+    def __get_block(self, placement, synapses_address):
         """ Get a block of data for undelayed synapses
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
         :param int synapses_address:
@@ -502,15 +496,14 @@ class SynapticMatrix(object):
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + synapses_address
-        block = transceiver.read_memory(
+        block = SpynnakerDataView().read_memory(
             placement.x, placement.y, address, self.__matrix_size)
         self.__received_block = block
         return block
 
-    def __get_delayed_block(self, transceiver, placement, synapses_address):
+    def __get_delayed_block(self, placement, synapses_address):
         """ Get a block of data for delayed synapses
 
-        :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int synapses_address:
             The base address of the synaptic matrix region
@@ -519,15 +512,14 @@ class SynapticMatrix(object):
         if self.__delay_received_block is not None:
             return self.__delay_received_block
         address = self.__delay_syn_mat_offset + synapses_address
-        block = transceiver.read_memory(
+        block = SpynnakerDataView().read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
         self.__delay_received_block = block
         return block
 
-    def __get_single_block(self, transceiver, placement, single_address):
+    def __get_single_block(self, placement, single_address):
         """ Get a block of data for "direct" or "single" synapses
 
-        :param Transceiver transceiver: How to read the data from the machine
         :param Placement placement: Where the matrix is on the machine
         :param int single_address:
             The base address of the "direct" or "single" matrix region
@@ -536,7 +528,7 @@ class SynapticMatrix(object):
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + single_address
-        block = transceiver.read_memory(
+        block = SpynnakerDataView().read_memory(
             placement.x, placement.y, address, self.__single_matrix_size)
         numpy_data = numpy.asarray(block, dtype="uint8").view("uint32")
         n_rows = len(numpy_data)

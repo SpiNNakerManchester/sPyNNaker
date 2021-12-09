@@ -50,7 +50,7 @@ def get_data(transceiver, placement, region, region_size):
     """
 
     region_base_address = locate_memory_region_for_placement(
-        placement, region, transceiver)
+        placement, region)
     number_of_bytes_written = transceiver.read_word(
         placement.x, placement.y, region_base_address)
 

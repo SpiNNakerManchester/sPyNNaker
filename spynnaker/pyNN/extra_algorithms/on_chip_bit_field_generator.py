@@ -54,18 +54,16 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-def on_chip_bitfield_generator(placements, executable_finder, transceiver):
+def on_chip_bitfield_generator(placements, executable_finder):
     """ Loads and runs the bit field generator on chip.
 
-    :param ~pacman.model.placements.Placements placements: placements
     :param executable_finder: the executable finder
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
     :param ~spinnman.transceiver.Transceiver transceiver:
         the SpiNNMan instance
     """
-    generator = _OnChipBitFieldGenerator(
-        placements, executable_finder, transceiver)
+    generator = _OnChipBitFieldGenerator(placements, executable_finder)
     generator._run(executable_finder)
 
 
@@ -104,7 +102,7 @@ class _OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __init__(self, placements, executable_finder, transceiver):
+    def __init__(self, placements, executable_finder):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -118,7 +116,7 @@ class _OnChipBitFieldGenerator(object):
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
         """
-        self.__txrx = transceiver
+        self.__txrx = SpynnakerDataView().transceiver
         self.__placements = placements
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
@@ -150,8 +148,7 @@ class _OnChipBitFieldGenerator(object):
 
         # run app
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, self.__txrx,
-            executable_finder,
+            expander_cores, bit_field_app_id, executable_finder,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
@@ -159,7 +156,7 @@ class _OnChipBitFieldGenerator(object):
         progress.end()
 
         # read in bit fields for debugging purposes
-        run_dir_path = SpynnakerDataView().run_dir_path
+        run_dir_path = view.run_dir_path
         if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
                 run_dir_path, self._BIT_FIELD_REPORT_FILENAME))
@@ -265,8 +262,7 @@ class _OnChipBitFieldGenerator(object):
         :rtype: iterable(tuple(int,int,list(int)))
         """
         # get bitfield address
-        address = placement.vertex.bit_field_base_address(
-            self.__txrx, placement)
+        address = placement.vertex.bit_field_base_address(placement)
 
         # read how many bitfields there are; header of filter_region_t
         _merged, _redundant, total = _THREE_WORDS.unpack(
@@ -332,7 +328,7 @@ class _OnChipBitFieldGenerator(object):
             placement.x, placement.y, user_1_base_address,
             bit_field_builder_region)
 
-    def __check_for_success(self, executable_targets, transceiver):
+    def __check_for_success(self, executable_targets):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
@@ -341,6 +337,7 @@ class _OnChipBitFieldGenerator(object):
         :param ~.Transceiver transceiver: SpiNNMan instance
         :rtype: bool
         """
+        transceiver = SpynnakerDataView().transceiver
         for core_subset in executable_targets.all_core_subsets:
             x = core_subset.x
             y = core_subset.y

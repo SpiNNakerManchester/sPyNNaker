@@ -212,13 +212,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         """
         self._projections.append(projection)
 
-    def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None):
+    def stop(self, clear_routing_tables=None, clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-            after running the execution. Note that this powers down all boards
-            connected to the BMP connections given to the transceiver
-        :type turn_off_machine: bool or None
         :param clear_routing_tables: informs the tool chain if it
             should turn off the clearing of the routing tables
         :type clear_routing_tables: bool or None
@@ -231,7 +226,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for population in self._populations:
             population._end()
 
-        super().stop(turn_off_machine, clear_routing_tables, clear_tags)
+        super().stop(clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
 
     def run(self, run_time, sync_time=0.0):
@@ -354,7 +349,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
-                self._router_tables, self._txrx, self._machine,
+                self._router_tables, self._machine,
                 self._placements, self._executable_finder, self._routing_infos,
                 self._executable_targets)
             self._multicast_routes_loaded = True
@@ -367,7 +362,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor(
-                self._router_tables, self._txrx, self._machine,
+                self._router_tables, self._machine,
                 self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets)
             self._multicast_routes_loaded = True
@@ -389,7 +384,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             synapse_expander(
-                self.placements, self._txrx, self._executable_finder,
+                self.placements, self._executable_finder,
                 get_config_bool("Reports", "write_expander_iobuf"))
 
     def _execute_on_chip_bit_field_generator(self):
@@ -397,7 +392,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             on_chip_bitfield_generator(
-                self.placements, self._executable_finder,  self._txrx)
+                self.placements, self._executable_finder)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

@@ -939,7 +939,7 @@ class Population(PopulationBase):
                     # SDRAM space.
                     placement = sim.placements.get_placement_of_vertex(vertex)
                     vertex.read_parameters_from_machine(
-                        sim.transceiver, placement, vertex.vertex_slice)
+                        placement, vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 
