@@ -143,7 +143,7 @@ class _OnChipBitFieldGenerator(object):
         expander_cores = self._calculate_core_data(app_graph, progress)
 
         # load data
-        bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
+        bit_field_app_id = view.get_new_id()
         progress.update(1)
 
         # run app
