@@ -30,6 +30,7 @@ class MachineTest(BaseTestCase):
         id2 = id(machine2)
         self.assertEqual(id1, id2)
         sim.run(2)
+
         machine3 = sim.get_machine()
         id3 = id(machine3)
         self.assertEqual(id1, id3)
@@ -45,6 +46,7 @@ class MachineTest(BaseTestCase):
         id5 = id(machine5)
         self.assertNotEqual(id1, id5)
         sim.run(3)
+
         machine6 = sim.get_machine()
         id6 = id(machine6)
         self.assertEqual(id5, id6)
@@ -64,9 +66,6 @@ class MachineTest(BaseTestCase):
         self.assertEqual(id7, id8)
 
         sim.end()
-        machine9 = sim.get_machine()
-        id9 = id(machine9)
-        self.assertEqual(id7, id9)
 
     def test_run(self):
         self.runsafe(self.do_run)
