@@ -18,6 +18,7 @@ from spinnaker_testbase import BaseTestCase
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utility_models import \
     ReverseIPTagMulticastSourceMachineVertex
+from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 n_neurons = 200  # number of neurons in each population
@@ -40,7 +41,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
 
         provenance_files = self.get_app_iobuf_files()
         placements = globals_variables.get_simulator()._placements
-        machine_graph = globals_variables.get_simulator()._machine_graph
+        machine_graph = SpynnakerDataWriter().get_runtime_machine_graph()
         sim.end()
 
         data = set()
