@@ -20,6 +20,7 @@ from spinn_front_end_common.utilities.system_control_logic import \
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
 from spynnaker.pyNN.models.utility_models.delays import (
@@ -56,7 +57,7 @@ def synapse_expander(
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
-    expander_app_id = transceiver.app_id_tracker.get_new_id()
+    expander_app_id = SpynnakerDataView().get_new_id()
     run_system_application(
         expander_cores, expander_app_id, transceiver, executable_finder,
         extract_iobuf, None, [CPUState.FINISHED], False,
