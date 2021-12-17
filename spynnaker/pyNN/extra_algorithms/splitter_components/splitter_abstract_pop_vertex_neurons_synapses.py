@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM)
+    MultiRegionSDRAM, ConstantSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
@@ -179,8 +179,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
-        atoms_per_core = min(
-            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
+        atoms_per_core = min(self._max_atoms_per_core, app_vertex.n_atoms)
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
                 get_n_bits(self.__get_max_delay)) > MAX_RING_BUFFER_BITS:
@@ -212,6 +211,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             BYTES_PER_WORD)
         all_syn_block_sz = max(app_vertex.get_synapses_size(
             atoms_per_core, app_vertex.incoming_projections), BYTES_PER_WORD)
+        print(all_syn_block_sz)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
         lead_synapse_resources = self.__get_synapse_resources(
@@ -222,9 +222,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
         for _ in range(self.__n_synapse_vertices - 1):
             total_sdram += shared_synapse_resources.sdram
-        total_sdram += PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
-            atoms_per_core, n_synapse_types) * (
-                self.__n_synapse_vertices + len(self.__poisson_sources))
+        total_sdram += ConstantSDRAM(
+            PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
+                atoms_per_core, n_synapse_types) * (
+                    self.__n_synapse_vertices + len(self.__poisson_sources)))
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
@@ -277,7 +278,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 edge_label = "SDRAM {}-->{}".format(
                     source_vertex.label, neuron_vertex.label)
                 sdram_partition.add_edge(
-                    SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label))
+                    SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label),
+                    None)
                 source_vertex.set_sdram_partition(sdram_partition)
 
             all_vertices = list(source_vertices)
@@ -404,7 +406,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         if feedback_partition is not None:
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            feedback_partition.add_edge(neuron_to_synapse_edge)
+            feedback_partition.add_edge(neuron_to_synapse_edge, None)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
 
     def __add_plastic_feedback(self, neuron_vertex, synapse_vertex):
@@ -428,7 +430,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             feedback_partition = MulticastEdgePartition(
                 neuron_vertex, SPIKE_PARTITION_ID)
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            feedback_partition.add_edge(neuron_to_synapse_edge)
+            feedback_partition.add_edge(neuron_to_synapse_edge, None)
             self.__multicast_partitions.append(feedback_partition)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
             return feedback_partition
@@ -510,7 +512,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
+    def get_in_coming_vertices(self, outgoing_edge_partition):
         # If the edge is delayed, get the real edge
         pre_vertex = outgoing_edge_partition.pre_vertex
         if isinstance(pre_vertex, DelayExtensionVertex):

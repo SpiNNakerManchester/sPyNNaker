@@ -80,7 +80,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
+    def get_in_coming_vertices(self, outgoing_edge_partition):
         # Only connect to the source that matches the current slice
         return [self._machine_vertex_by_slice[pre_m_vertex.vertex_slice]]
 

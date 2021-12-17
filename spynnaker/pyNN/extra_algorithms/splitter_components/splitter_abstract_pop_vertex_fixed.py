@@ -40,7 +40,6 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from pacman.model.graphs.common.slice import Slice
-from pacman.utilities.utility_objs import ChipCounter
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -51,9 +50,7 @@ class SplitterAbstractPopulationVertexFixed(
 
     __slots__ = [
         # The pre-calculated slices of the vertex
-        "__slices",
-        # All the machine vertices
-        "__vertices"
+        "__slices"
     ]
 
     """ The name of the splitter """
@@ -84,19 +81,20 @@ class SplitterAbstractPopulationVertexFixed(
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
+        max_atoms_per_core = min(self._max_atoms_per_core, app_vertex.n_atoms)
+
         projections = app_vertex.incoming_projections
         constraints = get_remaining_constraints(app_vertex)
         ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
         all_syn_block_sz = app_vertex.get_synapses_size(
-            self._max_atoms_per_core, projections)
+            max_atoms_per_core, projections)
         structural_sz = app_vertex.get_structural_dynamics_size(
-            self._max_atoms_per_core, projections)
+            max_atoms_per_core, projections)
         resources = self.get_resources_used_by_atoms(
-            self._max_atoms_per_core, all_syn_block_sz, structural_sz)
+            max_atoms_per_core, all_syn_block_sz, structural_sz)
 
         self.__create_slices()
-        self.__vertices = list()
 
         for index, vertex_slice in enumerate(self.__slices):
             chip_counter.add_core(resources)
@@ -105,7 +103,6 @@ class SplitterAbstractPopulationVertexFixed(
                 vertex_slice, resources, label, constraints, all_syn_block_sz,
                 structural_sz, ring_buffer_shifts, weight_scales, index)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
-            self.__vertices.append(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
@@ -122,12 +119,12 @@ class SplitterAbstractPopulationVertexFixed(
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition, pre_m_vertex):
+    def get_in_coming_vertices(self, outgoing_edge_partition):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
-        return self.__vertices
+        return self._governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints,
