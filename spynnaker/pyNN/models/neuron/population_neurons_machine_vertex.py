@@ -272,7 +272,8 @@ class PopulationNeuronsMachineVertex(
     @staticmethod
     def get_n_bytes_for_transfer(n_neurons, n_synapse_types):
         n_bytes = (2 ** get_n_bits(n_neurons) *
-                   n_synapse_types * self.N_BYTES_PER_INPUT)
+                   n_synapse_types *
+                   ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT)
         # May need to add some padding if not a round number of words
         extra_bytes = n_bytes % BYTES_PER_WORD
         if extra_bytes:
