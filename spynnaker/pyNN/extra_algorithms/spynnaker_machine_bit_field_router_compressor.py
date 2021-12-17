@@ -109,14 +109,13 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, machine,
+        routing_tables,
         placements, executable_finder, routing_infos, executable_targets,):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
     :type routing_tables:
         ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~spinn_machine.Machine machine: spinnMachine instance
     :param ~pacman.model.placements.Placements placements:
         placements on machine
     :param executable_finder: where are binaries are located
@@ -128,7 +127,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor(
-            routing_tables, machine,
+            routing_tables,
             placements, executable_finder, routing_infos, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.

@@ -339,7 +339,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
             self._dsg_targets, self._region_sizes = \
                 spynnaker_data_specification_writer(
-                    self._placements, self._ipaddress, self._machine)
+                    self._placements, self._ipaddress)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
@@ -349,7 +349,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
-                self._router_tables, self._machine,
+                self._router_tables,
                 self._placements, self._executable_finder, self._routing_infos,
                 self._executable_targets)
             self._multicast_routes_loaded = True

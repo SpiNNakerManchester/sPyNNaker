@@ -19,16 +19,13 @@ from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 
 
-def spynnaker_data_specification_writer(
-        placements, hostname, machine):
+def spynnaker_data_specification_writer(placements, hostname):
     """
     Executes data specification generation for sPyNNaker
 
     :param ~pacman.model.placements.Placements placements:
         placements of machine graph to cores
     :param str hostname: SpiNNaker machine name
-    :param ~spinn_machine.Machine machine:
-        the python representation of the SpiNNaker machine
     :return: DSG targets (map of placement tuple and filename)
     :rtype:
         tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
@@ -48,4 +45,4 @@ def spynnaker_data_specification_writer(
     placement_order.extend(delay_extensions)
 
     return graph_data_specification_writer(
-        placements, hostname, machine, placement_order)
+        placements, hostname, placement_order)
