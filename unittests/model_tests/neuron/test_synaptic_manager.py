@@ -415,8 +415,6 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
-    machine = virtual_machine(12, 12)
-    SpynnakerDataWriter().set_machine(machine)
 
     # Build a from list connector with the delays we want
     connections = []
@@ -431,6 +429,8 @@ def test_pop_based_master_pop_table_standard(
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
     p.setup(1.0)
+    machine = virtual_machine(12, 12)
+    SpynnakerDataWriter().set_machine(machine)
     post_pop = p.Population(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
