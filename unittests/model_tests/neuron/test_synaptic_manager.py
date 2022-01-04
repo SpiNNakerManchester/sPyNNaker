@@ -91,6 +91,7 @@ def test_write_data_spec():
 
     p.setup(1.0)
     load_config()
+    SpynnakerDataWriter().set_machine(virtual_machine(2, 2))
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
