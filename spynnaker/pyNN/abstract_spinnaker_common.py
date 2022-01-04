@@ -291,19 +291,19 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         """
         # pylint: disable=protected-access
         important_gathers = set()
-
         # iterate though projections
+        machine = self._data_writer.machine
         for projection in projections:
             # iteration though the projections machine edges to locate chips
             for edge in projection._projection_edge.machine_edges:
                 placement = self._placements.get_placement_of_vertex(
                     edge.post_vertex)
-                chip = self._machine.get_chip_at(placement.x, placement.y)
+                chip = machine.get_chip_at(placement.x, placement.y)
 
                 # locate extra monitor cores on the board of this chip
                 extra_monitor_cores_on_board = set(
                     extra_monitors_per_chip[xy]
-                    for xy in self._machine.get_existing_xys_on_board(chip))
+                    for xy in machine.get_existing_xys_on_board(chip))
 
                 # map gatherer to extra monitor cores for board
                 important_gathers.add((
@@ -362,7 +362,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor(
-                self._router_tables, self._machine,
+                self._router_tables,
                 self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets)
             self._multicast_routes_loaded = True
