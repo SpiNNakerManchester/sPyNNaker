@@ -43,6 +43,7 @@ class MachineTest(BaseTestCase):
         sim.reset()  # hard due to get_machine
         machine5 = sim.get_machine()
         id5 = id(machine5)
+        self.assertNotEqual(id4, id5)
         self.assertNotEqual(id1, id5)
         sim.run(3)
 
@@ -50,7 +51,7 @@ class MachineTest(BaseTestCase):
         id6 = id(machine6)
         self.assertEqual(id5, id6)
 
-        sim.reset()  # Hhard due to new pop
+        sim.reset()  # Hard due to new pop
         sim.Population(3, sim.IF_curr_exp(), label="pop_2")
         sim.run(3)
         machine7 = sim.get_machine()
