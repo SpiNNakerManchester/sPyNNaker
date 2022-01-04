@@ -455,11 +455,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         if not self._data_writer.runtime_graph.n_vertices:
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
-            if self._machine:
-                machine = self._machine
-            else:
-                machine = self._max_machine
             machine_graph, self._n_chips_needed = \
                 spynnaker_splitter_partitioner(
-                    machine, self._plan_n_timesteps, pre_allocated_resources)
+                    self._plan_n_timesteps, pre_allocated_resources)
             self._data_writer.set_runtime_machine_graph(machine_graph)

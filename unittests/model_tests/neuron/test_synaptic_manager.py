@@ -88,7 +88,6 @@ def test_write_data_spec():
     unittest_setup()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
-    machine = virtual_machine(2, 2)
 
     p.setup(1.0)
     load_config()
@@ -119,7 +118,7 @@ def test_write_data_spec():
     SpynnakerDataWriter().start_run()
     SpynnakerDataWriter().clone_graphs()
     delay_support_adder()
-    machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
+    machine_graph, _ = spynnaker_splitter_partitioner(100)
     allocator = ZonedRoutingInfoAllocator()
     SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
@@ -416,6 +415,7 @@ def test_pop_based_master_pop_table_standard(
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
     machine = virtual_machine(12, 12)
+    SpynnakerDataWriter().set_machine(machine)
 
     # Build a from list connector with the delays we want
     connections = []
@@ -445,7 +445,7 @@ def test_pop_based_master_pop_table_standard(
     SpynnakerDataWriter().start_run()
     SpynnakerDataWriter().clone_graphs()
     delay_support_adder()
-    machine_graph, _ = spynnaker_splitter_partitioner(machine, 100)
+    machine_graph, _ = spynnaker_splitter_partitioner(100)
     allocator = ZonedRoutingInfoAllocator()
     SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
