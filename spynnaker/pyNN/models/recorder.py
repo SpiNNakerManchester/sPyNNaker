@@ -251,8 +251,7 @@ class Recorder(object):
             # data
             view = SpynnakerDataView()
             results = self.__vertex.get_data(
-                variable, view.current_run_timesteps, sim.placements,
-                sim.buffer_manager)
+                variable, view.current_run_timesteps, sim.buffer_manager)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
@@ -604,17 +603,13 @@ class Recorder(object):
         sim = get_simulator()
         for variable in variables:
             if variable == SPIKES:
-                self.__vertex.clear_spike_recording(
-                    sim.buffer_manager, sim.placements)
+                self.__vertex.clear_spike_recording(sim.buffer_manager)
             elif variable == MEMBRANE_POTENTIAL:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
+                self.__vertex.clear_recording(variable, sim.buffer_manager)
             elif variable == GSYN_EXCIT:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
+                self.__vertex.clear_recording(variable, sim.buffer_manager)
             elif variable == GSYN_INHIB:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
+                self.__vertex.clear_recording(variable, sim.buffer_manager)
             else:
                 raise InvalidParameterType(
                     "The variable {} is not a recordable value".format(

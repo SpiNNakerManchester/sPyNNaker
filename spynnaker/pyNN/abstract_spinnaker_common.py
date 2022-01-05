@@ -383,16 +383,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecTimer(LOADING, "Synapse expander") as timer:
             if timer.skip_if_virtual_board():
                 return
-            synapse_expander(
-                self.placements, self._executable_finder,
-                get_config_bool("Reports", "write_expander_iobuf"))
+            synapse_expander(self._executable_finder)
 
     def _execute_on_chip_bit_field_generator(self):
         with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
             if timer.skip_if_virtual_board():
                 return
-            on_chip_bitfield_generator(
-                self.placements, self._executable_finder)
+            on_chip_bitfield_generator(self._executable_finder)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

@@ -54,16 +54,14 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-def on_chip_bitfield_generator(placements, executable_finder):
+def on_chip_bitfield_generator(executable_finder):
     """ Loads and runs the bit field generator on chip.
 
     :param executable_finder: the executable finder
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        the SpiNNMan instance
     """
-    generator = _OnChipBitFieldGenerator(placements, executable_finder)
+    generator = _OnChipBitFieldGenerator(executable_finder)
     generator._run(executable_finder)
 
 
@@ -102,29 +100,21 @@ class _OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __init__(self, placements, executable_finder):
+    def __init__(self, executable_finder):
         """ Loads and runs the bit field generator on chip.
 
-        :param ~pacman.model.placements.Placements placements: placements
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            the SpiNNMan instance
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            the machine graph
         """
-        self.__txrx = SpynnakerDataView().transceiver
-        self.__placements = placements
+        self.__txrx = None
+        self.__placements = None
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
     def _run(self, executable_finder):
         """ Loads and runs the bit field generator on chip.
 
-        :param ~pacman.model.placements.Placements placements: placements
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
@@ -132,6 +122,8 @@ class _OnChipBitFieldGenerator(object):
             the SpiNNMan instance
         """
         view = SpynnakerDataView()
+        self.__txrx = SpynnakerDataView().transceiver
+        self.__placements = SpynnakerDataView().placements
         app_graph = view.runtime_graph
         machine_graph = view.runtime_machine_graph
         # progress bar

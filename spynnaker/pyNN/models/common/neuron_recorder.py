@@ -245,7 +245,7 @@ class NeuronRecorder(object):
         return fragment
 
     def _get_placement_matrix_data(
-            self, placements, vertex, region, buffer_manager, expected_rows,
+            self, vertex, region, buffer_manager, expected_rows,
             missing_str, sampling_rate, label, data_type, n_per_timestep):
         """ processes a placement for matrix data
 
@@ -263,7 +263,7 @@ class NeuronRecorder(object):
         :return: placement data
         :rtype: ~numpy.ndarray
         """
-
+        placements = SpynnakerDataView().placements
         placement = placements.get_placement_of_vertex(vertex)
         if n_per_timestep == 0:
             return None
@@ -304,7 +304,7 @@ class NeuronRecorder(object):
         return placement_data
 
     def __read_data(
-            self, label, buffer_manager, placements, application_vertex,
+            self, label, buffer_manager, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
@@ -331,7 +331,7 @@ class NeuronRecorder(object):
             else:
                 indexes.append(i)
             placement_data = self._get_placement_matrix_data(
-                placements, vertex, region, buffer_manager, expected_rows,
+                vertex, region, buffer_manager, expected_rows,
                 missing_str, sampling_rate, label, data_type,
                 n_items_per_timestep)
 
@@ -354,7 +354,7 @@ class NeuronRecorder(object):
         return pop_level_data, indexes, sampling_interval
 
     def get_matrix_data(
-            self, label, buffer_manager, placements,
+            self, label, buffer_manager,
             application_vertex, variable, n_machine_time_steps):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
@@ -363,8 +363,6 @@ class NeuronRecorder(object):
         :param buffer_manager: the manager for buffered data
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -388,7 +386,7 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         return self.__read_data(
-            label, buffer_manager, placements, application_vertex,
+            label, buffer_manager, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps)
 
     def get_spikes(

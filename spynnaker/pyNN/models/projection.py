@@ -490,7 +490,6 @@ class Projection(object):
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
         connections = post_vertex.get_connections_from_machine(
-            get_simulator().placements,
             self.__projection_edge, self.__synapse_information)
         if connections is not None:
             connection_holder.add_connections(connections)

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_front_end_common.utilities.system_control_logic import \
@@ -31,18 +32,14 @@ from spinn_front_end_common.utilities.helpful_functions import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def synapse_expander(
-        placements, executable_finder, extract_iobuf):
+def synapse_expander(executable_finder):
     """ Run the synapse expander.
 
     .. note::
         Needs to be done after data has been loaded.
 
-    :param ~pacman.model.placements.Placements placements:
-        Where all vertices are on the machine.
     :param executable_finder:
         How to find the synapse expander binaries.
-    :param bool extract_iobuf: flag for extracting iobuf
     :type executable_finder:
         ~spinn_utilities.executable_finder.ExecutableFinder
     """
@@ -51,25 +48,24 @@ def synapse_expander(
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        placements, synapse_bin, delay_bin)
+        synapse_bin, delay_bin)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
     expander_app_id = SpynnakerDataView().get_new_id()
     run_system_application(
         expander_cores, expander_app_id, executable_finder,
-        extract_iobuf, None, [CPUState.FINISHED], False,
+        get_config_bool("Reports", "write_expander_iobuf"),
+        None, [CPUState.FINISHED], False,
         "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
         logger=logger)
     progress.end()
     _fill_in_connection_data(expanded_pop_vertices)
 
 
-def _plan_expansion(
-        placements, synapse_expander_bin, delay_expander_bin):
+def _plan_expansion(synapse_expander_bin, delay_expander_bin):
     """ Plan the expansion of synapses and set up the regions using USER1
 
-    :param ~pacman.model.placements.Placements: The placements of the vertices
     :param str synapse_expander_bin: The binary name of the synapse expander
     :param str delay_expander_bin: The binary name of the delay expander
     :return: The places to load the synapse expander and delay expander
@@ -79,6 +75,7 @@ def _plan_expansion(
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
+    placements = SpynnakerDataView().placements
     progress = ProgressBar(len(placements), "Preparing to Expand Synapses")
     for placement in progress.over(placements):
         # Add all machine vertices of the population vertex to ones

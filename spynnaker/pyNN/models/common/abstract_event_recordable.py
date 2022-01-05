@@ -53,14 +53,12 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def clear_event_recording(self, buffer_manager, placements):
+    def clear_event_recording(self, buffer_manager):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :rtype: None
         """
 
