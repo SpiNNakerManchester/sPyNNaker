@@ -39,13 +39,11 @@ logger = FormatAdapter(logging.getLogger(__name__))
 _RERUN_IOBUF_NAME_PATTERN = "rerun_of_synaptic_expander_on_{}_{}_{}.txt"
 
 
-def _locate_expander_rerun_targets(
-        bitfield_targets, executable_finder, placements):
+def _locate_expander_rerun_targets(bitfield_targets, executable_finder):
     """ removes host based cores for synaptic matrix regeneration
 
     :param ~.ExecutableTargets bitfield_targets: the cores that were used
     :param ~.ExecutableFinder executable_finder: way to get binary path
-    :param ~.Placements placements: placements on machine
     :return: new targets for synaptic expander
     :rtype: ~.ExecutableTargets
     """
@@ -57,8 +55,7 @@ def _locate_expander_rerun_targets(
     # if any ones are going to be ran on host, ignore them from the new
     # core setup
     new_cores = ExecutableTargets()
-    for placement in __machine_expandables(
-            bitfield_targets.all_core_subsets, placements):
+    for placement in __machine_expandables(bitfield_targets.all_core_subsets):
         new_cores.add_processor(
             expander_executable_path,
             placement.x, placement.y, placement.p,
@@ -70,13 +67,12 @@ def _locate_expander_rerun_targets(
     return new_cores
 
 
-def __machine_expandables(cores, placements):
+def __machine_expandables(cores):
     """
     :param ~.CoreSubsets cores:
-    :param ~.Placements placements:
     :rtype: iterable(~.Placement)
     """
-    for place in placements:
+    for place in SpynnakerDataView().placements:
         vertex = place.vertex
         if (cores.is_core(place.x, place.y, place.p)
                 # Have we overwritten it?
@@ -109,15 +105,12 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables,
-        placements, executable_finder, routing_infos, executable_targets,):
+        routing_tables, executable_finder, routing_infos, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
     :type routing_tables:
         ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~pacman.model.placements.Placements placements:
-        placements on machine
     :param executable_finder: where are binaries are located
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
@@ -132,22 +125,19 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets, executable_finder, placements)
+        compressor_executable_targets, executable_finder)
 
     # just rerun the synaptic expander for safety purposes
     _rerun_synaptic_cores(expander_chip_cores, executable_finder, True)
 
 
 def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables,
-        placements, executable_finder, routing_infos, executable_targets):
+        routing_tables, executable_finder, routing_infos, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
     :type routing_tables:
         ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~pacman.model.placements.Placements placements:
-        placements on machine
     :param executable_finder: where are binaries are located
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
@@ -162,7 +152,7 @@ def spynnaker_machine_bitField_pair_router_compressor(
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
-        compressor_executable_targets, executable_finder, placements)
+        compressor_executable_targets, executable_finder)
 
     # just rerun the synaptic expander for safety purposes
     _rerun_synaptic_cores(expander_chip_cores, executable_finder, True)

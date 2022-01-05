@@ -293,10 +293,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         important_gathers = set()
         # iterate though projections
         machine = self._data_writer.machine
+        placements = self._data_writer.placements
         for projection in projections:
             # iteration though the projections machine edges to locate chips
             for edge in projection._projection_edge.machine_edges:
-                placement = self._placements.get_placement_of_vertex(
+                placement = placements.get_placement_of_vertex(
                     edge.post_vertex)
                 chip = machine.get_chip_at(placement.x, placement.y)
 
@@ -349,7 +350,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
                 self._router_tables,
-                self._placements, self._executable_finder, self._routing_infos,
+                self._executable_finder, self._routing_infos,
                 self._executable_targets)
             self._multicast_routes_loaded = True
             return None
@@ -362,7 +363,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 return
             spynnaker_machine_bitField_pair_router_compressor(
                 self._router_tables,
-                self._placements, self._executable_finder,
+                self._executable_finder,
                 self._routing_infos, self._executable_targets)
             self._multicast_routes_loaded = True
             return None
