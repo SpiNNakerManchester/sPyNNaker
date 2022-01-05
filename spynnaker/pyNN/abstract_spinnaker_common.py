@@ -338,8 +338,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     def _execute_graph_data_specification_writer(self):
         with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
             self._dsg_targets, self._region_sizes = \
-                spynnaker_data_specification_writer(
-                    self._placements, self._ipaddress)
+                spynnaker_data_specification_writer(self._ipaddress)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(

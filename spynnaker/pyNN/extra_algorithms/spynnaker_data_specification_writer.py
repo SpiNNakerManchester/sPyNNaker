@@ -15,16 +15,15 @@
 
 from spinn_front_end_common.interface.interface_functions import (
     graph_data_specification_writer)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 
 
-def spynnaker_data_specification_writer(placements, hostname):
+def spynnaker_data_specification_writer(hostname):
     """
     Executes data specification generation for sPyNNaker
 
-    :param ~pacman.model.placements.Placements placements:
-        placements of machine graph to cores
     :param str hostname: SpiNNaker machine name
     :return: DSG targets (map of placement tuple and filename)
     :rtype:
@@ -37,12 +36,11 @@ def spynnaker_data_specification_writer(placements, hostname):
 
     delay_extensions = list()
     placement_order = list()
-    for placement in placements.placements:
+    for placement in SpynnakerDataView().placements:
         if isinstance(placement.vertex, DelayExtensionMachineVertex):
             delay_extensions.append(placement)
         else:
             placement_order.append(placement)
     placement_order.extend(delay_extensions)
 
-    return graph_data_specification_writer(
-        placements, hostname, placement_order)
+    return graph_data_specification_writer(hostname, placement_order)
