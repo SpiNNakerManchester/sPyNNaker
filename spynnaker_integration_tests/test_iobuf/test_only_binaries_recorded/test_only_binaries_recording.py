@@ -18,7 +18,7 @@ Synfirechain-like example
 """
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
-from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestCoresAndBinariesRecording(BaseTestCase):
@@ -35,7 +35,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(500)
 
         app_iobuf_files = self.get_app_iobuf_files()
-        placements = globals_variables.get_simulator()._placements
+        placements = SpynnakerDataView().placements
         sim.end()
 
         machine_verts = input._vertex.machine_vertices
