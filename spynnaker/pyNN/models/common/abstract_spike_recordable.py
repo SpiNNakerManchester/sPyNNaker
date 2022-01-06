@@ -60,11 +60,9 @@ class AbstractSpikeRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self, buffer_manager):
         """ Get the recorded spikes from the object
 
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager

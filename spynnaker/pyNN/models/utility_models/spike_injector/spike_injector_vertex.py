@@ -99,10 +99,11 @@ class SpikeInjectorVertex(
         return SpynnakerDataView().simulation_time_step_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self,
+                   buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
-            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, placements, self,
+            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None

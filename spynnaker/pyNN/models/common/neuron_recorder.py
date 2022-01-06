@@ -390,8 +390,7 @@ class NeuronRecorder(object):
             sampling_rate, data_type, variable, n_machine_time_steps)
 
     def get_spikes(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+            self, label, buffer_manager, application_vertex, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -399,8 +398,6 @@ class NeuronRecorder(object):
         :param buffer_manager: the manager for buffered data
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -421,6 +418,7 @@ class NeuronRecorder(object):
                 variable))
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
+        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
@@ -477,9 +475,7 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_events(
-            self, label, buffer_manager, placements,
-            application_vertex, variable):
+    def get_events(self, label, buffer_manager, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -487,8 +483,6 @@ class NeuronRecorder(object):
         :param buffer_manager: the manager for buffered data
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -498,8 +492,7 @@ class NeuronRecorder(object):
         """
         if variable == self.REWIRING:
             return self._get_rewires(
-                label, buffer_manager, placements, application_vertex,
-                variable)
+                label, buffer_manager, application_vertex, variable)
         else:
             # Unspecified event variable
             msg = (
@@ -508,8 +501,7 @@ class NeuronRecorder(object):
             raise ConfigurationException(msg)
 
     def _get_rewires(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+            self, label, buffer_manager, application_vertex, variable):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -517,8 +509,6 @@ class NeuronRecorder(object):
         :param buffer_manager: the manager for buffered data
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -537,6 +527,7 @@ class NeuronRecorder(object):
         missing_str = ""
         progress = ProgressBar(
             vertices, "Getting rewires for {}".format(label))
+        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice

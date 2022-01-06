@@ -285,7 +285,7 @@ class Recorder(object):
 
         # assuming we got here, everything is OK, so we should go get the
         # spikes
-        return self.__vertex.get_spikes(sim.placements, sim.buffer_manager)
+        return self.__vertex.get_spikes(sim.buffer_manager)
 
     def get_events(self, variable):
         """ How to get rewiring events (of a post-population) from recorder
@@ -314,8 +314,7 @@ class Recorder(object):
                 "truly ran, hence the rewires list will be empty")
             return numpy.zeros((0, 4))
 
-        return self.__vertex.get_events(
-            variable, sim.placements, sim.buffer_manager)
+        return self.__vertex.get_events(variable, sim.buffer_manager)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``

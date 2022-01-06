@@ -170,9 +170,9 @@ class SpikeSourceArrayVertex(
         return SpynnakerDataView().simulation_time_step_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self, buffer_manager):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager, 0, placements, self,
+            self.label, buffer_manager, 0, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None

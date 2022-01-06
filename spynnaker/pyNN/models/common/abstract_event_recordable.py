@@ -63,12 +63,10 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_events(self, variable, placements, buffer_manager):
+    def get_events(self, variable, buffer_manager):
         """ Get the recorded events from the object
 
         :param str variable: The variable to get the event data for
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager

@@ -425,16 +425,14 @@ class AbstractPopulationVertex(
             variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self, buffer_manager):
         return self.__neuron_recorder.get_spikes(
-            self.label, buffer_manager, placements, self,
-            NeuronRecorder.SPIKES)
+            self.label, buffer_manager, self, NeuronRecorder.SPIKES)
 
     @overrides(AbstractEventRecordable.get_events)
-    def get_events(
-            self, variable, placements, buffer_manager):
+    def get_events(self, variable, buffer_manager):
         return self.__synapse_recorder.get_events(
-            self.label, buffer_manager, placements, self, variable)
+            self.label, buffer_manager, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):

@@ -78,15 +78,13 @@ class MultiSpikeRecorder(object):
         return n_neurons * 4
 
     def get_spikes(
-            self, label, buffer_manager, region,
-            placements, application_vertex):
+            self, label, buffer_manager, region, application_vertex):
         """
         :param str label:
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param ~pacman.model.placements.Placements placements:
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -102,6 +100,7 @@ class MultiSpikeRecorder(object):
         missing = []
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))
+        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice

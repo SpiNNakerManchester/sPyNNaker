@@ -74,7 +74,7 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region, placements,
+    def get_spikes(self, label, buffer_manager, region,
                    application_vertex, base_key_function):
         """ Get the recorded spikes from the object
 
@@ -83,8 +83,6 @@ class EIEIOSpikeRecorder(object):
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -101,6 +99,7 @@ class EIEIOSpikeRecorder(object):
         vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
+        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
