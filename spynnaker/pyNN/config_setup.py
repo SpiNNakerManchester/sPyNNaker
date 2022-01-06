@@ -57,7 +57,7 @@ def unittest_setup():
     setup_for_unittest()
     clear_cfg_files(True)
     add_spynnaker_cfg()
-    SpynnakerDataWriter().mock()
+    SpynnakerDataWriter.mock()
 
 
 def add_spynnaker_cfg():

@@ -119,7 +119,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             front_end_versions=versions,
-            data_writer=SpynnakerDataWriter())
+            data_writer_cls=SpynnakerDataWriter)
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)

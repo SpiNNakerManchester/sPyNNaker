@@ -257,7 +257,7 @@ class ConnectorsTest(BaseTestCase):
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
         # As outside of run we have to use unprotected method
-        machine_graph = SpynnakerDataWriter().get_runtime_machine_graph()
+        machine_graph = SpynnakerDataWriter.mock().get_runtime_machine_graph()
         projection_edges = [edge for edge in machine_graph.edges if (
             edge.label == 'machine_edge_for_test')]
         sim.end()

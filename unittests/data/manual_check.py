@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.config_holder import clear_cfg_files
-from spinn_front_end_common.utilities.exceptions import (
-    SimulatorDataNotYetAvialable, SimulatorNotSetupException)
+from spinn_utilities.exceptions import (
+    DataNotYetAvialable, NotSetupException)
 from spynnaker.pyNN.config_setup import add_spynnaker_cfg
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
@@ -29,27 +29,26 @@ clear_cfg_files(True)
 add_spynnaker_cfg()
 
 view = SpynnakerDataView()
-writer = SpynnakerDataWriter()
 try:
     view.simulation_time_step_us
     raise Exception("OOPS")
-except SimulatorNotSetupException:
+except NotSetupException:
     pass
 try:
     view.min_delay
     raise Exception("OOPS")
-except SimulatorNotSetupException:
+except NotSetupException:
     pass
-writer.setup()
+writer = SpynnakerDataWriter.setup()
 try:
     view.simulation_time_step_us
     raise Exception("OOPS")
-except SimulatorDataNotYetAvialable:
+except DataNotYetAvialable:
     pass
 try:
     view.min_delay
     raise Exception("OOPS")
-except SimulatorDataNotYetAvialable:
+except DataNotYetAvialable:
     pass
 writer.set_up_timings_and_delay(1000, 1, 1)
 print(view.simulation_time_step_us)

@@ -16,7 +16,6 @@
 import unittest
 from spinn_utilities.exceptions import DataNotYetAvialable
 from spinn_front_end_common.data import FecDataView
-from spinn_front_end_common.data.fec_data_writer import FecDataWriter
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
 from spynnaker.pyNN.config_setup import unittest_setup
@@ -31,10 +30,9 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_setup(self):
         view = SpynnakerDataView()
-        writer = SpynnakerDataWriter()
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
-        writer.setup()
+        writer = SpynnakerDataWriter.setup()
         self.assertIn("run_1", view.run_dir_path)
         self.assertIn("provenance_data", view.provenance_dir_path)
         with self.assertRaises(DataNotYetAvialable):
@@ -48,8 +46,7 @@ class TestSimulatorData(unittest.TestCase):
         self.assertEqual(0.1, view.min_delay)
 
     def test_min_delay(self):
-        writer = SpynnakerDataWriter()
-        writer.setup()
+        writer = SpynnakerDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
             writer.min_delay
 
@@ -74,23 +71,18 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_mock(self):
         view = SpynnakerDataView()
-        writer = SpynnakerDataWriter()
-        writer.mock()
+        writer = SpynnakerDataWriter.mock()
         # check there is a value not what it is
         self.assertIsNotNone(view.app_id)
         self.assertIsNotNone(view.min_delay)
 
     def test_multiple(self):
         view = SpynnakerDataView()
-        writer = SpynnakerDataWriter()
+        writer = SpynnakerDataWriter.setup()
         view1 = SpynnakerDataView()
-        writer1 = SpynnakerDataWriter()
         view2 = FecDataView()
-        writer2 = FecDataWriter()
-        writer2.set_app_id(7)
+        writer.set_app_id(7)
         self.assertEqual(7, view.app_id)
         self.assertEqual(7, view2.app_id)
         self.assertEqual(7, view1.app_id)
         self.assertEqual(7, writer.app_id)
-        self.assertEqual(7, writer1.app_id)
-        self.assertEqual(7, writer2.app_id)

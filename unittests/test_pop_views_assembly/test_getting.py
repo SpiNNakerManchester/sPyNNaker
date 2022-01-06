@@ -17,6 +17,7 @@ from unittest import SkipTest
 import numpy
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.recorder import Recorder
 import spynnaker8 as sim
@@ -68,12 +69,15 @@ class TestGetting(BaseTestCase):
         Recorder.get_recorded_matrix = self.__get_recorded_matrix
 
     def test_simple_spikes(self):
+        view = SpynnakerDataView()
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
         Recorder.get_spikes = mock_spikes
         Recorder.get_recorded_matrix = mock_v_all
-        writer = SpynnakerDataWriter()
-        writer.increment_current_run_timesteps(100)
+        # Hack method not supported
+        view._FecDataView__fec_data._first_machine_time_step = \
+            view._FecDataView__fec_data._current_run_timesteps
+        view._FecDataView__fec_data._current_run_timesteps += 100
 
         neo = pop.getSpikes()
         spikes = neo_convertor.convert_spikes(neo)

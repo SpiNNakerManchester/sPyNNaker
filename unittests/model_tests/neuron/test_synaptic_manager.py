@@ -86,12 +86,13 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
     p.setup(1.0)
     load_config()
-    SpynnakerDataWriter().set_machine(virtual_machine(2, 2))
+    writer.set_machine(virtual_machine(2, 2))
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
@@ -116,12 +117,12 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    SpynnakerDataWriter().start_run()
-    SpynnakerDataWriter().clone_graphs()
+    writer.start_run()
+    writer.clone_graphs()
     delay_support_adder()
     machine_graph, _ = spynnaker_splitter_partitioner(100)
     allocator = ZonedRoutingInfoAllocator()
-    SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
+    writer.set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
     routing_info = allocator.__call__(n_keys_map, flexible=False)
 
@@ -152,7 +153,7 @@ def test_write_data_spec():
         region = executor.get_region(r)
         if region is not None:
             all_data.extend(region.region_data)
-    SpynnakerDataWriter().set_transceiver(MockTransceiverRawData(all_data))
+    writer.set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
     try:
         connections_1 = numpy.concatenate(
@@ -415,6 +416,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
 
     # Build a from list connector with the delays we want
     connections = []
@@ -430,7 +432,7 @@ def test_pop_based_master_pop_table_standard(
     # a single vertex
     p.setup(1.0)
     machine = virtual_machine(12, 12)
-    SpynnakerDataWriter().set_machine(machine)
+    writer.set_machine(machine)
     post_pop = p.Population(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
@@ -443,12 +445,12 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    SpynnakerDataWriter().start_run()
-    SpynnakerDataWriter().clone_graphs()
+    writer.start_run()
+    writer.clone_graphs()
     delay_support_adder()
     machine_graph, _ = spynnaker_splitter_partitioner(100)
     allocator = ZonedRoutingInfoAllocator()
-    SpynnakerDataWriter().set_runtime_machine_graph(machine_graph)
+    writer.set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
     routing_info = allocator.__call__(n_keys_map, flexible=False)
 
