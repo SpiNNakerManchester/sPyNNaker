@@ -31,6 +31,7 @@ from spinn_front_end_common.utilities.globals_variables import (
     get_simulator, get_not_running_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractContainsUnits, AbstractReadParametersBeforeSet,
@@ -933,11 +934,12 @@ class Population(PopulationBase):
                 and not sim.use_virtual_board):
             # go through each machine vertex and read the neuron parameters
             # it contains
+            placements = SpynnakerDataView().placements
             for vertex in self.__vertex.machine_vertices:
                 if isinstance(vertex, AbstractReadParametersBeforeSet):
                     # tell the core to rewrite neuron params back to the
                     # SDRAM space.
-                    placement = sim.placements.get_placement_of_vertex(vertex)
+                    placement = placements.get_placement_of_vertex(vertex)
                     vertex.read_parameters_from_machine(
                         placement, vertex.vertex_slice)
 
