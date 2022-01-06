@@ -31,14 +31,14 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
     __spy_data = _SpynnakerDataModel()
 
-    @overrides(FecDataWriter.setup)
-    def setup(self):
-        FecDataWriter.setup(self)
+    @overrides(FecDataWriter._setup)
+    def _setup(self):
+        FecDataWriter._setup(self)
         self.__spy_data._clear()
 
-    @overrides(FecDataWriter.mock)
-    def mock(self):
-        FecDataWriter.mock(self)
+    @overrides(FecDataWriter._mock)
+    def _mock(self):
+        FecDataWriter._mock(self)
         self._set_min_delay(1)
 
     def set_up_timings_and_delay(
