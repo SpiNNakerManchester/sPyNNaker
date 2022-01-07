@@ -639,7 +639,7 @@ class SpikeSourcePoissonMachineVertex(
         AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, placement, vertex_slice):
-        transceiver = SpynnakerDataView().transceiver
+        transceiver = SpynnakerDataView.get_transceiver()
         # locate SDRAM address where parameters are stored
         poisson_params = self.poisson_param_region_address(placement)
         seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(

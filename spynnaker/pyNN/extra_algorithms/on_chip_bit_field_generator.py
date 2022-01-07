@@ -122,7 +122,7 @@ class _OnChipBitFieldGenerator(object):
             the SpiNNMan instance
         """
         view = SpynnakerDataView()
-        self.__txrx = SpynnakerDataView().transceiver
+        self.__txrx = SpynnakerDataView.get_transceiver()
         self.__placements = SpynnakerDataView().placements
         app_graph = view.runtime_graph
         machine_graph = view.runtime_machine_graph
@@ -329,7 +329,7 @@ class _OnChipBitFieldGenerator(object):
         :param ~.Transceiver transceiver: SpiNNMan instance
         :rtype: bool
         """
-        transceiver = SpynnakerDataView().transceiver
+        transceiver = SpynnakerDataView.get_transceiver()
         for core_subset in executable_targets.all_core_subsets:
             x = core_subset.x
             y = core_subset.y
