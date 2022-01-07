@@ -496,7 +496,7 @@ class SynapticMatrix(object):
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + synapses_address
-        block = SpynnakerDataView().read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__matrix_size)
         self.__received_block = block
         return block
@@ -512,7 +512,7 @@ class SynapticMatrix(object):
         if self.__delay_received_block is not None:
             return self.__delay_received_block
         address = self.__delay_syn_mat_offset + synapses_address
-        block = SpynnakerDataView().read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
         self.__delay_received_block = block
         return block
@@ -528,7 +528,7 @@ class SynapticMatrix(object):
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + single_address
-        block = SpynnakerDataView().read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, self.__single_matrix_size)
         numpy_data = numpy.asarray(block, dtype="uint8").view("uint32")
         n_rows = len(numpy_data)

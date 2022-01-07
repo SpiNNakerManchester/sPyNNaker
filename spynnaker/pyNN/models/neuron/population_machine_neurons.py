@@ -234,7 +234,7 @@ class PopulationMachineNeurons(
             vertex_slice) - neurons_pre_size
 
         # get data from the machine
-        byte_array = SpynnakerDataView().read_memory(
+        byte_array = SpynnakerDataView.read_memory(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 
