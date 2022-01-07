@@ -76,7 +76,7 @@ def redundant_packet_count_report():
 
     :return:
     """
-    file_name = os.path.join(SpynnakerDataView().run_dir_path, _FILE_NAME)
+    file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
 
     try:
         _create_views()

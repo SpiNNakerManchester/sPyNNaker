@@ -53,7 +53,7 @@ class SpYNNakerSynapticMatrixReport(object):
 
         # generate folder for synaptic reports
         top_level_folder = os.path.join(
-            SpynnakerDataView().run_dir_path, _DIRNAME)
+            SpynnakerDataView.get_run_dir_path(), _DIRNAME)
         if not os.path.exists(top_level_folder):
             os.mkdir(top_level_folder)
 

@@ -33,7 +33,7 @@ class TestSimulatorData(unittest.TestCase):
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         writer = SpynnakerDataWriter.setup()
-        self.assertIn("run_1", view.run_dir_path)
+        self.assertIn("run_1", SpynnakerDataView.get_run_dir_path())
         self.assertIn("provenance_data", view.provenance_dir_path)
         with self.assertRaises(DataNotYetAvialable):
             view.simulation_time_step_us

@@ -54,7 +54,7 @@ class TestPowerMonitoring(BaseTestCase):
         self.assertIsNotNone(hist, "must have a histogram")
         # Did we build the report file like we asked for in config file?
         self.assertIn(EnergyReport._SUMMARY_FILENAME,
-                      os.listdir(SpynnakerDataView().run_dir_path))
+                      os.listdir(SpynnakerDataView.get_run_dir_path()))
         # Did we output power provenance data, as requested?
         num_chips = None
         for row in self.query_provenance(

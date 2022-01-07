@@ -148,7 +148,7 @@ class _OnChipBitFieldGenerator(object):
         progress.end()
 
         # read in bit fields for debugging purposes
-        run_dir_path = view.run_dir_path
+        run_dir_path = SpynnakerDataView.get_run_dir_path()
         if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
                 run_dir_path, self._BIT_FIELD_REPORT_FILENAME))

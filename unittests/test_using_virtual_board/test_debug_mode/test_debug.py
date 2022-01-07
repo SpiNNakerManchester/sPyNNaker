@@ -91,7 +91,7 @@ class TestDebug(BaseTestCase):
         pop.get_data("v")
         sim.end()
 
-        found = os.listdir(SpynnakerDataView().run_dir_path)
+        found = os.listdir(SpynnakerDataView.get_run_dir_path())
         print(found)
         for report in reports:
             self.assertIn(report, found)

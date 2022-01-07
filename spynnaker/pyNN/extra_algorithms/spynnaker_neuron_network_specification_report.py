@@ -82,7 +82,8 @@ def spynnaker_neuron_graph_network_specification_report():
         application_graph, dot_diagram, vertex_ids, progress)
 
     # write dot file and generate pdf
-    file_to_output = os.path.join(view.run_dir_path, _GRAPH_NAME)
+    file_to_output = os.path.join(
+        SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exeNotFoundExn:
