@@ -133,11 +133,10 @@ def live_neuron_voltage():
     assert(numpy.sum(translator_2.voltages[key_2_1]) == 0)
     assert(numpy.sum(translator_2.voltages[key_2_2]) == 0)
 
-    i = 0
+    # We can get packet loss so don't assume all voltages exist
     for volts in translator_1.voltages[key_1]:
-        while i < len(relevant_v) and volts != relevant_v[i]:
-            i += 1
-        assert(i < len(relevant_v))
+        # We can reorder packets, so don't assume all packets are in order
+        assert volts in relevant_v
 
 
 class TestLiveNeuronVoltage(BaseTestCase):
