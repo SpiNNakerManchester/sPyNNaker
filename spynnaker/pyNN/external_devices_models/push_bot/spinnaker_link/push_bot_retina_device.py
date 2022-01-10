@@ -14,14 +14,34 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject, supports_injection
+from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
 
 
-@supports_injection
+class DelayedPayloadMultiCastCommand(MultiCastCommand):
+    """
+    A Hack to get the key after the zone allocator is run
+    """
+
+    def __init__(self, key, vertex):
+        super().__init__(key)
+        self._vertex = vertex
+
+    @property
+    def payload(self):
+        if self._payload is None:
+            self._payload = self._vertex.new_key_command_payload()
+        return self._payload
+
+    @property
+    def is_payload(self):
+        return self.payload is not None
+
+
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
     __slots__ = ["__new_key_command"]
@@ -51,11 +71,20 @@ class PushBotSpiNNakerLinkRetinaDevice(
         # stores for the injection aspects
         self.__new_key_command = None
 
-    @inject("RoutingInfos")
-    def routing_info(self, routing_info):
+    @inject_items({
+        "routing_info": "RoutingInfos"
+    })
+    def new_key_command_payload(self, routing_info):
+        """
+        Support method to obtain the key after the key allocator has run
+
+        :param routing_info:
+        :return: the key
+        :rtype: int
+        """
         key = routing_info.get_first_key_from_pre_vertex(
             list(self.machine_vertices)[0], SPIKE_PARTITION_ID)
-        self.__new_key_command.payload = key
+        return key
 
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
@@ -65,7 +94,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
         for command in super().start_resume_commands:
             if command.key == self._protocol.disable_retina_key:
                 # This has to be stored so that the payload can be updated
-                self.__new_key_command = self._protocol.set_retina_key(0)
+                self.__new_key_command = DelayedPayloadMultiCastCommand(
+                    self._protocol.set_retina_key_key, self)
                 new_commands.append(self.__new_key_command)
             new_commands.append(command)
         return new_commands

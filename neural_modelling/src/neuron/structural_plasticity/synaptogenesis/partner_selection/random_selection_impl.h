@@ -22,7 +22,6 @@
 
 #include "partner.h"
 #include <neuron/spike_processing.h>
-#include <debug.h>
 
 //! \brief Notifies the rule that a spike has been received
 //! \details Not used by this rule

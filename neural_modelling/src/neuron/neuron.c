@@ -128,7 +128,8 @@ bool neuron_initialise(
     // Store where the actual neuron parameters start
     saved_params_address = &params->ring_buffer_shifts[n_synapse_types];
 
-    log_info("\t n_neurons = %u, peak %u", n_neurons, n_neurons_peak);
+    log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
+            n_neurons, n_neurons_peak, n_synapse_types);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {

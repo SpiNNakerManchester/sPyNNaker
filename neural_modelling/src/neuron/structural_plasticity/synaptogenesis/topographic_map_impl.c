@@ -166,7 +166,7 @@ bool synaptogenesis_dynamics_initialise(
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    log_info("Rewiring period %u, fast=%u, n_states=%u",
+    log_debug("Rewiring period %u, fast=%u, n_states=%u",
             rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
@@ -212,6 +212,8 @@ bool synaptogenesis_dynamics_initialise(
 
     rewiring_recording_index = *recording_regions_used;
     *recording_regions_used = rewiring_recording_index + 1;
+
+    log_debug("The rewiring_recording_index is %u", rewiring_recording_index);
 
     return true;
 }

@@ -81,6 +81,12 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
     return (post_trace_t){};
 }
 
+static inline post_trace_t timing_decay_post(
+        UNUSED uint32_t time, UNUSED uint32_t last_time,
+        UNUSED post_trace_t last_trace) {
+    return (post_trace_t) {};
+}
+
 //---------------------------------------
 //! \brief Add a post spike to the post trace
 //! \param[in] time: the time of the spike
