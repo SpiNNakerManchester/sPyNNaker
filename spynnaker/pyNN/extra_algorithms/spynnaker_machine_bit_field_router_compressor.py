@@ -105,7 +105,7 @@ def _rerun_synaptic_cores(
 
 
 def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, executable_finder, routing_infos, executable_targets):
+        routing_tables, executable_finder, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
@@ -120,8 +120,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_ordered_covering_compressor(
-            routing_tables,
-            executable_finder, routing_infos, executable_targets)
+            routing_tables, executable_finder, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
@@ -132,7 +131,7 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
 
 
 def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables, executable_finder, routing_infos, executable_targets):
+        routing_tables, executable_finder, executable_targets):
     """ entrance for routing table compression with bit field
 
     :param routing_tables: routing tables
@@ -141,14 +140,12 @@ def spynnaker_machine_bitField_pair_router_compressor(
     :param executable_finder: where are binaries are located
     :type executable_finder:
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
     :type retry_count: int or None
     :param bool read_algorithm_iobuf: flag saying if read iobuf
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor(
-            routing_tables,
-            executable_finder, routing_infos, executable_targets)
+            routing_tables, executable_finder, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
