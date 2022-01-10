@@ -39,7 +39,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(simtime)
 
         provenance_files = self.get_app_iobuf_files()
-        placements = SpynnakerDataView().placements
+        placements = SpynnakerDataView.get_placements()
         # As outside of run we have to use unprotected method
         machine_graph = SpynnakerDataView.get_runtime_machine_graph()
         sim.end()

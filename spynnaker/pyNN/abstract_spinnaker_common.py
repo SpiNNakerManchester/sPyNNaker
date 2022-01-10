@@ -293,7 +293,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         important_gathers = set()
         # iterate though projections
         machine = self._data_writer.machine
-        placements = self._data_writer.placements
+        placements = self._data_writer.get_placements()
         for projection in projections:
             # iteration though the projections machine edges to locate chips
             for edge in projection._projection_edge.machine_edges:

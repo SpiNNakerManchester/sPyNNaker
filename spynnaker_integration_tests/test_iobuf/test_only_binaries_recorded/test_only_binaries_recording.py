@@ -35,7 +35,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(500)
 
         app_iobuf_files = self.get_app_iobuf_files()
-        placements = SpynnakerDataView().placements
+        placements = SpynnakerDataView.get_placements()
         sim.end()
 
         machine_verts = input._vertex.machine_vertices

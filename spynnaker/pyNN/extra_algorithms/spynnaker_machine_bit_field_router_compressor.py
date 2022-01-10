@@ -72,7 +72,7 @@ def __machine_expandables(cores):
     :param ~.CoreSubsets cores:
     :rtype: iterable(~.Placement)
     """
-    for place in SpynnakerDataView().placements:
+    for place in SpynnakerDataView.get_placements():
         vertex = place.vertex
         if (cores.is_core(place.x, place.y, place.p)
                 # Have we overwritten it?

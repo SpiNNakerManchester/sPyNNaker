@@ -36,7 +36,7 @@ def spynnaker_data_specification_writer(hostname):
 
     delay_extensions = list()
     placement_order = list()
-    for placement in SpynnakerDataView().placements:
+    for placement in SpynnakerDataView.get_placements():
         if isinstance(placement.vertex, DelayExtensionMachineVertex):
             delay_extensions.append(placement)
         else:
