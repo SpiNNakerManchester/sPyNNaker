@@ -44,7 +44,7 @@ def spynnaker_splitter_selector():
 
     :raises PacmanConfigurationException: If a bad configuration is set
     """
-    app_graph = SpynnakerDataView().runtime_graph
+    app_graph = SpynnakerDataView.get_runtime_graph()
     progress_bar = ProgressBar(
         string_describing_what_being_progressed=PROGRESS_BAR_NAME,
         total_number_of_things_to_do=app_graph.n_vertices)

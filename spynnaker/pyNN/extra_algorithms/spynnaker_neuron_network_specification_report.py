@@ -54,8 +54,7 @@ def spynnaker_neuron_graph_network_specification_report():
     :param str report_folder: the report folder to put figure into
     """
     # create holders for data
-    view = SpynnakerDataView()
-    application_graph = view.runtime_graph
+    application_graph = SpynnakerDataView.get_runtime_graph()
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str("Reports", "network_graph_format")

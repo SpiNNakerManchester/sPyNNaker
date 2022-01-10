@@ -94,7 +94,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     @overrides(AbstractDependentSplitter.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
 
-        app_graph = SpynnakerDataView().runtime_graph
+        app_graph = SpynnakerDataView.get_runtime_graph()
         # pylint: disable=arguments-differ
         pre_slices, is_exact = self._other_splitter.get_out_going_slices()
 

@@ -124,7 +124,7 @@ class _OnChipBitFieldGenerator(object):
         view = SpynnakerDataView()
         self.__txrx = SpynnakerDataView.get_transceiver()
         self.__placements = SpynnakerDataView().placements
-        app_graph = view.runtime_graph
+        app_graph = SpynnakerDataView.get_runtime_graph()
         machine_graph = view.runtime_machine_graph
         # progress bar
         progress = ProgressBar(

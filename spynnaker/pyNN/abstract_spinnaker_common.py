@@ -449,7 +449,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self, pre_allocated_resources):
-        if not self._data_writer.runtime_graph.n_vertices:
+        if not self._data_writer.get_runtime_graph().n_vertices:
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
             machine_graph, self._n_chips_needed = \

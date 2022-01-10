@@ -81,7 +81,7 @@ class _DelaySupportAdder(object):
             splitter objects have been set.
 
         """
-        app_graph = SpynnakerDataView().runtime_graph
+        app_graph = SpynnakerDataView.get_runtime_graph()
         # progress abr and data holders
         progress = ProgressBar(
             len(list(app_graph.outgoing_edge_partitions)),
