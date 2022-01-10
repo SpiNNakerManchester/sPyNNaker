@@ -18,7 +18,6 @@ import numpy
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.recorder import Recorder
 import spynnaker8 as sim
 from spynnaker.pyNN.utilities import neo_convertor
