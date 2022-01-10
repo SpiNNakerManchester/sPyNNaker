@@ -263,8 +263,7 @@ class NeuronRecorder(object):
         :return: placement data
         :rtype: ~numpy.ndarray
         """
-        placements = SpynnakerDataView().placements
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = SpynnakerDataView.get_placement_of_vertex(vertex)
         if n_per_timestep == 0:
             return None
 
@@ -418,9 +417,8 @@ class NeuronRecorder(object):
                 variable))
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
-        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             neurons = list(self._neurons_recording(variable, vertex_slice))
@@ -527,9 +525,8 @@ class NeuronRecorder(object):
         missing_str = ""
         progress = ProgressBar(
             vertices, "Getting rewires for {}".format(label))
-        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             neurons = list(

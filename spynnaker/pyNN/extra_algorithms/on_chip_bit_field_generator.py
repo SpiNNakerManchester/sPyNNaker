@@ -69,7 +69,7 @@ class _OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
     """
 
-    __slots__ = ("__aplx", "__placements", "__txrx")
+    __slots__ = ("__aplx", "__txrx")
 
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
@@ -108,7 +108,6 @@ class _OnChipBitFieldGenerator(object):
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         """
         self.__txrx = None
-        self.__placements = None
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
@@ -123,7 +122,6 @@ class _OnChipBitFieldGenerator(object):
         """
         view = SpynnakerDataView()
         self.__txrx = SpynnakerDataView.get_transceiver()
-        self.__placements = SpynnakerDataView().placements
         app_graph = SpynnakerDataView.get_runtime_graph()
         machine_graph = SpynnakerDataView.get_runtime_machine_graph()
         # progress bar
@@ -243,7 +241,7 @@ class _OnChipBitFieldGenerator(object):
         """
         for vertex in app_vertex.machine_vertices:
             if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                yield self.__placements.get_placement_of_vertex(vertex)
+                yield SpynnakerDataView.get_placement_of_vertex(vertex)
 
     def __bitfields(self, placement):
         """ Reads back the bitfields that have been placed on a vertex.

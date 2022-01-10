@@ -180,9 +180,9 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager):
-        placements = SpynnakerDataView().placements
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)

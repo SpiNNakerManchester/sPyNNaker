@@ -934,12 +934,12 @@ class Population(PopulationBase):
                 and not sim.use_virtual_board):
             # go through each machine vertex and read the neuron parameters
             # it contains
-            placements = SpynnakerDataView().placements
             for vertex in self.__vertex.machine_vertices:
                 if isinstance(vertex, AbstractReadParametersBeforeSet):
                     # tell the core to rewrite neuron params back to the
                     # SDRAM space.
-                    placement = placements.get_placement_of_vertex(vertex)
+                    placement = SpynnakerDataView.get_placement_of_vertex(
+                        vertex)
                     vertex.read_parameters_from_machine(
                         placement, vertex.vertex_slice)
 

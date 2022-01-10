@@ -100,9 +100,8 @@ class MultiSpikeRecorder(object):
         missing = []
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))
-        placements = SpynnakerDataView().placements
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             # Read the spikes from the buffer manager

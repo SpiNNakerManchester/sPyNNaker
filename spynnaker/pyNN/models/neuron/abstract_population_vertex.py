@@ -675,9 +675,9 @@ class AbstractPopulationVertex(
         :param recording_region_id: the recorded region ID for clearing
         :rtype: None
         """
-        placements = SpynnakerDataView().placements
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
 
@@ -957,10 +957,10 @@ class AbstractPopulationVertex(
             len(self.machine_vertices),
             "Getting synaptic data between {} and {}".format(
                 app_edge.pre_vertex.label, app_edge.post_vertex.label))
-        placements = SpynnakerDataView().placements
         for post_vertex in progress.over(self.machine_vertices):
             if isinstance(post_vertex, HasSynapses):
-                placement = placements.get_placement_of_vertex(post_vertex)
+                placement = SpynnakerDataView.get_placement_of_vertex(
+                    post_vertex)
                 connections.extend(post_vertex.get_connections_from_machine(
                     placement, app_edge, synapse_info))
         return numpy.concatenate(connections)
