@@ -286,7 +286,7 @@ class DelayExtensionMachineVertex(
 
         incoming_key = 0
         incoming_mask = 0
-        graph = SpynnakerDataView().runtime_machine_graph
+        graph = SpynnakerDataView.get_runtime_machine_graph()
         incoming_edges = graph.get_edges_ending_at_vertex(vertex)
 
         for incoming_edge in incoming_edges:

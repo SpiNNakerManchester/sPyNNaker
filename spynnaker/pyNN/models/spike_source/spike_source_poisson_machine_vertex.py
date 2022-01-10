@@ -216,7 +216,7 @@ class SpikeSourcePoissonMachineVertex(
     @property
     @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
     def is_in_injection_mode(self):
-        graph = SpynnakerDataView().runtime_machine_graph
+        graph = SpynnakerDataView.get_runtime_machine_graph()
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
@@ -509,7 +509,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
-        graph = SpynnakerDataView().runtime_machine_graph
+        graph = SpynnakerDataView.get_runtime_machine_graph()
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:

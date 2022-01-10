@@ -27,7 +27,7 @@ from pacman.model.graphs.machine import MulticastEdgePartition
 class KeyConstraintAdder(object):
 
     def __call__(self):
-        machine_graph = SpynnakerDataView().runtime_machine_graph
+        machine_graph = SpynnakerDataView.get_runtime_machine_graph()
         for outgoing_partition in machine_graph.outgoing_edge_partitions:
             if not isinstance(outgoing_partition, MulticastEdgePartition):
                 continue
