@@ -51,17 +51,10 @@ class PopulationSynapsesMachineVertexShared(
             resources_required, label, constraints, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"})
-    def generate_data_specification(
-            self, spec, placement, routing_info):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         """
-        :param machine_graph: (injected)
-        :param routing_info: (injected)
         :param n_key_map: (injected)
         """
         # pylint: disable=arguments-differ
@@ -77,7 +70,7 @@ class PopulationSynapsesMachineVertexShared(
         self._write_sdram_edge_spec(spec)
 
         # Write information about keys
-        self._write_key_spec(spec, routing_info)
+        self._write_key_spec(spec)
 
         # End the writing of this specification:
         spec.end_specification()

@@ -16,7 +16,6 @@ from enum import Enum
 import os
 import ctypes
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
@@ -194,17 +193,10 @@ class PopulationNeuronsMachineVertex(
             self.vertex_slice)
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"})
-    def generate_data_specification(
-            self, spec, placement, routing_info):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         """
-        :param machine_graph: (injected)
-        :param routing_info: (injected)
         :param n_key_map: (injected)
         """
         # pylint: disable=arguments-differ
@@ -212,8 +204,7 @@ class PopulationNeuronsMachineVertex(
             self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         # Write information about SDRAM
         n_neurons = self._vertex_slice.n_atoms

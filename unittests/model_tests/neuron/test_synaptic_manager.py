@@ -124,7 +124,7 @@ def test_write_data_spec():
     allocator = ZonedRoutingInfoAllocator()
     writer.set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
-    routing_info = allocator.__call__(n_keys_map, flexible=False)
+    writer.set_routing_infos(allocator.__call__(n_keys_map, flexible=False))
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -139,7 +139,7 @@ def test_write_data_spec():
         connection_builder_region=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=10000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        weight_scales=[32, 32])
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -452,7 +452,7 @@ def test_pop_based_master_pop_table_standard(
     allocator = ZonedRoutingInfoAllocator()
     writer.set_runtime_machine_graph(machine_graph)
     n_keys_map = edge_to_n_keys_mapper()
-    routing_info = allocator.__call__(n_keys_map, flexible=False)
+    writer.set_routing_infos(allocator.__call__(n_keys_map, flexible=False))
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
@@ -467,7 +467,7 @@ def test_pop_based_master_pop_table_standard(
         connection_builder_region=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=1000000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        weight_scales=[32, 32])
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

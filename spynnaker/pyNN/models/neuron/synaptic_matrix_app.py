@@ -59,8 +59,6 @@ class SynapticMatrixApp(object):
         "__app_key_info",
         # The application-level key information for the incoming delay edge
         "__delay_app_key_info",
-        # All routing information
-        "__routing_info",
         # The weight scaling used by each synapse type
         "__weight_scales",
         # The machine edges of the incoming application edges
@@ -128,7 +126,6 @@ class SynapticMatrixApp(object):
         self.__all_syn_block_sz = None
         self.__app_key_info = None
         self.__delay_app_key_info = None
-        self.__routing_info = None
         self.__weight_scales = None
         self.__m_edges = None
         self.__use_app_keys = None
@@ -160,17 +157,16 @@ class SynapticMatrixApp(object):
         """
         if machine_edge in self.__matrices:
             return self.__matrices[machine_edge]
-
-        r_info = self.__routing_info.get_routing_info_for_edge(machine_edge)
+        routing_info = SpynnakerDataView.get_routing_infos()
+        r_info = routing_info.get_routing_info_for_edge(machine_edge)
         delayed_r_info = None
         delayed_app_edge = machine_edge.app_edge.delay_edge
         if delayed_app_edge is not None:
             delayed_machine_edge = delayed_app_edge.get_machine_edge(
                 machine_edge.pre_vertex, machine_edge.post_vertex)
             if delayed_machine_edge is not None:
-                delayed_r_info = (
-                    self.__routing_info.get_routing_info_for_edge(
-                        delayed_machine_edge))
+                delayed_r_info = (routing_info.get_routing_info_for_edge(
+                    delayed_machine_edge))
         matrix = SynapticMatrix(
             self.__poptable, self.__synapse_info,
             machine_edge, self.__app_edge, self.__n_synapse_types,
@@ -229,7 +225,7 @@ class SynapticMatrixApp(object):
             (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
 
     def set_info(self, all_syn_block_sz, app_key_info, delay_app_key_info,
-                 routing_info, weight_scales, m_edges):
+                 weight_scales, m_edges):
         """ Set extra information that isn't necessarily available when the
             class is created.
 
@@ -239,8 +235,6 @@ class SynapticMatrixApp(object):
             Application-level routing key information for undelayed vertices
         :param _AppKeyInfo delay_app_key_info:
             Application-level routing key information for delayed vertices
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            Routing key information for all incoming edges
         :param list(float) weight_scales:
             Weight scale for each synapse edge
         :param list(~pacman.model.graphs.machine.MachineEdge) m_edges:
@@ -249,7 +243,6 @@ class SynapticMatrixApp(object):
         self.__all_syn_block_sz = all_syn_block_sz
         self.__app_key_info = app_key_info
         self.__delay_app_key_info = delay_app_key_info
-        self.__routing_info = routing_info
         self.__weight_scales = weight_scales
         self.__m_edges = m_edges
 

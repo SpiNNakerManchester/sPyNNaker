@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
 from pacman.model.resources import (
@@ -31,6 +30,7 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 
@@ -138,11 +138,9 @@ class MachineMunichMotorDevice(
                     "Please increase the timer_tic or time_scale_factor "
                     "or decrease the number of neurons per core.")
 
-    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"})
-    def generate_data_specification(self, spec, placement, routing_info):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -157,6 +155,7 @@ class MachineMunichMotorDevice(
             placement.vertex.get_binary_file_name()))
 
         # Get the key
+        routing_info = SpynnakerDataView.get_routing_infos()
         edge_key = routing_info.get_first_key_from_pre_vertex(
             placement.vertex, self.MOTOR_PARTITION_ID)
         if edge_key is None:

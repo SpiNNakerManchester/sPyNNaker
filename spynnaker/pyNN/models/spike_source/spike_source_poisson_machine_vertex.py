@@ -24,7 +24,6 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
@@ -265,25 +264,16 @@ class SpikeSourcePoissonMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
-    @inject_items({
-        "routing_info": "RoutingInfos"})
     @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={
-            "routing_info"})
-    def regenerate_data_specification(
-            self, spec, placement, routing_info):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        """
+        AbstractRewritesDataSpecification.regenerate_data_specification)
+    def regenerate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
         self._reserve_poisson_params_rates_region(placement, spec)
 
         # write parameters
-        self._write_poisson_parameters(
-            spec=spec, placement=placement, routing_info=routing_info)
+        self._write_poisson_parameters(spec=spec, placement=placement)
 
         # write rates
         self._write_poisson_rates(spec)
@@ -291,18 +281,9 @@ class SpikeSourcePoissonMachineVertex(
         # end spec
         spec.end_specification()
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"}
-    )
-    def generate_data_specification(
-            self, spec, placement, routing_info):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=too-many-arguments, arguments-differ
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
@@ -326,7 +307,7 @@ class SpikeSourcePoissonMachineVertex(
             recorded_region_sizes))
 
         # write parameters
-        self._write_poisson_parameters(spec, placement, routing_info)
+        self._write_poisson_parameters(spec, placement)
 
         # write rates
         self._write_poisson_rates(spec)
@@ -486,13 +467,12 @@ class SpikeSourcePoissonMachineVertex(
             for i, d in enumerate(core_data_split[:-1])])
         spec.write_array(final_data)
 
-    def _write_poisson_parameters(self, spec, placement, routing_info):
+    def _write_poisson_parameters(self, spec, placement):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
         :param ~pacman.model.placements.Placement placement:
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
         # pylint: disable=too-many-arguments, too-many-locals
         spec.comment("\nWriting Parameters for {} poisson sources:\n"
@@ -503,6 +483,7 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value)
 
         # Write Key info for this core:
+        routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_first_key_from_pre_vertex(
             placement.vertex, constants.SPIKE_PARTITION_ID)
         spec.write_value(data=1 if key is not None else 0)

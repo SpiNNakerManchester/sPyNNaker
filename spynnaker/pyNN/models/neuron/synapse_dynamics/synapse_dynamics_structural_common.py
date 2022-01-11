@@ -86,7 +86,7 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, weight_scales, app_vertex,
-            vertex_slice, routing_info, synaptic_matrices):
+            vertex_slice, synaptic_matrices):
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
@@ -101,7 +101,7 @@ class SynapseDynamicsStructuralCommon(
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_projections, routing_info,
+            spec, app_vertex, structural_projections,
             weight_scales, synaptic_matrices, vertex_slice)
 
         # Write the post-to-pre table
@@ -195,7 +195,7 @@ class SynapseDynamicsStructuralCommon(
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_projections, routing_info,
+            self, spec, app_vertex, structural_projections,
             weight_scales, synaptic_matrices, post_vertex_slice):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -209,13 +209,13 @@ class SynapseDynamicsStructuralCommon(
         :type machine_edges_by_app:
             dict(~pacman.model.graphs.application.ApplicationEdge,
             list(~pacman.model.graphs.machine.MachineEdge))
-        :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
         pop_index = dict()
+        routing_info = SpynnakerDataView.get_routing_infos()
         index = 0
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(

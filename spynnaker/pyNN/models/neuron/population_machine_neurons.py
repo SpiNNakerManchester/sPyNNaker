@@ -130,17 +130,16 @@ class PopulationMachineNeurons(
             db.insert_core(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
-    def _write_neuron_data_spec(self, spec, routing_info, ring_buffer_shifts):
+    def _write_neuron_data_spec(self, spec, ring_buffer_shifts):
         """ Write the data specification of the neuron data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information to read the key from
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
+        routing_info = SpynnakerDataView.get_routing_infos()
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 

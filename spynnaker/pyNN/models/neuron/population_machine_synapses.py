@@ -151,14 +151,12 @@ class PopulationMachineSynapses(
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, routing_info, ring_buffer_shifts, weight_scales,
+            self, spec, ring_buffer_shifts, weight_scales,
             all_syn_block_sz, structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information to read the key from
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         :param list(int) weight_scales:
@@ -174,7 +172,7 @@ class PopulationMachineSynapses(
 
         # Write the synaptic matrices
         self._synaptic_matrices.write_synaptic_data(
-            spec, incoming, all_syn_block_sz, weight_scales, routing_info)
+            spec, incoming, all_syn_block_sz, weight_scales)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -202,7 +200,7 @@ class PopulationMachineSynapses(
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
                 weight_scales, self._app_vertex, self._vertex_slice,
-                routing_info, self._synaptic_matrices)
+                self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -220,7 +218,7 @@ class PopulationMachineSynapses(
             self._synapse_references.bitfield_filter,
             self._synapse_references.bitfield_key_map)
         bit_field_utilities.write_bitfield_init_data(
-            spec, incoming, self._vertex_slice, routing_info,
+            spec, incoming, self._vertex_slice,
             self._synapse_regions.bitfield_builder,
             self._synapse_regions.pop_table,
             self._synapse_regions.synaptic_matrix,

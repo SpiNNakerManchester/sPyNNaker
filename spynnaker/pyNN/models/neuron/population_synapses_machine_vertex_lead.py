@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
@@ -85,14 +84,9 @@ class PopulationSynapsesMachineVertexLead(
             self.vertex_slice)
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info"})
-    def generate_data_specification(
-            self, spec, placement, routing_info):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         """
         :param routing_info: (injected)
         """
@@ -102,7 +96,7 @@ class PopulationSynapsesMachineVertexLead(
         self._write_common_data_spec(spec, rec_regions)
 
         self._write_synapse_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts,
+            spec, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_sz,
             self.__structural_sz)
 
@@ -110,7 +104,7 @@ class PopulationSynapsesMachineVertexLead(
         self._write_sdram_edge_spec(spec)
 
         # Write information about keys
-        self._write_key_spec(spec, routing_info)
+        self._write_key_spec(spec)
 
         # End the writing of this specification:
         spec.end_specification()

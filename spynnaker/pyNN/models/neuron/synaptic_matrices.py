@@ -22,6 +22,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -188,8 +189,7 @@ class SynapticMatrices(object):
         return matrix
 
     def write_synaptic_data(
-            self, spec, incoming_projections, all_syn_block_sz, weight_scales,
-            routing_info):
+            self, spec, incoming_projections, all_syn_block_sz, weight_scales):
         """ Write the synaptic data for all incoming projections
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -199,8 +199,6 @@ class SynapticMatrices(object):
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
         :param list(float) weight_scales: The weight scale of each synapse
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information for all edges
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             The machine graph
         """
@@ -222,7 +220,7 @@ class SynapticMatrices(object):
 
         # Convert the data for convenience
         in_edges_by_app_edge, key_space_tracker = self.__in_edges_by_app_edge(
-            incoming_projections, routing_info)
+            incoming_projections)
 
         # Set up for single synapses
         # The list is seeded with an empty array so we can just concatenate
@@ -242,15 +240,15 @@ class SynapticMatrices(object):
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
             app_key_info = self.__app_key_and_mask(
-                m_edges, app_edge, routing_info, key_space_tracker)
+                m_edges, app_edge, key_space_tracker)
             d_app_key_info = self.__delay_app_key_and_mask(
-                m_edges, app_edge, routing_info, key_space_tracker)
+                m_edges, app_edge, key_space_tracker)
 
             for synapse_info in app_edge.synapse_information:
                 app_matrix = self.__app_matrix(app_edge, synapse_info)
                 app_matrix.set_info(
                     all_syn_block_sz, app_key_info, d_app_key_info,
-                    routing_info, weight_scales, m_edges)
+                    weight_scales, m_edges)
 
                 # If we can generate the connector on the machine, do so
                 if app_matrix.can_generate_on_machine(single_addr):
@@ -345,19 +343,19 @@ class SynapticMatrices(object):
             items.extend(data.gen_data)
         spec.write_array(numpy.concatenate(items))
 
-    def __in_edges_by_app_edge(self, incoming_projections, routing_info):
+    def __in_edges_by_app_edge(self, incoming_projections):
         """ Convert a list of incoming projections to a dict of
             application edge -> list of machine edges, and a key tracker
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The incoming projections
-        :param RoutingInfo routing_info: Routing information for all edges
         :rtype: tuple(dict, KeySpaceTracker)
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
         pre_vertices = set()
 
+        routing_info = SpynnakerDataView.get_routing_infos()
         for proj in incoming_projections:
             app_edge = proj._projection_edge
 
@@ -515,8 +513,7 @@ class SynapticMatrices(object):
             return False
         return True
 
-    def __app_key_and_mask(self, m_edges, app_edge, routing_info,
-                           key_space_tracker):
+    def __app_key_and_mask(self, m_edges, app_edge, key_space_tracker):
         """ Get a key and mask for an incoming application vertex as a whole,\
             or say it isn't possible (return None)
 
@@ -524,7 +521,6 @@ class SynapticMatrices(object):
             The relevant machine edges of the application edge
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         :param KeySpaceTracker key_space_tracker:
             A tracker pre-filled with the keys of all incoming edges
         """
@@ -538,6 +534,7 @@ class SynapticMatrices(object):
 
         # Can be merged only if all the masks are the same
         pre_slices = list()
+        routing_info = SpynnakerDataView.get_routing_infos()
         for m_edge in m_edges:
             rinfo = routing_info.get_routing_info_for_edge(m_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
@@ -560,8 +557,7 @@ class SynapticMatrices(object):
 
         return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
 
-    def __delay_app_key_and_mask(self, m_edges, app_edge, routing_info,
-                                 key_space_tracker):
+    def __delay_app_key_and_mask(self, m_edges, app_edge, key_space_tracker):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or say it isn't possible (return None)
 
@@ -569,7 +565,6 @@ class SynapticMatrices(object):
             The relevant machine edges of the application edge
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
-        :param RoutingInfo routing_info: The routing information of all edges
         :param KeySpaceTracker key_space_tracker:
             A tracker pre-filled with the keys of all incoming edges
         """
@@ -580,6 +575,7 @@ class SynapticMatrices(object):
 
         # Can be merged only if all the masks are the same
         pre_slices = list()
+        routing_info = SpynnakerDataView.get_routing_infos()
         for m_edge in m_edges:
             # If the edge doesn't have a delay edge, give up
             delayed_app_edge = m_edge.app_edge.delay_edge

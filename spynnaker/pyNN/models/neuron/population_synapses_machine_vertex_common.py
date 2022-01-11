@@ -20,6 +20,7 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
@@ -214,13 +215,11 @@ class PopulationSynapsesMachineVertexCommon(
         spec.write_value(get_config_int(
             "Simulation", "transfer_overhead_clocks"))
 
-    def _write_key_spec(self, spec, routing_info):
+    def _write_key_spec(self, spec):
         """ Write key config region
 
         :param DataSpecificationGenerator spec:
             The generator of the specification to write
-        :param RoutingInfo routing_info:
-            Container of keys and masks for edges
         """
         spec.reserve_memory_region(
             region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
@@ -233,6 +232,7 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(0)
             spec.write_value(0)
         else:
+            routing_info = SpynnakerDataView.get_routing_infos()
             r_info = routing_info.get_routing_info_for_edge(
                 self.__neuron_to_synapse_edge)
             spec.write_value(r_info.first_key)
