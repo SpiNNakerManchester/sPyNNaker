@@ -72,7 +72,7 @@ class TestSimulatorData(unittest.TestCase):
     def test_mock(self):
         view = SpynnakerDataView()
         # check there is a value not what it is
-        self.assertIsNotNone(view.app_id)
+        self.assertIsNotNone(SpynnakerDataView.get_app_id())
         self.assertIsNotNone(view.min_delay)
 
     def test_multiple(self):
@@ -81,7 +81,8 @@ class TestSimulatorData(unittest.TestCase):
         view1 = SpynnakerDataView()
         view2 = FecDataView()
         writer.set_app_id(7)
-        self.assertEqual(7, view.app_id)
-        self.assertEqual(7, view2.app_id)
-        self.assertEqual(7, view1.app_id)
-        self.assertEqual(7, writer.app_id)
+        self.assertEqual(SpynnakerDataView.get_app_id())
+        self.assertEqual(7, view.get_app_id())
+        self.assertEqual(7, view2.get_app_id())
+        self.assertEqual(7, view1.get_app_id())
+        self.assertEqual(7, writer.get_app_id())
