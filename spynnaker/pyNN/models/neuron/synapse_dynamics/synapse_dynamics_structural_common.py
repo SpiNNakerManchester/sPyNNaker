@@ -435,7 +435,6 @@ class SynapseDynamicsStructuralCommon(
 
     def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
-        view = SpynnakerDataView()
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 SpynnakerDataView.get_simulation_time_step_ms()):
             # fast rewiring, so need to set max_rewires_per_ts

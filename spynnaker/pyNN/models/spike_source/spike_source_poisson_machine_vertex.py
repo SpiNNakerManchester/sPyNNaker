@@ -257,8 +257,9 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
         # pylint: disable=arguments-differ
-         return (self.__change_requires_neuron_parameters_reload or
-                SpynnakerDataView.get_first_machine_time_step() == 0)
+         if self.__change_requires_neuron_parameters_reload:
+            return True
+         return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
@@ -508,7 +509,6 @@ class SpikeSourcePoissonMachineVertex(
             incoming_mask = ~incoming_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
-        view = SpynnakerDataView()
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
             data=SpynnakerDataView.get_simulation_time_step_s(),
