@@ -257,8 +257,8 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
         # pylint: disable=arguments-differ
-        return (self.__change_requires_neuron_parameters_reload or
-                SpynnakerDataView().first_machine_time_step == 0)
+         return (self.__change_requires_neuron_parameters_reload or
+                SpynnakerDataView.get_first_machine_time_step() == 0)
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
@@ -302,7 +302,7 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self._app_vertex.get_recording_sdram_usage(self.vertex_slice)
         recorded_region_sizes = [sdram.get_total_sdram(
-            SpynnakerDataView().max_run_time_steps)]
+            SpynnakerDataView.get_max_run_time_steps())]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
@@ -457,7 +457,8 @@ class SpikeSourcePoissonMachineVertex(
         # Work out the index where the core should start based on the given
         # first timestep
         ends_scaled_split = numpy.array_split(ends_scaled, splits)
-        first_machine_time_step = SpynnakerDataView().first_machine_time_step
+        first_machine_time_step = \
+            SpynnakerDataView.get_first_machine_time_step()
         indices = [numpy.argmax(e > first_machine_time_step)
                    for e in ends_scaled_split[:-1]]
 

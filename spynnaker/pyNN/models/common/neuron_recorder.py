@@ -1068,7 +1068,7 @@ class NeuronRecorder(object):
         :return: data size
         :rtype: int
         """
-        n_machine_time_steps = SpynnakerDataView().max_run_time_steps
+        n_machine_time_steps = SpynnakerDataView.get_max_run_time_steps()
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
             item = self.get_buffered_sdram_per_record(variable, vertex_slice)

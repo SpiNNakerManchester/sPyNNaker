@@ -66,7 +66,8 @@ class Recorder(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-        self._recording_start_time = get_simulator().t
+        self._recording_start_time = \
+            SpynnakerDataView.get_current_run_time_ms()
         self._data_cache = {}
 
     @property
@@ -249,9 +250,9 @@ class Recorder(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            view = SpynnakerDataView()
             results = self.__vertex.get_data(
-                variable, view.current_run_timesteps, sim.buffer_manager)
+                variable, SpynnakerDataView.get_current_run_timesteps(),
+                sim.buffer_manager)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
@@ -400,7 +401,7 @@ class Recorder(object):
                 description=self.__population.describe(),
                 segment_number=segment_number,
                 recording_start_time=self._recording_start_time,
-                t=get_simulator().t)
+                t=SpynnakerDataView.get_current_run_time_ms())
 
             for variable in variables:
                 if variable == SPIKES:
@@ -464,7 +465,7 @@ class Recorder(object):
                 self.__read_in_spikes(
                     segment=segment,
                     spikes=self.get_spikes(),
-                    t=SpynnakerDataView().current_run_time_ms,
+                    t=SpynnakerDataView.get_current_run_time_ms(),
                     n_neurons=self.__population.size,
                     recording_start_time=self._recording_start_time,
                     sampling_interval=self.__spike_sampling_interval,
