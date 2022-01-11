@@ -151,9 +151,10 @@ class Projection(object):
         if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
                 and (not isinstance(synapse_dynamics.delay, str))):
             synapse_dynamics.set_delay(
-                numpy.rint(numpy.array(synapse_dynamics.delay) *
-                           SpynnakerDataView().simulation_time_step_per_ms) *
-                SpynnakerDataView().simulation_time_step_ms)
+                numpy.rint(
+                    numpy.array(synapse_dynamics.delay) *
+                    SpynnakerDataView.get_simulation_time_step_per_ms()) *
+                SpynnakerDataView.get_simulation_time_step_ms())
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)

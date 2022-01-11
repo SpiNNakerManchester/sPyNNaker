@@ -95,7 +95,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = SpynnakerDataView().simulation_time_step_ms
+        self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

@@ -780,7 +780,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 s_info.connector, s_info)
             max_delay_ms = max(max_delay_ms, proj_max_delay)
         max_delay_steps = math.ceil(
-            max_delay_ms / SpynnakerDataView().simulation_time_step_ms)
+            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
         max_delay_bits = get_n_bits(max_delay_steps)
 
         # Find the maximum possible delay

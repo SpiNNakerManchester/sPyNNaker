@@ -154,7 +154,7 @@ class MultiSpikeRecorder(object):
                 (-1, 32))).reshape((-1, n_bytes_per_block * 8))
             indices = numpy.nonzero(bits)[1]
             times = numpy.repeat(
-                [time * SpynnakerDataView().simulation_time_step_ms],
+                [time * SpynnakerDataView.get_simulation_time_step_ms()],
                 len(indices))
             indices = indices + vertex_slice.lo_atom
             spike_ids.append(indices)

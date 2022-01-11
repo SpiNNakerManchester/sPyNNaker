@@ -170,7 +170,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the machine time step
         :rtype: float
         """
-        return self._data_writer.simulation_time_step_ms
+        return self._data_writer.get_simulation_time_step_ms()
 
     @dt.setter
     def dt(self, new_value):

@@ -422,7 +422,7 @@ class SpikeSourcePoissonVertex(
                 machine_vertex.set_reload_required(True)
 
     def max_spikes_per_ts(self):
-        ts_per_second = SpynnakerDataView().simulation_time_step_per_s
+        ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -519,7 +519,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return SpynnakerDataView().simulation_time_step_us
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     @staticmethod
     def get_dtcm_usage_for_atoms():

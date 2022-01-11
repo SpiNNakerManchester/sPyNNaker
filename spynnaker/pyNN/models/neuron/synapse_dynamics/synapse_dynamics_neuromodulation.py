@@ -55,7 +55,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         self.__weight = weight
         self.__tau_c = tau_c
         self.__tau_d = tau_d
-        ts = SpynnakerDataView().simulation_time_step_ms
+        ts =SpynnakerDataView.get_simulation_time_step_ms()
         self.__tau_c_data = get_exp_lut_array(
             ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
         self.__tau_d_data = get_exp_lut_array(

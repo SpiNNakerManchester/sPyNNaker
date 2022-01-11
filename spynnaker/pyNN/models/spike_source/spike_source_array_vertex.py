@@ -167,7 +167,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return SpynnakerDataView().simulation_time_step_us
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, buffer_manager):

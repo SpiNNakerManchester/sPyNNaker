@@ -55,7 +55,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         self.__synapse_structure = SynapseStructureWeightOnly()
 
         self.__tau_data = get_exp_lut_array(
-            SpynnakerDataView().simulation_time_step_ms, self.__tau)
+            SpynnakerDataView.get_simulation_time_step_ms(), self.__tau)
 
     @property
     def alpha(self):

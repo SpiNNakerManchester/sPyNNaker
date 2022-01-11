@@ -144,7 +144,7 @@ class EIEIOSpikeRecorder(object):
         offset = 0
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= SpynnakerDataView().simulation_time_step_ms
+            time *= SpynnakerDataView.get_simulation_time_step_ms()
             data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(

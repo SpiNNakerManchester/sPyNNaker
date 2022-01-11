@@ -777,7 +777,7 @@ class AbstractPopulationVertex(
         # E[ number of spikes ] in a timestep
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) /
-            SpynnakerDataView().simulation_time_step_per_s)
+            SpynnakerDataView.get_simulation_time_step_per_s())
 
         # Exact variance contribution from inherent Poisson variation
         poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
@@ -838,7 +838,7 @@ class AbstractPopulationVertex(
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = SpynnakerDataView().simulation_time_step_per_s
+        steps_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information

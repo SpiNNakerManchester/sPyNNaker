@@ -410,7 +410,8 @@ class SpikeSourcePoissonMachineVertex(
              for s in starts_split[:-1]])
 
         # Compute the spikes per tick for each rate for each atom
-        spikes_per_tick = rates * SpynnakerDataView().simulation_time_step_s
+        spikes_per_tick = (
+                rates * SpynnakerDataView.get_simulation_time_step_s())
         # Determine the properties of the sources
         is_fast_source = spikes_per_tick >= self.SLOW_RATE_PER_TICK_CUTOFF
         is_faster_source = spikes_per_tick >= self.FAST_RATE_PER_TICK_CUTOFF
@@ -510,12 +511,12 @@ class SpikeSourcePoissonMachineVertex(
         view = SpynnakerDataView()
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=view.simulation_time_step_s,
+            data=SpynnakerDataView.get_simulation_time_step_s(),
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=int(view.simulation_time_step_per_s))
+            data=int(SpynnakerDataView.get_simulation_time_step_per_s()))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -604,7 +605,7 @@ class SpikeSourcePoissonMachineVertex(
     @staticmethod
     def _convert_ms_to_n_timesteps(value):
         return numpy.round(
-            value * SpynnakerDataView().simulation_time_step_per_ms
+            value * SpynnakerDataView.get_simulation_time_step_per_ms()
         ).astype("uint32")
 
     def poisson_param_region_address(self, placement):
@@ -674,7 +675,7 @@ class SpikeSourcePoissonMachineVertex(
             self._app_vertex.rates.set_value_by_id(
                 i,
                 spikes_per_tick *
-                SpynnakerDataView().simulation_time_step_per_s)
+                SpynnakerDataView.get_simulation_time_step_per_s())
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded

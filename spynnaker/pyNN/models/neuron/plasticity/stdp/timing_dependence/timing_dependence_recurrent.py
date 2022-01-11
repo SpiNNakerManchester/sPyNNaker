@@ -161,7 +161,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        time_step_per_ms = SpynnakerDataView().simulation_time_step_per_ms
+        time_step_per_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
 
         mean_pre_timesteps = float(self.__mean_pre_window * time_step_per_ms)
         mean_post_timesteps = float(self.__mean_post_window * time_step_per_ms)

@@ -36,13 +36,13 @@ class TestSimulatorData(unittest.TestCase):
         self.assertIn("run_1", SpynnakerDataView.get_run_dir_path())
         self.assertIn("provenance_data", view.provenance_dir_path)
         with self.assertRaises(DataNotYetAvialable):
-            view.simulation_time_step_us
+            SpynnakerDataView.get_simulation_time_step_us()
         with self.assertRaises(DataNotYetAvialable):
             view.min_delay
         self.assertFalse(view.has_min_delay())
         writer.set_up_timings(100, 10)
         self.assertTrue(view.has_min_delay())
-        self.assertEqual(100, view.simulation_time_step_us)
+        self.assertEqual(100,  SpynnakerDataView.get_simulation_time_step_us())
         self.assertEqual(0.1, view.min_delay)
 
     def test_min_delay(self):
@@ -81,7 +81,7 @@ class TestSimulatorData(unittest.TestCase):
         view1 = SpynnakerDataView()
         view2 = FecDataView()
         writer.set_app_id(7)
-        self.assertEqual(SpynnakerDataView.get_app_id())
+        self.assertEqual(7, SpynnakerDataView.get_app_id())
         self.assertEqual(7, view.get_app_id())
         self.assertEqual(7, view2.get_app_id())
         self.assertEqual(7, view1.get_app_id())

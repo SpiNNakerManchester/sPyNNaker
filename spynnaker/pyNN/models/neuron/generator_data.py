@@ -107,7 +107,7 @@ class GeneratorData(object):
             self.__max_stage,
             self.__max_delay_per_stage,
             DataType.S1615.encode_as_int(
-                SpynnakerDataView().simulation_time_step_per_ms),
+                SpynnakerDataView.get_simulation_time_step_per_ms()),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

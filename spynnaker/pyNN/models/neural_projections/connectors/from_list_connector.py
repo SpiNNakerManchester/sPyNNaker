@@ -354,13 +354,12 @@ class FromListConnector(AbstractConnector):
 
         # Find any delays
         self.__delays = None
-        view = SpynnakerDataView()
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) *
-                view.simulation_time_step_per_ms) *
-                view.simulation_time_step_ms)
+                SpynnakerDataView.get_simulation_time_step_per_ms()) *
+                SpynnakerDataView.get_simulation_time_step_ms())
         except ValueError:
             pass
 

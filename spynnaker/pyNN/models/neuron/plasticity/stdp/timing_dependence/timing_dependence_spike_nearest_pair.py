@@ -53,7 +53,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = SpynnakerDataView().simulation_time_step_ms
+        ts =SpynnakerDataView.get_simulation_time_step_ms()
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 

@@ -144,8 +144,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 time_scale_factor, min_delay)
 
         # Check the combination of machine time step and time scale factor
-        if (self._data_writer.simulation_time_step_ms *
-                self._data_writer.time_scale_factor < 1):
+        if (self._data_writer.get_simulation_time_step_ms() *
+                self._data_writer.get_time_scale_factor() < 1):
             if not get_config_bool(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(

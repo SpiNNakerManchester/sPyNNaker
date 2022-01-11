@@ -216,7 +216,7 @@ class _DelaySupportAdder(object):
             raise DelayExtensionException(
                 self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
                     app_edge.post_vertex, post_splitter, app_edge))
-        time_step_ms = SpynnakerDataView().simulation_time_step_ms
+        time_step_ms = SpynnakerDataView.get_simulation_time_step_ms()
         max_delay_steps = app_edge.post_vertex.splitter.max_support_delay()
         max_delay_ms = max_delay_steps * time_step_ms
 

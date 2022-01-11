@@ -132,7 +132,7 @@ def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
     :rtype: int
     """
     return (post_vertex_max_delay_ticks *
-            SpynnakerDataView().simulation_time_step_ms)
+            SpynnakerDataView.get_simulation_time_step_ms())
 
 
 def get_max_row_info(
@@ -298,7 +298,8 @@ def get_synapses(
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(
-        connections["delay"] * SpynnakerDataView().simulation_time_step_per_ms)
+        connections["delay"] *
+        SpynnakerDataView.get_simulation_time_step_per_ms())
 
     # Scale weights
     if not synapse_info.synapse_type_from_dynamics:
@@ -673,7 +674,8 @@ def _rescale_connections(
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
-    connections["delay"] /= SpynnakerDataView().simulation_time_step_per_ms
+    connections["delay"] /= \
+        SpynnakerDataView.get_simulation_time_step_per_ms()
     # Undo the weight scaling
     connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections

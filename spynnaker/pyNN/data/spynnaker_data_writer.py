@@ -58,12 +58,12 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         :type min_delay: int, float or None
         """
         if min_delay is None:
-            min_delay = self.simulation_time_step_ms
+            min_delay = self.get_simulation_time_step_ms()
 
         if not isinstance(min_delay, (int, float)):
             raise TypeError("min_delay should be an float (or int)")
 
-        if min_delay < self.simulation_time_step_ms:
+        if min_delay < self.get_simulation_time_step_ms():
             raise ConfigurationException(
                 f'invalid min_delay: {min_delay} '
                 f'must at least simulation time step in microseconds: '
