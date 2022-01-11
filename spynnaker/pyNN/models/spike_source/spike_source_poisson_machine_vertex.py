@@ -257,9 +257,9 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
         # pylint: disable=arguments-differ
-         if self.__change_requires_neuron_parameters_reload:
+        if self.__change_requires_neuron_parameters_reload:
             return True
-         return SpynnakerDataView.get_first_machine_time_step() == 0
+        return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
