@@ -30,7 +30,7 @@ class TestIobuffMultirun(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, min_delay=1.0)
-        prov_path = SpynnakerDataView().app_provenance_dir_path
+        prov_path = SpynnakerDataView().get_app_provenance_dir_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 
@@ -59,7 +59,7 @@ class TestIobuffMultirun(BaseTestCase):
         sim.reset()
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
-        prov_patha = SpynnakerDataView().app_provenance_dir_path
+        prov_patha = SpynnakerDataView.get_app_provenance_dir_path()
         self.assertNotEqual(prov_path, prov_patha)
         size6 = self.check_size(prov_patha, placement)
         # Should write the same thing again
