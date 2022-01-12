@@ -207,7 +207,9 @@ def write_bitfield_init_data(
         in_edge = proj._projection_edge
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-            for source_vertex in in_edge.pre_vertex.machine_vertices:
+            srcs = in_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            for source_vertex in srcs:
                 sources.add(source_vertex)
 
     # write n keys max atom map

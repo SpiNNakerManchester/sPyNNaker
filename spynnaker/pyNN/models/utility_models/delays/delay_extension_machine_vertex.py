@@ -279,8 +279,9 @@ class DelayExtensionMachineVertex(
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
-        source_vertices = self.app_vertex.source_vertex.machine_vertices
-        for source_vertex in source_vertices:
+        srcs = self.app_vertex.source_vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID)
+        for source_vertex in srcs:
             if source_vertex.vertex_slice == self.vertex_slice:
                 r_info = routing_infos.get_routing_info_from_pre_vertex(
                     source_vertex, SPIKE_PARTITION_ID)

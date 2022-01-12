@@ -370,7 +370,9 @@ class SynapticMatrices(object):
                 continue
 
             # Add all incoming machine vertices
-            for machine_vertex in app_edge.pre_vertex.machine_vertices:
+            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            for machine_vertex in out_verts:
                 if machine_vertex in pre_vertices:
                     continue
 
@@ -384,7 +386,9 @@ class SynapticMatrices(object):
             # Add all incoming delayed vertices
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
-                for machine_vertex in delay_edge.pre_vertex.machine_vertices:
+                verts = delay_edge.pre_vertex.splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID)
+                for machine_vertex in verts:
                     if machine_vertex in pre_vertices:
                         continue
 

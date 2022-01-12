@@ -228,9 +228,9 @@ class SynapseDynamicsStructuralCommon(
             dynamics = synapse_info.synapse_dynamics
 
             # Number of incoming vertices
-            spec.write_value(
-                len(app_edge.pre_vertex.machine_vertices),
-                data_type=DataType.UINT16)
+            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            spec.write_value(len(out_verts), data_type=DataType.UINT16)
 
             # Controls - currently just if this is a self connection or not
             self_connected = app_vertex == app_edge.pre_vertex
@@ -257,7 +257,7 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for m_vertex in app_edge.pre_vertex.machine_vertices:
+            for m_vertex in out_verts:
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
                 vertex_slice = m_vertex.vertex_slice
