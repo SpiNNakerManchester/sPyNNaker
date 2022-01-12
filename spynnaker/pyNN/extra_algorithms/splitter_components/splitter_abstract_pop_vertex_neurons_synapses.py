@@ -107,7 +107,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # The internal SDRAM partitions
         "__sdram_partitions",
         # The same chip groups
-        "__same_chip_groups"
+        "__same_chip_groups",
+        # The application vertex sources that are neuromodulators
+        "__neuromodulators"
         ]
 
     SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
@@ -151,6 +153,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__multicast_partitions = []
         self.__sdram_partitions = []
         self.__same_chip_groups = []
+        self.__neuromodulators = set()
 
         if (self.__max_delay is not None and
                 self.__allow_delay_extension is None):
@@ -290,6 +293,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             [self.__synapse_verts_by_neuron[neuron][index]
                 for neuron in self.__neuron_vertices]
             for index in range(self.__n_synapse_vertices)]
+
+        # Find incoming neuromodulators
+        for proj in app_vertex.incoming_projections:
+            if proj._projection_edge.is_neuromodulation:
+                self.__neuromodulators.add(proj._projection_edge.pre_vertex)
 
     def __add_neuron_core(
             self, vertex_slice, neuron_resources, label, index, rb_shifts,
@@ -508,15 +516,21 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return self.__get_fixed_slices()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         return self.__neuron_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
+    def get_in_coming_vertices(self, partition_id):
+        return self.__synapse_vertices
+
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
         # If the edge is delayed, get the real edge
-        pre_vertex = outgoing_edge_partition.pre_vertex
-        if isinstance(pre_vertex, DelayExtensionVertex):
-            pre_vertex = pre_vertex.source_vertex
+        if isinstance(source_vertex, DelayExtensionVertex):
+            pre_vertex = source_vertex.source_vertex
+        else:
+            pre_vertex = source_vertex
 
         # Filter out edges from Poisson sources being done using SDRAM
         if pre_vertex in self.__poisson_sources:
@@ -524,17 +538,34 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # If the incoming edge targets the reward or punishment receptors
         # then it needs to be treated differently
-        for edge in outgoing_edge_partition.edges:
-            if edge.is_neuromodulation:
-                # In this instance, choose to send to all synapse vertices
-                return [v for s in self.__incoming_vertices for v in s]
+        if pre_vertex in self.__neuromodulators:
+            # In this instance, choose to send to all synapse vertices
+            return [(v, [source_vertex])
+                    for s in self.__incoming_vertices for v in s]
 
-        # Pick the same synapse vertex index for each neuron vertex
+        # Split the incoming machine vertices so that they are in ~power of 2
+        # groups
+        sources = pre_vertex.splitter.get_out_going_vertices(partition_id)
+        n_sources = len(sources)
+        sources_per_vertex = int(2 ** math.floor(math.log(
+            n_sources / self.__n_synapse_vertices)))
+
+        # Start on a different index each time to "even things out"
         index = self.__next_synapse_index
         self.__next_synapse_index = (
             (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
+        result = list()
+        for i in range(self.__n_synapse_vertices):
+            start = i * sources_per_vertex
+            end = start + sources_per_vertex
+            if (i + 1) == self.__n_synapse_vertices:
+                end = n_sources
+            source_range = sources[start:end]
+            for s_vertex in self.__incoming_vertices[index]:
+                result.append((s_vertex, source_range))
+            index = (index + 1) % self.__n_synapse_vertices
 
-        return self.__incoming_vertices[index]
+        return result
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):

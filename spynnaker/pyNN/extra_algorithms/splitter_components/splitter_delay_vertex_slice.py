@@ -76,13 +76,20 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
-    def get_out_going_vertices(self, outgoing_edge_partition):
+    def get_out_going_vertices(self, partition_id):
         return self._governed_app_vertex.machine_vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
-    def get_in_coming_vertices(self, outgoing_edge_partition):
-        # Only connect to the source that matches the current slice
-        return [self._machine_vertex_by_slice[pre_m_vertex.vertex_slice]]
+    def get_in_coming_vertices(self, partition_id):
+        return self._governed_app_vertex.machine_vertices
+
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+        # Only connect to the source that matches the slice
+        return [
+            (self._machine_vertex_by_slice[m_vertex.vertex_slice], [m_vertex])
+            for m_vertex in source_vertex.get_out_going_vertices(partition_id)]
 
     def create_machine_vertices(self, chip_counter):
         # pylint: disable=arguments-differ
