@@ -105,7 +105,7 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         if delay is None:
-            delay = SpynnakerDataView().min_delay
+            delay = SpynnakerDataView.get_min_delay()
         self.__delay = delay
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None

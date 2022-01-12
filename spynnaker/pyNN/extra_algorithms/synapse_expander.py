@@ -52,7 +52,7 @@ def synapse_expander(executable_finder):
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
-    expander_app_id = SpynnakerDataView().get_new_id()
+    expander_app_id = SpynnakerDataView.get_new_id()
     run_system_application(
         expander_cores, expander_app_id, executable_finder,
         get_config_bool("Reports", "write_expander_iobuf"),

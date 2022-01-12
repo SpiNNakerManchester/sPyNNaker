@@ -56,7 +56,7 @@ class SynapseDynamicsStatic(
         self.__change_requires_mapping = True
         self.__weight = weight
         if delay is None:
-            delay = SpynnakerDataView().min_delay
+            delay = SpynnakerDataView.get_min_delay()
         self.__delay = delay
         self.__pad_to_length = pad_to_length
 

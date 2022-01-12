@@ -30,7 +30,7 @@ class TestIobuffMultirun(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, min_delay=1.0)
-        prov_path = SpynnakerDataView().get_app_provenance_dir_path()
+        prov_path = SpynnakerDataView.get_app_provenance_dir_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 

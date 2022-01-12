@@ -29,7 +29,6 @@ class TestSimulatorData(unittest.TestCase):
         unittest_setup()
 
     def test_setup(self):
-        view = SpynnakerDataView()
         # What happens before setup depends on the previous test
         # Use manual_check to verify this without dependency
         writer = SpynnakerDataWriter.setup()
@@ -39,23 +38,23 @@ class TestSimulatorData(unittest.TestCase):
         with self.assertRaises(DataNotYetAvialable):
             SpynnakerDataView.get_simulation_time_step_us()
         with self.assertRaises(DataNotYetAvialable):
-            view.min_delay
-        self.assertFalse(view.has_min_delay())
+            SpynnakerDataView.get_min_delay()
+        self.assertFalse(SpynnakerDataView.has_min_delay())
         writer.set_up_timings(100, 10)
-        self.assertTrue(view.has_min_delay())
+        self.assertTrue(SpynnakerDataView.has_min_delay())
         self.assertEqual(100,  SpynnakerDataView.get_simulation_time_step_us())
-        self.assertEqual(0.1, view.min_delay)
+        self.assertEqual(0.1, SpynnakerDataView.get_min_delay())
 
     def test_min_delay(self):
         writer = SpynnakerDataWriter.setup()
         with self.assertRaises(DataNotYetAvialable):
-            writer.min_delay
+            SpynnakerDataView.get_min_delay()
 
         writer.set_up_timings_and_delay(500, 1, 0.5)
-        self.assertEqual(0.5, writer.min_delay)
+        self.assertEqual(0.5, SpynnakerDataView.get_min_delay())
 
         writer.set_up_timings_and_delay(1000, 1, None)
-        self.assertEqual(1, writer.min_delay)
+        self.assertEqual(1, SpynnakerDataView.get_min_delay())
 
         with self.assertRaises(ConfigurationException):
             writer.set_up_timings_and_delay(1000, 1, 0)
@@ -71,10 +70,9 @@ class TestSimulatorData(unittest.TestCase):
             writer.set_up_timings_and_delay(1000, 1, "baocn")
 
     def test_mock(self):
-        view = SpynnakerDataView()
         # check there is a value not what it is
         self.assertIsNotNone(SpynnakerDataView.get_app_id())
-        self.assertIsNotNone(view.min_delay)
+        self.assertIsNotNone(SpynnakerDataView.get_min_delay())
 
     def test_multiple(self):
         view = SpynnakerDataView()

@@ -120,7 +120,6 @@ class _OnChipBitFieldGenerator(object):
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
         """
-        view = SpynnakerDataView()
         self.__txrx = SpynnakerDataView.get_transceiver()
         app_graph = SpynnakerDataView.get_runtime_graph()
         machine_graph = SpynnakerDataView.get_runtime_machine_graph()
@@ -133,7 +132,7 @@ class _OnChipBitFieldGenerator(object):
         expander_cores = self._calculate_core_data(app_graph, progress)
 
         # load data
-        bit_field_app_id = view.get_new_id()
+        bit_field_app_id = SpynnakerDataView.get_new_id()
         progress.update(1)
 
         # run app

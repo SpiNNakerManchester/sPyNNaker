@@ -28,14 +28,13 @@ from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 clear_cfg_files(True)
 add_spynnaker_cfg()
 
-view = SpynnakerDataView()
 try:
     SpynnakerDataView.get_simulation_time_step_us()
     raise Exception("OOPS")
 except NotSetupException:
     pass
 try:
-    view.min_delay
+    SpynnakerDataView.get_min_delay()
     raise Exception("OOPS")
 except NotSetupException:
     pass
@@ -46,10 +45,10 @@ try:
 except DataNotYetAvialable:
     pass
 try:
-    view.min_delay
+    SpynnakerDataView.get_min_delay()
     raise Exception("OOPS")
 except DataNotYetAvialable:
     pass
 writer.set_up_timings_and_delay(1000, 1, 1)
 print(SpynnakerDataView.get_simulation_time_step_us())
-print(view.min_delay)
+print(SpynnakerDataView.get_min_delay())

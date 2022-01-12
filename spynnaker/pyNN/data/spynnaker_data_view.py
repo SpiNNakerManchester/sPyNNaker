@@ -69,7 +69,8 @@ class SpynnakerDataView(FecDataView):
 
     __slots__ = []
 
-    def get_min_delay(self):
+    @classmethod
+    def get_min_delay(cls):
         """ The minimum supported delay, in milliseconds.
 
         Typically simulation_time_step_per_ms but may be a positive multiple
@@ -78,26 +79,12 @@ class SpynnakerDataView(FecDataView):
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If the min_delay is currently unavailable
         """
-        if self.__spy_data._min_delay is not None:
-            return self.__spy_data._min_delay
-        return self.get_simulation_time_step_ms()
+        if cls.__spy_data._min_delay is not None:
+            return cls.__spy_data._min_delay
+        return cls.get_simulation_time_step_ms()
 
-    @property
-    def min_delay(self):
-        """ The minimum supported delay, in milliseconds.
-
-        Typically simulation_time_step_per_ms but may be a positive multiple
-
-        :rtype: float
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-            If the min_delay is currently unavailable
-        """
-        value = self.get_min_delay()
-        if value is None:
-            raise self._exception("min_delay")
-        return value
-
-    def has_min_delay(self):
-        if self.__spy_data._min_delay is not None:
+    @classmethod
+    def has_min_delay(cls):
+        if cls.__spy_data._min_delay is not None:
             return True
-        return self.has_time_step()
+        return cls.has_time_step()

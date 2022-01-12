@@ -96,7 +96,7 @@ def _rerun_synaptic_cores(
     """
     if synaptic_expander_rerun_cores.total_processors:
         logger.info("rerunning synaptic expander")
-        expander_app_id = SpynnakerDataView().get_new_id()
+        expander_app_id = SpynnakerDataView.get_new_id()
         run_system_application(
             synaptic_expander_rerun_cores, expander_app_id, executable_finder,
             get_config_bool("Reports", "write_expander_iobuf"),
