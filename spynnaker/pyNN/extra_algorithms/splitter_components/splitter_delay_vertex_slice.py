@@ -89,7 +89,8 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         # Only connect to the source that matches the slice
         return [
             (self._machine_vertex_by_slice[m_vertex.vertex_slice], [m_vertex])
-            for m_vertex in source_vertex.get_out_going_vertices(partition_id)]
+            for m_vertex in source_vertex.splitter.get_out_going_vertices(
+                partition_id)]
 
     def create_machine_vertices(self, chip_counter):
         # pylint: disable=arguments-differ
