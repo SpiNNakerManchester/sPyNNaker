@@ -214,7 +214,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             BYTES_PER_WORD)
         all_syn_block_sz = max(app_vertex.get_synapses_size(
             atoms_per_core, app_vertex.incoming_projections), BYTES_PER_WORD)
-        print(all_syn_block_sz)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
         lead_synapse_resources = self.__get_synapse_resources(
