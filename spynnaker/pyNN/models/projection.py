@@ -16,6 +16,7 @@
 import functools
 import logging
 import numpy
+import time
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.random import RandomDistribution
@@ -264,9 +265,12 @@ class Projection(object):
         if multiple_synapses != 'last':
             raise ConfigurationException(
                 "sPyNNaker only recognises multiple_synapses == last")
+        print("fectimer? ", get_simulator().fec_timer)
+        with get_simulator().fec_timer("getting data", "projection get"):
+            data = self.__get_data(
+                attribute_names, format, with_address, notify=None)
 
-        return self.__get_data(
-            attribute_names, format, with_address, notify=None)
+        return data
 
     def save(
             self, attribute_names, file, format='list',  # @ReservedAssignment
@@ -302,9 +306,12 @@ class Projection(object):
         metadata = {"columns": attribute_names}
         if with_address:
             metadata["columns"] = ["i", "j"] + list(metadata["columns"])
-        self.__get_data(
-            attribute_names, format, with_address,
-            notify=functools.partial(self.__save_callback, file, metadata))
+        with get_simulator().fec_timer("getting data", "projection save"):
+            data = self.__get_data(
+                attribute_names, format, with_address,
+                notify=functools.partial(self.__save_callback, file, metadata))
+
+        return data
 
     def __get_data(
             self, attribute_names, format,  # @ReservedAssignment
@@ -479,6 +486,8 @@ class Projection(object):
             data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
             fixed_values=fixed_values, notify=notify)
 
+        time2 = time.perf_counter_ns()
+
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
         if not get_simulator().has_ran:
@@ -486,11 +495,23 @@ class Projection(object):
                 connection_holder)
             return connection_holder
 
+        # If the synapse dynamics are not plastic, then surely we can just
+        # retrieve values locally somehow?  Or do we need to go onto
+        # the machine since there may be weights which aren't sensibly
+        # represented at this point? (Or perhaps formed on the machine by
+        # the expander and therefore not directly accessible from host?)
+        print("synapse_dynamics from synapse_information: ",
+              self.__synapse_information.synapse_dynamics)
+
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
         connections = post_vertex.get_connections_from_machine(
             get_simulator().transceiver, get_simulator().placements,
             self.__projection_edge, self.__synapse_information)
+
+        time3 = time.perf_counter_ns()
+        print("get_connections_from_machine time (ns): ", time3-time2)
+
         if connections is not None:
             connection_holder.add_connections(connections)
             connection_holder.finish()
