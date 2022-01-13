@@ -451,7 +451,7 @@ def test_pop_based_master_pop_table_standard(
     machine_graph, _ = spynnaker_splitter_partitioner(100)
     allocator = ZonedRoutingInfoAllocator()
     writer.set_runtime_machine_graph(machine_graph)
-    writer.get_machine_partition_n_keys_map(edge_to_n_keys_mapper())
+    writer.set_machine_partition_n_keys_map(edge_to_n_keys_mapper())
     writer.set_routing_infos(allocator.__call__(flexible=False))
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
