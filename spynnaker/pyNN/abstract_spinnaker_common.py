@@ -28,7 +28,6 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
-from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
@@ -62,8 +61,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         "_populations",
         "_projections"]
 
-    __EXECUTABLE_FINDER = ExecutableFinder()
-
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay, hostname,
@@ -92,7 +89,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         setup_configs()
 
         # add model binaries
-        self.__EXECUTABLE_FINDER.add_path(
+        SpynnakerDataWriter.get_executable_finder().add_path(
             os.path.dirname(model_binaries.__file__))
 
         # pynn population objects
@@ -113,7 +110,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             versions.extend(front_end_versions)
 
         super().__init__(
-            executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             n_chips_required=n_chips_required,
@@ -250,16 +246,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for projection in self._projections:
             projection._clear_cache()
 
-    @staticmethod
-    def register_binary_search_path(search_path):
-        """ Register an additional binary search path for executables.
-
-        :param str search_path: absolute search path for binaries
-        :rtype: None
-        """
-        # pylint: disable=protected-access
-        AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)
-
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
             raise Exception("{} is not a Vertex type".format(neuron_type))
@@ -349,8 +335,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
-                self._router_tables,
-                self._executable_finder, self._executable_targets)
+                self._router_tables, self._executable_targets)
             self._multicast_routes_loaded = True
             return None
 
@@ -361,8 +346,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor(
-                self._router_tables,
-                self._executable_finder, self._executable_targets)
+                self._router_tables, self._executable_targets)
             self._multicast_routes_loaded = True
             return None
 
@@ -381,13 +365,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         with FecTimer(LOADING, "Synapse expander") as timer:
             if timer.skip_if_virtual_board():
                 return
-            synapse_expander(self._executable_finder)
+            synapse_expander()
 
     def _execute_on_chip_bit_field_generator(self):
         with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
             if timer.skip_if_virtual_board():
                 return
-            on_chip_bitfield_generator(self._executable_finder)
+            on_chip_bitfield_generator()
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

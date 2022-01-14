@@ -32,17 +32,14 @@ from spinn_front_end_common.utilities.helpful_functions import (
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def synapse_expander(executable_finder):
+def synapse_expander():
     """ Run the synapse expander.
 
     .. note::
         Needs to be done after data has been loaded.
 
-    :param executable_finder:
-        How to find the synapse expander binaries.
-    :type executable_finder:
-        ~spinn_utilities.executable_finder.ExecutableFinder
     """
+    executable_finder = SpynnakerDataView.get_executable_finder()
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER_APLX)
     delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER_APLX)
 

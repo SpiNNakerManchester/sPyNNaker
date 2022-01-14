@@ -54,15 +54,12 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-def on_chip_bitfield_generator(executable_finder):
+def on_chip_bitfield_generator():
     """ Loads and runs the bit field generator on chip.
 
-    :param executable_finder: the executable finder
-    :type executable_finder:
-        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
     """
-    generator = _OnChipBitFieldGenerator(executable_finder)
-    generator._run(executable_finder)
+    generator = _OnChipBitFieldGenerator()
+    generator._run()
 
 
 class _OnChipBitFieldGenerator(object):
@@ -100,23 +97,18 @@ class _OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __init__(self, executable_finder):
+    def __init__(self):
         """ Loads and runs the bit field generator on chip.
 
-        :param executable_finder: the executable finder
-        :type executable_finder:
-            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         """
         self.__txrx = None
+        executable_finder = SpynnakerDataView.get_executable_finder()
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
-    def _run(self, executable_finder):
+    def _run(self):
         """ Loads and runs the bit field generator on chip.
 
-        :param executable_finder: the executable finder
-        :type executable_finder:
-            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
         """
@@ -137,7 +129,7 @@ class _OnChipBitFieldGenerator(object):
 
         # run app
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, executable_finder,
+            expander_cores, bit_field_app_id,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
