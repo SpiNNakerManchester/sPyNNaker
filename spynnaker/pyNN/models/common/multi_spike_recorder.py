@@ -77,13 +77,9 @@ class MultiSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(
-            self, label, buffer_manager, region, application_vertex):
+    def get_spikes(self, label, region, application_vertex):
         """
         :param str label:
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
         :param application_vertex:
         :type application_vertex:
@@ -93,6 +89,7 @@ class MultiSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         spike_times = list()
         spike_ids = list()
 

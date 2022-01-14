@@ -245,7 +245,7 @@ class NeuronRecorder(object):
         return fragment
 
     def _get_placement_matrix_data(
-            self, vertex, region, buffer_manager, expected_rows,
+            self, vertex, region, expected_rows,
             missing_str, sampling_rate, label, data_type, n_per_timestep):
         """ processes a placement for matrix data
 
@@ -254,7 +254,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             the vertex to read from
         :param int region: the recording region id
-        :param ~.BufferManager buffer_manager: the buffer manager
         :param int expected_rows:
             how many rows the tools think should be recorded
         :param str missing_str: string for reporting missing stuff
@@ -268,6 +267,7 @@ class NeuronRecorder(object):
             return None
 
         # for buffering output info is taken form the buffer manager
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         record_raw, missing_data = buffer_manager.get_data_by_placement(
             placement, region)
         record_length = len(record_raw)
@@ -303,7 +303,7 @@ class NeuronRecorder(object):
         return placement_data
 
     def __read_data(
-            self, label, buffer_manager, application_vertex,
+            self, label, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
@@ -330,7 +330,7 @@ class NeuronRecorder(object):
             else:
                 indexes.append(i)
             placement_data = self._get_placement_matrix_data(
-                vertex, region, buffer_manager, expected_rows,
+                vertex, region, expected_rows,
                 missing_str, sampling_rate, label, data_type,
                 n_items_per_timestep)
 
@@ -353,15 +353,11 @@ class NeuronRecorder(object):
         return pop_level_data, indexes, sampling_interval
 
     def get_matrix_data(
-            self, label, buffer_manager,
-            application_vertex, variable, n_machine_time_steps):
+            self, label, application_vertex, variable, n_machine_time_steps):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -385,18 +381,14 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         return self.__read_data(
-            label, buffer_manager, application_vertex,
+            label, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps)
 
-    def get_spikes(
-            self, label, buffer_manager, application_vertex, variable):
+    def get_spikes(self, label, application_vertex, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -433,6 +425,7 @@ class NeuronRecorder(object):
 
             # for buffering output info is taken form the buffer manager
             region = self.__region_ids[variable]
+            buffer_manager = SpynnakerDataView.get_buffer_manager()
             record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
@@ -473,14 +466,11 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_events(self, label, buffer_manager, application_vertex, variable):
+    def get_events(self, label, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -490,7 +480,7 @@ class NeuronRecorder(object):
         """
         if variable == self.REWIRING:
             return self._get_rewires(
-                label, buffer_manager, application_vertex, variable)
+                label, application_vertex, variable)
         else:
             # Unspecified event variable
             msg = (
@@ -499,14 +489,11 @@ class NeuronRecorder(object):
             raise ConfigurationException(msg)
 
     def _get_rewires(
-            self, label, buffer_manager, application_vertex, variable):
+            self, label, application_vertex, variable):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -514,6 +501,7 @@ class NeuronRecorder(object):
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         rewire_times = list()
         rewire_values = list()
         rewire_postids = list()

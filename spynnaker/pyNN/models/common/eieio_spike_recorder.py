@@ -74,14 +74,11 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region,
+    def get_spikes(self, label, region,
                    application_vertex, base_key_function):
         """ Get the recorded spikes from the object
 
         :param str label:
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
         :param application_vertex:
         :type application_vertex:
@@ -94,6 +91,7 @@ class EIEIOSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         results = list()
         missing = []
         vertices = application_vertex.machine_vertices

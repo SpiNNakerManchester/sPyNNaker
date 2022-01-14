@@ -545,9 +545,9 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed[vertex_slice] = seed
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager,
+            self.label,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
             self)
 
@@ -557,7 +557,8 @@ class SpikeSourcePoissonVertex(
         return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
                 machine_vertex)

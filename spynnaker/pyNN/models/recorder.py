@@ -251,8 +251,7 @@ class Recorder(object):
             # assuming we got here, everything is ok, so we should go get the
             # data
             results = self.__vertex.get_data(
-                variable, SpynnakerDataView.get_current_run_timesteps(),
-                sim.buffer_manager)
+                variable, SpynnakerDataView.get_current_run_timesteps())
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
@@ -286,7 +285,7 @@ class Recorder(object):
 
         # assuming we got here, everything is OK, so we should go get the
         # spikes
-        return self.__vertex.get_spikes(sim.buffer_manager)
+        return self.__vertex.get_spikes()
 
     def get_events(self, variable):
         """ How to get rewiring events (of a post-population) from recorder
@@ -315,7 +314,7 @@ class Recorder(object):
                 "truly ran, hence the rewires list will be empty")
             return numpy.zeros((0, 4))
 
-        return self.__vertex.get_events(variable, sim.buffer_manager)
+        return self.__vertex.get_events(variable)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -600,16 +599,11 @@ class Recorder(object):
         return metadata
 
     def _clear_recording(self, variables):
-        sim = get_simulator()
         for variable in variables:
             if variable == SPIKES:
-                self.__vertex.clear_spike_recording(sim.buffer_manager)
-            elif variable == MEMBRANE_POTENTIAL:
-                self.__vertex.clear_recording(variable, sim.buffer_manager)
-            elif variable == GSYN_EXCIT:
-                self.__vertex.clear_recording(variable, sim.buffer_manager)
-            elif variable == GSYN_INHIB:
-                self.__vertex.clear_recording(variable, sim.buffer_manager)
+                self.__vertex.clear_spike_recording()
+            elif variable in [MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB]:
+                self.__vertex.clear_recording(variable)
             else:
                 raise InvalidParameterType(
                     "The variable {} is not a recordable value".format(

@@ -57,25 +57,19 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def clear_recording(self, variable, buffer_manager):
+    def clear_recording(self, variable):
         """ Clear the recorded data from the object
 
         :param str variable: PyNN name of the variable
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :rtype: None
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, buffer_manager):
+    def get_data(self, variable, n_machine_time_steps):
         """ Get the recorded data
 
         :param str variable: PyNN name of the variable
         :param int n_machine_time_steps:
-        :param buffer_manager:
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """

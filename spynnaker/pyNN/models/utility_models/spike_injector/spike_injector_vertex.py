@@ -99,18 +99,17 @@ class SpikeInjectorVertex(
         return SpynnakerDataView.get_simulation_time_step_us()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self,
-                   buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager,
-            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
+            self.label, SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
                 machine_vertex)
