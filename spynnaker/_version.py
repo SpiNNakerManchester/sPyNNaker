@@ -18,3 +18,5 @@ __version_month__ = "May"
 __version_year__ = "2021"
 __version_day__ = "TBD"
 __version_name__ = "Not yet released"
+
+_NAME = f"SpiNNaker_under_version({__version__}-{__version_name__})"

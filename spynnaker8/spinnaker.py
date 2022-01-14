@@ -23,9 +23,6 @@ from spinn_front_end_common.interface.abstract_spinnaker_base import (
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker import _version
 
-_NAME = "SpiNNaker_under_version({}-{})".format(
-    _version.__version__, _version.__version_name__)
-
 
 class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
@@ -236,7 +233,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :return: the name of the simulator.
         :rtype: str
         """
-        return _NAME
+        return _version._NAME
 
     @property
     def populations(self):
