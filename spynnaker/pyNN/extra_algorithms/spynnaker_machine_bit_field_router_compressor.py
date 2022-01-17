@@ -136,11 +136,11 @@ def spynnaker_machine_bitField_pair_router_compressor(
     """
     compressor_executable_targets = \
         machine_bit_field_pair_router_compressor(
-            routing_tables, executable_finder, executable_targets)
+            routing_tables, executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
         compressor_executable_targets)
 
     # just rerun the synaptic expander for safety purposes
-    _rerun_synaptic_cores(expander_chip_cores, executable_finder, True)
+    _rerun_synaptic_cores(expander_chip_cores, True)
