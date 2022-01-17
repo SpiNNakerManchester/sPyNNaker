@@ -51,7 +51,7 @@ def synapse_expander():
                            "Expanding Synapses")
     expander_app_id = SpynnakerDataView.get_new_id()
     run_system_application(
-        expander_cores, expander_app_id, executable_finder,
+        expander_cores, expander_app_id,
         get_config_bool("Reports", "write_expander_iobuf"),
         None, [CPUState.FINISHED], False,
         "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
