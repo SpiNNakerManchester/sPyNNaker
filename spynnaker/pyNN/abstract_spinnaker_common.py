@@ -112,10 +112,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         super().__init__(
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
-            n_chips_required=n_chips_required,
-            n_boards_required=n_boards_required,
             front_end_versions=versions,
             data_writer_cls=SpynnakerDataWriter)
+
+        self._data_writer.set_n_required(n_boards_required, n_chips_required)
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
