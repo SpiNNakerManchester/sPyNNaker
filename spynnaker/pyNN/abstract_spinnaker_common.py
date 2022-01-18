@@ -68,7 +68,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
-            n_boards_required, timestep, min_delay, hostname,
+            n_boards_required, timestep, min_delay,
             time_scale_factor=None, front_end_versions=None):
         """
         :param str graph_label:
@@ -127,7 +127,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
-        self.set_up_machine_specifics(hostname)
+        self.check_machine_specifics()
 
         logger.info(f'Setting time scale factor to '
                     f'{self.time_scale_factor}.')
