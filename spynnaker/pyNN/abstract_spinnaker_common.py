@@ -127,7 +127,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
-        self.check_machine_specifics()
 
         logger.info(f'Setting time scale factor to '
                     f'{self.time_scale_factor}.')
