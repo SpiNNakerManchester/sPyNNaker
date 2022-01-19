@@ -91,7 +91,7 @@ jobs:
       with:
         base-path: spynnaker
 
-    #- name: Build documentation with sphinx (3.8 only)
-    #  uses: ./support/actions/sphinx
-    #  with:
-    #    directory: doc/source
+     name: Build documentation with sphinx (3.8 only)
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source
