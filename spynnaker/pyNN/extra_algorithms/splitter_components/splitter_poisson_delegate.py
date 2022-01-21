@@ -92,3 +92,16 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_out_going_slices()
         return super(SplitterPoissonDelegate, self).get_out_going_slices()
+
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(self, partition_id):
+        if self.send_over_sdram:
+            return []
+        return super(SplitterPoissonDelegate, self).get_out_going_vertices(
+            partition_id)
+
+    @overrides(AbstractSplitterCommon.get_same_chip_groups)
+    def get_same_chip_groups(self):
+        if self.send_over_sdram:
+            return []
+        return super(SplitterPoissonDelegate, self).get_same_chip_groups()
