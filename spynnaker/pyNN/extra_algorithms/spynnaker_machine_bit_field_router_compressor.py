@@ -101,20 +101,12 @@ def _rerun_synaptic_cores(
             _RERUN_IOBUF_NAME_PATTERN)
 
 
-def spynnaker_machine_bitfield_ordered_covering_compressor(
-        routing_tables, executable_targets):
+def spynnaker_machine_bitfield_ordered_covering_compressor(executable_targets):
     """ entrance for routing table compression with bit field
 
-    :param routing_tables: routing tables
-    :type routing_tables:
-        ~pacman.model.routing_tables.MulticastRoutingTables
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-    :type retry_count: int or None
-    :param bool read_algorithm_iobuf: flag saying if read iobuf
     """
     compressor_executable_targets = \
-        machine_bit_field_ordered_covering_compressor(
-            routing_tables, executable_targets)
+        machine_bit_field_ordered_covering_compressor(executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
@@ -124,19 +116,12 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(
     _rerun_synaptic_cores(expander_chip_cores, True)
 
 
-def spynnaker_machine_bitField_pair_router_compressor(
-        routing_tables, executable_targets):
+def spynnaker_machine_bitField_pair_router_compressor(executable_targets):
     """ entrance for routing table compression with bit field
 
-    :param routing_tables: routing tables
-    :type routing_tables:
-        ~pacman.model.routing_tables.MulticastRoutingTables
-    :type retry_count: int or None
-    :param bool read_algorithm_iobuf: flag saying if read iobuf
     """
     compressor_executable_targets = \
-        machine_bit_field_pair_router_compressor(
-            routing_tables, executable_targets)
+        machine_bit_field_pair_router_compressor(executable_targets)
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
