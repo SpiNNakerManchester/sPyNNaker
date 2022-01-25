@@ -399,7 +399,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
-                self._precompressed, self._txrx, self._machine, self._app_id,
+                self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
@@ -413,7 +413,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor(
-                self._precompressed, self._txrx, self._machine, self._app_id,
+                self._router_tables, self._txrx, self._machine, self._app_id,
                 self._machine_graph, self._placements, self._executable_finder,
                 self._routing_infos, self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
