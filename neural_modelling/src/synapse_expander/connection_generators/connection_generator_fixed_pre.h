@@ -45,7 +45,7 @@ struct fixed_pre_params {
  */
 struct fixed_pre {
     struct fixed_pre_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 //! Global values across all the fixed-pre connectors in play on this core
@@ -80,14 +80,14 @@ static uint32_t pre_random_in_range(struct fixed_pre *obj, uint32_t range) {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_fixed_pre_initialise(address_t *region) {
+static void *connection_generator_fixed_pre_initialise(void **region) {
     // Allocate memory for the parameters
     struct fixed_pre *obj = spin1_malloc(sizeof(struct fixed_pre));
 
     // Copy the parameters in
-    struct fixed_pre_params *params_sdram = (void *) *region;
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct fixed_pre_params *params_sdram = *region;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     // Initialise the RNG
     obj->rng = rng_init(region);

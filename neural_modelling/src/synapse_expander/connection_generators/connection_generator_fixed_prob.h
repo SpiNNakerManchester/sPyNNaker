@@ -43,7 +43,7 @@ struct fixed_prob_params {
  */
 struct fixed_prob {
     struct fixed_prob_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -52,14 +52,14 @@ struct fixed_prob {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_fixed_prob_initialise(address_t *region) {
+static void *connection_generator_fixed_prob_initialise(void **region) {
     // Allocate memory for the data
     struct fixed_prob *obj = spin1_malloc(sizeof(struct fixed_prob));
 
     // Copy the parameters in
-    struct fixed_prob_params *params_sdram = (void *) *region;
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct fixed_prob_params *params_sdram = *region;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     // Initialise the RNG for the connector
     obj->rng = rng_init(region);

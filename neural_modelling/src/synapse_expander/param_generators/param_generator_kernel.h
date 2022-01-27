@@ -65,14 +65,8 @@ struct param_generator_kernel {
 
     //! Offset into the postpopulation that the current core's slice starts at
     uint32_t post_slice_start;
-};
 
-//! Implementation of the state of the convolution kernel parameter generator
-struct all_kernel_params {
-    //! Configuration descriptor
-    struct param_generator_kernel params;
-    //! Array of values in the convolution kernel
-    accum *values;
+    accum values[];
 };
 
 /**
@@ -81,17 +75,17 @@ struct all_kernel_params {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_kernel_initialize(address_t *region) {
-    struct all_kernel_params *obj = spin1_malloc(sizeof(struct all_kernel_params));
-    struct param_generator_kernel *params_sdram = (void *) *region;
-    fast_memcpy(&obj->params, params_sdram++, sizeof(*params_sdram));
-    *region = (void *) params_sdram;
+static void *param_generator_kernel_initialize(void **region) {
+    struct param_generator_kernel *params_sdram = *region;
+    uint32_t data_size = sizeof(struct param_generator_kernel) + (
+            params_sdram->kernelHeight * params_sdram->kernelWidth * sizeof(accum));
+    struct param_generator_kernel *obj = spin1_malloc(data_size);
+    fast_memcpy(obj, params_sdram, data_size);
 
-    obj->values = (accum *) params_sdram;
-    *region += obj->params.kernelHeight * obj->params.kernelWidth;
+    *region = &params_sdram[1];
 
     log_debug("Kernel param generator; kernelWidth, kernelHeight = %u,%u",
-    		obj->params.kernelWidth, obj->params.kernelHeight);
+    		obj->kernelWidth, obj->kernelHeight);
 
     return obj;
 }
@@ -117,8 +111,7 @@ static void param_generator_kernel_free(void *generator) {
 static void param_generator_kernel_generate(
         void *generator, uint32_t n_synapses,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    struct all_kernel_params *obj = generator;
-    struct param_generator_kernel *params = &obj->params;
+    struct param_generator_kernel *params = generator;
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, params->preWidth, &pre_c);
 
@@ -156,7 +149,7 @@ static void param_generator_kernel_generate(
 
         if ((0 <= k_r) && (k_r < params->kernelHeight) && (0 <= k_c)
                 && (k_c < params->kernelWidth)) {
-            values[i] = obj->values[k_r * params->kernelWidth + k_c];
+            values[i] = params->values[k_r * params->kernelWidth + k_c];
             //      LOG_PRINT(LOG_LEVEL_INFO, "val = %5.6k", output[i]);
         } else {
             log_error("Kernel coordinates off range (%d, %d)", k_r, k_c);

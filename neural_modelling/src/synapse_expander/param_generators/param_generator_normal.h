@@ -40,7 +40,7 @@ struct normal_params {
  */
 struct param_generator_normal {
     struct normal_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -49,15 +49,15 @@ struct param_generator_normal {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_normal_initialize(address_t *region) {
+static void *param_generator_normal_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_normal *obj =
             spin1_malloc(sizeof(struct param_generator_normal));
-    struct normal_params *params_sdram = (void *) *region;
+    struct normal_params *params_sdram = *region;
 
     // Copy the parameters in
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("normal mu = %k, sigma = %k",
             obj->params.mu, obj->params.sigma);

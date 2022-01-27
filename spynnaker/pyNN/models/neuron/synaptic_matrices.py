@@ -35,8 +35,9 @@ from .synaptic_matrix_app import SynapticMatrixApp
 # 1 for n_synapse_types
 # 1 for n_synapse_type_bits
 # 1 for n_synapse_index_bits
+# 1 for padding
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
-    1 + 1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
+    1 + 1 + 2 + 1 + 1 + 1 + 1) * BYTES_PER_WORD
 
 DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
@@ -335,6 +336,8 @@ class SynapticMatrices(object):
         spec.write_value(get_n_bits(self.__n_synapse_types))
         n_neuron_id_bits = get_n_bits(self.__post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
+        # Padding to ensure 8-byte alignment for weight scales
+        spec.write_value(0)
         for w in weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale

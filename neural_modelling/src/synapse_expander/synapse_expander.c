@@ -31,7 +31,7 @@
 #include "common_mem.h"
 
 //! The configuration of the connection builder
-struct connection_builder_config {
+typedef struct connection_builder_config {
     // the per-connector parameters
     uint32_t offset;
     uint32_t delayed_offset;
@@ -50,10 +50,10 @@ struct connection_builder_config {
     uint32_t connector_type;
     uint32_t weight_type;
     uint32_t delay_type;
-};
+} connection_builder_config_t;
 
 //! The configuration of the synapse expander
-struct expander_config {
+typedef struct expander_config {
     uint32_t synaptic_matrix_region;
     uint32_t n_in_edges;
     uint32_t post_slice_start;
@@ -61,7 +61,9 @@ struct expander_config {
     uint32_t n_synapse_types;
     uint32_t n_synapse_type_bits;
     uint32_t n_synapse_index_bits;
-};
+    uint32_t PAD_1;
+    unsigned long accum weight_scales[];
+} expander_config_t;
 
 /**
  * \brief Generate the synapses for a single connector
@@ -78,26 +80,23 @@ struct expander_config {
  *                           type
  * \return true on success, false on failure
  */
-static bool read_connection_builder_region(address_t *in_region,
+static bool read_connection_builder_region(void **region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
         uint32_t n_synapse_index_bits, unsigned long accum *weight_scales) {
-    address_t region = *in_region;
-    struct connection_builder_config config;
-    fast_memcpy(&config, region, sizeof(config));
-    region += sizeof(config) / sizeof(uint32_t);
+    connection_builder_config_t *sdram_config = *region;
+    connection_builder_config_t config = *sdram_config;
+    *region = &sdram_config[1];
 
     // Get the matrix, connector, weight and delay parameter generators
     matrix_generator_t matrix_generator =
-            matrix_generator_init(config.matrix_type, &region);
+            matrix_generator_init(config.matrix_type, region);
     connection_generator_t connection_generator =
-            connection_generator_init(config.connector_type, &region);
+            connection_generator_init(config.connector_type, region);
     param_generator_t weight_generator =
-            param_generator_init(config.weight_type, &region);
+            param_generator_init(config.weight_type, region);
     param_generator_t delay_generator =
-            param_generator_init(config.delay_type, &region);
-
-    *in_region = region;
+            param_generator_init(config.delay_type, region);
 
     // If any components couldn't be created return false
     if (matrix_generator == NULL || connection_generator == NULL
@@ -159,31 +158,29 @@ static bool read_connection_builder_region(address_t *in_region,
  *         error
  */
 static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
-        address_t params_address) {
+        void *params_address) {
     // Read in the global parameters
-    struct expander_config config;
-    fast_memcpy(&config, params_address, sizeof(config));
-    params_address += sizeof(config) / sizeof(uint32_t);
+    expander_config_t *sdram_config = params_address;
+    uint32_t data_size = sizeof(expander_config_t)
+            + (sizeof(long accum) * sdram_config->n_synapse_types);
+    expander_config_t *config = spin1_malloc(data_size);
+    fast_memcpy(config, sdram_config, data_size);
     log_info("Generating %u edges for %u atoms starting at %u",
-            config.n_in_edges, config.post_slice_count, config.post_slice_start);
-
-    // Read in the weight scales, one per synapse type
-    unsigned long accum weight_scales[config.n_synapse_types];
-    fast_memcpy(weight_scales, params_address,
-            sizeof(unsigned long accum) * config.n_synapse_types);
-    params_address += 2 * config.n_synapse_types;
+            config->n_in_edges, config->post_slice_count, config->post_slice_start);
 
     // Get the synaptic matrix region
-    address_t synaptic_matrix_region = data_specification_get_region(
-            config.synaptic_matrix_region, ds_regions);
+    void *synaptic_matrix_region = data_specification_get_region(
+            config->synaptic_matrix_region, ds_regions);
+
 
     // Go through each connector and generate
-    for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {
+    void *address = &(sdram_config->weight_scales[config->n_synapse_types]);
+    for (uint32_t edge = 0; edge < config->n_in_edges; edge++) {
         if (!read_connection_builder_region(
-                &params_address, synaptic_matrix_region,
-                config.post_slice_start, config.post_slice_count,
-                config.n_synapse_type_bits,
-                config.n_synapse_index_bits, weight_scales)) {
+                &address, synaptic_matrix_region,
+                config->post_slice_start, config->post_slice_count,
+                config->n_synapse_type_bits, config->n_synapse_index_bits,
+                config->weight_scales)) {
             return false;
         }
     }
@@ -206,7 +203,7 @@ void c_main(void) {
     // Get the addresses of the regions
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    address_t params_address = data_specification_get_region(user1, ds_regions);
+    void *params_address = data_specification_get_region(user1, ds_regions);
     log_info("\tReading SDRAM at 0x%08x", params_address);
 
     // Run the expander

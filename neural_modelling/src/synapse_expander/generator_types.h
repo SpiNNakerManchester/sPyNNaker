@@ -43,7 +43,7 @@ typedef uint32_t generator_hash_t;
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-typedef void* (initialize_func)(address_t *region);
+typedef void* (initialize_func)(void **region);
 
 /**
  * \brief How to free any data for the generator; all generator types use

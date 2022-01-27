@@ -37,8 +37,7 @@ typedef struct matrix_generator *matrix_generator_t;
  * \return An initialised matrix generator that can be used with other
  *         functions, or NULL if it couldn't be initialised for any reason
  */
-matrix_generator_t matrix_generator_init(
-        uint32_t hash, address_t *region);
+matrix_generator_t matrix_generator_init(uint32_t hash, void **region);
 
 /**
  * \brief Finish with a matrix generator

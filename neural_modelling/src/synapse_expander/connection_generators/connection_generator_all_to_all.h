@@ -42,14 +42,14 @@ struct all_to_all {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_all_to_all_initialise(address_t *region) {
+static void *connection_generator_all_to_all_initialise(void **region) {
     // Allocate the data structure for parameters
     struct all_to_all *params = spin1_malloc(sizeof(struct all_to_all));
-    struct all_to_all *params_sdram = (void *) *region;
+    struct all_to_all *params_sdram = *region;
 
     // Copy the parameters into the data structure
-    *params = *params_sdram++;
-    *region = (void *) params_sdram;
+    *params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("All to all connector, pre_lo = %u, pre_hi = %u, "
             "post_lo = %u, post_hi = %u, allow_self_connections = %u",

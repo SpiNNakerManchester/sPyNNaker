@@ -40,7 +40,7 @@ struct uniform_params {
  */
 struct param_generator_uniform {
     struct uniform_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -49,15 +49,15 @@ struct param_generator_uniform {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_uniform_initialize(address_t *region) {
+static void *param_generator_uniform_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_uniform *params =
             spin1_malloc(sizeof(struct param_generator_uniform));
-    struct uniform_params *params_sdram = (void *) *region;
+    struct uniform_params *params_sdram = *region;
 
     // Copy the parameters in
-    params->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    params->params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("Uniform low = %k, high = %k",
             params->params.low, params->params.high);

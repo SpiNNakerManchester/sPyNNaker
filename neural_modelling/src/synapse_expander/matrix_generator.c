@@ -90,7 +90,7 @@ static const struct matrix_generator_info matrix_generators[] = {
             matrix_generator_neuromodulation_free}
 };
 
-matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
+matrix_generator_t matrix_generator_init(uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_MATRIX_GENERATORS; i++) {
         const matrix_generator_info *type = &matrix_generators[i];

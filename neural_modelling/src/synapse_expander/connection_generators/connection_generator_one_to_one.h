@@ -38,13 +38,13 @@ struct one_to_one {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_one_to_one_initialise(address_t *region) {
+static void *connection_generator_one_to_one_initialise(void **region) {
     struct one_to_one *params = spin1_malloc(sizeof(struct one_to_one));
-    struct one_to_one *params_sdram = (void *) *region;
+    struct one_to_one *params_sdram = *region;
 
     // Copy the parameters into the data structure
-    *params = *params_sdram++;
-    *region = (void *) params_sdram;
+    *params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("One to one connector, pre_lo = %u, pre_hi = %u, "
             "post_lo = %u, post_hi = %u",

@@ -43,7 +43,7 @@ struct fixed_total_params {
  */
 struct fixed_total {
     struct fixed_total_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -52,14 +52,14 @@ struct fixed_total {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_fixed_total_initialise(address_t *region) {
+static void *connection_generator_fixed_total_initialise(void **region) {
     // Allocate memory for the parameters
     struct fixed_total *obj = spin1_malloc(sizeof(struct fixed_total));
 
     // Copy the parameters in
-    struct fixed_total_params *params_sdram = (void *) *region;
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct fixed_total_params *params_sdram = *region;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     // Initialise the RNG
     obj->rng = rng_init(region);
@@ -85,7 +85,7 @@ static void connection_generator_fixed_total_free(void *generator) {
     sark_free(generator);
 }
 
-static inline uint32_t _pick(rng_t rng, uint32_t K, uint32_t not_K) {
+static inline uint32_t _pick(rng_t *rng, uint32_t K, uint32_t not_K) {
     return (uint32_t) (ulrbits(rng_generator(rng)) * (K + not_K));
 }
 
@@ -97,7 +97,7 @@ static inline uint32_t _pick(rng_t rng, uint32_t K, uint32_t not_K) {
  * \param[in] rng: The uniform random number generator
  * \return The number of times a valid item was drawn
  */
-static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
+static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t *rng) {
     uint32_t count = 0;
     uint32_t not_K = N - K;
     for (uint32_t i = 0; i < n; i++) {
@@ -116,7 +116,7 @@ static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
  * \param[in] rng: The uniform random number generator
  * \return The number of times a valid item was drawn
  */
-static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
+static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t *rng) {
     uint32_t count = 0;
     uint32_t K_remaining = K;
     uint32_t not_K_remaining = N - K;

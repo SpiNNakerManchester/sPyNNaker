@@ -101,7 +101,7 @@ static const connection_generator_info connection_generators[] = {
 };
 
 connection_generator_t connection_generator_init(
-        uint32_t hash, address_t *in_region) {
+        uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
         const connection_generator_info *type = &connection_generators[i];

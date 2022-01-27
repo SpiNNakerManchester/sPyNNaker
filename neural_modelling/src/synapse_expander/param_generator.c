@@ -112,7 +112,7 @@ static const struct param_generator_info param_generators[] = {
             param_generator_kernel_free},
 };
 
-param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
+param_generator_t param_generator_init(uint32_t hash, void **in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
         const param_generator_info *type = &param_generators[i];

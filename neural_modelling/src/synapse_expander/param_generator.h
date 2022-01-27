@@ -35,7 +35,7 @@ typedef struct param_generator *param_generator_t;
  *         functions, or NULL if it couldn't be initialised for any reason
  */
 param_generator_t param_generator_init(
-        uint32_t hash, address_t *region);
+        uint32_t hash, void **region);
 
 /**
  * \brief Generate values with a parameter generator

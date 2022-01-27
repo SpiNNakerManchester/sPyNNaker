@@ -33,7 +33,7 @@
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *matrix_generator_static_initialize(UNUSED address_t *region) {
+static void *matrix_generator_static_initialize(UNUSED void **region) {
     return NULL;
 }
 

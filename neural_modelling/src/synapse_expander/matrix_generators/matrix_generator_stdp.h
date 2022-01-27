@@ -58,15 +58,15 @@ struct matrix_generator_stdp {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-void *matrix_generator_stdp_initialize(address_t *region) {
+void *matrix_generator_stdp_initialize(void **region) {
     // Allocate memory for the parameters
     struct matrix_generator_stdp *obj =
             spin1_malloc(sizeof(struct matrix_generator_stdp));
 
     // Copy the parameters in
-    struct matrix_generator_stdp *params_sdram = (void *) *region;
-    *obj = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct matrix_generator_stdp *params_sdram = *region;
+    *obj = *params_sdram;
+    *region = &params_sdram[1];
     return obj;
 }
 

@@ -45,6 +45,12 @@ struct delay_builder_config {
     uint32_t delay_type;
 };
 
+struct global_config {
+    uint32_t n_out_edges;
+    uint32_t pre_slice_start;
+    uint32_t pre_slice_count;
+};
+
 /**
  * \brief Generate the data for a single connector
  * \param[in,out] in_region:
@@ -59,20 +65,20 @@ struct delay_builder_config {
  * \return True if the region was correctly generated, False if there was an
  *         error
  */
-static bool read_delay_builder_region(address_t *in_region,
+static bool read_delay_builder_region(void **region,
         bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
         uint32_t pre_slice_count) {
     // Get the parameters
-    address_t region = *in_region;
+    struct delay_builder_config *sdram_config = *region;
     struct delay_builder_config config;
-    fast_memcpy(&config, region, sizeof(config));
-    region += sizeof(config) / sizeof(uint32_t);
+    fast_memcpy(&config, sdram_config, sizeof(config));
+    *region = &sdram_config[1];
+
     // Get the connector and delay parameter generators
     connection_generator_t connection_generator =
-            connection_generator_init(config.connector_type, &region);
+            connection_generator_init(config.connector_type, region);
     param_generator_t delay_generator =
-            param_generator_init(config.delay_type, &region);
-    *in_region = region;
+            param_generator_init(config.delay_type, region);
 
     // If any components couldn't be created return false
     if (connection_generator == NULL || delay_generator == NULL) {
@@ -139,7 +145,7 @@ static bool read_delay_builder_region(address_t *in_region,
  *         error
  */
 static bool run_delay_expander(
-        void *delay_params_address, address_t params_address) {
+        void *delay_params_address, void *params_address) {
     // Read the global parameters from the delay extension
     struct delay_parameters *delay_params = delay_params_address;
     uint32_t num_neurons = delay_params->n_atoms;
@@ -156,9 +162,12 @@ static bool run_delay_expander(
     }
 
     // Read the global parameters from the expander region
-    uint32_t n_out_edges = *params_address++;
-    uint32_t pre_slice_start = *params_address++;
-    uint32_t pre_slice_count = *params_address++;
+    struct global_config *global_config = params_address;
+    uint32_t n_out_edges = global_config->n_out_edges;
+    uint32_t pre_slice_start = global_config->pre_slice_start;
+    uint32_t pre_slice_count = global_config->pre_slice_count;
+
+    params_address = &global_config[1];
 
     log_info("Generating %u delay edges for %u atoms starting at %u",
             n_out_edges, pre_slice_count, pre_slice_start);
@@ -183,17 +192,16 @@ void c_main(void) {
     log_info("Starting To Build Delays");
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    address_t delay_params_address = data_specification_get_region(
+    void *delay_params_address = data_specification_get_region(
             DELAY_PARAMS, ds_regions);
-    address_t params_address = data_specification_get_region(
+    void *params_address = data_specification_get_region(
             EXPANDER_REGION, ds_regions);
     log_info("\tReading SDRAM delay params at 0x%08x,"
             " expander params at 0x%08x",
             delay_params_address, params_address);
 
     // Run the expander
-    if (!run_delay_expander(
-            (address_t) delay_params_address, (address_t) params_address)) {
+    if (!run_delay_expander(delay_params_address,  params_address)) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);
     }

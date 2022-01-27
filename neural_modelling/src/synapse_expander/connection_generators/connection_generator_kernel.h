@@ -75,15 +75,15 @@ struct kernel {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_kernel_initialise(address_t *region) {
+static void *connection_generator_kernel_initialise(void **region) {
     // Allocate the data structure for parameters
     struct kernel *obj = spin1_malloc(sizeof(struct kernel));
 
     // Copy the parameters into the data structure
-    struct kernel *params_sdram = (void *) *region;
+    struct kernel *params_sdram = *region;
     // Smaller than standard memcpy()
-    fast_memcpy(obj, params_sdram++, sizeof(struct kernel));
-    *region = (void *) params_sdram;
+    *obj = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("Kernel connector, m_kernelWidth, m_kernelHeight = %u %u",
     		obj->kernelWidth, obj->kernelHeight);

@@ -43,7 +43,7 @@ struct normal_clipped_boundary_params {
  */
 struct param_generator_normal_clipped_boundary {
     struct normal_clipped_boundary_params params;
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -52,16 +52,15 @@ struct param_generator_normal_clipped_boundary {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_normal_clipped_boundary_initialize(
-        address_t *region) {
+static void *param_generator_normal_clipped_boundary_initialize(void **region) {
     // Allocate memory for the data
     struct param_generator_normal_clipped_boundary *obj =
             spin1_malloc(sizeof(struct param_generator_normal_clipped_boundary));
-    struct normal_clipped_boundary_params *params_sdram = (void *) *region;
+    struct normal_clipped_boundary_params *params_sdram = *region;
 
     // Copy the parameters in
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     log_debug("normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
             obj->params.mu, obj->params.sigma, obj->params.low, obj->params.high);

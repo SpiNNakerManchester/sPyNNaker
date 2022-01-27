@@ -38,7 +38,7 @@ typedef struct connection_generator *connection_generator_t;
  *         functions, or NULL if it couldn't be initialised for any reason
  */
 connection_generator_t connection_generator_init(
-        uint32_t hash, address_t *region);
+        uint32_t hash, void **region);
 
 /**
  * \brief Finish with a connection generator

@@ -75,15 +75,15 @@ typedef struct {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-void *matrix_generator_neuromodulation_initialize(address_t *region) {
+void *matrix_generator_neuromodulation_initialize(void **region) {
     // Allocate memory for the parameters
     matrix_generator_neuromodulation *conf =
             spin1_malloc(sizeof(matrix_generator_neuromodulation));
 
     // Copy the parameters in
-    matrix_generator_neuromodulation *params_sdram = (void *) *region;
-    *conf = *params_sdram++;
-    *region = (void *) params_sdram;
+    matrix_generator_neuromodulation *params_sdram = *region;
+    *conf = *params_sdram;
+    *region = &params_sdram[1];
     return conf;
 }
 

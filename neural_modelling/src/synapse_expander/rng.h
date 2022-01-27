@@ -15,16 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef __RNG_H__
+#define __RNG_H__
+
 /**
  * \file
  * \brief Random number generator interface
  */
 #include <common-typedefs.h>
+#include <random.h>
 
 /**
- * \brief Random number generator "object"
+ * \brief The Random number generator parameters
  */
-typedef struct rng *rng_t;
+typedef struct rng {
+    mars_kiss64_seed_t seed;
+} rng_t;
 
 /**
  * \brief Initialise the random number generator
@@ -33,31 +39,33 @@ typedef struct rng *rng_t;
  * \return An initialised random number generator that can be used with other
  *         functions, or NULL if it couldn't be initialised for any reason
  */
-rng_t rng_init(address_t *region);
+rng_t *rng_init(void **region);
 
 /**
  * \brief Generate a uniformly-distributed random number
  * \param[in] rng: The random number generator instance to generate from
  * \return The number generated between 0 and 0xFFFFFFFF
  */
-uint32_t rng_generator(rng_t rng);
+uint32_t rng_generator(rng_t *rng);
 
 /**
  * \brief Generate an exponentially-distributed random number
  * \param[in] rng: The random number generator instance to use
  * \return The number generated
  */
-accum rng_exponential(rng_t rng);
+accum rng_exponential(rng_t *rng);
 
 /**
  * \brief Generate an normally-distributed random number
  * \param[in] rng: The random number generator instance to use
  * \return The number generated
  */
-accum rng_normal(rng_t rng);
+accum rng_normal(rng_t *rng);
 
 /**
  * \brief Finish with a random number generator
  * \param[in] rng: The generator to free
  */
-void rng_free(rng_t rng);
+void rng_free(rng_t *rng);
+
+#endif

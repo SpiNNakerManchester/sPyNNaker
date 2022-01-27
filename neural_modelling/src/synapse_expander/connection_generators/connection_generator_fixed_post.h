@@ -54,7 +54,7 @@ struct fixed_post {
     //! Parameters read from SDRAM
     struct fixed_post_params params;
     //! Configured random number generator
-    rng_t rng;
+    rng_t *rng;
 };
 
 /**
@@ -63,14 +63,14 @@ struct fixed_post {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_fixed_post_initialise(address_t *region) {
+static void *connection_generator_fixed_post_initialise(void **region) {
     // Allocate memory for the parameters
     struct fixed_post *obj = spin1_malloc(sizeof(struct fixed_post));
 
     // Copy the parameters in
-    struct fixed_post_params *params_sdram = (void *) *region;
-    obj->params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct fixed_post_params *params_sdram = *region;
+    obj->params = *params_sdram;
+    *region = &params_sdram[1];
 
     // Initialise the RNG
     obj->rng = rng_init(region);

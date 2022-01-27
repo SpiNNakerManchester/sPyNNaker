@@ -38,15 +38,15 @@ struct param_generator_constant {
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *param_generator_constant_initialize(address_t *region) {
+static void *param_generator_constant_initialize(void **region) {
     // Allocate space for the parameters
     struct param_generator_constant *params =
             spin1_malloc(sizeof(struct param_generator_constant));
 
     // Read parameters from SDRAM
-    struct param_generator_constant *params_sdram = (void *) *region;
-    *params = *params_sdram++;
-    *region = (void *) params_sdram;
+    struct param_generator_constant *params_sdram = *region;
+    *params = *params_sdram;
+    *region = &params_sdram[1];
     log_debug("Constant value %k", params->value);
     return params;
 }
