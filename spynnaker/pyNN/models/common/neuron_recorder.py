@@ -223,7 +223,7 @@ class NeuronRecorder(object):
     @staticmethod
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
-            sampling_rate, label, placement_data):
+            sampling_rate, label, placement_data, region):
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -235,10 +235,10 @@ class NeuronRecorder(object):
             if len(local_indexes[0]) == 1:
                 fragment[i] = placement_data[local_indexes[0]]
             elif len(local_indexes[0]) > 1:
-                fragment[i] = placement_data[local_indexes[0], 1:]
+                fragment[i] = placement_data[local_indexes[0][0]]
                 logger.warning(
-                    "Population {} has multiple recorded data for time {}",
-                    label, time)
+                    "Population {} has multiple recorded data for time {}"
+                    " in region {} ", label, time, region)
             else:
                 # Set row to nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -299,7 +299,7 @@ class NeuronRecorder(object):
         # process data from core for missing data
         placement_data = self._process_missing_data(
             missing_str, placement, expected_rows, n_per_timestep, times,
-            sampling_rate, label, placement_data)
+            sampling_rate, label, placement_data, region)
         return placement_data
 
     def __read_data(
