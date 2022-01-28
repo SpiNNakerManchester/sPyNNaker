@@ -67,8 +67,8 @@ accuracy to gain performance.</p>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of neurons</p></li>
 <li><p><strong>fpga_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>fpga_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -164,7 +164,7 @@ accuracy to gain performance.</p>
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -177,14 +177,14 @@ accuracy to gain performance.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of constraints to give to the vertex, or None</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -259,7 +259,7 @@ accuracy to gain performance.</p>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)">AbstractConstraint</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -270,7 +270,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -281,7 +281,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -292,7 +292,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -308,7 +308,7 @@ accuracy to gain performance.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> – The mode of operation of the protocol</p></li>
-<li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The optional instance key to use</p></li>
+<li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The optional instance key to use</p></li>
 <li><p><strong>uart_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the UART when needed</p></li>
 </ul>
 </dd>
@@ -459,7 +459,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#spynnaker8.external_devices.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES">MUNICH_MODES</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES"><em>MUNICH_MODES</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -818,15 +818,15 @@ accuracy to gain performance.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>retina_key</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) – the new key for the retina</p></li>
-<li><p><strong>retina_payload</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the new payload for the set retina key command packet</p></li>
-<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – when to transmit this packet</p></li>
+<li><p><strong>retina_payload</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><em>None</em>) – the new payload for the set retina key command packet</p></li>
+<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – when to transmit this packet</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the command to send</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -867,14 +867,14 @@ accuracy to gain performance.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNaker link to which the motor is connected</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 <li><p><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>sample_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>update_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>delay_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>delta_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>continue_if_not_different</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -894,7 +894,7 @@ accuracy to gain performance.</p>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -928,7 +928,7 @@ accuracy to gain performance.</p>
 <li><p><strong>position</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <code class="docutils literal notranslate"><span class="pre">LEFT</span></code> or <code class="docutils literal notranslate"><span class="pre">RIGHT</span></code></p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
 <li><p><strong>polarity</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <code class="docutils literal notranslate"><span class="pre">UP</span></code>, <code class="docutils literal notranslate"><span class="pre">DOWN</span></code> or <code class="docutils literal notranslate"><span class="pre">MERGED</span></code></p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -974,7 +974,7 @@ accuracy to gain performance.</p>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)">AbstractConstraint</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -985,7 +985,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -996,7 +996,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1007,7 +1007,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1038,7 +1038,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1060,7 +1060,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1071,7 +1071,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1101,7 +1101,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1123,7 +1123,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1134,7 +1134,7 @@ accuracy to gain performance.</p>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1162,7 +1162,7 @@ or None to use the default</p></li>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1184,7 +1184,7 @@ or None to use the default</p></li>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1195,7 +1195,7 @@ or None to use the default</p></li>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1226,7 +1226,7 @@ or None to use the default</p></li>
 <dd><p>Get a Database Connection instance that this device uses            to inject packets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection">SpynnakerLiveSpikesConnection</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><em>SpynnakerLiveSpikesConnection</em></a></p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection">PushBotRetinaConnection</a></p>
@@ -1304,7 +1304,7 @@ or None to use the default</p></li>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1326,7 +1326,7 @@ or None to use the default</p></li>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1337,7 +1337,7 @@ or None to use the default</p></li>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1422,7 +1422,7 @@ or None to use the default</p></li>
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -1455,7 +1455,7 @@ or None to use the default</p></li>
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -1591,11 +1591,11 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNakerLink connected to</p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the device</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the device</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The IP address of the board that the device is connected to</p></li>
-<li><p><strong>start_active_time_front</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The “active time” to set for the front LED at the start</p></li>
-<li><p><strong>start_active_time_back</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The “active time” to set for the back LED at the start</p></li>
-<li><p><strong>start_total_period</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The “total period” to set at the start</p></li>
-<li><p><strong>start_frequency</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The “frequency” to set at the start</p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – The IP address of the board that the device is connected to</p></li>
+<li><p><strong>start_active_time_front</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The “active time” to set for the front LED at the start</p></li>
+<li><p><strong>start_active_time_back</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The “active time” to set for the back LED at the start</p></li>
+<li><p><strong>start_total_period</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The “total period” to set at the start</p></li>
+<li><p><strong>start_frequency</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The “frequency” to set at the start</p></li>
 </ul>
 </dd>
 </dl>
@@ -1619,7 +1619,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNakerLink that the PushBot is connected to</p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the device</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the device</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The IP address of the board that the device is connected to</p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – The IP address of the board that the device is connected to</p></li>
 <li><p><strong>start_active_time</strong> – The “active time” value to send at the start</p></li>
 <li><p><strong>start_total_period</strong> – The “total period” value to send at the start</p></li>
 <li><p><strong>start_frequency</strong> – The “frequency” to send at the start</p></li>
@@ -1646,7 +1646,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNakerLink connected to</p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the device</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the device</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The IP address of the board that the device is connected to</p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – The IP address of the board that the device is connected to</p></li>
 </ul>
 </dd>
 </dl>
@@ -1700,7 +1700,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1720,7 +1720,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNakerLink connected to</p></li>
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the device</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the device</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The IP address of the board that the device is connected to</p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – The IP address of the board that the device is connected to</p></li>
 <li><p><strong>start_active_time</strong> – The “active time” to set at the start</p></li>
 <li><p><strong>start_total_period</strong> – The “total period” to set at the start</p></li>
 <li><p><strong>start_frequency</strong> – The “frequency” to set at the start</p></li>
@@ -1743,12 +1743,12 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>notify</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to register for notifications</p></li>
-<li><p><strong>database_notify_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the hostname for the device which is
+<li><p><strong>database_notify_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – the hostname for the device which is
 listening to the database notification.</p></li>
-<li><p><strong>database_ack_port_num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the port number to which a external device
+<li><p><strong>database_ack_port_num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – the port number to which a external device
 will acknowledge that they have finished reading the database and are
 ready for it to start execution</p></li>
-<li><p><strong>database_notify_port_num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The port number to which a external
+<li><p><strong>database_notify_port_num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The port number to which a external
 device will receive the database is ready command</p></li>
 </ul>
 </dd>
@@ -1757,7 +1757,7 @@ device will receive the database is ready command</p></li>
 <a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">AbstractPyNNModel</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1867,7 +1867,7 @@ which can be used to send events.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1934,7 +1934,7 @@ class, which can be used to send events.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1985,7 +1985,7 @@ they have finished reading the database and are ready for it to
 start execution</p></li>
 <li><p><strong>database_notify_port_num</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The port number to which a external device will receive the
 database is ready command</p></li>
-<li><p><strong>key_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the prefix to be applied to the key</p></li>
+<li><p><strong>key_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – the prefix to be applied to the key</p></li>
 <li><p><strong>prefix_type</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman.messages.eieio/#spinnman.messages.eieio.EIEIOPrefix" title="(in SpiNNMan v6.0)"><em>EIEIOPrefix</em></a>) – if the prefix type is 32 bit or 16 bit</p></li>
 <li><p><strong>message_type</strong> (<a class="reference internal" href="#spynnaker8.external_devices.EIEIOType" title="spinnman.messages.eieio.EIEIOType"><em>EIEIOType</em></a>) – If the message is a EIEIO command message, or an EIEIO data
 message with 16 bit or 32 bit keys.</p></li>
@@ -1993,7 +1993,7 @@ message with 16 bit or 32 bit keys.</p></li>
 <li><p><strong>right_shift</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>use_payload_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
 <li><p><strong>notify</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
-<li><p><strong>payload_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>payload_prefix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </p></li>
 <li><p><strong>payload_right_shift</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>number_of_packets_sent_per_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The UDP port to which the live spikes will be sent. If not
@@ -2102,20 +2102,26 @@ continue the simulation</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker8.external_devices package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker8.external_devices">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker8.html"
-                        title="previous chapter">spynnaker8 package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker8.extra_models.html"
-                        title="next chapter">spynnaker8.extra_models package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker8.html"
+                          title="previous chapter">spynnaker8 package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker8.extra_models.html"
+                          title="next chapter">spynnaker8.extra_models package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -2160,7 +2166,7 @@ continue the simulation</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

@@ -199,7 +199,7 @@ ethernet.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> – The mode of operation of the protocol</p></li>
-<li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The optional instance key to use</p></li>
+<li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The optional instance key to use</p></li>
 <li><p><strong>uart_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the UART when needed</p></li>
 </ul>
 </dd>
@@ -350,7 +350,7 @@ ethernet.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES">MUNICH_MODES</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES"><em>MUNICH_MODES</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,15 +709,15 @@ ethernet.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>retina_key</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) – the new key for the retina</p></li>
-<li><p><strong>retina_payload</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the new payload for the set retina key command packet</p></li>
-<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – when to transmit this packet</p></li>
+<li><p><strong>retina_payload</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><em>None</em>) – the new payload for the set retina key command packet</p></li>
+<li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – when to transmit this packet</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>the command to send</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -848,20 +848,26 @@ ethernet.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.protocols package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.protocols">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.models.utility_models.spike_injector.html"
-                        title="previous chapter">spynnaker.pyNN.models.utility_models.spike_injector package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.utilities.html"
-                        title="next chapter">spynnaker.pyNN.utilities package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.models.utility_models.spike_injector.html"
+                          title="previous chapter">spynnaker.pyNN.models.utility_models.spike_injector package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.utilities.html"
+                          title="next chapter">spynnaker.pyNN.utilities package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -907,7 +913,7 @@ ethernet.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

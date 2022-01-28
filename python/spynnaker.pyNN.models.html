@@ -182,14 +182,14 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of constraints to give to the vertex, or None</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -260,7 +260,7 @@
 <dd><p>Set the maximum number of atoms per core for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The new maximum, or None for the largest possible</p>
+<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
 </dd>
 </dl>
 </dd></dl>
@@ -330,7 +330,7 @@ set parameters of those connections, including of plasticity mechanisms.</p>
 <li><p><strong>post_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><em>PopulationBase</em></a>) – </p></li>
 <li><p><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) – </p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) – </p></li>
-<li><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unsupported; must be None</p></li>
+<li><p><strong>source</strong> (<em>None</em>) – Unsupported; must be None</p></li>
 <li><p><strong>receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
 <li><p><strong>space</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.Space" title="pyNN.space.Space"><em>Space</em></a>) – </p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
@@ -409,7 +409,7 @@ source-target pairs with the same values exist.  Currently only
 <dd><p>The post-population or population view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase">PopulationBase</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><em>PopulationBase</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -420,7 +420,7 @@ source-target pairs with the same values exist.  Currently only
 <dd><p>The pre-population or population view.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase">PopulationBase</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase" title="spynnaker.pyNN.models.populations.PopulationBase"><em>PopulationBase</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -563,7 +563,7 @@ are calculated automatically.</p>
 <dd class="field-even"><p>The Neo block</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)">Block</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -599,7 +599,7 @@ are calculated automatically.</p>
 <dd class="field-odd"><p>the rewires (event times, values) from the underlying vertex</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -617,7 +617,7 @@ are calculated automatically.</p>
 <dd class="field-even"><p>data, indexes, sampling_interval</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a>, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>), <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -632,7 +632,7 @@ are calculated automatically.</p>
 <code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code></p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -646,7 +646,7 @@ are calculated automatically.</p>
 <dd class="field-odd"><p>the spikes (event times) from the underlying vertex</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -660,7 +660,7 @@ record in a Population, View or Assembly</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – either a single variable name or a list of variable
+<li><p><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – either a single variable name or a list of variable
 names. For a given celltype class, <code class="docutils literal notranslate"><span class="pre">celltype.recordable</span></code> contains
 a list of variables that can be recorded for that celltype.
 Can also be <code class="docutils literal notranslate"><span class="pre">None</span></code> to reset the list of variables.</p></li>
@@ -669,7 +669,7 @@ Can also be <code class="docutils literal notranslate"><span class="pre">None</s
 <cite>sim.end()</cite> is called.</p></li>
 <li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – a value in milliseconds, and an integer
 multiple of the simulation timestep.</p></li>
-<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The indexes of neurons to record from.
+<li><p><strong>indexes</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The indexes of neurons to record from.
 This is non-standard PyNN and equivalent to creating a view with
 these indexes and asking the View to record.</p></li>
 </ul>
@@ -683,7 +683,7 @@ these indexes and asking the View to record.</p></li>
 <dd><p>Turns off recording, is used by a pop saying <code class="docutils literal notranslate"><span class="pre">.record()</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p>
+<dd class="field-odd"><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> or </em><em>None</em>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -698,8 +698,8 @@ these indexes and asking the View to record.</p></li>
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The variable to record, supported variables to
 record are: <code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code>, <code class="docutils literal notranslate"><span class="pre">spikes</span></code>.</p></li>
 <li><p><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the interval to record them</p></li>
-<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – If set, a file to write to (by handle or name)</p></li>
-<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – List of indexes to record or None for all</p></li>
+<li><p><strong>to_file</strong> (<em>neo.io.baseio.BaseIO</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – If set, a file to write to (by handle or name)</p></li>
+<li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of indexes to record or None for all</p></li>
 </ul>
 </dd>
 </dl>
@@ -711,7 +711,7 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
 <dd><p>What variables should be written to files, and where should they            be written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, neo.io.baseio.BaseIO or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, neo.io.baseio.BaseIO or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a> or None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -731,8 +731,9 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -745,12 +746,17 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.model_binaries.html"
-                        title="previous chapter">spynnaker.pyNN.model_binaries package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.models.abstract_models.html"
-                        title="next chapter">spynnaker.pyNN.models.abstract_models package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.model_binaries.html"
+                          title="previous chapter">spynnaker.pyNN.model_binaries package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.models.abstract_models.html"
+                          title="next chapter">spynnaker.pyNN.models.abstract_models package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -796,7 +802,7 @@ record are: <code class="docutils literal notranslate"><span class="pre">gsyn_ex
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

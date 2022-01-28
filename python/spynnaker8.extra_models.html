@@ -99,7 +99,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -155,7 +155,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -216,14 +216,14 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of constraints to give to the vertex, or None</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -250,7 +250,7 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <dd><p>Set the maximum number of atoms per core for this model</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The new maximum, or None for the largest possible</p>
+<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
 </dd>
 </dl>
 </dd></dl>
@@ -294,20 +294,26 @@ instead.</p>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker8.extra_models package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker8.extra_models">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker8.external_devices.html"
-                        title="previous chapter">spynnaker8.external_devices package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker8.models.html"
-                        title="next chapter">spynnaker8.models package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker8.external_devices.html"
+                          title="previous chapter">spynnaker8.external_devices package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker8.models.html"
+                          title="next chapter">spynnaker8.models package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -352,7 +358,7 @@ instead.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

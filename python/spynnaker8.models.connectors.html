@@ -208,7 +208,7 @@ CSV file</p></li>
 <li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if False, once a connection is made, it can’t be made again;
 if True, multiple connections between the same pair of neurons
 are allowed</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -244,7 +244,7 @@ CSV file</p></li>
 <li><p><strong>with_replacement</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if False, once a connection is made, it can’t be made again; if
 True, multiple connections between the same pair of neurons are
 allowed</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -281,7 +281,7 @@ values. If False, this check is skipped.</p></li>
 specify distance-dependent weights or delays - not implemented</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
 CSV file</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -366,7 +366,7 @@ weight, delay, plasticity parameters).</p></li>
 If False, this check is skipped.</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
 CSV file</p></li>
-<li><p><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – the names of the parameters <cite>p1</cite>, <cite>p2</cite>, etc. If not provided, it
+<li><p><strong>column_names</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>) or </em><em>None</em>) – the names of the parameters <cite>p1</cite>, <cite>p2</cite>, etc. If not provided, it
 is assumed the parameters are <cite>weight, delay</cite> (for backwards
 compatibility).</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
@@ -401,7 +401,7 @@ populations, written as a Python expression; the indices will be
 given as variables <code class="docutils literal notranslate"><span class="pre">i</span></code> and <code class="docutils literal notranslate"><span class="pre">j</span></code> when the expression is
 evaluated.</p></li>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – allow a neuron to connect to itself</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 <li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
 If False, this check is skipped.</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – <p>if given, a callable that display a progress bar on the terminal.</p>
@@ -435,10 +435,10 @@ the input image shape)</p></li>
 <li><p><strong>shape_post</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the post population (rows/height, cols/width)</p></li>
 <li><p><strong>shape_kernel</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – 2D shape of the kernel (rows/height, cols/width)</p></li>
 <li><p><strong>weight_kernel</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em>
-or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – (optional)
+or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – (optional)
 2D matrix of size shape_kernel describing the weights</p></li>
 <li><p><strong>delay_kernel</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em>
-or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – (optional)
+or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><em>None</em>) – (optional)
 2D matrix of size shape_kernel describing the delays</p></li>
 <li><p><strong>shape_common</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – (optional)
 2D shape of common coordinate system (for both pre and post,
@@ -486,7 +486,7 @@ instead.</p>
 If False, this check is skipped.</p></li>
 <li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to output extra information about the connectivity to a
 CSV file</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 </ul>
 </dd>
 </dl>
@@ -538,9 +538,9 @@ instead.</p>
 <li><p><strong>allow_self_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if the connector is used to connect a Population to itself, this
 flag determines whether a neuron is allowed to connect to itself,
 or only to other neurons in the Population.</p></li>
-<li><p><strong>n_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – if specified, the number of efferent synaptic connections per
+<li><p><strong>n_connections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – if specified, the number of efferent synaptic connections per
 neuron</p></li>
-<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – random number generator</p></li>
+<li><p><strong>rng</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><em>None</em>) – random number generator</p></li>
 <li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to check that weights and delays have valid values.
 If False, this check is skipped.</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – For PyNN compatibility only.</p></li>
@@ -561,20 +561,26 @@ CSV file</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker8.models.connectors package</a><ul>
 <li><a class="reference internal" href="#module-spynnaker8.models.connectors">Module contents</a></li>
 </ul>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker8.models.html"
-                        title="previous chapter">spynnaker8.models package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker8.models.populations.html"
-                        title="next chapter">spynnaker8.models.populations package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker8.models.html"
+                          title="previous chapter">spynnaker8.models package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker8.models.populations.html"
+                          title="next chapter">spynnaker8.models.populations package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -620,7 +626,7 @@ CSV file</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

@@ -262,7 +262,7 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_process_missing_data</span><span class="p">(</span>
             <span class="n">missing_str</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">):</span>
+            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
         <span class="n">missing_str</span> <span class="o">+=</span> <span class="s2">&quot;(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">); &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
         <span class="c1"># Start the fragment for this slice empty</span>
@@ -274,10 +274,10 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">fragment</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">placement_data</span><span class="p">[</span><span class="n">local_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">fragment</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">placement_data</span><span class="p">[</span><span class="n">local_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">:]</span>
+                <span class="n">fragment</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">placement_data</span><span class="p">[</span><span class="n">local_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> has multiple recorded data for time </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">label</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+                    <span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> has multiple recorded data for time </span><span class="si">{}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot; in region </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Set row to nan</span>
                 <span class="n">fragment</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
@@ -339,7 +339,7 @@
         <span class="c1"># process data from core for missing data</span>
         <span class="n">placement_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_missing_data</span><span class="p">(</span>
             <span class="n">missing_str</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">)</span>
+            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">placement_data</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">placement_data</span>
 
     <span class="k">def</span> <span class="nf">__read_data</span><span class="p">(</span>
@@ -1362,7 +1362,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

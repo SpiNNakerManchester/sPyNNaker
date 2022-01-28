@@ -130,7 +130,7 @@
 <dd><p>Get a Database Connection instance that this device uses            to inject packets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection">SpynnakerLiveSpikesConnection</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><em>SpynnakerLiveSpikesConnection</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -195,7 +195,7 @@
 <dd class="field-odd"><p><strong>multicast_packet</strong> (<em>AbstractEIEIODataElement</em>) – A received multicast packet</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,8 +307,8 @@
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of neurons</p></li>
 <li><p><strong>fpga_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>fpga_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -344,7 +344,7 @@
 <li><p><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) – The model of synaptic input types</p></li>
 <li><p><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) – The model of the synapses’ dynamics</p></li>
 <li><p><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) – The model of the firing threshold</p></li>
-<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The model (if any) of additional environmental inputs</p></li>
+<li><p><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) – The model (if any) of additional environmental inputs</p></li>
 </ul>
 </dd>
 </dl>
@@ -357,14 +357,14 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
-<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A list of constraints to give to the vertex, or None</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -439,7 +439,7 @@
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)">AbstractConstraint</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -450,7 +450,7 @@
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -461,7 +461,7 @@
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -472,7 +472,7 @@
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -521,7 +521,7 @@
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -543,7 +543,7 @@
 <dd><p>Get the start type of the binary to be run.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v6.0)">ExecutableType</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs/#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v6.0)"><em>ExecutableType</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -608,7 +608,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>The resources required by the vertex</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v6.0)">ResourceContainer</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v6.0)"><em>ResourceContainer</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -624,14 +624,14 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNaker link to which the motor is connected</p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 <li><p><strong>speed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>sample_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>update_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>delay_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>delta_threshold</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>continue_if_not_different</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -651,7 +651,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)">ApplicationVertex</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -685,7 +685,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <li><p><strong>position</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <code class="docutils literal notranslate"><span class="pre">LEFT</span></code> or <code class="docutils literal notranslate"><span class="pre">RIGHT</span></code></p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p></li>
 <li><p><strong>polarity</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – <code class="docutils literal notranslate"><span class="pre">UP</span></code>, <code class="docutils literal notranslate"><span class="pre">DOWN</span></code> or <code class="docutils literal notranslate"><span class="pre">MERGED</span></code></p></li>
-<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -731,7 +731,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)">AbstractConstraint</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -742,7 +742,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -753,7 +753,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -764,7 +764,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)">MultiCastCommand</a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -846,7 +846,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>) or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>) or
-<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)">RangedList</a>)</p>
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -892,8 +892,9 @@ position) to be used for provenance error reporting to the user.</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models">Module contents</a></li>
@@ -901,12 +902,17 @@ position) to be used for provenance error reporting to the user.</p></li>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.connections.html"
-                        title="previous chapter">spynnaker.pyNN.connections package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker.pyNN.external_devices_models.push_bot.html"
-                        title="next chapter">spynnaker.pyNN.external_devices_models.push_bot package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.connections.html"
+                          title="previous chapter">spynnaker.pyNN.connections package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.external_devices_models.push_bot.html"
+                          title="next chapter">spynnaker.pyNN.external_devices_models.push_bot package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -952,7 +958,7 @@ position) to be used for provenance error reporting to the user.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

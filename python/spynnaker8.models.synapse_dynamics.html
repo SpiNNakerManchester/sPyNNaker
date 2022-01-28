@@ -84,10 +84,10 @@ instead.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>timing_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence"><em>AbstractTimingDependence</em></a>) – </p></li>
 <li><p><strong>weight_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – </p></li>
-<li><p><strong>voltage_dependence</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Unsupported</p></li>
+<li><p><strong>voltage_dependence</strong> (<em>None</em>) – Unsupported</p></li>
 <li><p><strong>dendritic_delay_fraction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – </p></li>
 <li><p><strong>backprop_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – </p></li>
 </ul>
 </dd>
@@ -107,7 +107,7 @@ instead.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – </p></li>
-<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – </p></li>
+<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -130,7 +130,7 @@ instead.</p>
 <li><p><strong>elimination</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination" title="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination"><em>AbstractElimination</em></a>) – The elimination rule</p></li>
 <li><p><strong>timing_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.AbstractTimingDependence"><em>AbstractTimingDependence</em></a>) – The STDP timing dependence rule</p></li>
 <li><p><strong>weight_dependence</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – The STDP weight dependence rule</p></li>
-<li><p><strong>voltage_dependence</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The STDP voltage dependence (unsupported)</p></li>
+<li><p><strong>voltage_dependence</strong> (<em>None</em>) – The STDP voltage dependence (unsupported)</p></li>
 <li><p><strong>dendritic_delay_fraction</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The STDP dendritic delay fraction</p></li>
 <li><p><strong>f_rew</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – How many rewiring attempts will be done per second.</p></li>
 <li><p><strong>initial_weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Weight assigned to a newly formed connection</p></li>
@@ -138,7 +138,7 @@ instead.</p>
 <li><p><strong>s_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum fan-in per target layer neuron</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – seed the random number generators</p></li>
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight of connections formed by the connector</p></li>
-<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The delay of connections formed by the connector</p></li>
+<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – The delay of connections formed by the connector</p></li>
 </ul>
 </dd>
 </dl>
@@ -168,7 +168,7 @@ values</p></li>
 <li><p><strong>s_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Maximum fan-in per target layer neuron</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – seed the random number generators</p></li>
 <li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight of connections formed by the connector</p></li>
-<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The delay of connections formed by the connector</p></li>
+<li><p><strong>delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – The delay of connections formed by the connector</p></li>
 </ul>
 </dd>
 </dl>
@@ -184,8 +184,9 @@ values</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">spynnaker8.models.synapse_dynamics package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#module-spynnaker8.models.synapse_dynamics">Module contents</a></li>
@@ -193,12 +194,17 @@ values</p></li>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="spynnaker8.models.populations.html"
-                        title="previous chapter">spynnaker8.models.populations package</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="spynnaker8.models.synapse_dynamics.timing_dependence.html"
-                        title="next chapter">spynnaker8.models.synapse_dynamics.timing_dependence package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker8.models.populations.html"
+                          title="previous chapter">spynnaker8.models.populations package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker8.models.synapse_dynamics.timing_dependence.html"
+                          title="next chapter">spynnaker8.models.synapse_dynamics.timing_dependence package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -244,7 +250,7 @@ values</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>
