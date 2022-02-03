@@ -33,7 +33,6 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
-from spynnaker import __version__ as version
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, on_chip_bitfield_generator,
     redundant_packet_count_report,
@@ -69,7 +68,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay, hostname,
-            time_scale_factor=None, front_end_versions=None):
+            time_scale_factor=None):
         """
         :param str graph_label:
         :param database_socket_addresses:
@@ -86,8 +85,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :param str hostname:
         :param time_scale_factor:
         :type time_scale_factor: float or None
-        :param front_end_versions:
-        :type front_end_versions: list(tuple(str,str)) or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -113,17 +110,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         self.__neurons_per_core_set = set()
 
-        versions = [("sPyNNaker", version)]
-        if front_end_versions is not None:
-            versions.extend(front_end_versions)
-
         super().__init__(
             executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             n_chips_required=n_chips_required,
-            n_boards_required=n_boards_required,
-            front_end_versions=versions)
+            n_boards_required=n_boards_required)
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
