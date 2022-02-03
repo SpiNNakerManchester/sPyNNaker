@@ -13,31 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import numpy
-from collections import defaultdict
 
-from spinn_utilities.ordered_set import OrderedSet
 from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_per_ms)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
 # 1 for synaptic matrix region
 # 1 for n_edges
-# 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
+# 1 for post_vertex_slice.lo_atom
+# 1 for post_vertex_slice.n_atoms
+# 1 for post index
 # 1 for n_synapse_types
-# 1 for n_synapse_type_bits
-# 1 for n_synapse_index_bits
+# 1 for timestep per delay
 # 1 for padding
+# 4 for Population RNG seed
+# 4 for core RNG seed
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
-    1 + 1 + 2 + 1 + 1 + 1 + 1) * BYTES_PER_WORD
+    1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 4 + 4) * BYTES_PER_WORD
 
 DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
@@ -51,8 +51,6 @@ class SynapticMatrices(object):
         "__post_vertex_slice",
         # The number of synapse types received
         "__n_synapse_types",
-        # The maximum summed size of the "direct" or "single" matrices
-        "__all_single_syn_sz",
         # The ID of the synaptic matrix region
         "__synaptic_matrix_region",
         # The ID of the "direct" or "single" matrix region
@@ -80,15 +78,17 @@ class SynapticMatrices(object):
         # Reference to give the master population table
         "__poptable_ref",
         # Reference to give the connection builder
-        "__connection_builder_ref"
+        "__connection_builder_ref",
+        # Number of bits to use for neuron IDs
+        "__max_atoms_per_core"
     ]
 
     def __init__(
-            self, post_vertex_slice, n_synapse_types, all_single_syn_sz,
+            self, post_vertex_slice, n_synapse_types,
             synaptic_matrix_region, direct_matrix_region, poptable_region,
-            connection_builder_region, synaptic_matrix_ref=None,
-            direct_matrix_ref=None, poptable_ref=None,
-            connection_builder_ref=None):
+            connection_builder_region, max_atoms_per_core,
+            synaptic_matrix_ref=None, direct_matrix_ref=None,
+            poptable_ref=None, connection_builder_ref=None):
         """
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post vertex that these matrices are for
@@ -122,11 +122,11 @@ class SynapticMatrices(object):
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
-        self.__all_single_syn_sz = all_single_syn_sz
         self.__synaptic_matrix_region = synaptic_matrix_region
         self.__direct_matrix_region = direct_matrix_region
         self.__poptable_region = poptable_region
         self.__connection_builder_region = connection_builder_region
+        self.__max_atoms_per_core = max_atoms_per_core
         self.__synaptic_matrix_ref = synaptic_matrix_ref
         self.__direct_matrix_ref = direct_matrix_ref
         self.__poptable_ref = poptable_ref
@@ -181,16 +181,15 @@ class SynapticMatrices(object):
             return self.__matrices[key]
 
         matrix = SynapticMatrixApp(
-            self.__poptable, synapse_info, app_edge,
-            self.__n_synapse_types, self.__all_single_syn_sz,
+            self.__poptable, synapse_info, app_edge, self.__n_synapse_types,
             self.__post_vertex_slice, self.__synaptic_matrix_region,
-            self.__direct_matrix_region)
+            self.__max_atoms_per_core)
         self.__matrices[key] = matrix
         return matrix
 
     def write_synaptic_data(
             self, spec, incoming_projections, all_syn_block_sz, weight_scales,
-            routing_info):
+            routing_info, app_vertex):
         """ Write the synaptic data for all incoming projections
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -219,16 +218,6 @@ class SynapticMatrices(object):
         block_addr = 0
         self.__poptable.initialise_table()
 
-        # Convert the data for convenience
-        incoming_by_app_edge, delayed_by_app_edge, key_space_tracker = \
-            self.__incoming_by_app_edge(incoming_projections, routing_info)
-
-        # Set up for single synapses
-        # The list is seeded with an empty array so we can just concatenate
-        # later (as numpy doesn't let you concatenate nothing)
-        single_synapses = [numpy.array([], dtype="uint32")]
-        single_addr = 0
-
         # Lets write some synapses
         spec.switch_write_focus(self.__synaptic_matrix_region)
 
@@ -236,32 +225,25 @@ class SynapticMatrices(object):
         generate_on_machine = list()
 
         # For each incoming machine vertex, create a synaptic list
-        for app_edge, m_vertices in incoming_by_app_edge.items():
-            delayed_m_vertices = delayed_by_app_edge.get(app_edge, [])
-
+        for proj in incoming_projections:
+            app_edge = proj._projection_edge
+            synapse_info = proj._synapse_information
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
-            app_key_info = self.__app_key_and_mask(
-                m_vertices, app_edge, routing_info, key_space_tracker)
+            app_key_info = self.__app_key_and_mask(app_edge, routing_info)
+            if app_key_info is None:
+                continue
             d_app_key_info = self.__delay_app_key_and_mask(
-                delayed_m_vertices, app_edge, routing_info, key_space_tracker)
+                app_edge, routing_info)
+            app_matrix = self.__app_matrix(app_edge, synapse_info)
+            app_matrix.set_info(
+                all_syn_block_sz, app_key_info, d_app_key_info, weight_scales)
 
-            for synapse_info in app_edge.synapse_information:
-                app_matrix = self.__app_matrix(app_edge, synapse_info)
-                delay_pre_vertex = None
-                if app_edge.delay_edge is not None:
-                    delay_pre_vertex = app_edge.delay_edge.pre_vertex
-                app_matrix.set_info(
-                    all_syn_block_sz, app_key_info, d_app_key_info,
-                    routing_info, weight_scales, m_vertices,
-                    delay_pre_vertex)
-
-                # If we can generate the connector on the machine, do so
-                if app_matrix.can_generate_on_machine(single_addr):
-                    generate_on_machine.append(app_matrix)
-                else:
-                    block_addr, single_addr = app_matrix.write_matrix(
-                        spec, block_addr, single_addr, single_synapses)
+            # If we can generate the connector on the machine, do so
+            if synapse_info.may_generate_on_machine():
+                generate_on_machine.append(app_matrix)
+            else:
+                block_addr = app_matrix.write_matrix(spec, block_addr)
 
         self.__host_generated_block_addr = block_addr
 
@@ -280,8 +262,8 @@ class SynapticMatrices(object):
             spec, self.__poptable_region, self.__poptable_ref)
 
         # Write the size and data of single synapses to the direct region
-        single_data = numpy.concatenate(single_synapses)
-        single_data_words = len(single_data)
+        # This is currently disabled
+        single_data_words = 0
         spec.reserve_memory_region(
             region=self.__direct_matrix_region,
             size=(
@@ -291,14 +273,12 @@ class SynapticMatrices(object):
             reference=self.__direct_matrix_ref)
         spec.switch_write_focus(self.__direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)
-        if single_data_words:
-            spec.write_array(single_data)
 
         self.__write_synapse_expander_data_spec(
-            spec, generator_data, weight_scales)
+            spec, generator_data, weight_scales, app_vertex)
 
     def __write_synapse_expander_data_spec(
-            self, spec, generator_data, weight_scales):
+            self, spec, generator_data, weight_scales, app_vertex):
         """ Write the data spec for the synapse expander
 
         :param ~.DataSpecificationGenerator spec:
@@ -332,12 +312,16 @@ class SynapticMatrices(object):
         spec.write_value(len(generator_data))
         spec.write_value(self.__post_vertex_slice.lo_atom)
         spec.write_value(self.__post_vertex_slice.n_atoms)
+        spec.write_value(0)  # TODO: The index if needed
         spec.write_value(self.__n_synapse_types)
-        spec.write_value(get_n_bits(self.__n_synapse_types))
-        n_neuron_id_bits = get_n_bits(self.__post_vertex_slice.n_atoms)
-        spec.write_value(n_neuron_id_bits)
+        spec.write_value(
+            DataType.S1615.encode_as_int(machine_time_step_per_ms()))
         # Padding to ensure 8-byte alignment for weight scales
         spec.write_value(0)
+        # Per-Population RNG
+        spec.write_array(app_vertex.pop_seed)
+        # Per-Core RNG
+        spec.write_array(app_vertex.core_seed)
         for w in weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
@@ -351,263 +335,53 @@ class SynapticMatrices(object):
             items.extend(data.gen_data)
         spec.write_array(numpy.concatenate(items))
 
-    def __incoming_by_app_edge(self, incoming_projections, routing_info):
-        """ Convert a list of incoming projections to a dict of
-            application edge -> list of pre vertices, and a key tracker
-
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-            The incoming projections
-        :param RoutingInfo routing_info: Routing information for all edges
-        :rtype: tuple(dict, KeySpaceTracker)
-        """
-        incoming_by_app_edge = defaultdict(OrderedSet)
-        delayed_by_app_edge = defaultdict(OrderedSet)
-        key_space_tracker = KeySpaceTracker()
-        pre_vertices = set()
-
-        for proj in incoming_projections:
-            app_edge = proj._projection_edge
-
-            # Skip if already done
-            if app_edge in incoming_by_app_edge:
-                continue
-
-            # Add all incoming machine vertices
-            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)
-            for machine_vertex in out_verts:
-                if machine_vertex in pre_vertices:
-                    continue
-
-                pre_vertices.add(machine_vertex)
-                rinfo = routing_info.get_routing_info_from_pre_vertex(
-                    machine_vertex, SPIKE_PARTITION_ID)
-                key_space_tracker.allocate_keys(rinfo)
-
-                incoming_by_app_edge[app_edge].add(machine_vertex)
-
-            # Add all incoming delayed vertices
-            delay_edge = app_edge.delay_edge
-            if delay_edge is not None:
-                verts = delay_edge.pre_vertex.splitter.get_out_going_vertices(
-                    SPIKE_PARTITION_ID)
-                for machine_vertex in verts:
-                    if machine_vertex in pre_vertices:
-                        continue
-
-                    pre_vertices.add(machine_vertex)
-                    rinfo = routing_info.get_routing_info_from_pre_vertex(
-                        machine_vertex, SPIKE_PARTITION_ID)
-                    key_space_tracker.allocate_keys(rinfo)
-                    delayed_by_app_edge[app_edge].add(machine_vertex)
-
-        return incoming_by_app_edge, delayed_by_app_edge, key_space_tracker
-
-    @staticmethod
-    def __check_keys_adjacent(keys, mask_size):
-        """ Check that a given list of keys and slices have no gaps between
-            them
-
-        :param list(tuple(int, Slice)) keys: A list of keys and slices to check
-        :param mask_size: The number of 0s in the mask
-        :rtype: bool
-        """
-        key_increment = (1 << mask_size)
-        last_key = None
-        last_slice = None
-        for i, (key, v_slice) in enumerate(keys):
-            # If the first round, we can skip the checks and just store
-            if last_key is not None:
-                # Fail if next key is not adjacent to last key
-                if (last_key + key_increment) != key:
-                    return False
-
-                # Fail if this is not the last key and the number of atoms
-                # don't match the other keys (last is OK to be different)
-                elif ((i + 1) < len(keys) and
-                        last_slice.n_atoms != v_slice.n_atoms):
-                    return False
-
-                # Fail if the atoms are not adjacent
-                elif (last_slice.hi_atom + 1) != v_slice.lo_atom:
-                    return False
-
-            # Store for the next round
-            last_key = key
-            last_slice = v_slice
-
-        # Pass if nothing failed
-        return True
-
-    def __get_app_key_and_mask(self, keys, mask, n_stages, key_space_tracker):
-        """ Get a key and mask for an incoming application vertex as a whole,\
-            or say it isn't possible (return None)
+    def __get_app_key_and_mask(self, r_info, n_stages):
+        """ Get a key and mask for an incoming application vertex as a whole
 
         :param list(tuple(int, Slice)) keys:
             The key and slice of each relevant machine vertex in the incoming
             application vertex
         :param int mask: The mask that covers all keys
         :param n_stages: The number of delay stages
-        :param key_space_tracker:
-            A key space tracker that has been filled in with all keys this
-            vertex will receive
         :rtype: None or _AppKeyInfo
         """
 
-        # Can be merged only if keys are adjacent outside the mask
-        keys = sorted(keys, key=lambda item: item[0])
-        mask_size = KeySpaceTracker.count_trailing_0s(mask)
-        if not self.__check_keys_adjacent(keys, mask_size):
-            return None
+        # Find the bit that is just for the core
+        core_mask = r_info.machine_mask - r_info.first_mask
+        mask_size = r_info.n_bits_atoms
+        n_atoms = r_info.vertex.n_atoms
 
-        # Get the key as the first key and the mask as the mask that covers
-        # enough keys
-        key = keys[0][0]
-        n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
-        core_mask = (2 ** n_extra_mask_bits) - 1
-        new_mask = mask & ~(core_mask << mask_size)
+        return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
+                           mask_size, n_atoms * n_stages)
 
-        # Final check because adjacent keys don't mean they all fit under a
-        # single mask
-        if key & new_mask != key:
-            return None
+    def __app_key_and_mask(self, app_edge, routing_info):
+        """ Get a key and mask for an incoming application vertex as a whole
 
-        # Check that the key doesn't cover other keys that it shouldn't
-        next_key = keys[-1][0] + (2 ** mask_size)
-        max_key = key + (2 ** (mask_size + n_extra_mask_bits))
-        n_unused = max_key - (next_key & mask)
-        if n_unused > 0 and key_space_tracker.is_allocated(next_key, n_unused):
-            return None
-
-        return _AppKeyInfo(key, new_mask, core_mask, mask_size,
-                           keys[0][1].n_atoms * n_stages)
-
-    def __check_key_slices(self, n_atoms, slices, delay_stages=1):
-        """ Check if a list of slices cover all n_atoms without any gaps
-
-        :param int n_atoms: The total number of atoms expected
-        :param list(Slice) slices: The list of slices to check
-        :rtype: bool
-        """
-        slices = sorted(slices, key=lambda s: s.lo_atom)
-        slice_atoms = slices[-1].hi_atom - slices[0].lo_atom + 1
-        if slice_atoms != n_atoms:
-            return False
-
-        # Check that all slices are also there in between, and that all are
-        # the same size (except the last one)
-        next_high = 0
-        n_atoms_per_core = None
-        last_slice = slices[-1]
-        for s in slices:
-            if s.lo_atom != next_high:
-                return False
-            if (n_atoms_per_core is not None and s != last_slice and
-                    n_atoms_per_core != s.n_atoms):
-                return None
-            next_high = s.hi_atom + 1
-            if n_atoms_per_core is None:
-                n_atoms_per_core = s.n_atoms
-
-        # If the number of atoms per core is too big, this can't be done
-        if ((n_atoms_per_core * delay_stages) >
-                self.__poptable.max_n_neurons_per_core):
-            return False
-        return True
-
-    def __app_key_and_mask(self, m_vertices, app_edge, routing_info,
-                           key_space_tracker):
-        """ Get a key and mask for an incoming application vertex as a whole,\
-            or say it isn't possible (return None)
-
-        :param list(MachineVertex) m_vertices:
-            The relevant incoming machine vertices
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param RoutingInfo routing_info: The routing information of all edges
-        :param KeySpaceTracker key_space_tracker:
-            A tracker pre-filled with the keys of all incoming edges
         """
-        # If there are too many pre-cores, give up now
-        if len(m_vertices) > self.__poptable.max_core_mask:
+        r_info = routing_info.get_routing_info_from_pre_vertex(
+            app_edge.pre_vertex, SPIKE_PARTITION_ID)
+        if r_info is None:
             return None
+        return self.__get_app_key_and_mask(r_info, 1)
 
-        # Work out if the keys allow the machine vertices to be merged
-        mask = None
-        keys = list()
-
-        # Can be merged only if all the masks are the same
-        pre_slices = list()
-        for m_vertex in m_vertices:
-            rinfo = routing_info.get_routing_info_from_pre_vertex(
-                m_vertex, SPIKE_PARTITION_ID)
-            pre_slices.append(m_vertex.vertex_slice)
-            # No routing info at all? Must have been filtered, so doesn't work
-            if rinfo is None:
-                return None
-            # Mask is not the same as the last mask?  Doesn't work
-            if mask is not None and rinfo.first_mask != mask:
-                return None
-            mask = rinfo.first_mask
-            keys.append((rinfo.first_key, m_vertex.vertex_slice))
-
-        if mask is None:
-            return None
-
-        if not self.__check_key_slices(
-                app_edge.pre_vertex.n_atoms, pre_slices):
-            return None
-
-        return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
-
-    def __delay_app_key_and_mask(self, m_vertices, app_edge, routing_info,
-                                 key_space_tracker):
+    def __delay_app_key_and_mask(self, app_edge, routing_info):
         """ Get a key and mask for a whole incoming delayed application\
-            vertex, or say it isn't possible (return None)
+            vertex, or return None if no delay edge exists
 
-        :param list(MachineVertex) m_vertices:
-            The relevant incoming machine vertices from delays
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param RoutingInfo routing_info: The routing information of all edges
-        :param KeySpaceTracker key_space_tracker:
-            A tracker pre-filled with the keys of all incoming edges
         """
-        # If there are no delay vertices, stop
-        if not m_vertices:
+        delay_edge = app_edge.delay_edge
+        if delay_edge is None:
             return None
+        r_info = routing_info.get_routing_info_from_pre_vertex(
+            delay_edge.pre_vertex, SPIKE_PARTITION_ID)
 
-        # If there are too many pre-cores, give up now
-        if len(m_vertices) > self.__poptable.max_core_mask:
-            return None
-
-        # Work out if the keys allow the machine vertices to be
-        # merged
-        mask = None
-        keys = list()
-
-        # Can be merged only if all the masks are the same
-        pre_slices = list()
-        for m_vertex in m_vertices:
-            rinfo = routing_info.get_routing_info_from_pre_vertex(
-                m_vertex, SPIKE_PARTITION_ID)
-            pre_slices.append(m_vertex.vertex_slice)
-            # No routing info at all? Must have been filtered, so doesn't work
-            if rinfo is None:
-                return None
-            # Mask is not the same as the last mask?  Doesn't work
-            if mask is not None and rinfo.first_mask != mask:
-                return None
-            mask = rinfo.first_mask
-            keys.append((rinfo.first_key, m_vertex.vertex_slice))
-
-        if not self.__check_key_slices(
-                app_edge.pre_vertex.n_atoms, pre_slices,
-                app_edge.n_delay_stages):
-            return None
-
-        return self.__get_app_key_and_mask(
-            keys, mask, app_edge.n_delay_stages, key_space_tracker)
+        return self.__get_app_key_and_mask(r_info, app_edge.n_delay_stages)
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):
@@ -654,18 +428,16 @@ class SynapticMatrices(object):
         """
         return self.__gen_on_machine
 
-    def get_index(self, app_edge, synapse_info, m_vertex):
+    def get_index(self, app_edge, synapse_info):
         """ Get the index of an incoming projection in the population table
 
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
-            The source machine vertex
         """
         matrix = self.__app_matrix(app_edge, synapse_info)
-        return matrix.get_index(m_vertex)
+        return matrix.get_index()
 
 
 class _AppKeyInfo(object):

@@ -102,13 +102,13 @@ class SynapseDynamicsStructuralCommon(
             len(structural_projections))
 
         # Write the pre-population info
-        pop_index = self.__write_prepopulation_info(
+        pop_index, subpop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, vertex_slice)
+            weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
-            spec, pop_index, app_vertex, vertex_slice)
+            spec, pop_index, subpop_index, app_vertex, vertex_slice)
 
         # Write the component parameters
         # pylint: disable=no-member
@@ -197,7 +197,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_projections, routing_info,
-            weight_scales, synaptic_matrices, post_vertex_slice):
+            weight_scales, synaptic_matrices):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -217,6 +217,7 @@ class SynapseDynamicsStructuralCommon(
         """
         spec.comment("Writing pre-population info")
         pop_index = dict()
+        subpop_index = dict()
         index = 0
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
@@ -257,7 +258,7 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for m_vertex in out_verts:
+            for sub, m_vertex in enumerate(out_verts):
                 r_info = routing_info.get_routing_info_from_pre_vertex(
                     m_vertex, SPIKE_PARTITION_ID)
                 vertex_slice = m_vertex.vertex_slice
@@ -266,11 +267,13 @@ class SynapseDynamicsStructuralCommon(
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
-                    app_edge, synapse_info, m_vertex))
-        return pop_index
+                    app_edge, synapse_info))
+                for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+                    subpop_index[app_edge.pre_vertex, synapse_info, i] = sub
+        return pop_index, subpop_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, app_vertex, vertex_slice):
+            self, spec, pop_index, subpop_index, app_vertex, vertex_slice):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
@@ -287,18 +290,19 @@ class SynapseDynamicsStructuralCommon(
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
-            [conn for (conn, _, _, _, _) in slice_conns])
+            [conn for (conn, _, _) in slice_conns])
         # Make a single large array of population index
-        conn_lens = [len(conn) for (conn, _, _, _, _) in slice_conns]
-        for (_, a_edge, _, _, s_info) in slice_conns:
+        conn_lens = [len(conn) for (conn, _, _) in slice_conns]
+        for (_, a_edge, s_info) in slice_conns:
             if (a_edge.pre_vertex, s_info) not in pop_index:
                 print("Help!")
         pop_indices = numpy.repeat(
             [pop_index[a_edge.pre_vertex, s_info]
-             for (_, a_edge, _, _, s_info) in slice_conns], conn_lens)
+             for (_, a_edge, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
-        subpop_indices = numpy.repeat(
-            [pre_index for (_, _, pre_index, _, _) in slice_conns], conn_lens)
+        subpop_indices = numpy.array([
+            subpop_index[a_edge, s_info, c["source"]]
+            for (conns, a_edge, s_info) in slice_conns for c in conns])
         # Get the low atom for each source and subtract
         lo_atoms = numpy.repeat(
             [pre_slice.lo_atom

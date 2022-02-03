@@ -248,8 +248,8 @@ def _get_allowed_row_length(n_words, dynamics, in_edge, n_synapses):
 
 def get_synapses(
         connections, synapse_info, n_delay_stages, n_synapse_types,
-        weight_scales, app_edge, pre_vertex_slice, post_vertex_slice,
-        max_row_info, gen_undelayed, gen_delayed):
+        weight_scales, app_edge, post_vertex_slice, max_row_info,
+        gen_undelayed, gen_delayed, max_atoms_per_core):
     """ Get the synapses as an array of words for non-delayed synapses and\
         an array of words for delayed synapses. This is used to prepare\
         information for *deployment to SpiNNaker*.
@@ -266,8 +266,6 @@ def get_synapses(
         The scaling of the weights for each synapse type
     :param ~pacman.model.graphs.appplication.ApplicationEdge app_edge:
         The incoming machine edge that the synapses are on
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of the pre-vertex to get the synapses for
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of the post-vertex to get the synapses for
     :param MaxRowInfo max_row_info:
@@ -276,20 +274,17 @@ def get_synapses(
         Whether to generate undelayed data
     :param bool gen_delayed:
         Whether to generate delayed data
+    :param int max_atoms_per_core:
+        The maximum number of atoms on a core
     :return:
-        (``row_data``, ``delayed_row_data``, ``delayed_source_ids``,
-        ``stages``) where:
+        (``row_data``, ``delayed_row_data``) where:
 
         * ``row_data`` is the undelayed connectivity data arranged into a
             row per source, each row the same length
         * ``delayed_row_data`` is the delayed connectivity data arranged
             into a row per source per delay stage, each row the same length
-        * ``delayed_source_ids`` is the machine-vertex-local source neuron
-            id of each connection of the delayed vertices
-        * ``stages`` is the delay stage of each delayed connection
     :rtype:
-        tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
-        ~numpy.ndarray)
+        tuple(~numpy.ndarray, ~numpy.ndarray)
     """
     # pylint: disable=too-many-arguments, too-many-locals
     # pylint: disable=assignment-from-no-return
@@ -321,22 +316,19 @@ def get_synapses(
     row_data = numpy.zeros(0, dtype="uint32")
     if gen_undelayed and max_row_info.undelayed_max_n_synapses:
         # Get which row each connection will go into
-        undelayed_row_indices = (
-                undelayed_connections["source"] - pre_vertex_slice.lo_atom)
+        undelayed_row_indices = undelayed_connections["source"]
         row_data = _get_row_data(
             undelayed_connections, undelayed_row_indices,
-            pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
+            app_edge.pre_vertex.n_atoms, post_vertex_slice, n_synapse_types,
             synapse_info.synapse_dynamics,
             max_row_info.undelayed_max_n_synapses,
-            max_row_info.undelayed_max_words)
+            max_row_info.undelayed_max_words, max_atoms_per_core)
 
         del undelayed_row_indices
     del undelayed_connections
 
     # Get the data for the delayed connections
     delayed_row_data = numpy.zeros(0, dtype="uint32")
-    stages = numpy.zeros(0, dtype="uint32")
-    delayed_source_ids = numpy.zeros(0, dtype="uint32")
     if gen_delayed and max_row_info.delayed_max_n_synapses:
         # Get the delay stages and which row each delayed connection will
         # go into
@@ -344,30 +336,27 @@ def get_synapses(
             delayed_connections["delay"] - 1.0)) / max_delay).astype(
             "uint32")
         delayed_row_indices = (
-                (delayed_connections[
-                     "source"] - pre_vertex_slice.lo_atom) +
-                ((stages - 1) * pre_vertex_slice.n_atoms))
+                delayed_connections["source"] +
+                ((stages - 1) * app_edge.pre_vertex.n_atoms))
         delayed_connections["delay"] -= max_delay * stages
-        delayed_source_ids = (
-                delayed_connections["source"] - pre_vertex_slice.lo_atom)
 
         # Get the data
         delayed_row_data = _get_row_data(
             delayed_connections, delayed_row_indices,
-            pre_vertex_slice.n_atoms * n_delay_stages, post_vertex_slice,
+            app_edge.pre_vertex.n_atoms * n_delay_stages, post_vertex_slice,
             n_synapse_types, synapse_info.synapse_dynamics,
             max_row_info.delayed_max_n_synapses,
-            max_row_info.delayed_max_words)
+            max_row_info.delayed_max_words, max_atoms_per_core)
         del delayed_row_indices
     del delayed_connections
 
-    return row_data, delayed_row_data, delayed_source_ids, stages
+    return row_data, delayed_row_data
 
 
 def _get_row_data(
         connections, row_indices, n_rows, post_vertex_slice,
         n_synapse_types, synapse_dynamics, max_row_n_synapses,
-        max_row_n_words):
+        max_row_n_words, max_atoms_per_core):
     """
     :param ~numpy.ndarray connections:
         The connections to convert; the dtype is
@@ -383,6 +372,7 @@ def _get_row_data(
         The synapse dynamics of the synapses
     :param int max_row_n_synapses: The maximum number of synapses in a row
     :param int max_row_n_words: The maximum number of words in a row
+    :param int max_atoms_per_core: The maximum number of atoms per core
     :rtype: tuple(int, ~numpy.ndarray)
     """
     # pylint: disable=too-many-arguments, too-many-locals
@@ -394,7 +384,7 @@ def _get_row_data(
         # Get the static data
         ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
             connections, row_indices, n_rows, post_vertex_slice,
-            n_synapse_types, max_row_n_synapses)
+            n_synapse_types, max_row_n_synapses, max_atoms_per_core)
 
         # Blank the plastic data
         fp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -411,7 +401,7 @@ def _get_row_data(
         fp_data, pp_data, fp_size, pp_size = \
             synapse_dynamics.get_plastic_synaptic_data(
                 connections, row_indices, n_rows, post_vertex_slice,
-                n_synapse_types, max_row_n_synapses)
+                n_synapse_types, max_row_n_synapses, max_atoms_per_core)
 
     # Add some padding
     row_lengths = [
@@ -432,16 +422,15 @@ def _get_row_data(
 
 
 def convert_to_connections(
-        synapse_info, pre_vertex_slice, post_vertex_slice,
+        synapse_info, post_vertex_slice, n_pre_atoms,
         max_row_length, n_synapse_types, weight_scales, data,
-        delayed, post_vertex_max_delay_ticks):
+        delayed, post_vertex_max_delay_ticks, max_atoms_per_core):
     """ Read the synapses for a given projection synapse information\
         object out of the given data and convert to connection data
 
     :param SynapseInformation synapse_info:
         The synapse information of the synapses
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of the source neurons of the synapses in the data
+    :param int n_pre_atoms: The number of atoms in the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of the target neurons of the synapses in the data
     :param int max_row_length:
@@ -452,9 +441,12 @@ def convert_to_connections(
         The weight scaling of each synapse type
     :param bytearray data:
         The raw data containing the synapses
-    :param bool delayed: True if the data should be considered delayed
+    :param bool delayed:
+        True if the data should be considered delayed
     :param int post_vertex_max_delay_ticks:
-            max delayed ticks supported from post vertex
+        The maximum delayed ticks supported from post vertex
+    :param int max_atoms_per_core:
+        The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: ~numpy.ndarray
@@ -472,13 +464,13 @@ def convert_to_connections(
     if isinstance(dynamics, AbstractStaticSynapseDynamics):
         # Read static data
         connections = _read_static_data(
-            dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-            row_data, delayed, post_vertex_max_delay_ticks)
+            dynamics, post_vertex_slice, n_pre_atoms, n_synapse_types,
+            row_data, delayed, post_vertex_max_delay_ticks, max_atoms_per_core)
     else:
         # Read plastic data
         connections = _read_plastic_data(
-            dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-            row_data, delayed, post_vertex_max_delay_ticks)
+            dynamics, post_vertex_slice, n_pre_atoms, n_synapse_types,
+            row_data, delayed, post_vertex_max_delay_ticks, max_atoms_per_core)
 
     # There might still be no connections if the row was all padding
     if not connections.size:
@@ -495,8 +487,8 @@ def convert_to_connections(
 
 def read_all_synapses(
         data, delayed_data, synapse_info, n_synapse_types,
-        weight_scales, pre_vertex_slice, post_vertex_slice,
-        post_vertex_max_delay_ticks, max_row_info):
+        weight_scales, post_vertex_slice, n_pre_atoms,
+        post_vertex_max_delay_ticks, max_row_info, max_atoms_per_core):
     """ Read the synapses for a given projection synapse information\
         object out of the given delayed and undelayed data.
 
@@ -510,14 +502,15 @@ def read_all_synapses(
         The total number of synapse types available
     :param list(float) weight_scales:
         A weight scale for each synapse type
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of the pre-vertex to read the synapses for
+    :param int n_pre_atoms: The number of atoms in the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of the post-vertex to read the synapses for
     :param int post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
     :param MaxRowInfo max_row_info:
         The maximum information for each of the rows
+    :param int max_atoms_per_core:
+        The maximum number of atoms on a core
     :return: The connections read from the data; the dtype is
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: ~numpy.ndarray
@@ -526,13 +519,13 @@ def read_all_synapses(
     max_row_length = max_row_info.undelayed_max_words
     delayed_max_row_length = max_row_info.delayed_max_words
     connections.append(convert_to_connections(
-        synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
+        synapse_info, post_vertex_slice, n_pre_atoms, max_row_length,
         n_synapse_types, weight_scales, data, False,
-        post_vertex_max_delay_ticks))
+        post_vertex_max_delay_ticks, max_atoms_per_core))
     connections.append(convert_to_connections(
-        synapse_info, pre_vertex_slice, post_vertex_slice,
+        synapse_info, post_vertex_slice, n_pre_atoms,
         delayed_max_row_length, n_synapse_types, weight_scales, delayed_data,
-        True, post_vertex_max_delay_ticks))
+        True, post_vertex_max_delay_ticks, max_atoms_per_core))
 
     # Join the connections into a single list and return it
     return numpy.concatenate(connections)
@@ -559,14 +552,14 @@ def _parse_static_data(row_data, dynamics):
 
 
 def _read_static_data(
-        dynamics, pre_vertex_slice, post_vertex_slice,
-        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks):
+        dynamics, post_vertex_slice, n_pre_atoms,
+        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks,
+        max_atoms_per_core):
     """ Read static data from row data
 
     :param AbstractStaticSynapseDynamics dynamics:
         The synapse dynamics that generated the data
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of neurons that are the sources of the synapses
+    :param int n_pre_atoms: The number of atoms on the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of neurons that are the targets of the synapses
     :param int n_synapse_types:
@@ -575,6 +568,7 @@ def _read_static_data(
         The raw row data to read
     :param bool delayed: True if data should be considered delayed
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
+    :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
@@ -584,14 +578,13 @@ def _read_static_data(
             0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     ff_size, ff_data = _parse_static_data(row_data, dynamics)
     connections = dynamics.read_static_synaptic_data(
-        post_vertex_slice, n_synapse_types, ff_size, ff_data)
+        post_vertex_slice, n_synapse_types, ff_size, ff_data,
+        max_atoms_per_core)
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
         connections = __convert_delayed_data(
-            n_synapses, pre_vertex_slice, connections,
+            n_synapses, n_pre_atoms, connections,
             post_vertex_max_delay_ticks)
-    else:
-        connections["source"] += pre_vertex_slice.lo_atom
     return connections
 
 
@@ -624,14 +617,14 @@ def _parse_plastic_data(row_data, dynamics):
 
 
 def _read_plastic_data(
-        dynamics, pre_vertex_slice, post_vertex_slice,
-        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks):
+        dynamics, post_vertex_slice, n_pre_atoms,
+        n_synapse_types, row_data, delayed, post_vertex_max_delay_ticks,
+        max_atoms_per_core):
     """ Read plastic data from raw data
 
     :param AbstractStaticSynapseDynamics dynamics:
         The synapse dynamics that generated the data
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of neurons that are the sources of the synapses
+    :param int n_pre_atoms: The number of atoms in the pre-vertex
     :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         The slice of neurons that are the targets of the synapses
     :param int n_synapse_types:
@@ -640,6 +633,7 @@ def _read_plastic_data(
         The raw row data to read
     :param bool delayed: True if data should be considered delayed
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
+    :param int max_atoms_per_core: The maximum number of atoms on a core
     :return: the connections read with dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
@@ -651,15 +645,13 @@ def _read_plastic_data(
         row_data, dynamics)
     connections = dynamics.read_plastic_synaptic_data(
         post_vertex_slice, n_synapse_types, pp_size, pp_data,
-        fp_size, fp_data)
+        fp_size, fp_data, max_atoms_per_core)
 
     if delayed:
         n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
         connections = __convert_delayed_data(
-            n_synapses, pre_vertex_slice, connections,
+            n_synapses, n_pre_atoms, connections,
             post_vertex_max_delay_ticks)
-    else:
-        connections["source"] += pre_vertex_slice.lo_atom
     return connections
 
 
@@ -680,14 +672,13 @@ def _rescale_connections(
 
 
 def __convert_delayed_data(
-            n_synapses, pre_vertex_slice, delayed_connections,
+            n_synapses, n_pre_atoms, delayed_connections,
             post_vertex_max_delay_ticks):
     """ Take the delayed_connections and convert the source ids and delay\
         values back to global values
 
     :param ~numpy.ndarray n_synapses: The number of synapses in each row
-    :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        The slice of atoms in the pre-vertex
+    :param int n_pre_atoms: number of atoms in the pre-vertex
     :param ~numpy.ndarray delayed_connections:
         The connections to convert of dtype
         AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
@@ -699,7 +690,7 @@ def __convert_delayed_data(
     # from the first delay stage, then all from the second stage and so on
     synapse_ids = range(len(n_synapses))
     row_stage = numpy.array([
-        i // pre_vertex_slice.n_atoms
+        i // n_pre_atoms
         for i in synapse_ids], dtype="uint32")
     # Work out the delay for each stage
     row_min_delay = (row_stage + 1) * post_vertex_max_delay_ticks
@@ -711,11 +702,10 @@ def __convert_delayed_data(
     # this converts the row id back to a source neuron id
     connection_source_extra = numpy.concatenate([
         numpy.repeat(
-            row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
+            row_stage[i] * numpy.uint32(n_pre_atoms),
             n_synapses[i])
         for i in synapse_ids])
     # Do the conversions
     delayed_connections["source"] -= connection_source_extra
-    delayed_connections["source"] += pre_vertex_slice.lo_atom
     delayed_connections["delay"] += connection_min_delay
     return delayed_connections

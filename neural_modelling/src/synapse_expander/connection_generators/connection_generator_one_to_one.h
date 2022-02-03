@@ -23,42 +23,24 @@
 #include <synapse_expander/generator_types.h>
 
 /**
- * \brief The parameters to be passed around for this connector
- */
-struct one_to_one {
-    uint32_t pre_lo;
-    uint32_t pre_hi;
-    uint32_t post_lo;
-    uint32_t post_hi;
-};
-
-/**
  * \brief Initialise the one-to-one connection generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *connection_generator_one_to_one_initialise(void **region) {
-    struct one_to_one *params = spin1_malloc(sizeof(struct one_to_one));
-    struct one_to_one *params_sdram = *region;
+static void *connection_generator_one_to_one_initialise(UNUSED void **region) {
 
-    // Copy the parameters into the data structure
-    *params = *params_sdram;
-    *region = &params_sdram[1];
+    log_debug("One to one connector");
 
-    log_debug("One to one connector, pre_lo = %u, pre_hi = %u, "
-            "post_lo = %u, post_hi = %u",
-            params->pre_lo, params->pre_hi, params->post_lo, params->post_hi);
-
-    return params;
+    return NULL;
 }
 
 /**
  * \brief Free the one-to-one connection generator
  * \param[in] generator: The generator to free
  */
-static void connection_generator_one_to_one_free(void *generator) {
-    sark_free(generator);
+static void connection_generator_one_to_one_free(UNUSED void *generator) {
+    // Nothing to do
 }
 
 /**
@@ -80,43 +62,27 @@ static void connection_generator_one_to_one_free(void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static uint32_t connection_generator_one_to_one_generate(
-        void *generator, UNUSED uint32_t pre_slice_start,
-        UNUSED uint32_t pre_slice_count, uint32_t pre_neuron_index,
-        uint32_t post_slice_start, UNUSED uint32_t post_slice_count,
-        uint32_t max_row_length, uint16_t *indices) {
-    struct one_to_one *obj = generator;
-    log_debug("pre_neuron_index %u", pre_neuron_index);
+static void connection_generator_one_to_one_generate(
+        UNUSED void *generator, uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
+        uint32_t post_slice_start, uint32_t post_slice_count,
+        unsigned long accum weight_scale, accum timestep_per_delay,
+        param_generator_t weight_generator, param_generator_t delay_generator,
+        matrix_generator_t matrix_generator) {
 
-    // If no space, generate nothing
-    if (max_row_length < 1) {
-        return 0;
+    // Get the actual ranges to generate within
+    uint32_t post_start = max(post_slice_start, post_lo);
+    uint32_t post_end = min(post_slice_start + post_slice_count - 1, post_hi);
+    uint32_t pre_start = max(pre_lo, post_start);
+    uint32_t pre_end = min(pre_hi, post_end);
+
+    for (uint32_t pre = pre_start; pre <= pre_end; pre++) {
+        uint32_t local_post = pre - post_slice_start;
+        uint16_t weight = rescale_weight(
+                param_generator_generate(weight_generator), weight_scale);
+        uint16_t delay = rescale_delay(
+                param_generator_generate(delay_generator), timestep_per_delay);
+        matrix_generator_write_synapse(matrix_generator, pre, local_post,
+                weight, delay);
     }
-
-    // If not in the pre-population view range, then don't generate
-    if ((pre_neuron_index < obj->pre_lo) ||
-            (pre_neuron_index > obj->pre_hi)) {
-        return 0;
-    }
-
-    // Post-index = view-relative pre-index
-    // Note that this could be negative (but see later)
-    int post_neuron_index = pre_neuron_index - obj->pre_lo + obj->post_lo;
-
-    // If not in the post-population view range, then don't generate.
-    // This will filter negatives
-    if ((post_neuron_index < (int) obj->post_lo) ||
-            (post_neuron_index > (int) obj->post_hi)) {
-        return 0;
-    }
-
-    // If out of range, don't generate anything
-    if ((post_neuron_index < (int) post_slice_start) ||
-            (post_neuron_index >= (int) (post_slice_start + post_slice_count))) {
-        return 0;
-    }
-
-    // Post-index = core-relative post-index
-    indices[0] = post_neuron_index - post_slice_start;
-    return 1;
 }

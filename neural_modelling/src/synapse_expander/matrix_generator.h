@@ -21,9 +21,6 @@
  */
 #include <common-typedefs.h>
 
-#include "connection_generator.h"
-#include "param_generator.h"
-
 /**
  * \brief Data type for matrix generator
  */
@@ -34,10 +31,12 @@ typedef struct matrix_generator *matrix_generator_t;
  * \param[in] hash: The identifier of the generator to initialise
  * \param[in,out] region: The address to read data from; updated to position
  *                        after data has been read
+ * \param[in] synaptic_matrix: The address of the base of the synaptic matrix
  * \return An initialised matrix generator that can be used with other
  *         functions, or NULL if it couldn't be initialised for any reason
  */
-matrix_generator_t matrix_generator_init(uint32_t hash, void **region);
+matrix_generator_t matrix_generator_init(uint32_t hash, void **region,
+        void *synaptic_matrix);
 
 /**
  * \brief Finish with a matrix generator
@@ -46,48 +45,13 @@ matrix_generator_t matrix_generator_init(uint32_t hash, void **region);
 void matrix_generator_free(matrix_generator_t generator);
 
 /**
- * \brief Generate a matrix with a matrix generator
+ * \brief Write a synapse with a matrix generator
  * \param[in] generator: The generator to use to generate the matrix
- * \param[in] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[in] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                     write delayed connections to
- * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words: The maximum number of words in a delayed
- *                                     row
- * \param[in] max_row_n_synapses: The maximum number of synapses in a normal row
- * \param[in] max_delayed_row_n_synapses: The maximum number of synapses in a
- *                                        delayed row
- * \param[in] n_synapse_type_bits: The number of bits used for the synapse type
- * \param[in] n_synapse_index_bits: The number of bits used for the neuron id
- * \param[in] synapse_type: The synapse type of each connection
- * \param[in] weight_scales: An array of weight scales, one for each synapse
- *                           type
- * \param[in] post_slice_start: The start of the slice of the post-population
- *                              being generated
- * \param[in] post_slice_count: The number of neurons in the slice of the
- *                              post-population being generated
- * \param[in] pre_slice_start: The start of the slice of the pre-population
- *                             being generated
- * \param[in] pre_slice_count: The number of neurons in the slice of the
- *                             pre-population being generated
- * \param[in] connection_generator: The generator of connections
- * \param[in] delay_generator: The generator of delay values
- * \param[in] weight_generator: The generator of weight values
- * \param[in] max_stage: The maximum delay stage to support
- * \param[in] max_delay_per_stage: The delay per delay stage
- * \param[in] timestep_per_delay: The delay value multiplier to get to timesteps
- * \return The number of connections generated
+ * \param[in] pre_index: The index of the pre-neuron relative to the start of
+ *                       the matrix
+ * \param[in] post_index: The index of the post-neuron on this core
+ * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] delay: The delay of the synapse in time steps
  */
-bool matrix_generator_generate(
-        matrix_generator_t generator,
-        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
-        uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
-        uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, unsigned long accum *weight_scales,
-        uint32_t post_slice_start, uint32_t post_slice_count,
-        uint32_t pre_slice_start, uint32_t pre_slice_count,
-        connection_generator_t connection_generator,
-        param_generator_t delay_generator, param_generator_t weight_generator,
-        uint32_t max_stage, uint32_t max_delay_per_stage,
-        accum timestep_per_delay);
+void matrix_generator_write_synapse(matrix_generator_t generator,
+        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);

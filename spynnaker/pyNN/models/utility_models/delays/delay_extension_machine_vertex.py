@@ -16,8 +16,7 @@ from enum import Enum
 
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SIMULATION_N_BYTES)
+from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
@@ -25,14 +24,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-
-#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
-#  6. n_delay_stages, 7. the number of delay supported by each delay stage
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-
-_EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
-
-DELAY_EXPANDER_APLX = "delay_expander.aplx"
 
 
 class DelayExtensionMachineVertex(
@@ -47,8 +39,7 @@ class DelayExtensionMachineVertex(
         SYSTEM = 0
         DELAY_PARAMS = 1
         PROVENANCE_REGION = 2
-        EXPANDER_REGION = 3
-        TDMA_REGION = 4
+        TDMA_REGION = 3
 
     class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
         N_PACKETS_RECEIVED = 0
@@ -254,8 +245,7 @@ class DelayExtensionMachineVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        delay_params_sz = self._app_vertex.delay_params_size(
-            self._vertex_slice)
+        delay_params_sz = self._app_vertex.delay_params_size()
 
         spec.reserve_memory_region(
             region=self._DELAY_EXTENSION_REGIONS.SYSTEM.value,
@@ -291,22 +281,6 @@ class DelayExtensionMachineVertex(
 
         self.write_delay_parameters(
             spec, self._vertex_slice, key, incoming_key, incoming_mask)
-
-        generator_data = self._app_vertex.delay_generator_data(
-            self._vertex_slice)
-        if generator_data is not None:
-            expander_size = sum(data.size for data in generator_data)
-            expander_size += _EXPANDER_BASE_PARAMS_SIZE
-            spec.reserve_memory_region(
-                region=self._DELAY_EXTENSION_REGIONS.EXPANDER_REGION.value,
-                size=expander_size, label='delay_expander')
-            spec.switch_write_focus(
-                self._DELAY_EXTENSION_REGIONS.EXPANDER_REGION.value)
-            spec.write_value(len(generator_data))
-            spec.write_value(self._vertex_slice.lo_atom)
-            spec.write_value(self._vertex_slice.n_atoms)
-            for data in generator_data:
-                spec.write_array(data.gen_data)
 
         # add tdma data
         spec.switch_write_focus(
@@ -370,15 +344,3 @@ class DelayExtensionMachineVertex(
 
         # write whether to throw away spikes
         spec.write_value(data=int(self._app_vertex.drop_late_spikes))
-
-        # Write the actual delay blocks (create a new one if it doesn't exist)
-        spec.write_array(array_values=self._app_vertex.delay_blocks_for(
-            self._vertex_slice).delay_block)
-
-    def gen_on_machine(self):
-        """ Determine if the given slice needs to be generated on the machine
-
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: bool
-        """
-        return self.app_vertex.gen_on_machine(self.vertex_slice)

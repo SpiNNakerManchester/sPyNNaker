@@ -40,6 +40,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from pacman.model.graphs.common.slice import Slice
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -101,7 +102,8 @@ class SplitterAbstractPopulationVertexFixed(
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, resources, label, constraints, all_syn_block_sz,
-                structural_sz, ring_buffer_shifts, weight_scales, index)
+                structural_sz, ring_buffer_shifts, weight_scales, index,
+                max_atoms_per_core)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -129,13 +131,13 @@ class SplitterAbstractPopulationVertexFixed(
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints,
             all_syn_block_sz, structural_sz, ring_buffer_shifts,
-            weight_scales, index):
+            weight_scales, index, max_atoms_per_core):
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
             resources, label, remaining_constraints,
             self._governed_app_vertex, vertex_slice, index, ring_buffer_shifts,
-            weight_scales, all_syn_block_sz, structural_sz)
+            weight_scales, all_syn_block_sz, structural_sz, max_atoms_per_core)
 
     def get_resources_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):

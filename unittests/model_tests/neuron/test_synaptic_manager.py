@@ -134,7 +134,7 @@ def test_write_data_spec():
     synaptic_matrices = SynapticMatrices(
         post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
         synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4)
+        connection_builder_region=4, n_neuron_bits=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=10000,
         weight_scales=[32, 32], routing_info=routing_info)
@@ -461,7 +461,7 @@ def test_pop_based_master_pop_table_standard(
     synaptic_matrices = SynapticMatrices(
         post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
         synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4)
+        connection_builder_region=4, n_neuron_bits=7)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=1000000,
         weight_scales=[32, 32], routing_info=routing_info)

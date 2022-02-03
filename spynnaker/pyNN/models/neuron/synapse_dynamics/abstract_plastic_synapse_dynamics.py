@@ -36,7 +36,8 @@ class AbstractPlasticSynapseDynamics(
     @abstractmethod
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses):
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            max_atoms_per_core):
         """ Get the fixed-plastic data, and plastic-plastic data for each row,\
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
@@ -58,6 +59,7 @@ class AbstractPlasticSynapseDynamics(
             The slice of the post vertex to get the connections for
         :param int n_synapse_types: The number of synapse types
         :param int max_n_synapses: The maximum number of synapses to generate
+        :param int max_atoms_per_core: The maximum number of atoms on a core
         :return: (fp_data, pp_data, fp_size, pp_size)
         :rtype:
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
@@ -90,7 +92,7 @@ class AbstractPlasticSynapseDynamics(
     @abstractmethod
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data):
+            fp_size, fp_data, max_atoms_per_core):
         """ Read the connections indicated in the connection indices from the\
             data in `pp_data` and `fp_data`.
 
@@ -100,6 +102,7 @@ class AbstractPlasticSynapseDynamics(
         :param ~numpy.ndarray pp_data: 2D
         :param ~numpy.ndarray fp_size: 1D
         :param ~numpy.ndarray fp_data: 2D
+        :param int max_atoms_per_core:
         :return:
             array with columns ``source``, ``target``, ``weight``, ``delay``
         :rtype: ~numpy.ndarray

@@ -56,8 +56,6 @@ class AbstractGenerateConnectorOnMachine(
     """
 
     __slots__ = [
-        "__delay_seed",
-        "__weight_seed",
         "__connector_seed"
     ]
 
@@ -68,8 +66,6 @@ class AbstractGenerateConnectorOnMachine(
         :param bool verbose:
         """
         super().__init__(safe=safe, callback=callback, verbose=verbose)
-        self.__delay_seed = dict()
-        self.__weight_seed = dict()
         self.__connector_seed = dict()
 
     def _generate_lists_on_machine(self, values):
@@ -110,31 +106,11 @@ class AbstractGenerateConnectorOnMachine(
         return self.__connector_seed[key]
 
     @staticmethod
-    def _generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, values, seeds):
-        """ Get the seed of a parameter generator for a given pre-post pairing
-
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param values:
-        :type values: int or ~pyNN.random.NumpyRNG
-        :param dict(list(int)) seeds:
-        :rtype: list(int)
-        """
-        if not isinstance(values, RandomDistribution):
-            return None
-        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
-        if key not in seeds:
-            seeds[key] = utility_calls.create_mars_kiss_seeds(values.rng)
-        return seeds[key]
-
-    @staticmethod
-    def _param_generator_params(values, seed):
+    def _param_generator_params(values):
         """ Get the parameter generator parameters as a numpy array
 
         :param values:
         :type values: int or ~pyNN.random.NumpyRNG
-        :param list(int) seed:
         :rtype: ~numpy.ndarray
         """
         if numpy.isscalar(values):
@@ -152,7 +128,6 @@ class AbstractGenerateConnectorOnMachine(
                 for param in parameters if param is not None)
             params = [
                 DataType.S1615.encode_as_int(param) for param in parameters]
-            params.extend(seed)
             return numpy.array(params, dtype=numpy.uint32)
 
         raise ValueError("Unexpected value {}".format(values))
@@ -170,7 +145,7 @@ class AbstractGenerateConnectorOnMachine(
 
         if isinstance(values, RandomDistribution):
             parameters = available_distributions[values.name]
-            return (len(parameters) + 4) * BYTES_PER_WORD
+            return len(parameters) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
 
@@ -217,27 +192,20 @@ class AbstractGenerateConnectorOnMachine(
         """
         return self._param_generator_id(weights)
 
-    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
+    def gen_weights_params(self, weights):
         """ Get the parameters of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :type weights: ~pyNN.random.NumpyRNG or int or float
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
-        seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, weights,
-            self.__weight_seed)
-        return self._param_generator_params(weights, seed)
+        return self._param_generator_params(weights)
 
     def gen_weight_params_size_in_bytes(self, weights):
         """ The size of the weight parameters in bytes
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type weights: ~pyNN.random.NumpyRNG or int or float
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(weights)
@@ -246,26 +214,19 @@ class AbstractGenerateConnectorOnMachine(
         """ Get the id of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
+        :type delays: ~pyNN.random.NumpyRNG or int or float
         :rtype: int
         """
         return self._param_generator_id(delays)
 
-    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
+    def gen_delay_params(self, delays):
         """ Get the parameters of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
-            float or list(int) or list(float)
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :type delays: ~pyNN.random.NumpyRNG or int or float
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
-        seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, delays,
-            self.__delay_seed)
-        return self._param_generator_params(delays, seed)
+        return self._param_generator_params(delays)
 
     def gen_delay_params_size_in_bytes(self, delays):
         """ The size of the delay parameters in bytes
@@ -284,17 +245,9 @@ class AbstractGenerateConnectorOnMachine(
         :rtype: int
         """
 
-    def gen_connector_params(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+    def gen_connector_params(self):
         """ Get the parameters of the on machine generation.
 
-        :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param AbstractSynapseType synapse_type:
-        :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray(uint32)
         """
         # pylint: disable=unused-argument

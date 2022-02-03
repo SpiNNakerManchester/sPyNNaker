@@ -154,24 +154,21 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        ids = numpy.where(self.__mask[
-            pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
+        ids = numpy.where(self.__mask[:, post_vertex_slice.as_slice])
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (
-            (ids[0] % pre_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+        block["source"] = ids[0] % synapse_info.n_pre_neurons
         block["target"] = (
             (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            block["source"], block["target"], n_connections, None,
-            pre_vertex_slice, post_vertex_slice, synapse_info)
+            block["source"], block["target"], n_connections, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
 
         # Re-wire some connections

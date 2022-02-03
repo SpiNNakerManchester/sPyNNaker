@@ -95,6 +95,13 @@ class PopulationMachineSynapses(
         :rtype: .SynapseRegions
         """
 
+    @abstractproperty
+    def _max_atoms_per_core(self):
+        """ The maximum number of atoms on any core targetted by these synapses
+
+        :rtype: int
+        """
+
     @property
     def _synapse_references(self):
         """ The references to synapse regions.  Override to provide these.
@@ -103,7 +110,7 @@ class PopulationMachineSynapses(
         """
         return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
 
-    def _create_synaptic_matrices(self, allow_direct=True):
+    def _create_synaptic_matrices(self):
         """ Creates the synaptic matrices object.
 
         :note: This is required because this object cannot have any storage
@@ -113,11 +120,11 @@ class PopulationMachineSynapses(
         return SynapticMatrices(
             self._vertex_slice,
             self._app_vertex.neuron_impl.get_n_synapse_types(),
-            self._app_vertex.all_single_syn_size if allow_direct else 0,
             self._synapse_regions.synaptic_matrix,
             self._synapse_regions.direct_matrix,
             self._synapse_regions.pop_table,
             self._synapse_regions.connection_builder,
+            self._max_atoms_per_core,
             self._synapse_references.synaptic_matrix,
             self._synapse_references.direct_matrix,
             self._synapse_references.pop_table,
@@ -168,6 +175,7 @@ class PopulationMachineSynapses(
             The scaling to apply to weights to store them in the synapses
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
+        :param int n_neuron_bits: The number of bits to use for neuron ids
         """
         # Get incoming projections
         incoming = self._app_vertex.incoming_projections
@@ -177,7 +185,8 @@ class PopulationMachineSynapses(
 
         # Write the synaptic matrices
         self._synaptic_matrices.write_synaptic_data(
-            spec, incoming, all_syn_block_sz, weight_scales, routing_info)
+            spec, incoming, all_syn_block_sz, weight_scales, routing_info,
+            self._app_vertex)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics

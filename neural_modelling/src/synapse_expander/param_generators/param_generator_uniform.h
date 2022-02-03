@@ -40,7 +40,6 @@ struct uniform_params {
  */
 struct param_generator_uniform {
     struct uniform_params params;
-    rng_t *rng;
 };
 
 /**
@@ -62,8 +61,6 @@ static void *param_generator_uniform_initialize(void **region) {
     log_debug("Uniform low = %k, high = %k",
             params->params.low, params->params.high);
 
-    // Initialise the RNG for this generator
-    params->rng = rng_init(region);
     return params;
 }
 
@@ -72,28 +69,17 @@ static void *param_generator_uniform_initialize(void **region) {
  * \param[in] generator: The generator to free
  */
 static void param_generator_uniform_free(void *generator) {
-    struct param_generator_uniform *obj = generator;
-    rng_free(obj->rng);
     sark_free(generator);
 }
 
 /**
  * \brief How to generate values with the uniform RNG parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \return The generated value
  */
-static void param_generator_uniform_generate(
-        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
-        UNUSED uint16_t *indices, accum *values) {
+static accum param_generator_uniform_generate(void *generator) {
     // For each index, generate a uniformly distributed value
     struct param_generator_uniform *obj = generator;
     accum range = obj->params.high - obj->params.low;
-    for (uint32_t i = 0; i < n_indices; i++) {
-        values[i] = obj->params.low + ulrbits(rng_generator(obj->rng)) * range;
-    }
+    return obj->params.low + (ulrbits(rng_generator(core_rng)) * range);
 }

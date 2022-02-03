@@ -59,6 +59,7 @@ from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -114,7 +115,9 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__self_projection"]
+        "__self_projection",
+        "__rng",
+        "__pop_seed"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -138,7 +141,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter):
+            neuron_impl, pynn_model, drop_late_spikes, splitter, seed):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -236,6 +239,10 @@ class AbstractPopulationVertex(
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
         self.__synapse_dynamics = None
+
+        # An RNG for use in synaptic generation
+        self.__rng = numpy.random.RandomState(seed)
+        self.__pop_seed = create_mars_kiss_seeds(self.__rng)
 
     @property
     def synapse_dynamics(self):
@@ -1315,3 +1322,21 @@ class AbstractPopulationVertex(
         :rtype: list(~spynnaker.pyNN.models.projection.Projection)
         """
         return self.__incoming_projections
+
+    @property
+    def pop_seed(self):
+        """ The seed to use for the population overall
+
+        :return: A list of 4 integers
+        :rtype: list(int)
+        """
+        return self.__pop_seed
+
+    @property
+    def core_seed(self):
+        """ The seed to use for a core
+
+        :return: A list of 4 integers
+        :rtype: list(int)
+        """
+        return create_mars_kiss_seeds(self.__rng)

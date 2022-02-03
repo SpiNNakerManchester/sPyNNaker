@@ -34,22 +34,14 @@ typedef struct param_generator *param_generator_t;
  * \return An initialised parameter generator that can be used with other
  *         functions, or NULL if it couldn't be initialised for any reason
  */
-param_generator_t param_generator_init(
-        uint32_t hash, void **region);
+param_generator_t param_generator_init(uint32_t hash, void **region);
 
 /**
- * \brief Generate values with a parameter generator
+ * \brief Generate value with a parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The n_indices post-neuron indices for each connection
- * \param[in,out] values: An array into which to place the values; will be
- *                        n_indices in size
+ * \return The value generated
  */
-void param_generator_generate(
-        param_generator_t generator, uint32_t n_indices,
-        uint32_t pre_neuron_index, uint16_t *indices, accum *values);
+accum param_generator_generate(param_generator_t generator);
 
 /**
  * \brief Finish with a parameter generator

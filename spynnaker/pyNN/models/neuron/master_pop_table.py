@@ -358,17 +358,17 @@ class MasterPopTableAsBinarySearch(object):
         for proj in incoming_projections:
             in_edge = proj._projection_edge
 
+            # Each projection with a delay will have an additional entry
+            if in_edge.n_delay_stages:
+                n_entries += 1
+
             # If we haven't seen this edge before, add it in
             if in_edge not in seen_edges:
                 seen_edges.add(in_edge)
-                vertex = in_edge.pre_vertex
-                n_cores = len(vertex.splitter.get_out_going_slices())
-
-                # If there are also delays, double it
+                # Each pre-vertex has a master pop entry
+                n_vertices += 1
                 if in_edge.n_delay_stages:
-                    n_cores *= _DELAY_SCALE
-
-                n_vertices += n_cores
+                    n_vertices += 1
 
         return (
             _BASE_SIZE_BYTES +

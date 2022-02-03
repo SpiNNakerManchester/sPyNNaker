@@ -22,8 +22,6 @@ from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
-from spynnaker.pyNN.models.utility_models.delays import (
-    DelayExtensionMachineVertex, DELAY_EXPANDER_APLX)
 from spinn_front_end_common.utilities.helpful_functions import (
     write_address_to_user1)
 
@@ -48,11 +46,10 @@ def synapse_expander(
         ~spinn_utilities.executable_finder.ExecutableFinder
     """
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER_APLX)
-    delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER_APLX)
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        placements, synapse_bin, delay_bin, transceiver)
+        placements, synapse_bin, transceiver)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
@@ -66,13 +63,11 @@ def synapse_expander(
     _fill_in_connection_data(expanded_pop_vertices, transceiver)
 
 
-def _plan_expansion(
-        placements, synapse_expander_bin, delay_expander_bin, transceiver):
+def _plan_expansion(placements, synapse_expander_bin, transceiver):
     """ Plan the expansion of synapses and set up the regions using USER1
 
     :param ~pacman.model.placements.Placements: The placements of the vertices
     :param str synapse_expander_bin: The binary name of the synapse expander
-    :param str delay_expander_bin: The binary name of the delay expander
     :param ~spinnman.transceiver.Transceiver transceiver:
         How to talk to the machine
     :return: The places to load the synapse expander and delay expander
@@ -98,13 +93,6 @@ def _plan_expansion(
                 write_address_to_user1(
                     transceiver, placement.x, placement.y, placement.p,
                     vertex.connection_generator_region)
-
-        elif isinstance(vertex, DelayExtensionMachineVertex):
-            if vertex.gen_on_machine():
-                expander_cores.add_processor(
-                    delay_expander_bin,
-                    placement.x, placement.y, placement.p,
-                    executable_type=ExecutableType.SYSTEM)
 
     return expander_cores, expanded_pop_vertices
 

@@ -68,4 +68,14 @@ accum rng_normal(rng_t *rng);
  */
 void rng_free(rng_t *rng);
 
+/**
+ * \brief An RNG that starts in the same place on every core of the Population
+ */
+extern rng_t *population_rng;
+
+/**
+ * \brief An RNG that is local to the current core
+ */
+extern rng_t *core_rng;
+
 #endif

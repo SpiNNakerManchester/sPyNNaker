@@ -41,7 +41,6 @@ class FromListConnector(AbstractConnector):
         "__extra_parameters",
         "__extra_parameter_names",
         "__split_conn_list",
-        "__split_pre_slices",
         "__split_post_slices"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None,
@@ -110,63 +109,49 @@ class FromListConnector(AbstractConnector):
         else:
             return numpy.var(self.__delays)
 
-    def _split_connections(self, pre_slices, post_slices):
+    def _split_connections(self, post_slices):
         """
-        :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
         :param list(~pacman.model.graphs.commmon.Slice) post_slices:
         :rtype: bool
         """
         # If nothing has changed, use the cache
-        if (self.__split_pre_slices == pre_slices and
-                self.__split_post_slices == post_slices):
+        if self.__split_post_slices == post_slices:
             return False
 
         # If there are no connections, return
-        if not len(self.__sources):
+        if not len(self.__conn_list):
             self.__split_conn_list = {}
             return False
 
-        self.__split_pre_slices = list(pre_slices)
         self.__split_post_slices = list(post_slices)
 
         # Create bins into which connections are to be grouped
-        pre_bins = numpy.concatenate((
-            [0], numpy.sort([s.hi_atom + 1 for s in pre_slices])))
         post_bins = numpy.concatenate((
             [0], numpy.sort([s.hi_atom + 1 for s in post_slices])))
 
-        # Find the group of each item in the separate bins
-        pre_indices = numpy.searchsorted(
-            pre_bins, self.__sources, side="right")
+        # Find the index of the top of each bin in the sorted data
         post_indices = numpy.searchsorted(
             post_bins, self.__targets, side="right")
 
-        # Join the groups from both axes
-        n_bins = (len(pre_bins) + 1, len(post_bins) + 1)
-        joined_indices = numpy.ravel_multi_index(
-            (pre_indices, post_indices), n_bins)
-
         # Get a count of the indices in each bin
-        index_count = numpy.bincount(
-            joined_indices, minlength=numpy.prod(n_bins))
+        n_bins = len(post_bins)
+        index_count = numpy.bincount(post_indices, minlength=n_bins)
 
         # Get a sort order on the connections
-        sort_indices = numpy.argsort(joined_indices)
+        sort_indices = numpy.argsort(post_indices)
 
         # Split the sort order in to groups of connection indices
         split_indices = numpy.array(numpy.split(
             sort_indices, numpy.cumsum(index_count)))
 
         # Ignore the outliers
-        split_indices = split_indices[:-1].reshape(n_bins)[1:-1, 1:-1]
-        split_indices = split_indices.reshape(-1)
+        split_indices = split_indices[1:-1]
 
         # Get the results indexed by hi_atom in the slices
-        pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
-                         for post in post_bins[1:]]
+        post_bins = [(post - 1) for post in post_bins[1:]]
         self.__split_conn_list = {
-            pre_post: indices
-            for pre_post, indices in zip(pre_post_bins, split_indices)
+            post: indices
+            for post, indices in zip(post_bins, split_indices)
             if len(indices) > 0
         }
 
@@ -262,17 +247,14 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, post_slices, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
-        self._split_connections(pre_slices, post_slices)
-        pre_hi = pre_vertex_slice.hi_atom
+        self._split_connections(post_slices)
         post_hi = post_vertex_slice.hi_atom
-        if (pre_hi, post_hi) not in self.__split_conn_list:
+        if post_hi not in self.__split_conn_list:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         else:
-            indices = self.__split_conn_list[
-                pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
+            indices = self.__split_conn_list[post_hi]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
@@ -282,8 +264,8 @@ class FromListConnector(AbstractConnector):
                 block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
                 block["weight"] = self._generate_weights(
-                    block["source"], block["target"], len(indices), None,
-                    pre_vertex_slice, post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices),
+                    post_vertex_slice, synapse_info)
         else:
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
@@ -292,8 +274,8 @@ class FromListConnector(AbstractConnector):
                 block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
                 block["delay"] = self._generate_delays(
-                    block["source"], block["target"], len(indices), None,
-                    pre_vertex_slice, post_vertex_slice, synapse_info)
+                    block["source"], block["target"], len(indices),
+                    post_vertex_slice, synapse_info)
         else:
             block["delay"] = self._clip_delays(self.__delays[indices])
         block["synapse_type"] = synapse_type
@@ -432,14 +414,11 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.could_connect)
     def could_connect(
             self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        pre_slices = \
-            src_machine_vertex.app_vertex.splitter.get_out_going_slices()
         post_slices = \
             dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
-        self._split_connections(pre_slices, post_slices)
-        pre_hi = src_machine_vertex.vertex_slice.hi_atom
+        self._split_connections(post_slices)
         post_hi = dest_machine_vertex.vertex_slice.hi_atom
-        return (pre_hi, post_hi) in self.__split_conn_list
+        return post_hi in self.__split_conn_list
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """

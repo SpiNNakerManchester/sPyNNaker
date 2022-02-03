@@ -36,12 +36,13 @@ class PopulationSynapsesMachineVertexLead(
         "__weight_scales",
         "__all_syn_block_sz",
         "__structural_sz",
-        "__synapse_references"]
+        "__synapse_references",
+        "__max_atoms_per_core"]
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
             vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
-            structural_sz, synapse_references):
+            structural_sz, synapse_references, max_atoms_per_core):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -60,6 +61,7 @@ class PopulationSynapsesMachineVertexLead(
         self.__all_syn_block_sz = all_syn_block_sz
         self.__structural_sz = structural_sz
         self.__synapse_references = synapse_references
+        self.__max_atoms_per_core = max_atoms_per_core
 
         # Need to do this last so that the values above can be used
         self.__synaptic_matrices = self._create_synaptic_matrices(False)
@@ -78,6 +80,11 @@ class PopulationSynapsesMachineVertexLead(
     @overrides(PopulationMachineSynapses._synapse_references)
     def _synapse_references(self):
         return self.__synapse_references
+
+    @property
+    @overrides(PopulationMachineSynapses._max_atoms_per_core)
+    def _max_atoms_per_core(self):
+        return self.__max_atoms_per_core
 
     @overrides(PopulationMachineCommon.get_recorded_region_ids)
     def get_recorded_region_ids(self):

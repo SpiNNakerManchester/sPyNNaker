@@ -13,13 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APPS = delay_expander.mk synapse_expander.mk
+APP = synapse_expander
+BUILD_DIR = build/
+SOURCES = synapse_expander/rng.c \
+          synapse_expander/common_kernel.c \
+          synapse_expander/param_generator.c \
+          synapse_expander/connection_generator.c \
+          synapse_expander/matrix_generator.c \
+          synapse_expander/synapse_expander.c
 
-all: $(APPS)
-	for f in $(APPS); do $(MAKE) -f $$f || exit $$?; done
-
-%.aplx: %.mk
-	"$(MAKE)" -f $*
-
-clean: $(DIRS)
-	for f in $(APPS); do $(MAKE) -f $$f clean || exit $$?; done
+include ../neural_support.mk

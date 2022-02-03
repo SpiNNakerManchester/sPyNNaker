@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import math
-
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.constraints.partitioner_constraints import (
@@ -30,14 +28,8 @@ from pacman.utilities.algorithm_utilities.\
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionVertex, DelayExtensionMachineVertex)
-from spynnaker.pyNN.models.utility_models.delays.delay_generator_data import (
-    DelayGeneratorData)
 
 
 class SplitterDelayVertexSlice(AbstractSplitterCommon):
@@ -149,7 +141,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         :param vertex_slice: the slice
         :rtype: ResourceContainer
         """
-        constant_sdram = self.constant_sdram(vertex_slice)
+        constant_sdram = self.constant_sdram()
 
         # set resources required from this object
         container = ResourceContainer(
@@ -160,7 +152,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         # return the total resources.
         return container
 
-    def constant_sdram(self, vertex_slice):
+    def constant_sdram(self):
         """ returns the sdram used by the delay extension
 
         :param ApplicationGraph graph: app graph
@@ -169,11 +161,10 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """
         return ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
-            self._governed_app_vertex.delay_params_size(vertex_slice) +
+            self._governed_app_vertex.delay_params_size() +
             self._governed_app_vertex.tdma_sdram_size_in_bytes +
             DelayExtensionMachineVertex.get_provenance_data_size(
-                DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +
-            self._get_size_of_generator_information())
+                DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES))
 
     def dtcm_cost(self, vertex_slice):
         """ returns the dtcm used by the delay extension slice.
@@ -192,53 +183,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """
         return CPUCyclesPerTickResource(
             self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms)
-
-    def _get_size_of_generator_information(self):
-        """ Get the size of the generator data
-
-        :rtype: int
-        """
-        gen_on_machine = False
-        size = 0
-        for out_edge in self._governed_app_vertex.outgoing_edges:
-            for synapse_info in out_edge.synapse_information:
-
-                # Get the number of likely vertices
-                max_atoms = out_edge.post_vertex.get_max_atoms_per_core()
-                if out_edge.post_vertex.n_atoms < max_atoms:
-                    max_atoms = out_edge.post_vertex.n_atoms
-                n_edge_vertices = int(math.ceil(
-                    out_edge.post_vertex.n_atoms / float(max_atoms)))
-
-                # Get the size
-                gen_size = self._get_edge_generator_size(synapse_info)
-                if gen_size > 0:
-                    gen_on_machine = True
-                    size += gen_size * n_edge_vertices
-        if gen_on_machine:
-            size += self._EXPANDER_BASE_PARAMS_SIZE
-        return size
-
-    @staticmethod
-    def _get_edge_generator_size(synapse_info):
-        """ Get the size of the generator data for a given synapse info object
-
-        :param SynapseInformation synapse_info: the synapse info
-        """
-        connector = synapse_info.connector
-        dynamics = synapse_info.synapse_dynamics
-        connector_gen = (isinstance(
-            connector, AbstractGenerateConnectorOnMachine) and
-            connector.generate_on_machine(
-                synapse_info.weights, synapse_info.delays))
-        synapse_gen = isinstance(dynamics, AbstractGenerateOnMachine)
-        if connector_gen and synapse_gen:
-            return sum((
-                DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delays),
-                connector.gen_connector_params_size_in_bytes))
-        return 0
 
     @overrides(AbstractSplitterCommon.check_supported_constraints)
     def check_supported_constraints(self):

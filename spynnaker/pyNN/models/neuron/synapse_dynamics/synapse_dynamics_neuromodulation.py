@@ -145,7 +145,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_n_synapses):
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            max_atoms_per_core):
         # pylint: disable=too-many-arguments
         weights = numpy.rint(
             numpy.abs(connections["weight"]) * STDP_FIXED_POINT_ONE)
@@ -194,7 +195,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
-            fp_size, fp_data):
+            fp_size, fp_data, max_atoms_per_core):
         data = numpy.concatenate(fp_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
@@ -221,15 +222,21 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
 
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
-    def gen_matrix_params(self):
-        return numpy.array([NEUROMODULATION_TARGETS["reward"]],
-                           dtype=numpy.uint32)
+    def gen_matrix_params(
+            self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
+            synapse_info, max_row_info, max_atoms_per_core):
+        synapse_type = synapse_info.synapse_type
+        return numpy.array([
+            synaptic_matrix_offset,
+            max_row_info.undelayed_max_words, app_edge.pre_vertex.n_atoms,
+            synapse_type is NEUROMODULATION_TARGETS["reward"], synapse_type],
+            dtype=numpy.uint32)
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 1 * BYTES_PER_WORD
+        return 5 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)

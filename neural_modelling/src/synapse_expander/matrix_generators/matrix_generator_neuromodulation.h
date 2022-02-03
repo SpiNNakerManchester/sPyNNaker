@@ -20,29 +20,6 @@
  * \brief Neuromodulation synaptic matrix implementation
  */
 
-/**
- * \brief How to generate a row of a static synaptic matrix
- * \param[in] generator:
- *      The data for the matrix generator, returned by the initialise function
- * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[out] delayed_synaptic_matrix:
- *      The address of the synaptic matrix to write delayed connections to
- * \param[in] n_pre_neurons: The number of pre neurons to generate for
- * \param[in] pre_neuron_index: The index of the first pre neuron
- * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words:
- *      The maximum number of words in a delayed row
- * \param[in] synapse_type_bits: The number of bits used for the synapse type
- * \param[in] synapse_index_bits: The number of bits used for the neuron id
- * \param[in] synapse_type: The synapse type of each connection
- * \param[in] n_synapses: The number of synapses
- * \param[in] indices: Pointer to table of indices
- * \param[in] delays: Pointer to table of delays
- * \param[in] weights: Pointer to table of weights
- * \param[in] max_stage: The maximum delay stage to support
- * \param[in] max_delay_per_stage: The max delay per delay stage
- */
-
 #include <stdbool.h>
 #include <debug.h>
 #include <delay_extension/delay_extension.h>
@@ -51,7 +28,16 @@
 #include <utils.h>
 
 typedef struct {
-    uint32_t reward_synapse_type;
+    union {
+        //! The address of the synaptic matrix (once initialised)
+        uint32_t *synaptic_matrix;
+        //! The offset of the synaptic matrix (as read from SDRAM)
+        uint32_t synaptic_matrix_offset;
+    };
+    uint32_t max_row_n_words;
+    uint32_t n_pre_neurons;
+    uint32_t is_reward;
+    uint32_t synapse_type;
 } matrix_generator_neuromodulation;
 
 //! The layout of the initial plastic synapse part of the row
@@ -70,12 +56,56 @@ typedef struct {
 } row_nm_fixed_t;
 
 /**
+ * \brief Get a synaptic row for a given neuron
+ * \param[in] synaptic_matrix the address of the synaptic matrix
+ * \param[in] max_row_n_words the maximum number of words (excluding headers)
+ *                            in each row of the table
+ * \param[in] pre_index the index of the pre-neuron relative to the start of the
+ *                      matrix
+ * \return A pointer to the row of the matrix to write to
+ */
+static row_nm_plastic_t *get_nm_row(uint32_t *synaptic_matrix, uint32_t max_row_n_words,
+        uint32_t pre_index) {
+    uint32_t idx = pre_index * (max_row_n_words + N_HEADER_WORDS);
+    return (row_nm_plastic_t *) &synaptic_matrix[idx];
+}
+
+/**
+ * \brief Get the fixed part of a row that comes after the plastic part.
+ * \param[in] plastic_row A pointer to the row to find the fixed part of
+ * \return A pointer to the fixed part of the matrix to write to
+ */
+static row_nm_fixed_t *get_nm_fixed_row(row_nm_plastic_t *plastic_row) {
+    return (row_nm_fixed_t *) &plastic_row[1];
+}
+
+/**
+ * \brief Set up the rows so that they are ready for writing to
+ * \param[in] matrix The base address of the matrix to set up
+ * \param[in] n_rows The number of rows in the matrix
+ * \param[in] max_row_n_words The maximum number of words used by a row
+ */
+static void setup_nm_rows(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words) {
+    // Set all the header half-words to 0 and set all the sizes
+    for (uint32_t i = 0; i < n_rows; i++) {
+        row_nm_plastic_t *row = get_nm_row(matrix, max_row_n_words, i);
+        row->plastic_plastic_size = 1;
+        row_nm_fixed_t *fixed = get_nm_fixed_row(row);
+        fixed->fixed_fixed_size = 0;
+        fixed->fixed_plastic_size = 0;
+    }
+}
+
+
+/**
  * \brief Initialise the Neuromodulation synaptic matrix generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
+ * \param[in] synaptic_matrix: The base address of the synaptic matrix
  * \return A data item to be passed in to other functions later on
  */
-void *matrix_generator_neuromodulation_initialize(void **region) {
+void *matrix_generator_neuromodulation_initialize(void **region,
+        void *synaptic_matrix) {
     // Allocate memory for the parameters
     matrix_generator_neuromodulation *conf =
             spin1_malloc(sizeof(matrix_generator_neuromodulation));
@@ -84,6 +114,12 @@ void *matrix_generator_neuromodulation_initialize(void **region) {
     matrix_generator_neuromodulation *params_sdram = *region;
     *conf = *params_sdram;
     *region = &params_sdram[1];
+
+    // Offsets are in words
+    uint32_t *syn_mat = synaptic_matrix;
+    conf->synaptic_matrix = &(syn_mat[conf->synaptic_matrix_offset]);
+    setup_nm_rows(conf->synaptic_matrix, conf->n_pre_neurons, conf->max_row_n_words);
+
     return conf;
 }
 
@@ -95,42 +131,17 @@ void matrix_generator_neuromodulation_free(void *generator) {
     sark_free(generator);
 }
 
-static void matrix_generator_neuromodulation_write_row(
-        void *generator,
-        address_t synaptic_matrix, UNUSED address_t delayed_synaptic_matrix,
-        UNUSED uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_n_words, UNUSED uint32_t max_delayed_row_n_words,
-        UNUSED uint32_t synapse_type_bits, UNUSED uint32_t synapse_index_bits,
-        uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices,
-        UNUSED uint16_t *delays, uint16_t *weights, UNUSED uint32_t max_stage,
-        UNUSED uint32_t max_delay_per_stage) {
-
+static void matrix_generator_neuromodulation_write_synapse(void *generator,
+        uint32_t pre_index, uint16_t post_index, uint16_t weight,
+        UNUSED uint16_t delay) {
     matrix_generator_neuromodulation *conf = generator;
-
-    // The number of words in a row including headers
-    uint32_t n_row_words = max_row_n_words + 3;
-
-    // The normal row position
-    row_nm_plastic_t *row =
-            (row_nm_plastic_t *) &synaptic_matrix[pre_neuron_index * n_row_words];
-    row->plastic_plastic_size = 1;
-    row->is_neuromodulation = 1;
-    row->is_reward = synapse_type == conf->reward_synapse_type;
-    row->synapse_type = synapse_type;
-
-    // Set the fixed-fixed size to 0 and point to the fixed-plastic region
-    row_nm_fixed_t *fixed = (row_nm_fixed_t *) &row[1];
-    fixed->fixed_fixed_size = 0;
-    fixed->fixed_plastic_size = n_synapses;
-
-    // Go through the synapses
-    for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
-        // Post-neuron index
-        uint32_t post_index = indices[synapse];
-
-        // Weight
-        uint16_t weight = weights[synapse];
-
-        fixed->fixed_plastic_data[synapse] = (weight << 16) | post_index;
-    }
+    row_nm_plastic_t *plastic_row = get_nm_row(conf->synaptic_matrix,
+            conf->max_row_n_words, pre_index);
+    row_nm_fixed_t *fixed_row = get_nm_fixed_row(plastic_row);
+    plastic_row->is_neuromodulation = 1;
+    plastic_row->is_reward = conf->is_reward;
+    plastic_row->synapse_type = conf->synapse_type;
+    uint32_t pos = fixed_row->fixed_fixed_size;
+    fixed_row->fixed_fixed_size = pos + 1;
+    fixed_row->fixed_plastic_data[pos] = (weight << 16) | post_index;
 }

@@ -25,6 +25,8 @@
 
 #include <common-typedefs.h>
 #include <spin1_api.h>
+#include "param_generator.h"
+#include "matrix_generator.h"
 
 #ifndef UNUSED
 #define UNUSED __attribute__((__unused__))
@@ -37,13 +39,29 @@
 typedef uint32_t generator_hash_t;
 
 /**
- * \brief How to initialise the generator; all generator types use the same
- * signature of initialiser
+ * \brief How to initialise the param generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-typedef void* (initialize_func)(void **region);
+typedef void* (initialize_param_func)(void **region);
+
+/**
+ * \brief How to initialise the connection generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
+typedef void* (initialize_connector_func)(void **region);
+
+/**
+ * \brief How to initialise the matrix generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \param[in] synaptic_matrix: The address of the base of the synaptic matrix
+ * \return A data item to be passed in to other functions later on
+ */
+typedef void* (initialize_matrix_func)(void **region, void *synaptic_matrix);
 
 /**
  * \brief How to free any data for the generator; all generator types use
@@ -51,6 +69,25 @@ typedef void* (initialize_func)(void **region);
  * \param[in] data: The data to free
  */
 typedef void (free_func)(void *data);
+
+/**
+ * \brief How to generate values with a parameter generator
+ * \param[in] generator: The generator to use to generate values
+ * \return The value generated
+ */
+typedef accum (generate_param_func)(void *generator);
+
+/**
+ * \brief How to write a synapse to a matrix
+ * \param[in] generator: The generator data
+ * \param[in] pre_index: The index of the pre-neuron relative to the start of
+ *                       the matrix
+ * \param[in] post_index: The index of the post-neuron on this core
+ * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
+ * \param[in] delay: The delay of the synapse in time steps
+ */
+typedef void (write_synapse_func)(void *generator,
+        uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);
 
 /**
  * \brief How to generate connections with a connection generator
@@ -71,55 +108,48 @@ typedef void (free_func)(void *data);
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-typedef uint32_t (generate_connection_func)(
-        void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count,
-        uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
+typedef void (generate_connection_func)(
+        void *generator, uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
+        uint32_t post_slice_start, uint32_t post_slice_count,
+        unsigned long accum weight_scale, accum timestep_per_delay,
+        param_generator_t weight_generator, param_generator_t delay_generator,
+        matrix_generator_t matrix_generator);
 
-/**
- * \brief How to generate values with a parameter generator
- * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
- */
-typedef void (generate_param_func)(
-        void *generator, uint32_t n_indices, uint32_t pre_neuron_index,
-        uint16_t *indices, accum *values);
+//! \brief Rescales a delay to account for timesteps and type-converts it
+//! \param[in] delay: the delay to rescale
+//! \param[in] timestep_per_delay: The timestep unit
+//! \return the rescaled delay
+static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
+    accum ts_delay = delay * timestep_per_delay;
+    if (ts_delay < 0) {
+        ts_delay = 1;
+    }
+    uint16_t delay_int = (uint16_t) ts_delay;
+    if (ts_delay != delay_int) {
+        log_debug("Rounded delay %k to %u", delay, delay_int);
+    }
+    return delay_int;
+}
 
-/**
- * \brief How to generate a row of a matrix with a matrix generator
- * \param[in] generator: The data for the matrix generator, returned by the
- *                       initialise function
- * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                      write delayed connections to
- * \param[in] n_pre_neurons: The number of pre neurons to generate for
- * \param[in] pre_neuron_index: The index of the first pre neuron
- * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words: The maximum number of words in a
- *                                     delayed row
- * \param[in] synapse_type_bits: The number of bits used for the synapse type
- * \param[in] synapse_index_bits: The number of bits used for the neuron id
- * \param[in] synapse_type: The synapse type of each connection
- * \param[in] n_synapses: The number of synapses
- * \param[in] indices: Pointer to table of indices
- * \param[in] delays: Pointer to table of delays
- * \param[in] weights: Pointer to table of weights
- * \param[in] max_stage: The maximum delay stage to support
- * \param[in] max_delay_in_a_stage: max delay in a delay stage
- */
-typedef void (generate_row_func)(
-        void *generator,
-        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-        uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
-        uint32_t synapse_type_bits, uint32_t synapse_index_bits,
-        uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage, uint32_t max_delay_in_a_stage);
+//! \brief Rescales a weight to account for weight granularity and
+//!     type-converts it
+//! \param[in] weight: the weight to rescale
+//! \param[in] weight_scale: The weight scaling factor
+//! \return the rescaled weight
+static inline uint16_t rescale_weight(accum weight, unsigned long accum weight_scale) {
+    if (weight < 0) {
+        weight = -weight;
+    }
+    accum weight_scaled = weight * weight_scale;
+    uint16_t weight_int = (uint16_t) weight_scaled;
+    if (weight_scaled != weight_int) {
+        log_debug("Rounded weight %k to %u (scale is %k)",
+                weight_scaled, weight_int, weight_scale);
+    }
+    return weight_int;
+}
+
+#define max(a, b) (a > b? a: b)
 
 #endif //INCLUDED_GENERATOR_TYPES_H

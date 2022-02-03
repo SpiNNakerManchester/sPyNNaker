@@ -247,7 +247,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__add_lead_synapse_core(
                     vertex_slice, all_syn_block_sz, structural_sz,
                     lead_synapse_resources, label, rb_shifts, weight_scales,
-                    synapse_vertices, neuron_vertex, constraints)
+                    synapse_vertices, neuron_vertex, constraints,
+                    atoms_per_core)
             chip_counter.add_core(lead_synapse_resources)
 
             # Do the remaining synapse cores
@@ -332,7 +333,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def __add_lead_synapse_core(
             self, vertex_slice, all_syn_block_sz, structural_sz,
             lead_synapse_resources, label, rb_shifts, weight_scales,
-            synapse_vertices, neuron_vertex, constraints):
+            synapse_vertices, neuron_vertex, constraints, atoms_per_core):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
@@ -358,6 +359,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The neuron vertex the synapses will feed into
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints to add
+        :param int atoms_per_core: The maximum atoms per core
         :return: References to the synapse regions that can be used by a shared
             synapse core, and the basic label for the synapse cores
         :rtype: tuple(SynapseRegions, str)
@@ -370,7 +372,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
             lead_synapse_resources, "{}(0)".format(syn_label), constraints,
             self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
-            all_syn_block_sz, structural_sz, synapse_references)
+            all_syn_block_sz, structural_sz, synapse_references,
+            atoms_per_core)
         self._governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)

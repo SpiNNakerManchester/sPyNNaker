@@ -79,7 +79,8 @@ class PopulationMachineVertex(
         "__weight_scales",
         "__all_syn_block_sz",
         "__structural_sz",
-        "__slice_index"]
+        "__slice_index",
+        "__max_atoms_per_core"]
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
@@ -146,7 +147,7 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
-            all_syn_block_sz, structural_sz):
+            all_syn_block_sz, structural_sz, max_atoms_per_core):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -165,6 +166,7 @@ class PopulationMachineVertex(
             The scaling to apply to weights to store them in the synapses
         :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
+        :param int n_neuron_bits: The number of bits to use for neuron ids
         """
         super(PopulationMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -173,13 +175,14 @@ class PopulationMachineVertex(
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__synaptic_matrices = self._create_synaptic_matrices()
         self.__change_requires_neuron_parameters_reload = False
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
         self.__all_syn_block_sz = all_syn_block_sz
         self.__structural_sz = structural_sz
+        self.__max_atoms_per_core = max_atoms_per_core
+        self.__synaptic_matrices = self._create_synaptic_matrices()
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -209,6 +212,11 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineSynapses._synaptic_matrices)
     def _synaptic_matrices(self):
         return self.__synaptic_matrices
+
+    @property
+    @overrides(PopulationMachineSynapses._max_atoms_per_core)
+    def _max_atoms_per_core(self):
+        return self.__max_atoms_per_core
 
     @staticmethod
     def __get_binary_file_name(app_vertex):

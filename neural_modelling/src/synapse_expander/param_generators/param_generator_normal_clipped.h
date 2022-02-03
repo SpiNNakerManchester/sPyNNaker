@@ -48,7 +48,6 @@ struct normal_clipped_params {
  */
 struct param_generator_normal_clipped {
     struct normal_clipped_params params;
-    rng_t *rng;
 };
 
 /**
@@ -70,9 +69,6 @@ static void *param_generator_normal_clipped_initialize(void **region) {
     log_debug("normal clipped mu = %k, sigma = %k, low = %k, high = %k",
             obj->params.mu, obj->params.sigma, obj->params.low,
             obj->params.high);
-
-    // Initialise the RNG for this generator
-    obj->rng = rng_init(region);
     return obj;
 }
 
@@ -81,41 +77,32 @@ static void *param_generator_normal_clipped_initialize(void **region) {
  * \param[in] generator: The generator to free
  */
 static void param_generator_normal_clipped_free(void *generator) {
-    struct param_generator_normal_clipped *obj = generator;
-    rng_free(obj->rng);
     sark_free(generator);
 }
 
 /**
  * \brief How to generate values with the clipped normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
- * \param[in] n_indices: The number of values to generate
- * \param[in] pre_neuron_index: The index of the neuron in the pre-population
- *                              being generated
- * \param[in] indices: The \p n_indices post-neuron indices for each connection
- * \param[out] values: An array into which to place the values; will be
- *                     \p n_indices in size
+ * \return The generated value
  */
-static void param_generator_normal_clipped_generate(
-        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
-        UNUSED uint16_t *indices, accum *values) {
+static accum param_generator_normal_clipped_generate(void *generator) {
     // For each index, generate a normally distributed random value, redrawing
     // if outside the given range
     struct param_generator_normal_clipped *obj = generator;
-    for (uint32_t i = 0; i < n_indices; i++) {
-        uint32_t n_draws = 0;
-        do {
-            accum value = rng_normal(obj->rng);
-            values[i] = obj->params.mu + (value * obj->params.sigma);
-            n_draws++;
-        } while ((values[i] < obj->params.low || values[i] > obj->params.high)
-                && (n_draws < MAX_REDRAWS));
-        if (n_draws == MAX_REDRAWS) {
-            log_error("Maximum number of redraws (%u) exceeded on clipped normal "
-                    "distribution with mu=%k, sigma=%k, low=%k, high=%k",
-                    n_draws, obj->params.mu, obj->params.sigma, obj->params.low,
-                    obj->params.high);
-            rt_error(RTE_SWERR);
-        }
+    uint32_t n_draws = 0;
+    accum value = 0k;
+    do {
+        value = rng_normal(core_rng);
+        value = obj->params.mu + (value * obj->params.sigma);
+        n_draws++;
+    } while ((value < obj->params.low || value > obj->params.high)
+            && (n_draws < MAX_REDRAWS));
+    if (n_draws == MAX_REDRAWS) {
+        log_error("Maximum number of redraws (%u) exceeded on clipped normal "
+                "distribution with mu=%k, sigma=%k, low=%k, high=%k",
+                n_draws, obj->params.mu, obj->params.sigma, obj->params.low,
+                obj->params.high);
+        rt_error(RTE_SWERR);
     }
+    return value;
 }

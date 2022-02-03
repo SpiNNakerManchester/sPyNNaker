@@ -24,16 +24,12 @@
 #include <synapse_expander/generator_types.h>
 
 // Eclipse does *NOT* like this type!
-typedef unsigned long fract _probability_t;
+typedef unsigned long fract probability_t;
 
 //! The parameters that can be copied in from SDRAM
 struct fixed_prob_params {
-    uint32_t pre_lo;
-    uint32_t pre_hi;
-    uint32_t post_lo;
-    uint32_t post_hi;
     uint32_t allow_self_connections;
-    _probability_t probability;
+    probability_t probability;
 };
 
 /**
@@ -43,7 +39,6 @@ struct fixed_prob_params {
  */
 struct fixed_prob {
     struct fixed_prob_params params;
-    rng_t *rng;
 };
 
 /**
@@ -61,14 +56,9 @@ static void *connection_generator_fixed_prob_initialise(void **region) {
     obj->params = *params_sdram;
     *region = &params_sdram[1];
 
-    // Initialise the RNG for the connector
-    obj->rng = rng_init(region);
-    log_debug("Fixed Probability Connector, pre_lo = %u, pre_hi = %u, "
-    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
+    log_debug("Fixed Probability Connector, allow self connections = %u, "
             "probability = %k",
-			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
-            obj->params.allow_self_connections,
-            (accum) obj->params.probability);
+			obj->params.allow_self_connections, (accum) obj->params.probability);
     return obj;
 }
 
@@ -77,8 +67,6 @@ static void *connection_generator_fixed_prob_initialise(void **region) {
  * \param[in] generator: The generator to free
  */
 static void connection_generator_fixed_prob_free(void *generator) {
-    struct fixed_prob *params = generator;
-    rng_free(params->rng);
     sark_free(generator);
 }
 
@@ -101,50 +89,38 @@ static void connection_generator_fixed_prob_free(void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static uint32_t connection_generator_fixed_prob_generate(
-        void *generator, UNUSED uint32_t pre_slice_start,
-        UNUSED uint32_t pre_slice_count,
-        uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
+static void connection_generator_fixed_prob_generate(
+        void *generator, uint32_t pre_lo, uint32_t pre_hi,
+        uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
+        uint32_t post_slice_start, uint32_t post_slice_count,
+        unsigned long accum weight_scale, accum timestep_per_delay,
+        param_generator_t weight_generator, param_generator_t delay_generator,
+        matrix_generator_t matrix_generator) {
     struct fixed_prob *obj = generator;
 
-    // If no space, generate nothing
-    if (max_row_length < 1) {
-        return 0;
-    }
+    // Get the actual ranges to generate within
+    uint32_t post_start = max(post_slice_start, post_lo);
+    uint32_t post_end = min(post_slice_start + post_slice_count - 1, post_hi);
 
-    // If not in the pre-population view range, then don't generate
-    if ((pre_neuron_index < obj->params.pre_lo) ||
-    		(pre_neuron_index > obj->params.pre_hi)) {
-    	return 0;
-    }
+    for (uint32_t pre = pre_lo; pre <= pre_hi; pre++) {
+        for (uint32_t post = post_start; post <= post_end; post++) {
+            if (pre == post && !obj->params.allow_self_connections) {
+                continue;
+            }
 
-    // Randomly select connections to each post-neuron
-    uint32_t n_conns = 0;
-    for (uint32_t i = 0; i < post_slice_count; i++) {
-        // Disallow self connections if configured
-        if (!obj->params.allow_self_connections &&
-                (pre_neuron_index == post_slice_start + i)) {
-            continue;
-        }
+            // Generate a random number
+            probability_t value = ulrbits(rng_generator(core_rng));
 
-        // Don't generate if the value is not in the range of the post-population view
-        if ((i + post_slice_start < obj->params.post_lo) ||
-        	(i + post_slice_start > obj->params.post_hi)) {
-        	continue;
-        }
-
-        // Generate a random number
-        _probability_t value = ulrbits(rng_generator(obj->rng));
-
-        // If less than our probability, generate a connection if possible
-        if ((value <= obj->params.probability) &&
-                (n_conns < max_row_length)) {
-            indices[n_conns++] = i;
-        } else if (n_conns >= max_row_length) {
-            log_warning("Row overflow");
+            // If less than our probability, generate a connection
+            if (value <= obj->params.probability) {
+                uint32_t local_post = post - post_slice_start;
+                uint16_t weight = rescale_weight(
+                        param_generator_generate(weight_generator), weight_scale);
+                uint16_t delay = rescale_delay(
+                        param_generator_generate(delay_generator), timestep_per_delay);
+                matrix_generator_write_synapse(matrix_generator, pre, local_post,
+                        weight, delay);
+            }
         }
     }
-
-    return n_conns;
 }

@@ -16,11 +16,9 @@
 import numpy
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 from .generator_data import GeneratorData, SYN_REGION_UNUSED
-from .synapse_io import get_synapses, convert_to_connections
+from .synapse_io import convert_to_connections
 
 
 class SynapticMatrix(object):
@@ -139,62 +137,6 @@ class SynapticMatrix(object):
         self.__is_single = False
         self.__received_block = None
         self.__delay_received_block = None
-
-    def __is_direct(self, single_addr):
-        """ Determine if the given connection can be done with a "direct"\
-            synaptic matrix - this must have an exactly 1 entry per row
-
-        :param int single_addr: The current offset of the direct matrix
-        :rtype: bool
-        """
-        if not self.__is_direct_capable:
-            return False
-        next_addr = single_addr + self.__single_matrix_size
-        return next_addr <= self.__all_single_syn_sz
-
-    def get_row_data(self):
-        """ Generate the row data for a synaptic matrix from the description
-
-        :return: The data and the delayed data
-        :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
-        """
-
-        # Get the actual connections
-        pre_slices =\
-            self.__app_edge.pre_vertex.splitter.get_out_going_slices()
-        post_slices =\
-            self.__app_edge.post_vertex.splitter.get_in_coming_slices()
-        connections = self.__synapse_info.connector.create_synaptic_block(
-            pre_slices, post_slices, self.__pre_slice, self.__post_slice,
-            self.__synapse_info.synapse_type, self.__synapse_info)
-
-        # Get the row data; note that we use the availability of the routing
-        # keys to decide if we should actually generate any data; this is
-        # because a single edge might have been filtered
-        (row_data, delayed_row_data, delayed_source_ids,
-         delay_stages) = get_synapses(
-            connections, self.__synapse_info, self.__app_edge.n_delay_stages,
-            self.__n_synapse_types, self.__weight_scales, self.__app_edge,
-            self.__pre_slice, self.__post_slice, self.__max_row_info,
-            self.__routing_info is not None,
-            self.__delay_routing_info is not None)
-
-        # Set connections for structural plasticity
-        if isinstance(self.__synapse_info.synapse_dynamics,
-                      AbstractSynapseDynamicsStructural):
-            self.__synapse_info.synapse_dynamics.set_connections(
-                connections, self.__post_slice, self.__app_edge,
-                self.__synapse_info, self.__pre_index, self.__pre_slice)
-
-        if self.__app_edge.delay_edge is not None:
-            self.__app_edge.delay_edge.pre_vertex.add_delays(
-                self.__pre_slice, delayed_source_ids, delay_stages)
-        elif delayed_source_ids.size != 0:
-            raise Exception(
-                "Found delayed source IDs but no delay "
-                "edge for {}".format(self.__app_edge.label))
-
-        return row_data, delayed_row_data
 
     def write_machine_matrix(
             self, spec, block_addr, single_synapses, single_addr, row_data):
@@ -368,7 +310,6 @@ class SynapticMatrix(object):
             The synaptic matrix offset to write the delayed data to
         :rtype: GeneratorData
         """
-        self.__write_on_chip_delay_data()
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -380,26 +321,6 @@ class SynapticMatrix(object):
             self.__pre_slice, self.__post_slice,
             self.__synapse_info, self.__app_edge.n_delay_stages + 1,
             self.__app_edge.post_vertex.splitter.max_support_delay())
-
-    def __write_on_chip_delay_data(self):
-        """ Write data for delayed on-chip generation
-        """
-        # If delay edge exists, tell this about the data too, so it can
-        # generate its own data
-        if (self.__max_row_info.delayed_max_n_synapses > 0 and
-                self.__app_edge.delay_edge is not None):
-            self.__app_edge.delay_edge.pre_vertex.add_generator_data(
-                self.__max_row_info.undelayed_max_n_synapses,
-                self.__max_row_info.delayed_max_n_synapses,
-                self.__app_edge.pre_vertex.splitter.get_out_going_slices(),
-                self.__app_edge.post_vertex.splitter.get_in_coming_slices(),
-                self.__pre_slice, self.__post_slice,
-                self.__synapse_info, self.__app_edge.n_delay_stages + 1,
-                self.__app_edge.post_vertex.splitter.max_support_delay())
-        elif self.__max_row_info.delayed_max_n_synapses != 0:
-            raise Exception(
-                "Found delayed items but no delay machine edge for {}".format(
-                    self.__app_edge.label))
 
     def __next_addr(self, block_addr, size, max_addr=None):
         """ Get the next block address and check it hasn't overflowed the

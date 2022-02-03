@@ -370,8 +370,7 @@ class SpikeSourcePoissonMachineVertex(
             # If we are here, the connector must be one-to-one so create
             # the synapses and then store the scaled weights
             connections = synapse_info.connector.create_synaptic_block(
-                None, None, self.vertex_slice, self.vertex_slice, synapse_type,
-                synapse_info)
+                None, self.vertex_slice, synapse_type, synapse_info)
             weight_scales = (
                 next(iter(self.__sdram_partition.edges))
                 .post_vertex.weight_scales)
