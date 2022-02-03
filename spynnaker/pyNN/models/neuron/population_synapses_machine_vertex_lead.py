@@ -64,7 +64,7 @@ class PopulationSynapsesMachineVertexLead(
         self.__max_atoms_per_core = max_atoms_per_core
 
         # Need to do this last so that the values above can be used
-        self.__synaptic_matrices = self._create_synaptic_matrices(False)
+        self.__synaptic_matrices = self._create_synaptic_matrices()
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
