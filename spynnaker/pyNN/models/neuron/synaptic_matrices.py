@@ -349,7 +349,8 @@ class SynapticMatrices(object):
         # Find the bit that is just for the core
         core_mask = r_info.machine_mask - r_info.first_mask
         mask_size = r_info.n_bits_atoms
-        n_atoms = r_info.vertex.n_atoms
+        pre = r_info.vertex
+        n_atoms = min(pre.splitter.max_atoms_per_core, pre.n_atoms)
 
         return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
                            mask_size, n_atoms * n_stages)
