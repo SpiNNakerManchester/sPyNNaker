@@ -22,6 +22,7 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker import _version
 
@@ -54,20 +55,20 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
-        front_end_versions = [("sPyNNaker8_version", _version.__version__)]
-        front_end_versions.append(("pyNN_version", pynn_version))
-        front_end_versions.append(("quantities_version", quantities_version))
-        front_end_versions.append(("neo_version", neo_version))
-        front_end_versions.append(("lazyarray_version", lazyarray_version))
-
         # SpiNNaker setup
         super(SpiNNaker, self).__init__(
             database_socket_addresses=database_socket_addresses,
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             min_delay=min_delay,
-            timestep=timestep, time_scale_factor=time_scale_factor,
-            front_end_versions=front_end_versions)
+            timestep=timestep, time_scale_factor=time_scale_factor)
+
+        with ProvenanceWriter() as db:
+            db.insert_version("sPyNNaker_version", _version.__version__)
+            db.insert_version("pyNN_version", pynn_version)
+            db.insert_version("quantities_version", quantities_version)
+            db.insert_version("neo_version", neo_version)
+            db.insert_version("lazyarray_version", lazyarray_version)
 
     def run(self, run_time, sync_time=0.0):
         """ Run the simulation for a span of simulation time.
