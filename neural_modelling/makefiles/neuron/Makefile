@@ -13,17 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
-         IF_cond_exp_cerebellum_stdp_mad_mfvn_mfvn \
-		 IF_curr_exp \
+MODELS = IF_curr_exp \
          IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
          IF_curr_exp_stdp_mad_pair_additive \
-         #IF_curr_exp_stdp_mad_pair_multiplicative \
+         IF_curr_exp_stdp_mad_pair_multiplicative \
          IF_cond_exp_stdp_mad_pair_additive \
          external_device_lif_control \
+         IF_cond_exp_stoc \
          IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
          IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
          IF_curr_exp_stdp_mad_vogels_2011_additive \
@@ -40,8 +39,6 @@ MODELS = IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
          IF_curr_exp_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_random_distance_weight \
          IF_curr_exp_sEMD \
-         #IF_cond_exp_stoc \
-         IF_curr_exp_sEMD \
          IZK_curr_exp_stdp_mad_pair_additive \
          IZK_cond_exp_stdp_mad_pair_additive \
          IF_curr_exp_stdp_izhikevich_neuromodulation_pair_additive \
@@ -56,7 +53,9 @@ MODELS = IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
          IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
          IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
-         IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight
+         IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight \
+         IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
+         IF_cond_exp_cerebellum_stdp_mad_mfvn_mfvn
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done

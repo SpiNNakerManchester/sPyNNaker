@@ -64,7 +64,7 @@ static inline void send_spike_mc(uint32_t key) {
 static inline void send_spike(UNUSED uint32_t timer_count, UNUSED uint32_t time,
         uint32_t neuron_index) {
     // Do any required synapse processing
-//    synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+    synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
     if (use_key) {
         send_spike_mc(key | neuron_index);

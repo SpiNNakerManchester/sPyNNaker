@@ -321,26 +321,26 @@ static inline void start_dma_loop(void) {
     }
 
     // if timer is getting low, don't do next DMA and instead flush spike buffer
-     // originally 6657 clock cycles from the end of the interval was used
-//    if (tc[T1_COUNT] < 6657){//6657){
-//    	    uint cpsr = spin1_int_disable();
-//    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
-//    	    timer_callback_active = true;
-//    	    spin1_mode_restore(cpsr);
-//
-//    	    if (spikes_remaining > 0){
-//    	    	total_flushed_spikes += spikes_remaining;
-//
-//    	    	if (spikes_remaining > max_flushed_spikes){
-//    	    		max_flushed_spikes = spikes_remaining;
-//    	    	}
-//
-////    	    	log_info("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
-//
-//    	    	//io_printf(IO_BUF, "At time: %u, flushed spikes: %u\n",
-//    	    	//		time, spikes_remaining);
-//    	    }
-//    }
+    // originally 6657 clock cycles from the end of the interval was used
+    if (tc[T1_COUNT] < 6657){//6657){
+    	    uint cpsr = spin1_int_disable();
+    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
+    	    timer_callback_active = true;
+    	    spin1_mode_restore(cpsr);
+
+    	    if (spikes_remaining > 0){
+    	    	total_flushed_spikes += spikes_remaining;
+
+    	    	if (spikes_remaining > max_flushed_spikes){
+    	    		max_flushed_spikes = spikes_remaining;
+    	    	}
+
+//    	    	log_info("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
+
+    	    	//io_printf(IO_BUF, "At time: %u, flushed spikes: %u\n",
+    	    	//		time, spikes_remaining);
+    	    }
+    }
 }
 
 //! \brief Called when a multicast packet is received
@@ -404,13 +404,13 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     bool plastic_only = true;
 
     // If rewiring, do rewiring first
-//    for (uint32_t i = n_rewires; i > 0; i--) {
-//        if (synaptogenesis_row_restructure(time, current_buffer->row)) {
-//            write_back = true;
-//            plastic_only = false;
-//            n_successful_rewires++;
-//        }
-//    }
+    for (uint32_t i = n_rewires; i > 0; i--) {
+        if (synaptogenesis_row_restructure(time, current_buffer->row)) {
+            write_back = true;
+            plastic_only = false;
+            n_successful_rewires++;
+        }
+    }
 
     // Process synaptic row repeatedly for any upcoming spikes
     while (n_spikes > 0) {
