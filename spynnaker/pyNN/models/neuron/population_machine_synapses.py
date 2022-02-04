@@ -30,7 +30,6 @@ from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
-from .synaptic_matrices import SynapticMatrices
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
 
@@ -80,10 +79,7 @@ class PopulationMachineSynapses(
 
     @abstractproperty
     def _synaptic_matrices(self):
-        """ The object holding synaptic matrices.
-
-        :note: This can be created by calling the _create_synaptic_matrices
-               method defined below.
+        """ The object holding synaptic matrices
 
         :rtype: SynapticMatrices
         """
@@ -109,26 +105,6 @@ class PopulationMachineSynapses(
         :rtype: .SynapseRegions
         """
         return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
-
-    def _create_synaptic_matrices(self):
-        """ Creates the synaptic matrices object.
-
-        :note: This is required because this object cannot have any storage
-
-        :rtype: SynapticMatrices
-        """
-        return SynapticMatrices(
-            self._vertex_slice,
-            self._app_vertex.neuron_impl.get_n_synapse_types(),
-            self._synapse_regions.synaptic_matrix,
-            self._synapse_regions.direct_matrix,
-            self._synapse_regions.pop_table,
-            self._synapse_regions.connection_builder,
-            self._max_atoms_per_core,
-            self._synapse_references.synaptic_matrix,
-            self._synapse_references.direct_matrix,
-            self._synapse_references.pop_table,
-            self._synapse_references.connection_builder)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
@@ -162,7 +138,7 @@ class PopulationMachineSynapses(
 
     def _write_synapse_data_spec(
             self, spec, routing_info, ring_buffer_shifts, weight_scales,
-            all_syn_block_sz, structural_sz):
+            structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -184,9 +160,12 @@ class PopulationMachineSynapses(
         self._write_synapse_parameters(spec, ring_buffer_shifts)
 
         # Write the synaptic matrices
+        self._synaptic_matrices.generate_data(routing_info)
         self._synaptic_matrices.write_synaptic_data(
-            spec, incoming, all_syn_block_sz, weight_scales, routing_info,
-            self._app_vertex)
+            spec, self._vertex_slice, self._synapse_references.synaptic_matrix,
+            self._synapse_references.direct_matrix,
+            self._synapse_references.pop_table,
+            self._synapse_references.connection_builder)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -282,7 +261,7 @@ class PopulationMachineSynapses(
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
     def read_generated_connection_holders(self, transceiver, placement):
         self._synaptic_matrices.read_generated_connection_holders(
-            transceiver, placement)
+            transceiver, placement, self._vertex_slice)
 
     @property
     @overrides(AbstractSynapseExpandable.connection_generator_region)
@@ -303,9 +282,4 @@ class PopulationMachineSynapses(
             The specific projection within the edge
         """
         return self._synaptic_matrices.get_connections_from_machine(
-            transceiver, placement, app_edge, synapse_info)
-
-    def clear_connection_cache(self):
-        """ Flush the cache of connection information; needed for a second run
-        """
-        self._synaptic_matrices.clear_connection_cache()
+            transceiver, placement, app_edge, synapse_info, self._vertex_slice)

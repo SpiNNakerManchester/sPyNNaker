@@ -47,8 +47,6 @@ class SynapticMatrices(object):
     """
 
     __slots__ = [
-        # The slice of the post-vertex that these matrices are for
-        "__post_vertex_slice",
         # The number of synapse types received
         "__n_synapse_types",
         # The ID of the synaptic matrix region
@@ -59,8 +57,6 @@ class SynapticMatrices(object):
         "__poptable_region",
         # The ID of the connection builder region
         "__connection_builder_region",
-        # The master population table data structure
-        "__poptable",
         # The sub-matrices for each incoming edge
         "__matrices",
         # The address within the synaptic matrix region after the last matrix
@@ -71,30 +67,33 @@ class SynapticMatrices(object):
         "__on_chip_generated_block_addr",
         # Determine if any of the matrices can be generated on the machine
         "__gen_on_machine",
-        # Reference to give the synaptic matrix
-        "__synaptic_matrix_ref",
-        # Reference to give the direct matrix
-        "__direct_matrix_ref",
-        # Reference to give the master population table
-        "__poptable_ref",
-        # Reference to give the connection builder
-        "__connection_builder_ref",
         # Number of bits to use for neuron IDs
-        "__max_atoms_per_core"
+        "__max_atoms_per_core",
+        # The stored master population table data
+        "__master_pop_data",
+        # The stored generated data
+        "__generated_data",
+        # The size needed for generated data
+        "__generated_data_size",
+        # The number of generated matrices
+        "__n_generated_matrices",
+        # The matrices that need to be generated on host
+        "__on_host_matrices",
+        # The application vertex
+        "__app_vertex",
+        # The weight scales
+        "__weight_scales",
+        # The size of all synaptic blocks added together
+        "__all_syn_block_sz",
+        # Whether data generation has already happened
+        "__data_generated"
     ]
 
     def __init__(
-            self, post_vertex_slice, n_synapse_types,
-            synaptic_matrix_region, direct_matrix_region, poptable_region,
-            connection_builder_region, max_atoms_per_core,
-            synaptic_matrix_ref=None, direct_matrix_ref=None,
-            poptable_ref=None, connection_builder_ref=None):
+            self, app_vertex, synaptic_matrix_region, direct_matrix_region,
+            poptable_region, connection_builder_region, max_atoms_per_core,
+            weight_scales, all_syn_block_sz):
         """
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post vertex that these matrices are for
-        :param int n_synapse_types: The number of synapse types available
-        :param int all_single_syn_sz:
-            The space available for "direct" or "single" synapses
         :param int synaptic_matrix_region:
             The region where synaptic matrices are stored
         :param int direct_matrix_region:
@@ -120,20 +119,15 @@ class SynapticMatrices(object):
             referenceable
         :type connection_builder_ref: int or None
         """
-        self.__post_vertex_slice = post_vertex_slice
-        self.__n_synapse_types = n_synapse_types
+        self.__app_vertex = app_vertex
+        self.__n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         self.__synaptic_matrix_region = synaptic_matrix_region
         self.__direct_matrix_region = direct_matrix_region
         self.__poptable_region = poptable_region
         self.__connection_builder_region = connection_builder_region
         self.__max_atoms_per_core = max_atoms_per_core
-        self.__synaptic_matrix_ref = synaptic_matrix_ref
-        self.__direct_matrix_ref = direct_matrix_ref
-        self.__poptable_ref = poptable_ref
-        self.__connection_builder_ref = connection_builder_ref
-
-        # Set up the master population table
-        self.__poptable = MasterPopTableAsBinarySearch()
+        self.__weight_scales = weight_scales
+        self.__all_syn_block_sz = all_syn_block_sz
 
         # Map of (app_edge, synapse_info) to SynapticMatrixApp
         self.__matrices = dict()
@@ -144,6 +138,7 @@ class SynapticMatrices(object):
 
         # Determine whether to generate on machine
         self.__gen_on_machine = False
+        self.__data_generated = False
 
     @property
     def host_generated_block_addr(self):
@@ -167,29 +162,88 @@ class SynapticMatrices(object):
         return (self.__on_chip_generated_block_addr -
                 self.__host_generated_block_addr)
 
-    def __app_matrix(self, app_edge, synapse_info):
-        """ Get or create an application synaptic matrix object
+    def generate_data(self, routing_info):
+        # If the data has already been generated, stop
+        if self.__data_generated:
+            return
+        self.__data_generated = True
 
-        :param ProjectionApplicationEdge app_edge:
-            The application edge to get the object for
-        :param SynapseInformation synapse_info:
-            The synapse information to get the object for
-        :rtype: SynapticMatrixApp
-        """
-        key = (app_edge, synapse_info)
-        if key in self.__matrices:
-            return self.__matrices[key]
+        # If there are no synapses, there is nothing to do!
+        if self.__all_syn_block_sz == 0:
+            return
 
-        matrix = SynapticMatrixApp(
-            self.__poptable, synapse_info, app_edge, self.__n_synapse_types,
-            self.__post_vertex_slice, self.__synaptic_matrix_region,
-            self.__max_atoms_per_core)
-        self.__matrices[key] = matrix
-        return matrix
+        # Track writes inside the synaptic matrix region:
+        block_addr = 0
+
+        # Set up the master population table
+        poptable = MasterPopTableAsBinarySearch()
+        poptable.initialise_table()
+
+        # Set up other lists
+        self.__on_host_matrices = list()
+        generated_data = list()
+
+        # Keep on-machine generated blocks together at the end
+        generate_on_machine = list()
+        self.__generated_data_size = (
+            SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
+            (self.__n_synapse_types * DataType.U3232.size))
+
+        # For each incoming machine vertex, reserve pop table space
+        for proj in self.__app_vertex.incoming_projections:
+            app_edge = proj._projection_edge
+            synapse_info = proj._synapse_information
+            app_key_info = self.__app_key_and_mask(app_edge, routing_info)
+            if app_key_info is None:
+                continue
+            d_app_key_info = self.__delay_app_key_and_mask(
+                app_edge, routing_info)
+            app_matrix = SynapticMatrixApp(
+                synapse_info, app_edge, self.__n_synapse_types,
+                self.__synaptic_matrix_region, self.__max_atoms_per_core,
+                self.__all_syn_block_sz, app_key_info, d_app_key_info,
+                self.__weight_scales)
+            self.__matrices[app_edge, synapse_info] = app_matrix
+
+            # If we can generate on machine, store until end
+            if synapse_info.may_generate_on_machine():
+                generate_on_machine.append(app_matrix)
+            else:
+                block_addr = app_matrix.reserve_matrices(block_addr)
+                self.__on_host_matrices.append(app_matrix)
+
+        self.__host_generated_block_addr = block_addr
+
+        # Now add the blocks on machine to keep these all together
+        for app_matrix in generate_on_machine:
+            block_addr = app_matrix.reserve_matrices(block_addr, poptable)
+            gen_data = app_matrix.get_generator_data()
+            self.__generated_data_size += gen_data.size
+            generated_data.extend(gen_data.gen_data)
+        if generated_data:
+            self.__gen_on_machine = True
+            self.__n_generated_matrices = len(generate_on_machine)
+            self.__generated_data = numpy.concatenate(generated_data)
+        else:
+            self.__generated_data = None
+
+        self.__on_chip_generated_block_addr = block_addr
+
+        # Store the master pop table
+        self.__master_pop_data = poptable.get_pop_table_data()
+
+    def __write_pop_table(self, spec, poptable_ref=None):
+        master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
+        spec.reserve_memory_region(
+            region=self.__poptable_region, size=master_pop_table_sz,
+            label='PopTable', reference=poptable_ref)
+        spec.switch_write_focus(region=self.__poptable_region)
+        spec.write_array(self.__master_pop_data)
 
     def write_synaptic_data(
-            self, spec, incoming_projections, all_syn_block_sz, weight_scales,
-            routing_info, app_vertex):
+            self, spec, post_vertex_slice,
+            synaptic_matrix_ref=None, direct_matrix_ref=None,
+            poptable_ref=None, connection_builder_ref=None):
         """ Write the synaptic data for all incoming projections
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -199,67 +253,25 @@ class SynapticMatrices(object):
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
         :param list(float) weight_scales: The weight scale of each synapse
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information for all edges
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
         """
-        # If there are no synapses, there is nothing to do!
-        if all_syn_block_sz == 0:
-            return
 
         # Reserve the region
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
+
+        self.__write_pop_table(spec, poptable_ref)
+
         spec.reserve_memory_region(
             region=self.__synaptic_matrix_region,
-            size=all_syn_block_sz, label='SynBlocks',
-            reference=self.__synaptic_matrix_ref)
+            size=self.__all_syn_block_sz, label='SynBlocks',
+            reference=synaptic_matrix_ref)
 
-        # Track writes inside the synaptic matrix region:
-        block_addr = 0
-        self.__poptable.initialise_table()
-
-        # Lets write some synapses
+        # Write data for each matrix
         spec.switch_write_focus(self.__synaptic_matrix_region)
-
-        # Store a list of synapse info to be generated on the machine
-        generate_on_machine = list()
-
-        # For each incoming machine vertex, create a synaptic list
-        for proj in incoming_projections:
-            app_edge = proj._projection_edge
-            synapse_info = proj._synapse_information
-            spec.comment("\nWriting matrix for edge:{}\n".format(
-                app_edge.label))
-            app_key_info = self.__app_key_and_mask(app_edge, routing_info)
-            if app_key_info is None:
-                continue
-            d_app_key_info = self.__delay_app_key_and_mask(
-                app_edge, routing_info)
-            app_matrix = self.__app_matrix(app_edge, synapse_info)
-            app_matrix.set_info(
-                all_syn_block_sz, app_key_info, d_app_key_info, weight_scales)
-
-            # If we can generate the connector on the machine, do so
-            if synapse_info.may_generate_on_machine():
-                generate_on_machine.append(app_matrix)
-            else:
-                block_addr = app_matrix.write_matrix(spec, block_addr)
-
-        self.__host_generated_block_addr = block_addr
-
-        # Skip blocks that will be written on the machine, but add them
-        # to the master population table
-        generator_data = list()
-        for app_matrix in generate_on_machine:
-            block_addr = app_matrix.write_on_chip_matrix_data(
-                generator_data, block_addr)
-            self.__gen_on_machine = True
-
-        self.__on_chip_generated_block_addr = block_addr
-
-        # Finish the master population table
-        self.__poptable.finish_master_pop_table(
-            spec, self.__poptable_region, self.__poptable_ref)
+        for matrix in self.__on_host_matrices:
+            matrix.write_matrix(spec, post_vertex_slice)
 
         # Write the size and data of single synapses to the direct region
         # This is currently disabled
@@ -270,15 +282,15 @@ class SynapticMatrices(object):
                 single_data_words * BYTES_PER_WORD +
                 DIRECT_MATRIX_HEADER_COST_BYTES),
             label='DirectMatrix',
-            reference=self.__direct_matrix_ref)
+            reference=direct_matrix_ref)
         spec.switch_write_focus(self.__direct_matrix_region)
         spec.write_value(single_data_words * BYTES_PER_WORD)
 
         self.__write_synapse_expander_data_spec(
-            spec, generator_data, weight_scales, app_vertex)
+            spec, post_vertex_slice, connection_builder_ref)
 
     def __write_synapse_expander_data_spec(
-            self, spec, generator_data, weight_scales, app_vertex):
+            self, spec, post_vertex_slice, connection_builder_ref=None):
         """ Write the data spec for the synapse expander
 
         :param ~.DataSpecificationGenerator spec:
@@ -287,8 +299,8 @@ class SynapticMatrices(object):
         :param weight_scales: scaling of weights on each synapse
         :type weight_scales: list(int or float)
         """
-        if not generator_data:
-            if self.__connection_builder_ref is not None:
+        if self.__generated_data is None:
+            if connection_builder_ref is not None:
                 # If there is a reference, we still need a region to create
                 spec.reserve_memory_region(
                     region=self.__connection_builder_region,
@@ -296,22 +308,16 @@ class SynapticMatrices(object):
                     reference=self.__connection_builder_ref)
             return
 
-        n_bytes = (
-            SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self.__n_synapse_types * DataType.U3232.size))
-        for data in generator_data:
-            n_bytes += data.size
-
         spec.reserve_memory_region(
             region=self.__connection_builder_region,
-            size=n_bytes, label="ConnectorBuilderRegion",
-            reference=self.__connection_builder_ref)
+            size=self.__generated_data_size, label="ConnectorBuilderRegion",
+            reference=connection_builder_ref)
         spec.switch_write_focus(self.__connection_builder_region)
 
         spec.write_value(self.__synaptic_matrix_region)
-        spec.write_value(len(generator_data))
-        spec.write_value(self.__post_vertex_slice.lo_atom)
-        spec.write_value(self.__post_vertex_slice.n_atoms)
+        spec.write_value(self.__n_generated_matrices)
+        spec.write_value(post_vertex_slice.lo_atom)
+        spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(0)  # TODO: The index if needed
         spec.write_value(self.__n_synapse_types)
         spec.write_value(
@@ -319,10 +325,10 @@ class SynapticMatrices(object):
         # Padding to ensure 8-byte alignment for weight scales
         spec.write_value(0)
         # Per-Population RNG
-        spec.write_array(app_vertex.pop_seed)
+        spec.write_array(self.__app_vertex.pop_seed)
         # Per-Core RNG
-        spec.write_array(app_vertex.core_seed)
-        for w in weight_scales:
+        spec.write_array(self.__app_vertex.core_seed)
+        for w in self.__weight_scales:
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
             # if converted to an int, so we use U3232 here instead (as there
@@ -330,10 +336,7 @@ class SynapticMatrices(object):
             dtype = DataType.U3232
             spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
-        items = list()
-        for data in generator_data:
-            items.extend(data.gen_data)
-        spec.write_array(numpy.concatenate(items))
+        spec.write_array(self.__generated_data)
 
     def __get_app_key_and_mask(self, r_info, n_stages):
         """ Get a key and mask for an incoming application vertex as a whole
@@ -385,7 +388,8 @@ class SynapticMatrices(object):
         return self.__get_app_key_and_mask(r_info, app_edge.n_delay_stages)
 
     def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info):
+            self, transceiver, placement, app_edge, synapse_info,
+            post_vertex_slice):
         """ Get the synaptic connections from the machine
 
         :param ~spinnman.transceiver.Transceiver transceiver:
@@ -396,14 +400,18 @@ class SynapticMatrices(object):
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
-        matrix = self.__app_matrix(app_edge, synapse_info)
-        return matrix.get_connections(transceiver, placement)
+        matrix = self.__matrices[app_edge, synapse_info]
+        return matrix.get_connections(
+            transceiver, placement, post_vertex_slice)
 
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(
+            self, transceiver, placement, post_vertex_slice):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
@@ -411,15 +419,12 @@ class SynapticMatrices(object):
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
         """
         for matrix in self.__matrices.values():
-            matrix.read_generated_connection_holders(transceiver, placement)
-
-    def clear_connection_cache(self):
-        """ Clear any values read from the machine
-        """
-        for matrix in self.__matrices.values():
-            matrix.clear_connection_cache()
+            matrix.read_generated_connection_holders(
+                transceiver, placement, post_vertex_slice)
 
     @property
     def gen_on_machine(self):
@@ -437,7 +442,7 @@ class SynapticMatrices(object):
         :param SynapseInformation synapse_info:
             The synapse information of the projection
         """
-        matrix = self.__app_matrix(app_edge, synapse_info)
+        matrix = self.__matrices[app_edge, synapse_info]
         return matrix.get_index()
 
 

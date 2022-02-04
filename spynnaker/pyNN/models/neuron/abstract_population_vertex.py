@@ -117,7 +117,8 @@ class AbstractPopulationVertex(
         "__max_row_info",
         "__self_projection",
         "__rng",
-        "__pop_seed"]
+        "__pop_seed",
+        "__connection_cache"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -243,6 +244,10 @@ class AbstractPopulationVertex(
         # An RNG for use in synaptic generation
         self.__rng = numpy.random.RandomState(seed)
         self.__pop_seed = create_mars_kiss_seeds(self.__rng)
+
+        # Store connections read from machine until asked to clear
+        # Key is app_edge, synapse_info
+        self.__connection_cache = dict()
 
     @property
     def synapse_dynamics(self):
@@ -644,9 +649,7 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         """ Flush the cache of connection information; needed for a second run
         """
-        for post_vertex in self.machine_vertices:
-            if isinstance(post_vertex, HasSynapses):
-                post_vertex.clear_connection_cache()
+        self.__connection_cache.clear()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -964,6 +967,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
+        # If we already have connections cached, return them
+        if (app_edge, synapse_info) in self.__connection_cache:
+            return self.__connection_cache[app_edge, synapse_info]
+
         # Start with something in the list so that concatenate works
         connections = [numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)]
@@ -976,7 +983,9 @@ class AbstractPopulationVertex(
                 placement = placements.get_placement_of_vertex(post_vertex)
                 connections.extend(post_vertex.get_connections_from_machine(
                     transceiver, placement, app_edge, synapse_info))
-        return numpy.concatenate(connections)
+        all_connections = numpy.concatenate(connections)
+        self.__connection_cache[app_edge, synapse_info] = all_connections
+        return all_connections
 
     def get_synapse_params_size(self):
         """ Get the size of the synapse parameters in bytes

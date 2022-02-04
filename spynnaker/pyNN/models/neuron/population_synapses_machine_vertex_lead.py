@@ -34,15 +34,15 @@ class PopulationSynapsesMachineVertexLead(
         "__synaptic_matrices",
         "__ring_buffer_shifts",
         "__weight_scales",
-        "__all_syn_block_sz",
         "__structural_sz",
         "__synapse_references",
         "__max_atoms_per_core"]
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
-            structural_sz, synapse_references, max_atoms_per_core):
+            vertex_slice, ring_buffer_shifts, weight_scales,
+            structural_sz, synapse_references, max_atoms_per_core,
+            synaptic_matrices):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -58,13 +58,12 @@ class PopulationSynapsesMachineVertexLead(
             resources_required, label, constraints, app_vertex, vertex_slice)
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
-        self.__all_syn_block_sz = all_syn_block_sz
         self.__structural_sz = structural_sz
         self.__synapse_references = synapse_references
         self.__max_atoms_per_core = max_atoms_per_core
 
         # Need to do this last so that the values above can be used
-        self.__synaptic_matrices = self._create_synaptic_matrices()
+        self.__synaptic_matrices = synaptic_matrices
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)
@@ -112,8 +111,7 @@ class PopulationSynapsesMachineVertexLead(
 
         self._write_synapse_data_spec(
             spec, routing_info, self.__ring_buffer_shifts,
-            self.__weight_scales, self.__all_syn_block_sz,
-            self.__structural_sz)
+            self.__weight_scales, self.__structural_sz)
 
         # Write information about SDRAM
         self._write_sdram_edge_spec(spec)

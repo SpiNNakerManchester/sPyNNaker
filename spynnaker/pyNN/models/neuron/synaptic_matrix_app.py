@@ -16,7 +16,7 @@ import numpy
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from .generator_data import GeneratorData, SYN_REGION_UNUSED
+from .generator_data import GeneratorData
 from .synapse_io import read_all_synapses, convert_to_connections, get_synapses
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
@@ -28,16 +28,12 @@ class SynapticMatrixApp(object):
     """
 
     __slots__ = [
-        # The master population table
-        "__poptable",
         # The synaptic info that these matrices are for
         "__synapse_info",
         # The application edge that these matrices are for
         "__app_edge",
         # The number of synapse types incoming
         "__n_synapse_types",
-        # The slice of the post vertex these matrices are for
-        "__post_vertex_slice",
         # The ID of the synaptic matrix region
         "__synaptic_matrix_region",
         # The maximum row length of delayed and undelayed matrices
@@ -63,36 +59,34 @@ class SynapticMatrixApp(object):
         # The index of the delayed synaptic matrix within the master population
         # table
         "__delay_index",
-        # A cache of the received synaptic matrix
-        "__received_block",
-        # A cache of the received delayed synaptic matrix
-        "__delay_received_block",
         # The number of bits to use for neuron IDs
         "__max_atoms_per_core"
     ]
 
     def __init__(
-            self, poptable, synapse_info, app_edge, n_synapse_types,
-            post_vertex_slice, synaptic_matrix_region, max_atoms_per_core):
+            self, synapse_info, app_edge, n_synapse_types,
+            synaptic_matrix_region, max_atoms_per_core, all_syn_block_sz,
+            app_key_info, delay_app_key_info, weight_scales):
         """
-
-        :param MasterPopTableAsBinarySearch poptable:
-            The master population table
         :param SynapseInformation synapse_info:
             The projection synapse information
         :param ProjectionApplicationEdge app_edge:
             The projection application edge
         :param int n_synapse_types: The number of synapse types accepted
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         :param int synaptic_matrix_region:
             The region where synaptic matrices are stored
+        :param int all_syn_block_sz:
+            The space available for all synaptic matrices on the core
+        :param _AppKeyInfo app_key_info:
+            Application-level routing key information for undelayed vertices
+        :param _AppKeyInfo delay_app_key_info:
+            Application-level routing key information for delayed vertices
+        :param list(float) weight_scales:
+            Weight scale for each synapse edge
         """
-        self.__poptable = poptable
         self.__synapse_info = synapse_info
         self.__app_edge = app_edge
         self.__n_synapse_types = n_synapse_types
-        self.__post_vertex_slice = post_vertex_slice
         self.__synaptic_matrix_region = synaptic_matrix_region
         self.__max_atoms_per_core = max_atoms_per_core
 
@@ -100,11 +94,10 @@ class SynapticMatrixApp(object):
         self.__max_row_info = self.__app_edge.post_vertex.get_max_row_info(
             synapse_info, max_atoms_per_core, app_edge)
 
-        # These are set directly later
-        self.__all_syn_block_sz = None
-        self.__app_key_info = None
-        self.__delay_app_key_info = None
-        self.__weight_scales = None
+        self.__all_syn_block_sz = all_syn_block_sz
+        self.__app_key_info = app_key_info
+        self.__delay_app_key_info = delay_app_key_info
+        self.__weight_scales = weight_scales
 
         self.__matrix_size = (
             self.__app_edge.pre_vertex.n_atoms *
@@ -120,30 +113,122 @@ class SynapticMatrixApp(object):
         self.__index = None
         self.__delay_index = None
 
-        # These are stored when blocks are read
-        self.__received_block = None
-        self.__delay_received_block = None
+    def reserve_matrices(self, block_addr, poptable):
+        """ Allocate the master pop table entries for the blocks
 
-    def set_info(self, all_syn_block_sz, app_key_info, delay_app_key_info,
-                 weight_scales):
-        """ Set extra information that isn't necessarily available when the
-            class is created.
-
-        :param int all_syn_block_sz:
-            The space available for all synaptic matrices on the core
-        :param _AppKeyInfo app_key_info:
-            Application-level routing key information for undelayed vertices
-        :param _AppKeyInfo delay_app_key_info:
-            Application-level routing key information for delayed vertices
-        :param list(float) weight_scales:
-            Weight scale for each synapse edge
+        :param int block_addr: Where the allocation can start from
+        :param MasterPopTableAsBinarySearch poptable:
+            The master population table
+        :return: Where the next allocation can start from
+        :rtype: int
         """
-        self.__all_syn_block_sz = all_syn_block_sz
-        self.__app_key_info = app_key_info
-        self.__delay_app_key_info = delay_app_key_info
-        self.__weight_scales = weight_scales
+        block_addr = self.__reserve_app_matrix(block_addr, poptable)
+        block_addr = self.__reserve_delay_app_matrix(block_addr, poptable)
+        return block_addr
 
-    def __get_row_data(self):
+    def __reserve_app_matrix(self, block_addr, poptable):
+        """ Reserve space for the matrix in the master pop table
+
+        :param int block_addr:
+            The address in the synaptic matrix region to start writing at
+        :param MasterPopTableAsBinarySearch poptable:
+            The master population table
+        :return: The updated block address
+        :rtype: int
+        """
+        # If there is no routing info, don't write anything
+        if self.__app_key_info is None:
+            return block_addr
+
+        # If we have routing info but no synapses, write an invalid entry
+        if self.__max_row_info.undelayed_max_n_synapses == 0:
+            self.__index = poptable.add_invalid_application_entry(
+                self.__app_key_info.key_and_mask,
+                self.__app_key_info.core_mask, self.__app_key_info.core_shift,
+                self.__app_key_info.n_neurons)
+            return block_addr
+
+        # Write a matrix for the whole application vertex
+        block_addr = poptable.get_next_allowed_address(block_addr)
+        self.__index = poptable.add_application_entry(
+            block_addr,  self.__max_row_info.undelayed_max_words,
+            self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
+        self.__syn_mat_offset = block_addr
+        block_addr = self.__next_addr(block_addr, self.__matrix_size)
+        return block_addr
+
+    def __reserve_delay_app_matrix(self, block_addr, poptable):
+        """ Reserve space in the master pop table for a delayed matrix
+
+        :param int block_addr:
+            The address in the synaptic matrix region to start writing at
+        :param MasterPopTableAsBinarySearch poptable:
+            The master population table
+        :return: The updated block address
+        :rtype: int
+        """
+        # If there is no routing info, don't write anything
+        if self.__delay_app_key_info is None:
+            return block_addr
+
+        # If we have routing info but no synapses, write an invalid entry
+        if self.__max_row_info.delayed_max_n_synapses == 0:
+            self.__delay_index = poptable.add_invalid_application_entry(
+                self.__delay_app_key_info.key_and_mask,
+                self.__delay_app_key_info.core_mask,
+                self.__delay_app_key_info.core_shift,
+                self.__delay_app_key_info.n_neurons)
+            return block_addr
+
+        # Write a matrix for the whole application vertex
+        block_addr = poptable.get_next_allowed_address(block_addr)
+        self.__delay_index = poptable.add_application_entry(
+            block_addr, self.__max_row_info.delayed_max_words,
+            self.__delay_app_key_info.key_and_mask,
+            self.__delay_app_key_info.core_mask,
+            self.__delay_app_key_info.core_shift,
+            self.__delay_app_key_info.n_neurons)
+        self.__delay_syn_mat_offset = block_addr
+        block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
+        return block_addr
+
+    def __next_addr(self, block_addr, size):
+        """ Get the next address after a block, checking it is in range
+
+        :param int block_addr: The address of the start of the block
+        :param int size: The size of the block in bytes
+        :param int max_addr: The maximum allowed address
+        :return: The updated address
+        :rtype: int
+        :raises Exception: If the updated address is out of range
+        """
+        next_addr = block_addr + size
+        if next_addr > self.__all_syn_block_sz:
+            raise Exception(
+                "Too much synaptic memory has been written: {} of {} "
+                .format(next_addr, self.__all_syn_block_sz))
+        return next_addr
+
+    def write_matrix(self, spec, post_vertex_slice):
+        """ Write a synaptic matrix from host
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The specification to write to
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
+        """
+        row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
+        self.__update_connection_holders(
+            row_data, delay_row_data, post_vertex_slice)
+        if self.__syn_mat_offset:
+            spec.set_write_pointer(self.__syn_mat_offset)
+            spec.write_array(row_data)
+        if self.__delay_syn_mat_offset:
+            spec.set_write_pointer(self.__delay_syn_mat_offset)
+            spec.write_array(delay_row_data)
+
+    def __get_row_data(self, post_vertex_slice):
         """ Generate the row data for a synaptic matrix from the description
 
         :return: The data and the delayed data
@@ -154,7 +239,7 @@ class SynapticMatrixApp(object):
         post_slices =\
             self.__app_edge.post_vertex.splitter.get_in_coming_slices()
         connections = self.__synapse_info.connector.create_synaptic_block(
-            post_slices, self.__post_vertex_slice,
+            post_slices, post_vertex_slice,
             self.__synapse_info.synapse_type, self.__synapse_info)
 
         # Get the row data; note that we use the availability of the routing
@@ -163,7 +248,7 @@ class SynapticMatrixApp(object):
         (row_data, delayed_row_data) = get_synapses(
             connections, self.__synapse_info, self.__app_edge.n_delay_stages,
             self.__n_synapse_types, self.__weight_scales, self.__app_edge,
-            self.__post_vertex_slice, self.__max_row_info,
+            post_vertex_slice, self.__max_row_info,
             self.__app_key_info is not None,
             self.__delay_app_key_info is not None, self.__max_atoms_per_core)
 
@@ -171,7 +256,7 @@ class SynapticMatrixApp(object):
         if isinstance(self.__synapse_info.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             self.__synapse_info.synapse_dynamics.set_connections(
-                connections, self.__post_vertex_slice, self.__app_edge,
+                connections, post_vertex_slice, self.__app_edge,
                 self.__synapse_info)
         if self.__app_edge.delay_edge is None and len(delayed_row_data) != 0:
             raise Exception(
@@ -180,182 +265,8 @@ class SynapticMatrixApp(object):
 
         return row_data, delayed_row_data
 
-    def write_matrix(self, spec, block_addr):
-        """ Write a synaptic matrix from host
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The specification to write to
-        :param int block_addr:
-            The address in the synaptic matrix region to start writing at
-        :return: The updated block_addr
-        :rtype: int
-        """
-        row_data, delay_row_data = self.__get_row_data()
-        self.__update_connection_holders(row_data, delay_row_data)
-        block_addr = self.__write_app_matrix(spec, block_addr, row_data)
-        block_addr = self.__write_delay_app_matrix(spec, block_addr,
-                                                   delay_row_data)
-        return block_addr
-
-    def __write_app_matrix(self, spec, block_addr, row_data):
-        """ Write a matrix for a whole incoming application vertex as one
-
-        :param DataSpecificationGenerator spec:
-            The specification to write to
-        :param int block_addr:
-            The address in the synaptic matrix region to start writing at
-        :param ~numpy.ndarray row_data:
-            The data for the source application vertex
-        :return: The updated block address
-        :rtype: int
-        """
-        # If there is no routing info, don't write anything
-        if self.__app_key_info is None:
-            return block_addr
-
-        # If we have routing info but no synapses, write an invalid entry
-        if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_application_entry(
-                self.__app_key_info.key_and_mask,
-                self.__app_key_info.core_mask, self.__app_key_info.core_shift,
-                self.__app_key_info.n_neurons)
-            return block_addr
-
-        # Write a matrix for the whole application vertex
-        block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__index = self.__poptable.add_application_entry(
-            block_addr,  self.__max_row_info.undelayed_max_words,
-            self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
-            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
-        self.__syn_mat_offset = block_addr
-
-        # Write the data
-        spec.write_array(row_data)
-
-        return block_addr
-
-    def __write_delay_app_matrix(self, spec, block_addr, delay_row_data):
-        """ Write a delay matrix for a whole incoming application vertex as one
-
-        :param DataSpecificationGenerator spec:
-            The specification to write to
-        :param int block_addr:
-            The address in the synaptic matrix region to start writing at
-        :param ~numpy.ndarray delay_row_data:
-            The data for the source application vertex
-        :return: The updated block address
-        :rtype: int
-        """
-        # If there is no routing info, don't write anything
-        if self.__delay_app_key_info is None:
-            return block_addr
-
-        # If we have routing info but no synapses, write an invalid entry
-        if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_application_entry(
-                self.__delay_app_key_info.key_and_mask,
-                self.__delay_app_key_info.core_mask,
-                self.__delay_app_key_info.core_shift,
-                self.__delay_app_key_info.n_neurons)
-            return block_addr
-
-        # Write a matrix for the whole application vertex
-        block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__delay_index = self.__poptable.add_application_entry(
-            block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_app_key_info.key_and_mask,
-            self.__delay_app_key_info.core_mask,
-            self.__delay_app_key_info.core_shift,
-            self.__delay_app_key_info.n_neurons)
-        self.__delay_syn_mat_offset = block_addr
-
-        # Write the data
-        spec.write_array(delay_row_data)
-
-        return block_addr
-
-    def write_on_chip_matrix_data(self, generator_data, block_addr):
-        """ Prepare to write a matrix using an on-chip generator
-
-        :param list(GeneratorData) generator_data: List of data to add to
-        :param int block_addr:
-            The address in the synaptic matrix region to start writing at
-        :return: The updated block address
-        :rtype: int
-        """
-        # Reserve the space in the matrix for an application-level key,
-        # and tell the pop table
-
-        block_addr, syn_block_addr = self.__reserve_mpop_block(block_addr)
-        block_addr, d_block_addr = self.__reserve_delay_mpop_block(block_addr)
-        generator_data.append(GeneratorData(
-            syn_block_addr, d_block_addr, self.__app_edge, self.__synapse_info,
-            self.__max_row_info, self.__max_atoms_per_core))
-        return block_addr
-
-    def __reserve_mpop_block(self, block_addr):
-        """ Reserve a block in the master population table for an undelayed
-            matrix
-
-        :param int block_addr:
-            The address in the synaptic matrix region to start at
-        :return: The updated block address and the reserved address
-        :rtype: int, int
-        """
-        # If there is no routing information, don't reserve anything
-        if self.__app_key_info is None:
-            return block_addr, SYN_REGION_UNUSED, None
-
-        # If we have routing info but no synapses, write an invalid entry
-        if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__index = self.__poptable.add_invalid_application_entry(
-                self.__app_key_info.key_and_mask,
-                self.__app_key_info.core_mask, self.__app_key_info.core_shift,
-                self.__app_key_info.n_neurons)
-            return block_addr, SYN_REGION_UNUSED
-
-        block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__index = self.__poptable.add_application_entry(
-            block_addr, self.__max_row_info.undelayed_max_words,
-            self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
-            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
-        self.__syn_mat_offset = block_addr
-        block_addr = self.__next_addr(block_addr, self.__matrix_size)
-        return block_addr, self.__syn_mat_offset
-
-    def __reserve_delay_mpop_block(self, block_addr):
-        """ Reserve a block in the master population table for a delayed matrix
-
-        :param int block_addr:
-            The address in the synaptic matrix region to start at
-        :return: The updated block address and the reserved address
-        :rtype: int, int
-        """
-        # If there is no routing information don't reserve anything
-        if self.__delay_app_key_info is None:
-            return block_addr, SYN_REGION_UNUSED
-
-        # If we have routing info but no synapses, write an invalid entry
-        if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__delay_index = self.__poptable.add_invalid_application_entry(
-                self.__delay_app_key_info.key_and_mask,
-                self.__delay_app_key_info.core_mask,
-                self.__delay_app_key_info.core_shift,
-                self.__delay_app_key_info.n_neurons)
-            return block_addr, SYN_REGION_UNUSED
-
-        block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__delay_index = self.__poptable.add_application_entry(
-            block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_app_key_info.key_and_mask,
-            self.__delay_app_key_info.core_mask,
-            self.__delay_app_key_info.core_shift,
-            self.__delay_app_key_info.n_neurons)
-        self.__delay_syn_mat_offset = block_addr
-        block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
-        return block_addr, self.__delay_syn_mat_offset
-
-    def __update_connection_holders(self, data, delayed_data):
+    def __update_connection_holders(
+            self, data, delayed_data, post_vertex_slice):
         """ Fill in connections in the connection holders as they are created
 
         :param ~numpy.ndarray data: The row data created
@@ -371,35 +282,29 @@ class SynapticMatrixApp(object):
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
                     self.__app_edge.pre_vertex.n_atoms,
-                    self.__post_vertex_slice, post_vertex_max_delay_ticks,
+                    post_vertex_slice, post_vertex_max_delay_ticks,
                     self.__max_row_info, self.__max_atoms_per_core))
 
-    def __next_addr(self, block_addr, size, max_addr=None):
-        """ Get the next address after a block, checking it is in range
+    def get_generator_data(self):
+        """ Prepare to write a matrix using an on-chip generator
 
-        :param int block_addr: The address of the start of the block
-        :param int size: The size of the block in bytes
-        :param int max_addr: The maximum allowed address
-        :return: The updated address
-        :rtype: int
-        :raises Exception: If the updated address is out of range
+        :return: The data to generate with
+        :rtype: GeneratorData
         """
-        if not max_addr:
-            max_addr = self.__all_syn_block_sz
-        next_addr = block_addr + size
-        if next_addr > max_addr:
-            raise Exception(
-                "Too much synaptic memory has been written: {} of {} "
-                .format(next_addr, max_addr))
-        return next_addr
+        return GeneratorData(
+            self.__syn_mat_offset, self.__delay_syn_mat_offset,
+            self.__app_edge, self.__synapse_info, self.__max_row_info,
+            self.__max_atoms_per_core)
 
-    def get_connections(self, transceiver, placement):
+    def get_connections(self, transceiver, placement, post_vertex_slice):
         """ Get the connections for this matrix from the machine
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
@@ -407,31 +312,29 @@ class SynapticMatrixApp(object):
         synapses_address = locate_memory_region_for_placement(
             placement, self.__synaptic_matrix_region, transceiver)
         return self.__read_connections(
-            transceiver, placement, synapses_address)
+            transceiver, placement, synapses_address, post_vertex_slice)
 
-    def clear_connection_cache(self):
-        """ Clear saved connections
-        """
-        self.__received_block = None
-        self.__delay_received_block = None
-
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(
+            self, transceiver, placement, post_vertex_slice):
         """ Read any pre-run connection holders after data has been generated
 
         :param ~spinnman.transceiver.Transceiver transceiver:
             How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the matrix is on the machine
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post-vertex the matrix is for
         """
         if self.__synapse_info.pre_run_connection_holders:
-            connections = self.get_connections(transceiver, placement)
+            connections = self.get_connections(
+                transceiver, placement, post_vertex_slice)
             if connections:
                 connections = numpy.concatenate(connections)
                 for holder in self.__synapse_info.pre_run_connection_holders:
                     holder.add_connections(connections)
-            self.clear_connection_cache()
 
-    def __read_connections(self, transceiver, placement, synapses_address):
+    def __read_connections(
+            self, transceiver, placement, synapses_address, post_vertex_slice):
         """ Read connections from an address on the machine
 
         :param Transceiver transceiver: How to read the data from the machine
@@ -448,7 +351,7 @@ class SynapticMatrixApp(object):
             block = self.__get_block(transceiver, placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, self.__post_vertex_slice,
+                self.__synapse_info, post_vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.undelayed_max_words,
                 self.__n_synapse_types, self.__weight_scales, block,
@@ -460,7 +363,7 @@ class SynapticMatrixApp(object):
                 transceiver, placement, synapses_address)
             splitter = self.__app_edge.post_vertex.splitter
             connections.append(convert_to_connections(
-                self.__synapse_info, self.__post_vertex_slice,
+                self.__synapse_info, post_vertex_slice,
                 self.__app_edge.pre_vertex.n_atoms,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
                 self.__weight_scales, block, True,
@@ -477,12 +380,9 @@ class SynapticMatrixApp(object):
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
-        if self.__received_block is not None:
-            return self.__received_block
         address = self.__syn_mat_offset + synapses_address
         block = transceiver.read_memory(
             placement.x, placement.y, address, self.__matrix_size)
-        self.__received_block = block
         return block
 
     def __get_delayed_block(self, transceiver, placement, synapses_address):
@@ -494,12 +394,9 @@ class SynapticMatrixApp(object):
             The base address of the synaptic matrix region
         :rtype: bytearray
         """
-        if self.__delay_received_block is not None:
-            return self.__delay_received_block
         address = self.__delay_syn_mat_offset + synapses_address
         block = transceiver.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
-        self.__delay_received_block = block
         return block
 
     def get_index(self):

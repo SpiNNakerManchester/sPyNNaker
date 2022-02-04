@@ -41,6 +41,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -219,6 +220,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         lead_synapse_resources = self.__get_synapse_resources(
             atoms_per_core, shared_synapse_sdram)
         shared_synapse_resources = self.__get_synapse_resources(atoms_per_core)
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
+        synaptic_matrices = SynapticMatrices(
+            app_vertex, regions.synaptic_matrix, regions.direct_matrix,
+            regions.pop_table, regions.connection_builder, atoms_per_core,
+            weight_scales, all_syn_block_sz)
 
         # Keep track of the SDRAM for each group of vertices
         total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
@@ -245,10 +251,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Add the first vertex
             synapse_references, syn_label, feedback_partition = \
                 self.__add_lead_synapse_core(
-                    vertex_slice, all_syn_block_sz, structural_sz,
-                    lead_synapse_resources, label, rb_shifts, weight_scales,
-                    synapse_vertices, neuron_vertex, constraints,
-                    atoms_per_core)
+                    vertex_slice, structural_sz, lead_synapse_resources, label,
+                    rb_shifts, weight_scales, synapse_vertices, neuron_vertex,
+                    constraints, atoms_per_core, synaptic_matrices)
             chip_counter.add_core(lead_synapse_resources)
 
             # Do the remaining synapse cores
@@ -331,9 +336,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         return neuron_vertex
 
     def __add_lead_synapse_core(
-            self, vertex_slice, all_syn_block_sz, structural_sz,
-            lead_synapse_resources, label, rb_shifts, weight_scales,
-            synapse_vertices, neuron_vertex, constraints, atoms_per_core):
+            self, vertex_slice, structural_sz, lead_synapse_resources, label,
+            rb_shifts, weight_scales, synapse_vertices, neuron_vertex,
+            constraints, atoms_per_core, synaptic_matrices):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
@@ -372,8 +377,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
             lead_synapse_resources, "{}(0)".format(syn_label), constraints,
             self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
-            all_syn_block_sz, structural_sz, synapse_references,
-            atoms_per_core)
+            structural_sz, synapse_references, atoms_per_core,
+            synaptic_matrices)
         self._governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
         self.__synapse_vertices.append(lead_synapse_vertex)
         synapse_vertices.append(lead_synapse_vertex)
@@ -648,21 +653,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.merge(independent_synapse_sdram)
         sdram.merge(proj_dependent_sdram)
+        sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .synaptic_matrix, all_syn_block_sz)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.direct_matrix,
+            regions.direct_matrix,
             max(self._governed_app_vertex.all_single_syn_size, BYTES_PER_WORD))
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .structural_dynamics, structural_sz)
-        sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .synapse_dynamics, dynamics_sz)
+        sdram.add_cost(regions.structural_dynamics, structural_sz)
+        sdram.add_cost(regions.synapse_dynamics, dynamics_sz)
         return sdram
 
     def __get_shared_synapse_sdram(
@@ -726,14 +726,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         app_vertex = self._governed_app_vertex
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.synapse_params,
+            regions.synapse_params,
             max(app_vertex.get_synapse_params_size(), BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_builder,
+            regions.bitfield_builder,
             max(exact_sdram_for_bit_field_builder_region(), BYTES_PER_WORD))
         return sdram
 
@@ -745,24 +745,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         app_vertex = self._governed_app_vertex
+        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS.pop_table,
+            regions.pop_table,
             max(MasterPopTableAsBinarySearch.get_master_population_table_size(
                     incoming_projections), BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .connection_builder,
+            regions.connection_builder,
             max(app_vertex.get_synapse_expander_size(incoming_projections),
                 BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_filter,
+            regions.bitfield_filter,
             max(get_estimated_sdram_for_bit_field_region(incoming_projections),
                 BYTES_PER_WORD))
         sdram.add_cost(
-            PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
-            .bitfield_key_map,
+            regions.bitfield_key_map,
             max(get_estimated_sdram_for_key_region(incoming_projections),
                 BYTES_PER_WORD))
         return sdram

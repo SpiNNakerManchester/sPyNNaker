@@ -34,10 +34,14 @@ class GeneratorData(object):
             app_edge, synapse_information, max_row_info, max_atoms_per_core):
         # Offsets are used in words in the generator, but only
         # if the values are valid
-        if synaptic_matrix_offset != SYN_REGION_UNUSED:
+        if synaptic_matrix_offset is not None:
             synaptic_matrix_offset //= BYTES_PER_WORD
-        if delayed_synaptic_matrix_offset != SYN_REGION_UNUSED:
+        else:
+            synaptic_matrix_offset = SYN_REGION_UNUSED
+        if delayed_synaptic_matrix_offset is not None:
             delayed_synaptic_matrix_offset //= BYTES_PER_WORD
+        else:
+            delayed_synaptic_matrix_offset = SYN_REGION_UNUSED
 
         # Take care of Population views
         pre_lo = 0

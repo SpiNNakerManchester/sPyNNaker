@@ -616,36 +616,17 @@ class MasterPopTableAsBinarySearch(object):
                     core_mask, core_shift, n_neurons))
         return entry
 
-    def finish_master_pop_table(self, spec, region, ref):
-        """ Complete the master pop table in the data specification.
+    def get_pop_table_data(self):
+        """ Get the master pop table data as a numpy array
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the data specification to write the master pop entry to
-        :param int region:
-            the region to which the master pop table is being stored
-        :param ref:
-            the reference to use for the region, or None if not referenceable
+        :rtype: ~numpy.ndarray
         """
         # sort entries by key
         entries = sorted(
             self.__entries.values(),
             key=lambda a_entry: a_entry.routing_key)
         n_entries = len(entries)
-
-        # reserve space and switch
-        master_pop_table_sz = (
-            _BASE_SIZE_BYTES +
-            n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
-            self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
-        spec.reserve_memory_region(
-            region=region, size=master_pop_table_sz, label='PopTable',
-            reference=ref)
-        spec.switch_write_focus(region=region)
-
-        # write no master pop entries and the address list size
-        spec.write_value(n_entries)
-        spec.write_value(self.__n_addresses)
-
+        data = [numpy.array([n_entries, self.__n_addresses], dtype="uint32")]
         # Generate the table and list as arrays
         pop_table = _make_array(_MasterPopEntryCType, n_entries)
         address_list = _make_array(_AddressListEntryCType, self.__n_addresses)
@@ -653,14 +634,10 @@ class MasterPopTableAsBinarySearch(object):
         for i, entry in enumerate(entries):
             start += entry.write_to_table(pop_table[i], address_list, start)
 
-        # Write the arrays
-        spec.write_array(_to_numpy(pop_table))
-        spec.write_array(_to_numpy(address_list))
-
-        self.__entries.clear()
-        del self.__entries
-        self.__entries = None
-        self.__n_addresses = 0
+        # Add the arrays
+        data.append(_to_numpy(pop_table))
+        data.append(_to_numpy(address_list))
+        return numpy.concatenate(data)
 
     @property
     def max_n_neurons_per_core(self):
@@ -687,25 +664,3 @@ class MasterPopTableAsBinarySearch(object):
         :rtype: int
         """
         return _MAX_ADDRESS_COUNT
-
-    def write_padding(self, spec, next_block_start_address):
-        """ Write padding to the data spec needed between blocks to align\
-            addresses correctly.
-
-        :param ~data_specification.DataSpecificationGenerator spec:
-            The spec to write to
-        :param int next_block_start_address:
-            The address we are starting at
-        :return: The address we finish at after the padding
-        :rtype: int
-        """
-        next_allowed = self.get_next_allowed_address(next_block_start_address)
-        padding = next_allowed - next_block_start_address
-        if padding != 0:
-
-            # Pad out data file with the added alignment bytes:
-            spec.comment("\nWriting population table required padding\n")
-            spec.write_array(numpy.repeat(
-                numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
-                    "uint32"))
-        return next_allowed

@@ -132,12 +132,12 @@ def test_write_data_spec():
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
     synaptic_matrices = SynapticMatrices(
-        post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
-        synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4, n_neuron_bits=4)
-    synaptic_matrices.write_synaptic_data(
-        spec, post_pop._vertex.incoming_projections, all_syn_block_sz=10000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        post_vertex, n_synapse_types=2, synaptic_matrix_region=1,
+        direct_matrix_region=2, poptable_region=3,
+        connection_builder_region=4, max_atoms_per_core=10,
+        weight_scales=[32, 32], all_syn_block_sz=10000)
+    synaptic_matrices.generate_data(routing_info)
+    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice)
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -158,7 +158,8 @@ def test_write_data_spec():
             synaptic_matrices.get_connections_from_machine(
                 transceiver, post_vertex_placement,
                 proj_one_to_one_1._projection_edge,
-                proj_one_to_one_1._synapse_information))
+                proj_one_to_one_1._synapse_information,
+                post_vertex_slice))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_1) == post_vertex_slice.n_atoms
@@ -169,7 +170,8 @@ def test_write_data_spec():
             synaptic_matrices.get_connections_from_machine(
                 transceiver, post_vertex_placement,
                 proj_one_to_one_2._projection_edge,
-                proj_one_to_one_2._synapse_information))
+                proj_one_to_one_2._synapse_information,
+                post_vertex_slice))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_2) == post_vertex_slice.n_atoms
@@ -180,7 +182,8 @@ def test_write_data_spec():
             synaptic_matrices.get_connections_from_machine(
                 transceiver, post_vertex_placement,
                 proj_all_to_all._projection_edge,
-                proj_all_to_all._synapse_information))
+                proj_all_to_all._synapse_information,
+                post_vertex_slice))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_3) == 100
@@ -191,7 +194,8 @@ def test_write_data_spec():
             synaptic_matrices.get_connections_from_machine(
                 transceiver, post_vertex_placement,
                 proj_from_list._projection_edge,
-                proj_from_list._synapse_information))
+                proj_from_list._synapse_information,
+                post_vertex_slice))
 
         # Check that all the connections have the right weight and delay
         assert len(connections_4) == len(from_list_list)
@@ -459,12 +463,12 @@ def test_pop_based_master_pop_table_standard(
     spec = DataSpecificationGenerator(io.FileIO(temp_spec, "wb"), None)
 
     synaptic_matrices = SynapticMatrices(
-        post_vertex_slice, n_synapse_types=2, all_single_syn_sz=10000,
-        synaptic_matrix_region=1, direct_matrix_region=2, poptable_region=3,
-        connection_builder_region=4, n_neuron_bits=7)
-    synaptic_matrices.write_synaptic_data(
-        spec, post_pop._vertex.incoming_projections, all_syn_block_sz=1000000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        post_pop._vertex, n_synapse_types=2, synaptic_matrix_region=1,
+        direct_matrix_region=2, poptable_region=3,
+        connection_builder_region=4, max_atoms_per_core=neurons_per_core,
+        weight_scales=[32, 32], all_syn_block_sz=10000000)
+    synaptic_matrices.generate_data(routing_info)
+    synaptic_matrices.write_synaptic_data(spec, post_vertex_slice)
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

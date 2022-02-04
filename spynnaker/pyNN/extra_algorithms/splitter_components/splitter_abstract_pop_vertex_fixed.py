@@ -40,7 +40,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from pacman.model.graphs.common.slice import Slice
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -94,16 +94,21 @@ class SplitterAbstractPopulationVertexFixed(
             max_atoms_per_core, projections)
         resources = self.get_resources_used_by_atoms(
             max_atoms_per_core, all_syn_block_sz, structural_sz)
+        regions = PopulationMachineVertex.SYNAPSE_REGIONS
+        synaptic_matrices = SynapticMatrices(
+            app_vertex, regions.synaptic_matrix, regions.direct_matrix,
+            regions.pop_table, regions.connection_builder, max_atoms_per_core,
+            weight_scales, all_syn_block_sz)
 
         self.__create_slices()
 
         for index, vertex_slice in enumerate(self.__slices):
             chip_counter.add_core(resources)
-            label = f"Slice {vertex_slice} of {app_vertex.label}"
+            label = f"{vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, resources, label, constraints, all_syn_block_sz,
-                structural_sz, ring_buffer_shifts, weight_scales, index,
-                max_atoms_per_core)
+                vertex_slice, resources, label, constraints, structural_sz,
+                ring_buffer_shifts, weight_scales, index, max_atoms_per_core,
+                synaptic_matrices)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -130,14 +135,14 @@ class SplitterAbstractPopulationVertexFixed(
 
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints,
-            all_syn_block_sz, structural_sz, ring_buffer_shifts,
-            weight_scales, index, max_atoms_per_core):
+            structural_sz, ring_buffer_shifts, weight_scales, index,
+            max_atoms_per_core, synaptic_matrices):
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            resources, label, remaining_constraints,
-            self._governed_app_vertex, vertex_slice, index, ring_buffer_shifts,
-            weight_scales, all_syn_block_sz, structural_sz, max_atoms_per_core)
+            resources, label, remaining_constraints, self._governed_app_vertex,
+            vertex_slice, index, ring_buffer_shifts, weight_scales,
+            structural_sz, max_atoms_per_core, synaptic_matrices)
 
     def get_resources_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):
@@ -214,37 +219,29 @@ class SplitterAbstractPopulationVertexFixed(
         """
         app_vertex = self._governed_app_vertex
         projections = self._governed_app_vertex.incoming_projections
+        regions = PopulationMachineVertex.SYNAPSE_REGIONS
         sdram = MultiRegionSDRAM()
+        sdram.add_cost(regions.synapse_params,
+                       app_vertex.get_synapse_params_size())
+        sdram.add_cost(regions.synapse_dynamics,
+                       app_vertex.get_synapse_dynamics_size(n_atoms))
+        sdram.add_cost(regions.structural_dynamics, structural_sz)
+        sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
+        sdram.add_cost(regions.direct_matrix, app_vertex.all_single_syn_size)
         sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_params,
-            app_vertex.get_synapse_params_size())
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.synapse_dynamics,
-            app_vertex.get_synapse_dynamics_size(n_atoms))
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.structural_dynamics,
-            structural_sz)
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.synaptic_matrix,
-            all_syn_block_sz)
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.direct_matrix,
-            app_vertex.all_single_syn_size)
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.pop_table,
+            regions.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
                 projections))
+        sdram.add_cost(regions.connection_builder,
+                       app_vertex.get_synapse_expander_size(projections))
         sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.connection_builder,
-            app_vertex.get_synapse_expander_size(projections))
-        sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_filter,
+            regions.bitfield_filter,
             get_estimated_sdram_for_bit_field_region(projections))
         sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_key_map,
+            regions.bitfield_key_map,
             get_estimated_sdram_for_key_region(projections))
         sdram.add_cost(
-            PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
+            regions.bitfield_builder,
             exact_sdram_for_bit_field_builder_region())
         return sdram
 

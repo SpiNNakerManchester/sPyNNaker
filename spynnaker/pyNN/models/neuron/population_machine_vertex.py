@@ -77,7 +77,6 @@ class PopulationMachineVertex(
         "__key",
         "__ring_buffer_shifts",
         "__weight_scales",
-        "__all_syn_block_sz",
         "__structural_sz",
         "__slice_index",
         "__max_atoms_per_core"]
@@ -147,7 +146,7 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
-            all_syn_block_sz, structural_sz, max_atoms_per_core):
+            structural_sz, max_atoms_per_core, synaptic_matrices):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -164,9 +163,9 @@ class PopulationMachineVertex(
             The shifts to apply to convert ring buffer values to S1615 values
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
-        :param int all_syn_block_sz: The maximum size of the synapses in bytes
         :param int structural_sz: The size of the structural data
         :param int n_neuron_bits: The number of bits to use for neuron ids
+        :param SynapticMatrices synaptic_matrices: The synaptic matrices
         """
         super(PopulationMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -179,10 +178,9 @@ class PopulationMachineVertex(
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
-        self.__all_syn_block_sz = all_syn_block_sz
         self.__structural_sz = structural_sz
         self.__max_atoms_per_core = max_atoms_per_core
-        self.__synaptic_matrices = self._create_synaptic_matrices()
+        self.__synaptic_matrices = synaptic_matrices
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -304,8 +302,7 @@ class PopulationMachineVertex(
 
         self._write_synapse_data_spec(
             spec, routing_info, self.__ring_buffer_shifts,
-            self.__weight_scales, self.__all_syn_block_sz,
-            self.__structural_sz)
+            self.__weight_scales, self.__structural_sz)
 
         # End the writing of this specification:
         spec.end_specification()
