@@ -218,7 +218,12 @@ def get_probable_maximum_selected(
         with a probability of selection of selection_prob
     """
     prob = 1.0 - (chance / float(n_total_trials))
-    return binom.ppf(prob, n_trials, selection_prob)
+    val = binom.ppf(prob, n_trials, selection_prob)
+    if val == math.nan:
+        raise Exception(
+            f"Could not find maximum selected from {n_trials} out of"
+            f" {n_total_trials} trials, with selection probability of"
+            f" {selection_prob} and chance {chance}.  Final chance = {prob}.")
 
 
 def get_probable_minimum_selected(
