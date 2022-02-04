@@ -224,6 +224,7 @@ def get_probable_maximum_selected(
             f"Could not find maximum selected from {n_trials} out of"
             f" {n_total_trials} trials, with selection probability of"
             f" {selection_prob} and chance {chance}.  Final chance = {prob}.")
+    return val
 
 
 def get_probable_minimum_selected(
