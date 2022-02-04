@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from math import isnan
 
 """
 utility class containing simple helper methods
@@ -219,7 +220,7 @@ def get_probable_maximum_selected(
     """
     prob = 1.0 - (chance / float(n_total_trials))
     val = binom.ppf(prob, n_trials, selection_prob)
-    if val == math.nan:
+    if isnan(val):
         raise Exception(
             f"Could not find maximum selected from {n_trials} out of"
             f" {n_total_trials} trials, with selection probability of"
