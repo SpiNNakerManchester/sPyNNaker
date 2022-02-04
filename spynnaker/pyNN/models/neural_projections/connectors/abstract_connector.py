@@ -224,8 +224,15 @@ class AbstractConnector(object, metaclass=AbstractBase):
         if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_in_range)))
+            if prob_in_range > 0:
+                v = int(math.ceil(utility_calls.get_probable_maximum_selected(
+                    n_total_connections, n_connections, prob_in_range)))
+                # If the probability is so low as to result in 0, assume
+                # at least 1 if there is some probability that the delay is
+                # in range
+                return max(v, 1)
+            else:
+                return 0
         elif isinstance(delays, str):
             d = self._get_distances(delays, synapse_info)
             delays = _expr_context.eval(delays, d=d)
