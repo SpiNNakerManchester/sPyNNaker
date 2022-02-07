@@ -49,23 +49,19 @@ typedef struct master_population_table_entry {
     uint32_t mask;
     //! The index into ::address_list for this entry
     uint32_t start: 15;
-    //! Flag to indicate if an extra_info struct is present
+    //! Flag to indicate if core mask etc. is valid
     uint32_t extra_info_flag: 1;
     //! The number of entries in ::address_list for this entry
     uint32_t count: 16;
+    //! The mask to apply to the key once shifted to get the core index
+    uint32_t core_mask: 16;
+    //! The shift to apply to the key to get the core part
+    uint32_t mask_shift: 16;
+    //! The number of neurons per core
+    uint32_t n_neurons: 16;
+    //! The number of words for n_neurons
+    uint32_t n_words: 16;
 } master_population_table_entry;
-
-//! \brief A packed extra info (note: same size as address and row length)
-typedef struct extra_info {
-    //! The mask to apply to the key once shifted get the core index
-    uint32_t core_mask: 10;
-    //! The number of words required for n_neurons
-    uint32_t n_words: 6;
-    //! The shift to apply to the key to get the core part (0-31)
-    uint32_t mask_shift: 5;
-    //! The number of neurons per core (up to 2048)
-    uint32_t n_neurons: 11;
-} extra_info;
 
 //! \brief A packed address and row length (note: same size as extra info)
 typedef struct {
@@ -75,13 +71,6 @@ typedef struct {
     uint32_t address : N_ADDRESS_BITS;
     //! whether this is a direct/single address
     uint32_t is_single : 1;
-} address_and_row_length;
-
-//! \brief An entry in the address list is either an address and row length or extra
-//! info if flagged.
-typedef union {
-    address_and_row_length addr;
-    extra_info extra;
 } address_list_entry;
 
 //! \brief An Invalid address and row length
@@ -148,7 +137,7 @@ uint32_t bit_field_filtered_packets = 0;
 //! \brief Get the direct row address out of an entry
 //! \param[in] entry: the table entry
 //! \return a direct row address
-static inline uint32_t get_direct_address(address_and_row_length entry) {
+static inline uint32_t get_direct_address(address_list_entry entry) {
     return entry.address + direct_rows_base_address;
 }
 
@@ -157,14 +146,14 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 //!     (= up shifts by 4)
 //! \param[in] entry: the table entry
 //! \return a row address (which is an offset)
-static inline uint32_t get_offset(address_and_row_length entry) {
+static inline uint32_t get_offset(address_list_entry entry) {
     return entry.address << INDIRECT_ADDRESS_SHIFT;
 }
 
 //! \brief Get the standard address out of an entry
 //! \param[in] entry: the table entry
 //! \return a row address
-static inline uint32_t get_address(address_and_row_length entry) {
+static inline uint32_t get_address(address_list_entry entry) {
     return get_offset(entry) + synaptic_rows_base_address;
 }
 
@@ -174,33 +163,33 @@ static inline uint32_t get_address(address_and_row_length entry) {
 //!
 //! \param[in] entry: the table entry
 //! \return the row length
-static inline uint32_t get_row_length(address_and_row_length entry) {
+static inline uint32_t get_row_length(address_list_entry entry) {
     return entry.row_length + 1;
 }
 
 //! \brief Get the source core index from a spike
-//! \param[in] extra: The extra info entry
+//! \param[in] entry: The master pop table entry
 //! \param[in] spike: The spike received
 //! \return the source core index in the list of source cores
-static inline uint32_t get_core_index(extra_info extra, spike_t spike) {
-    return (spike >> extra.mask_shift) & extra.core_mask;
+static inline uint32_t get_core_index(master_population_table_entry entry, spike_t spike) {
+    return (spike >> entry.mask_shift) & entry.core_mask;
 }
 
 //! \brief Get the total number of neurons on cores which come before this core
-//! \param[in] extra: The extra info entry
+//! \param[in] entry: The master pop table entry
 //! \param[in] spike: The spike received
 //! \return the base neuron number of this core
-static inline uint32_t get_core_sum(extra_info extra, spike_t spike) {
-    return get_core_index(extra, spike) * extra.n_neurons;
+static inline uint32_t get_core_sum(master_population_table_entry entry, spike_t spike) {
+    return get_core_index(entry, spike) * entry.n_neurons;
 }
 
 //! \brief Get the total number of bits in bitfields for cores which came before
 //!        this core.
-//! \param[in] extra: The extra info entry
+//! \param[in] entry: The master pop table entry
 //! \param[in] spike: The spike received
 //! \return the base bitfield bit index of this core
-static inline uint32_t get_bitfield_sum(extra_info extra, spike_t spike) {
-    return get_core_index(extra, spike) * extra.n_words * BITS_PER_WORD;
+static inline uint32_t get_bitfield_sum(master_population_table_entry entry, spike_t spike) {
+    return get_core_index(entry, spike) * entry.n_words * BITS_PER_WORD;
 }
 
 //! \brief Get the source neuron ID for a spike given its table entry (without extra info)
@@ -215,18 +204,17 @@ static inline uint32_t get_neuron_id(
 //! \brief Get the neuron id of the neuron on the source core, for a spike with
 //!        extra info
 //! \param[in] entry: the table entry
-//! \param[in] extra: the extra info entry
 //! \param[in] spike: the spike received
 //! \return the source neuron id local to the core
 static inline uint32_t get_local_neuron_id(
-        master_population_table_entry entry, extra_info extra, spike_t spike) {
-    return spike & ~(entry.mask | (extra.core_mask << extra.mask_shift));
+        master_population_table_entry entry, spike_t spike) {
+    return spike & ~(entry.mask | (entry.core_mask << entry.mask_shift));
 }
 
 //! \brief Prints the master pop table.
 //! \details For debugging
 static inline void print_master_population_table(void) {
-#if log_level >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
     log_info("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
@@ -234,13 +222,11 @@ static inline void print_master_population_table(void) {
         int count = entry.count;
         int start = entry.start;
         if (entry.extra_info_flag) {
-            extra_info extra = address_list[start].extra;
-            start += 1;
             log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
-                    extra.core_mask, extra.mask_shift, extra.n_neurons, extra.n_words);
+                    entry.core_mask, entry.mask_shift, entry.n_neurons, entry.n_words);
         }
         for (uint16_t j = start; j < (start + count); j++) {
-            address_and_row_length addr = address_list[j].addr;
+            address_list_entry addr = address_list[j];
             if (addr.address == INVALID_ADDRESS) {
                 log_info("    index %d: INVALID", j);
             } else if (!addr.is_single) {
@@ -501,10 +487,9 @@ bool population_table_get_first_address(
     items_to_go = entry.count;
     uint32_t bit_field_id = 0;
     if (entry.extra_info_flag) {
-        extra_info extra = address_list[next_item++].extra;
-        uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
-        last_neuron_id = local_neuron_id + get_core_sum(extra, spike);
-        bit_field_id = local_neuron_id + get_bitfield_sum(extra, spike);
+        uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
+        last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
+        bit_field_id = local_neuron_id + get_bitfield_sum(entry, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
         bit_field_id = last_neuron_id;
@@ -559,7 +544,7 @@ bool population_table_get_next_address(
 
     bool is_valid = false;
     do {
-        address_and_row_length item = address_list[next_item].addr;
+        address_list_entry item = address_list[next_item];
         if (item.address != INVALID_ADDRESS) {
 
             // If the row is a direct row, indicate this by specifying the

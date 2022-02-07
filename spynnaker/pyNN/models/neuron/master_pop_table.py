@@ -79,7 +79,15 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
         # Flag to indicate if an extra_info struct is present
         ("extra_info_flag", ctypes.c_uint32, 1),
         # The number of entries in ::address_list for this entry
-        ("count", ctypes.c_uint32, 16)
+        ("count", ctypes.c_uint32, 16),
+        # The mask to apply to the key once shifted get the core index
+        ("core_mask", ctypes.c_uint32, 16),
+        # The shift to apply to the key to get the core part (0-31)
+        ("mask_shift", ctypes.c_uint32, 16),
+        # The number of neurons per core (up to 2048)
+        ("n_neurons", ctypes.c_uint32, 16),
+        # The number of words required for n_neurons
+        ("n_words", ctypes.c_uint32, 16)
     ]
 
 
@@ -88,29 +96,13 @@ _MAX_ADDRESS_START = (1 << _n_bits(_MasterPopEntryCType.start)) - 1
 # Maximum count of address list entries for a single pop table entry
 _MAX_ADDRESS_COUNT = (1 << _n_bits(_MasterPopEntryCType.count)) - 1
 
-
-class _ExtraInfoCType(ctypes.LittleEndianStructure):
-    """ An Extra Info structure; matches the C struct
-    """
-    _fields_ = [
-        # The mask to apply to the key once shifted get the core index
-        ("core_mask", ctypes.c_uint32, 10),
-        # The number of words required for n_neurons
-        ("n_words", ctypes.c_uint32, 6),
-        # The shift to apply to the key to get the core part (0-31)
-        ("mask_shift", ctypes.c_uint32, 5),
-        # The number of neurons per core (up to 2048)
-        ("n_neurons", ctypes.c_uint32, 11)
-    ]
-
-
 # The maximum n_neurons value
-_MAX_N_NEURONS = (1 << _n_bits(_ExtraInfoCType.n_neurons)) - 1
+_MAX_N_NEURONS = (1 << _n_bits(_MasterPopEntryCType.n_neurons)) - 1
 # Maximum core mask (i.e. number of cores)
-_MAX_CORE_MASK = (1 << _n_bits(_ExtraInfoCType.core_mask)) - 1
+_MAX_CORE_MASK = (1 << _n_bits(_MasterPopEntryCType.core_mask)) - 1
 
 
-class _AddressAndRowLengthCType(ctypes.LittleEndianStructure):
+class _AddressListEntryCType(ctypes.LittleEndianStructure):
     """ An Address and Row Length structure; matches the C struct
     """
     _fields_ = [
@@ -124,24 +116,13 @@ class _AddressAndRowLengthCType(ctypes.LittleEndianStructure):
 
 
 # An invalid address in the address and row length list
-_INVALID_ADDDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 1
+_INVALID_ADDDRESS = (1 << _n_bits(_AddressListEntryCType.address)) - 1
 # Address is 23 bits, but maximum value means invalid
-_MAX_ADDRESS = (1 << _n_bits(_AddressAndRowLengthCType.address)) - 2
-
-
-class _AddressListEntryCType(ctypes.Union):
-    """ An Address List entry; one of two things
-    """
-    _fields_ = [
-        ("addr", _AddressAndRowLengthCType),
-        ("extra", _ExtraInfoCType)
-    ]
-
+_MAX_ADDRESS = (1 << _n_bits(_AddressListEntryCType.address)) - 2
 
 # Sizes of structs
 _MASTER_POP_ENTRY_SIZE_BYTES = ctypes.sizeof(_MasterPopEntryCType)
 _ADDRESS_LIST_ENTRY_SIZE_BYTES = ctypes.sizeof(_AddressListEntryCType)
-_EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
@@ -307,18 +288,21 @@ class _MasterPopEntry(object):
         # If there is a core mask, add a special entry for it
         if self.__core_mask != 0:
             entry.extra_info_flag = True
-            extra_info = address_list[next_addr].extra
-            extra_info.core_mask = self.__core_mask
-            extra_info.n_words = int(math.ceil(
+            entry.core_mask = self.__core_mask
+            entry.n_words = int(math.ceil(
                 self.__n_neurons / BIT_IN_A_WORD))
-            extra_info.n_neurons = self.__n_neurons
-            extra_info.mask_shift = self.__core_shift
-            next_addr += 1
-            n_entries += 1
+            entry.n_neurons = self.__n_neurons
+            entry.mask_shift = self.__core_shift
+        else:
+            entry.extra_info_flag = False
+            entry.core_mask = 0
+            entry.n_words = 0
+            entry.n_neurons = 0
+            entry.mask_shift = 0
 
         for j, (address, row_length, is_single, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
-            address_entry = address_list[next_addr + j].addr
+            address_entry = address_list[next_addr + j]
             if not is_valid:
                 address_entry.address = _INVALID_ADDDRESS
             else:
@@ -373,7 +357,6 @@ class MasterPopTableAsBinarySearch(object):
         return (
             _BASE_SIZE_BYTES +
             (n_vertices * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
     @staticmethod
