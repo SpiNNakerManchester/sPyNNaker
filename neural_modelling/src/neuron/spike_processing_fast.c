@@ -283,6 +283,10 @@ static inline void handle_row_error(dma_buffer *buffer) {
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(buffer->row);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    if (fixed_synapse > (buffer->n_bytes_transferred >> 2)) {
+        log_error("Too many fixed synapses: %u", fixed_synapse);
+        rt_error(RTE_SWERR);
+    }
     log_error("\nFixed-Fixed Region (%u synapses):", fixed_synapse);
     for (; fixed_synapse > 0; fixed_synapse--) {
         uint32_t synaptic_word = *synaptic_words++;
