@@ -107,8 +107,8 @@ class Projection(object):
                     pre_synaptic_population.label,
                     post_synaptic_population.label, connector))
             # give an auto generated label for the underlying edge
-            label = "projection edge {}".format(sim.none_labelled_edge_count)
-            sim.increment_none_labelled_edge_count()
+            label = "projection edge {}".format(
+                SpynnakerDataView.get_next_none_labelled_edge_number())
 
         # Handle default synapse type
         if synapse_type is None:
