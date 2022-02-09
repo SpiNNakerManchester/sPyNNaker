@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM, ConstantSDRAM)
+    MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
@@ -205,8 +205,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.incoming_projections)
         weight_scales = app_vertex.get_weight_scales(rb_shifts)
 
+        # We add the SDRAM edge SDRAM to the neuron resources so it is
+        # accounted for within the placement
+        n_incoming = self.__n_synapse_vertices + len(self.__poisson_sources)
+        edge_sdram = PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
+            atoms_per_core, n_synapse_types)
+        sdram_edge_sdram = edge_sdram * n_incoming
+
         # Get maximum resources for neurons for each split
-        neuron_resources = self.__get_neuron_resources(atoms_per_core)
+        neuron_resources = self.__get_neuron_resources(
+            atoms_per_core, sdram_edge_sdram)
 
         # Get resources for synapses
         structural_sz = max(
@@ -230,10 +238,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
         for _ in range(self.__n_synapse_vertices - 1):
             total_sdram += shared_synapse_resources.sdram
-        total_sdram += ConstantSDRAM(
-            PopulationNeuronsMachineVertex.get_n_bytes_for_transfer(
-                atoms_per_core, n_synapse_types) * (
-                    self.__n_synapse_vertices + len(self.__poisson_sources)))
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
@@ -612,13 +616,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 len(PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS))]
         return SynapseRegions(*references)
 
-    def __get_neuron_resources(self, n_atoms):
+    def __get_neuron_resources(self, n_atoms, sdram_edge_sdram):
         """  Gets the resources of the neurons of a slice of atoms from a given
              app vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :rtype: ~pacman.model.resources.ResourceContainer
         """
+
         app_vertex = self._governed_app_vertex
         n_record = len(app_vertex.neuron_recordables)
         variable_sdram = app_vertex.get_max_neuron_variable_sdram(n_atoms)
@@ -632,7 +637,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS.value,
             NEURONS_SDRAM_PARAMS_SIZE)
         sdram.nest(
-            len(PopulationNeuronsMachineVertex.REGIONS) + 1, variable_sdram)
+            len(PopulationNeuronsMachineVertex.REGIONS), variable_sdram)
+        sdram.add_cost(
+            len(PopulationNeuronsMachineVertex.REGIONS) + 1, sdram_edge_sdram)
+
         dtcm = app_vertex.get_common_dtcm()
         dtcm += app_vertex.get_neuron_dtcm(n_atoms)
         cpu_cycles = app_vertex.get_common_cpu()
