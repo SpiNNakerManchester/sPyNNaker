@@ -201,18 +201,9 @@ class PopulationMachineSynapses(
                 size=4, label='synapseDynamicsStructuralParams',
                 reference=self._synapse_references.structural_dynamics)
 
-        # write up the bitfield builder data
-        # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
-            spec, incoming, self._synapse_regions.bitfield_builder,
-            self._synapse_regions.bitfield_filter,
-            self._synapse_regions.bitfield_key_map,
-            self._synapse_references.bitfield_builder,
-            self._synapse_references.bitfield_filter,
-            self._synapse_references.bitfield_key_map)
-        bit_field_utilities.write_bitfield_init_data(
-            spec, incoming, routing_info,
-            self._synapse_regions.bitfield_builder,
+        size = bit_field_utilities.get_estimated_sdram_for_bit_field_region(
+            incoming)
+        bit_field_header = bit_field_utilities.get_bitfield_builder_data(
             self._synapse_regions.pop_table,
             self._synapse_regions.synaptic_matrix,
             self._synapse_regions.direct_matrix,
@@ -220,6 +211,15 @@ class PopulationMachineSynapses(
             self._synapse_regions.bitfield_key_map,
             self._synapse_regions.structural_dynamics,
             isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
+        bit_field_key_map = bit_field_utilities.get_bitfield_key_map_data(
+            incoming, routing_info)
+        bit_field_utilities.write_bitfield_init_data(
+            spec,  self._synapse_regions.bitfield_builder, bit_field_header,
+            self._synapse_regions.bitfield_key_map, bit_field_key_map,
+            self._synapse_regions.bitfield_filter, size,
+            self._synapse_references.bitfield_builder,
+            self._synapse_references.bitfield_key_map,
+            self._synapse_references.bitfield_filter)
 
     def _write_synapse_parameters(self, spec, ring_buffer_shifts):
         """ Write the synapse parameters data region

@@ -98,53 +98,6 @@ def exact_sdram_for_bit_field_builder_region():
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
-def reserve_bit_field_regions(
-        spec, incoming_projections, bit_field_builder_region,
-        bit_filter_region, bit_field_key_region,
-        bit_field_builder_region_ref=None, bit_filter_region_ref=None,
-        bit_field_key_region_ref=None):
-    """ reserves the regions for the bitfields
-
-    :param ~data_specification.DataSpecificationGenerator spec:
-        dsg spec writer
-    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-        The projections to generate bitfields for
-    :param int bit_field_builder_region: region id for the builder region
-    :param int bit_filter_region: region id for the bitfield region
-    :param int bit_field_key_region: region id for the key map
-    :param bit_field_builder_region_ref:
-        Reference to give the region, or None if not referencable
-    :type bit_field_builder_region_ref: int or None
-    :param bit_filter_region_ref:
-        Reference to give the region, or None if not referencable
-    :type bit_filter_region_ref: int or None
-    :param bit_field_key_region_ref:
-        Reference to give the region, or None if not referencable
-    :type bit_field_key_region_ref: int or None
-    """
-
-    # reserve the final destination for the bitfields
-    spec.reserve_memory_region(
-        region=bit_filter_region,
-        size=get_estimated_sdram_for_bit_field_region(incoming_projections),
-        label="bit_field region",
-        reference=bit_filter_region_ref)
-
-    # reserve region for the bitfield builder
-    spec.reserve_memory_region(
-        region=bit_field_builder_region,
-        size=exact_sdram_for_bit_field_builder_region(),
-        label="bit field builder region",
-        reference=bit_field_builder_region_ref)
-
-    # reserve memory region for the key region
-    spec.reserve_memory_region(
-        region=bit_field_key_region,
-        size=get_estimated_sdram_for_key_region(incoming_projections),
-        label="bit field key data",
-        reference=bit_field_key_region_ref)
-
-
 def get_bitfield_builder_data(
         master_pop_region_id, synaptic_matrix_region_id,
         direct_matrix_region_id, bit_field_region_id,
@@ -203,7 +156,9 @@ def get_bitfield_key_map_data(incoming_projections, routing_info):
 
 def write_bitfield_init_data(
         spec, bit_field_builder_region, builder_data,
-        bit_field_key_map_region, key_map_data, bit_field_region):
+        bit_field_key_map_region, key_map_data, bit_field_region,
+        n_bit_field_bytes, bit_field_builder_region_ref=None,
+        bit_field_key_region_ref=None, bit_field_region_ref=None):
     """ writes the init data needed for the bitfield generator
 
     :param ~data_specification.DataSpecificationGenerator spec:
@@ -213,11 +168,30 @@ def write_bitfield_init_data(
     :param int bit_field_region_id: the region id for the bit-fields
     :param int bit_field_key_map_region_id: the region id for the key map
     """
+    # reserve region for the bitfield builder
+    spec.reserve_memory_region(
+        region=bit_field_builder_region,
+        size=len(builder_data) * BYTES_PER_WORD,
+        label="bit field builder region",
+        reference=bit_field_builder_region_ref)
     spec.switch_write_focus(bit_field_builder_region)
     spec.write_array(builder_data)
+
+    # reserve memory region for the key region
+    spec.reserve_memory_region(
+        region=bit_field_key_map_region,
+        size=len(key_map_data) * BYTES_PER_WORD,
+        label="bit field key data",
+        reference=bit_field_key_region_ref)
     spec.switch_write_focus(bit_field_key_map_region)
     spec.write_array(key_map_data)
 
-    # ensure if nothing else that n bitfields in bitfield region set to 0
+    # reserve the final destination for the bitfields
+    spec.reserve_memory_region(
+        region=bit_field_region,
+        size=n_bit_field_bytes,
+        label="bit_field region",
+        reference=bit_field_region_ref)
+    # Ensure a 0 is written at least to indicate no bit fields
     spec.switch_write_focus(bit_field_region)
     spec.write_value(0)
