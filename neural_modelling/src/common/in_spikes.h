@@ -137,6 +137,7 @@ static inline spike_t in_spikes_value_at_index(uint32_t index) {
     return circular_buffer_value_at_index(buffer, index);
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
 // FLUSH SPIKES
 static inline uint32_t in_spikes_flush_buffer(void) {
 
@@ -145,4 +146,6 @@ static inline uint32_t in_spikes_flush_buffer(void) {
 
 	return num_spikes_left;
 }
+#endif
+
 #endif // _IN_SPIKES_H_
