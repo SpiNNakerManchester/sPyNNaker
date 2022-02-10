@@ -22,6 +22,7 @@ from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
@@ -240,7 +241,7 @@ class SpynnakerExternalDevicePluginManager(object):
             label=lpg_label, translate_keys=translate_keys)
 
         # add to the tracker
-        get_simulator().add_live_packet_gatherer_parameters(
+        SpynnakerDataView.add_live_packet_gatherer_parameters(
             params, vertex_to_record_from, partition_ids)
 
     @staticmethod
