@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
+import numpy
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_utilities.ordered_set import OrderedSet
@@ -144,22 +145,14 @@ def reserve_bit_field_regions(
         reference=bit_field_key_region_ref)
 
 
-def write_bitfield_init_data(
-        spec, incoming_projections, vertex_slice, routing_info,
-        bit_field_builder_region, master_pop_region_id,
-        synaptic_matrix_region_id, direct_matrix_region_id,
-        bit_field_region_id, bit_field_key_map_region_id,
-        structural_dynamics_region_id, has_structural_dynamics_region):
-    """ writes the init data needed for the bitfield generator
+def get_bitfield_builder_data(
+        master_pop_region_id, synaptic_matrix_region_id,
+        direct_matrix_region_id, bit_field_region_id,
+        bit_field_key_map_region_id, structural_dynamics_region_id,
+        has_structural_dynamics_region):
 
-    :param ~data_specification.DataSpecificationGenerator spec:
-        data spec writer
-    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-        The projections to generate bitfields for
-    :param ~pacman.model.graphs.common.slice vertex_slice:
-        The slice of the target vertex
-    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
-    :param int bit_field_builder_region: the region id for the bitfield builder
+    """ Get data for bit field region
+
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix
     :param int direct_matrix_region_id: the region id for the direct matrix
@@ -168,24 +161,29 @@ def write_bitfield_init_data(
     :param int structural_dynamics_region_id: the region id for the structural
     :param bool has_structural_dynamics_region:
         whether the core has a structural_dynamics region
+    :rtype: ~numpy.ndarray
     """
-    spec.switch_write_focus(bit_field_builder_region)
-
-    spec.write_value(master_pop_region_id)
-    spec.write_value(synaptic_matrix_region_id)
-    spec.write_value(direct_matrix_region_id)
-    spec.write_value(bit_field_region_id)
-    spec.write_value(bit_field_key_map_region_id)
-
     # save 4 bytes by making a key flag of full mask to avoid when not got
     # a structural
     if not has_structural_dynamics_region:
-        spec.write_value(FULL_MASK)
+        struct_region = FULL_MASK
     else:
-        spec.write_value(structural_dynamics_region_id)
+        struct_region = structural_dynamics_region_id
 
-    spec.switch_write_focus(bit_field_key_map_region_id)
+    return numpy.array([
+        master_pop_region_id, synaptic_matrix_region_id,
+        direct_matrix_region_id, bit_field_region_id,
+        bit_field_key_map_region_id, struct_region], dtype="uint32")
 
+
+def get_bitfield_key_map_data(incoming_projections, routing_info):
+    """ Get data for the key map region
+
+    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
+        The projections to generate bitfields for
+    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
+    :rtype: ~numpy.ndarray
+    """
     # Gather the source vertices that target this core
     sources = OrderedSet()
     for proj in incoming_projections:
@@ -196,14 +194,30 @@ def write_bitfield_init_data(
             if key is not None:
                 sources.add((key, in_edge.pre_vertex.n_atoms))
 
-    # write n keys max atom map
-    spec.write_value(len(sources))
+    key_map = numpy.array(
+        [[key, n_atoms] for key, n_atoms in sources], dtype="uint32")
 
-    # load in key to max atoms map
-    for key, n_atoms in sources:
-        spec.write_value(key)
-        spec.write_value(n_atoms)
+    # write n keys max atom map
+    return numpy.concatenate(([len(sources)], numpy.ravel(key_map)))
+
+
+def write_bitfield_init_data(
+        spec, bit_field_builder_region, builder_data,
+        bit_field_key_map_region, key_map_data, bit_field_region):
+    """ writes the init data needed for the bitfield generator
+
+    :param ~data_specification.DataSpecificationGenerator spec:
+        data spec writer
+    :param int bit_field_builder_region: the region id for the bitfield builder
+    :param ~numpy.ndarray builder_data: Data for the builder region
+    :param int bit_field_region_id: the region id for the bit-fields
+    :param int bit_field_key_map_region_id: the region id for the key map
+    """
+    spec.switch_write_focus(bit_field_builder_region)
+    spec.write_array(builder_data)
+    spec.switch_write_focus(bit_field_key_map_region)
+    spec.write_array(key_map_data)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
-    spec.switch_write_focus(bit_field_region_id)
+    spec.switch_write_focus(bit_field_region)
     spec.write_value(0)

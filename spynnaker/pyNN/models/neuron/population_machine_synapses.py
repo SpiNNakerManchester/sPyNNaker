@@ -211,7 +211,7 @@ class PopulationMachineSynapses(
             self._synapse_references.bitfield_filter,
             self._synapse_references.bitfield_key_map)
         bit_field_utilities.write_bitfield_init_data(
-            spec, incoming, self._vertex_slice, routing_info,
+            spec, incoming, routing_info,
             self._synapse_regions.bitfield_builder,
             self._synapse_regions.pop_table,
             self._synapse_regions.synaptic_matrix,
