@@ -112,7 +112,7 @@ static uint32_t dma_complete_count;
 static uint32_t max_pipeline_restarts;
 static uint32_t spike_pipeline_deactivation_time = 0;
 static uint32_t timer_callback_completed = 0;
-static uint32_t spikes_this_time_step = 0; // needed because packets gets reset?
+static uint32_t spikes_this_time_step = 0;
 static uint32_t dmas_this_time_step = 0;
 static uint32_t pipeline_restarts = 0;
 
@@ -320,9 +320,10 @@ static inline void start_dma_loop(void) {
         }
     }
 
+#if LOG_LEVEL >= LOG_DEBUG
     // if timer is getting low, don't do next DMA and instead flush spike buffer
     // originally 6657 clock cycles from the end of the interval was used
-    if (tc[T1_COUNT] < 6657){//6657){
+    if (tc[T1_COUNT] < 6657) {
     	    uint cpsr = spin1_int_disable();
     	    uint32_t spikes_remaining = in_spikes_flush_buffer();
     	    timer_callback_active = true;
@@ -335,12 +336,10 @@ static inline void start_dma_loop(void) {
     	    		max_flushed_spikes = spikes_remaining;
     	    	}
 
-//    	    	log_info("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
-
-    	    	//io_printf(IO_BUF, "At time: %u, flushed spikes: %u\n",
-    	    	//		time, spikes_remaining);
+    	    	log_debug("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
     	    }
     }
+#endif
 }
 
 //! \brief Called when a multicast packet is received
@@ -572,15 +571,17 @@ void spike_processing_get_and_reset_pipeline_restarts_this_tick(void) {
 	pipeline_restarts = 0;
 }
 
-//uint32_t spike_processing_get_pipeline_deactivation_time(){
-//	return spike_pipeline_deactivation_time;
-//}
-//
-//// FLUSH SPIKES
-//uint32_t spike_processing_get_total_flushed_spikes(){
-//	return total_flushed_spikes;
-//}
-//
-//uint32_t spike_processing_get_max_flushed_spikes(){
-//	return max_flushed_spikes;
-//}
+#if LOG_LEVEL >= LOG_DEBUG
+uint32_t spike_processing_get_pipeline_deactivation_time(){
+	return spike_pipeline_deactivation_time;
+}
+
+// FLUSHED SPIKES
+uint32_t spike_processing_get_total_flushed_spikes(){
+	return total_flushed_spikes;
+}
+
+uint32_t spike_processing_get_max_flushed_spikes(){
+	return max_flushed_spikes;
+}
+#endif
