@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import math
 from unittest import SkipTest
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker8 as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
@@ -49,9 +50,6 @@ def do_one_run():
                     n_boards)) from oops
         raise oops
     target_x, target_y = find_good_chip(machine, n_target)
-    print(machine)
-    print(target_x, target_y)
-
     sources = []
     for s in range(n_source):
         sources.append(sim.Population(
@@ -80,4 +78,6 @@ def do_one_run():
                     receptor_type="inhibitory")
 
     sim.run(1)
+    t = ProvenanceReader().get_timer_provenance("Routing table loader")
+    assert t == "", "Routing table loader should not have run"
     sim.end()
