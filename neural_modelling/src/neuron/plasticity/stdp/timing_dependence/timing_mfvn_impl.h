@@ -40,7 +40,6 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 // Exponential decay lookup parameters
 #define TAU_PLUS_TIME_SHIFT 0
-//#define EXP_COS_LUT_SIZE 256
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -70,18 +69,10 @@ static inline post_trace_t timing_add_post_spike(
 	if (print_plasticity){
 		io_printf(IO_BUF, "Adding pre spike to event history (from vestibular nuclei)\n");
 	}
-//    // Get time since last spike
-//    uint32_t delta_time = time - last_time;
-
-//    // Decay previous o1 and o2 traces
-//    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
-//            DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
     // **NOTE** o2 trace is pre-multiplied by a3_plus
     int32_t new_o1_trace = 0; //decayed_o1_trace + STDP_FIXED_POINT_ONE;
-
-//    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
@@ -142,14 +133,8 @@ static inline update_state_t timing_apply_post_spike(
     }
 
     if (time_since_last_pre < 255){
-//        int32_t multiplier = EXP_COS_LOOKUP(time_since_last_pre);
-//        int32_t multiplier = STDP_FIXED_MUL_16X16(last_pre_trace,
-//                maths_lut_exponential_decay_time_shifted(
-//                        time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_cos_lookup));
         int32_t multiplier = maths_lut_exponential_decay_time_shifted(
                 time_since_last_pre, TAU_PLUS_TIME_SHIFT, exp_cos_lookup);
-//        int32_t multiplier = STDP_FIXED_MUL_16X16(last_pre_trace,
-//                maths_lut_exponential_decay(time_since_last_pre, exp_cos_lookup));
 
         if (print_plasticity){
         	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);

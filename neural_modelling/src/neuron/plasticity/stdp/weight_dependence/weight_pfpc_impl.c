@@ -43,7 +43,6 @@ address_t weight_initialise(
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
-
     plasticity_weight_region_data_t *dtcm_copy = plasticity_weight_region_data =
         spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
 

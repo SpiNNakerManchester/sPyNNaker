@@ -81,8 +81,6 @@ static inline final_state_t plasticity_update_synapse(
     	io_printf(IO_BUF, "    Printing PC history\n");
     	print_event_history(post_event_history);
     }
-//     print_delayed_window_events(post_event_history, window_begin_time,
-//    		window_end_time, delay_dendritic);
 
     if (print_plasticity){
     	io_printf(IO_BUF, "\n############ Phase 1 #############\n");
@@ -255,9 +253,7 @@ static inline plastic_synapse_t process_plastic_synapse(
 
     // Update the synapse state
     uint32_t post_delay = s.delay_dendritic;
-//    if (!params.backprop_delay) {
-//        post_delay = 0;
-//    }
+
     final_state_t final_state = plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, new_pre_trace,
             post_delay, s.delay_axonal, current_state,
@@ -281,20 +277,12 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-//    plastic_synapse_t *plastic_words = _plastic_synapses(
-//        plastic_region_address);
     plastic_synapse_t *plastic_words = plastic_region_address->synapses;
     const control_t *control_words = synapse_row_plastic_controls(fixed_region);
     size_t n_plastic_synapses = synapse_row_num_plastic_controls(fixed_region);
 
     num_plastic_pre_synaptic_events += n_plastic_synapses;
 
-    // Get event history from synaptic row
-//    pre_event_history_t *event_history = _plastic_event_history(
-//        plastic_region_address);
-//    pre_event_history_t *event_history = plastic_region_address->history;
-
-    // Get last pre-synaptic event from event history
     // Get last pre-synaptic event from event history
     const uint32_t recorded_spikes_minus_one =
             plastic_region_address->history.num_recorded_mf_spikes_minus_one;
@@ -303,7 +291,6 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // no longer need to manage this trace
     const pre_trace_t last_pre_trace = 0;
-
 
     // add pre spike to struct capturing pre synaptic event history
     // NOTE: this uses the post_event_history_t handling code

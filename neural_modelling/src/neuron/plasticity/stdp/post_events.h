@@ -66,7 +66,7 @@ typedef struct {
 // Inline functions
 //---------------------------------------
 
-//#if LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print a post-synaptic event history
 //! \param[in] events: The history
 static inline void print_event_history(const post_event_history_t *events) {
@@ -76,7 +76,7 @@ static inline void print_event_history(const post_event_history_t *events) {
                 i, events->times[i], events->traces[i]);
     }
 }
-//#endif
+#endif
 
 //! \brief Initialise an array of post-synaptic event histories
 //! \param[in] n_neurons: Number of neurons
@@ -84,14 +84,12 @@ static inline void print_event_history(const post_event_history_t *events) {
 static inline post_event_history_t *post_events_init_buffers(
         uint32_t n_neurons) {
     post_event_history_t *post_event_history =
-        (post_event_history_t*) spin1_malloc(
-            n_neurons * sizeof(post_event_history_t));
+            spin1_malloc(n_neurons * sizeof(post_event_history_t));
 
     // Check allocations succeeded
     if (post_event_history == NULL) {
-        log_error(
-            "Unable to allocate global STDP structures - Out of DTCM: Try "
-            "reducing the number of neurons per core to fix this problem ");
+        log_error("Unable to allocate global STDP structures - Out of DTCM: Try "
+                "reducing the number of neurons per core to fix this problem ");
         return NULL;
     }
 
@@ -170,8 +168,10 @@ static inline post_event_window_t post_events_next(
 }
 
 
-// TODO This function is removed in master. Does this still serve any purpose?
-//---------------------------------------
+//! \brief Advance a post-synaptic event window to the next (delayed) event
+//! \param[in] window: The window to advance
+//! \param[in] delayed_time: The delayed time
+//! \return the advanced window
 static inline post_event_window_t post_events_next_delayed(
         post_event_window_t window, uint32_t delayed_time) {
 
@@ -201,7 +201,6 @@ static inline void post_events_add(
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-
         // Otherwise Shuffle down elements
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t e = 2; e < MAX_POST_SYNAPTIC_EVENTS; e++) {
