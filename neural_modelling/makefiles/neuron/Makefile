@@ -54,6 +54,7 @@ MODELS = IF_curr_exp \
          IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
          IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
          IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight \
+         IF_cond_exp_cerebellum \
          IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
          IF_cond_exp_cerebellum_stdp_mad_mfvn_mfvn
 

@@ -15,8 +15,8 @@
 
 APP = $(notdir $(CURDIR))
 
-NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
-NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_t_last_impl.c
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_t_last_impl.h
 INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_conductance.h
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
 THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h

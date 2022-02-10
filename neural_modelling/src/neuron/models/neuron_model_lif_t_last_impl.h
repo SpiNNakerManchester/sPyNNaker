@@ -20,6 +20,8 @@
 
 #include "neuron_model.h"
 
+#include <debug.h>
+
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
 typedef struct neuron_t {
@@ -54,5 +56,86 @@ typedef struct neuron_t {
 
 typedef struct global_neuron_params_t {
 } global_neuron_params_t;
+
+// simple Leaky I&F ODE
+//! \param[in,out] neuron: The neuron to update
+//! \param[in] V_prev: previous voltage
+//! \param[in] input_this_timestep: The input to apply
+static inline void _lif_neuron_closed_form(
+        neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
+    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
+
+    // update membrane voltage
+    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
+}
+
+//! \brief primary function called in timer loop after synaptic updates
+//! \param[in] num_excitatory_inputs: Number of excitatory receptor types.
+//! \param[in] exc_input: Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a positive reaction within the neuron in
+//!     terms of stimulation.
+//! \param[in] num_inhibitory_inputs: Number of inhibitory receptor types.
+//! \param[in] inh_input: Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a negative reaction within the neuron in
+//!     terms of stimulation.
+//! \param[in] external_bias: This is the intrinsic plasticity which could be
+//!     used for ac, noisy input etc etc. (general purpose input)
+//! \param[in,out] neuron: the pointer to a neuron parameter struct which
+//!     contains all the parameters for a specific neuron
+//! \return the value to be compared with a threshold value to determine if the
+//!     neuron has spiked
+static state_t neuron_model_state_update(
+        uint16_t num_excitatory_inputs, const input_t *exc_input,
+        uint16_t num_inhibitory_inputs, const input_t *inh_input,
+        input_t external_bias, neuron_t *restrict neuron) {
+
+    log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
+    log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+
+
+    // If outside of the refractory period
+    if (neuron->refract_timer <= 0) {
+        REAL total_exc = 0;
+        REAL total_inh = 0;
+
+        for (int i=0; i < num_excitatory_inputs; i++){
+            total_exc += exc_input[i];
+        }
+        for (int i=0; i< num_inhibitory_inputs; i++){
+            total_inh += inh_input[i];
+        }
+        // Get the input in nA
+        input_t input_this_timestep =
+            total_exc - total_inh + external_bias + neuron->I_offset;
+
+        _lif_neuron_closed_form(
+            neuron, neuron->V_membrane, input_this_timestep);
+    } else {
+
+        // countdown refractory timer
+        neuron->refract_timer -= 1;
+    }
+    return neuron->V_membrane;
+}
+
+//! \brief Indicates that the neuron has spiked
+//! \param[in, out] neuron pointer to a neuron parameter struct which contains
+//!     all the parameters for a specific neuron
+static void neuron_model_has_spiked(neuron_t *restrict neuron) {
+    // reset membrane voltage
+    neuron->V_membrane = neuron->V_reset;
+
+    // reset refractory timer
+    neuron->refract_timer  = neuron->T_refract;
+}
+
+//! \brief get the neuron membrane voltage for a given neuron parameter set
+//! \param[in] neuron: a pointer to a neuron parameter struct which contains
+//!     all the parameters for a specific neuron
+//! \return the membrane voltage for a given neuron with the neuron
+//!     parameters specified in neuron
+static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron)  {
+    return neuron->V_membrane;
+}
 
 #endif // _NEURON_MODEL_LIF_CURR_T_LAST_IMPL_H_

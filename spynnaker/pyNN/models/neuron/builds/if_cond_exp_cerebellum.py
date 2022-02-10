@@ -15,7 +15,7 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models \
-    import NeuronModelLeakyIntegrateAndFire
+    import NeuronModelLeakyIntegrateAndFireTLast
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
@@ -36,7 +36,7 @@ class IFCondExpCerebellum(AbstractPyNNNeuronModelStandard):
             i_offset=0.0, e_rev_E=0.0, e_rev_I=-70.0, v=-65.0,
             isyn_exc=0.0, isyn_inh=0.0):
         # pylint: disable=too-many-arguments, too-many-locals
-        neuron_model = NeuronModelLeakyIntegrateAndFire(
+        neuron_model = NeuronModelLeakyIntegrateAndFireTLast(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)

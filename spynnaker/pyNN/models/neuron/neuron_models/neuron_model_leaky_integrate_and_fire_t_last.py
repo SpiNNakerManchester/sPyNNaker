@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
-from .abstract_neuron_model import AbstractNeuronModel
-from data_specification.enums import DataType
-
 import numpy
+from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
+from .abstract_neuron_model import AbstractNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 V = "v"
 V_REST = "v_rest"
@@ -43,19 +43,50 @@ UNITS = {
 
 
 class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
+    """ Classic LIF neuron model with t_last state variable included.
+    """
     __slots__ = [
-        "_v_init",
-        "_v_rest",
-        "_tau_m",
-        "_cm",
-        "_i_offset",
-        "_v_reset",
-        "_tau_refrac"
+        "__v_init",
+        "__v_rest",
+        "__tau_m",
+        "__cm",
+        "__i_offset",
+        "__v_reset",
+        "__tau_refrac"
         ]
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
-        super(NeuronModelLeakyIntegrateAndFireTLast, self).__init__(
+        r"""
+        :param v_init: :math:`V_{init}`
+        :type v_init:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param v_rest: :math:`V_{rest}`
+        :type v_rest:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param tau_m: :math:`\tau_{m}`
+        :type tau_m:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param cm: :math:`C_m`
+        :type cm: float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param v_reset: :math:`V_{reset}`
+        :type v_reset:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        :param tau_refrac: :math:`\tau_{refrac}`
+        :type tau_refrac:
+            float, iterable(float), ~pyNN.random.RandomDistribution or
+            (mapping) function
+        """
+        super().__init__(
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
              DataType.S1615,   # r_membrane (= tau_m / cm)
@@ -70,13 +101,13 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
         if v_init is None:
             v_init = v_rest
 
-        self._v_init = v_init
-        self._v_rest = v_rest
-        self._tau_m = tau_m
-        self._cm = cm
-        self._i_offset = i_offset
-        self._v_reset = v_reset
-        self._tau_refrac = tau_refrac
+        self.__v_init = v_init
+        self.__v_rest = v_rest
+        self.__tau_m = tau_m
+        self.__cm = cm
+        self.__i_offset = i_offset
+        self.__v_reset = v_reset
+        self.__tau_refrac = tau_refrac
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -85,16 +116,16 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters[V_REST] = self._v_rest
-        parameters[TAU_M] = self._tau_m
-        parameters[CM] = self._cm
-        parameters[I_OFFSET] = self._i_offset
-        parameters[V_RESET] = self._v_reset
-        parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[V_REST] = self.__v_rest
+        parameters[TAU_M] = self.__tau_m
+        parameters[CM] = self.__cm
+        parameters[I_OFFSET] = self.__i_offset
+        parameters[V_RESET] = self.__v_reset
+        parameters[TAU_REFRAC] = self.__tau_refrac
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[V] = self._v_init
+        state_variables[V] = self.__v_init
         state_variables[COUNT_REFRAC] = 0
         state_variables[T_LAST] = 0
 
@@ -106,9 +137,12 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values)
+    @overrides(AbstractStandardNeuronComponent.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param int ts: machine time step
+        """
+        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [
@@ -125,19 +159,12 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
                 state_variables[T_LAST]
                 ]
 
-    @overrides(AbstractNeuronModel.update_values)
+    @overrides(AbstractStandardNeuronComponent.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (v,
-         _v_rest,
-         _r_membrane,
-         _exp_tc,
-         _i_offset,
-         count_refrac,
-         _v_reset,
-         _tau_refrac,
-         t_last) = values
+        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
+         _v_reset, _tau_refrac, t_last) = values
 
         # Copy the changed data only
         state_variables[V] = v
@@ -146,56 +173,56 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
 
     @property
     def v_init(self):
-        return self._v_init
+        """ Settable model parameter: :math:`V_{init}`
 
-    @v_init.setter
-    def v_init(self, v_init):
-        self._v_init = v_init
+        :rtype: float
+        """
+        return self.__v_init
 
     @property
     def v_rest(self):
-        return self._v_rest
+        """ Settable model parameter: :math:`V_{rest}`
 
-    @v_rest.setter
-    def v_rest(self, v_rest):
-        self._v_rest = v_rest
+        :rtype: float
+        """
+        return self.__v_rest
 
     @property
     def tau_m(self):
-        return self._tau_m
+        r""" Settable model parameter: :math:`\tau_{m}`
 
-    @tau_m.setter
-    def tau_m(self, tau_m):
-        self._tau_m = tau_m
+        :rtype: float
+        """
+        return self.__tau_m
 
     @property
     def cm(self):
-        return self._cm
+        """ Settable model parameter: :math:`C_m`
 
-    @cm.setter
-    def cm(self, cm):
-        self._cm = cm
+        :rtype: float
+        """
+        return self.__cm
 
     @property
     def i_offset(self):
-        return self._i_offset
+        """ Settable model parameter: :math:`I_{offset}`
 
-    @i_offset.setter
-    def i_offset(self, i_offset):
-        self._i_offset = i_offset
+        :rtype: float
+        """
+        return self.__i_offset
 
     @property
     def v_reset(self):
-        return self._v_reset
+        """ Settable model parameter: :math:`V_{reset}`
 
-    @v_reset.setter
-    def v_reset(self, v_reset):
-        self._v_reset = v_reset
+        :rtype: float
+        """
+        return self.__v_reset
 
     @property
     def tau_refrac(self):
-        return self._tau_refrac
+        r""" Settable model parameter: :math:`\tau_{refrac}`
 
-    @tau_refrac.setter
-    def tau_refrac(self, tau_refrac):
-        self._tau_refrac = tau_refrac
+        :rtype: float
+        """
+        return self.__tau_refrac
