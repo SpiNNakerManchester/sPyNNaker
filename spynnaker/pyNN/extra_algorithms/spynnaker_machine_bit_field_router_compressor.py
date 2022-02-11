@@ -116,12 +116,12 @@ def spynnaker_machine_bitfield_ordered_covering_compressor(executable_targets):
     _rerun_synaptic_cores(expander_chip_cores, True)
 
 
-def spynnaker_machine_bitField_pair_router_compressor(executable_targets):
+def spynnaker_machine_bitField_pair_router_compressor():
     """ entrance for routing table compression with bit field
 
     """
     compressor_executable_targets = \
-        machine_bit_field_pair_router_compressor(executable_targets)
+        machine_bit_field_pair_router_compressor()
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(
