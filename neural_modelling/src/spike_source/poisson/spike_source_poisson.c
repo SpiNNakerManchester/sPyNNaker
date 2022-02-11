@@ -725,10 +725,8 @@ static void process_fast_source(
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
-                spin1_send_mc_packet(
-                    spike_key, num_spikes, WITH_PAYLOAD);
-//                tdma_processing_send_packet(
-//                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+                tdma_processing_send_packet(
+                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * num_spikes;
@@ -766,10 +764,8 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                spin1_send_mc_packet(
-                    ssp_params.key | s_id, 0, NO_PAYLOAD);
-//                tdma_processing_send_packet(
-//                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+                tdma_processing_send_packet(
+                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * count;
