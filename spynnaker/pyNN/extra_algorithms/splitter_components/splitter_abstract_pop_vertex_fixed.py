@@ -96,9 +96,8 @@ class SplitterAbstractPopulationVertexFixed(
             max_atoms_per_core, all_syn_block_sz, structural_sz)
         regions = PopulationMachineVertex.SYNAPSE_REGIONS
         synaptic_matrices = SynapticMatrices(
-            app_vertex, regions.synaptic_matrix, regions.direct_matrix,
-            regions.pop_table, regions.connection_builder, max_atoms_per_core,
-            weight_scales, all_syn_block_sz)
+            app_vertex, regions, max_atoms_per_core, weight_scales,
+            all_syn_block_sz)
 
         self.__create_slices()
 

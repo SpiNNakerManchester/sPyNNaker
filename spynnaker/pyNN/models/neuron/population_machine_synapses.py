@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from collections import namedtuple
-
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import abstractproperty
 
@@ -26,25 +24,12 @@ from spinn_front_end_common.abstract_models import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractSynapseExpandable, HasSynapses)
 
 from .population_machine_synapses_provenance import (
     PopulationMachineSynapsesProvenance)
-
-# Identifiers for synapse regions
-SYNAPSE_FIELDS = [
-    "synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
-    "synapse_dynamics", "structural_dynamics", "bitfield_builder",
-    "bitfield_key_map", "bitfield_filter", "connection_builder"]
-SynapseRegions = namedtuple(
-    "SynapseRegions", SYNAPSE_FIELDS)
-
-SynapseReferences = namedtuple(
-    "SynapseReferences",
-    ["direct_matrix_ref", "pop_table_ref", "synaptic_matrix_ref",
-     "bitfield_filter_ref"])
+from .synaptic_matrices import SynapseRegions, SYNAPSE_FIELDS
 
 
 class PopulationMachineSynapses(
@@ -153,8 +138,6 @@ class PopulationMachineSynapses(
         :param int structural_sz: The size of the structural data
         :param int n_neuron_bits: The number of bits to use for neuron ids
         """
-        # Get incoming projections
-        incoming = self._app_vertex.incoming_projections
 
         # Write the synapse parameters
         self._write_synapse_parameters(spec, ring_buffer_shifts)
@@ -162,10 +145,7 @@ class PopulationMachineSynapses(
         # Write the synaptic matrices
         self._synaptic_matrices.generate_data(routing_info)
         self._synaptic_matrices.write_synaptic_data(
-            spec, self._vertex_slice, self._synapse_references.synaptic_matrix,
-            self._synapse_references.direct_matrix,
-            self._synapse_references.pop_table,
-            self._synapse_references.connection_builder)
+            spec, self._vertex_slice, self._synapse_references)
 
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
@@ -200,26 +180,6 @@ class PopulationMachineSynapses(
                 region=self._synapse_regions.structural_dynamics,
                 size=4, label='synapseDynamicsStructuralParams',
                 reference=self._synapse_references.structural_dynamics)
-
-        size = bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-            incoming)
-        bit_field_header = bit_field_utilities.get_bitfield_builder_data(
-            self._synapse_regions.pop_table,
-            self._synapse_regions.synaptic_matrix,
-            self._synapse_regions.direct_matrix,
-            self._synapse_regions.bitfield_filter,
-            self._synapse_regions.bitfield_key_map,
-            self._synapse_regions.structural_dynamics,
-            isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural))
-        bit_field_key_map = bit_field_utilities.get_bitfield_key_map_data(
-            incoming, routing_info)
-        bit_field_utilities.write_bitfield_init_data(
-            spec,  self._synapse_regions.bitfield_builder, bit_field_header,
-            self._synapse_regions.bitfield_key_map, bit_field_key_map,
-            self._synapse_regions.bitfield_filter, size,
-            self._synapse_references.bitfield_builder,
-            self._synapse_references.bitfield_key_map,
-            self._synapse_references.bitfield_filter)
 
     def _write_synapse_parameters(self, spec, ring_buffer_shifts):
         """ Write the synapse parameters data region

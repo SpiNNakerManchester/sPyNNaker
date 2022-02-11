@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from collections import namedtuple
 
 from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
@@ -25,6 +26,9 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .synaptic_matrix_app import SynapticMatrixApp
+from spynnaker.pyNN.utilities import bit_field_utilities
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 # 1 for synaptic matrix region
 # 1 for n_edges
@@ -41,6 +45,14 @@ SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
 
 DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
+# Identifiers for synapse regions
+SYNAPSE_FIELDS = [
+    "synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
+    "synapse_dynamics", "structural_dynamics", "bitfield_builder",
+    "bitfield_key_map", "bitfield_filter", "connection_builder"]
+SynapseRegions = namedtuple(
+    "SynapseRegions", SYNAPSE_FIELDS)
+
 
 class SynapticMatrices(object):
     """ Handler of synaptic matrices for a core of a population vertex
@@ -49,14 +61,8 @@ class SynapticMatrices(object):
     __slots__ = [
         # The number of synapse types received
         "__n_synapse_types",
-        # The ID of the synaptic matrix region
-        "__synaptic_matrix_region",
-        # The ID of the "direct" or "single" matrix region
-        "__direct_matrix_region",
-        # The ID of the master population table region
-        "__poptable_region",
-        # The ID of the connection builder region
-        "__connection_builder_region",
+        # The region identifiers
+        "__regions",
         # The sub-matrices for each incoming edge
         "__matrices",
         # The address within the synaptic matrix region after the last matrix
@@ -86,45 +92,24 @@ class SynapticMatrices(object):
         # The size of all synaptic blocks added together
         "__all_syn_block_sz",
         # Whether data generation has already happened
-        "__data_generated"
+        "__data_generated",
+        # The size of the bit field data to be allocated
+        "__bit_field_size",
+        # The bit field header data generated
+        "__bit_field_header",
+        # The bit field key map generated
+        "__bit_field_key_map"
     ]
 
     def __init__(
-            self, app_vertex, synaptic_matrix_region, direct_matrix_region,
-            poptable_region, connection_builder_region, max_atoms_per_core,
-            weight_scales, all_syn_block_sz):
+            self, app_vertex, regions, max_atoms_per_core, weight_scales,
+            all_syn_block_sz):
         """
-        :param int synaptic_matrix_region:
-            The region where synaptic matrices are stored
-        :param int direct_matrix_region:
-            The region where "direct" or "single" synapses are stored
-        :param int poptable_region:
-            The region where the population table is stored
-        :param int connection_builder_region:
-            The region where the synapse generator information is stored
-        :param synaptic_matrix_ref:
-            The reference to the synaptic matrix region, or None if not
-            referenceable
-        :type synaptic_matrix_ref: int or None
-        :param direct_matrix_ref:
-            The reference to the direct matrix region, or None if not
-            referenceable
-        :type direct_matrix_ref: int or None
-        :param poptable_ref:
-            The reference to the pop table region, or None if not
-            referenceable
-        :type poptable_ref: int or None
-        :param connection_builder_ref:
-            The reference to the connection builder region, or None if not
-            referenceable
-        :type connection_builder_ref: int or None
+        :param SynapseRegions regions: The synapse regions to use
         """
         self.__app_vertex = app_vertex
+        self.__regions = regions
         self.__n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
-        self.__synaptic_matrix_region = synaptic_matrix_region
-        self.__direct_matrix_region = direct_matrix_region
-        self.__poptable_region = poptable_region
-        self.__connection_builder_region = connection_builder_region
         self.__max_atoms_per_core = max_atoms_per_core
         self.__weight_scales = weight_scales
         self.__all_syn_block_sz = all_syn_block_sz
@@ -200,7 +185,7 @@ class SynapticMatrices(object):
                 app_edge, routing_info)
             app_matrix = SynapticMatrixApp(
                 synapse_info, app_edge, self.__n_synapse_types,
-                self.__synaptic_matrix_region, self.__max_atoms_per_core,
+                self.__regions.synaptic_matrix, self.__max_atoms_per_core,
                 self.__all_syn_block_sz, app_key_info, d_app_key_info,
                 self.__weight_scales)
             self.__matrices[app_edge, synapse_info] = app_matrix
@@ -232,18 +217,34 @@ class SynapticMatrices(object):
         # Store the master pop table
         self.__master_pop_data = poptable.get_pop_table_data()
 
+        # Store bit field data
+        self.__bit_field_size = \
+            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
+                self.__app_vertex.incoming_projections)
+        self.__bit_field_header = \
+            bit_field_utilities.get_bitfield_builder_data(
+                self.__regions.pop_table,
+                self.__regions.synaptic_matrix,
+                self.__regions.direct_matrix,
+                self.__regions.bitfield_filter,
+                self.__regions.bitfield_key_map,
+                self.__regions.structural_dynamics,
+                isinstance(self.__app_vertex.synapse_dynamics,
+                           AbstractSynapseDynamicsStructural))
+        self.__bit_field_key_map = \
+            bit_field_utilities.get_bitfield_key_map_data(
+                self.__app_vertex.incoming_projections, routing_info)
+
     def __write_pop_table(self, spec, poptable_ref=None):
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
         spec.reserve_memory_region(
-            region=self.__poptable_region, size=master_pop_table_sz,
+            region=self.__regions.pop_table, size=master_pop_table_sz,
             label='PopTable', reference=poptable_ref)
-        spec.switch_write_focus(region=self.__poptable_region)
+        spec.switch_write_focus(region=self.__regions.pop_table)
         spec.write_array(self.__master_pop_data)
 
     def write_synaptic_data(
-            self, spec, post_vertex_slice,
-            synaptic_matrix_ref=None, direct_matrix_ref=None,
-            poptable_ref=None, connection_builder_ref=None):
+            self, spec, post_vertex_slice, references):
         """ Write the synaptic data for all incoming projections
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -261,15 +262,15 @@ class SynapticMatrices(object):
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
-        self.__write_pop_table(spec, poptable_ref)
+        self.__write_pop_table(spec, references.pop_table)
 
         spec.reserve_memory_region(
-            region=self.__synaptic_matrix_region,
+            region=self.__regions.synaptic_matrix,
             size=self.__all_syn_block_sz, label='SynBlocks',
-            reference=synaptic_matrix_ref)
+            reference=references.synaptic_matrix)
 
         # Write data for each matrix
-        spec.switch_write_focus(self.__synaptic_matrix_region)
+        spec.switch_write_focus(self.__regions.synaptic_matrix)
         for matrix in self.__on_host_matrices:
             matrix.write_matrix(spec, post_vertex_slice)
 
@@ -277,17 +278,24 @@ class SynapticMatrices(object):
         # This is currently disabled
         single_data_words = 0
         spec.reserve_memory_region(
-            region=self.__direct_matrix_region,
+            region=self.__regions.direct_matrix,
             size=(
                 single_data_words * BYTES_PER_WORD +
                 DIRECT_MATRIX_HEADER_COST_BYTES),
             label='DirectMatrix',
-            reference=direct_matrix_ref)
-        spec.switch_write_focus(self.__direct_matrix_region)
+            reference=references.direct_matrix)
+        spec.switch_write_focus(self.__regions.direct_matrix)
         spec.write_value(single_data_words * BYTES_PER_WORD)
 
         self.__write_synapse_expander_data_spec(
-            spec, post_vertex_slice, connection_builder_ref)
+            spec, post_vertex_slice, references.connection_builder)
+
+        bit_field_utilities.write_bitfield_init_data(
+            spec,  self.__regions.bitfield_builder, self.__bit_field_header,
+            self.__regions.bitfield_key_map, self.__bit_field_key_map,
+            self.__regions.bitfield_filter, self.__bit_field_size,
+            references.bitfield_builder, references.bitfield_key_map,
+            references.bitfield_filter)
 
     def __write_synapse_expander_data_spec(
             self, spec, post_vertex_slice, connection_builder_ref=None):
@@ -303,18 +311,18 @@ class SynapticMatrices(object):
             if connection_builder_ref is not None:
                 # If there is a reference, we still need a region to create
                 spec.reserve_memory_region(
-                    region=self.__connection_builder_region,
+                    region=self.__regions.connection_builder,
                     size=4, label="ConnectorBuilderRegion",
                     reference=self.__connection_builder_ref)
             return
 
         spec.reserve_memory_region(
-            region=self.__connection_builder_region,
+            region=self.__regions.connection_builder,
             size=self.__generated_data_size, label="ConnectorBuilderRegion",
             reference=connection_builder_ref)
-        spec.switch_write_focus(self.__connection_builder_region)
+        spec.switch_write_focus(self.__regions.connection_builder)
 
-        spec.write_value(self.__synaptic_matrix_region)
+        spec.write_value(self.__regions.synaptic_matrix)
         spec.write_value(self.__n_generated_matrices)
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
