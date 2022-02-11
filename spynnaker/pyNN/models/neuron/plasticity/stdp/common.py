@@ -28,30 +28,6 @@ def float_to_fixed(value):
     """
     return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
-# def float_to_fixed(value, fixed_point_one):
-#     return int(round(float(value) * float(fixed_point_one)))
-
-
-# def get_lut_provenance(
-#         pre_population_label, post_population_label, rule_name, entry_name,
-#         param_name, last_entry):
-#     # pylint: disable=too-many-arguments
-#     top_level_name = "{}_{}_STDP_{}".format(
-#         pre_population_label, post_population_label, rule_name)
-#     report = False
-#     if last_entry is not None:
-#         report = last_entry > 0
-#     return ProvenanceDataItem(
-#         [top_level_name, entry_name], last_entry, report=report,
-#         message=(
-#             "The last entry in the STDP exponential lookup table for the {}"
-#             " parameter of the {} between {} and {} was {} rather than 0,"
-#             " indicating that the lookup table was not big enough at this"
-#             " timestep and value.  Try reducing the parameter value, or"
-#             " increasing the timestep".format(
-#                 param_name, rule_name, pre_population_label,
-#                 post_population_label, last_entry)))
-
 
 def get_exp_lut_array(time_step, time_constant, shift=0):
     """
@@ -80,8 +56,6 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
 
 def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
-    # Add this to function arguments in the future
-    # machine_time_step = 1.0
     sin_pwr = 20
 
     # Calculate required time constant
@@ -170,8 +144,6 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
 
 def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                    fixed_point_one=STDP_FIXED_POINT_ONE, kernel_scaling=1.0):
-    # Add this to function arguments in the future
-    # machine_time_step = 1.0
     cos_pwr = 2
 
     # Calculate required time constant

@@ -136,16 +136,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
                 "exp_sin LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        print("check, tau_plus_data: ", self._tau_plus_data)
         spec.write_array(self._tau_plus_data)
-        # self._tau_plus_last_entry = write_pfpc_lut(
-        #     spec,
-        #     peak_time=self._t_peak,
-        #     time_probe=None,
-        #     lut_size=LUT_SIZE,
-        #     shift=0,
-        #     kernel_scaling=self._kernel_scaling
-        # )
 
     @property
     def synaptic_structure(self):
@@ -190,14 +181,6 @@ class TimingDependencePFPC(AbstractTimingDependence):
                         f"not big enough at this timestep and value.  Try "
                         f"reducing the parameter value, or increasing the "
                         f"timestep.")
-        # prov_data = list()
-        # prov_data.append(get_lut_provenance(
-        #     pre_population_label, post_population_label, "PFPCRule",
-        #     "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
-        # prov_data.append(get_lut_provenance(
-        #     pre_population_label, post_population_label, "PFPCRule",
-        #     "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
-        # return prov_data
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
