@@ -558,7 +558,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # groups
         sources = pre_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
-        sources_per_vertex = int(2 ** math.floor(math.log(
+        sources_per_vertex = int(2 ** math.ceil(math.log(
             n_sources / self.__n_synapse_vertices)))
 
         # Start on a different index each time to "even things out"
@@ -566,11 +566,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__next_synapse_index = (
             (self.__next_synapse_index + 1) % self.__n_synapse_vertices)
         result = list()
-        for i in range(self.__n_synapse_vertices):
-            start = i * sources_per_vertex
-            end = start + sources_per_vertex
-            if (i + 1) == self.__n_synapse_vertices:
-                end = n_sources
+        for start in range(0, n_sources, sources_per_vertex):
+            end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]
             for s_vertex in self.__incoming_vertices[index]:
                 result.append((s_vertex, source_range))
