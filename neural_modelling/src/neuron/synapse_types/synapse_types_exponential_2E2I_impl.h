@@ -22,6 +22,8 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
+XXXXYYYYXXXX
+
 typedef struct exp_params_t{
 	decay_t decay;
     decay_t init;

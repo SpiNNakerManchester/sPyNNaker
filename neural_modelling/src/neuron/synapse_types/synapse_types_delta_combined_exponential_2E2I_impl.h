@@ -91,14 +91,13 @@ typedef struct bi_exp_params{
 
  static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
  	// EXCITATORY
- 	parameter->exc_a_response = 0; // make this a Delta synapse
- 	//parameter->exc_a_response = decay_s1615(
- 	//		parameter->exc_a_response,
- 	//		parameter->exc_a_decay);
+ 	parameter->exc_a_response = decay_s1615(
+ 			parameter->exc_a_response,
+ 			parameter->exc_a_decay);
 
- 	//parameter->exc_b_response =  decay_s1615(
- 	//		parameter->exc_b_response,
- 	//		parameter->exc_b_decay);
+ 	parameter->exc_b_response =  decay_s1615(
+ 			parameter->exc_b_response,
+ 			parameter->exc_b_decay);
 
  	// EXCITATORY2
  	parameter->exc2_a_response = 0; // make this (the Teacher) a Delta synapse
@@ -145,8 +144,7 @@ typedef struct bi_exp_params{
  	if (synapse_type_index == EXCITATORY) {
                 //log_info("ip: %5.6k", input);
 
- 		parameter->exc_a_response = input; // Add delta input only SD 231121
- 		//parameter->exc_a_response =  parameter->exc_a_response + input;
+ 		parameter->exc_a_response =  parameter->exc_a_response + input;
  				/*
  				decay_s1615(input,
  				parameter->exc_a_init);

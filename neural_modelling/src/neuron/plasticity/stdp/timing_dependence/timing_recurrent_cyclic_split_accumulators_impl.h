@@ -292,6 +292,7 @@ static inline update_state_t timing_apply_pre_spike(
                         } 
                         //else previous_state.weight_state.weight = previous_state.weight_state.weight + 1; // Detect locked synapse
                     } // End of if syn_type == 2....
+
                     //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
                     // SD 9/2/21: Reverse order of these conditions: 
                     else if ((voltage_difference > v_diff_pot_threshold) && (voltage_difference < 900.0k)) {
@@ -300,17 +301,21 @@ static inline update_state_t timing_apply_pre_spike(
 			previous_state.lock = 1;
 			previous_state.dep_accumulator = 0;
 			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                        // Just assign w_min to the weight: SD 29/11/21:
+			//previous_state.weight_state.weight = previous_state.weight_state.weight_region->min_weight;
 			if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
                         
                     } else{
                         // Neuron is firing slightly too early or by teacher. No major adjustment here.
                         // SD 19/5/21: Reduce synapse values to two (pot and dep) by eliminating neutral value.
+                        // SD 20/12/21: Let's try full depression to keep the spike time oscillating:
 	            	previous_state.lock = 1;
 		     	previous_state.dep_accumulator = 0;
                        if (!locked_weights_unchanged) {
                            // 8/6/21: SD Put back lock at baseline
-                            previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
-			   //previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                           // SD 20/12/21: Dont' leave as is! Full depression:
+                           //previous_state.weight_state.weight = previous_state.weight_state.weight + 8*inc_LL_dep;
+			   previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                            //previous_state.weight_state.weight = previous_state.weight_state.weight - inc_LL_dep;
                        }
                     }
@@ -439,7 +444,9 @@ static inline update_state_t timing_apply_post_spike(
                        //io_printf(IO_BUF, "%d : pot syn - dep tuning\n", time);
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
-			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+		       previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+		       //previous_state.weight_state.weight = previous_state.weight_state.weight_region->min_weight;
+
                        if (!locked_weights_unchanged) {
                         previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_dep;
                        }
@@ -447,6 +454,8 @@ static inline update_state_t timing_apply_post_spike(
                        // Neuron fired through teacher but still far from threshold using FF alone
                        //io_printf(IO_BUF, "%d : pot syn - big potentiation\n", time);
                        previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                       // Remove mult and just set weight to max value:
+                       //previous_state.weight_state.weight = previous_state.weight_state.weight_region->max_weight;
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
                    } // if voltage_difference < v_diff_pot_threshold
@@ -458,7 +467,9 @@ static inline update_state_t timing_apply_post_spike(
                        //              does not jump to be much earlier. (Comment out potentiation and do a LL-pot:
                        //SD 250821 - remove this: previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                        if (!locked_weights_unchanged) {
-                           previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_pot;
+                           // 20/12/21: Full potentiation:
+                           //previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_pot;
+                           previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                        }
                        //io_printf(IO_BUF, "%d : pot syn - pot tuning\n", time);
                        if (print_plasticity){
@@ -584,7 +595,7 @@ static inline weight_state_t weight_one_term_apply_depression_sd(
 
 
    //io_printf(IO_BUF, "    Fixed Updated weight: %k, max weight: %k\n",
-   //		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
+   // 		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
    //io_printf(IO_BUF, "    Int   Updated weight: %u, max weight: %u\n",
    //		   state.weight, state.weight_region->max_weight);
 
