@@ -101,12 +101,12 @@ def _rerun_synaptic_cores(
             _RERUN_IOBUF_NAME_PATTERN)
 
 
-def spynnaker_machine_bitfield_ordered_covering_compressor(executable_targets):
+def spynnaker_machine_bitfield_ordered_covering_compressor():
     """ entrance for routing table compression with bit field
 
     """
     compressor_executable_targets = \
-        machine_bit_field_ordered_covering_compressor(executable_targets)
+        machine_bit_field_ordered_covering_compressor()
 
     # adjust cores to exclude the ones which did not give sdram.
     expander_chip_cores = _locate_expander_rerun_targets(

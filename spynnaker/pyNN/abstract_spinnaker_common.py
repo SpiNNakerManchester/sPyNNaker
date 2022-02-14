@@ -326,8 +326,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 as timer:
             if timer.skip_if_virtual_board():
                 return
-            spynnaker_machine_bitfield_ordered_covering_compressor(
-                self._executable_targets)
+            spynnaker_machine_bitfield_ordered_covering_compressor()
             self._multicast_routes_loaded = True
             return None
 
