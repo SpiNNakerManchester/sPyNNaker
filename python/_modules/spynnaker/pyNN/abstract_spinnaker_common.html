@@ -105,7 +105,7 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span> <span class="n">database_socket_addresses</span><span class="p">,</span> <span class="n">n_chips_required</span><span class="p">,</span>
-            <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
+            <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span>
             <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str graph_label:</span>
@@ -157,7 +157,7 @@
 
         <span class="c1"># set up machine targeted data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_up_machine_specifics</span><span class="p">(</span><span class="n">hostname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_machine_specifics</span><span class="p">()</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting time scale factor to &#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
