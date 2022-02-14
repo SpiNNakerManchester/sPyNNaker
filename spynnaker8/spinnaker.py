@@ -32,8 +32,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     def __init__(
             self, database_socket_addresses,
             time_scale_factor, min_delay, graph_label,
-            n_chips_required=None, n_boards_required=None, timestep=0.1,
-            hostname=None):
+            n_chips_required=None, n_boards_required=None, timestep=0.1):
         # pylint: disable=too-many-arguments, too-many-locals
 
         # change min delay auto to be the min delay supported by simulator
@@ -56,7 +55,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
             database_socket_addresses=database_socket_addresses,
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            hostname=hostname, min_delay=min_delay,
+            min_delay=min_delay,
             timestep=timestep, time_scale_factor=time_scale_factor)
 
         with ProvenanceWriter() as db:
