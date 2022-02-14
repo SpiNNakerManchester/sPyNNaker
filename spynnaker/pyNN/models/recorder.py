@@ -17,6 +17,7 @@ import logging
 import numpy
 import neo
 import quantities
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
@@ -240,7 +241,7 @@ class Recorder(object):
             indexes = []
             sampling_interval = self.__vertex.get_neuron_sampling_interval(
                 variable)
-        elif sim.use_virtual_board:
+        elif get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the list will be empty")
@@ -278,7 +279,7 @@ class Recorder(object):
                 "The simulation has not yet run, therefore spikes cannot "
                 "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the spike list will be empty")
@@ -309,7 +310,7 @@ class Recorder(object):
                 "The simulation has not yet run, therefore rewires cannot "
                 "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the rewires list will be empty")

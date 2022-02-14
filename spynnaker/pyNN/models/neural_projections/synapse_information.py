@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pyNN.random import NumpyRNG
+from spinn_utilities.config_holder import get_config_bool
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -34,7 +35,6 @@ class SynapseInformation(object):
         "__synapse_dynamics",
         "__synapse_type",
         "__receptor_type",
-        "__is_virtual_machine",
         "__weights",
         "__delays",
         "__pre_run_connection_holders",
@@ -43,8 +43,7 @@ class SynapseInformation(object):
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
                  synapse_dynamics, synapse_type, receptor_type,
-                 is_virtual_machine, synapse_type_from_dynamics,
-                 weights=None, delays=None):
+                 synapse_type_from_dynamics, weights=None, delays=None):
         """
         :param AbstractConnector connector:
             The connector connected to the synapse
@@ -62,7 +61,6 @@ class SynapseInformation(object):
             The dynamic behaviour of the synapse
         :param int synapse_type: The type of the synapse
         :param str receptor_type: Description of the receptor (e.g. excitatory)
-        :param bool is_virtual_machine: Whether the machine is virtual
         :param bool synapse_type_from_dynamics:
             Whether the synapse type came from synapse dynamics
         :param weights: The synaptic weights
@@ -81,7 +79,6 @@ class SynapseInformation(object):
         self.__receptor_type = receptor_type
         self.__weights = weights
         self.__delays = delays
-        self.__is_virtual_machine = is_virtual_machine
         self.__synapse_type_from_dynamics = synapse_type_from_dynamics
 
         # Make a list of holders to be updated
@@ -205,7 +202,7 @@ class SynapseInformation(object):
         :rtype: bool
         """
         # If we are using a virtual machine, we can't generate on the machine
-        if self.__is_virtual_machine:
+        if get_config_bool("Machine", "virtual_board"):
             return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and

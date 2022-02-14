@@ -98,7 +98,7 @@ def test_connectors(
             post_population=MockPopulation(n_post, "Post"),
             prepop_is_view=False, postpop_is_view=False, rng=None,
             synapse_dynamics=None, synapse_type=None, receptor_type=None,
-            is_virtual_machine=False, synapse_type_from_dynamics=False,
+            synapse_type_from_dynamics=False,
             weights=weight, delays=delay)
         connector.set_projection_information(synapse_info=synapse_info)
 

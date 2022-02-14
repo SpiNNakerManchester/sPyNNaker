@@ -19,6 +19,7 @@ import neo
 import inspect
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
@@ -931,7 +932,7 @@ class Population(PopulationBase):
         sim = get_simulator()
         if (sim.has_ran
                 and not self.__has_read_neuron_parameters_this_run
-                and not sim.use_virtual_board):
+                and not get_config_bool("Machine", "virtual_board")):
             # go through each machine vertex and read the neuron parameters
             # it contains
             for vertex in self.__vertex.machine_vertices:

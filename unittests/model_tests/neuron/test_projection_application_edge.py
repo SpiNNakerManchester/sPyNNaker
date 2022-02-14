@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.neural_projections import SynapseInformation
 def test_slices():
     unittest_setup()
     s_info = SynapseInformation(
-        None, None, None, False, False, None, None, None, None, False, False,
+        None, None, None, False, False, None, None, None, None, False,
         None, None)
     app_edge = ProjectionApplicationEdge(None, None, s_info)
     mv0_2 = SimpleMachineVertex(None, None, None, None, Slice(0, 1))

@@ -16,6 +16,7 @@
 import functools
 import logging
 import numpy
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.random import RandomDistribution
@@ -166,8 +167,7 @@ class Projection(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             pre_is_view, post_is_view, rng, synapse_dynamics,
-            synaptic_type, receptor_type, sim.use_virtual_board,
-            synapse_type_from_dynamics,
+            synaptic_type, receptor_type, synapse_type_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
@@ -195,7 +195,7 @@ class Projection(object):
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             self.__virtual_connection_list = list()
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
