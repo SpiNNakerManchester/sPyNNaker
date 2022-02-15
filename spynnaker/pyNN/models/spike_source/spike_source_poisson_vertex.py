@@ -41,7 +41,7 @@ from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
-    get_sdram_edge_params_bytes)
+    get_sdram_edge_params_bytes, get_expander_rates_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
@@ -76,25 +76,19 @@ class SpikeSourcePoissonVertex(
 
     __slots__ = [
         "__change_requires_mapping",
-        "__duration",
         "__model",
         "__model_name",
         "__n_atoms",
-        "__rate",
         "__rng",
         "__seed",
         "__spike_recorder",
-        "__start",
-        "__time_to_spike",
         "__kiss_seed",  # dict indexed by vertex slice
         "__n_subvertices",
-        "__n_data_specs",
         "__max_rate",
-        "__rate_change",
+        "__max_n_rates",
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__max_spikes",
         "__outgoing_projections",
         "__incoming_control_edge"]
 
@@ -132,7 +126,6 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed = dict()
         self.__rng = None
         self.__n_subvertices = 0
-        self.__n_data_specs = 0
 
         # check for changes parameters
         self.__change_requires_mapping = True
@@ -186,10 +179,10 @@ class SpikeSourcePoissonVertex(
             durations = numpy.array(durations)
         else:
             if hasattr(rates[0], "__len__"):
-                durations = [numpy.array([None for r in _rate])
+                durations = [numpy.array([0 for r in _rate])
                              for _rate in rates]
             else:
-                durations = numpy.array([None for _rate in rates])
+                durations = numpy.array([0 for _rate in rates])
 
         # Check that there is either one list for all neurons,
         # or one per neuron
@@ -233,13 +226,6 @@ class SpikeSourcePoissonVertex(
                 if len(duration_set) != len(rate_set):
                     raise Exception("Each rate must have its own duration")
 
-        if hasattr(rates[0], "__len__"):
-            time_to_spike = [
-                numpy.array([0 for _ in range(len(rates[i]))])
-                for i in range(len(rates))]
-        else:
-            time_to_spike = numpy.array([0 for _ in range(len(rates))])
-
         self.__data = SpynnakerRangeDictionary(n_neurons)
         self.__data["rates"] = SpynnakerRangedList(
             n_neurons, rates,
@@ -250,11 +236,7 @@ class SpikeSourcePoissonVertex(
         self.__data["durations"] = SpynnakerRangedList(
             n_neurons, durations,
             use_list_as_value=not hasattr(durations[0], "__len__"))
-        self.__data["time_to_spike"] = SpynnakerRangedList(
-            n_neurons, time_to_spike,
-            use_list_as_value=not hasattr(time_to_spike[0], "__len__"))
         self.__rng = numpy.random.RandomState(seed)
-        self.__rate_change = numpy.zeros(n_neurons)
 
         self.__n_profile_samples = get_config_int(
             "Reports", "n_profile_samples")
@@ -268,15 +250,7 @@ class SpikeSourcePoissonVertex(
             self.__max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self.__max_rate = 0
-
-        total_rate = numpy.sum(all_rates)
-        self.__max_spikes = 0
-        if total_rate > 0:
-            # Note we have to do this per rate, as the whole array is not numpy
-            max_rates = numpy.array(
-                [numpy.max(r) for r in self.__data["rates"]])
-            self.__max_spikes = numpy.sum(scipy.stats.poisson.ppf(
-                1.0 - (1.0 / max_rates), max_rates))
+        self.__max_n_rates = max(len(r) for r in self.__data["rates"])
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
@@ -311,8 +285,8 @@ class SpikeSourcePoissonVertex(
     def rate(self, rate):
         if self.__is_variable_rate:
             raise Exception("Cannot set rate of a variable rate poisson")
-        self.__rate_change = rate - numpy.array(
-            list(_flatten(self.__data["rates"])))
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_rate_changed()
         # Normalise parameter
         if hasattr(rate, "__len__"):
             # Single rate per neuron for whole simulation
@@ -405,10 +379,6 @@ class SpikeSourcePoissonVertex(
         return self.__data["time_to_spike"]
 
     @property
-    def rate_change(self):
-        return self.__rate_change
-
-    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         return self.__change_requires_mapping
@@ -454,12 +424,16 @@ class SpikeSourcePoissonVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         # pylint: disable=arguments-differ
-        poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        poisson_params_sz = get_rates_bytes(
+            vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
+        poisson_expander_sz = get_expander_rates_bytes(
+            vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz + self.tdma_sdram_size_in_bytes +
+            poisson_params_sz + poisson_expander_sz +
+            self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples) +
@@ -493,6 +467,10 @@ class SpikeSourcePoissonVertex(
     @property
     def max_rate(self):
         return self.__max_rate
+
+    @property
+    def max_n_rates(self):
+        return self.__max_n_rates
 
     @property
     def seed(self):
@@ -605,3 +583,7 @@ class SpikeSourcePoissonVertex(
     @property
     def incoming_control_edge(self):
         return self.__incoming_control_edge
+
+    @property
+    def data(self):
+        return self.__data
