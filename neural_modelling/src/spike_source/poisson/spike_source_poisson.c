@@ -152,10 +152,11 @@ struct poisson_extension_provenance {
     uint32_t times_tdma_fell_behind;
 };
 
+__attribute__((aligned(4)))
 typedef struct source_details {
-    REAL rate;
-    REAL start;
-    REAL duration;
+    unsigned long accum rate;
+    unsigned long accum start;
+    unsigned long accum duration;
 } source_details;
 
 //! Collection of rates to apply over time to a particular spike source
@@ -346,7 +347,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 //! \param[in] id: the ID of the source to be updated
 //! \param[in] rate:
 //!     the rate in Hz, to be multiplied to get per-tick values
-void set_spike_source_rate(uint32_t sub_id, REAL rate) {
+void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
 
     REAL rate_per_tick = rate * ssp_params.seconds_per_tick;
     log_debug("Setting rate of %u to %kHz (%k per tick)",
@@ -387,7 +388,7 @@ static void store_provenance_data(address_t provenance_region) {
     log_debug("finished other provenance data");
 }
 
-static inline uint32_t ms_to_ticks(REAL ms) {
+static inline uint32_t ms_to_ticks(unsigned long accum ms) {
     return (uint32_t) ((ms + 0.5k) * ssp_params.ticks_per_ms);
 }
 
@@ -396,7 +397,7 @@ static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
     log_debug("Source %u is at index %u", id, index);
     source_details details = source_data[id]->details[index];
     if (rate_changed) {
-        log_debug("Setting rate of %u to %k", id, details.rate);
+        log_debug("Setting rate of %u to %k", id, (s1615) details.rate);
         set_spike_source_rate(id, details.rate);
     }
     spike_source_t *p = &(source[id]);
@@ -561,9 +562,12 @@ static void expand_rates(source_expand_region *items, source_info *sdram_sources
 
         // Copy SDRAM data to local
         uint32_t n_rates = item->info.n_rates;
+        log_debug("Reading %u rates", n_rates);
         source_details details[n_rates];
         for (uint32_t k = 0; k < n_rates; k++) {
             details[k] = item->info.details[k];
+            log_debug("Repeating rate %k %u times",
+                    (accum) details[k].rate, item->count);
         }
 
         // Repeat the same thing this many times
