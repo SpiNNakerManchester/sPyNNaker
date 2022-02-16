@@ -29,7 +29,11 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include <key_atom_map.h>
 #include "common_mem.h"
+#include "bit_field_expander.h"
+
+#define INVALID_REGION_ID 0xFFFFFFFF
 
 //! The configuration of the connection builder
 typedef struct connection_builder_config {
@@ -47,15 +51,18 @@ typedef struct connection_builder_config {
 } connection_builder_config_t;
 
 //! The configuration of the synapse expander
+__attribute__((aligned(4)))
 typedef struct expander_config {
     uint32_t synaptic_matrix_region;
+    uint32_t master_pop_region;
+    uint32_t bitfield_filter_region;
+    uint32_t structural_region;
     uint32_t n_in_edges;
     uint32_t post_slice_start;
     uint32_t post_slice_count;
     uint32_t post_index;
     uint32_t n_synapse_types;
     accum timestep_per_delay;
-    uint32_t PAD_1;
     rng_t population_rng;
     rng_t core_rng;
     unsigned long accum weight_scales[];
@@ -152,6 +159,7 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
     log_info("Core RNG: %u %u %u %u", core_rng->seed[0],
             core_rng->seed[1], core_rng->seed[2], core_rng->seed[3]);
 
+
     // Go through each connector and generate
     void *address = &(sdram_config->weight_scales[config->n_synapse_types]);
     for (uint32_t edge = 0; edge < config->n_in_edges; edge++) {
@@ -163,7 +171,19 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
         }
     }
 
-    return true;
+    // Do bitfield generation on the whole matrix
+    key_atom_data_t *key_atom_data_sdram = address;
+    void *master_pop = data_specification_get_region(
+            config->master_pop_region, ds_regions);
+    void *bitfield_filter = data_specification_get_region(
+            config->bitfield_filter_region, ds_regions);
+    void *structural_matrix = NULL;
+    if (config->structural_region != INVALID_REGION_ID) {
+        structural_matrix = data_specification_get_region(
+            config->structural_region, ds_regions);
+    }
+    return do_bitfield_generation(key_atom_data_sdram, master_pop,
+            synaptic_matrix, bitfield_filter, structural_matrix);
 }
 
 //! Entry point

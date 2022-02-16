@@ -55,9 +55,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_estimated_sdram_for_bit_field_region,
-    get_estimated_sdram_for_key_region,
-    exact_sdram_for_bit_field_builder_region)
+    get_sdram_for_bit_field_region)
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
@@ -733,9 +731,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             regions.synapse_params,
             max(app_vertex.get_synapse_params_size(), BYTES_PER_WORD))
-        sdram.add_cost(
-            regions.bitfield_builder,
-            max(exact_sdram_for_bit_field_builder_region(), BYTES_PER_WORD))
         return sdram
 
     def __proj_dependent_synapse_sdram(self, incoming_projections):
@@ -758,11 +753,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 BYTES_PER_WORD))
         sdram.add_cost(
             regions.bitfield_filter,
-            max(get_estimated_sdram_for_bit_field_region(incoming_projections),
-                BYTES_PER_WORD))
-        sdram.add_cost(
-            regions.bitfield_key_map,
-            max(get_estimated_sdram_for_key_region(incoming_projections),
+            max(get_sdram_for_bit_field_region(incoming_projections),
                 BYTES_PER_WORD))
         return sdram
 

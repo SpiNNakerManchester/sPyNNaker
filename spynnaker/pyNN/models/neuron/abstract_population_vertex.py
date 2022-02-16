@@ -60,6 +60,7 @@ from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -1084,7 +1085,9 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         :rtype: int
         """
-        size = 0
+        size = SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
+        size += (self.__neuron_impl.get_n_synapse_types() *
+                 DataType.U3232.size)
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
@@ -1096,12 +1099,7 @@ class AbstractPopulationVertex(
                                       vertex.n_atoms))
                 n_sub_edges = int(math.ceil(vertex.n_atoms / max_atoms))
             size += self.__generator_info_size(synapse_info) * n_sub_edges
-
-        # If anything generates data, also add some base information
-        if size:
-            size += SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += (self.__neuron_impl.get_n_synapse_types() *
-                     DataType.U3232.size)
+        size += get_sdram_for_keys(incoming_projections)
         return size
 
     @staticmethod

@@ -15,7 +15,6 @@
 
 import math
 import numpy
-from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -29,11 +28,6 @@ FILTER_HEADER_WORDS = 2
 #: n elements in each key to n atoms map for bitfield (key, n atoms)
 KEY_N_ATOM_MAP_WORDS = 2
 
-#: the regions addresses needed (
-#: pop table, synaptic matrix, bit_field, bit field builder,
-#: bit_field_key, structural region)
-N_REGIONS_ADDRESSES = 5
-
 #: n key to n neurons maps size in words
 N_KEYS_DATA_SET_IN_WORDS = 1
 
@@ -42,8 +36,8 @@ N_KEYS_DATA_SET_IN_WORDS = 1
 BIT_IN_A_WORD = 32.0
 
 
-def get_estimated_sdram_for_bit_field_region(incoming_projections):
-    """ estimates the SDRAM for the bit field region
+def get_sdram_for_bit_field_region(incoming_projections):
+    """ the SDRAM for the bit field filter region
 
     :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
@@ -66,8 +60,8 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
     return sdram
 
 
-def get_estimated_sdram_for_key_region(incoming_projections):
-    """ gets an estimate of the bitfield builder region
+def get_sdram_for_keys(incoming_projections):
+    """ gets the space needed for keys
 
     :param iterable(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections that target the vertex in question
@@ -87,43 +81,6 @@ def get_estimated_sdram_for_key_region(incoming_projections):
                 sdram += KEY_N_ATOM_MAP_WORDS * BYTES_PER_WORD
 
     return sdram
-
-
-def exact_sdram_for_bit_field_builder_region():
-    """ Gets the SDRAM requirement for the builder region
-
-    :return: the SDRAM requirement for the builder region
-    :rtype: int
-    """
-    return N_REGIONS_ADDRESSES * BYTES_PER_WORD
-
-
-def get_bitfield_builder_data(
-        master_pop_region_id, synaptic_matrix_region_id, bit_field_region_id,
-        bit_field_key_map_region_id, structural_dynamics_region_id,
-        has_structural_dynamics_region):
-
-    """ Get data for bit field region
-
-    :param int master_pop_region_id: the region id for the master pop table
-    :param int synaptic_matrix_region_id: the region id for the synaptic matrix
-    :param int bit_field_region_id: the region id for the bit-fields
-    :param int bit_field_key_map_region_id: the region id for the key map
-    :param int structural_dynamics_region_id: the region id for the structural
-    :param bool has_structural_dynamics_region:
-        whether the core has a structural_dynamics region
-    :rtype: ~numpy.ndarray
-    """
-    # save 4 bytes by making a key flag of full mask to avoid when not got
-    # a structural
-    if not has_structural_dynamics_region:
-        struct_region = FULL_MASK
-    else:
-        struct_region = structural_dynamics_region_id
-
-    return numpy.array([
-        master_pop_region_id, synaptic_matrix_region_id, bit_field_region_id,
-        bit_field_key_map_region_id, struct_region], dtype="uint32")
 
 
 def get_bitfield_key_map_data(incoming_projections, routing_info):
@@ -152,43 +109,20 @@ def get_bitfield_key_map_data(incoming_projections, routing_info):
 
 
 def write_bitfield_init_data(
-        spec, bit_field_builder_region, builder_data,
-        bit_field_key_map_region, key_map_data, bit_field_region,
-        n_bit_field_bytes, bit_field_builder_region_ref=None,
-        bit_field_key_region_ref=None, bit_field_region_ref=None):
+        spec, bit_field_region, n_bit_field_bytes, bit_field_region_ref=None):
     """ writes the init data needed for the bitfield generator
 
     :param ~data_specification.DataSpecificationGenerator spec:
         data spec writer
-    :param int bit_field_builder_region: the region id for the bitfield builder
-    :param ~numpy.ndarray builder_data: Data for the builder region
-    :param int bit_field_region_id: the region id for the bit-fields
-    :param int bit_field_key_map_region_id: the region id for the key map
+    :param int bit_field_region: the region id for the bit-field filters
+    :param int n_bit_field_bytes: the size of the region
+    :param int bit_field_region_ref: The reference to the region
     """
-    # reserve region for the bitfield builder
-    spec.reserve_memory_region(
-        region=bit_field_builder_region,
-        size=len(builder_data) * BYTES_PER_WORD,
-        label="bit field builder region",
-        reference=bit_field_builder_region_ref)
-    spec.switch_write_focus(bit_field_builder_region)
-    spec.write_array(builder_data)
-
-    # reserve memory region for the key region
-    spec.reserve_memory_region(
-        region=bit_field_key_map_region,
-        size=len(key_map_data) * BYTES_PER_WORD,
-        label="bit field key data",
-        reference=bit_field_key_region_ref)
-    spec.switch_write_focus(bit_field_key_map_region)
-    spec.write_array(key_map_data)
-
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
-        region=bit_field_region,
-        size=n_bit_field_bytes,
-        label="bit_field region",
-        reference=bit_field_region_ref)
-    # Ensure a 0 is written at least to indicate no bit fields
+        region=bit_field_region, size=n_bit_field_bytes,
+        label="bit_field region", reference=bit_field_region_ref)
+
+    # Ensure a 0 is written at least to indicate no bit fields if not expanded
     spec.switch_write_focus(bit_field_region)
     spec.write_value(0)

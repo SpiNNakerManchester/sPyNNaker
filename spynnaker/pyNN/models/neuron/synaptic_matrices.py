@@ -26,11 +26,16 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .synaptic_matrix_app import SynapticMatrixApp
-from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_sdram_for_bit_field_region, get_bitfield_key_map_data,
+    write_bitfield_init_data)
 
 # 1 for synaptic matrix region
+# 1 for master pop region
+# 1 for bitfield filter region
+# 1 for structural region
 # 1 for n_edges
 # 1 for post_vertex_slice.lo_atom
 # 1 for post_vertex_slice.n_atoms
@@ -41,15 +46,17 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 # 4 for Population RNG seed
 # 4 for core RNG seed
 SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
-    1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 4 + 4) * BYTES_PER_WORD
+    1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 4 + 4) * BYTES_PER_WORD
 
 DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
+# Value to use when there is no region
+INVALID_REGION_ID = 0xFFFFFFFF
+
 # Identifiers for synapse regions
 SYNAPSE_FIELDS = [
-    "synapse_params", "pop_table", "synaptic_matrix",
-    "synapse_dynamics", "structural_dynamics", "bitfield_builder",
-    "bitfield_key_map", "bitfield_filter", "connection_builder"]
+    "synapse_params", "pop_table", "synaptic_matrix", "synapse_dynamics",
+    "structural_dynamics", "bitfield_filter", "connection_builder"]
 SynapseRegions = namedtuple(
     "SynapseRegions", SYNAPSE_FIELDS)
 
@@ -95,8 +102,6 @@ class SynapticMatrices(object):
         "__data_generated",
         # The size of the bit field data to be allocated
         "__bit_field_size",
-        # The bit field header data generated
-        "__bit_field_header",
         # The bit field key map generated
         "__bit_field_key_map"
     ]
@@ -218,21 +223,12 @@ class SynapticMatrices(object):
         self.__master_pop_data = poptable.get_pop_table_data()
 
         # Store bit field data
-        self.__bit_field_size = \
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                self.__app_vertex.incoming_projections)
-        self.__bit_field_header = \
-            bit_field_utilities.get_bitfield_builder_data(
-                self.__regions.pop_table,
-                self.__regions.synaptic_matrix,
-                self.__regions.bitfield_filter,
-                self.__regions.bitfield_key_map,
-                self.__regions.structural_dynamics,
-                isinstance(self.__app_vertex.synapse_dynamics,
-                           AbstractSynapseDynamicsStructural))
-        self.__bit_field_key_map = \
-            bit_field_utilities.get_bitfield_key_map_data(
-                self.__app_vertex.incoming_projections, routing_info)
+        self.__bit_field_size = get_sdram_for_bit_field_region(
+            self.__app_vertex.incoming_projections)
+        self.__bit_field_key_map = get_bitfield_key_map_data(
+            self.__app_vertex.incoming_projections, routing_info)
+        self.__generated_data_size += (
+            len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
     def __write_pop_table(self, spec, poptable_ref=None):
         master_pop_table_sz = len(self.__master_pop_data) * BYTES_PER_WORD
@@ -276,11 +272,8 @@ class SynapticMatrices(object):
         self.__write_synapse_expander_data_spec(
             spec, post_vertex_slice, references.connection_builder)
 
-        bit_field_utilities.write_bitfield_init_data(
-            spec,  self.__regions.bitfield_builder, self.__bit_field_header,
-            self.__regions.bitfield_key_map, self.__bit_field_key_map,
-            self.__regions.bitfield_filter, self.__bit_field_size,
-            references.bitfield_builder, references.bitfield_key_map,
+        write_bitfield_init_data(
+            spec, self.__regions.bitfield_filter, self.__bit_field_size,
             references.bitfield_filter)
 
     def __write_synapse_expander_data_spec(
@@ -307,8 +300,14 @@ class SynapticMatrices(object):
             size=self.__generated_data_size, label="ConnectorBuilderRegion",
             reference=connection_builder_ref)
         spec.switch_write_focus(self.__regions.connection_builder)
-
         spec.write_value(self.__regions.synaptic_matrix)
+        spec.write_value(self.__regions.pop_table)
+        spec.write_value(self.__regions.bitfield_filter)
+        if isinstance(self.__app_vertex.synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
+            spec.write_value(self.__regions.structural_dynamics)
+        else:
+            spec.write_value(INVALID_REGION_ID)
         spec.write_value(self.__n_generated_matrices)
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
@@ -316,8 +315,6 @@ class SynapticMatrices(object):
         spec.write_value(self.__n_synapse_types)
         spec.write_value(
             DataType.S1615.encode_as_int(machine_time_step_per_ms()))
-        # Padding to ensure 8-byte alignment for weight scales
-        spec.write_value(0)
         # Per-Population RNG
         spec.write_array(self.__app_vertex.pop_seed)
         # Per-Core RNG
@@ -331,6 +328,7 @@ class SynapticMatrices(object):
             spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
         spec.write_array(self.__generated_data)
+        spec.write_array(self.__bit_field_key_map)
 
     def __get_app_key_and_mask(self, r_info, n_stages):
         """ Get a key and mask for an incoming application vertex as a whole

@@ -104,9 +104,7 @@ class PopulationMachineVertex(
         PROFILING = 9
         CONNECTOR_BUILDER = 10
         BIT_FIELD_FILTER = 11
-        BIT_FIELD_BUILDER = 12
-        BIT_FIELD_KEY_MAP = 13
-        RECORDING = 14
+        RECORDING = 12
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -128,8 +126,6 @@ class PopulationMachineVertex(
         synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
         synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
         structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_builder=REGIONS.BIT_FIELD_BUILDER.value,
-        bitfield_key_map=REGIONS.BIT_FIELD_KEY_MAP.value,
         bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
         connection_builder=REGIONS.CONNECTOR_BUILDER.value
     )

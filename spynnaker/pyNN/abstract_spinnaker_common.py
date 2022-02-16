@@ -34,8 +34,7 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder, on_chip_bitfield_generator,
-    redundant_packet_count_report,
+    delay_support_adder, redundant_packet_count_report,
     spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
 from spynnaker.pyNN.extra_algorithms.\
@@ -431,14 +430,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self.placements, self._txrx, self._executable_finder,
                 get_config_bool("Reports", "write_expander_iobuf"))
 
-    def _execute_on_chip_bit_field_generator(self):
-        with FecTimer(LOADING, "Execute on chip bitfield generator") as timer:
-            if timer.skip_if_virtual_board():
-                return
-            on_chip_bitfield_generator(
-                self.placements, self.application_graph,
-                self._executable_finder,  self._txrx)
-
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):
             finish_connection_holders(self.application_graph)
@@ -446,7 +437,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
         self._execute_synapse_expander()
-        self._execute_on_chip_bit_field_generator()
         self._execute_finish_connection_holders()
 
     def _execute_write_network_graph(self):

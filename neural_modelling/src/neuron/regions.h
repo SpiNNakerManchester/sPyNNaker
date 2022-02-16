@@ -36,7 +36,5 @@ typedef enum neuron_regions_e {
     PROFILER_REGION,            //!< profiling; 9
     CONNECTOR_BUILDER_REGION,   //!< connection building; 10
     BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 11
-    BIT_FIELD_BUILDER,          //!< bitfield builder parameters; 12
-    BIT_FIELD_KEY_MAP,          //!< bitfield key map; 13
-    RECORDING_REGION            //!< general recording data; 14
+    RECORDING_REGION            //!< general recording data; 12
 } regions_e;

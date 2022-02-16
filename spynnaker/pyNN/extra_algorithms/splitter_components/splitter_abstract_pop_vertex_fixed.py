@@ -34,9 +34,7 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from spynnaker.pyNN.utilities.bit_field_utilities import (
-    get_estimated_sdram_for_bit_field_region,
-    get_estimated_sdram_for_key_region,
-    exact_sdram_for_bit_field_builder_region)
+    get_sdram_for_bit_field_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from pacman.model.graphs.common.slice import Slice
@@ -232,15 +230,8 @@ class SplitterAbstractPopulationVertexFixed(
                 projections))
         sdram.add_cost(regions.connection_builder,
                        app_vertex.get_synapse_expander_size(projections))
-        sdram.add_cost(
-            regions.bitfield_filter,
-            get_estimated_sdram_for_bit_field_region(projections))
-        sdram.add_cost(
-            regions.bitfield_key_map,
-            get_estimated_sdram_for_key_region(projections))
-        sdram.add_cost(
-            regions.bitfield_builder,
-            exact_sdram_for_bit_field_builder_region())
+        sdram.add_cost(regions.bitfield_filter,
+                       get_sdram_for_bit_field_region(projections))
         return sdram
 
     def __get_dtcm_cost(self, n_atoms):

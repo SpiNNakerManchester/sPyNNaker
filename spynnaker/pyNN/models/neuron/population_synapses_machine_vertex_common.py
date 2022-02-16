@@ -103,8 +103,6 @@ class PopulationSynapsesMachineVertexCommon(
         SDRAM_EDGE_PARAMS = 10
         KEY_REGION = 11
         CONNECTOR_BUILDER = 12
-        BIT_FIELD_BUILDER = 13
-        BIT_FIELD_KEY_MAP = 14
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -120,8 +118,6 @@ class PopulationSynapsesMachineVertexCommon(
         synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
         synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,
         structural_dynamics=REGIONS.STRUCTURAL_DYNAMICS.value,
-        bitfield_builder=REGIONS.BIT_FIELD_BUILDER.value,
-        bitfield_key_map=REGIONS.BIT_FIELD_KEY_MAP.value,
         bitfield_filter=REGIONS.BIT_FIELD_FILTER.value,
         connection_builder=REGIONS.CONNECTOR_BUILDER.value
     )
