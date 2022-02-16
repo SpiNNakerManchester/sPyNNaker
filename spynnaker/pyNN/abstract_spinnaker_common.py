@@ -381,7 +381,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             self._dsg_targets, self._region_sizes = \
                 spynnaker_data_specification_writer(
                     self._placements, self._ipaddress, self._machine,
-                    self._max_run_time_steps)
+                    self._app_id, self._max_run_time_steps)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
