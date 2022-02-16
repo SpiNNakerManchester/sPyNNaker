@@ -109,9 +109,7 @@ class _AddressListEntryCType(ctypes.LittleEndianStructure):
         # the length of the row
         ("row_length", ctypes.c_uint32, 8),
         # the address
-        ("address", ctypes.c_uint32, 23),
-        # whether this is a direct/single address
-        ("is_single", ctypes.c_uint32, 1)
+        ("address", ctypes.c_uint32, 24)
     ]
 
 
@@ -185,12 +183,11 @@ class _MasterPopEntry(object):
         self.__n_neurons = n_neurons
         self.__addresses_and_row_lengths = list()
 
-    def append(self, address, row_length, is_single):
+    def append(self, address, row_length):
         """ Add a synaptic matrix pointer to the entry
 
         :param int address: The address of the synaptic matrix
         :param int row_length: The length of each row in the matrix
-        :param bool is_single: True if the address is to the direct matrix
         :return: The index of the pointer within the entry
         :rtype: int
         """
@@ -200,7 +197,7 @@ class _MasterPopEntry(object):
                 "{} connections for the same source key (maximum {})".format(
                     index, _MAX_ADDRESS_COUNT))
         self.__addresses_and_row_lengths.append(
-            (address, row_length, is_single, True))
+            (address, row_length, True))
         return index
 
     def append_invalid(self):
@@ -211,7 +208,7 @@ class _MasterPopEntry(object):
         :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
-        self.__addresses_and_row_lengths.append((0, 0, False, False))
+        self.__addresses_and_row_lengths.append((0, 0, False))
         return index
 
     @property
@@ -300,13 +297,12 @@ class _MasterPopEntry(object):
             entry.n_neurons = 0
             entry.mask_shift = 0
 
-        for j, (address, row_length, is_single, is_valid) in enumerate(
+        for j, (address, row_length, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
             address_entry = address_list[next_addr + j]
             if not is_valid:
                 address_entry.address = _INVALID_ADDDRESS
             else:
-                address_entry.is_single = is_single
                 address_entry.row_length = row_length
                 address_entry.address = address
         return n_entries
@@ -399,24 +395,6 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = dict()
         self.__n_addresses = 0
 
-    def add_machine_entry(
-            self, block_start_addr, row_length, key_and_mask, is_single=False):
-        """ Add an entry for a machine-edge to the population table.
-
-        :param int block_start_addr: where the synaptic matrix block starts
-        :param int row_length: how long in words each row is
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
-            the key and mask for this master pop entry
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
-        :return: The index of the entry, to be used to retrieve it
-        :rtype: int
-        :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
-            If a bad address is used.
-        """
-        return self.__update_master_population_table(
-            block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
-
     def add_application_entry(
             self, block_start_addr, row_length, key_and_mask, core_mask,
             core_shift, n_neurons):
@@ -431,8 +409,6 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
@@ -452,11 +428,11 @@ class MasterPopTableAsBinarySearch(object):
 
         return self.__update_master_population_table(
             block_start_addr, row_length, key_and_mask, core_mask, core_shift,
-            n_neurons, False)
+            n_neurons)
 
     def __update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons, is_single):
+            core_shift, n_neurons):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -468,47 +444,28 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
-        :param bool is_single:
-            Flag that states if the entry is a direct entry for a single row.
         :return: The index of the entry, to be used to retrieve it
         :rtype: int
         :raises ~spynnaker.pyNN.exceptions.SynapticConfigurationException:
             If a bad address is used.
         """
         # if not single, scale the address
-        start_addr = block_start_addr
-        if not is_single:
-            if block_start_addr % _ADDRESS_SCALE != 0:
-                raise SynapticConfigurationException(
-                    "Address {} is not compatible with this table".format(
-                        block_start_addr))
-            start_addr = block_start_addr // _ADDRESS_SCALE
-            if start_addr > _MAX_ADDRESS:
-                raise SynapticConfigurationException(
-                    "Address {} is too big for this table".format(
-                        block_start_addr))
+        if block_start_addr % _ADDRESS_SCALE != 0:
+            raise SynapticConfigurationException(
+                "Address {} is not compatible with this table".format(
+                    block_start_addr))
+        start_addr = block_start_addr // _ADDRESS_SCALE
+        if start_addr > _MAX_ADDRESS:
+            raise SynapticConfigurationException(
+                "Address {} is too big for this table".format(
+                    block_start_addr))
         row_length = self.get_allowed_row_length(row_length)
 
         entry = self.__add_entry(
             key_and_mask, core_mask, core_shift, n_neurons)
-        index = entry.append(start_addr, row_length - 1, is_single)
+        index = entry.append(start_addr, row_length - 1)
         self.__n_addresses += 1
         return index
-
-    def add_invalid_machine_entry(self, key_and_mask):
-        """ Add an entry to the table from a machine vertex that doesn't point
-            to anywhere.  Used to keep indices in synchronisation between e.g.
-            normal and delay entries and between entries on different cores.
-
-        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
-            a key_and_mask object used as part of describing
-            an edge that will require being received to be stored in the
-            master pop table; the whole edge will become multiple calls to
-            this function
-        :return: The index of the added entry
-        :rtype: int
-        """
-        return self.__add_invalid_entry(key_and_mask, 0, 0, 0)
 
     def add_invalid_application_entry(
             self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):

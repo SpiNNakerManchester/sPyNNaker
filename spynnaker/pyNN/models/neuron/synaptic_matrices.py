@@ -47,7 +47,7 @@ DIRECT_MATRIX_HEADER_COST_BYTES = 1 * BYTES_PER_WORD
 
 # Identifiers for synapse regions
 SYNAPSE_FIELDS = [
-    "synapse_params", "direct_matrix", "pop_table", "synaptic_matrix",
+    "synapse_params", "pop_table", "synaptic_matrix",
     "synapse_dynamics", "structural_dynamics", "bitfield_builder",
     "bitfield_key_map", "bitfield_filter", "connection_builder"]
 SynapseRegions = namedtuple(
@@ -225,7 +225,6 @@ class SynapticMatrices(object):
             bit_field_utilities.get_bitfield_builder_data(
                 self.__regions.pop_table,
                 self.__regions.synaptic_matrix,
-                self.__regions.direct_matrix,
                 self.__regions.bitfield_filter,
                 self.__regions.bitfield_key_map,
                 self.__regions.structural_dynamics,
@@ -273,19 +272,6 @@ class SynapticMatrices(object):
         spec.switch_write_focus(self.__regions.synaptic_matrix)
         for matrix in self.__on_host_matrices:
             matrix.write_matrix(spec, post_vertex_slice)
-
-        # Write the size and data of single synapses to the direct region
-        # This is currently disabled
-        single_data_words = 0
-        spec.reserve_memory_region(
-            region=self.__regions.direct_matrix,
-            size=(
-                single_data_words * BYTES_PER_WORD +
-                DIRECT_MATRIX_HEADER_COST_BYTES),
-            label='DirectMatrix',
-            reference=references.direct_matrix)
-        spec.switch_write_focus(self.__regions.direct_matrix)
-        spec.write_value(single_data_words * BYTES_PER_WORD)
 
         self.__write_synapse_expander_data_spec(
             spec, post_vertex_slice, references.connection_builder)

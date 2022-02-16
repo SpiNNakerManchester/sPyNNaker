@@ -57,7 +57,6 @@ enum regions {
     PROFILER_REGION,
     RECORDING_REGION,
     SYNAPSE_PARAMS_REGION,
-    DIRECT_MATRIX_REGION,
     SYNAPTIC_MATRIX_REGION,
     POPULATION_TABLE_REGION,
     SYNAPSE_DYNAMICS_REGION,
@@ -85,7 +84,6 @@ const struct common_priorities COMMON_PRIORITIES = {
 //! From the regions, select those that are used for synapse-specific things
 const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_params = SYNAPSE_PARAMS_REGION,
-    .direct_matrix = DIRECT_MATRIX_REGION,
     .synaptic_matrix = SYNAPTIC_MATRIX_REGION,
     .pop_table = POPULATION_TABLE_REGION,
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,

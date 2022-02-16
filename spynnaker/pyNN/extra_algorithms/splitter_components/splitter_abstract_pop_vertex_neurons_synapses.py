@@ -662,9 +662,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.merge(independent_synapse_sdram)
         sdram.merge(proj_dependent_sdram)
         sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
-        sdram.add_cost(
-            regions.direct_matrix,
-            max(self._governed_app_vertex.all_single_syn_size, BYTES_PER_WORD))
         sdram.add_cost(regions.structural_dynamics, structural_sz)
         sdram.add_cost(regions.synapse_dynamics, dynamics_sz)
         return sdram

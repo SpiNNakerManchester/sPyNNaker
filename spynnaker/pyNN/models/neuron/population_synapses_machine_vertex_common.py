@@ -95,17 +95,16 @@ class PopulationSynapsesMachineVertexCommon(
         PROFILING = 2
         RECORDING = 3
         SYNAPSE_PARAMS = 4
-        DIRECT_MATRIX = 5
-        SYNAPTIC_MATRIX = 6
-        POPULATION_TABLE = 7
-        SYNAPSE_DYNAMICS = 8
-        STRUCTURAL_DYNAMICS = 9
-        BIT_FIELD_FILTER = 10
-        SDRAM_EDGE_PARAMS = 11
-        KEY_REGION = 12
-        CONNECTOR_BUILDER = 13
-        BIT_FIELD_BUILDER = 14
-        BIT_FIELD_KEY_MAP = 15
+        SYNAPTIC_MATRIX = 5
+        POPULATION_TABLE = 6
+        SYNAPSE_DYNAMICS = 7
+        STRUCTURAL_DYNAMICS = 8
+        BIT_FIELD_FILTER = 9
+        SDRAM_EDGE_PARAMS = 10
+        KEY_REGION = 11
+        CONNECTOR_BUILDER = 12
+        BIT_FIELD_BUILDER = 13
+        BIT_FIELD_KEY_MAP = 14
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -117,7 +116,6 @@ class PopulationSynapsesMachineVertexCommon(
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
         synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        direct_matrix=REGIONS.DIRECT_MATRIX.value,
         pop_table=REGIONS.POPULATION_TABLE.value,
         synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
         synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,

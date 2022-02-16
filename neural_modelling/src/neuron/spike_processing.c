@@ -21,7 +21,6 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
-#include "direct_synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
@@ -236,15 +235,6 @@ static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
             // other being set to 0, but we add both as it is simple
             *n_rewires += dma_n_rewires;
             *n_synapse_processes += dma_n_spikes;
-            dma_n_rewires = 0;
-            dma_n_spikes = 0;
-        } else if (n_bytes_to_transfer == 0) {
-            // If the row is in DTCM, process the row now
-            synaptic_row_t single_fixed_synapse =
-                    direct_synapses_get_direct_synapse(row);
-            bool write_back;
-            synapses_process_synaptic_row(
-                    time, single_fixed_synapse, &write_back);
             dma_n_rewires = 0;
             dma_n_spikes = 0;
         } else {

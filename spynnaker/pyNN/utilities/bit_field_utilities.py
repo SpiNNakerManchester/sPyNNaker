@@ -30,9 +30,9 @@ FILTER_HEADER_WORDS = 2
 KEY_N_ATOM_MAP_WORDS = 2
 
 #: the regions addresses needed (
-#: pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
+#: pop table, synaptic matrix, bit_field, bit field builder,
 #: bit_field_key, structural region)
-N_REGIONS_ADDRESSES = 6
+N_REGIONS_ADDRESSES = 5
 
 #: n key to n neurons maps size in words
 N_KEYS_DATA_SET_IN_WORDS = 1
@@ -99,8 +99,7 @@ def exact_sdram_for_bit_field_builder_region():
 
 
 def get_bitfield_builder_data(
-        master_pop_region_id, synaptic_matrix_region_id,
-        direct_matrix_region_id, bit_field_region_id,
+        master_pop_region_id, synaptic_matrix_region_id, bit_field_region_id,
         bit_field_key_map_region_id, structural_dynamics_region_id,
         has_structural_dynamics_region):
 
@@ -108,7 +107,6 @@ def get_bitfield_builder_data(
 
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix
-    :param int direct_matrix_region_id: the region id for the direct matrix
     :param int bit_field_region_id: the region id for the bit-fields
     :param int bit_field_key_map_region_id: the region id for the key map
     :param int structural_dynamics_region_id: the region id for the structural
@@ -124,8 +122,7 @@ def get_bitfield_builder_data(
         struct_region = structural_dynamics_region_id
 
     return numpy.array([
-        master_pop_region_id, synaptic_matrix_region_id,
-        direct_matrix_region_id, bit_field_region_id,
+        master_pop_region_id, synaptic_matrix_region_id, bit_field_region_id,
         bit_field_key_map_region_id, struct_region], dtype="uint32")
 
 

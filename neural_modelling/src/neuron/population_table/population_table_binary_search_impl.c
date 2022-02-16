@@ -34,7 +34,7 @@
 
 //! \brief The number of bits of address.
 //!        This is a constant as it is used more than once below.
-#define N_ADDRESS_BITS 23
+#define N_ADDRESS_BITS 24
 
 //! \brief The shift to apply to indirect addresses.
 //!    The address is in units of four words, so this multiplies by 16 (= up
@@ -69,8 +69,6 @@ typedef struct {
     uint32_t row_length : 8;
     //! the address
     uint32_t address : N_ADDRESS_BITS;
-    //! whether this is a direct/single address
-    uint32_t is_single : 1;
 } address_list_entry;
 
 //! \brief An Invalid address and row length
@@ -97,9 +95,6 @@ static address_list_entry *address_list;
 
 //! Base address for the synaptic matrix's indirect rows
 static uint32_t synaptic_rows_base_address;
-
-//! Base address for the synaptic matrix's direct rows
-static uint32_t direct_rows_base_address;
 
 //! \brief The last spike received
 static spike_t last_spike = 0;
@@ -133,13 +128,6 @@ uint32_t bit_field_filtered_packets = 0;
 
 //! \name Support functions
 //! \{
-
-//! \brief Get the direct row address out of an entry
-//! \param[in] entry: the table entry
-//! \return a direct row address
-static inline uint32_t get_direct_address(address_list_entry entry) {
-    return entry.address + direct_rows_base_address;
-}
 
 //! \brief Get the standard address offset out of an entry
 //! \details The address is in units of four words, so this multiplies by 16
@@ -229,12 +217,9 @@ static inline void print_master_population_table(void) {
             address_list_entry addr = address_list[j];
             if (addr.address == INVALID_ADDRESS) {
                 log_info("    index %d: INVALID", j);
-            } else if (!addr.is_single) {
+            } else {
                 log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
                     j, get_offset(addr), get_address(addr), get_row_length(addr));
-            } else {
-                log_info("    index %d: offset: %u, address: 0x%08x, single",
-                    j, addr.address, get_direct_address(addr));
             }
         }
     }
@@ -397,7 +382,7 @@ static inline bool population_table_position_in_the_master_pop_array(
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
-        address_t direct_rows_address, uint32_t *row_max_n_words) {
+        uint32_t *row_max_n_words) {
     log_debug("Population_table_initialise: starting");
     pop_table_config_t *config = (pop_table_config_t *) table_address;
 
@@ -444,10 +429,7 @@ bool population_table_initialise(
     // Store the base address
     log_debug("The stored synaptic matrix base address is located at: 0x%08x",
             synapse_rows_address);
-    log_debug("The direct synaptic matrix base address is located at: 0x%08x",
-            direct_rows_address);
     synaptic_rows_base_address = (uint32_t) synapse_rows_address;
-    direct_rows_base_address = (uint32_t) direct_rows_address;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
@@ -546,28 +528,18 @@ bool population_table_get_next_address(
     do {
         address_list_entry item = address_list[next_item];
         if (item.address != INVALID_ADDRESS) {
+            uint32_t row_length = get_row_length(item);
+            uint32_t block_address = get_address(item);
+            uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+            uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
 
-            // If the row is a direct row, indicate this by specifying the
-            // n_bytes_to_transfer is 0
-            if (item.is_single) {
-                *row_address = (synaptic_row_t) (get_direct_address(item) +
-                    (last_neuron_id * sizeof(uint32_t)));
-                *n_bytes_to_transfer = 0;
-            } else {
-
-                uint32_t row_length = get_row_length(item);
-                uint32_t block_address = get_address(item);
-                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-                uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
-
-                *row_address = (synaptic_row_t) (block_address + neuron_offset);
-                *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_debug("neuron_id = %u, block_address = 0x%.8x, "
-                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                        last_neuron_id, block_address, row_length, *row_address,
-                        *n_bytes_to_transfer);
-                *spike = last_spike;
-            }
+            *row_address = (synaptic_row_t) (block_address + neuron_offset);
+            *n_bytes_to_transfer = stride * sizeof(uint32_t);
+            log_debug("neuron_id = %u, block_address = 0x%.8x, "
+                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                    last_neuron_id, block_address, row_length, *row_address,
+                    *n_bytes_to_transfer);
+            *spike = last_spike;
             is_valid = true;
         }
 

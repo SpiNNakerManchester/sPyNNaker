@@ -80,7 +80,6 @@ const struct neuron_regions NEURON_REGIONS = {
 //! From the regions, extract those that are synapse-specific
 const struct synapse_regions SYNAPSE_REGIONS = {
     .synapse_params = SYNAPSE_PARAMS_REGION,
-    .direct_matrix = DIRECT_MATRIX_REGION,
     .synaptic_matrix = SYNAPTIC_MATRIX_REGION,
     .pop_table = POPULATION_TABLE_REGION,
     .synapse_dynamics = SYNAPSE_DYNAMICS_REGION,

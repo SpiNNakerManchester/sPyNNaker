@@ -103,11 +103,10 @@ class PopulationMachineVertex(
         PROVENANCE_DATA = 8
         PROFILING = 9
         CONNECTOR_BUILDER = 10
-        DIRECT_MATRIX = 11
-        BIT_FIELD_FILTER = 12
-        BIT_FIELD_BUILDER = 13
-        BIT_FIELD_KEY_MAP = 14
-        RECORDING = 15
+        BIT_FIELD_FILTER = 11
+        BIT_FIELD_BUILDER = 12
+        BIT_FIELD_KEY_MAP = 13
+        RECORDING = 14
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -125,7 +124,6 @@ class PopulationMachineVertex(
     # Regions for this vertex used by synapse parts
     SYNAPSE_REGIONS = SynapseRegions(
         synapse_params=REGIONS.SYNAPSE_PARAMS.value,
-        direct_matrix=REGIONS.DIRECT_MATRIX.value,
         pop_table=REGIONS.POPULATION_TABLE.value,
         synaptic_matrix=REGIONS.SYNAPTIC_MATRIX.value,
         synapse_dynamics=REGIONS.SYNAPSE_DYNAMICS.value,

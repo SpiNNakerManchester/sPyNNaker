@@ -226,7 +226,6 @@ class SplitterAbstractPopulationVertexFixed(
                        app_vertex.get_synapse_dynamics_size(n_atoms))
         sdram.add_cost(regions.structural_dynamics, structural_sz)
         sdram.add_cost(regions.synaptic_matrix, all_syn_block_sz)
-        sdram.add_cost(regions.direct_matrix, app_vertex.all_single_syn_size)
         sdram.add_cost(
             regions.pop_table,
             MasterPopTableAsBinarySearch.get_master_population_table_size(
