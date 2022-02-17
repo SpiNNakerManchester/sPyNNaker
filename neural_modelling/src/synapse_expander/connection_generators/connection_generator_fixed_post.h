@@ -25,6 +25,8 @@
 #include <log.h>
 #include <synapse_expander/rng.h>
 
+#define N_RETRIES 10
+
 //! The parameters that can be copied from SDRAM.
 struct fixed_post_params {
     //! Do we allow self connections?
@@ -87,14 +89,14 @@ static uint32_t post_random_in_range(rng_t *rng, uint32_t range) {
     return (u01 * range) >> 15;
 }
 
-static void fixed_post_write(uint32_t pre, uint32_t post, accum weight_scale,
+static bool fixed_post_write(uint32_t pre, uint32_t post, accum weight_scale,
         accum timestep_per_delay, param_generator_t weight_generator,
         param_generator_t delay_generator, matrix_generator_t matrix_generator) {
     uint16_t weight = rescale_weight(
             param_generator_generate(weight_generator), weight_scale);
     uint16_t delay = rescale_delay(
             param_generator_generate(delay_generator), timestep_per_delay);
-    matrix_generator_write_synapse(
+    return matrix_generator_write_synapse(
             matrix_generator, pre, post, weight, delay);
 }
 
@@ -117,7 +119,7 @@ static void fixed_post_write(uint32_t pre, uint32_t post, accum weight_scale,
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static void connection_generator_fixed_post_generate(
+static bool connection_generator_fixed_post_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -147,8 +149,11 @@ static void connection_generator_fixed_post_generate(
                 // We can only use post neurons in range here
                 if (post >= post_slice_start && post < post_slice_end) {
                     post -= post_slice_start;
-                    fixed_post_write(pre, post, weight_scale, timestep_per_delay,
-                            weight_generator, delay_generator, matrix_generator);
+                    if (!fixed_post_write(pre, post, weight_scale, timestep_per_delay,
+                            weight_generator, delay_generator, matrix_generator)) {
+                        log_error("Matrix not sized correctly!");
+                        return false;
+                    }
                 }
             }
         } else {
@@ -176,10 +181,14 @@ static void connection_generator_fixed_post_generate(
             for (uint32_t j = 0; j < n_conns; j++) {
                 if (values[j] >= post_slice_start && values[j] < post_slice_end) {
                     uint32_t post = values[j] - post_slice_start;
-                    fixed_post_write(pre, post, weight_scale, timestep_per_delay,
-                        weight_generator, delay_generator, matrix_generator);
+                    if (!fixed_post_write(pre, post, weight_scale, timestep_per_delay,
+                        weight_generator, delay_generator, matrix_generator)) {
+                        log_error("Matrix not sized correctly!");
+                        return false;
+                    }
                 }
             }
         }
     }
+    return true;
 }

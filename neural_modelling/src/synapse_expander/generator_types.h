@@ -85,8 +85,9 @@ typedef accum (generate_param_func)(void *generator);
  * \param[in] post_index: The index of the post-neuron on this core
  * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
  * \param[in] delay: The delay of the synapse in time steps
+ * \return: Whether the synapse was added or not
  */
-typedef void (write_synapse_func)(void *generator,
+typedef bool (write_synapse_func)(void *generator,
         uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);
 
 /**
@@ -106,9 +107,9 @@ typedef void (write_synapse_func)(void *generator,
  * \param[in,out] indices: An array into which the core-relative post-indices
  *                         should be placed.  This will be initialised to be
  *                         \p max_row_length in size
- * \return The number of connections generated
+ * \return Whether connections have been generated successfully
  */
-typedef void (generate_connection_func)(
+typedef bool (generate_connection_func)(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,

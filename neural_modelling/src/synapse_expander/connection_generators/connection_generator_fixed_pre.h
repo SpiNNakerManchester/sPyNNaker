@@ -52,17 +52,6 @@ static uint32_t pre_random_in_range(rng_t *rng, uint32_t range) {
     return (u01 * range) >> 15;
 }
 
-static void fixed_pre_write(uint32_t pre, uint32_t post, accum weight_scale,
-        accum timestep_per_delay, param_generator_t weight_generator,
-        param_generator_t delay_generator, matrix_generator_t matrix_generator) {
-    uint16_t weight = rescale_weight(
-            param_generator_generate(weight_generator), weight_scale);
-    uint16_t delay = rescale_delay(
-            param_generator_generate(delay_generator), timestep_per_delay);
-    matrix_generator_write_synapse(
-            matrix_generator, pre, post, weight, delay);
-}
-
 /**
  * \brief Initialise the fixed-pre connection generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
@@ -114,7 +103,7 @@ void connection_generator_fixed_pre_free(void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-void connection_generator_fixed_pre_generate(
+bool connection_generator_fixed_pre_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -138,12 +127,25 @@ void connection_generator_fixed_pre_generate(
         if (obj->params.with_replacement) {
             // If with replacement just repeated pick
             for (uint32_t j = 0; j < n_conns; j++) {
+                uint16_t weight = rescale_weight(
+                        param_generator_generate(weight_generator), weight_scale);
+                uint16_t delay = rescale_delay(
+                        param_generator_generate(delay_generator), timestep_per_delay);
                 uint32_t pre;
+                bool written = false;
+                uint32_t n_retries = 0;
                 do {
                     pre = pre_random_in_range(core_rng, n_values) + pre_lo;
-                } while (!obj->params.allow_self_connections && pre == post);
-                fixed_pre_write(pre, local_post, weight_scale, timestep_per_delay,
-                        weight_generator, delay_generator, matrix_generator);
+                    if (obj->params.allow_self_connections || pre != post) {
+                        written = matrix_generator_write_synapse(
+                                matrix_generator, pre, local_post, weight, delay);
+                        n_retries++;
+                    }
+                } while (!written && n_retries < 10);
+                if (!written) {
+                    log_error("Couldn't find a row to write to!");
+                    return false;
+                }
             }
         } else {
             // Without replacement uses reservoir sampling to save space
@@ -168,9 +170,17 @@ void connection_generator_fixed_pre_generate(
                 }
             }
             for (uint32_t j = 0; j < n_conns; j++) {
-                fixed_pre_write(values[j], local_post, weight_scale, timestep_per_delay,
-                    weight_generator, delay_generator, matrix_generator);
+                uint16_t weight = rescale_weight(
+                        param_generator_generate(weight_generator), weight_scale);
+                uint16_t delay = rescale_delay(
+                        param_generator_generate(delay_generator), timestep_per_delay);
+                // Not a lot we can do here!
+                if (!matrix_generator_write_synapse(matrix_generator, values[j],
+                        local_post, weight, delay)) {
+                    log_warning("Could not write to matrix!");
+                }
             }
         }
     }
+    return true;
 }

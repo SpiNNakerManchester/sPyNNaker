@@ -210,8 +210,9 @@ static void matrix_generator_static_free(void *generator) {
  * \param[in] post_index: The index of the post-neuron on this core
  * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
  * \param[in] delay: The delay of the synapse in time steps
+ * \return whether the synapses was added or not
  */
-static void matrix_generator_static_write_synapse(void *generator,
+static bool matrix_generator_static_write_synapse(void *generator,
         uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay) {
     matrix_genetator_static_data_t *data = generator;
     struct delay_value delay_and_stage = get_delay(delay, data->max_stage,
@@ -224,7 +225,7 @@ static void matrix_generator_static_write_synapse(void *generator,
         if (pos >= data->max_row_n_words) {
             log_warning("Row %u at 0x%08x of matrix 0x%08x is already full (%u of %u)",
                     pre_index, row, data->synaptic_matrix, pos, data->max_row_n_words);
-            return;
+            return false;
         }
     } else {
         row = get_delay_row(data->delayed_synaptic_matrix,
@@ -236,6 +237,7 @@ static void matrix_generator_static_write_synapse(void *generator,
         if (pos >= data->max_delayed_row_n_words) {
             log_warning("Row %u, stage %u at 0x%08x of delayed matrix 0x%08x is already full (%u of %u)",
                     pre_index, delay_and_stage.stage, row, data->delayed_synaptic_matrix, pos, data->max_delayed_row_n_words);
+            return false;
         }
     }
 
@@ -243,4 +245,5 @@ static void matrix_generator_static_write_synapse(void *generator,
     row->fixed_fixed_data[pos] = build_static_word(weight, delay_and_stage.delay,
             data->synapse_type, post_index, data->synapse_type_bits,
             data->synapse_index_bits, data->delay_bits);
+    return true;
 }

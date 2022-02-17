@@ -110,11 +110,13 @@ static bool read_connection_builder_region(void **region,
         return false;
     }
 
-    connection_generator_generate(
+    if (!connection_generator_generate(
             connection_generator, config.pre_lo, config.pre_hi, config.post_lo,
             config.post_hi, post_index, post_slice_start, post_slice_count,
             weight_scales[config.synapse_type], timestep_per_delay,
-            weight_generator, delay_generator, matrix_generator);
+            weight_generator, delay_generator, matrix_generator)) {
+        return false;
+    }
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);

@@ -32,13 +32,6 @@ struct fixed_total_params {
     uint32_t with_replacement;
     // The number of synapses to generate in total over all cores
     uint32_t n_synapses_total;
-
-    /*// The number of cores to generate for in total
-    uint32_t n_cores;
-    // The number of possible synapses in total over all cores
-    uint32_t max_synapses_total;
-    // The number of possible synapses per core
-    uint32_t max_synapses_per_core; */
 };
 
 /**
@@ -115,11 +108,9 @@ static void *connection_generator_fixed_total_initialise(void **region) {
     *region = &params_sdram[1];
 
     log_debug("Fixed Total Number Connector, allow self connections = %u, "
-            "with replacement = %u, n_synapses_total = %u" /*, "
-            "n_cores = %u, max_synapses_total = %u"*/,
+            "with replacement = %u, n_synapses_total = %u",
             obj->params.allow_self_connections,
-            obj->params.with_replacement, obj->params.n_synapses_total /*,
-            obj->params.n_cores, obj->params.max_synapses_total */);
+            obj->params.with_replacement, obj->params.n_synapses_total);
 
     // Go through every core and use the population-level RNG to generate
     // the number of synapses on every core with a binomial.
@@ -184,7 +175,7 @@ static void fixed_total_next(uint32_t *pre, uint32_t *post, uint32_t pre_lo, uin
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static void connection_generator_fixed_total_generate(
+static bool connection_generator_fixed_total_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -201,20 +192,29 @@ static void connection_generator_fixed_total_generate(
     // Generate the connections for all cores then filter for this one
     if (obj->params.with_replacement) {
         for (uint32_t i = 0; i < n_conns; i++) {
-            uint32_t pre;
-            uint32_t post;
-            do {
-                pre = random_in_range(population_rng, n_pre) + pre_lo;
-                post = random_in_range(population_rng, n_post) + post_lo;
-            } while (!obj->params.allow_self_connections && pre == post);
+            uint32_t post = random_in_range(population_rng, n_post) + post_lo;
             if (post >= post_slice_start && post < post_slice_end) {
                 uint32_t local_post = post - post_slice_start;
                 uint16_t weight = rescale_weight(
                         param_generator_generate(weight_generator), weight_scale);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
-                matrix_generator_write_synapse(matrix_generator, pre, local_post,
-                        weight, delay);
+
+                uint32_t pre;
+                bool written = false;
+                uint32_t n_retries = 0;
+                do {
+                    pre = random_in_range(core_rng, n_pre) + pre_lo;
+                    if (obj->params.allow_self_connections || pre != post) {
+                        written = matrix_generator_write_synapse(matrix_generator,
+                            pre, local_post, weight, delay);
+                        n_retries++;
+                    }
+                } while (!written && n_retries < 10);
+                if (!written) {
+                    log_error("Couldn't find a row to write to!");
+                    return false;
+                }
             }
         }
     } else {
@@ -254,9 +254,14 @@ static void connection_generator_fixed_total_generate(
                         param_generator_generate(weight_generator), weight_scale);
                 uint16_t delay = rescale_delay(
                         param_generator_generate(delay_generator), timestep_per_delay);
-                matrix_generator_write_synapse(matrix_generator, local_pre, local_post,
-                        weight, delay);
+                if (!matrix_generator_write_synapse(matrix_generator, local_pre, local_post,
+                        weight, delay)) {
+                    // Not a lot we can do here...
+                    log_error("Couldn't write matrix!");
+                    return false;
+                }
             }
         }
     }
+    return true;
 }

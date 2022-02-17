@@ -227,8 +227,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
             synapse_info, max_row_info, max_atoms_per_core):
         synapse_type = synapse_info.synapse_type
         return numpy.array([
-            synaptic_matrix_offset,
-            max_row_info.undelayed_max_words, app_edge.pre_vertex.n_atoms,
+            synaptic_matrix_offset, max_row_info.undelayed_max_words,
+            max_row_info.undelayed_max_n_synapses, app_edge.pre_vertex.n_atoms,
             synapse_type is NEUROMODULATION_TARGETS["reward"], synapse_type],
             dtype=numpy.uint32)
 
@@ -236,7 +236,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 5 * BYTES_PER_WORD
+        return 6 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)

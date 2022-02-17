@@ -279,7 +279,7 @@ void matrix_generator_stdp_free(void *generator) {
  * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
  * \param[in] delay: The delay of the synapse in time steps
  */
-static void matrix_generator_stdp_write_synapse(void *generator,
+static bool matrix_generator_stdp_write_synapse(void *generator,
         uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay) {
     matrix_generator_stdp_data_t *data = generator;
     struct delay_value delay_and_stage = get_delay(delay, data->max_stage,
@@ -296,8 +296,8 @@ static void matrix_generator_stdp_write_synapse(void *generator,
         pos = fixed_row->fixed_plastic_size;
         if (pos >= data->max_row_n_synapses) {
             log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_row_n_words);
-            return;
+                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_row_n_synapses);
+            return false;
         }
     } else {
         plastic_row = get_stdp_delay_row(data->delayed_synaptic_matrix,
@@ -309,8 +309,8 @@ static void matrix_generator_stdp_write_synapse(void *generator,
         pos = fixed_row->fixed_plastic_size;
         if (pos >= data->max_delayed_row_n_synapses) {
             log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_row_n_words);
-            return;
+                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_delayed_row_n_synapses);
+            return false;
         }
     }
     fixed_row->fixed_plastic_size = pos + 1;
@@ -320,5 +320,6 @@ static void matrix_generator_stdp_write_synapse(void *generator,
     uint32_t plastic_pos = data->n_half_words_per_pp_row_header
             + (data->n_half_words_per_pp_synapse * pos) + data->weight_half_word;
     plastic_row->plastic_plastic_data[plastic_pos] = weight;
+    return true;
 }
 

@@ -125,7 +125,7 @@ static void connection_generator_kernel_free(void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static void connection_generator_kernel_generate(
+static bool connection_generator_kernel_generate(
         void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -188,11 +188,15 @@ static void connection_generator_kernel_generate(
                     weight = param_generator_generate(weight_generator);
                     delay = param_generator_generate(delay_generator);
                 }
-                matrix_generator_write_synapse(
+                if (!matrix_generator_write_synapse(
                         matrix_generator, pre, local_post,
                         rescale_weight(weight, weight_scale),
-                        rescale_delay(delay, timestep_per_delay));
+                        rescale_delay(delay, timestep_per_delay))) {
+                    log_error("Matrix size is wrong!");
+                    return false;
+                }
             }
         }
     }
+    return true;
 }

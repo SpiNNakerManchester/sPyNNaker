@@ -53,5 +53,5 @@ void matrix_generator_free(matrix_generator_t generator);
  * \param[in] weight: The weight of the synapse pre-encoded as a uint16_t
  * \param[in] delay: The delay of the synapse in time steps
  */
-void matrix_generator_write_synapse(matrix_generator_t generator,
+bool matrix_generator_write_synapse(matrix_generator_t generator,
         uint32_t pre_index, uint16_t post_index, uint16_t weight, uint16_t delay);

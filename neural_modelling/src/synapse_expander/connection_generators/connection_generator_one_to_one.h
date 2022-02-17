@@ -62,7 +62,7 @@ static void connection_generator_one_to_one_free(UNUSED void *generator) {
  *                         \p max_row_length in size
  * \return The number of connections generated
  */
-static void connection_generator_one_to_one_generate(
+static bool connection_generator_one_to_one_generate(
         UNUSED void *generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, UNUSED uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -82,7 +82,11 @@ static void connection_generator_one_to_one_generate(
                 param_generator_generate(weight_generator), weight_scale);
         uint16_t delay = rescale_delay(
                 param_generator_generate(delay_generator), timestep_per_delay);
-        matrix_generator_write_synapse(matrix_generator, pre, local_post,
-                weight, delay);
+        if (!matrix_generator_write_synapse(matrix_generator, pre, local_post,
+                weight, delay)) {
+            log_error("Matrix size is wrong!");
+            return false;
+        }
     }
+    return true;
 }

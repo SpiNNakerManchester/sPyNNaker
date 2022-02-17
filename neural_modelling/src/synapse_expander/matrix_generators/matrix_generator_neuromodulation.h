@@ -35,6 +35,7 @@ typedef struct {
         uint32_t synaptic_matrix_offset;
     };
     uint32_t max_row_n_words;
+    uint32_t max_row_n_synapses;
     uint32_t n_pre_neurons;
     uint32_t is_reward;
     uint32_t synapse_type;
@@ -85,11 +86,15 @@ static row_nm_fixed_t *get_nm_fixed_row(row_nm_plastic_t *plastic_row) {
  * \param[in] n_rows The number of rows in the matrix
  * \param[in] max_row_n_words The maximum number of words used by a row
  */
-static void setup_nm_rows(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words) {
+static void setup_nm_rows(uint32_t *matrix, uint32_t n_rows, uint32_t max_row_n_words,
+        uint32_t is_reward, uint32_t synapse_type) {
     // Set all the header half-words to 0 and set all the sizes
     for (uint32_t i = 0; i < n_rows; i++) {
         row_nm_plastic_t *row = get_nm_row(matrix, max_row_n_words, i);
         row->plastic_plastic_size = 1;
+        row->is_neuromodulation = 1;
+        row->is_reward = is_reward;
+        row->synapse_type = synapse_type;
         row_nm_fixed_t *fixed = get_nm_fixed_row(row);
         fixed->fixed_fixed_size = 0;
         fixed->fixed_plastic_size = 0;
@@ -118,7 +123,8 @@ void *matrix_generator_neuromodulation_initialize(void **region,
     // Offsets are in words
     uint32_t *syn_mat = synaptic_matrix;
     conf->synaptic_matrix = &(syn_mat[conf->synaptic_matrix_offset]);
-    setup_nm_rows(conf->synaptic_matrix, conf->n_pre_neurons, conf->max_row_n_words);
+    setup_nm_rows(conf->synaptic_matrix, conf->n_pre_neurons, conf->max_row_n_words,
+            conf->is_reward, conf->synapse_type);
 
     return conf;
 }
@@ -131,17 +137,20 @@ void matrix_generator_neuromodulation_free(void *generator) {
     sark_free(generator);
 }
 
-static void matrix_generator_neuromodulation_write_synapse(void *generator,
+static bool matrix_generator_neuromodulation_write_synapse(void *generator,
         uint32_t pre_index, uint16_t post_index, uint16_t weight,
         UNUSED uint16_t delay) {
     matrix_generator_neuromodulation *conf = generator;
     row_nm_plastic_t *plastic_row = get_nm_row(conf->synaptic_matrix,
             conf->max_row_n_words, pre_index);
     row_nm_fixed_t *fixed_row = get_nm_fixed_row(plastic_row);
-    plastic_row->is_neuromodulation = 1;
-    plastic_row->is_reward = conf->is_reward;
-    plastic_row->synapse_type = conf->synapse_type;
-    uint32_t pos = fixed_row->fixed_fixed_size;
-    fixed_row->fixed_fixed_size = pos + 1;
+    uint32_t pos = fixed_row->fixed_plastic_size;
+    if (pos >= conf->max_row_n_synapses) {
+        log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
+                pre_index, plastic_row, fixed_row, conf->synaptic_matrix, pos, conf->max_row_n_synapses);
+        return false;
+    }
+    fixed_row->fixed_plastic_size = pos + 1;
     fixed_row->fixed_plastic_data[pos] = (weight << 16) | post_index;
+    return true;
 }

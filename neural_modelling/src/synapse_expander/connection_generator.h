@@ -68,7 +68,7 @@ void connection_generator_free(connection_generator_t generator);
  *                         max_row_length in size
  * \return The number of connections generated
  */
-void connection_generator_generate(
+bool connection_generator_generate(
         connection_generator_t generator, uint32_t pre_lo, uint32_t pre_hi,
         uint32_t post_lo, uint32_t post_hi, uint32_t post_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
