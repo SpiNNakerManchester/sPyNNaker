@@ -19,12 +19,10 @@ from pacman.operations.partition_algorithms.splitter_partitioner import (
 from data_specification import ReferenceContext
 
 
-def spynnaker_splitter_partitioner(
-        plan_n_time_steps, pre_allocated_resources=None):
+def spynnaker_splitter_partitioner(pre_allocated_resources=None):
     """
     a splitter partitioner that's bespoke for spynnaker vertices.
 
-    :param int plan_n_time_steps: the number of time steps to run for
     :param pre_allocated_resources: any pre-allocated res to account for
         before doing any splitting.
     :type pre_allocated_resources: PreAllocatedResourceContainer or None
@@ -32,7 +30,7 @@ def spynnaker_splitter_partitioner(
     :raise PacmanPartitionException: when it cant partition
     """
     partitioner = _SpynnakerSplitterPartitioner()
-    return partitioner._run(plan_n_time_steps, pre_allocated_resources)
+    return partitioner._run(pre_allocated_resources)
 
 
 class _SpynnakerSplitterPartitioner(_SplitterPartitioner):
@@ -41,10 +39,8 @@ class _SpynnakerSplitterPartitioner(_SplitterPartitioner):
 
     __slots__ = []
 
-    def _run(
-            self, plan_n_time_steps, pre_allocated_resources=None):
+    def _run(self, pre_allocated_resources=None):
         """
-        :param int plan_n_time_steps: the number of time steps to run for
         :param pre_allocated_resources: any pre-allocated res to account for
             before doing any splitting.
         :type pre_allocated_resources: PreAllocatedResourceContainer or None
@@ -54,8 +50,7 @@ class _SpynnakerSplitterPartitioner(_SplitterPartitioner):
 
         # do partitioning in same way, but in a context of references
         with ReferenceContext():
-            machine_graph, chips_used = super()._run(
-                plan_n_time_steps, pre_allocated_resources)
+            machine_graph, chips_used = super()._run(pre_allocated_resources)
 
         # return the accepted things
         return machine_graph, chips_used

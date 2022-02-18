@@ -423,6 +423,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
             machine_graph, n_chips_in_graph = spynnaker_splitter_partitioner(
-                    self._plan_n_timesteps, pre_allocated_resources)
+                    pre_allocated_resources)
             self._data_writer.set_runtime_machine_graph(machine_graph)
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
