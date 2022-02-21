@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
+from spinn_utilities.config_holder import set_config
 from spinnaker_testbase import BaseTestCase
 
 
@@ -27,6 +28,7 @@ class TestConstraint(BaseTestCase):
 
         """
         sim.setup(timestep=1.0)
+        set_config("Reports", "write_application_graph_placer_report", True)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
 
         pop_1 = sim.Population(200, sim.IF_curr_exp(), label="pop_1")
