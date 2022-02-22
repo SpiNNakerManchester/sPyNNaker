@@ -416,10 +416,9 @@
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_graph_data_specification_writer</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_execute_graph_data_specification_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="s2">&quot;Spynnaker data specification writer&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region_sizes</span> <span class="o">=</span> \
-                <span class="n">spynnaker_data_specification_writer</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span> <span class="o">=</span> <span class="n">spynnaker_data_specification_writer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_execute_spynnaker_ordered_covering_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
