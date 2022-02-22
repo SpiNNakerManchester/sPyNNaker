@@ -141,7 +141,7 @@ class WholeBoardTest(BaseTestCase):
             if len(spikes) != 1:
                 raise Exception("Chain {name} has {len(spikes)} spikes")
 
-    def test_do_run(self):
+    def do_run(self):
         # find actual machine
         sim.setup(timestep=1.0, n_boards_required=1)
         machine = sim.get_machine()
