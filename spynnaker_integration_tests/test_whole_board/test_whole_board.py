@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import random
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -21,23 +20,23 @@ from spinnaker_testbase import BaseTestCase
 class WholeBoardTest(BaseTestCase):
 
     up = [(0, 0), (0, 1), (0, 2), (0, 3),
-           (1, 0), (1, 1), (1, 2), (1, 3), (1, 4),
-           (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5),
-           (3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (3, 5), (3, 6),
-           (4, 0), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7),
-           (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5, 7),
-           (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7),
-           (7, 3), (7, 4), (7, 5), (7, 6), (7, 7)]
+          (1, 0), (1, 1), (1, 2), (1, 3), (1, 4),
+          (2, 0), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5),
+          (3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (3, 5), (3, 6),
+          (4, 0), (4, 1), (4, 2), (4, 3), (4, 4), (4, 5), (4, 6), (4, 7),
+          (5, 1), (5, 2), (5, 3), (5, 4), (5, 5), (5, 6), (5, 7),
+          (6, 2), (6, 3), (6, 4), (6, 5), (6, 6), (6, 7),
+          (7, 3), (7, 4), (7, 5), (7, 6), (7, 7)]
     down = list(up)
     down.reverse()
-    right =[(0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
-            (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
-            (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2),
-            (0, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3),
-            (1, 4), (2, 4), (3, 4), (4, 4), (5, 4), (6, 4), (7, 4),
-            (2, 5), (3, 5), (4, 5), (5, 5), (6, 5), (7, 5),
-            (3, 6), (4, 6), (5, 6), (6, 6), (7, 6),
-            (4, 7), (5, 7), (6, 7), (7, 7)]
+    right = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0),
+             (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
+             (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2),
+             (0, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3), (7, 3),
+             (1, 4), (2, 4), (3, 4), (4, 4), (5, 4), (6, 4), (7, 4),
+             (2, 5), (3, 5), (4, 5), (5, 5), (6, 5), (7, 5),
+             (3, 6), (4, 6), (5, 6), (6, 6), (7, 6),
+             (4, 7), (5, 7), (6, 7), (7, 7)]
     left = list(right)
     left.reverse()
     ur = [(0, 0), (0, 1), (0, 2), (0, 3),
@@ -82,7 +81,7 @@ class WholeBoardTest(BaseTestCase):
         x, y = chain.pop()
         spikeArray = {'spike_times': [[0]]}
         previous = sim.Population(
-            1, sim.SpikeSourceArray, spikeArray, label = f"Stimulus {name}")
+            1, sim.SpikeSourceArray, spikeArray, label=f"Stimulus {name}")
         previous.add_placement_constraint(x, y)
         for (x, y) in chain:
             current = sim.Population(
@@ -179,7 +178,6 @@ class WholeBoardTest(BaseTestCase):
         sim.run(1000)
         self.check_spikes()
         sim.end()
-
 
     def test_run(self):
         self.runsafe(self.do_run)
