@@ -19,7 +19,6 @@ import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = FormatAdapter(logging.getLogger(__name__))
