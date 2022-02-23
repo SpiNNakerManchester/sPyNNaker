@@ -31,7 +31,7 @@ class SpYNNakerSynapticMatrixReport(object):
     """ Generate the synaptic matrices for reporting purposes.
     """
 
-    def __call__(self, connection_holder, dsg_targets):
+    def __call__(self, connection_holder):
         """ Convert synaptic matrix for every application edge.
 
         :param connection_holder: where the synaptic matrices are stored
@@ -39,17 +39,11 @@ class SpYNNakerSynapticMatrixReport(object):
         :type connection_holder:
             dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)
-        :param dsg_targets: used to check if connection holders are populated
         """
 
         # Update the print options to display everything
         print_opts = numpy.get_printoptions()
         numpy.set_printoptions(threshold=numpy.nan)
-
-        if dsg_targets is None:
-            raise SynapticConfigurationException(
-                "dsg_targets should not be none, used as a check for "
-                "connection holder data to be generated")
 
         # generate folder for synaptic reports
         top_level_folder = os.path.join(
