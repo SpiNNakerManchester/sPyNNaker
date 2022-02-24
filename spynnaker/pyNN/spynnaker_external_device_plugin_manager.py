@@ -171,16 +171,6 @@ class SpynnakerExternalDevicePluginManager(object):
             population._vertex, device_vertex, partition_id)
 
     @staticmethod
-    def add_socket_address(socket_address):
-        """ Add a socket address to the list to be checked by the\
-            notification protocol.
-
-        :param ~spinn_utilities.socket_address.SocketAddress socket_address:
-            the socket address
-        """
-        get_simulator().add_socket_address(socket_address)
-
-    @staticmethod
     def update_live_packet_gather_tracker(
             vertex_to_record_from, lpg_label, port=None, hostname=None,
             tag=None, strip_sdp=True, use_prefix=False, key_prefix=None,
