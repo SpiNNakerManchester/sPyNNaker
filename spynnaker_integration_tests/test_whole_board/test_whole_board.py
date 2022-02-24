@@ -15,19 +15,20 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
-from spalloc.protocol_client import ProtocolClient
 from spalloc.job import Job
 from spalloc.states import JobState
 import pytest
 import tempfile
 import os
 
+
 def pytest_generate_tests(metafunc):
-    boards = [(x, y, p) 
-              for x in range(0, machine["width"])
-              for y in range(0, machine["height"])
+    boards = [(x, y, b)
+              for x in range(0, 20)
+              for y in range(0, 20)
               for b in range(3)]
-    metafunc.parametrize(["x", "y", "b"], boards, ids=idlist, scope="class")
+    metafunc.parametrize(["x", "y", "b"], boards, scope="class")
+
 
 class WholeBoardTest(BaseTestCase):
 
@@ -192,10 +193,11 @@ class WholeBoardTest(BaseTestCase):
         sim.end()
 
     def test_run(self, x, y, b):
-        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk", owner="Jenkins Machine Test")
+        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk", 
+                  owner="Jenkins Machine Test")
         if job.state == JobState.queued:
             job.destroy("Queued")
-            pytest.skip(f"Board {x}, {y}, {p} is in use")
+            pytest.skip(f"Board {x}, {y}, {b} is in use")
         with job:
             with tempfile.TemporaryDirectory() as tmpdir:
                 os.chdir(tmpdir)
