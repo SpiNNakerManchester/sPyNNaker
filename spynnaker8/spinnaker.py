@@ -30,8 +30,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     """
 
     def __init__(
-            self, database_socket_addresses,
-            time_scale_factor, min_delay, graph_label,
+            self, time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -52,7 +51,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
 
         # SpiNNaker setup
         super(SpiNNaker, self).__init__(
-            database_socket_addresses=database_socket_addresses,
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
             min_delay=min_delay,

@@ -49,17 +49,6 @@ class SpynnakerExternalDevicePluginManager(object):
             simulation should start.
         :type database_ack_port_num: int or None
         """
-        if database_notify_port_num is None:
-            database_notify_port_num = get_config_int(
-                "Database", "notify_port")
-        if database_notify_host is None:
-            database_notify_host = get_config_str(
-                "Database", "notify_hostname")
-        elif database_notify_host == "0.0.0.0":
-            database_notify_host = "localhost"
-        if database_ack_port_num is None:
-            database_ack_port_num = get_config_int("Database", "listen_port")
-
         # build the database socket address used by the notification interface
         database_socket = SocketAddress(
             listen_port=database_ack_port_num,
@@ -67,8 +56,7 @@ class SpynnakerExternalDevicePluginManager(object):
             notify_port_no=database_notify_port_num)
 
         # update socket interface with new demands.
-        SpynnakerExternalDevicePluginManager.add_socket_address(
-            database_socket)
+        SpynnakerDataView.add_socket_address(database_socket)
 
     @staticmethod
     def activate_live_output_for(

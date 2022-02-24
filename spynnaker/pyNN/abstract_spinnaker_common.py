@@ -61,14 +61,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         "_projections"]
 
     def __init__(
-            self, graph_label, database_socket_addresses, n_chips_required,
+            self, graph_label, n_chips_required,
             n_boards_required, timestep, min_delay,
             time_scale_factor=None):
         """
         :param str graph_label:
-        :param database_socket_addresses:
-        :type database_socket_addresses:
-            iterable(~spinn_utilities.socket_address.SocketAddress)
         :param n_chips_required:
         :type n_chips_required: int or None
         :param n_boards_required:
@@ -104,7 +101,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         super().__init__(
             graph_label=graph_label,
-            database_socket_addresses=database_socket_addresses,
             data_writer_cls=SpynnakerDataWriter)
 
         self._data_writer.set_n_required(n_boards_required, n_chips_required)

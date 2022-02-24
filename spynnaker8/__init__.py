@@ -35,6 +35,7 @@ from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException, SimulatorNotSetupException,
     SimulatorShutdownException)
 from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
@@ -327,11 +328,13 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     # create the main object for all stuff related software
     SpiNNaker(
-        database_socket_addresses=database_socket_addresses,
         time_scale_factor=time_scale_factor, timestep=timestep,
         min_delay=min_delay, graph_label=graph_label,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
+
+    SpynnakerDataView.add_database_socket_addresses(
+        database_socket_addresses)
 
     # warn about kwargs arguments
     if extra_params:
