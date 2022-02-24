@@ -15,7 +15,19 @@
 
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
+from spalloc.protocol_client import ProtocolClient
+from spalloc.job import Job
+from spalloc.states import JobState
+import pytest
+import tempfile
+import os
 
+def pytest_generate_tests(metafunc):
+    boards = [(x, y, p) 
+              for x in range(0, machine["width"])
+              for y in range(0, machine["height"])
+              for b in range(3)]
+    metafunc.parametrize(["x", "y", "b"], boards, ids=idlist, scope="class")
 
 class WholeBoardTest(BaseTestCase):
 
@@ -179,5 +191,17 @@ class WholeBoardTest(BaseTestCase):
         self.check_spikes()
         sim.end()
 
-    def test_run(self):
-        self.runsafe(self.do_run)
+    def test_run(self, x, y, b):
+        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk", owner="Jenkins Machine Test")
+        if job.state == JobState.queued:
+            job.destroy("Queued")
+            pytest.skip(f"Board {x}, {y}, {p} is in use")
+        with job:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                os.chdir(tmpdir)
+                with open("spynnaker.cfg", "w") as f:
+                    f.write("[Machine]\n")
+                    f.write("spalloc_server = None\n")
+                    f.write(f"machine_name = {job.hostname}\n")
+                    f.write("version = 5\n")
+                self.runsafe(self.do_run)
