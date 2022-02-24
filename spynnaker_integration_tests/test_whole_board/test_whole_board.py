@@ -193,7 +193,7 @@ class WholeBoardTest(BaseTestCase):
         sim.end()
 
     def test_run(self, x, y, b):
-        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk", 
+        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
                   owner="Jenkins Machine Test")
         if job.state == JobState.queued:
             job.destroy("Queued")
