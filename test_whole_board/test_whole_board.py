@@ -22,15 +22,7 @@ import tempfile
 import os
 
 
-def pytest_generate_tests(metafunc):
-    boards = [(x, y, b)
-              for x in range(0, 20)
-              for y in range(0, 20)
-              for b in range(3)]
-    metafunc.parametrize(["x", "y", "b"], boards, scope="class")
-
-
-class WholeBoardTest(BaseTestCase):
+class WholeBoardTest(object):
 
     up = [(0, 0), (0, 1), (0, 2), (0, 3),
           (1, 0), (1, 1), (1, 2), (1, 3), (1, 4),
@@ -192,18 +184,25 @@ class WholeBoardTest(BaseTestCase):
         self.check_spikes()
         sim.end()
 
-    def test_run(self, x, y, b):
-        job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
-                  owner="Jenkins Machine Test")
-        if job.state == JobState.queued:
-            job.destroy("Queued")
-            pytest.skip(f"Board {x}, {y}, {b} is in use")
-        with job:
-            with tempfile.TemporaryDirectory() as tmpdir:
-                os.chdir(tmpdir)
-                with open("spynnaker.cfg", "w") as f:
-                    f.write("[Machine]\n")
-                    f.write("spalloc_server = None\n")
-                    f.write(f"machine_name = {job.hostname}\n")
-                    f.write("version = 5\n")
-                self.runsafe(self.do_run)
+
+@pytest.mark.parametrize(
+    "x,y,b",
+    [(x, y, b) for x in range(20)
+     for y in range(20)
+     for b in range(3)])
+def test_run(x, y, b):
+    job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
+              owner="Jenkins Machine Test")
+    if job.state == JobState.queued:
+        job.destroy("Queued")
+        pytest.skip(f"Board {x}, {y}, {b} is in use")
+    with job:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            os.chdir(tmpdir)
+            with open("spynnaker.cfg", "w") as f:
+                f.write("[Machine]\n")
+                f.write("spalloc_server = None\n")
+                f.write(f"machine_name = {job.hostname}\n")
+                f.write("version = 5\n")
+            test = WholeBoardTest()
+            test.do_run()
