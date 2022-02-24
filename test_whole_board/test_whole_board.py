@@ -196,6 +196,8 @@ def test_run(x, y, b):
     if job.state == JobState.queued:
         job.destroy("Queued")
         pytest.skip(f"Board {x}, {y}, {b} is in use")
+    elif job.state == JobState.destroyed:
+        pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
     with job:
         with tempfile.TemporaryDirectory() as tmpdir:
             os.chdir(tmpdir)
