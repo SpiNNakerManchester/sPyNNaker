@@ -23,6 +23,9 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.report_functions.\
     routing_table_from_machine_report import _FOLDER_NAME as \
     routing_tables_from_machine_report
+from spinn_front_end_common.utilities.report_functions.\
+    memory_map_on_host_report import _FOLDER_NAME as \
+    memory_map_on_host_report
 # from spinn_front_end_common.utilities.report_functions.energy_report \
 #    import EnergyReport
 from spinn_front_end_common.utilities.report_functions.board_chip_report \
@@ -69,7 +72,7 @@ class CheckDebug(BaseTestCase):
             # write_routing_tables_from_machine_report
             routing_tables_from_machine_report,
             # write_memory_map_report
-            # ??? used by MachineExecuteDataSpecification but not called ???
+            memory_map_on_host_report,
             # write_network_specification_report
             network_specification_file_name,
             # write_provenance_data
