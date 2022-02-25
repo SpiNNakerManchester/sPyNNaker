@@ -20,7 +20,7 @@ from spynnaker.pyNN.models.utility_models.delays import (
 
 
 def spynnaker_data_specification_writer(
-        placements, hostname, machine, data_n_timesteps):
+        placements, hostname, machine, app_id, data_n_timesteps):
     """
     Executes data specification generation for sPyNNaker
 
@@ -50,4 +50,5 @@ def spynnaker_data_specification_writer(
     placement_order.extend(delay_extensions)
 
     return graph_data_specification_writer(
-        placements, hostname, machine, data_n_timesteps, placement_order)
+        placements, hostname, machine, app_id, data_n_timesteps,
+        placement_order)
