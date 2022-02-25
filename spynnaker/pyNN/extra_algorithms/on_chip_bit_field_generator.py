@@ -161,7 +161,7 @@ class _OnChipBitFieldGenerator(object):
         # get data
         expander_cores, max_bit_data_size = self._calculate_core_data(
             app_graph, progress)
-        
+
         # Allow 1s per 8000 bits (=1000 bytes), minimum of 2 seconds
         timeout = max(2.0, max_bit_data_size / 1000.0)
 

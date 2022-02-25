@@ -152,7 +152,7 @@ class SynapticMatrixApp(object):
         self.__received_block = None
         self.__delay_received_block = None
         self.__gen_n_rows = 0
-        
+
     @property
     def gen_size(self):
         max_row_length = max(
@@ -471,7 +471,7 @@ class SynapticMatrixApp(object):
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
             self.__gen_n_rows += (
-                m_edge.pre_vertex.vertex_slice.n_atoms * 
+                m_edge.pre_vertex.vertex_slice.n_atoms *
                 (self.__app_edge.n_delay_stages + 1))
             block_addr, syn_mat_offset = matrix.next_on_chip_address(
                 block_addr)

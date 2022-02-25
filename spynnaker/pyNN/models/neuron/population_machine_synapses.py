@@ -300,7 +300,7 @@ class PopulationMachineSynapses(
         """ Flush the cache of connection information; needed for a second run
         """
         self._synaptic_matrices.clear_connection_cache()
-    
+
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
     def max_gen_data(self):

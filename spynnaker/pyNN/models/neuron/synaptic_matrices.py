@@ -146,11 +146,11 @@ class SynapticMatrices(object):
         # Determine whether to generate on machine
         self.__gen_on_machine = False
         self.__max_gen_data = 0
-        
+
     @property
     def max_gen_data(self):
         """  The maximum amount of data to be generated for the synapses.
-        
+
         :rtype: int
         """
         return self.__max_gen_data

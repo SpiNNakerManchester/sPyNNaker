@@ -53,7 +53,7 @@ def synapse_expander(
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices, max_data = _plan_expansion(
         placements, synapse_bin, delay_bin, transceiver)
-    
+
     # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
     timeout = max(2.0, max_data / 1000.0)
 
@@ -84,7 +84,7 @@ def _plan_expansion(
     """
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
-    
+
     max_data = 0
 
     progress = ProgressBar(len(placements), "Preparing to Expand Synapses")
