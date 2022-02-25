@@ -34,7 +34,7 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         # The number of population table hits on INVALID entries
         ("n_invalid_pop_table_hits", ctypes.c_uint32),
         # The number of spikes that didn't transfer empty rows
-        ("n_filtered_by_bitfield", ctypes.c_uint32),
+        ("n_filtered_by_bitfield", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
