@@ -18,7 +18,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spinn_utilities.overrides import overrides
 
 _population_parameters = {
-    "seed": None,  "max_rate": 1000, "splitter": None}
+    "seed": None,  "max_rate": None, "splitter": None}
 
 # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
 # in terms of CPU (2900 at 10 times slow down is fine, but not at
