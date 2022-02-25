@@ -444,7 +444,7 @@ class Projection(object):
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
-        graph_edges = SpynnakerDataView.get_graph().\
+        graph_edges = SpynnakerDataView.\
             get_edges_ending_at_vertex(post_synaptic_vertex)
 
         # Search the edges for any that start at the presynaptic vertex
