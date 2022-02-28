@@ -186,7 +186,7 @@ class Projection(object):
             self.__projection_edge = ProjectionApplicationEdge(
                 pre_vertex, post_vertex, self.__synapse_information,
                 label=label)
-            sim.add_application_edge(
+            SpynnakerDataView.add_edge(
                 self.__projection_edge, SPIKE_PARTITION_ID)
 
         # add projection to the SpiNNaker control system

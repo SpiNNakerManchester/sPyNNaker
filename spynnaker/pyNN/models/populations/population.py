@@ -122,7 +122,7 @@ class Population(PopulationBase):
         # add objects to the SpiNNaker control class
         sim = get_simulator()
         sim.add_population(self)
-        sim.add_application_vertex(self.__vertex)
+        SpynnakerDataView.add_vertex(self.__vertex)
 
         # initialise common stuff
         if size is None:

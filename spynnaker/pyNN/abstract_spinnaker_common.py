@@ -172,13 +172,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         return changed, data_changed
 
-    def add_application_vertex(self, vertex):
-        if isinstance(vertex, CommandSender):
-            raise NotImplementedError(
-                "Please contact spinnker team as adding a CommandSender "
-                "currently disabled")
-        super().add_application_vertex(vertex)
-
     @staticmethod
     def _count_unique_keys(commands):
         unique_keys = {command.key for command in commands}

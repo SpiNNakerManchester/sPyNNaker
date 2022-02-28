@@ -277,10 +277,9 @@ class SpynnakerExternalDevicePluginManager(object):
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets
         """
-        _spinnaker = get_simulator()
         edge = ApplicationEdge(vertex, device_vertex)
-        _spinnaker.add_application_edge(edge, partition_id)
+        SpynnakerDataView.add_edge(edge, partition_id)
 
     @staticmethod
     def add_application_vertex(vertex):
-        get_simulator().add_application_vertex(vertex)
+        SpynnakerDataView.add_vertex(vertex)
