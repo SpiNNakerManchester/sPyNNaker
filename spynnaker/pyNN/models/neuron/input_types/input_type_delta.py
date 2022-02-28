@@ -16,6 +16,9 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
+from spynnaker.pyNN.utilities.struct import Struct
+
+SCALE = "scale_factor"
 
 
 class InputTypeDelta(AbstractInputType):
@@ -26,8 +29,10 @@ class InputTypeDelta(AbstractInputType):
     def __init__(self):
         """
         """
-        super().__init__([
-            DataType.S1615])  # scale_factor, calculated from timestep
+        super().__init__(
+            # scale_factor, calculated from timestep
+            [Struct([(DataType.S1615, SCALE)])],
+            {SCALE: ""})
 
     @overrides(AbstractInputType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -41,15 +46,8 @@ class InputTypeDelta(AbstractInputType):
     def add_state_variables(self, state_variables):
         pass
 
-    @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # pylint: disable=arguments-differ
-        scale_factor = 1000.0 / float(ts)
-        return [scale_factor]
-
-    @overrides(AbstractInputType.update_values)
-    def update_values(self, values, parameters, state_variables):
-        pass
+    def get_precomputed_values(self, parameters, state_variables, ts):
+        return {SCALE: [1000.0 / float(ts)]}
 
     @overrides(AbstractInputType.get_units)
     def get_units(self, variable):

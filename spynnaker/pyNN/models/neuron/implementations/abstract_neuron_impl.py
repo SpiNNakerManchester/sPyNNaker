@@ -37,27 +37,18 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         :rtype str
         """
 
+    @abstractproperty
+    def structs(self):
+        """ A list of structs used by the implementation
+
+        :rtype: list(Struct)
+        """
+
     @abstractmethod
     def get_n_cpu_cycles(self, n_neurons):
         """ Get the number of CPU cycles required to update the state
 
         :param int n_neurons: The number of neurons to get the cycles for
-        :rtype: int
-        """
-
-    @abstractmethod
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        """ Get the DTCM memory usage required
-
-        :param int n_neurons: The number of neurons to get the usage for
-        :rtype: int
-        """
-
-    @abstractmethod
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        """ Get the SDRAM memory usage required
-
-        :param int n_neurons: The number of neurons to get the usage for
         :rtype: int
         """
 
@@ -146,36 +137,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_data(self, parameters, state_variables, vertex_slice):
-        """ Get the data *to be written to the machine* for this model
-
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            The holder of the parameters
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            The holder of the state variables
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to generate parameters for
-        :rtype: ~numpy.ndarray(~numpy.uint32)
-        """
-
-    @abstractmethod
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
-        """ Read the parameters and state variables of the model\
-            *from the given data* (read from the machine)
-
-        :param data: The data to be read
-        :type data: bytearray or bytes or memoryview
-        :param int offset: The offset where the data should be read from
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to read parameters for
-        :param ~spinn_utilities.ranged.RangeDictionary parameters:
-            The holder of the parameters to update
-        :param ~spinn_utilities.ranged.RangeDictionary state_variables:
-            The holder of the state variables to update
-        """
-
-    @abstractmethod
     def get_units(self, variable):
         """ Get the units of the given variable
 
@@ -188,3 +149,25 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
+
+    def get_precomputed_values(self, parameters, state_variables):
+        """ Get a dict of additional values calculated from the parameters
+            and state variables, where the key is the name of the field in
+            a struct.
+
+            The values of the dict are each an AbstractList instance.  Each of
+            the items in parameters and state_variables are also AbstractList
+            instances; calculations can be performed by calling apply_operation
+            on any of the items e.g.:
+                parameters[PARAM].apply_operation(lambda x: numpy.exp(-x))
+            Normal operations between parameters are also supported e.g.:
+                parameters[PARAM_1] / parameters[PARAM_2]
+
+            By default this returns an empty dict so must be overridden to
+            provide additional values.
+
+        :param RangeDictionary parameters: parameter values
+        :param RangeDictionary state_variables: state variable values
+        :rtype: dict(str, AbstractList)
+        """
+        return {}

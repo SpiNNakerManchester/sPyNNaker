@@ -21,6 +21,7 @@ from scipy import special  # @UnresolvedImport
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.ranged import RangeDictionary
 from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -53,14 +54,13 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
     HasSynapses)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary)
 from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
+from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -72,6 +72,11 @@ logger = FormatAdapter(logging.getLogger(__name__))
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
+
+_NEURON_GENERATOR_BASE_SDRAM = 12 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_STRUCT = 4 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_PARAM = 2 * BYTES_PER_WORD
+_NEURON_GENERATOR_PER_ITEM = (2 * BYTES_PER_WORD) + MAX_PARAMS_BYTES
 
 # 1 for number of neurons
 # 1 for number of synapse types
@@ -137,7 +142,7 @@ class AbstractPopulationVertex(
 
     # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms, 4. n_atoms_peak 5. n_synapse_types
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
+    CORE_PARAMS_BASE_SIZE = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -198,9 +203,9 @@ class AbstractPopulationVertex(
 
         self.__neuron_impl = neuron_impl
         self.__pynn_model = pynn_model
-        self._parameters = SpynnakerRangeDictionary(n_neurons)
+        self._parameters = RangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
-        self.__initial_state_variables = SpynnakerRangeDictionary(n_neurons)
+        self.__initial_state_variables = RangeDictionary(n_neurons)
         self.__neuron_impl.add_state_variables(self.__initial_state_variables)
         self._state_variables = self.__initial_state_variables.copy()
 
@@ -392,18 +397,43 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
+    def get_sdram_usage_for_core_neuron_params(self):
+        return (
+            self.CORE_PARAMS_BASE_SIZE +
+            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
+            self.tdma_sdram_size_in_bytes)
+
     def get_sdram_usage_for_neuron_params(self, n_atoms):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms.
+        :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron region
         """
-        return (
-            self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
-            self.tdma_sdram_size_in_bytes +
-            self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
+        return sum(s.get_size_in_whole_words(n_atoms)
+                   for s in self.__neuron_impl.structs) * BYTES_PER_WORD
+
+    def get_sdram_usage_for_neuron_generation(self, n_atoms):
+        """ Calculate the SDRAM usage for the neuron generation region.
+
+        :param int n_atoms: The number of atoms per core
+        :return: The SDRAM required for the neuron generator region
+        """
+        # Uses nothing if not generatable
+        structs = self.__neuron_impl.structs
+        for struct in structs:
+            if not struct.is_generatable:
+                return 0
+
+        # If structs are generatable, we can guess that parameters are,
+        # and then assume each parameters is different for maximum SDRAM.
+        n_structs = len(structs)
+        n_params = sum(len(s.fields) for s in structs)
+        return sum([
+            _NEURON_GENERATOR_BASE_SDRAM,
+            _NEURON_GENERATOR_PER_STRUCT * n_structs,
+            _NEURON_GENERATOR_PER_PARAM * n_params,
+            _NEURON_GENERATOR_PER_ITEM * n_params * n_atoms
+        ])
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -1236,12 +1266,18 @@ class AbstractPopulationVertex(
         """
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
+            neuron_regions.core_params,
+            self.get_sdram_usage_for_core_neuron_params())
+        sdram.add_cost(
             neuron_regions.neuron_params,
             self.get_sdram_usage_for_neuron_params(n_atoms))
         sdram.add_cost(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
                 n_atoms))
+        sdram.add_cost(
+            neuron_regions.neuron_builder,
+            self.get_sdram_usage_for_neuron_generation(n_atoms))
         return sdram
 
     def get_common_dtcm(self):
@@ -1261,7 +1297,8 @@ class AbstractPopulationVertex(
         :rtype: int
         """
         return (
-            self.__neuron_impl.get_dtcm_usage_in_bytes(n_atoms) +
+            self.get_sdram_usage_for_core_neuron_params() +
+            self.get_sdram_usage_for_neuron_params(n_atoms) +
             self.__neuron_recorder.get_dtcm_usage_in_bytes(n_atoms)
         )
 

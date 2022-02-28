@@ -52,10 +52,10 @@ static uint32_t n_synapse_types;
 static uint32_t *ring_buffer_to_input_left_shifts;
 
 //! The address where the actual neuron parameters start
-static address_t saved_params_address;
+static void *saved_neuron_params_address;
 
 //! parameters that reside in the neuron_parameter_data_region
-struct neuron_parameters {
+struct neuron_core_parameters {
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
@@ -72,7 +72,7 @@ static bool neuron_load_neuron_parameters(void) {
     // Note the "next" is 0 here because we are using a saved address
     // which has already accounted for the position of the data within
     // the region being read.
-    neuron_impl_load_neuron_parameters(saved_params_address, 0, n_neurons);
+    neuron_impl_load_neuron_parameters(saved_neuron_params_address, 0, n_neurons);
     return true;
 }
 
@@ -87,16 +87,16 @@ bool neuron_resume(void) { // EXPORTED
 }
 
 bool neuron_initialise(
-        address_t address, address_t recording_address, // EXPORTED
-        uint32_t *n_rec_regions_used) {
+        void *core_params_address, void *neuron_params_address,
+        void *recording_address, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
-    void *data_addr = address;
+    void *data_addr = core_params_address;
     tdma_processing_initialise(&data_addr);
 
     // cast left over SDRAM into neuron struct.
-    struct neuron_parameters *params = data_addr;
+    struct neuron_core_parameters *params = data_addr;
 
     // Check if there is a key to use
     use_key = params->has_key;
@@ -130,7 +130,7 @@ bool neuron_initialise(
             ring_buffer_bytes);
 
     // Store where the actual neuron parameters start
-    saved_params_address = &params->ring_buffer_shifts[n_synapse_types];
+    saved_neuron_params_address = neuron_params_address;
 
     log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
             n_neurons, n_neurons_peak, n_synapse_types);
@@ -157,7 +157,7 @@ bool neuron_initialise(
 void neuron_pause(void) { // EXPORTED
 
     // call neuron implementation function to do the work
-    neuron_impl_store_neuron_parameters(saved_params_address, 0, n_neurons);
+    neuron_impl_store_neuron_parameters(saved_neuron_params_address, 0, n_neurons);
 }
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED

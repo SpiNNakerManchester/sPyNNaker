@@ -74,6 +74,7 @@ class PopulationMachineVertex(
     __slots__ = [
         "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices",
+        "__neuron_data",
         "__key",
         "__ring_buffer_shifts",
         "__weight_scales",
@@ -93,18 +94,20 @@ class PopulationMachineVertex(
     class REGIONS(Enum):
         """Regions for populations."""
         SYSTEM = 0
-        NEURON_PARAMS = 1
-        SYNAPSE_PARAMS = 2
-        POPULATION_TABLE = 3
-        SYNAPTIC_MATRIX = 4
-        SYNAPSE_DYNAMICS = 5
-        STRUCTURAL_DYNAMICS = 6
-        NEURON_RECORDING = 7
-        PROVENANCE_DATA = 8
-        PROFILING = 9
-        CONNECTOR_BUILDER = 10
-        BIT_FIELD_FILTER = 11
-        RECORDING = 12
+        CORE_PARAMS = 1
+        NEURON_PARAMS = 2
+        SYNAPSE_PARAMS = 3
+        POPULATION_TABLE = 4
+        SYNAPTIC_MATRIX = 5
+        SYNAPSE_DYNAMICS = 6
+        STRUCTURAL_DYNAMICS = 7
+        NEURON_RECORDING = 8
+        PROVENANCE_DATA = 9
+        PROFILING = 10
+        CONNECTOR_BUILDER = 11
+        NEURON_BUILDER = 12
+        BIT_FIELD_FILTER = 13
+        RECORDING = 14
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -115,8 +118,10 @@ class PopulationMachineVertex(
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
+        core_params=REGIONS.CORE_PARAMS.value,
         neuron_params=REGIONS.NEURON_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value
+        neuron_recording=REGIONS.NEURON_RECORDING.value,
+        neuron_builder=REGIONS.NEURON_BUILDER.value
     )
 
     # Regions for this vertex used by synapse parts
@@ -140,7 +145,7 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices):
+            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -160,6 +165,7 @@ class PopulationMachineVertex(
         :param int structural_sz: The size of the structural data
         :param int n_neuron_bits: The number of bits to use for neuron ids
         :param SynapticMatrices synaptic_matrices: The synaptic matrices
+        :param NeuronData neuron_data: The handler of neuron data
         """
         super(PopulationMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -175,6 +181,7 @@ class PopulationMachineVertex(
         self.__structural_sz = structural_sz
         self.__max_atoms_per_core = max_atoms_per_core
         self.__synaptic_matrices = synaptic_matrices
+        self.__neuron_data = neuron_data
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -194,6 +201,11 @@ class PopulationMachineVertex(
     @overrides(PopulationMachineNeurons._neuron_regions)
     def _neuron_regions(self):
         return self.NEURON_REGIONS
+
+    @property
+    @overrides(PopulationMachineNeurons._neuron_data)
+    def _neuron_data(self):
+        return self.__neuron_data
 
     @property
     @overrides(PopulationMachineSynapses._synapse_regions)

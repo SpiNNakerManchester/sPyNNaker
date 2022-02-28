@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from math import isnan
 
 """
 utility class containing simple helper methods
@@ -21,6 +20,7 @@ import logging
 import os
 import math
 import numpy
+from math import isnan
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter

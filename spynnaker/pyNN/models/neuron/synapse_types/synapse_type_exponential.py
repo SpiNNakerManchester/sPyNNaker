@@ -17,18 +17,16 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
+from spynnaker.pyNN.utilities.struct import Struct
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_I = 'tau_syn_I'
 ISYN_EXC = "isyn_exc"
 ISYN_INH = "isyn_inh"
-
-UNITS = {
-    TAU_SYN_E: "mV",
-    TAU_SYN_I: 'mV',
-    ISYN_EXC: "",
-    ISYN_INH: "",
-}
+DECAY_E = "decay_E"
+DECAY_I = "decay_I"
+INIT_E = "init_E"
+INIT_I = "init_I"
 
 
 class SynapseTypeExponential(AbstractSynapseType):
@@ -57,13 +55,15 @@ class SynapseTypeExponential(AbstractSynapseType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.U032,    # decay_E
-            DataType.U032,    # init_E
-            DataType.S1615,   # isyn_exc
-            DataType.U032,    # decay_I
-            DataType.U032,    # init_I
-            DataType.S1615])  # isyn_inh
+        super().__init__(
+            [Struct([
+                (DataType.U032, DECAY_E),
+                (DataType.U032, INIT_E),
+                (DataType.S1615, ISYN_EXC),
+                (DataType.U032, DECAY_I),
+                (DataType.U032, INIT_I),
+                (DataType.S1615, ISYN_INH)])],
+            {TAU_SYN_E: "mV", TAU_SYN_I: 'mV', ISYN_EXC: "", ISYN_INH: ""})
         self.__tau_syn_E = tau_syn_E
         self.__tau_syn_I = tau_syn_I
         self.__isyn_exc = isyn_exc
@@ -83,41 +83,18 @@ class SynapseTypeExponential(AbstractSynapseType):
         state_variables[ISYN_EXC] = self.__isyn_exc
         state_variables[ISYN_INH] = self.__isyn_inh
 
-    @overrides(AbstractSynapseType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractSynapseType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractSynapseType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        """
-        :param int ts: machine time step
-        """
-        # pylint: disable=arguments-differ
-
+    @overrides(AbstractSynapseType.get_precomputed_values)
+    def get_precomputed_values(self, parameters, state_variables, ts):
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
         init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
 
-        # Add the rest of the data
-        return [parameters[TAU_SYN_E].apply_operation(decay),
-                parameters[TAU_SYN_E].apply_operation(init),
-                state_variables[ISYN_EXC],
-                parameters[TAU_SYN_I].apply_operation(decay),
-                parameters[TAU_SYN_I].apply_operation(init),
-                state_variables[ISYN_INH]]
-
-    @overrides(AbstractSynapseType.update_values)
-    def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_decay_E, _init_E, isyn_exc, _decay_I, _init_I, isyn_inh) = values
-
-        state_variables[ISYN_EXC] = isyn_exc
-        state_variables[ISYN_INH] = isyn_inh
+        return {
+            DECAY_E: parameters[TAU_SYN_E].apply_operation(decay),
+            DECAY_I: parameters[TAU_SYN_I].apply_operation(decay),
+            INIT_E: parameters[TAU_SYN_E].apply_operation(init),
+            INIT_I: parameters[TAU_SYN_I].apply_operation(init)
+        }
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

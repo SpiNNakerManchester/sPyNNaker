@@ -36,6 +36,8 @@ struct neuron_provenance {
 
 //! The region IDs used by the neuron processing
 struct neuron_regions {
+    //! The core parameters
+    uint32_t core_params;
     //! The neuron parameters
     uint32_t neuron_params;
     //! The neuron recording details
@@ -71,6 +73,7 @@ static inline bool initialise_neuron_regions(
 
     // Set up the neurons
     if (!neuron_initialise(
+            data_specification_get_region(regions.core_params, ds_regions),
             data_specification_get_region(regions.neuron_params, ds_regions),
             data_specification_get_region(regions.neuron_recording, ds_regions),
             n_rec_regions_used)) {

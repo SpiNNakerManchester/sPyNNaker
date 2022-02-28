@@ -15,6 +15,7 @@
 
 from spinn_utilities.overrides import overrides
 from .abstract_input_type import AbstractInputType
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 class InputTypeCurrent(AbstractInputType):
@@ -25,7 +26,7 @@ class InputTypeCurrent(AbstractInputType):
     def __init__(self):
         """
         """
-        super().__init__([])
+        super().__init__([Struct([])], {})
 
     @overrides(AbstractInputType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -37,14 +38,6 @@ class InputTypeCurrent(AbstractInputType):
 
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):
-        pass
-
-    @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        return []
-
-    @overrides(AbstractInputType.update_values)
-    def update_values(self, values, parameters, state_variables):
         pass
 
     @overrides(AbstractInputType.get_units)

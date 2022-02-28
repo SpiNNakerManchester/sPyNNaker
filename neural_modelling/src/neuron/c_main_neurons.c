@@ -48,6 +48,7 @@ typedef enum callback_priorities {
 //! Overall regions to be used by the neuron core
 enum regions {
     SYSTEM_REGION,
+    CORE_PARAMS_REGION,
     PROVENANCE_DATA_REGION,
     PROFILER_REGION,
     RECORDING_REGION,
@@ -75,6 +76,7 @@ const struct common_priorities COMMON_PRIORITIES = {
  * From the regions, select those that are used for neuron-specific things
  */
 const struct neuron_regions NEURON_REGIONS = {
+    .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
 };

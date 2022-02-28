@@ -16,14 +16,10 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
+from spynnaker.pyNN.utilities.struct import Struct
 
 MULTIPLICATOR = "multiplicator"
 INH_INPUT_PREVIOUS = "inh_input_previous"
-
-UNITS = {
-    MULTIPLICATOR: "0",
-    INH_INPUT_PREVIOUS: "mV"
-}
 
 
 class InputTypeCurrentSEMD(AbstractInputType):
@@ -44,9 +40,10 @@ class InputTypeCurrentSEMD(AbstractInputType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.S1615,   # multiplicator
-            DataType.S1615])  # inh_input_previous
+        super().__init__(
+            [Struct([(DataType.S1615, MULTIPLICATOR),
+                     (DataType.S1615, INH_INPUT_PREVIOUS)])],
+            {MULTIPLICATOR: "0", INH_INPUT_PREVIOUS: "mV"})
         self.__multiplicator = multiplicator
         self.__inh_input_previous = inh_input_previous
 
@@ -62,28 +59,6 @@ class InputTypeCurrentSEMD(AbstractInputType):
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[INH_INPUT_PREVIOUS] = self.__inh_input_previous
-
-    @overrides(AbstractInputType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractInputType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-
-        # Add the rest of the data
-        return [parameters[MULTIPLICATOR], state_variables[INH_INPUT_PREVIOUS]]
-
-    @overrides(AbstractInputType.update_values)
-    def update_values(self, values, parameters, state_variables):
-
-        # Read the data
-        (_multiplicator, inh_input_previous) = values
-
-        state_variables[INH_INPUT_PREVIOUS] = inh_input_previous
 
     @property
     def multiplicator(self):

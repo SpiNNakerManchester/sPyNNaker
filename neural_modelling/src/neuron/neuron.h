@@ -38,15 +38,17 @@
 
 //! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
 //!        and convert it into c based objects for use.
-//! \param[in] address: the absolute address in SDRAM for the start of the
-//!            NEURON_PARAMS data region in SDRAM
+//! \param[in] core_params_address: the absolute address in SDRAM for the start
+//!            of the core parameters data region in SDRAM
+//! \param[in] neuron_params_address: The absolute address in SDRAM for the
+//!            start of the neuron parameters data region in SDRAM
 //! \param[in] recording_address: the recording parameters in SDRAM
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_rec_regions_used: The number of regions used by neuron recording
 //! \return True if the translation was successful, otherwise False
 bool neuron_initialise(
-        address_t address, address_t recording_address,
-        uint32_t *n_rec_regions_used);
+        void *core_params_address, void *neuron_params_address,
+        void *recording_address, uint32_t *n_rec_regions_used);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

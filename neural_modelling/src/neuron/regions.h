@@ -25,16 +25,18 @@
 //! DSG region identifiers
 typedef enum neuron_regions_e {
     SYSTEM_REGION,              //!< simulation system; 0
-    NEURON_PARAMS_REGION,       //!< neuron parameters; 1
-    SYNAPSE_PARAMS_REGION,      //!< synapse parameters; 2
-    POPULATION_TABLE_REGION,    //!< master population table; 3
-    SYNAPTIC_MATRIX_REGION,     //!< synaptic matrix; 4
-    SYNAPSE_DYNAMICS_REGION,    //!< synapse dynamics; 5
-    STRUCTURAL_DYNAMICS_REGION, //!< structural dynamics; 6
-    NEURON_RECORDING_REGION,    //!< recording; 7
-    PROVENANCE_DATA_REGION,     //!< provenance; 8
-    PROFILER_REGION,            //!< profiling; 9
-    CONNECTOR_BUILDER_REGION,   //!< connection building; 10
-    BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 11
-    RECORDING_REGION            //!< general recording data; 12
+    CORE_PARAMS_REGION,         //!< core parameters; 1
+    NEURON_PARAMS_REGION,       //!< neuron parameters; 2
+    SYNAPSE_PARAMS_REGION,      //!< synapse parameters; 3
+    POPULATION_TABLE_REGION,    //!< master population table; 4
+    SYNAPTIC_MATRIX_REGION,     //!< synaptic matrix; 5
+    SYNAPSE_DYNAMICS_REGION,    //!< synapse dynamics; 6
+    STRUCTURAL_DYNAMICS_REGION, //!< structural dynamics; 7
+    NEURON_RECORDING_REGION,    //!< recording; 8
+    PROVENANCE_DATA_REGION,     //!< provenance; 9
+    PROFILER_REGION,            //!< profiling; 10
+    CONNECTOR_BUILDER_REGION,   //!< connection building; 11
+    NEURON_BUILDER_REGION,      //!< neuron building; 12
+    BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 13
+    RECORDING_REGION            //!< general recording data; 14
 } regions_e;

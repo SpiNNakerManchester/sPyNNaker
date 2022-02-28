@@ -29,6 +29,8 @@ from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .receives_synaptic_inputs_over_sdram import (
     ReceivesSynapticInputsOverSDRAM)
 from .has_synapses import HasSynapses
+from .abstract_neuron_expandable import (
+    AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
@@ -37,4 +39,4 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractSettable", "AbstractSynapseExpandable",
            "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
            "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
-           "HasSynapses"]
+           "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX"]

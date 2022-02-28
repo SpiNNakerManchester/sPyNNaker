@@ -13,13 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_synapse_type import AbstractSynapseType
-from .synapse_type_dual_exponential import SynapseTypeDualExponential
-from .synapse_type_exponential import SynapseTypeExponential
-from .synapse_type_delta import SynapseTypeDelta
-from .synapse_type_alpha import SynapseTypeAlpha
-from .synapse_type_semd import SynapseTypeSEMD
+APP = synapse_expander
+BUILD_DIR = build/
+SOURCES = synapse_expander/rng.c \
+          synapse_expander/common_kernel.c \
+          synapse_expander/param_generator.c \
+          synapse_expander/connection_generator.c \
+          synapse_expander/matrix_generator.c \
+          synapse_expander/synapse_expander.c \
+          neuron/population_table/population_table_binary_search_impl.c
 
-__all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeSEMD"]
+include ../neural_support.mk

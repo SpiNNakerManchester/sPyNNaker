@@ -16,16 +16,14 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
+from spynnaker.pyNN.utilities.struct import Struct
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
 V_THRESH = "v_thresh"
-
-UNITS = {
-    DU_TH: "mV",
-    TAU_TH: "ms",
-    V_THRESH: "mV"
-}
+INV_DU_TH = "inv_du_th"
+INV_TAU_TH = "inv_tau_th"
+TENTH_TS_MS = "tenth_ts_ms"
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
@@ -54,11 +52,13 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.S1615,   # 1 / du_th
-            DataType.S1615,   # 1 / tau_th
-            DataType.S1615,   # v_thresh
-            DataType.S1615])  # ts / 10
+        super().__init__(
+            [Struct([
+                (DataType.S1615, INV_DU_TH),
+                (DataType.S1615, INV_TAU_TH),
+                (DataType.S1615, V_THRESH),
+                (DataType.S1615, TENTH_TS_MS)])],
+            {DU_TH: "mV", TAU_TH: "ms", V_THRESH: "mV"})
         self.__du_th = du_th
         self.__tau_th = tau_th
         self.__v_thresh = v_thresh
@@ -77,26 +77,13 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def add_state_variables(self, state_variables):
         pass
 
-    @overrides(AbstractThresholdType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractThresholdType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # pylint: disable=arguments-differ
-
-        # Add the rest of the data
-        return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
-                parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
-                parameters[V_THRESH], float(ts) / -10000.0]
-
-    @overrides(AbstractThresholdType.update_values)
-    def update_values(self, values, parameters, state_variables):
-        pass
+    @overrides(AbstractThresholdType.get_precomputed_values)
+    def get_precomputed_values(self, parameters, state_variables, ts):
+        return {
+            INV_DU_TH: parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
+            INV_TAU_TH: parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
+            TENTH_TS_MS: [float(ts) / -10000.0]
+        }
 
     @property
     def v_thresh(self):

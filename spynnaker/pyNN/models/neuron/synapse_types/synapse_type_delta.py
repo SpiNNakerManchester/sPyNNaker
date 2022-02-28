@@ -16,14 +16,10 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
+from spynnaker.pyNN.utilities.struct import Struct
 
 ISYN_EXC = "isyn_exc"
 ISYN_INH = "isyn_inh"
-
-UNITS = {
-    ISYN_EXC: "",
-    ISYN_EXC: ""
-}
 
 
 class SynapseTypeDelta(AbstractSynapseType):
@@ -44,9 +40,11 @@ class SynapseTypeDelta(AbstractSynapseType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.S1615,   # isyn_exc
-            DataType.S1615])  # isyn_inh
+        super().__init__(
+            [Struct([
+                (DataType.S1615, ),  # isyn_exc
+                (DataType.S1615, )])],  # isyn_inh
+            {ISYN_EXC: "", ISYN_EXC: ""})
         self.__isyn_exc = isyn_exc
         self.__isyn_inh = isyn_inh
 
@@ -62,27 +60,6 @@ class SynapseTypeDelta(AbstractSynapseType):
     def add_state_variables(self, state_variables):
         state_variables[ISYN_EXC] = self.__isyn_exc
         state_variables[ISYN_INH] = self.__isyn_inh
-
-    @overrides(AbstractSynapseType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractSynapseType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractSynapseType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # Add the rest of the data
-        return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]
-
-    @overrides(AbstractSynapseType.update_values)
-    def update_values(self, values, parameters, state_variables):
-        # Read the data
-        (isyn_exc, isyn_inh) = values
-
-        state_variables[ISYN_EXC] = isyn_exc
-        state_variables[ISYN_INH] = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

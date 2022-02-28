@@ -63,17 +63,20 @@ class PopulationNeuronsMachineVertex(
         "__sdram_partition",
         "__ring_buffer_shifts",
         "__weight_scales",
-        "__slice_index"]
+        "__slice_index",
+        "__neuron_data"]
 
     class REGIONS(Enum):
         """Regions for populations."""
         SYSTEM = 0
-        PROVENANCE_DATA = 1
-        PROFILING = 2
-        RECORDING = 3
-        NEURON_PARAMS = 4
-        NEURON_RECORDING = 5
-        SDRAM_EDGE_PARAMS = 6
+        CORE_PARAMS = 1
+        PROVENANCE_DATA = 2
+        PROFILING = 3
+        RECORDING = 4
+        NEURON_PARAMS = 5
+        NEURON_RECORDING = 6
+        SDRAM_EDGE_PARAMS = 7
+        NEURON_BUILDER = 8
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -84,8 +87,10 @@ class PopulationNeuronsMachineVertex(
 
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
+        core_params=REGIONS.CORE_PARAMS.value,
         neuron_params=REGIONS.NEURON_PARAMS.value,
-        neuron_recording=REGIONS.NEURON_RECORDING.value
+        neuron_recording=REGIONS.NEURON_RECORDING.value,
+        neuron_builder=REGIONS.NEURON_BUILDER.value
     )
 
     _PROFILE_TAG_LABELS = {
@@ -93,7 +98,8 @@ class PopulationNeuronsMachineVertex(
 
     def __init__(
             self, resources_required, label, constraints, app_vertex,
-            vertex_slice, slice_index, ring_buffer_shifts, weight_scales):
+            vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
+            neuron_data):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -110,6 +116,8 @@ class PopulationNeuronsMachineVertex(
             The shifts to apply to convert ring buffer values to S1615 values
         :param list(int) weight_scales:
             The scaling to apply to weights to store them in the synapses
+        :param NeuronData neuron_data:
+            The handler of neuron data
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -122,6 +130,7 @@ class PopulationNeuronsMachineVertex(
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
+        self.__neuron_data = neuron_data
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -141,6 +150,11 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineNeurons._neuron_regions)
     def _neuron_regions(self):
         return self.NEURON_REGIONS
+
+    @property
+    @overrides(PopulationMachineNeurons._neuron_data)
+    def _neuron_data(self):
+        return self.__neuron_data
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance

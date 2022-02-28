@@ -19,11 +19,11 @@ from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -46,11 +46,12 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
 # Identifiers for neuron regions
 NeuronRegions = namedtuple(
     "NeuronRegions",
-    ["neuron_params", "neuron_recording"])
+    ["core_params", "neuron_params", "neuron_recording", "neuron_builder"])
 
 
 class PopulationMachineNeurons(
-        AbstractReadParametersBeforeSet, allow_derivation=True):
+        AbstractReadParametersBeforeSet, AbstractNeuronExpandable,
+        allow_derivation=True):
     """ Mix-in for machine vertices that have neurons in them
     """
 
@@ -105,6 +106,13 @@ class PopulationMachineNeurons(
         :rtype: .NeuronRegions
         """
 
+    @abstractproperty
+    def _neuron_data(self):
+        """ The neuron data handler
+
+        :rtype: NeuronData
+        """
+
     def _parse_neuron_provenance(
             self, label, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
@@ -143,8 +151,8 @@ class PopulationMachineNeurons(
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
-        # Write the neuron parameters
-        self._write_neuron_parameters(spec, ring_buffer_shifts)
+        # Write the neuron core parameters
+        self._write_neuron_core_parameters(spec, ring_buffer_shifts)
 
         # Write the neuron recording region
         neuron_recorder = self._app_vertex.neuron_recorder
@@ -156,7 +164,9 @@ class PopulationMachineNeurons(
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
 
-    def _write_neuron_parameters(self, spec, ring_buffer_shifts):
+        self._neuron_data.write_data(spec, self._vertex_slice)
+
+    def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):
         """ Write the neuron parameters region
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -172,12 +182,11 @@ class PopulationMachineNeurons(
             n_atoms))
 
         # Reserve and switch to the memory region
-        params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
-            n_atoms)
+        params_size = self._app_vertex.get_sdram_usage_for_core_neuron_params()
         spec.reserve_memory_region(
-            region=self._neuron_regions.neuron_params, size=params_size,
-            label='NeuronParams')
-        spec.switch_write_focus(self._neuron_regions.neuron_params)
+            region=self._neuron_regions.core_params, size=params_size,
+            label='Neuron Core Params')
+        spec.switch_write_focus(self._neuron_regions.core_params)
 
         # store the tdma data here for this slice.
         data = self._app_vertex.generate_tdma_data_specification_data(
@@ -204,12 +213,6 @@ class PopulationMachineNeurons(
         spec.write_value(n_synapse_types)
         spec.write_array(ring_buffer_shifts)
 
-        # Write the neuron parameters
-        neuron_data = self._app_vertex.neuron_impl.get_data(
-            self._app_vertex.parameters, self._app_vertex.state_variables,
-            self._vertex_slice)
-        spec.write_array(neuron_data)
-
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
@@ -220,26 +223,25 @@ class PopulationMachineNeurons(
                 placement, self._neuron_regions.neuron_params,
                 transceiver)
 
-        # shift past the extra stuff before neuron parameters that we don't
-        # need to read
-        neurons_pre_size = (
-            self._app_vertex.tdma_sdram_size_in_bytes +
-            self._app_vertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            (self._app_vertex.neuron_impl.get_n_synapse_types() *
-             BYTES_PER_WORD))
-        neuron_parameters_sdram_address = (
-            neuron_region_sdram_address + neurons_pre_size)
-
         # get size of neuron params
         size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
-            vertex_slice.n_atoms) - neurons_pre_size
+            vertex_slice.n_atoms)
 
         # get data from the machine
         byte_array = transceiver.read_memory(
-            placement.x, placement.y, neuron_parameters_sdram_address,
+            placement.x, placement.y, neuron_region_sdram_address,
             size_of_region)
 
         # update python neuron parameters with the data
         self._app_vertex.neuron_impl.read_data(
             byte_array, 0, vertex_slice, self._app_vertex.parameters,
             self._app_vertex.state_variables)
+
+    @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
+    def gen_neurons_on_machine(self):
+        return self._neuron_data.gen_on_machine
+
+    @property
+    @overrides(AbstractNeuronExpandable.neuron_generator_region)
+    def neuron_generator_region(self):
+        return self._neuron_regions.neuron_builder

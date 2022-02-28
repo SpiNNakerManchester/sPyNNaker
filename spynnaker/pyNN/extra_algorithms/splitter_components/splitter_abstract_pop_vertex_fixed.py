@@ -39,6 +39,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -92,10 +93,12 @@ class SplitterAbstractPopulationVertexFixed(
             max_atoms_per_core, projections)
         resources = self.get_resources_used_by_atoms(
             max_atoms_per_core, all_syn_block_sz, structural_sz)
-        regions = PopulationMachineVertex.SYNAPSE_REGIONS
+        synapse_regions = PopulationMachineVertex.SYNAPSE_REGIONS
         synaptic_matrices = SynapticMatrices(
-            app_vertex, regions, max_atoms_per_core, weight_scales,
+            app_vertex, synapse_regions, max_atoms_per_core, weight_scales,
             all_syn_block_sz)
+        neuron_regions = PopulationMachineVertex.NEURON_REGIONS
+        neuron_data = NeuronData(neuron_regions, app_vertex)
 
         self.__create_slices()
 
@@ -105,7 +108,7 @@ class SplitterAbstractPopulationVertexFixed(
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, resources, label, constraints, structural_sz,
                 ring_buffer_shifts, weight_scales, index, max_atoms_per_core,
-                synaptic_matrices)
+                synaptic_matrices, neuron_data)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -133,13 +136,13 @@ class SplitterAbstractPopulationVertexFixed(
     def create_machine_vertex(
             self, vertex_slice, resources, label, remaining_constraints,
             structural_sz, ring_buffer_shifts, weight_scales, index,
-            max_atoms_per_core, synaptic_matrices):
+            max_atoms_per_core, synaptic_matrices, neuron_data):
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
             resources, label, remaining_constraints, self._governed_app_vertex,
             vertex_slice, index, ring_buffer_shifts, weight_scales,
-            structural_sz, max_atoms_per_core, synaptic_matrices)
+            structural_sz, max_atoms_per_core, synaptic_matrices, neuron_data)
 
     def get_resources_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):

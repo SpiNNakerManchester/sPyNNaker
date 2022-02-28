@@ -19,6 +19,7 @@ import numpy
 import scipy.stats
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged import RangeDictionary, RangedList
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -43,10 +44,6 @@ from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
-from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
-    import SpynnakerRangeDictionary
-from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
-    import SpynnakerRangedList
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -226,14 +223,14 @@ class SpikeSourcePoissonVertex(
                 if len(duration_set) != len(rate_set):
                     raise Exception("Each rate must have its own duration")
 
-        self.__data = SpynnakerRangeDictionary(n_neurons)
-        self.__data["rates"] = SpynnakerRangedList(
+        self.__data = RangeDictionary(n_neurons)
+        self.__data["rates"] = RangedList(
             n_neurons, rates,
             use_list_as_value=not hasattr(rates[0], "__len__"))
-        self.__data["starts"] = SpynnakerRangedList(
+        self.__data["starts"] = RangedList(
             n_neurons, starts,
             use_list_as_value=not hasattr(starts[0], "__len__"))
-        self.__data["durations"] = SpynnakerRangedList(
+        self.__data["durations"] = RangedList(
             n_neurons, durations,
             use_list_as_value=not hasattr(durations[0], "__len__"))
         self.__rng = numpy.random.RandomState(seed)

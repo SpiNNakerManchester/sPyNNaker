@@ -73,6 +73,7 @@ const struct common_priorities COMMON_PRIORITIES = {
 
 //! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
+    .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
 };

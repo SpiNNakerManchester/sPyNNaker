@@ -16,14 +16,10 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
+from spynnaker.pyNN.utilities.struct import Struct
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
-
-UNITS = {
-    E_REV_E: "mV",
-    E_REV_I: "mV"
-}
 
 
 class InputTypeConductance(AbstractInputType):
@@ -46,9 +42,10 @@ class InputTypeConductance(AbstractInputType):
             float, iterable(float), ~pyNN.random.RandomDistribution
             or (mapping) function
         """
-        super().__init__([
-            DataType.S1615,   # e_rev_E
-            DataType.S1615])  # e_rev_I
+        super().__init__(
+            [Struct([(DataType.S1615, E_REV_E),
+                     (DataType.S1615, E_REV_I)])],
+            {E_REV_E: "mV", E_REV_I: "mV"})
         self.__e_rev_E = e_rev_E
         self.__e_rev_I = e_rev_I
 
@@ -64,24 +61,6 @@ class InputTypeConductance(AbstractInputType):
 
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):
-        pass
-
-    @overrides(AbstractInputType.get_units)
-    def get_units(self, variable):
-        return UNITS[variable]
-
-    @overrides(AbstractInputType.has_variable)
-    def has_variable(self, variable):
-        return variable in UNITS
-
-    @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-
-        # Add the rest of the data
-        return [parameters[E_REV_E], parameters[E_REV_I]]
-
-    @overrides(AbstractInputType.update_values)
-    def update_values(self, values, parameters, state_variables):
         pass
 
     @overrides(AbstractInputType.get_global_weight_scale)

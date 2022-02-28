@@ -13,14 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APP = synapse_expander
-BUILD_DIR = build/
-SOURCES = synapse_expander/rng.c \
-          synapse_expander/common_kernel.c \
-          synapse_expander/param_generator.c \
-          synapse_expander/connection_generator.c \
-          synapse_expander/matrix_generator.c \
-          synapse_expander/synapse_expander.c \
-          neuron/population_table/population_table_binary_search_impl.c
+MODELS = synapse_expander neuron_expander
 
-include ../neural_support.mk
+all:
+	for d in $(MODELS); do $(MAKE) -f $$d.mk || exit $$?; done
+
+clean:
+	for d in $(MODELS); do $(MAKE) -f $$d.mk clean || exit $$?; done

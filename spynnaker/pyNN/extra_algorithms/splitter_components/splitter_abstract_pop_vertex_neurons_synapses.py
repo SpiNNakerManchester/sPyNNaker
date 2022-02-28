@@ -42,6 +42,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
+from spynnaker.pyNN.models.neuron.neuron_data import NeuronData
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -226,10 +227,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         lead_synapse_resources = self.__get_synapse_resources(
             atoms_per_core, shared_synapse_sdram)
         shared_synapse_resources = self.__get_synapse_resources(atoms_per_core)
-        regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
+        synapse_regions = PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
         synaptic_matrices = SynapticMatrices(
-            app_vertex, regions, atoms_per_core, weight_scales,
+            app_vertex, synapse_regions, atoms_per_core, weight_scales,
             all_syn_block_sz)
+        neuron_regions = PopulationNeuronsMachineVertex.NEURON_REGIONS
+        neuron_data = NeuronData(neuron_regions, app_vertex)
 
         # Keep track of the SDRAM for each group of vertices
         total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
@@ -241,7 +244,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_resources, label, index, rb_shifts,
-                weight_scales, constraints)
+                weight_scales, constraints, neuron_data)
             chip_counter.add_core(neuron_resources)
 
             # Keep track of synapse vertices for each neuron vertex and
@@ -307,7 +310,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, neuron_resources, label, index, rb_shifts,
-            weight_scales, constraints):
+            weight_scales, constraints, neuron_data):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -330,7 +333,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
             neuron_resources, neuron_label, constraints, app_vertex,
-            vertex_slice, index, rb_shifts, weight_scales)
+            vertex_slice, index, rb_shifts, weight_scales, neuron_data)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 

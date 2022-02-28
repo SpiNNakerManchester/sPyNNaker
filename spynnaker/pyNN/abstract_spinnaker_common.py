@@ -45,7 +45,7 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
-from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
+from spynnaker.pyNN.extra_algorithms import synapse_expander, neuron_expander
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
@@ -430,12 +430,21 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
                 self.placements, self._txrx, self._executable_finder,
                 get_config_bool("Reports", "write_expander_iobuf"))
 
+    def _execute_neuron_expander(self):
+        with FecTimer(LOADING, "Neuron expander") as timer:
+            if timer.skip_if_virtual_board():
+                return
+            neuron_expander(
+                self.placements, self._txrx, self._executable_finder,
+                get_config_bool("Reports", "write_expander_iobuf"))
+
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):
             finish_connection_holders(self.application_graph)
 
     @overrides(AbstractSpinnakerBase._do_extra_load_algorithms)
     def _do_extra_load_algorithms(self):
+        self._execute_neuron_expander()
         self._execute_synapse_expander()
         self._execute_finish_connection_holders()
 
