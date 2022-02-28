@@ -147,7 +147,7 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     :param int notify_port: port num for the notify command
     :param int ack_port: port num for the acknowledge command
     """
-    SpynnakerDataView.add_socket_address(
+    SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
 
 
