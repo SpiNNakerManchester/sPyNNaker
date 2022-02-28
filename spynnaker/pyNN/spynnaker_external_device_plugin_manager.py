@@ -55,7 +55,7 @@ class SpynnakerExternalDevicePluginManager(object):
             notify_port_no=database_notify_port_num)
 
         # update socket interface with new demands.
-        SpynnakerDataView.add_database_socket(database_socket)
+        SpynnakerDataView.add_socket_address(database_socket)
 
     @staticmethod
     def activate_live_output_for(
