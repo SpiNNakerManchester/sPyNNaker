@@ -79,7 +79,6 @@ class FromListConnector(AbstractConnector):
 
         self.__column_names = column_names
         self.__split_conn_list = {}
-        self.__split_pre_slices = None
         self.__split_post_slices = None
 
         # Call the conn_list setter, as this sets the internal values

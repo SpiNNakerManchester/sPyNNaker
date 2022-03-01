@@ -74,7 +74,7 @@ def _plan_expansion(placements, synapse_expander_bin, transceiver):
     """
     expander_cores = ExecutableTargets()
 
-    progress = ProgressBar(len(placements), "Preparing to Expand Synapses")
+    progress = ProgressBar(len(placements), "Preparing to Expand Neuron Data")
     for placement in progress.over(placements):
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion

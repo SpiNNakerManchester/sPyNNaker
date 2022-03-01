@@ -79,6 +79,9 @@ class NeuronData(object):
         # The number of structs in neuron_data
         "__neuron_data_n_structs",
 
+        # The neuron recording data for all vertices, if applicable
+        "__neuron_recording_data",
+
         # Whether an attempt has been made to generate neuron data
         "__generation_done",
 
@@ -90,6 +93,7 @@ class NeuronData(object):
         self.__neuron_regions = neuron_regions
         self.__app_vertex = app_vertex
         self.__neuron_data = None
+        self.__neuron_recording_data = None
         self.__generation_done = False
         self.__gen_on_machine = None
 
@@ -138,6 +142,11 @@ class NeuronData(object):
         self.__neuron_data = numpy.concatenate(all_data)
         self.__neuron_data_n_structs = len(structs)
 
+        # Get the neuron recording data
+        neuron_recorder = self.__app_vertex.neuron_recorder
+        if neuron_recorder.is_global_generatable:
+            self.__neuron_recording_data = neuron_recorder.get_generator_data()
+
         # If we get here, we know everything is generated on machine
         self.__gen_on_machine = True
 
@@ -148,6 +157,12 @@ class NeuronData(object):
             size=self.__app_vertex.get_sdram_usage_for_neuron_params(
                     vertex_slice.n_atoms),
             label="neuron_params")
+        neuron_recorder = self.__app_vertex.neuron_recorder
+        spec.reserve_memory_region(
+            region=self.__neuron_regions.neuron_recording,
+            size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
+                vertex_slice.n_atoms),
+            label="neuron recording")
         if self.gen_on_machine:
             if self.__neuron_data is not None:
                 data = self.__neuron_data
@@ -155,17 +170,26 @@ class NeuronData(object):
             else:
                 n_structs, data = self.__get_neuron_builder_data(vertex_slice)
             header = self.__get_neuron_builder_header(vertex_slice, n_structs)
+            if self.__neuron_recording_data is not None:
+                rec_data = self.__neuron_recording_data
+            else:
+                rec_data = neuron_recorder.get_generator_data(vertex_slice)
+            n_words = len(data) + len(header) + len(rec_data)
             spec.reserve_memory_region(
                 region=self.__neuron_regions.neuron_builder,
-                size=(len(data) + len(header)) * BYTES_PER_WORD,
+                size=n_words * BYTES_PER_WORD,
                 label="neuron_builder")
             spec.switch_write_focus(self.__neuron_regions.neuron_builder)
             spec.write_array(header)
             spec.write_array(data)
+            spec.write_array(rec_data)
         else:
             spec.switch_write_focus(self.__neuron_regions.neuron_params)
             neuron_data = self.__get_neuron_param_data(vertex_slice)
             spec.write_array(neuron_data)
+            neuron_recorder.write_neuron_recording_region(
+                spec, self._neuron_regions.neuron_recording,
+                self._vertex_slice)
 
     def __get_neuron_param_data(self, vertex_slice):
         structs = self.__app_vertex.neuron_impl.structs

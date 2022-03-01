@@ -154,16 +154,7 @@ class PopulationMachineNeurons(
         # Write the neuron core parameters
         self._write_neuron_core_parameters(spec, ring_buffer_shifts)
 
-        # Write the neuron recording region
-        neuron_recorder = self._app_vertex.neuron_recorder
-        spec.reserve_memory_region(
-            region=self._neuron_regions.neuron_recording,
-            size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
-                self._vertex_slice.n_atoms),
-            label="neuron recording")
-        neuron_recorder.write_neuron_recording_region(
-            spec, self._neuron_regions.neuron_recording, self._vertex_slice)
-
+        # Write the other parameters
         self._neuron_data.write_data(spec, self._vertex_slice)
 
     def _write_neuron_core_parameters(self, spec, ring_buffer_shifts):

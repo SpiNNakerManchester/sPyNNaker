@@ -199,7 +199,7 @@ class SynapticMatrices(object):
             if synapse_info.may_generate_on_machine():
                 generate_on_machine.append(app_matrix)
             else:
-                block_addr = app_matrix.reserve_matrices(block_addr)
+                block_addr = app_matrix.reserve_matrices(block_addr, poptable)
                 self.__on_host_matrices.append(app_matrix)
 
         self.__host_generated_block_addr = block_addr

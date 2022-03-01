@@ -32,8 +32,16 @@
 
 #define REPEAT_PER_NEURON 0xFFFFFFFF
 
+#define REPEAT_PER_NEURON_RECORDED 0x7FFFFFFF
+
 // Mask to work out MOD 4
 #define MOD_4 0x3
+
+//! When bitwise anded with a number will floor to the nearest multiple of 4
+#define FLOOR_TO_4 0xFFFFFFFC
+
+//! Add to a number before applying floor to 4 to turn it into a ceil operation
+#define CEIL_TO_4 3
 
 // An array of how much to add to align data to 4-bytes
 // indexed by [current offset % 4][size to write % 4].
@@ -89,6 +97,44 @@ typedef struct neuron_params_struct {
     // Following on from this are the data of each param_generator in order
     // of appearance in the above
 } neuron_params_struct_t;
+
+typedef struct sdram_variable_recording_data {
+    uint32_t rate;
+    uint32_t n_recording;
+    uint32_t element_size;
+    uint8_t indices[];
+} sdram_variable_recording_data_t;
+
+typedef struct sdram_bitfield_recording_data {
+    uint32_t rate;
+    uint32_t n_recording;
+    uint8_t indices[];
+} sdram_bitfield_recording_data_t;
+
+typedef struct recording_index {
+    uint32_t n_repeats:31;
+    uint32_t is_recording:1;
+} recording_index_t;
+
+typedef struct variable_recording {
+    uint32_t rate;
+    uint32_t element_size;
+    uint32_t n_index_items;
+    recording_index_t index_items[];
+} variable_recording_t;
+
+typedef struct bitfield_recording {
+    uint32_t rate;
+    uint32_t n_index_items;
+    recording_index_t index_items[];
+} bitfield_recording_t;
+
+typedef struct recording_params {
+    // How many variables can be recorded
+    uint32_t n_recordable_variables;
+    // How many bit fields can be recorded
+    uint32_t n_recordable_bit_fields;
+} recording_params_t;
 
 //! The configuration of the expander
 __attribute__((aligned(4)))
@@ -202,6 +248,96 @@ static bool read_struct_builder_region(void **region,
     return true;
 }
 
+static inline uint32_t read_index(uint32_t n_items, recording_index_t *items,
+        uint32_t n_neurons, uint32_t n_neurons_max, uint8_t *sdram_out) {
+    // Go through the data
+    uint8_t indices[n_neurons_max];
+    uint32_t neuron_id = 0;
+    uint32_t next_index = 0;
+    uint32_t n_recording = 0;
+    for (uint32_t i = 0; i < n_items; i++) {
+        recording_index_t item = items[i];
+        uint32_t n_repeats = item.n_repeats;
+        if (n_repeats == REPEAT_PER_NEURON_RECORDED) {
+            n_repeats = n_neurons;
+        }
+        if (item.is_recording) {
+            for (uint32_t r = 0; r < n_repeats; r++) {
+                indices[neuron_id++] = next_index++;
+            }
+            n_recording += n_repeats;
+        } else {
+            for (uint32_t r = 0; r < n_repeats; r++) {
+                indices[neuron_id++] = n_neurons;
+            }
+        }
+    }
+
+    // Copy to SDRAM
+    uint32_t *index_words = (uint32_t *) &(indices[0]);
+    uint32_t *sdram_out_words = (uint32_t *) sdram_out;
+    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+        sdram_out_words[i] = index_words[i];
+    }
+    return n_recording;
+}
+
+static void write_zero_index(uint32_t n_neurons_max, uint8_t *sdram_out) {
+    uint32_t *sdram_out_words = (uint32_t *) sdram_out;
+    for (uint32_t i = 0; i < (n_neurons_max >> 2); i++) {
+        sdram_out_words[i] = 0;
+    }
+}
+
+static void read_recorded_variable(void **region, void **recording_region,
+        uint32_t n_neurons, uint32_t n_neurons_max) {
+    // Get the recording data
+    variable_recording_t *rec = *region;
+    uint32_t n_items = rec->n_index_items;
+    *region = &(rec->index_items[n_items]);
+
+    // Get the place to write data to, and move on to next
+    sdram_variable_recording_data_t *sdram_out = *recording_region;
+    *recording_region = &(sdram_out->indices[n_neurons_max]);
+
+    // Do the simple things
+    uint32_t rate = rec->rate;
+    sdram_out->rate = rate;
+    sdram_out->element_size = rec->element_size;
+
+    if (rate == 0) {
+        sdram_out->n_recording = 0;
+        write_zero_index(n_neurons_max, &sdram_out->indices[0]);
+    } else {
+        sdram_out->n_recording = read_index(n_items, &rec->index_items[0],
+                n_neurons, n_neurons_max, &sdram_out->indices[0]);
+    }
+}
+
+static void read_recorded_bitfield(void **region, void **recording_region,
+        uint32_t n_neurons, uint32_t n_neurons_max) {
+    // Get the recording data
+    bitfield_recording_t *rec = *region;
+    uint32_t n_items = rec->n_index_items;
+    *region = &(rec->index_items[n_items]);
+
+    // Get the place to write data to, and move on to next
+    sdram_bitfield_recording_data_t *sdram_out = *recording_region;
+    *recording_region = &(sdram_out->indices[n_neurons_max]);
+
+    // Do the simple things
+    uint32_t rate = rec->rate;
+    sdram_out->rate = rate;
+
+    if (rate == 0) {
+        sdram_out->n_recording = 0;
+        write_zero_index(n_neurons_max, &sdram_out->indices[0]);
+    } else {
+        sdram_out->n_recording = read_index(n_items, &rec->index_items[0],
+                n_neurons, n_neurons_max, &sdram_out->indices[0]);
+    }
+}
+
 /**
  * \brief Read the data for the expander
  * \param[in] ds_regions: The data specification regions
@@ -237,12 +373,41 @@ static bool run_neuron_expander(data_specification_metadata_t *ds_regions,
     void *address = &(sdram_config[1]);
 
     // Read the remaining structs
+    uint32_t n_neurons = config->n_neurons;
     for (uint32_t s = 0; s < config->n_structs; s++) {
         if (!read_struct_builder_region(&address, &neuron_params_region,
-                config->n_neurons)) {
+                n_neurons)) {
             return false;
         }
     }
+
+    // Read recording data
+    recording_params_t *recording_params = address;
+    recording_params_t *sdram_recording_params = data_specification_get_region(
+            config->neuron_recording_region, ds_regions);
+
+    // Copy header data
+    uint32_t n_variables = recording_params->n_recordable_variables;
+    uint32_t n_bitfields = recording_params->n_recordable_bit_fields;
+    sdram_recording_params->n_recordable_variables = n_variables;
+    sdram_recording_params->n_recordable_bit_fields = n_bitfields;
+
+    // Move read and write pointers
+    address = &(recording_params[1]);
+    void *sdram_address = &(sdram_recording_params[1]);
+
+    // Round up the number of neurons to the next multiple of 4
+    uint32_t n_neurons_max = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
+
+    // Do variables
+    for (uint32_t i = 0; i < n_variables; i++) {
+        read_recorded_variable(&address, &sdram_address, n_neurons, n_neurons_max);
+    }
+    // Do bitfields
+    for (uint32_t i = 0; i < n_bitfields; i++) {
+        read_recorded_bitfield(&address, &sdram_address, n_neurons, n_neurons_max);
+    }
+
     return true;
 }
 

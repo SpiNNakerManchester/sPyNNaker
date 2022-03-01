@@ -29,6 +29,10 @@ from spinn_front_end_common.utilities.globals_variables import (
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+_REPEAT_PER_NEURON = 0x7FFFFFFF
+
+_RECORDED_FLAG = 0x80000000
+
 
 class _ReadOnlyDict(dict):
     def __readonly__(self, *args, **kwargs):  # pylint: disable=unused-argument
@@ -1355,3 +1359,99 @@ class NeuronRecorder(object):
     @property
     def _indexes(self):  # for testing only
         return _ReadOnlyDict(self.__indexes)
+
+    @property
+    def is_global_generatable(self):
+        """ Is the data for all neurons the same i.e. all or none of the
+            neurons are recorded for all variables
+
+        :rtype: bool
+        """
+        for variable in self.__sampling_rates:
+            if variable in self.__indexes:
+                return False
+        return True
+
+    def get_generator_data(self, vertex_slice=None):
+        """ Get the recorded data as a generatable data set
+
+        :param vertex_slice:
+            The slice to generate the data for, or None to generate for
+            all neurons (assuming all the same, otherwise error)
+        :type vertex_slice: Slice or None
+        :rtype: numpy.ndarray
+        """
+        n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
+        data = [n_vars, len(self.__bitfield_variables)]
+        for variable in self.__sampling_rates:
+            if variable in self.__bitfield_variables:
+                continue
+            rate = self.__sampling_rates[variable]
+            data.extend([rate, self.__data_types[variable].size])
+            if rate == 0:
+                data.append(0)
+            else:
+                data.extend(self.__get_generator_indices(
+                    variable, vertex_slice))
+        for variable in self.__bitfield_variables:
+            rate = self.__sampling_rates[variable]
+            data.append(rate)
+            if rate == 0:
+                data.append(0)
+            else:
+                data.extend(self.__get_generator_indices(
+                    variable, vertex_slice))
+        return numpy.array(data, dtype="uint32")
+
+    def __get_generator_indices(self, variable, vertex_slice=None):
+        index = self.__indexes.get(variable)
+        if index is None:
+            return [1, _REPEAT_PER_NEURON | _RECORDED_FLAG]
+
+        # This must be non-global data, so we need a slice
+        if vertex_slice is None:
+            raise ValueError("There must be a vertex slice!")
+
+        # Initially there are no items, but this will be updated
+        data = [0]
+        last_i = None
+        n_items = 0
+        start_i = None
+        for i in index:
+            # Ignore before slice
+            if i < vertex_slice.lo_atom:
+                continue
+            # Finish after slice
+            if i > vertex_slice.hi_atom:
+                break
+
+            # This is the first item, but not the first index, add not recorded
+            if last_i is None and i != vertex_slice.lo_atom:
+                data.append(i - vertex_slice.lo_atom)
+
+            # This is the first item, store it
+            if start_i is None:
+                start_i = i
+
+            # The sequence is broken, record the ranges
+            elif i != last_i + 1:
+                n_items += 2
+                # Everything from start to last is recorded
+                data.append((last_i - start_i + 1) | _RECORDED_FLAG)
+                # Everything from last to this is not recorded
+                data.append((i - last_i) - 1)
+                # Start a new run
+                start_i = i
+
+            # Store last i
+            last_i = i
+
+        # If we found at least one start item in range, we need to finish it
+        if start_i is not None:
+            n_items += 1
+            data.append(((last_i - start_i) + 1) | _RECORDED_FLAG)
+        if last_i != vertex_slice.hi_atom:
+            n_items += 1
+            data.append(vertex_slice.hi_atom - last_i)
+        data[0] = n_items
+        return numpy.array(data, dtype="uint32")
