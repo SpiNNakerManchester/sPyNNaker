@@ -16,7 +16,10 @@
  */
 
 //! \file
-//! \brief STDP core implementation
+//! \brief STDP implementation for MF-VN STDP rules as defined by e.g. Luque et al 2019
+//!        https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006298
+
+
 #include "post_events.h"
 #include "synapse_dynamics_stdp_common.h"
 // sPyNNaker neural modelling includes

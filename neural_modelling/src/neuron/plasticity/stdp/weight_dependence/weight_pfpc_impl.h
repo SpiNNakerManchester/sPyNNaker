@@ -18,6 +18,9 @@
 #ifndef _WEIGHT_PFPC_IMPL_H_
 #define _WEIGHT_PFPC_IMPL_H_
 
+// PF-PC STDP rules as defined by e.g. Luque et al 2019
+// https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006298
+
 // Include generic plasticity maths functions
 #include <neuron/plasticity/stdp/maths.h>
 #include <neuron/plasticity/stdp/stdp_typedefs.h>

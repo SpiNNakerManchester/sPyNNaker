@@ -18,6 +18,9 @@
 #ifndef _TIMING_PFPC_IMPL_H_
 #define _TIMING_PFPC_IMPL_H_
 
+// PF-PC STDP rules as defined by e.g. Luque et al 2019
+// https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1006298
+
 //---------------------------------------
 // Typedefines
 //---------------------------------------
