@@ -139,7 +139,7 @@ class Struct(object):
                     for start, end, value in all_values.iter_ranges_by_slice(
                             offset, offset + array_size):
                         # Get the values and convert to the correct data type
-                        if isinstance(all_values, RandomDistribution):
+                        if isinstance(value, RandomDistribution):
                             r_vals = value.next(end - start)
                             data_value = [
                                 convert_to(v, data_type) for v in r_vals]

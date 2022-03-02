@@ -99,6 +99,7 @@ class NeuronData(object):
 
     @property
     def gen_on_machine(self):
+        return False
         if self.__gen_on_machine is None:
             # First try to generate data.  This might have already been done.
             self.generate_data()
@@ -112,6 +113,7 @@ class NeuronData(object):
         return self.__gen_on_machine
 
     def generate_data(self):
+        return
         if self.__generation_done:
             return
         self.__generation_done = True
@@ -188,8 +190,8 @@ class NeuronData(object):
             neuron_data = self.__get_neuron_param_data(vertex_slice)
             spec.write_array(neuron_data)
             neuron_recorder.write_neuron_recording_region(
-                spec, self._neuron_regions.neuron_recording,
-                self._vertex_slice)
+                spec, self.__neuron_regions.neuron_recording,
+                vertex_slice)
 
     def __get_neuron_param_data(self, vertex_slice):
         structs = self.__app_vertex.neuron_impl.structs
