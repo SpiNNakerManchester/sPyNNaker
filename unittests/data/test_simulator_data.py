@@ -73,15 +73,3 @@ class TestSimulatorData(unittest.TestCase):
         # check there is a value not what it is
         self.assertIsNotNone(SpynnakerDataView.get_app_id())
         self.assertIsNotNone(SpynnakerDataView.get_min_delay())
-
-    def test_multiple(self):
-        view = SpynnakerDataView()
-        writer = SpynnakerDataWriter.setup()
-        view1 = SpynnakerDataView()
-        view2 = FecDataView()
-        writer.set_app_id(7)
-        self.assertEqual(7, SpynnakerDataView.get_app_id())
-        self.assertEqual(7, view.get_app_id())
-        self.assertEqual(7, view2.get_app_id())
-        self.assertEqual(7, view1.get_app_id())
-        self.assertEqual(7, writer.get_app_id())
