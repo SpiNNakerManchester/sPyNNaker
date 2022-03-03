@@ -421,6 +421,7 @@ class AbstractPopulationVertex(
         :param int n_atoms: The number of atoms per core
         :return: The SDRAM required for the neuron generator region
         """
+        return 0
         # Uses nothing if not generatable
         structs = self.__neuron_impl.structs
         for struct in structs:
