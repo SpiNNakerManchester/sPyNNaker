@@ -60,6 +60,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
+from spynnaker.pyNN.utilities.struct import StructRepeat
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
@@ -410,6 +411,8 @@ class AbstractPopulationVertex(
         :return: The SDRAM required for the neuron region
         """
         return sum(s.get_size_in_whole_words(n_atoms)
+                   if s.repeat_type == StructRepeat.PER_NEURON
+                   else s.get_size_in_whole_words()
                    for s in self.__neuron_impl.structs) * BYTES_PER_WORD
 
     def get_sdram_usage_for_neuron_generation(self, n_atoms):
