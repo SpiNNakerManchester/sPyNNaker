@@ -692,5 +692,4 @@ def get_machine():
     :return: the machine object
     :rtype: ~spinn_machine.Machine
     """
-    globals_variables.check_simulator()
-    return globals_variables.get_simulator().machine
+    SpynnakerDataView.get_machine()

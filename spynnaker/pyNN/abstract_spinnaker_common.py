@@ -256,7 +256,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # pylint: disable=protected-access
         important_gathers = set()
         # iterate though projections
-        machine = self._data_writer.machine
+        machine = self._data_writer.get_machine()
         placements = self._data_writer.get_placements()
         for projection in projections:
             # iteration though the projections machine edges to locate chips
