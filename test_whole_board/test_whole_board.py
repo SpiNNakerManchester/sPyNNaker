@@ -20,6 +20,8 @@ from spalloc.states import JobState
 import pytest
 import tempfile
 import os
+import traceback
+import sys
 
 
 class WholeBoardTest(object):
@@ -185,11 +187,12 @@ class WholeBoardTest(object):
         sim.end()
 
 
-@pytest.mark.parametrize(
-    "x,y,b",
-    [(8,13,0), (7,6,1), (10,17,0), (13,9,1), (11,17,0), (10,18,2), (11,14,2),  # 3x Errors
-     (10,4,2), # 2x Errors
-     (2,7,1), (6,7,1), (3,10,0), (13,10,2)]) # 1x Errors
+        
+
+boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
+    
+
+@pytest.mark.parametrize("x,y,b", boards)
 def test_run(x, y, b):
     job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
               owner="Jenkins Machine Test")
@@ -208,3 +211,13 @@ def test_run(x, y, b):
                 f.write("version = 5\n")
             test = WholeBoardTest()
             test.do_run()
+
+
+if __name__ == "__main__":
+    for x, y, b in boards:
+        print("", file=sys.stderr,)
+        print(f"============= Testing {x}, {y}, {b} =================", file=sys.stderr)
+        try:
+            test_run(x, y, b)
+        except Exception:
+            traceback.print_exc()
