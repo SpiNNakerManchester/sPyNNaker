@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
-from spinnaker_testbase import BaseTestCase
 from spalloc.job import Job
 from spalloc.states import JobState
 import pytest
@@ -52,7 +51,7 @@ class WholeBoardTest(object):
           (0, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7),
           (1, 0), (2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6),
           (2, 0), (3, 1), (4, 2), (5, 3), (6, 4), (7, 5),
-          (3, 0), (4, 1), (5, 2), (6, 3), (7, 4), 
+          (3, 0), (4, 1), (5, 2), (6, 3), (7, 4),
           (4, 0), (5, 1), (6, 2), (7, 3)]
     dl = list(ur)
     dl.reverse()
@@ -187,10 +186,8 @@ class WholeBoardTest(object):
         sim.end()
 
 
-        
-
 boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
-    
+
 
 @pytest.mark.parametrize("x,y,b", boards)
 def test_run(x, y, b):
@@ -216,7 +213,8 @@ def test_run(x, y, b):
 if __name__ == "__main__":
     for x, y, b in boards:
         print("", file=sys.stderr,)
-        print(f"============= Testing {x}, {y}, {b} =================", file=sys.stderr)
+        print(f"*************** Testing {x}, {y}, {b} *******************",
+              file=sys.stderr)
         try:
             test_run(x, y, b)
         except Exception:
