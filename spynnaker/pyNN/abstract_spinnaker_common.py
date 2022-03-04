@@ -66,7 +66,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
-            n_boards_required, timestep, min_delay, hostname,
+            n_boards_required, timestep, min_delay,
             time_scale_factor=None):
         """
         :param str graph_label:
@@ -118,7 +118,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
-        self.set_up_machine_specifics(hostname)
+        self.check_machine_specifics()
 
         logger.info(f'Setting time scale factor to '
                     f'{self.time_scale_factor}.')
@@ -377,10 +377,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
         with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
-            self._dsg_targets, self._region_sizes = \
-                spynnaker_data_specification_writer(
-                    self._placements, self._ipaddress, self._machine,
-                    self._max_run_time_steps)
+            self._dsg_targets = spynnaker_data_specification_writer(
+                self._placements, self._ipaddress, self._machine,
+                self._app_id, self._max_run_time_steps)
 
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
