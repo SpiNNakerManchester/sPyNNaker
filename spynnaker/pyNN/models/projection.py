@@ -483,7 +483,8 @@ class Projection(object):
 
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
-        if not get_simulator().has_ran:
+        # TODO should this be
+        if not SpynnakerDataView.is_ran_ever():
             self.__synapse_information.add_pre_run_connection_holder(
                 connection_holder)
             return connection_holder
