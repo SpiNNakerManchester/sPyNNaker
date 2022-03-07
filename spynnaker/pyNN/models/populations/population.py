@@ -929,8 +929,7 @@ class Population(PopulationBase):
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        sim = get_simulator()
-        if (sim.has_ran
+        if (SpynnakerDataView.is_ran_last()
                 and not self.__has_read_neuron_parameters_this_run
                 and not get_config_bool("Machine", "virtual_board")):
             # go through each machine vertex and read the neuron parameters
@@ -943,7 +942,6 @@ class Population(PopulationBase):
                         vertex)
                     vertex.read_parameters_from_machine(
                         placement, vertex.vertex_slice)
-
             self.__has_read_neuron_parameters_this_run = True
 
     @property
