@@ -15,17 +15,38 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import (
     AbstractSlicesConnect, AbstractVerticesConnect)
-from pacman.operations.partition_algorithms import SplitterPartitioner
+from pacman.operations.partition_algorithms.splitter_partitioner import (
+    _SplitterPartitioner)
 from data_specification import ReferenceContext
 
 
-class SpynnakerSplitterPartitioner(SplitterPartitioner):
+def spynnaker_splitter_partitioner(
+        app_graph, machine, plan_n_time_steps,
+        pre_allocated_resources=None):
+    """
+    a splitter partitioner that's bespoke for spynnaker vertices.
+
+    :param ApplicationGraph app_graph: app graph
+    :param ~spinn_machine.Machine machine: machine
+    :param int plan_n_time_steps: the number of time steps to run for
+    :param pre_allocated_resources: any pre-allocated res to account for
+        before doing any splitting.
+    :type pre_allocated_resources: PreAllocatedResourceContainer or None
+    :rtype: tuple(~pacman.model.graphs.machine.MachineGraph, int)
+    :raise PacmanPartitionException: when it cant partition
+    """
+    partitioner = _SpynnakerSplitterPartitioner()
+    return partitioner._run(
+        app_graph, machine, plan_n_time_steps, pre_allocated_resources)
+
+
+class _SpynnakerSplitterPartitioner(_SplitterPartitioner):
     """ a splitter partitioner that's bespoke for spynnaker vertices.
     """
 
     __slots__ = []
 
-    def __call__(
+    def _run(
             self, app_graph, machine, plan_n_time_steps,
             pre_allocated_resources=None):
         """
@@ -41,13 +62,13 @@ class SpynnakerSplitterPartitioner(SplitterPartitioner):
 
         # do partitioning in same way, but in a context of references
         with ReferenceContext():
-            machine_graph, chips_used = super().__call__(
+            machine_graph, chips_used = super()._run(
                 app_graph, machine, plan_n_time_steps, pre_allocated_resources)
 
         # return the accepted things
         return machine_graph, chips_used
 
-    @overrides(SplitterPartitioner.create_machine_edge)
+    @overrides(_SplitterPartitioner.create_machine_edge)
     def create_machine_edge(
             self, src_machine_vertex, dest_machine_vertex,
             common_edge_type, app_edge, machine_graph,
