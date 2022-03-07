@@ -22,7 +22,7 @@ class MachineTest(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, n_boards_required=2)
-        sim.Population(3, sim.IF_curr_exp(), label="pop_1")
+        pop = sim.Population(3, sim.IF_curr_exp(), label="pop_1")
         # HACK to avoid detecting we do not yet have a machine
         # DO NOT COPY AS UNSUPPORTED
         self.assertIsNone(SpynnakerDataView._MachineDataView__data._machine)
@@ -31,6 +31,8 @@ class MachineTest(BaseTestCase):
         # HACK to avoid detecting we have a machine
         # DO NOT COPY AS UNSUPPORTED
         machine1 = SpynnakerDataView._MachineDataView__data._machine
+        # a call to initialize should not force a hard reset
+        pop.initialize(v=-64)
         sim.run(2)
 
         # Same machine after second run
