@@ -155,7 +155,7 @@ class Recorder(object):
         :type indexes: list(int) or None
         """
 
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_write()
         # tell vertex its recording
         if variable == "spikes":
             if not isinstance(self.__vertex, AbstractSpikeRecordable):
@@ -217,10 +217,7 @@ class Recorder(object):
         :return: data, indexes, sampling_interval
         :rtype: tuple(~numpy.ndarray, list(int), float)
         """
-        sim = get_simulator()
-
-        sim.verify_not_running()
-
+        SpynnakerDataView.check_user_write()
         # check that we're in a state to get voltages
         if not isinstance(self.__vertex, AbstractNeuronRecordable):
             raise ConfigurationException(

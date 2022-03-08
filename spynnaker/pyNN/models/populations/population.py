@@ -961,7 +961,7 @@ class Population(PopulationBase):
 
         :param ~pacman.model.constraints.AbstractConstraint constraint:
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_write()
         if not isinstance(constraint, AbstractConstraint):
             raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -978,7 +978,7 @@ class Population(PopulationBase):
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_write()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
@@ -992,7 +992,7 @@ class Population(PopulationBase):
             A dictionary containing "x", "y" and optionally "p" as keys, and
             ints as values
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_write()
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
@@ -1005,7 +1005,7 @@ class Population(PopulationBase):
         :param int max_atoms_per_core:
             the new value for the max atoms per core.
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_write()
         self.__vertex.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
         # state that something has changed in the population
