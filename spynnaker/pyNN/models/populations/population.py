@@ -797,10 +797,11 @@ class Population(PopulationBase):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
-            raise Exception("Population does not support changes after run")
-        self._read_parameters_before_set()
+        if SpynnakerDataView.is_ran_last():
+            if not self.__vertex_changeable_after_run:
+                raise Exception(
+                    "Population does not support changes after run")
+            self._read_parameters_before_set()
         self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
@@ -847,8 +848,9 @@ class Population(PopulationBase):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        sim = get_not_running_simulator()
-        if sim.has_ran and not self.__vertex_changeable_after_run:
+        SpynnakerDataView.check_user_write()
+        if (SpynnakerDataView.is_ran_ever()
+                and not self.__vertex_changeable_after_run):
             raise Exception(
                 "Run has been called but vertex is not changable.")
 
@@ -860,8 +862,8 @@ class Population(PopulationBase):
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
 
-        if not sim.has_reset_last:
-            self._read_parameters_before_set()
+        if SpynnakerDataView.is_ran_last():
+           self._read_parameters_before_set()
 
     def _set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.

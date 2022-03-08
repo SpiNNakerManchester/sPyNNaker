@@ -217,7 +217,6 @@ class Recorder(object):
         :return: data, indexes, sampling_interval
         :rtype: tuple(~numpy.ndarray, list(int), float)
         """
-        data = None
         sim = get_simulator()
 
         sim.verify_not_running()
@@ -232,11 +231,16 @@ class Recorder(object):
                 "This population has not been set to record {}".format(
                     variable))
 
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore {} cannot be "
-                "retrieved, hence the list will be empty".format(
-                    variable))
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    f"The simulation has been reset, therefore {variable} "
+                    f"cannot be retrieved, hence the list/last segment list "
+                    f"will be empty")
+            else:
+                logger.warning(
+                    f"The simulation has not yet run, therefore {variable} "
+                    f"cannot be retrieved, hence the list will be empty")
             data = numpy.zeros((0, 3))
             indexes = []
             sampling_interval = self.__vertex.get_neuron_sampling_interval(
@@ -273,11 +277,15 @@ class Recorder(object):
             raise ConfigurationException(
                 "This population has not been set to record spikes")
 
-        sim = get_simulator()
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore spikes cannot "
-                "be retrieved, hence the list will be empty")
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    "The simulation has reset, therefore spikes cannot "
+                    "be retrieved, hence the list/ last segment will be empty")
+            else:
+                logger.warning(
+                    "The simulation has not yet run, therefore spikes cannot "
+                    "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
         if get_config_bool("Machine", "virtual_board"):
             logger.warning(
@@ -304,11 +312,15 @@ class Recorder(object):
             raise ConfigurationException(
                 "This population has not been set to record rewires")
 
-        sim = get_simulator()
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore rewires cannot "
-                "be retrieved, hence the list will be empty")
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    "The simulation has been reset, therefore rewires cannot "
+                    "be retrieved, hence the list/last segment will be empty")
+            else:
+                logger.warning(
+                    "The simulation has not yet run, therefore rewires "
+                    "cannot be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
         if get_config_bool("Machine", "virtual_board"):
             logger.warning(
