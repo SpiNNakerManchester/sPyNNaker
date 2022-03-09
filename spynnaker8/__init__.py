@@ -313,7 +313,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     pynn_common.setup(timestep, min_delay, **extra_params)
 
     # create stuff simulator
-    if globals_variables.has_simulator():
+    if SpynnakerDataView.is_setup():
         logger.warning("Calling setup a second time causes the previous "
                        "simulator to be stopped and cleared.")
         # if already exists, kill and rebuild
