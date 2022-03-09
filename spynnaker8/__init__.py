@@ -513,7 +513,7 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param ~pyNN.random.NumpyRNG rng: random number generator
     """
     # pylint: disable=too-many-arguments
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 
 
@@ -526,7 +526,7 @@ def create(cellclass, cellparams=None, n=1):
     :param int n: n neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["create"](cellclass, cellparams, n)
 
 
@@ -544,7 +544,7 @@ def get_current_time():
 
     :return: returns the current time
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["get_current_time"]()
 
 
@@ -555,7 +555,7 @@ def get_min_delay():
     :return: returns the min delay of the simulation
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["get_min_delay"]()
 
 
@@ -578,7 +578,7 @@ def get_time_step():
     :return: get the time step of the simulation (in ms)
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return float(__pynn["get_time_step"]())
 
 
@@ -590,7 +590,7 @@ def initialize(cells, **initial_values):
         ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     pynn_common.initialize(cells, **initial_values)
 
 
@@ -603,7 +603,7 @@ def num_processes():
     :return: the number of MPI processes
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["num_processes"]()
 
 
@@ -616,7 +616,7 @@ def rank():
     :return: MPI rank
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["rank"]()
 
 
@@ -639,7 +639,7 @@ def record(variables, source, filename, sampling_interval=None,
     :return: neo object
     :rtype: ~neo.core.Block
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["record"](variables, source, filename, sampling_interval,
                             annotations)
 
@@ -653,7 +653,7 @@ def reset(annotations=None):
     """
     if annotations is None:
         annotations = {}
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     __pynn["reset"](annotations)
 
 
@@ -666,7 +666,7 @@ def run(simtime, callbacks=None):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["run"](simtime, callbacks=callbacks)
 
 
@@ -682,7 +682,7 @@ def run_until(tstop):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_write()
     return __pynn["run_until"](tstop)
 
 
