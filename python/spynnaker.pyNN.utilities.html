@@ -463,8 +463,8 @@ regardless of if they where recording or not.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>as1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – first analogsignal holding list of individual analogsignal Objects</p></li>
-<li><p><strong>as2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – second analogsignal holding list of individual analogsignal Objects</p></li>
+<li><p><strong>as1</strong> (<em>AnalogSignal</em>) – first analogsignal holding list of individual analogsignal Objects</p></li>
+<li><p><strong>as2</strong> (<em>AnalogSignal</em>) – second analogsignal holding list of individual analogsignal Objects</p></li>
 <li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same length of data is
 held, i.e., all spikes up to the same time. If False allows one trains
 to have additional data after the first ends. This is used to compare
@@ -484,8 +484,8 @@ data extracted part way with data extracted at the end.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>neo1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – First block to check</p></li>
-<li><p><strong>neo2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Second block to check</p></li>
+<li><p><strong>neo1</strong> (<em>Block</em>) – First block to check</p></li>
+<li><p><strong>neo2</strong> (<em>Block</em>) – Second block to check</p></li>
 <li><p><strong>same_runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to signal if blocks are the same length.
 If False extra segments in the larger block are ignored</p></li>
 <li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
@@ -509,8 +509,8 @@ data extracted part way with data extracted at the end.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>seg1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.10)"><em>Segment</em></a>) – First Segment to check</p></li>
-<li><p><strong>seg2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.10)"><em>Segment</em></a>) – Second Segment to check</p></li>
+<li><p><strong>seg1</strong> (<em>Segment</em>) – First Segment to check</p></li>
+<li><p><strong>seg2</strong> (<em>Segment</em>) – Second Segment to check</p></li>
 <li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
 i.e., same spikes, v, gsyn_exc and gsyn_inh.
 If False only data in both blocks is compared</p></li>
@@ -533,8 +533,8 @@ data extracted part way with data extracted at the end.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spiketrain1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a>) – first spiketrain</p></li>
-<li><p><strong>spiketrain2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a>) – second spiketrain</p></li>
+<li><p><strong>spiketrain1</strong> (<em>SpikeTrain</em>) – first spiketrain</p></li>
+<li><p><strong>spiketrain2</strong> (<em>SpikeTrain</em>) – second spiketrain</p></li>
 <li><p><strong>same_length</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same length of data is
 held, i.e., all spikes up to the same time. If False allows one trains
 to have additional spikes after the first ends. This is used to
@@ -557,8 +557,8 @@ compare data extracted part way with data extracted at the end.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – First list SpikeTrains to compare</p></li>
-<li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – Second list of SpikeTrains to compare</p></li>
+<li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>SpikeTrain</em><em>)</em>) – First list SpikeTrains to compare</p></li>
+<li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>SpikeTrain</em><em>)</em>) – Second list of SpikeTrains to compare</p></li>
 <li><p><strong>same_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Flag to indicate if the same type of data is held,
 i.e., same spikes, v, gsyn_exc and gsyn_inh.
 If False allows one or both lists to be Empty.
@@ -585,7 +585,7 @@ data extracted part way with data extracted at the end.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – Extended Quantities object</p></li>
+<li><p><strong>signal_array</strong> (<em>AnalogSignal</em>) – Extended Quantities object</p></li>
 <li><p><strong>time_unit</strong> (<em>quantities.unitquantity.UnitTime</em>) – Data time unit for time index</p></li>
 </ul>
 </dd>
@@ -602,7 +602,7 @@ data extracted part way with data extracted at the end.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
+<li><p><strong>data</strong> (<em>Block</em>) – Data as returned by a getData() call</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
 Same values as used in getData()</p></li>
 <li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
@@ -621,7 +621,7 @@ Same values as used in getData()</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
+<li><p><strong>data</strong> (<em>Block</em>) – Data as returned by a getData() call</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
 Same values as used in getData()</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
@@ -645,8 +645,8 @@ Or None to extract all runs</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>gsyn_exc</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
-<li><p><strong>gsyn_inh</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
+<li><p><strong>gsyn_exc</strong> (<em>Block</em>) – neo with gsyn_exc data</p></li>
+<li><p><strong>gsyn_inh</strong> (<em>Block</em>) – neo with gsyn_exc data</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -662,7 +662,7 @@ Or None to extract all runs</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have Gsyn_exc data in it</p></li>
+<li><p><strong>data</strong> (<em>Block</em>) – The data to convert; it must have Gsyn_exc data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
@@ -680,7 +680,7 @@ Or None to extract all runs</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have Gsyn_inh data in it</p></li>
+<li><p><strong>data</strong> (<em>Block</em>) – The data to convert; it must have Gsyn_inh data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
@@ -698,7 +698,7 @@ Or None to extract all runs</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo Object including Spike Data</p></li>
+<li><p><strong>neo</strong> (<em>Block</em>) – neo Object including Spike Data</p></li>
 <li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
 </ul>
 </dd>
@@ -714,7 +714,7 @@ Or None to extract all runs</p></li>
 <dd><p>Converts a list of spiketrains into spynnaker7 format</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>SpikeTrain</em><em>)</em>) – List of SpikeTrains</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -729,7 +729,7 @@ Or None to extract all runs</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have V data in it</p></li>
+<li><p><strong>data</strong> (<em>Block</em>) – The data to convert; it must have V data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
@@ -747,7 +747,7 @@ Or None to extract all runs</p></li>
 <p>Only counts run 0</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Neo Object which has spikes in it</p>
+<dd class="field-odd"><p><strong>neo</strong> (<em>Block</em>) – Neo Object which has spikes in it</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The number of spikes in the first segment</p>
@@ -761,7 +761,7 @@ Or None to extract all runs</p></li>
 <dd><p>Help function to count the number of spikes in a list of spiketrains</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
+<dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>SpikeTrain</em><em>)</em>) – List of SpikeTrains</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Total number of spikes in all the spiketrains</p>

@@ -227,7 +227,9 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_seeds</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span>
 
         <span class="c1"># write local seed (4 words), generated randomly!</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_seeds</span><span class="p">())</span>
+        <span class="c1"># Note that in case of a reset, these need a key to ensure subsequent</span>
+        <span class="c1"># runs match the first run</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_seeds</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="c1"># write the number of pre-populations</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">n_pre_pops</span><span class="p">)</span>

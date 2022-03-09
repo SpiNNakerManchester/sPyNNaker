@@ -106,7 +106,8 @@
         <span class="s2">&quot;__events_per_core_datatypes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__events_per_core_recording&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__events_per_ts&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__region_ids&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__region_ids&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__offset_added&quot;</span><span class="p">]</span>
 
     <span class="n">_N_BYTES_FOR_TIMESTAMP</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
     <span class="n">_N_BYTES_PER_RATE</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
@@ -200,14 +201,20 @@
                     <span class="n">events_per_core_variables</span><span class="p">,</span> <span class="n">per_timestep_variables</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">region_id</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__offset_added</span> <span class="o">=</span> <span class="kc">False</span>
+
 <div class="viewcode-block" id="NeuronRecorder.add_region_offset"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.add_region_offset">[docs]</a>    <span class="k">def</span> <span class="nf">add_region_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an offset to the regions.  Used when there are multiple\</span>
 <span class="sd">            recorders on a single core</span>
 
 <span class="sd">        :param int offset: The offset to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">var</span><span class="p">,</span> <span class="n">region</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span>
-                                 <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__offset_added</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">region</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__offset_added</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="nf">_count_recording_per_slice</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>

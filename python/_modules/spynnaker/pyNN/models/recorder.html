@@ -445,6 +445,10 @@
                     <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
                     <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_sampling_interval</span>
                     <span class="n">indexes</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">REWIRING</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+                    <span class="n">sampling_interval</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">indexes</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> \
                         <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
