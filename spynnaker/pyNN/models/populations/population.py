@@ -848,7 +848,7 @@ class Population(PopulationBase):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        SpynnakerDataView.check_user_write()
+        SpynnakerDataView.check_user_can_act()
         if (SpynnakerDataView.is_ran_ever()
                 and not self.__vertex_changeable_after_run):
             raise Exception(
@@ -961,7 +961,7 @@ class Population(PopulationBase):
 
         :param ~pacman.model.constraints.AbstractConstraint constraint:
         """
-        SpynnakerDataView.check_user_write()
+        SpynnakerDataView.check_user_can_act()
         if not isinstance(constraint, AbstractConstraint):
             raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -978,7 +978,7 @@ class Population(PopulationBase):
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
         """
-        SpynnakerDataView.check_user_write()
+        SpynnakerDataView.check_user_can_act()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
@@ -992,7 +992,7 @@ class Population(PopulationBase):
             A dictionary containing "x", "y" and optionally "p" as keys, and
             ints as values
         """
-        SpynnakerDataView.check_user_write()
+        SpynnakerDataView.check_user_can_act()
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
@@ -1005,7 +1005,7 @@ class Population(PopulationBase):
         :param int max_atoms_per_core:
             the new value for the max atoms per core.
         """
-        SpynnakerDataView.check_user_write()
+        SpynnakerDataView.check_user_can_act()
         self.__vertex.add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
         # state that something has changed in the population
