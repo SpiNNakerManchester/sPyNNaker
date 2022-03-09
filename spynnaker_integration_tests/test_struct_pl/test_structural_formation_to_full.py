@@ -139,5 +139,6 @@ class TestStructuralFormationToFull(BaseTestCase):
     def test_structural_formation_to_full_with_reset(self):
         self.runsafe(self.do_run_with_reset)
 
+
 if __name__ == "__main__":
     structural_formation_to_full()

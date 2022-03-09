@@ -118,7 +118,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         pps = pop_lif.get_data()
 
         totalpackets = sum(
-            pps.segments[0].filter(name='packets-per-timestep')[0])+ sum(
+            pps.segments[0].filter(name='packets-per-timestep')[0]) + sum(
                 pps.segments[1].filter(name='packets-per-timestep')[0])
 
         assert(totalpackets == n_neurons * (runtime // spikegap))
