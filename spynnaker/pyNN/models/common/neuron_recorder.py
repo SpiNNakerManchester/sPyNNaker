@@ -68,7 +68,8 @@ class NeuronRecorder(object):
         "__events_per_core_datatypes",
         "__events_per_core_recording",
         "__events_per_ts",
-        "__region_ids"]
+        "__region_ids",
+        "__offset_added"]
 
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
@@ -162,14 +163,20 @@ class NeuronRecorder(object):
                     events_per_core_variables, per_timestep_variables)):
             self.__region_ids[variable] = region_id
 
+        self.__offset_added = False
+
     def add_region_offset(self, offset):
         """ Add an offset to the regions.  Used when there are multiple\
             recorders on a single core
 
         :param int offset: The offset to add
         """
-        self.__region_ids = dict((var, region + offset)
-                                 for var, region in self.__region_ids.items())
+        if not self.__offset_added:
+            self.__region_ids = dict(
+                (var, region + offset)
+                for var, region in self.__region_ids.items())
+
+        self.__offset_added = True
 
     def _count_recording_per_slice(
             self, variable, vertex_slice):
