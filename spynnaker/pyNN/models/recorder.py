@@ -418,6 +418,10 @@ class Recorder(object):
                     data = self.get_spikes()
                     sampling_interval = self.__spike_sampling_interval
                     indexes = None
+                elif variable == REWIRING:
+                    data = self.get_events(variable)
+                    sampling_interval = None
+                    indexes = None
                 else:
                     (data, indexes, sampling_interval) = \
                         self.get_recorded_matrix(variable)
