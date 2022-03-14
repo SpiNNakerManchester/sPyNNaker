@@ -40,8 +40,8 @@ class MachineTest(BaseTestCase):
             ResetStatus.HAS_RUN,
             SpynnakerDataView._UtilsDataView__data._reset_status, "run 1")
         # a call to initialize should not force a hard reset
-        #pop.initialize(v=-64)
-        #sim.run(2)
+        pop.initialize(v=-64)
+        sim.run(2)
 
         # Same machine after second run
         # HACK to avoid detecting user accessed machine
@@ -173,7 +173,6 @@ class MachineTest(BaseTestCase):
         self.assertEqual(id(machine), id(machine4), "run 8")
 
         sim.end()
-
 
     def test_run(self):
         self.runsafe(self.do_run)

@@ -30,8 +30,8 @@ from pyNN.random import NumpyRNG, RandomDistribution as _PynnRandomDistribution
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
-from spinn_utilities.exceptions import (SimulatorNotSetupException,
-    SimulatorShutdownException)
+from spinn_utilities.exceptions import (
+    SimulatorNotSetupException, SimulatorShutdownException)
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)

@@ -863,7 +863,7 @@ class Population(PopulationBase):
                 " set, or a dict of parameter: value items to set")
 
         if SpynnakerDataView.is_ran_last():
-           self._read_parameters_before_set()
+            self._read_parameters_before_set()
 
     def _set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.

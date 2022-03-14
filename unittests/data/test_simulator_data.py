@@ -15,7 +15,6 @@
 
 import unittest
 from spinn_utilities.exceptions import DataNotYetAvialable
-from spinn_front_end_common.data import FecDataView
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
 from spynnaker.pyNN.config_setup import unittest_setup
