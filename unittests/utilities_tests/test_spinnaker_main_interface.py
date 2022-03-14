@@ -16,9 +16,9 @@
 import os
 import sys
 import unittest
+from spinn_utilities.exceptions import SimulatorShutdownException
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.config_setup import unittest_setup
 
 
@@ -59,7 +59,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         self.assertFalse(mock_contoller.closed)
         interface.stop(clear_routing_tables=False, clear_tags=False)
         self.assertTrue(mock_contoller.closed)
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(SimulatorShutdownException):
             interface.stop(clear_routing_tables=False, clear_tags=False)
 
 
