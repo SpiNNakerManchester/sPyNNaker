@@ -693,4 +693,4 @@ def get_machine():
     :return: the machine object
     :rtype: ~spinn_machine.Machine
     """
-    SpynnakerDataView.get_machine()
+    return SpynnakerDataView.get_machine()
