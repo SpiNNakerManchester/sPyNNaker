@@ -22,6 +22,7 @@ from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker import _version
 
 
@@ -37,10 +38,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         # change min delay auto to be the min delay supported by simulator
         if min_delay == "auto":
             min_delay = timestep
-
-        # population and projection holders
-        self._populations = list()
-        self._projections = list()
 
         # pynn demanded objects
         self.__segment_counter = 0
@@ -94,7 +91,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     def reset(self):
         """ Reset the state of the current network to time t = 0.
         """
-        for population in self._populations:
+        for population in SpynnakerDataView.iterate_populations():
             population._cache_data()
 
         self.__segment_counter += 1
@@ -232,26 +229,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         :rtype: str
         """
         return _version._NAME
-
-    @property
-    def populations(self):
-        """ The list of all populations in the simulation.
-
-        :return: list of populations
-        :rtype: list(~spynnaker.pyNN.models.population.Population)
-        """
-        # needed by the population class
-        return self._populations
-
-    @property
-    def projections(self):
-        """ The list of all projections in the simulation.
-
-        :return: list of projections
-        :rtype: list(~spynnaker.pyNN.models.projection.Projection)
-        """
-        # needed by the projection class.
-        return self._projections
 
     @property
     def recorders(self):

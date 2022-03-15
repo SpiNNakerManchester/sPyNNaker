@@ -138,13 +138,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         changed, data_changed = super()._detect_if_graph_has_changed()
 
         # Additionally check populations for changes
-        for population in self._populations:
+        for population in self._data_writer.iterate_populations():
             if population.requires_mapping:
                 changed = True
             population.mark_no_changes()
 
         # Additionally check projections for changes
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections():
             if projection.requires_mapping:
                 changed = True
             projection.mark_no_changes()
@@ -155,16 +155,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     def _count_unique_keys(commands):
         unique_keys = {command.key for command in commands}
         return len(unique_keys)
-
-    def add_population(self, population):
-        """ Called by each population to add itself to the list.
-        """
-        self._populations.append(population)
-
-    def add_projection(self, projection):
-        """ Called by each projection to add itself to the list.
-        """
-        self._projections.append(projection)
 
     def stop(self, clear_routing_tables=None, clear_tags=None):
         """
@@ -177,7 +167,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         :rtype: None
         """
         # pylint: disable=protected-access
-        for population in self._populations:
+        for population in self._data_writer.iterate_populations():
             population._end()
 
         super().stop(clear_routing_tables, clear_tags)
@@ -197,11 +187,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # pylint: disable=protected-access
 
         # extra post run algorithms
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
         super().run(run_time, sync_time)
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
