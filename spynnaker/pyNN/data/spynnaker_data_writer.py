@@ -78,3 +78,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
                 f' {self.get_simulation_time_step_ms()}')
 
         self.__spy_data._min_delay = min_delay
+
+    def reset_number_of_neurons_per_core(self):
+        for neuron_type in self.__spy_data._neurons_per_core_set:
+            neuron_type.set_model_max_atoms_per_core()

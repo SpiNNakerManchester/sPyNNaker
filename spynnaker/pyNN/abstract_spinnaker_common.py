@@ -50,8 +50,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
-    __slots__ = [
-         "__neurons_per_core_set"]
+    __slots__ = []
 
     def __init__(
             self, graph_label, n_chips_required,
@@ -78,8 +77,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # add model binaries
         SpynnakerDataWriter.get_executable_finder().add_path(
             os.path.dirname(model_binaries.__file__))
-
-        self.__neurons_per_core_set = set()
 
         super().__init__(
             graph_label=graph_label,
@@ -184,7 +181,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
             population._end()
 
         super().stop(clear_routing_tables, clear_tags)
-        self.reset_number_of_neurons_per_core()
+        self._data_writer.reset_number_of_neurons_per_core()
 
     def run(self, run_time, sync_time=0.0):
         """ Run the model created.

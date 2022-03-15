@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class _SpynnakerDataModel(object):
@@ -37,6 +41,7 @@ class _SpynnakerDataModel(object):
         # Data values cached
         "_id_counter",
         "_min_delay",
+        "_neurons_per_core_set",
         "_populations",
         "_projections"
     ]
@@ -56,6 +61,8 @@ class _SpynnakerDataModel(object):
         """
         self._id_counter = 0
         self._min_delay = None
+        # Using a dict to verify if later could be stored here only
+        self._neurons_per_core_set = set()
         self._populations = []
         self._projections = []
 
@@ -161,3 +168,18 @@ class SpynnakerDataView(FecDataView):
         cls.__spy_data._id_counter += population.size
         cls.__spy_data._populations.append(population)
         return first_id, cls.__spy_data._id_counter
+
+    @classmethod
+    def set_number_of_neurons_per_core(cls, neuron_type, max_permitted):
+        if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
+            raise Exception(f"{neuron_type} is not a Vertex type")
+
+        if hasattr(neuron_type, "get_max_atoms_per_core"):
+            previous = neuron_type.get_max_atoms_per_core()
+            if previous < max_permitted:
+                logger.warning(
+                    "Attempt to increase number_of_neurons_per_core "
+                    "from {} to {} ignored", previous, max_permitted)
+                return
+        neuron_type.set_model_max_atoms_per_core(max_permitted)
+        cls.__spy_data._neurons_per_core_set.add(neuron_type)
