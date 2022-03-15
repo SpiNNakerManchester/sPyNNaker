@@ -186,7 +186,15 @@ class SpynnakerDataView(FecDataView):
         return first_id, cls.__spy_data._id_counter
 
     @classmethod
-    def set_number_of_neurons_per_core(cls, neuron_type, max_permitted):
+    def add_number_of_neurons_per_core(cls, neuron_type, max_permitted):
+        """
+        Sets a ceiling on the number of neurons of a given type that can be\
+        placed on a single core.
+
+        :param AbstractPopulationVertex neuron_type: neuron type
+        :param int max_permitted: the number to set to
+        :return:
+        """
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
             raise Exception(f"{neuron_type} is not a Vertex type")
 

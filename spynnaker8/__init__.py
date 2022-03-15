@@ -493,7 +493,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         msg = "set_number_of_neurons_per_core call now expects " \
               "neuron_type as a class instead of as a str"
         raise ConfigurationException(msg)
-    SpynnakerDataView.set_number_of_neurons_per_core(
+    SpynnakerDataView.add_number_of_neurons_per_core(
         neuron_type, max_permitted)
 
 
