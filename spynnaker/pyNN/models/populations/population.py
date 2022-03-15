@@ -120,8 +120,6 @@ class Population(PopulationBase):
         self._positions = None
 
         # add objects to the SpiNNaker control class
-        sim = get_simulator()
-        sim.add_population(self)
         SpynnakerDataView.add_vertex(self.__vertex)
 
         # initialise common stuff
@@ -135,13 +133,9 @@ class Population(PopulationBase):
         self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
-        self._all_ids = numpy.arange(sim.id_counter, sim.id_counter + size)
-        self.__first_id = self._all_ids[0]
-        self.__last_id = self._all_ids[-1]
-
-        # update the simulators id_counter for giving a unique ID for every
-        # atom
-        sim.id_counter += size
+        self.__first_id, self.__last_id = SpynnakerDataView.add_population(
+            self)
+        self._all_ids = numpy.arange(self.__first_id, self.__last_id)
 
         # set up initial values if given
         if initial_values:

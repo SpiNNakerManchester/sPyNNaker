@@ -35,7 +35,10 @@ class _SpynnakerDataModel(object):
 
     __slots__ = [
         # Data values cached
-        "_min_delay"
+        "_id_counter",
+        "_min_delay",
+        "_populations",
+        "_projections"
     ]
 
     def __new__(cls):
@@ -51,7 +54,10 @@ class _SpynnakerDataModel(object):
         """
         Clears out all data
         """
+        self._id_counter = 0
         self._min_delay = None
+        self._populations = []
+        self._projections = []
 
 
 class SpynnakerDataView(FecDataView):
@@ -88,3 +94,70 @@ class SpynnakerDataView(FecDataView):
         if cls.__spy_data._min_delay is not None:
             return True
         return cls.has_time_step()
+
+    @classmethod
+    def iterate_projections(cls):
+        """
+        An iteration of the projections previously added
+
+        The iteration will be emtpy if no projections added.
+
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+        """
+        return iter(cls.__spy_data._projections)
+
+    @classmethod
+    def add_projection(cls, projection):
+        """
+        Called by each projection to add itself to the list.
+
+        :param Projection projections: Projection to add
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If projections should not be added in the current state
+        """
+        # UGLY but needed to avoid circular import
+        from spynnaker.pyNN.models.projection import Projection
+        cls.check_user_can_act()
+        if not isinstance(projection, Projection):
+            raise TypeError("The projection must be a Projection")
+        cls.__spy_data._projections.append(projection)
+
+    @classmethod
+    def iterate_populations(cls):
+        """
+        An iteration of the populations previously added
+
+        The iteration will be emtpy if no populations added.
+
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+        """
+        return iter(cls.__spy_data._populations)
+
+    @classmethod
+    def add_population(cls, population):
+        """
+        Called by each population to add itself to the list.
+
+        Usage other than from Population.__init__ is not supported and likely
+        to raise an exception
+
+        Increments the all population id counter by the size of the population.
+
+        :param Population projections: Population to add
+        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+            If projections should not be added in the current state
+        :rtype: (int, int)
+        :return: The first and last global ids for this Population
+        """
+        # UGLY but needed to avoid circular import
+        from spynnaker.pyNN.models.populations.population import Population
+        cls.check_user_can_act()
+        if not isinstance(population, Population):
+            raise TypeError("The population must be a Projection")
+        if population in cls.__spy_data._populations:
+            raise NotImplementedError(
+                "This method should only be called from the Population init")
+        first_id = cls.__spy_data._id_counter
+        cls.__spy_data._id_counter += population.size
+        cls.__spy_data._populations.append(population)
+        return first_id, cls.__spy_data._id_counter

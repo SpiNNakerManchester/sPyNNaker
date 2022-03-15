@@ -51,13 +51,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
     """ Main interface for neural code.
     """
     __slots__ = [
-        "__command_edge_count",
-        "__edge_count",
-        "__id_counter",
-        "__live_spike_recorder",
-        "__neurons_per_core_set",
-        "_populations",
-        "_projections"]
+         "__neurons_per_core_set"]
 
     def __init__(
             self, graph_label, n_chips_required,
@@ -84,17 +78,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # add model binaries
         SpynnakerDataWriter.get_executable_finder().add_path(
             os.path.dirname(model_binaries.__file__))
-
-        # pynn population objects
-        self._populations = []
-        self._projections = []
-        self.__edge_count = 0
-        self.__id_counter = 0
-
-        # the number of edges that are associated with commands being sent to
-        # a vertex
-        self.__command_edge_count = 0
-        self.__live_spike_recorder = dict()
 
         self.__neurons_per_core_set = set()
 
@@ -286,18 +269,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
 
         :rtype: int
         """
-        return self.__id_counter
-
-    @id_counter.setter
-    def id_counter(self, new_value):
-        """ Setter for id_counter, currently used by the populations.
-
-        .. note::
-            Maybe it could live in the pop class???
-
-        :param int new_value: new value for id_counter
-        """
-        self.__id_counter = new_value
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):

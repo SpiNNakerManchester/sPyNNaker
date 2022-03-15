@@ -14,12 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from spinn_utilities.exceptions import DataNotYetAvialable
+from spinn_utilities.exceptions import (
+    DataNotYetAvialable, SimulatorRunningException)
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException)
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector)
+from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
+from spynnaker.pyNN.models.projection import Projection
+from spynnaker.pyNN.models.populations.population import Population
 
 
 class TestSimulatorData(unittest.TestCase):
@@ -72,3 +78,56 @@ class TestSimulatorData(unittest.TestCase):
         # check there is a value not what it is
         self.assertIsNotNone(SpynnakerDataView.get_app_id())
         self.assertIsNotNone(SpynnakerDataView.get_min_delay())
+
+    def test_populations_and_projections(self):
+        writer = SpynnakerDataWriter.setup()
+        writer.create_graphs("test")
+        writer.set_up_timings_and_delay(1000, 1, 1)
+        self.assertListEqual(
+            [], list(SpynnakerDataView.iterate_populations()))
+        self.assertListEqual(
+            [], list(SpynnakerDataView.iterate_projections()))
+        model = IFCurrExpBase()
+        pop_1 = Population(size=5, cellclass=model)
+        # Population adds itself so no one can
+        with self.assertRaises(NotImplementedError):
+            writer.add_population(pop_1)
+        self.assertListEqual(
+            [pop_1], list(SpynnakerDataView.iterate_populations()))
+        # Hack to check internal data
+        # DO NOT COPY as unsupported
+        self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
+        pop_2 = Population(size=15, cellclass=model)
+
+        self.assertListEqual(
+            [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        # Hack to check internal data
+        # DO NOT COPY as unsupported
+        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        pro_1 = Projection(
+            pop_1, pop_2, OneToOneConnector(), receptor_type='excitatory')
+        self.assertListEqual(
+            [pro_1], list(SpynnakerDataView.iterate_projections()))
+        pro_2 = Projection(
+            pop_2, pop_1, OneToOneConnector(), receptor_type='excitatory')
+        self.assertListEqual(
+            [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        writer.start_run()
+        # Unable to add while running
+        with self.assertRaises(SimulatorRunningException):
+            Population(size=11, cellclass=model)
+        with self.assertRaises(SimulatorRunningException):
+            Projection(
+                pop_2, pop_1, OneToOneConnector(), receptor_type="inhibitory")
+        writer.finish_run()
+        writer.hard_reset()
+        # population not changed by hard reset
+        self.assertListEqual(
+            [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        self.assertListEqual(
+            [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
+        with self.assertRaises(TypeError):
+            writer.add_population("bacon")
+        with self.assertRaises(TypeError):
+            writer.add_projection("bacon")

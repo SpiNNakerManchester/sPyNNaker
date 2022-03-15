@@ -23,8 +23,6 @@ from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -88,7 +86,6 @@ class Projection(object):
                 "sPyNNaker {} does not yet support multi-compartmental "
                 "cells.".format(__version__))
 
-        sim = get_simulator()
         self.__projection_edge = None
         self.__host_based_synapse_list = None
         self.__has_retrieved_synaptic_list_from_machine = False
@@ -190,7 +187,7 @@ class Projection(object):
                 self.__projection_edge, SPIKE_PARTITION_ID)
 
         # add projection to the SpiNNaker control system
-        sim.add_projection(self)
+        SpynnakerDataView.add_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
