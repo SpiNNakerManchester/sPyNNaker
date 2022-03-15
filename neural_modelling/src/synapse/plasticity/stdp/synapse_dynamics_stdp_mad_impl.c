@@ -277,7 +277,7 @@ address_t synapse_dynamics_initialise(
 
     post_event_size = n_neurons * sizeof(uint8_t);
 
-    post_event_local = spin1_malloc(post_event_size);
+    post_event_local = spin1_malloc(post_event_size+1);
     if (post_event_local == NULL) {
         log_error("Not enough memory to allocate post event region locally");
         return NULL;
@@ -290,7 +290,8 @@ address_t synapse_dynamics_initialise(
 
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
-        weight_t *ring_buffers, uint32_t time) {
+        weight_t *ring_buffers, uint32_t time,
+        uint32_t *num_fixed_pre_synaptic_events_per_timestep) {
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words =
@@ -315,6 +316,8 @@ bool synapse_dynamics_process_plastic_synapses(
     event_history->prev_time = time;
     event_history->prev_trace =
             timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+
+    (*num_fixed_pre_synaptic_events_per_timestep) += plastic_synapse;
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -395,7 +398,7 @@ void synapse_dynamics_process_post_synaptic_event(uint32_t time) {
 
     for(index_t neuron_index = 0; neuron_index < neurons; neuron_index++) {
 
-        if(post_event_region[neuron_index]) {
+        if(post_event_local[neuron_index]) {
 
             // Add post-event
             post_event_history_t *history = &post_event_history[neuron_index];

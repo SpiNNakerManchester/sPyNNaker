@@ -567,6 +567,7 @@ void neuron_do_timestep_update( // EXPORTED
         }
 
         while (!dma_finished);
+
     }
 
     // Set the next expected time to wait for between spike sending

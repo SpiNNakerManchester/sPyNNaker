@@ -67,7 +67,7 @@ class PyNNPopulationCommon(object):
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None,
-            in_partitions=None, out_partitions=None, n_targets=None):
+            in_partitions=None, out_partitions=None, n_targets=None, wc_time=None):
         # pylint: disable=too-many-arguments
         size = self._roundsize(size, label)
 
@@ -88,6 +88,8 @@ class PyNNPopulationCommon(object):
                 population_parameters["out_partitions"] = out_partitions
             if n_targets is not None:
                 population_parameters["n_targets"] = n_targets
+            if wc_time is not None:
+                population_parameters["wc_time"] = wc_time
             vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 

@@ -141,7 +141,8 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         "__change_requires_mapping",
         "_recordables",
         "__mem_offset",
-        "__n_targets"]
+        "__n_targets",
+        "__wc_time"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -149,12 +150,12 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
 
     _n_vertices = 0
 
-    memory_LUT = [12, 18, 19, 24, 23, 23, 27, 27, 27, 27, 22, 22, 12]
+    memory_LUT = [12, 15, 12, 15, 15, 15, 15, 27, 27, 27, 22, 22, 12]
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, atoms_offset,
                  constraints, label, max_atoms_per_core, weight_scale, ring_buffer_sigma,
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types, mem_offset,
-                 n_targets, population_table_type=None, synapse_io=None):
+                 n_targets, wctime, population_table_type=None, synapse_io=None):
 
         self._implemented_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -172,6 +173,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         #Global partition index
         self.__mem_offset = mem_offset
         self.__n_targets = n_targets
+        self.__wc_time = wctime
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -1225,7 +1227,7 @@ class SynapticManager(ApplicationVertex, AbstractGeneratesDataSpecification, Abs
         spec.write_value(data=index)
 
         # Write the number of microseconds needed for the syn contribution write
-        spec.write_value(data=self.memory_LUT[self.__n_targets - 1])
+        spec.write_value(data=self.__wc_time)
 
         # Hardcoded and moved in the constructor
         #ring_buffer_shifts = self._get_ring_buffer_shifts(
