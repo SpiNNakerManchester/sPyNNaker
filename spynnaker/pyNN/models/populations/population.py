@@ -28,8 +28,6 @@ from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.constraints.partitioner_constraints import (
     MaxVertexAtomsConstraint)
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView

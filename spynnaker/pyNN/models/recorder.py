@@ -22,7 +22,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker import _version
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
@@ -358,7 +357,7 @@ class Recorder(object):
         """
         block = neo.Block()
 
-        for previous in range(0, get_simulator().segment_counter):
+        for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self._append_previous_segment(
                 block, previous, variables, view_indexes)
 
@@ -403,7 +402,7 @@ class Recorder(object):
         """
         variables = self.get_all_recording_variables()
         if variables:
-            segment_number = get_simulator().segment_counter
+            segment_number = SpynnakerDataView.get_segment_counter()
             logger.info("Caching data for segment {:d}", segment_number)
 
             data_cache = DataCache(
@@ -467,7 +466,7 @@ class Recorder(object):
     def __append_current_segment(self, block, variables, view_indexes, clear):
         # build segment for the current data to be gathered in
         segment = neo.Segment(
-            name="segment{}".format(get_simulator().segment_counter),
+            name="segment{}".format(SpynnakerDataView.get_segment_counter()),
             description=self.__population.describe(),
             rec_datetime=datetime.now())
 

@@ -41,6 +41,20 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         FecDataWriter._mock(self)
         self._set_min_delay(1)
 
+    @overrides(FecDataWriter._hard_reset)
+    def _hard_reset(self):
+        if not self.is_soft_reset():
+            # Only increase it if this is a hard not following a soft
+            self.__spy_data._segment_counter += 1
+        FecDataWriter._hard_reset(self)
+        self.__spy_data._hard_reset()
+
+    @overrides(FecDataWriter._soft_reset)
+    def _soft_reset(self):
+        self.__spy_data._segment_counter += 1
+        FecDataWriter._soft_reset(self)
+        self.__spy_data._soft_reset()
+
     def set_up_timings_and_delay(
             self, simulation_time_step_us, time_scale_factor, min_delay):
         try:

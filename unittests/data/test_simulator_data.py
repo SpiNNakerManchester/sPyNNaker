@@ -131,3 +131,55 @@ class TestSimulatorData(unittest.TestCase):
             writer.add_population("bacon")
         with self.assertRaises(TypeError):
             writer.add_projection("bacon")
+
+    def test_segment_counter(self):
+        writer = SpynnakerDataWriter.setup()
+        self.assertEqual(0, SpynnakerDataView.get_segment_counter())
+
+        # Not changed by running
+        writer.start_run()
+        self.assertEqual(0, SpynnakerDataView.get_segment_counter())
+        writer.finish_run()
+        self.assertEqual(0, SpynnakerDataView.get_segment_counter())
+
+        # Not changed by running again
+        writer.start_run()
+        writer.finish_run()
+        self.assertEqual(0, SpynnakerDataView.get_segment_counter())
+
+        # Changed by a soft reset
+        writer.soft_reset()
+        self.assertEqual(1, SpynnakerDataView.get_segment_counter())
+        writer.start_run()
+        writer.finish_run()
+        self.assertEqual(1, SpynnakerDataView.get_segment_counter())
+
+        # Changed by a hard reset
+        writer.hard_reset()
+        self.assertEqual(2, SpynnakerDataView.get_segment_counter())
+        writer.start_run()
+        writer.finish_run()
+
+        # Changed once by a soft than not by the hard reset before run
+        writer.soft_reset()
+        self.assertEqual(3, SpynnakerDataView.get_segment_counter())
+        writer.hard_reset()
+        self.assertEqual(3, SpynnakerDataView.get_segment_counter())
+        writer.start_run()
+        writer.finish_run()
+        self.assertEqual(3, SpynnakerDataView.get_segment_counter())
+
+        # Changed once by a soft than not by the hard reset in run
+        writer.soft_reset()
+        self.assertEqual(4, SpynnakerDataView.get_segment_counter())
+        writer.start_run()
+        writer.hard_reset()
+        self.assertEqual(4, SpynnakerDataView.get_segment_counter())
+        writer.finish_run()
+        self.assertEqual(4, SpynnakerDataView.get_segment_counter())
+
+        # shutting down does not change the value
+        writer.stopping()
+        self.assertEqual(4, SpynnakerDataView.get_segment_counter())
+        writer.shut_down()
+        self.assertEqual(4, SpynnakerDataView.get_segment_counter())

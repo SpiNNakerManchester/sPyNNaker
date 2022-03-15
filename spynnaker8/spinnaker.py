@@ -13,9 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from lazyarray import __version__ as lazyarray_version
 from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
+from spinn_utilities.log import FormatAdapter
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -24,6 +26,8 @@ from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker import _version
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
@@ -39,8 +43,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         if min_delay == "auto":
             min_delay = timestep
 
-        # pynn demanded objects
-        self.__segment_counter = 0
         self.__recorders = set([])
 
         # main pynn interface inheritance
@@ -82,7 +84,6 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
         """
         self.recorders = set([])
         self.id_counter = 0
-        self.__segment_counter = -1
         self.reset()
 
         # Stop any currently running SpiNNaker application
@@ -91,10 +92,15 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     def reset(self):
         """ Reset the state of the current network to time t = 0.
         """
+        if not self._data_writer.is_ran_last():
+            if not self._data_writer.is_ran_ever():
+                logger.error("Ignoring the reset before the run")
+            else:
+                logger.error("Ignoring the repeated reset call")
+            return
+
         for population in SpynnakerDataView.iterate_populations():
             population._cache_data()
-
-        self.__segment_counter += 1
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)
@@ -186,10 +192,12 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     def segment_counter(self):
         """ The number of the current recording segment being generated.
 
+        This is required by PyNN
+
         :return: the segment counter
         :rtype: int
         """
-        return self.__segment_counter
+        return SpynnakerDataView.get_segment_counter()
 
     @segment_counter.setter
     def segment_counter(self, new_value):
@@ -197,7 +205,8 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
 
         :param int new_value: new value for the segment counter
         """
-        self.__segment_counter = new_value
+        raise NotImplementedError(
+            "We do not support externally altering the segment counter")
 
     @property
     def running(self):
