@@ -194,24 +194,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
-    def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
-        if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
-            raise Exception("{} is not a Vertex type".format(neuron_type))
-
-        if hasattr(neuron_type, "get_max_atoms_per_core"):
-            previous = neuron_type.get_max_atoms_per_core()
-            if previous < max_permitted:
-                logger.warning(
-                    "Attempt to increase number_of_neurons_per_core "
-                    "from {} to {} ignored", previous, max_permitted)
-                return
-        neuron_type.set_model_max_atoms_per_core(max_permitted)
-        self.__neurons_per_core_set.add(neuron_type)
-
-    def reset_number_of_neurons_per_core(self):
-        for neuron_type in self.__neurons_per_core_set:
-            neuron_type.set_model_max_atoms_per_core()
-
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):
         """ Locate receivers and their corresponding monitor cores for\
