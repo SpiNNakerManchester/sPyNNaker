@@ -85,13 +85,12 @@ class _SpynnakerDataModel(object):
 
 class SpynnakerDataView(FecDataView):
     """
-    A read only view of the data available at Spynnaker level
+    Adds the extra Methods to the View for PyNN level.
 
-    The property methods will either return a valid value or
-    raise an Exception if the data is currently not available
+    See UtilsDataView for a more detailed description.
 
-    While how and where the underpinning DataModel(s) store data can change
-    without notice, methods in this class can be considered a supported API
+    Use this class weherever possible as it inherits all methods from all View
+    classes.
     """
 
     __spy_data = _SpynnakerDataModel()
@@ -100,7 +99,7 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def get_min_delay(cls):
-        """ The minimum supported delay, in milliseconds.
+        """ The minimum supported delay, in milliseconds if available
 
         Typically simulation_time_step_per_ms but may be a positive multiple
 
@@ -114,6 +113,11 @@ class SpynnakerDataView(FecDataView):
 
     @classmethod
     def has_min_delay(cls):
+        """
+        report if the minimum supported delay, in milliseconds if available
+
+        :rtype: bool
+        """
         if cls.__spy_data._min_delay is not None:
             return True
         return cls.has_time_step()
@@ -125,9 +129,18 @@ class SpynnakerDataView(FecDataView):
 
         The iteration will be emtpy if no projections added.
 
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+        :rtpye: iterable(Projection)
         """
         return iter(cls.__spy_data._projections)
+
+    @classmethod
+    def get_n_projections(cls):
+        """
+        The number of projections previously added
+
+        rtype: int
+        """
+        return len(cls.__spy_data._projections)
 
     @classmethod
     def add_projection(cls, projection):
@@ -152,9 +165,18 @@ class SpynnakerDataView(FecDataView):
 
         The iteration will be emtpy if no populations added.
 
-        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
+        :rtpye: iterable(~spynnaker.pyNN.models.populations.Population)
         """
         return iter(cls.__spy_data._populations)
+
+    @classmethod
+    def get_n_populations(cls):
+        """
+        The number of populations previously added
+
+        :rtpye: int
+        """
+        return len(cls.__spy_data._populations)
 
     @classmethod
     def add_population(cls, population):
@@ -166,7 +188,8 @@ class SpynnakerDataView(FecDataView):
 
         Increments the all population id counter by the size of the population.
 
-        :param Population projections: Population to add
+        :param ~spynnaker.pyNN.models.populations.Population projections:
+            Population to add
         :rtype: (int, int)
         :return: The first and last global ids for this Population
         :raises SimulatorRunningException: If sim.run is currently running
@@ -197,7 +220,7 @@ class SpynnakerDataView(FecDataView):
         :return:
         """
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
-            raise Exception(f"{neuron_type} is not a Vertex type")
+            raise TypeError(f"{neuron_type} is not a Vertex type")
 
         if hasattr(neuron_type, "get_max_atoms_per_core"):
             previous = neuron_type.get_max_atoms_per_core()

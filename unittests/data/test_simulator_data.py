@@ -85,8 +85,10 @@ class TestSimulatorData(unittest.TestCase):
         writer.set_up_timings_and_delay(1000, 1, 1)
         self.assertListEqual(
             [], list(SpynnakerDataView.iterate_populations()))
+        self.assertEqual(0, SpynnakerDataView.get_n_populations())
         self.assertListEqual(
             [], list(SpynnakerDataView.iterate_projections()))
+        self.assertEqual(0, SpynnakerDataView.get_n_projections())
         model = IFCurrExpBase()
         pop_1 = Population(size=5, cellclass=model)
         # Population adds itself so no one can
@@ -94,6 +96,7 @@ class TestSimulatorData(unittest.TestCase):
             writer.add_population(pop_1)
         self.assertListEqual(
             [pop_1], list(SpynnakerDataView.iterate_populations()))
+        self.assertEqual(1, SpynnakerDataView.get_n_populations())
         # Hack to check internal data
         # DO NOT COPY as unsupported
         self.assertEqual(5, writer._SpynnakerDataWriter__spy_data._id_counter)
@@ -101,6 +104,7 @@ class TestSimulatorData(unittest.TestCase):
 
         self.assertListEqual(
             [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        self.assertEqual(2, SpynnakerDataView.get_n_populations())
         # Hack to check internal data
         # DO NOT COPY as unsupported
         self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
@@ -108,10 +112,12 @@ class TestSimulatorData(unittest.TestCase):
             pop_1, pop_2, OneToOneConnector(), receptor_type='excitatory')
         self.assertListEqual(
             [pro_1], list(SpynnakerDataView.iterate_projections()))
+        self.assertEqual(1, SpynnakerDataView.get_n_projections())
         pro_2 = Projection(
             pop_2, pop_1, OneToOneConnector(), receptor_type='excitatory')
         self.assertListEqual(
             [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        self.assertEqual(2, SpynnakerDataView.get_n_projections())
         writer.start_run()
         # Unable to add while running
         with self.assertRaises(SimulatorRunningException):
@@ -124,8 +130,10 @@ class TestSimulatorData(unittest.TestCase):
         # population not changed by hard reset
         self.assertListEqual(
             [pop_1, pop_2], list(SpynnakerDataView.iterate_populations()))
+        self.assertEqual(2, SpynnakerDataView.get_n_populations())
         self.assertListEqual(
             [pro_1, pro_2], list(SpynnakerDataView.iterate_projections()))
+        self.assertEqual(2, SpynnakerDataView.get_n_projections())
         self.assertEqual(20, writer._SpynnakerDataWriter__spy_data._id_counter)
         with self.assertRaises(TypeError):
             writer.add_population("bacon")
