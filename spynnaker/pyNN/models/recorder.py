@@ -152,6 +152,9 @@ class Recorder(object):
         :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or None for all
         :type indexes: list(int) or None
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
 
         SpynnakerDataView.check_user_can_act()
@@ -215,6 +218,9 @@ class Recorder(object):
             ``gsyn_exc``, ``gsyn_inh``, ``v``
         :return: data, indexes, sampling_interval
         :rtype: tuple(~numpy.ndarray, list(int), float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
         # check that we're in a state to get voltages

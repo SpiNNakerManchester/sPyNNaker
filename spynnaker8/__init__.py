@@ -511,6 +511,9 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param str receptor_type: excitatory / inhibitory
     :param float p: probability
     :param ~pyNN.random.NumpyRNG rng: random number generator
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     # pylint: disable=too-many-arguments
     SpynnakerDataView.check_user_can_act()
@@ -525,6 +528,9 @@ def create(cellclass, cellparams=None, n=1):
     :param cellparams: population params.
     :param int n: n neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["create"](cellclass, cellparams, n)
@@ -543,6 +549,9 @@ def get_current_time():
     """ Gets the time within the simulation
 
     :return: returns the current time
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["get_current_time"]()
@@ -554,6 +563,9 @@ def get_min_delay():
 
     :return: returns the min delay of the simulation
     :rtype: int
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["get_min_delay"]()
@@ -577,6 +589,9 @@ def get_time_step():
 
     :return: get the time step of the simulation (in ms)
     :rtype: float
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return float(__pynn["get_time_step"]())
@@ -589,6 +604,9 @@ def initialize(cells, **initial_values):
     :type cells: ~spynnaker.pyNN.models.populations.Population or
         ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     pynn_common.initialize(cells, **initial_values)
@@ -602,6 +620,9 @@ def num_processes():
 
     :return: the number of MPI processes
     :rtype: int
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["num_processes"]()
@@ -615,6 +636,9 @@ def rank():
 
     :return: MPI rank
     :rtype: int
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["rank"]()
@@ -638,6 +662,9 @@ def record(variables, source, filename, sampling_interval=None,
     :type annotations: dict(str, ...)
     :return: neo object
     :rtype: ~neo.core.Block
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["record"](variables, source, filename, sampling_interval,
@@ -650,6 +677,9 @@ def reset(annotations=None):
     :param annotations: the annotations to the data objects
     :type annotations: dict(str, ...)
     :rtype: None
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     if annotations is None:
         annotations = {}
@@ -665,6 +695,9 @@ def run(simtime, callbacks=None):
     :param callbacks: callbacks to run
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["run"](simtime, callbacks=callbacks)
@@ -681,6 +714,9 @@ def run_until(tstop):
     :param float tstop: the time to stop at (in milliseconds)
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
+    :raises SimulatorRunningException: If sim.run is currently running
+    :raises SimulatorNotSetupException: If called before sim.setup
+    :raises SimulatorShutdownException: If called after sim.end
     """
     SpynnakerDataView.check_user_can_act()
     return __pynn["run_until"](tstop)

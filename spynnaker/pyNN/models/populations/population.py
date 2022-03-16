@@ -835,6 +835,9 @@ class Population(PopulationBase):
 
     def _set_check(self, parameter, value):
         """ Checks for various set methods.
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if not self.__vertex_population_settable:
             raise KeyError("Population does not have property {}".format(
@@ -874,6 +877,9 @@ class Population(PopulationBase):
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         self._set_check(parameter, value)
 
@@ -907,6 +913,9 @@ class Population(PopulationBase):
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         self._set_check(parameter, value)
 
@@ -952,6 +961,9 @@ class Population(PopulationBase):
             onto which its atoms will be placed.
 
         :param ~pacman.model.constraints.AbstractConstraint constraint:
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
         if not isinstance(constraint, AbstractConstraint):
@@ -969,6 +981,9 @@ class Population(PopulationBase):
         :param int x: The x-coordinate of the placement constraint
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
@@ -983,6 +998,9 @@ class Population(PopulationBase):
         :param dict(str,int) constraint_dict:
             A dictionary containing "x", "y" and optionally "p" as keys, and
             ints as values
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
         self.add_placement_constraint(**constraint_dict)
@@ -996,6 +1014,9 @@ class Population(PopulationBase):
 
         :param int max_atoms_per_core:
             the new value for the max atoms per core.
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
         self.__vertex.add_constraint(
