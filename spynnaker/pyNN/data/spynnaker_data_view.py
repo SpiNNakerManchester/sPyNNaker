@@ -158,7 +158,7 @@ class SpynnakerDataView(FecDataView):
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.projection import Projection
         cls.check_user_can_act()
-        if projection in cls.__spy_data._projection:
+        if projection in cls.__spy_data._projections:
             raise NotImplementedError(
                 "This method should only be called from the Projection init")
         if not isinstance(projection, Projection):
