@@ -147,7 +147,8 @@ class SpynnakerDataView(FecDataView):
         """
         Called by each projection to add itself to the list.
 
-        :param Projection projections: Projection to add
+        :param ~spynnaker.pyNN.models.projectionProjection projections:
+        Projection to add
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
             If projections should not be added in the current state
         """
