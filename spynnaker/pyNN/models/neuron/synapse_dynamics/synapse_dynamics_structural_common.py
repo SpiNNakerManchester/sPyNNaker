@@ -190,7 +190,9 @@ class SynapseDynamicsStructuralCommon(
         spec.write_array(self.get_seeds(app_vertex))
 
         # write local seed (4 words), generated randomly!
-        spec.write_array(self.get_seeds())
+        # Note that in case of a reset, these need a key to ensure subsequent
+        # runs match the first run
+        spec.write_array(self.get_seeds(vertex_slice))
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)
