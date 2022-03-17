@@ -150,8 +150,8 @@ class SpynnakerDataView(FecDataView):
         Usage other than from Projection.__init__ is not supported and likely
         to raise an exception
 
-        :param ~spynnaker.pyNN.models.projectionProjection projections:
-        Projection to add
+        :param projection: Projection to add
+        :type projection: ~spynnaker.pyNN.models.projectionProjection
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
         If projections should not be added in the current state
         """
@@ -193,6 +193,15 @@ class SpynnakerDataView(FecDataView):
         Usage other than from Population.__init__ is not supported and likely
         to raise an exception
 
+        Increments the all population id counter by the size of the population.
+
+        :param population: Population to add
+        :type population: ~spynnaker.pyNN.models.populations.Population
+        :rtype: (int, int)
+        :return: The first and last global ids for this Population
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.populations.population import Population
