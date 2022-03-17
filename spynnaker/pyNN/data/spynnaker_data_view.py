@@ -147,6 +147,9 @@ class SpynnakerDataView(FecDataView):
         """
         Called by each projection to add itself to the list.
 
+        Usage other than from Projection.__init__ is not supported and likely
+        to raise an exception
+
         :param ~spynnaker.pyNN.models.projectionProjection projections:
         Projection to add
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
@@ -155,6 +158,9 @@ class SpynnakerDataView(FecDataView):
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.projection import Projection
         cls.check_user_can_act()
+        if projection in cls.__spy_data._projection:
+            raise NotImplementedError(
+                "This method should only be called from the Projection init")
         if not isinstance(projection, Projection):
             raise TypeError("The projection must be a Projection")
         cls.__spy_data._projections.append(projection)
@@ -189,7 +195,7 @@ class SpynnakerDataView(FecDataView):
 
         Increments the all population id counter by the size of the population.
 
-        :param ~spynnaker.pyNN.models.populations.Population projections:
+        :param ~spynnaker.pyNN.models.populations.Population population:
         Population to add
         :rtype: (int, int)
         :return: The first and last global ids for this Population
