@@ -195,8 +195,8 @@ class SpynnakerDataView(FecDataView):
 
         Increments the all population id counter by the size of the population.
 
-        :param ~spynnaker.pyNN.models.populations.Population population:
-        Population to add
+        :param population: Population to add
+        :type  population: ~spynnaker.pyNN.models.populations.Population
         :rtype: (int, int)
         :return: The first and last global ids for this Population
         :raises SimulatorRunningException: If sim.run is currently running
