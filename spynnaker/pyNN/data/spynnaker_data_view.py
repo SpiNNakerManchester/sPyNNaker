@@ -153,7 +153,7 @@ class SpynnakerDataView(FecDataView):
         :param projection: Projection to add
         :type projection: ~spynnaker.pyNN.models.projectionProjection
         :raises ~spinn_utilities.exceptions.SpiNNUtilsException:
-        If projections should not be added in the current state
+            If projections should not be added in the current state
         """
         # UGLY but needed to avoid circular import
         from spynnaker.pyNN.models.projection import Projection
