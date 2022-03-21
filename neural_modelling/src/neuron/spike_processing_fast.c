@@ -546,7 +546,7 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
     }
 }
 
-static inline void check_times() {
+static inline void check_times(void) {
     uint32_t tc_time = tc[T1_COUNT];
     if (tc_time > earliest_spike_received_time) {
         earliest_spike_received_time = tc_time;
