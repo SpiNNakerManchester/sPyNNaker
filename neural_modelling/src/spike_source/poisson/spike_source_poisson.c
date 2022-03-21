@@ -129,7 +129,7 @@ typedef struct global_parameters {
     //! The time between ticks in seconds for setting the rate
     UFRACT seconds_per_tick;
     //! The number of ticks per millisecond for setting the start and duration
-    REAL ticks_per_ms;
+    UREAL ticks_per_ms;
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
     //! The border rate between fast and faster sources
@@ -142,8 +142,6 @@ typedef struct global_parameters {
     uint32_t max_spikes_per_tick;
     //! The seed for the Poisson generation process
     rng_seed_t spike_source_seed;
-    //! Determine if any rates have been changed
-    uint32_t rate_changed;
 } global_parameters;
 
 //! Structure of the provenance data
@@ -177,6 +175,8 @@ typedef struct source_expand_details {
 } source_expand_details;
 
 typedef struct source_expand_region {
+    //! Determine if any rates have been changed
+    uint32_t rate_changed;
     // The number of expander items in the region
     uint32_t n_items;
     // The expander items.  Because each of these are dynamic they have to be
@@ -240,6 +240,9 @@ static struct sdram_config *sdram_inputs;
 
 //! The inputs to be sent at the end of this timestep
 static uint16_t *input_this_timestep;
+
+//! The timesteps per second
+static UREAL ts_per_second;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -349,27 +352,35 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 //!     the rate in Hz, to be multiplied to get per-tick values
 void set_spike_source_rate(uint32_t sub_id, unsigned long accum rate) {
 
-    REAL rate_per_tick = rate * ssp_params.seconds_per_tick;
+    REAL rate_per_tick = kbits(
+            (__U64(bitsk(rate)) * __U64(bitsulr(ssp_params.seconds_per_tick))) >> 32);
     log_debug("Setting rate of %u to %kHz (%k per tick)",
             sub_id, rate, rate_per_tick);
     spike_source_t *spike_source = &source[sub_id];
 
     if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
-        spike_source->is_fast_source = true;
+        spike_source->is_fast_source = 1;
+        spike_source->mean_isi_ticks = 0;
+        spike_source->time_to_spike_ticks = 0;
         if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
             spike_source->sqrt_lambda = SQRT(rate_per_tick);
+            spike_source->exp_minus_lambda = UFRACT_CONST(0);
             // warning: sqrtk is untested...
         } else {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
             spike_source->sqrt_lambda = ZERO;
         }
-    } else if (rate_per_tick == 0) {
-        spike_source->is_fast_source = false;
-        spike_source->mean_isi_ticks = 0;
-        spike_source->time_to_spike_ticks = 0;
     } else {
-        spike_source->is_fast_source = false;
-        spike_source->mean_isi_ticks = (uint32_t) (ONE / rate_per_tick);
+        if (rate > 0) {
+            spike_source->mean_isi_ticks =
+                (uint32_t) ((bitsulk((unsigned long accum) ts_per_second)) / bitsulk(rate));
+        } else {
+            spike_source->mean_isi_ticks = 0;
+        }
+
+        spike_source->exp_minus_lambda = UFRACT_CONST(0);
+        spike_source->sqrt_lambda = ZERO;
+        spike_source->is_fast_source = 0;
         spike_source->time_to_spike_ticks =
                 slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
     }
@@ -389,7 +400,7 @@ static void store_provenance_data(address_t provenance_region) {
 }
 
 static inline uint32_t ms_to_ticks(unsigned long accum ms) {
-    return (uint32_t) ((ms + 0.5k) * ssp_params.ticks_per_ms);
+    return (uint32_t) ((ms * ssp_params.ticks_per_ms) + 0.5k);
 }
 
 static inline void set_spike_source_details(uint32_t id, bool rate_changed) {
@@ -447,9 +458,10 @@ static void print_spike_source(index_t s) {
     log_info("scaled end = %u", p->end_ticks);
     log_info("scaled next = %u", p->next_ticks);
     log_info("is_fast_source = %d", p->is_fast_source);
-    log_info("exp_minus_lamda = %k", (REAL) p->exp_minus_lambda);
-    log_info("isi_val = %k", p->mean_isi_ticks);
-    log_info("time_to_spike = %k", p->time_to_spike_ticks);
+    log_info("exp_minus_lambda = %k", (REAL) p->exp_minus_lambda);
+    log_info("sqrt_lambda = %k", p->sqrt_lambda);
+    log_info("isi_val = %u", p->mean_isi_ticks);
+    log_info("time_to_spike = %u", p->time_to_spike_ticks);
 }
 
 //! Print all spike sources
@@ -467,6 +479,7 @@ static void print_spike_sources(void) {
 static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("read global_parameters: starting");
     ssp_params = *sdram_globals;
+    ts_per_second = ukbits(1000 * bitsuk(ssp_params.ticks_per_ms));
 
     log_info("\tkey = %08x, set rate mask = %08x",
             ssp_params.key, ssp_params.set_rate_neuron_id_mask);
@@ -479,11 +492,11 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
             ssp_params.n_spike_sources, ssp_params.first_source_id);
     log_info("seconds_per_tick = %k\n", (REAL) ssp_params.seconds_per_tick);
     log_info("ticks_per_ms = %k\n", ssp_params.ticks_per_ms);
+    log_info("ts_per_second = %k", ts_per_second);
     log_info("slow_rate_per_tick_cutoff = %k\n",
             ssp_params.slow_rate_per_tick_cutoff);
     log_info("fast_rate_per_tick_cutoff = %k\n",
             ssp_params.fast_rate_per_tick_cutoff);
-    log_info("rate_changed = %u", ssp_params.rate_changed);
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -548,7 +561,7 @@ static bool read_rates(source_info *sdram_sources, bool rate_changed) {
     return true;
 }
 
-static void expand_rates(source_expand_region *items, source_info *sdram_sources) {
+static bool expand_rates(source_expand_region *items, source_info *sdram_sources) {
 
     // We need a pointer here as each item is dynamically sized.  This pointer
     // will be updated each time with the start of the next item to be read
@@ -585,6 +598,8 @@ static void expand_rates(source_expand_region *items, source_info *sdram_sources
         // Update the item pointer to just after the last item read
         item = (source_expand_details *) &(item->info.details[n_rates]);
     }
+
+    return items->rate_changed;
 }
 
 //! \brief Initialise the recording parts of the model.
@@ -668,9 +683,10 @@ static bool initialize(void) {
     }
 
     void *rates_region = data_specification_get_region(RATES, ds_regions);
-    expand_rates(data_specification_get_region(EXPANDER_REGION, ds_regions),
+    bool rates_changed = expand_rates(
+            data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
-    if (!read_rates(rates_region, true)) {
+    if (!read_rates(rates_region, rates_changed)) {
         return false;
     }
 
@@ -719,6 +735,9 @@ static bool initialize(void) {
             return false;
         }
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
+        for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
+            log_debug("weight[%u] = %u", i, sdram_inputs->weights[i]);
+        }
     }
 
     log_info("Initialise: completed successfully");
@@ -733,18 +752,12 @@ static void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
 
-    // Setup regions that specify spike source array data
-    if (!read_global_parameters(
-            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
-        log_error("failed to reread the Poisson parameters from SDRAM");
-        rt_error(RTE_SWERR);
-    }
-
     void *rates_region = data_specification_get_region(RATES, ds_regions);
-    expand_rates(data_specification_get_region(EXPANDER_REGION, ds_regions),
+    bool rates_changed = expand_rates(
+            data_specification_get_region(EXPANDER_REGION, ds_regions),
             rates_region);
 
-    if (!read_rates(rates_region, ssp_params.rate_changed)) {
+    if (!read_rates(rates_region, rates_changed)) {
         log_error("failed to reread the Poisson rates from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -755,22 +768,6 @@ static void resume_callback(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     print_spike_sources();
 #endif
-}
-
-//! \brief Store the Poisson parameters back into SDRAM for reading by the
-//!     host when needed
-//! \return True if successful
-static bool store_poisson_parameters(void) {
-    log_info("store_parameters: starting");
-
-    // Get the address this core's DTCM data starts at from SRAM
-    global_parameters *sdram_globals = data_specification_get_region(
-        POISSON_PARAMS, data_specification_get_data_address());
-
-    *sdram_globals = ssp_params;
-
-    log_info("store_parameters: completed successfully");
-    return true;
 }
 
 //! \brief records spikes as needed
@@ -909,12 +906,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     if (simulation_is_finished()) {
         // go into pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
-
-        // rewrite poisson params to SDRAM for reading out if needed
-        if (!store_poisson_parameters()) {
-            log_error("Failed to write poisson parameters to SDRAM");
-            rt_error(RTE_SWERR);
-        }
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 

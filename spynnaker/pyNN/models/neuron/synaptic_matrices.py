@@ -292,7 +292,7 @@ class SynapticMatrices(object):
                 spec.reserve_memory_region(
                     region=self.__regions.connection_builder,
                     size=4, label="ConnectorBuilderRegion",
-                    reference=self.__connection_builder_ref)
+                    reference=connection_builder_ref)
             return
 
         spec.reserve_memory_region(

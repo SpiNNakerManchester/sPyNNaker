@@ -85,7 +85,7 @@ def get_expander_rates_bytes(n_atoms, n_rates):
     :rtype: int
     """
     return ((n_atoms * PARAMS_WORDS_PER_NEURON) +
-            (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
+            (n_rates * PARAMS_WORDS_PER_RATE) + 1) * BYTES_PER_WORD
 
 
 def get_sdram_edge_params_bytes(vertex_slice):
@@ -284,20 +284,15 @@ class SpikeSourcePoissonMachineVertex(
     def set_reload_required(self, new_value):
         self.__change_requires_neuron_parameters_reload = new_value
 
-    @inject_items({"routing_info": "RoutingInfos"})
     @overrides(
-        AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={"routing_info"})
+        AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(
-            self, spec, placement, routing_info):
+            self, spec, placement):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
-
-        # write parameters
-        self._write_poisson_parameters(spec, placement, routing_info)
 
         # write rates
         self._write_poisson_rates(spec, placement)
@@ -438,6 +433,7 @@ class SpikeSourcePoissonMachineVertex(
         # List starts with n_items, so start with 0.  Use arrays to allow
         # numpy concatenation to work.
         data_items = list()
+        data_items.append([int(self.__rate_changed)])
         data_items.append([0])
         n_items = 0
         data_slice = self._app_vertex.data[vertex_slice.as_slice]
@@ -451,7 +447,7 @@ class SpikeSourcePoissonMachineVertex(
             data_items.extend([[count], [len(items)], [0],
                                numpy.ravel(items).view("uint32")])
             n_items += 1
-        data_items[0] = [n_items]
+        data_items[1] = [n_items]
         data_to_write = numpy.concatenate(data_items)
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION.value,
@@ -459,6 +455,8 @@ class SpikeSourcePoissonMachineVertex(
         spec.switch_write_focus(
             self.POISSON_SPIKE_SOURCE_REGIONS.EXPANDER_REGION.value)
         spec.write_array(data_to_write)
+
+        self.__rate_changed = False
 
     def _write_poisson_parameters(self, spec, placement, routing_info):
         """ Generate Parameter data for Poisson spike sources
@@ -506,7 +504,7 @@ class SpikeSourcePoissonMachineVertex(
         # Write the number of timesteps per ms (accum)
         spec.write_value(
             data=MICRO_TO_MILLISECOND_CONVERSION / machine_time_step(),
-            data_type=DataType.S1615)
+            data_type=DataType.U1616)
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -527,10 +525,6 @@ class SpikeSourcePoissonMachineVertex(
 
         # Write the random seed (4 words), generated randomly!
         spec.write_array(self._app_vertex.kiss_seed(self.vertex_slice))
-
-        # Write a bit field of which rates have changed
-        spec.write_value(data=int(self.__rate_changed))
-        self.__rate_changed = False
 
     def set_rate_changed(self):
         self.__rate_changed = True
@@ -557,14 +551,6 @@ class SpikeSourcePoissonMachineVertex(
         AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-
-        # locate SDRAM address where parameters are stored
-        poisson_params = self.poisson_param_region_address(
-            placement, transceiver)
-        seed_array = _FOUR_WORDS.unpack_from(transceiver.read_memory(
-            placement.x, placement.y, poisson_params + self.SEED_OFFSET_BYTES,
-            self.SEED_SIZE_BYTES))
-        self._app_vertex.update_kiss_seed(vertex_slice, seed_array)
 
         # It is only worth updating the rates when there is a control edge
         # that can change them

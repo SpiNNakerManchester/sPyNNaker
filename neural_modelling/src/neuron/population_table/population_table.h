@@ -25,6 +25,133 @@
 #include <common/neuron-typedefs.h>
 #include <filter_info.h>
 
+
+//! bits in a word
+#define BITS_PER_WORD 32
+
+//! \brief The highest bit within the word
+#define TOP_BIT_IN_WORD 31
+
+//! \brief The flag for when a spike isn't in the master pop table (so
+//!     shouldn't happen)
+#define NOT_IN_MASTER_POP_TABLE_FLAG -1
+
+//! \brief The number of bits of address.
+//!        This is a constant as it is used more than once below.
+#define N_ADDRESS_BITS 24
+
+//! \brief The shift to apply to indirect addresses.
+//!    The address is in units of four words, so this multiplies by 16 (= up
+//!    shifts by 4)
+#define INDIRECT_ADDRESS_SHIFT 4
+
+//! \brief An entry in the master population table.
+typedef struct master_population_table_entry {
+    //! The key to match against the incoming message
+    uint32_t key;
+    //! The mask to select the relevant bits of \p key for matching
+    uint32_t mask;
+    //! The index into ::address_list for this entry
+    uint32_t start: 15;
+    //! Flag to indicate if core mask etc. is valid
+    uint32_t extra_info_flag: 1;
+    //! The number of entries in ::address_list for this entry
+    uint32_t count: 16;
+    //! The mask to apply to the key once shifted to get the core index
+    uint32_t core_mask: 16;
+    //! The shift to apply to the key to get the core part
+    uint32_t mask_shift: 16;
+    //! The number of neurons per core
+    uint32_t n_neurons: 16;
+    //! The number of words for n_neurons
+    uint32_t n_words: 16;
+} master_population_table_entry;
+
+//! \brief A packed address and row length (note: same size as extra info)
+typedef struct {
+    //! the length of the row
+    uint32_t row_length : 8;
+    //! the address
+    uint32_t address : N_ADDRESS_BITS;
+} address_list_entry;
+
+//! \brief An Invalid address and row length
+//! \details Used to keep indices aligned between delayed and undelayed tables
+#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
+
+//! \brief The memory layout in SDRAM of the first part of the population table
+//!     configuration. Address list data (array of ::address_and_row_length) is
+//!     packed on the end.
+typedef struct {
+    uint32_t table_length;
+    uint32_t addr_list_length;
+    master_population_table_entry data[];
+} pop_table_config_t;
+
+//! \name Support functions
+//! \{
+
+//! \brief Get the standard address offset out of an entry
+//! \details The address is in units of four words, so this multiplies by 16
+//!     (= up shifts by 4)
+//! \param[in] entry: the table entry
+//! \return a row address (which is an offset)
+static inline uint32_t get_offset(address_list_entry entry) {
+    return entry.address << INDIRECT_ADDRESS_SHIFT;
+}
+
+//! \brief Get the standard address out of an entry
+//! \param[in] entry: the table entry
+//! \return a row address
+static inline uint32_t get_address(address_list_entry entry, uint32_t addr) {
+    return get_offset(entry) + addr;
+}
+
+//! \brief Get the length of the row from the entry
+//!
+//! Row lengths are stored offset by 1, to allow 1-256 length rows
+//!
+//! \param[in] entry: the table entry
+//! \return the row length
+static inline uint32_t get_row_length(address_list_entry entry) {
+    return entry.row_length + 1;
+}
+
+//! \brief Get the source core index from a spike
+//! \param[in] entry: The master pop table entry
+//! \param[in] spike: The spike received
+//! \return the source core index in the list of source cores
+static inline uint32_t get_core_index(master_population_table_entry entry, spike_t spike) {
+    return (spike >> entry.mask_shift) & entry.core_mask;
+}
+
+//! \brief Get the total number of neurons on cores which come before this core
+//! \param[in] entry: The master pop table entry
+//! \param[in] spike: The spike received
+//! \return the base neuron number of this core
+static inline uint32_t get_core_sum(master_population_table_entry entry, spike_t spike) {
+    return get_core_index(entry, spike) * entry.n_neurons;
+}
+
+//! \brief Get the source neuron ID for a spike given its table entry (without extra info)
+//! \param[in] entry: the table entry
+//! \param[in] spike: the spike
+//! \return the neuron ID
+static inline uint32_t get_neuron_id(
+        master_population_table_entry entry, spike_t spike) {
+    return spike & ~entry.mask;
+}
+
+//! \brief Get the neuron id of the neuron on the source core, for a spike with
+//!        extra info
+//! \param[in] entry: the table entry
+//! \param[in] spike: the spike received
+//! \return the source neuron id local to the core
+static inline uint32_t get_local_neuron_id(
+        master_population_table_entry entry, spike_t spike) {
+    return spike & ~(entry.mask | (entry.core_mask << entry.mask_shift));
+}
+
 //! \brief the number of times a DMA resulted in 0 entries
 extern uint32_t ghost_pop_table_searches;
 
@@ -41,6 +168,19 @@ extern uint32_t bit_field_filtered_packets;
 
 //! \brief The number of addresses from the same spike left to process
 extern uint16_t items_to_go;
+
+//! \brief Set up and return the table for outside use
+//! \param[in] table_address: The address of the start of the table data
+//! \param[out] row_max_n_words: Updated with the maximum length of any row in
+//!                              the table in words
+//! \param[out] master_pop_table_length: Updated with the length of the table
+//! \param[out] master_pop_table: Updated with the table entries
+//! \param[out] address_list: Updated with the address list
+//! \return True if the table was setup successfully, False otherwise
+bool population_table_setup(address_t table_address, uint32_t *row_max_n_words,
+    uint32_t *master_pop_table_length,
+    master_population_table_entry **master_pop_table,
+    address_list_entry **address_list);
 
 //! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data

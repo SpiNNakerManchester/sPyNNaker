@@ -174,7 +174,7 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
     }
 
     // Do bitfield generation on the whole matrix
-    key_atom_data_t *key_atom_data_sdram = address;
+    uint32_t *n_atom_data_sdram = address;
     void *master_pop = data_specification_get_region(
             config->master_pop_region, ds_regions);
     void *bitfield_filter = data_specification_get_region(
@@ -184,7 +184,7 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
         structural_matrix = data_specification_get_region(
             config->structural_region, ds_regions);
     }
-    return do_bitfield_generation(key_atom_data_sdram, master_pop,
+    return do_bitfield_generation(n_atom_data_sdram, master_pop,
             synaptic_matrix, bitfield_filter, structural_matrix);
 }
 

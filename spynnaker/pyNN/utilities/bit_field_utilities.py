@@ -25,12 +25,6 @@ FILTER_INFO_WORDS = 3  # n words, key, pointer to bitfield
 #: n_filters, pointer for array
 FILTER_HEADER_WORDS = 2
 
-#: n elements in each key to n atoms map for bitfield (key, n atoms)
-KEY_N_ATOM_MAP_WORDS = 2
-
-#: n key to n neurons maps size in words
-N_KEYS_DATA_SET_IN_WORDS = 1
-
 #: the number of bits in a word
 # (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
 BIT_IN_A_WORD = 32.0
@@ -70,15 +64,15 @@ def get_sdram_for_keys(incoming_projections):
     """
 
     # basic sdram
-    sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
+    sdram = 0
     seen_app_edges = set()
     for proj in incoming_projections:
         in_edge = proj._projection_edge
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-            sdram += KEY_N_ATOM_MAP_WORDS * BYTES_PER_WORD
+            sdram += BYTES_PER_WORD
             if in_edge.n_delay_stages:
-                sdram += KEY_N_ATOM_MAP_WORDS * BYTES_PER_WORD
+                sdram += BYTES_PER_WORD
 
     return sdram
 
@@ -101,11 +95,16 @@ def get_bitfield_key_map_data(incoming_projections, routing_info):
             if key is not None:
                 sources.add((key, in_edge.pre_vertex.n_atoms))
 
+    if not sources:
+        return numpy.array([], dtype="uint32")
+
+    # Make keys and atoms, ordered by keys
     key_map = numpy.array(
         [[key, n_atoms] for key, n_atoms in sources], dtype="uint32")
+    key_map = key_map[numpy.argsort(key_map[:, 0])]
 
-    # write n keys max atom map
-    return numpy.concatenate(([len(sources)], numpy.ravel(key_map)))
+    # get the number of atoms per item
+    return key_map[:, 1]
 
 
 def write_bitfield_init_data(

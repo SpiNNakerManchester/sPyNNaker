@@ -244,7 +244,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, neuron_resources, label, index, rb_shifts,
-                weight_scales, constraints, neuron_data)
+                weight_scales, constraints, neuron_data, atoms_per_core)
             chip_counter.add_core(neuron_resources)
 
             # Keep track of synapse vertices for each neuron vertex and
@@ -310,7 +310,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_neuron_core(
             self, vertex_slice, neuron_resources, label, index, rb_shifts,
-            weight_scales, constraints, neuron_data):
+            weight_scales, constraints, neuron_data, atoms_per_core):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -333,7 +333,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
             neuron_resources, neuron_label, constraints, app_vertex,
-            vertex_slice, index, rb_shifts, weight_scales, neuron_data)
+            vertex_slice, index, rb_shifts, weight_scales, neuron_data,
+            atoms_per_core)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
 
@@ -558,8 +559,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # groups
         sources = pre_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
-        sources_per_vertex = int(2 ** math.ceil(math.log(
-            n_sources / self.__n_synapse_vertices)))
+        sources_per_vertex = max(1, int(2 ** math.ceil(math.log(
+            n_sources / self.__n_synapse_vertices))))
 
         # Start on a different index each time to "even things out"
         index = self.__next_synapse_index

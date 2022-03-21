@@ -113,6 +113,14 @@ class PopulationMachineNeurons(
         :rtype: NeuronData
         """
 
+    @abstractproperty
+    def _max_atoms_per_core(self):
+        """ The maximum number of atoms on a core, used for neuron data
+            transfer
+
+        :rtype: int
+        """
+
     def _parse_neuron_provenance(
             self, label, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
@@ -195,7 +203,7 @@ class PopulationMachineNeurons(
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
-        spec.write_value(data=2**get_n_bits(n_atoms))
+        spec.write_value(data=2**get_n_bits(self._max_atoms_per_core))
 
         # Write the ring buffer data
         # This is only the synapse types that need a ring buffer i.e. not

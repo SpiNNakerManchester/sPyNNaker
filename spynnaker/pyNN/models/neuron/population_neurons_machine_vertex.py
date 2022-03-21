@@ -64,7 +64,8 @@ class PopulationNeuronsMachineVertex(
         "__ring_buffer_shifts",
         "__weight_scales",
         "__slice_index",
-        "__neuron_data"]
+        "__neuron_data",
+        "__max_atoms_per_core"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -99,7 +100,7 @@ class PopulationNeuronsMachineVertex(
     def __init__(
             self, resources_required, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
-            neuron_data):
+            neuron_data, max_atoms_per_core):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
             The resources used by the vertex
@@ -118,6 +119,8 @@ class PopulationNeuronsMachineVertex(
             The scaling to apply to weights to store them in the synapses
         :param NeuronData neuron_data:
             The handler of neuron data
+        :param int max_atoms_per_core:
+            The maximum number of atoms per core
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
             label, constraints, app_vertex, vertex_slice, resources_required,
@@ -131,6 +134,7 @@ class PopulationNeuronsMachineVertex(
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
         self.__neuron_data = neuron_data
+        self.__max_atoms_per_core = max_atoms_per_core
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -155,6 +159,11 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineNeurons._neuron_data)
     def _neuron_data(self):
         return self.__neuron_data
+
+    @property
+    @overrides(PopulationMachineNeurons._max_atoms_per_core)
+    def _max_atoms_per_core(self):
+        return self.__max_atoms_per_core
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance
@@ -232,8 +241,6 @@ class PopulationNeuronsMachineVertex(
             spec, routing_info, self.__ring_buffer_shifts)
 
         # Write information about SDRAM
-        n_neurons = self._vertex_slice.n_atoms
-        n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()
         spec.reserve_memory_region(
             region=self.REGIONS.SDRAM_EDGE_PARAMS.value,
             size=SDRAM_PARAMS_SIZE, label="SDRAM Params")
@@ -241,10 +248,7 @@ class PopulationNeuronsMachineVertex(
         spec.write_value(
             self.__sdram_partition.get_sdram_base_address_for(self))
         spec.write_value(self.n_bytes_for_transfer)
-        spec.write_value(n_neurons)
-        spec.write_value(n_synapse_types)
         spec.write_value(len(self.__sdram_partition.pre_vertices))
-        spec.write_value(get_n_bits(n_neurons))
 
         # End the writing of this specification:
         spec.end_specification()
@@ -269,16 +273,6 @@ class PopulationNeuronsMachineVertex(
         self.__change_requires_neuron_parameters_reload = new_value
 
     @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_neurons)
-    def n_target_neurons(self):
-        return self._vertex_slice.n_atoms
-
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_target_synapse_types)
-    def n_target_synapse_types(self):
-        return self._app_vertex.neuron_impl.get_n_synapse_types()
-
-    @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
     def weight_scales(self):
         return self.__weight_scales
@@ -298,7 +292,8 @@ class PopulationNeuronsMachineVertex(
     @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
     def n_bytes_for_transfer(self):
         return self.get_n_bytes_for_transfer(
-            self.n_target_neurons, self.n_target_synapse_types)
+            self.__max_atoms_per_core,
+            self._app_vertex.neuron_impl.get_n_synapse_types())
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

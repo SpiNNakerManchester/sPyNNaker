@@ -197,7 +197,7 @@ class PopulationMachineSynapses(
             reference=self._synapse_references.synapse_params)
 
         # Get values
-        n_neurons = self._vertex_slice.n_atoms
+        n_neurons = self._max_atoms_per_core
         # We only count neuron synapse types here, as this is related to
         # the ring buffers
         n_synapse_types = self._app_vertex.neuron_impl.get_n_synapse_types()

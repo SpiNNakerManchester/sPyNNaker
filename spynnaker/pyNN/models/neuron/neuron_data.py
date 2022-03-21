@@ -99,7 +99,6 @@ class NeuronData(object):
 
     @property
     def gen_on_machine(self):
-        return False
         if self.__gen_on_machine is None:
             # First try to generate data.  This might have already been done.
             self.generate_data()
@@ -113,7 +112,6 @@ class NeuronData(object):
         return self.__gen_on_machine
 
     def generate_data(self):
-        return
         if self.__generation_done:
             return
         self.__generation_done = True

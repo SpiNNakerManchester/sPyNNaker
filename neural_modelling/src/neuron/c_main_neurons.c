@@ -87,14 +87,8 @@ struct sdram_config {
     uint8_t *address;
     //! The size of the input data to be transferred per core
     uint32_t size_in_bytes;
-    //! The number of neurons
-    uint32_t n_neurons;
-    //! The number of synapse types
-    uint32_t n_synapse_types;
     //! The number of synapse cores feeding into here
     uint32_t n_synapse_cores;
-    //! The number of bits needed for the neurons
-    uint32_t synapse_index_bits;
 };
 
 //! Provenance for this specific core
@@ -274,11 +268,9 @@ static bool initialise(void) {
             SDRAM_PARAMS_REGION, ds_regions);
     spin1_memcpy(&sdram_inputs, sdram_config, sizeof(struct sdram_config));
 
-    log_info("Transferring ring buffers from 0x%08x for %d neurons (%d bits) "
-            "and %d synapse types from %d cores using %d bytes per core",
-            sdram_inputs.address, sdram_inputs.n_neurons,
-            sdram_inputs.synapse_index_bits, sdram_inputs.n_synapse_types,
-            sdram_inputs.n_synapse_cores, sdram_inputs.size_in_bytes);
+    log_info("Transferring ring buffers from 0x%08x for %d cores using %d bytes!"
+            " per core", sdram_inputs.address, sdram_inputs.n_synapse_cores,
+            sdram_inputs.size_in_bytes);
 
     uint32_t n_words = sdram_inputs.size_in_bytes >> 2;
     for (uint32_t i = 0; i < N_SYNAPTIC_BUFFERS; i++) {
