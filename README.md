@@ -18,7 +18,6 @@ from other Python modules, you can set the install to be a
 which describes the process of installing the other modules which these
 depend upon for a complete editable install.
 
-
 Documentation
 -------------
 [sPyNNaker Python documentation](http://spinnakermanchester.github.io/sPyNNaker/python/)

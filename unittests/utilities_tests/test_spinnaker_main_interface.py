@@ -16,14 +16,11 @@
 import os
 import sys
 import unittest
-from spinn_front_end_common.interface.config_handler import CONFIG_FILE
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
+from spynnaker.pyNN.config_setup import unittest_setup
 
 
 class Close_Once(object):
@@ -42,24 +39,22 @@ class Close_Once(object):
 
 class TestSpinnakerMainInterface(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        # Normally this is done by spinnaker.py during import
-        globals_variables._failed_state = SpynnakerFailedState("test")
+    def setUp(self):
+        unittest_setup()
 
     def test_min_init(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
         print(path)
-        AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
+        AbstractSpinnakerBase(ExecutableFinder())
 
     def test_stop_init(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
 
-        interface = AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
+        interface = AbstractSpinnakerBase(ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)

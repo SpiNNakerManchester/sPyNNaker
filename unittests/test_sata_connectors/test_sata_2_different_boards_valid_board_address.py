@@ -18,7 +18,7 @@ retina example that just feeds data from a retina to live output via an
 intermediate population
 """
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def do_run():
@@ -46,6 +46,8 @@ def do_run():
 
 
 class Sata2DifferentBoardsValidBoardAddress(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_sata_2_different_boards_valid_board_address(self):
         do_run()

@@ -1,6 +1,0 @@
-Replaced by
-sPyNNaker/p8_jenkins_quick/test_0_1_time_steps/test_allow_violate/test_allow.py
-and
-sPyNNaker/unittests/test_integration_using_virtual_baord/test_do_not_allow_violate/test_do_not_allow_violate.py
-
-All other test not required in 0.1 time!

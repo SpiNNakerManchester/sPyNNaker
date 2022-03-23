@@ -16,10 +16,12 @@
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestRanged(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_uniform(self):
         # Need to do setup to get a pynn version

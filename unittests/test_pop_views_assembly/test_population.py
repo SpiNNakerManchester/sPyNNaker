@@ -17,10 +17,12 @@ from unittest import SkipTest
 import pytest
 from pyNN.space import Sphere, RandomStructure
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestPopulation(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_properties(self):
         n_neurons = 5

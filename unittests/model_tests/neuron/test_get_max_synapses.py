@@ -13,16 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
-from unittests.mocks import MockSimulator
+import spynnaker8
 
 
 def test_get_max_synapses():
-    MockSimulator.setup()
+    unittest_setup()
+    spynnaker8.setup()
     d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),
                             weight_dependence=WeightDependenceAdditive(),
                             pad_to_length=258)

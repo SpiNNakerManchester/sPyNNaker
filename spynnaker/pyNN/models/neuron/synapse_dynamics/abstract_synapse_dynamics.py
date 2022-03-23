@@ -70,13 +70,17 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def write_parameters(self, spec, region, machine_time_step, weight_scales):
+    def write_parameters(self, spec, region, global_weight_scale,
+                         synapse_weight_scales):
         """ Write the synapse parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int region: region ID
-        :param int machine_time_step:
-        :param list(float) weight_scales:
+            The specification to write to
+        :param int region: region ID to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
         """
 
     @abstractmethod
@@ -123,15 +127,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """ The amount each row should pad to, or None if not specified
         """
 
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get the provenance data from this synapse dynamics object
-
-        :param str pre_population_label:
-        :param str post_population_label:
-        """
-        # pylint: disable=unused-argument
-        return list()
-
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
 
@@ -151,14 +146,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         return connector.get_delay_minimum(synapse_info)
 
-    def get_delay_variance(self, connector, delays):
+    def get_delay_variance(self, connector, delays, synapse_info):
         """ Get the variance in delay for the synapses
 
         :param AbstractConnector connector:
         :param ~numpy.ndarray delays:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance(delays)
+        return connector.get_delay_variance(delays, synapse_info)
 
     def get_weight_mean(self, connector, synapse_info):
         """ Get the mean weight for the synapses
@@ -167,7 +162,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean(synapse_info.weights)
+        return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
     def get_weight_maximum(self, connector, synapse_info):
         """ Get the maximum weight for the synapses
@@ -178,14 +173,14 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
 
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         """ Get the variance in weight for the synapses
 
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance(weights)
+        return connector.get_weight_variance(weights, synapse_info)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data, max_n_synapses):
@@ -228,3 +223,12 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",
             constant_values=0).view("uint32") for row in rows]
         return words
+
+    def get_synapse_id_by_target(self, target):
+        """ Get the index of the synapse type based on the name, or None
+            if the name is not found.
+
+        :param str target: The name of the synapse
+        :rtype: int or None
+        """
+        return None

@@ -15,6 +15,7 @@
 
 import pytest
 import numpy
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
@@ -22,7 +23,6 @@ from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
 from spynnaker.pyNN.models.defaults import default_initial_values, defaults
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
-from unittests.mocks import MockSimulator
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
@@ -116,7 +116,7 @@ class MockNeuron(AbstractPopulationVertex):
 
 
 def test_initializable():
-    MockSimulator.setup()
+    unittest_setup()
     neuron = MockNeuron()
     assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
     neuron.initialize("foo", 2)
@@ -126,7 +126,7 @@ def test_initializable():
 
 
 def test_init_by_in():
-    MockSimulator.setup()
+    unittest_setup()
     neuron = MockNeuron()
     assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
     neuron.initialize(variable="foo", value=11, selector=1)
@@ -138,7 +138,7 @@ def test_init_by_in():
 
 
 def test_init_bad():
-    MockSimulator.setup()
+    unittest_setup()
     neuron = MockNeuron()
     with pytest.raises(KeyError):
         neuron.get_initial_value("badvariable")
@@ -147,7 +147,7 @@ def test_init_bad():
 
 
 def test_initial_values():
-    MockSimulator.setup()
+    unittest_setup()
     neuron = MockNeuron()
     initial_values = neuron.initial_values
     assert "foo" in initial_values

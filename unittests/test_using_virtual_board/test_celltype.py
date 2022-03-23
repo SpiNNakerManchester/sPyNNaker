@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def before_run(nNeurons):
-    p.setup(timestep=1, min_delay=1, max_delay=15)
+    p.setup(timestep=1, min_delay=1)
 
     neuron_parameters = {'cm': 0.25, 'i_offset': 2, 'tau_m': 10.0,
                          'tau_refrac': 2.0, 'tau_syn_E': 0.5, 'tau_syn_I': 0.5,
@@ -31,6 +31,8 @@ def before_run(nNeurons):
 
 
 class Test_celltype(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_before_run(self):
         nNeurons = 20  # number of neurons in each population

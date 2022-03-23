@@ -14,10 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class SSANeuronClassNoEdgeTest(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_run(self):
         sim.setup()

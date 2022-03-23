@@ -18,35 +18,26 @@ from quantities import __version__ as quantities_version
 from neo import __version__ as neo_version
 from pyNN.common import control as pynn_control
 from pyNN import __version__ as pynn_version
-from spinn_front_end_common.utilities.globals_variables import set_failed_state
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-from spynnaker.pyNN.utilities.spynnaker_failed_state import (
-    SpynnakerFailedState)
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
 from spynnaker import _version
 
 _NAME = "SpiNNaker_under_version({}-{})".format(
     _version.__version__, _version.__version_name__)
 
 
-class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
-                SpynnakerSimulatorInterface):
+class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
     """
 
     def __init__(
             self, database_socket_addresses,
-            extra_algorithm_xml_paths, extra_mapping_inputs,
-            extra_mapping_algorithms, extra_pre_run_algorithms,
-            extra_post_run_algorithms, extra_load_algorithms,
-            time_scale_factor, min_delay, max_delay, graph_label,
-            n_chips_required=None, n_boards_required=None, timestep=0.1,
-            hostname=None):
+            time_scale_factor, min_delay, graph_label,
+            n_chips_required=None, n_boards_required=None, timestep=0.1):
         # pylint: disable=too-many-arguments, too-many-locals
 
         # change min delay auto to be the min delay supported by simulator
@@ -64,42 +55,20 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         # main pynn interface inheritance
         pynn_control.BaseState.__init__(self)
 
-        # handle the extra load algorithms and the built in ones
-        built_in_extra_load_algorithms = list()
-        if extra_load_algorithms is not None:
-            built_in_extra_load_algorithms.extend(extra_load_algorithms)
-
-        # handle extra xmls and the ones needed by default
-        built_in_extra_xml_paths = list()
-        if extra_algorithm_xml_paths is not None:
-            built_in_extra_xml_paths.extend(extra_algorithm_xml_paths)
-
-        # handle the extra mapping inputs and the built in ones
-        built_in_extra_mapping_inputs = dict()
-        if extra_mapping_inputs is not None:
-            built_in_extra_mapping_inputs.update(extra_mapping_inputs)
-
-        front_end_versions = [("sPyNNaker8_version", _version.__version__)]
-        front_end_versions.append(("pyNN_version", pynn_version))
-        front_end_versions.append(("quantities_version", quantities_version))
-        front_end_versions.append(("neo_version", neo_version))
-        front_end_versions.append(("lazyarray_version", lazyarray_version))
-
         # SpiNNaker setup
         super(SpiNNaker, self).__init__(
             database_socket_addresses=database_socket_addresses,
-            user_extra_algorithm_xml_path=built_in_extra_xml_paths,
-            user_extra_mapping_inputs=built_in_extra_mapping_inputs,
-            extra_mapping_algorithms=extra_mapping_algorithms,
-            user_extra_algorithms_pre_run=extra_pre_run_algorithms,
-            extra_post_run_algorithms=extra_post_run_algorithms,
-            extra_load_algorithms=built_in_extra_load_algorithms,
             graph_label=graph_label, n_chips_required=n_chips_required,
             n_boards_required=n_boards_required,
-            hostname=hostname, min_delay=min_delay,
-            max_delay=max_delay, timestep=timestep,
-            time_scale_factor=time_scale_factor,
-            front_end_versions=front_end_versions)
+            min_delay=min_delay,
+            timestep=timestep, time_scale_factor=time_scale_factor)
+
+        with ProvenanceWriter() as db:
+            db.insert_version("sPyNNaker_version", _version.__version__)
+            db.insert_version("pyNN_version", pynn_version)
+            db.insert_version("quantities_version", quantities_version)
+            db.insert_version("neo_version", neo_version)
+            db.insert_version("lazyarray_version", lazyarray_version)
 
     def run(self, run_time, sync_time=0.0):
         """ Run the simulation for a span of simulation time.
@@ -203,7 +172,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :return: the machine time step
         :rtype: float
         """
-        return self.machine_time_step / float(MICRO_TO_MILLISECOND_CONVERSION)
+        return self.machine_time_step_ms
 
     @dt.setter
     def dt(self, new_value):
@@ -220,8 +189,7 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :return: the current runtime already executed
         :rtype: float
         """
-        return (
-            self._current_run_timesteps * (self.machine_time_step / 1000.0))
+        return self._current_run_timesteps * self.machine_time_step_ms
 
     @property
     def segment_counter(self):
@@ -307,15 +275,3 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         :param new_value: the new value for the recorder
         """
         self.__recorders = new_value
-
-
-# Defined in this file to prevent an import loop
-class Spynnaker8FailedState(SpynnakerFailedState):
-    __slots__ = ()
-
-    def __init__(self):
-        super(Spynnaker8FailedState, self).__init__(_NAME)
-
-
-# At import time change the default FailedState
-set_failed_state(Spynnaker8FailedState())

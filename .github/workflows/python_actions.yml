@@ -13,22 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# This workflow will install Python dependencies, run tests, lint and rat with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow will install Python dependencies, run tests, lint and rat with
+# a variety of Python versions. For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+# Note that documentation building is done in parallel (with testing) because
+# that takes a long time in sPyNNaker right now.
 
 name: Python Actions
 on: [push]
-
-env:
-  # Magic to make matplotlib behave nicely
-  MPLBACKEND: module://matplotlib.backends.backend_agg
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
 
     steps:
     - name: Checkout
@@ -39,6 +39,10 @@ jobs:
         repository: SpiNNakerManchester/SupportScripts
         path: support
 
+    - name: Install Ubuntu dependencies
+      uses: ./support/actions/apt-get-install
+      with:
+        packages: graphviz
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -50,14 +54,12 @@ jobs:
       with:
         repositories: >
           SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
+          SpiNNFrontEndCommon TestBase
         install: true
+    - name: Install matplotlib
+      uses: ./support/actions/install-matplotlib
     - name: Setup
       uses: ./support/actions/run-setup
-    - name: Checkout Spinnaker Test Cases
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: IntroLab PyNN8Examples
 
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker
@@ -67,81 +69,29 @@ jobs:
       uses: ./support/actions/pytest
       with:
         tests: unittests
-        coverage: ${{ matrix.python-version == 3.6 }}
+        coverage: ${{ matrix.python-version == 3.8 }}
         cover-packages: spynnaker
-        coveralls-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-
-  validate:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v2
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
-        install: true
-    - name: Setup
-      uses: ./support/actions/run-setup
+        coveralls-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Lint with flake8
-      run: flake8 spynnaker unittests
+      run: flake8 spynnaker spynnaker8 unittests spynnaker_integration_tests
+
     - name: Lint with pylint
       uses: ./support/actions/pylint
       with:
-        package: spynnaker
-    - name: Run rat copyright enforcement
-      uses: ./support/actions/check-copyrights
-    - name: Validate all XML
-      uses: ./support/actions/validate-xml
-      with:
-        base-path: spynnaker
+        package: spynnaker spynnaker8
 
-  doc-check:
-    runs-on: ubuntu-latest
-    # Only runs with 3.6
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v2
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.6
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
-      with:
-        repositories: >
-          SpiNNUtils SpiNNMachine SpiNNMan PACMAN DataSpecification spalloc
-          SpiNNFrontEndCommon
-        install: true
-    - name: Setup
-      uses: ./support/actions/run-setup
-    - name: Build documentation with sphinx
+    - name: Run rat copyright enforcement
+      if: matrix.python-version == 3.8
+      uses: ./support/actions/check-copyrights
+
+    #- name: Validate all XML
+    #  if: matrix.python-version == 3.8
+    #  uses: ./support/actions/validate-xml
+    #  with:
+    #    base-path: spynnaker
+
+    - name: Build documentation with sphinx (3.8 only)
       uses: ./support/actions/sphinx
       with:
         directory: doc/source

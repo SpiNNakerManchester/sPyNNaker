@@ -14,50 +14,41 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_front_end_common.interface.interface_functions import (
-    GraphDataSpecificationWriter)
+    graph_data_specification_writer)
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 
 
-class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
-    """ Executes data specification generation for sPyNNaker
+def spynnaker_data_specification_writer(
+        placements, hostname, machine, app_id, data_n_timesteps):
     """
+    Executes data specification generation for sPyNNaker
 
-    __slots__ = ()
+    :param ~pacman.model.placements.Placements placements:
+        placements of machine graph to cores
+    :param str hostname: SpiNNaker machine name
+    :param ~spinn_machine.Machine machine:
+        the python representation of the SpiNNaker machine
+    :param int data_n_timesteps:
+        The number of timesteps for which data space will been reserved
+    :return: DSG targets (map of placement tuple and filename)
+    :rtype:
+        tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
+        dict(tuple(int,int,int), int))
+    :raises ~spinn_front_end_common.exceptions.ConfigurationException:
+        If the DSG asks to use more SDRAM than is available.
+    """
+    # pylint: disable=too-many-arguments, signature-differs
 
-    def __call__(
-            self, placements, hostname, report_default_directory,
-            write_text_specs, machine, data_n_timesteps):
-        """
-        :param ~pacman.model.placements.Placements placements:
-            placements of machine graph to cores
-        :param str hostname: SpiNNaker machine name
-        :param str report_default_directory:
-            the location where reports are stored
-        :param bool write_text_specs:
-            True if the textual version of the specification is to be written
-        :param ~spinn_machine.Machine machine:
-            the python representation of the SpiNNaker machine
-        :param int data_n_timesteps:
-            The number of timesteps for which data space will been reserved
-        :return: DSG targets (map of placement tuple and filename)
-        :rtype:
-            tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
-            dict(tuple(int,int,int), int))
-        :raises ~spinn_front_end_common.exceptions.ConfigurationException:
-            If the DSG asks to use more SDRAM than is available.
-        """
-        # pylint: disable=too-many-arguments, signature-differs
+    delay_extensions = list()
+    placement_order = list()
+    for placement in placements.placements:
+        if isinstance(placement.vertex, DelayExtensionMachineVertex):
+            delay_extensions.append(placement)
+        else:
+            placement_order.append(placement)
+    placement_order.extend(delay_extensions)
 
-        delay_extensions = list()
-        placement_order = list()
-        for placement in placements.placements:
-            if isinstance(placement.vertex, DelayExtensionMachineVertex):
-                delay_extensions.append(placement)
-            else:
-                placement_order.append(placement)
-        placement_order.extend(delay_extensions)
-
-        return super().__call__(
-            placements, hostname, report_default_directory, write_text_specs,
-            machine, data_n_timesteps, placement_order)
+    return graph_data_specification_writer(
+        placements, hostname, machine, app_id, data_n_timesteps,
+        placement_order)

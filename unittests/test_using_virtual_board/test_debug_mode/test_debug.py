@@ -15,11 +15,15 @@
 
 import os
 import unittest
-import pacman.operations.algorithm_reports.reports as reports_names
-from pacman.operations.algorithm_reports.network_specification import (
-    NetworkSpecification)
-from spinn_front_end_common.utilities import globals_variables
-from p8_integration_tests.base_test_case import BaseTestCase
+import spinn_front_end_common.utilities.report_functions.reports as \
+    reports_names
+from spinn_front_end_common.utilities.report_functions.network_specification \
+    import _FILENAME as network_specification_file_name
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
+from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.extra_algorithms.\
+    spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
 import spynnaker8 as sim
 
 
@@ -27,6 +31,9 @@ class TestDebug(BaseTestCase):
     """
     that it does not crash in debug mode. All reports on.
     """
+
+    # NO unittest_setup() as sim.setup is called
+
     def debug(self):
         reports = [
             # write_energy_report does not happen on a virtual machine
@@ -59,7 +66,7 @@ class TestDebug(BaseTestCase):
             # write_memory_map_report
             # ??? used by MachineExecuteDataSpecification but not called ???
             # write_network_specification_report
-            NetworkSpecification._FILENAME,
+            network_specification_file_name,
             # write_provenance_data
             "provenance_data",
             # write_tag_allocation_reports
@@ -70,6 +77,9 @@ class TestDebug(BaseTestCase):
             # BoardChipReport.AREA_CODE_REPORT_NAME,
             # write_data_speed_up_report not on a virtual board
             # DataSpeedUpPacketGatherMachineVertex.REPORT_NAME
+            _GRAPH_NAME,
+            # TODO why svg when default is png
+            _GRAPH_NAME + ".svg",
             ]
         sim.setup(1.0)
         pop = sim.Population(100, sim.IF_curr_exp, {}, label="pop")
@@ -80,11 +90,9 @@ class TestDebug(BaseTestCase):
                        synapse_type=sim.StaticSynapse(weight=5))
         sim.run(1000)
         pop.get_data("v")
-        report_directory = globals_variables.get_simulator().\
-            _report_default_directory
         sim.end()
 
-        found = os.listdir(report_directory)
+        found = os.listdir(report_default_directory())
         print(found)
         for report in reports:
             self.assertIn(report, found)

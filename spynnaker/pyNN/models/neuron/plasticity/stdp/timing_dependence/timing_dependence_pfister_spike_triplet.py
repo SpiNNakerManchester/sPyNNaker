@@ -14,15 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    AbstractTimingDependence)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightOnly)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
@@ -44,6 +44,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         "__tau_y_data",
         "__a_plus",
         "__a_minus"]
+    __PARAM_NAMES = ('tau_plus', 'tau_minus', 'tau_x', 'tau_y')
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y, A_plus, A_minus):
@@ -64,8 +65,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step
-        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
+        ts = machine_time_step_ms()
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
         self.__tau_x_data = get_exp_lut_array(ts, self.__tau_x, shift=2)
@@ -153,7 +153,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         :rtype: int
         """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
-        return BYTES_PER_WORD
+        # and the time of the last spike
+        return BYTES_PER_WORD * 2
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
@@ -171,7 +172,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
-    def write_parameters(self, spec, machine_time_step, weight_scales):
+    def write_parameters(
+            self, spec, global_weight_scale, synapse_weight_scales):
 
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
@@ -189,4 +191,4 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus', 'tau_x', 'tau_y']
+        return self.__PARAM_NAMES

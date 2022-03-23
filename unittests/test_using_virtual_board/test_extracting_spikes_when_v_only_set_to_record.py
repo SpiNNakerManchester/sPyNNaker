@@ -1,3 +1,5 @@
+# NO unittest_setup() as sim.setup is called
+
 # Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
@@ -15,10 +17,12 @@
 
 import spynnaker8 as sim
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class ExtractingSpikesWhenVOnlySetToRecord(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_cause_error(self):
         with self.assertRaises(ConfigurationException):

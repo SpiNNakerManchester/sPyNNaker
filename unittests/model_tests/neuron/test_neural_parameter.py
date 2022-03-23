@@ -20,11 +20,11 @@ import struct
 import tempfile
 from data_specification.enums import DataType
 from data_specification import DataSpecificationGenerator
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neural_properties.neural_parameter import (
     _Range_Iterator, _Get_Iterator, _SingleValue_Iterator)
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from unittests.mocks import MockSimulator
 
 
 def _iterate_parameter_values(iterator, data_type):
@@ -41,7 +41,6 @@ def _iterate_parameter_values(iterator, data_type):
 
 
 def run_spec_check(method):
-    MockSimulator.setup()
     if platform.system() == "Windows":
         spec_writer = io.FileIO("test.dat", "wb")
         spec = DataSpecificationGenerator(spec_writer, None)
@@ -70,12 +69,12 @@ def range_list(spec):
 
 
 def test_range_list():
+    unittest_setup()
     run_spec_check(range_list)
 
 
 def _generator(size):
-    for i in range(size):
-        yield i
+    yield from range(size)
 
 
 def range_list_as_list(spec):
@@ -88,6 +87,7 @@ def range_list_as_list(spec):
 
 
 def test_range_list_as_list():
+    unittest_setup()
     run_spec_check(range_list_as_list)
 
 
@@ -101,6 +101,7 @@ def real_list(spec):
 
 
 def test_real_list():
+    unittest_setup()
     run_spec_check(real_list)
 
 
@@ -114,4 +115,5 @@ def single_value(spec):
 
 
 def test_single_value():
+    unittest_setup()
     run_spec_check(single_value)

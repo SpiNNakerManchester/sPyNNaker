@@ -21,7 +21,7 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.recorder import Recorder
 import spynnaker8 as sim
 from spynnaker.pyNN.utilities import neo_convertor
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def mock_spikes(_self):
@@ -62,6 +62,7 @@ def trim_spikes(spikes, indexes):
 class TestGetting(BaseTestCase):
     def setUp(self):
         """ Save the real methods that we mock out """
+        # NO unittest_setup() as sim.setup is called
         self.__get_spikes = Recorder.get_spikes
         self.__get_recorded_matrix = Recorder.get_recorded_matrix
 

@@ -14,15 +14,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.protocols import (
-    MunichIoSpiNNakerLinkProtocol, RetinaKey)
+    MunichIoSpiNNakerLinkProtocol, MUNICH_MODES, RetinaKey)
 
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):
 
+    def setUp(self):
+        unittest_setup()
+
     def test_call_each_function(self):
         protocol = MunichIoSpiNNakerLinkProtocol(
-            mode=MunichIoSpiNNakerLinkProtocol.MODES.PUSH_BOT)
+            mode=MUNICH_MODES.PUSH_BOT)
         protocol.add_payload_logic_to_current_output(0)
         protocol.add_payload_logic_to_current_output_key
         protocol.bias_values(0, 0)

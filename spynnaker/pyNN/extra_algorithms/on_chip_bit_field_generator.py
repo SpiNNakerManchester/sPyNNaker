@@ -16,6 +16,7 @@
 from collections import defaultdict
 import os
 import struct
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -25,6 +26,8 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
+from spinn_front_end_common.utilities.globals_variables import (
+    report_default_directory)
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -52,7 +55,30 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-class OnChipBitFieldGenerator(object):
+def on_chip_bitfield_generator(
+        placements, app_graph, executable_finder, transceiver,
+        machine_graph, routing_infos):
+    """ Loads and runs the bit field generator on chip.
+
+    :param ~pacman.model.placements.Placements placements: placements
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        the app graph
+    :param executable_finder: the executable finder
+    :type executable_finder:
+        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        the SpiNNMan instance
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        the machine graph
+    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+        the key to edge map
+    """
+    generator = _OnChipBitFieldGenerator(
+        placements, executable_finder, transceiver)
+    generator._run(app_graph, executable_finder, machine_graph, routing_infos)
+
+
+class _OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
     """
 
@@ -87,11 +113,7 @@ class OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __call__(
-            self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver, write_bit_field_generator_iobuf,
-            generating_bitfield_report, default_report_folder, machine_graph,
-            routing_infos, generating_bit_field_summary_report):
+    def __init__(self, placements, executable_finder, transceiver):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -100,25 +122,35 @@ class OnChipBitFieldGenerator(object):
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param str provenance_file_path:
-            the path to where provenance data items are written
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param bool write_bit_field_generator_iobuf: flag for report
-        :param bool generating_bitfield_report: flag for report
-        :param str default_report_folder: the file path for reports
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             the machine graph
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
             the key to edge map
-        :param bool generating_bit_field_summary_report:
-            whether to make summary report
         """
         self.__txrx = transceiver
         self.__placements = placements
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
+    def _run(
+            self, app_graph, executable_finder, machine_graph, routing_infos):
+        """ Loads and runs the bit field generator on chip.
+
+        :param ~pacman.model.placements.Placements placements: placements
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+            the app graph
+        :param executable_finder: the executable finder
+        :type executable_finder:
+            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpiNNMan instance
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine graph
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            the key to edge map
+        """
         # progress bar
         progress = ProgressBar(
             app_graph.n_vertices + machine_graph.n_vertices + 1,
@@ -128,26 +160,25 @@ class OnChipBitFieldGenerator(object):
         expander_cores = self._calculate_core_data(app_graph, progress)
 
         # load data
-        bit_field_app_id = transceiver.app_id_tracker.get_new_id()
+        bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
         progress.update(1)
 
         # run app
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder,
-            write_bit_field_generator_iobuf, self.__check_for_success,
-            [CPUState.FINISHED], False,
+            expander_cores, bit_field_app_id, self.__txrx,
+            executable_finder,
+            get_config_bool("Reports", "write_bit_field_iobuf"),
+            self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()
 
         # read in bit fields for debugging purposes
-        if generating_bitfield_report:
+        if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
-                default_report_folder, self._BIT_FIELD_REPORT_FILENAME))
-        if generating_bit_field_summary_report:
+                report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
             self._summary_report_bit_fields(app_graph, os.path.join(
-                default_report_folder,
+                report_default_directory(),
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
     def _summary_report_bit_fields(self, app_graph, file_path):

@@ -20,18 +20,6 @@ from spinn_utilities.abstract_base import (
 class AbstractWeightDependence(object, metaclass=AbstractBase):
     __slots__ = ()
 
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-
-        :param str pre_population_label: label of pre.
-        :param str post_population_label: label of post.
-        :return: the provenance data of the weight dependency
-        :rtype:
-            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
-        """
-        # pylint: disable=unused-argument
-        return list()
-
     @abstractmethod
     def get_parameter_names(self):
         """ Returns the parameter names
@@ -66,13 +54,17 @@ class AbstractWeightDependence(object, metaclass=AbstractBase):
 
     @abstractmethod
     def write_parameters(
-            self, spec, machine_time_step, weight_scales, n_weight_terms):
+            self, spec, global_weight_scale, synapse_weight_scales,
+            n_weight_terms):
         """ Write the parameters of the rule to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step: (unused?)
-        :param iterable(float) weight_scales:
-        :param int n_weight_terms:
+            The specification to write to
+        :param float global_weight_scale: The weight scale applied globally
+        :param list(float) synapse_weight_scales:
+            The total weight scale applied to each synapse including the global
+            weight scale
+        :param int n_weight_terms: The number of terms used by the synapse rule
        """
 
     @abstractproperty

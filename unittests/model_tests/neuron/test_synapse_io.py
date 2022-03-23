@@ -19,14 +19,14 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsSTDP)
-from spynnaker.pyNN.models.neuron.master_pop_table import (
-    MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
+from spynnaker.pyNN.models.neuron.synapse_io import _get_allowed_row_length
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
-from unittests.mocks import MockSimulator
+import spynnaker8
+
+# No unittest_setup as sim.setup must be called before SynapseDynamicsStatic
 
 
 @pytest.mark.parametrize(
@@ -50,22 +50,19 @@ from unittests.mocks import MockSimulator
       20, None, 20)])
 def test_get_allowed_row_length(
         dynamics_class, timing, weight, size, exception, max_size):
-    MockSimulator.setup()
+    spynnaker8.setup()
     if timing is not None and weight is not None:
         dynamics = dynamics_class(timing(), weight())
     else:
         dynamics = dynamics_class()
-    io = SynapseIORowBased()
-    population_table = MasterPopTableAsBinarySearch()
     synapse_information = SynapseInformation(
-        None, None, None, False, False, None, None, dynamics, 0, True)
+        None, None, None, False, False, None, None, dynamics, 0, None, True,
+        False)
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:
-            io._get_allowed_row_length(
-                size, dynamics, population_table, in_edge, size)
+            _get_allowed_row_length(size, dynamics, in_edge, size)
         assert exc_info.value.max_size == max_size
     else:
-        actual_size = io._get_allowed_row_length(
-            size, dynamics, population_table, in_edge, size)
+        actual_size = _get_allowed_row_length(size, dynamics, in_edge, size)
         assert actual_size == max_size

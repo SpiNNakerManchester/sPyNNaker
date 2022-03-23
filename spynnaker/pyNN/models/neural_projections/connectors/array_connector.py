@@ -62,39 +62,57 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        return self._get_delay_maximum(synapse_info.delays, len(self.__array))
+        return self._get_delay_maximum(
+            synapse_info.delays, len(self.__array), synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
-        return self._get_delay_minimum(synapse_info.delays, len(self.__array))
+        return self._get_delay_minimum(
+            synapse_info.delays, len(self.__array), synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        n_connections = 0
+        max_connections_row = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
+        # Max number per row is required
         for i in range(self.__array_dims[0]):
+            n_connections_row = 0
             for j in range(post_lo, post_hi+1):
                 if self.__array[i, j] == 1:
-                    n_connections += 1
+                    n_connections_row += 1
+
+            if n_connections_row > max_connections_row:
+                max_connections_row = n_connections_row
 
         if min_delay is None and max_delay is None:
-            return n_connections
+            return max_connections_row
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays, self.__n_total_connections, n_connections,
-            min_delay, max_delay)
+            synapse_info.delays, self.__n_total_connections,
+            max_connections_row, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        return self.__n_total_connections
+        # Max number per column is required
+        max_connections_col = 0
+        for j in range(self.__array_dims[1]):
+            n_connections_col = 0
+            for i in range(self.__array_dims[0]):
+                if self.__array[i, j] == 1:
+                    n_connections_col = 0
+
+            if n_connections_col > max_connections_col:
+                max_connections_col = n_connections_col
+
+        return max_connections_col
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
-            synapse_info.weights, self.__n_total_connections)
+            synapse_info.weights, self.__n_total_connections, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -120,11 +138,11 @@ class ArrayConnector(AbstractConnector):
         block["source"] = pre_neurons
         block["target"] = post_neurons
         block["weight"] = self._generate_weights(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

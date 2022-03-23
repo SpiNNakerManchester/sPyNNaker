@@ -215,7 +215,8 @@ static inline bool is_something_to_do(
 //! \param[in,out] n_rewires: Accumulator of number of rewirings
 //! \param[in,out] n_synapse_processes:
 //!     Accumulator of number of synapses processed
-static void setup_synaptic_dma_read(dma_buffer *current_buffer,
+//! \return Whether an actual DMA was set up or not
+static bool setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
     // Set up to store the DMA location and size to read
     synaptic_row_t row;
@@ -256,6 +257,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         // processing and not the surplus DMA requests.
         spike_processing_count++;
     }
+    return setup_done;
 }
 
 //! \brief Set up a DMA write of synaptic data.
@@ -289,39 +291,47 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-static void multicast_packet_received_callback(uint key, uint payload) {
-    p_per_ts_struct.packets_this_time_step += 1;
-
-    // handle the 2 cases separately
-    if (payload == 0) {
-        log_debug(
-            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-        // set to 1 to work with the loop.
-        payload = 1;
-    } else {
-        log_debug(
-            "Received spike %x with payload %d at %d, DMA Busy = %d",
-            key, payload, time, dma_busy);
-    }
-
-    // cycle through the packet insertion
-    for (uint count = payload; count > 0; count--) {
-        in_spikes_add_spike(key);
-    }
-
+//! \brief Start the DMA processing loop if not already running
+static inline void start_dma_loop(void) {
     // If we're not already processing synaptic DMAs,
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
     if (!dma_busy) {
         log_debug("Sending user event for new spike");
+        // Only set busy if successful.
+        // NOTE: Counts when unsuccessful are handled by the API
         if (spin1_trigger_user_event(0, 0)) {
             dma_busy = true;
-        } else {
-            log_warning("Could not trigger user event\n");
         }
+    }
+}
+
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param[in] unused: Only specified to match API
+static void multicast_packet_received_callback(uint key, UNUSED uint unused) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    if (in_spikes_add_spike(key)) {
+        start_dma_loop();
+    }
+}
+
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param[in] payload: the payload of the packet. The count.
+static void multicast_packet_pl_received_callback(uint key, uint payload) {
+    p_per_ts_struct.packets_this_time_step += 1;
+    log_debug("Received spike %x with payload %d at %d, DMA Busy = %d",
+        key, payload, time, dma_busy);
+
+    // cycle through the packet insertion
+    bool added = false;
+    for (uint count = payload; count > 0; count--) {
+        added = in_spikes_add_spike(key);
+    }
+    if (added) {
+        start_dma_loop();
     }
 }
 
@@ -354,7 +364,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
     bool plastic_only = true;
 
     // If rewiring, do rewiring first
-    for (uint32_t i = 0; i < n_rewires; i++) {
+    for (uint32_t i = n_rewires; i > 0; i--) {
         if (synaptogenesis_row_restructure(time, current_buffer->row)) {
             write_back = true;
             plastic_only = false;
@@ -381,7 +391,7 @@ static void dma_complete_callback(UNUSED uint unused, uint tag) {
             address_t row = (address_t) current_buffer->row;
             for (uint32_t i = 0;
                     i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%.8x", i, row[i]);
+                log_error("%u: 0x%08x", i, row[i]);
             }
             rt_error(RTE_SWERR);
         }
@@ -415,9 +425,13 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 }
 
 /* INTERFACE FUNCTIONS - cannot be static */
-
-//! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(timer_t time) {
+    uint32_t n_spikes = in_spikes_size();
+    if (clear_input_buffers_of_late_packets) {
+        spin1_dma_flush();
+        in_spikes_clear();
+        dma_busy = false;
+    }
 
     // Record the number of packets received last timer tick
     p_per_ts_struct.time = time;
@@ -425,11 +439,7 @@ void spike_processing_clear_input_buffer(timer_t time) {
     p_per_ts_struct.packets_this_time_step = 0;
 
     // Record the count whether clearing or not for provenance
-    count_input_buffer_packets_late += in_spikes_size();
-
-    if (clear_input_buffers_of_late_packets) {
-        in_spikes_clear();
-    }
+    count_input_buffer_packets_late += n_spikes;
 }
 
 bool spike_processing_initialise( // EXPORTED
@@ -463,7 +473,7 @@ bool spike_processing_initialise( // EXPORTED
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     spin1_callback_on(MCPL_PACKET_RECEIVED,
-            multicast_packet_received_callback, mc_packet_callback_priority);
+            multicast_packet_pl_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
@@ -471,48 +481,20 @@ bool spike_processing_initialise( // EXPORTED
     return true;
 }
 
-uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
-    // Check for buffer overflow
-    return in_spikes_get_n_buffer_overflows();
+void spike_processing_store_provenance(struct spike_processing_provenance *prov) {
+    prov->n_input_buffer_overflows = in_spikes_get_n_buffer_overflows();
+    prov->n_dmas_complete = dma_complete_count;
+    prov->n_spikes_processed = spike_processing_count;
+    prov->n_rewires = n_successful_rewires;
+    prov->n_packets_dropped_from_lateness = count_input_buffer_packets_late;
+    prov->max_filled_input_buffer_size = biggest_fill_size_of_input_buffer;
 }
 
-uint32_t spike_processing_get_dma_complete_count(void) {
-    return dma_complete_count;
-}
-
-uint32_t spike_processing_get_spike_processing_count(void) {
-    return spike_processing_count;
-}
-
-uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
-    return n_successful_rewires;
-}
-
-uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
-    return count_input_buffer_packets_late;
-}
-
-uint32_t spike_processing_get_max_filled_input_buffer_size(void) { // EXPORTED
-    return biggest_fill_size_of_input_buffer;
-}
-
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
     // disable interrupts
     uint cpsr = spin1_int_disable();
     rewires_to_do += number_of_rewires;
-
-    // If we're not already processing synaptic DMAs,
-    // flag pipeline as busy and trigger a feed event
-    if (!dma_busy) {
-        log_debug("Sending user event for rewiring");
-        if (spin1_trigger_user_event(0, 0)) {
-            dma_busy = true;
-        } else {
-            log_debug("Could not trigger user event\n");
-        }
-    }
+    start_dma_loop();
     // enable interrupts
     spin1_mode_restore(cpsr);
     return true;

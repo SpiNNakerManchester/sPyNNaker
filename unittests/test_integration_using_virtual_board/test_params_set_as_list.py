@@ -15,12 +15,12 @@
 
 from pyNN.random import RandomDistribution, NumpyRNG
 import spynnaker8 as p
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 def do_run(nNeurons):
 
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
+    p.setup(timestep=1.0, min_delay=1.0)
 
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
 
@@ -96,6 +96,8 @@ def do_run(nNeurons):
 
 
 class ParamsSetAsList(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_run(self):
         nNeurons = 225  # number of neurons in each population

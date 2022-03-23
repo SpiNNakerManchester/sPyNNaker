@@ -25,14 +25,6 @@ __version_type__ = None
 exec(open("spynnaker/_version.py").read())
 assert __version__
 
-# Classifiers: https://pypi.org/classifiers/
-_status_map = {
-    "alpha": "Development Status :: 3 - Alpha",
-    "beta": "Development Status :: 4 - Beta",
-    "production": "Development Status :: 5 - Production/Stable",
-}
-assert __version_type__ in _status_map
-
 long_description = {}
 this_directory = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -44,16 +36,14 @@ except IOError:
     pass
 
 install_requires = [
-    'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
-    'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
-    'SpiNNMan >= 1!5.1.1, < 1!6.0.0',
-    'SpiNNaker_PACMAN >= 1!5.1.1, < 1!6.0.0',
-    'SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0',
-    'spalloc >= 2.0.2, < 3.0.0',
-    'SpiNNFrontEndCommon >= 1!5.1.1, < 1!6.0.0',
-    "numpy > 1.13, < 1.20; python_version == '3.6'",
-    "numpy > 1.13, < 1.21; python_version == '3.7'",
-    "numpy; python_version >= '3.8'",
+    'SpiNNUtilities == 1!6.0.1',
+    'SpiNNMachine == 1!6.0.1',
+    'SpiNNMan == 1!6.0.1',
+    'SpiNNaker_PACMAN == 1!6.0.1',
+    'SpiNNaker_DataSpecification == 1!6.0.1',
+    'spalloc == 1!6.0.1',
+    'SpiNNFrontEndCommon == 1!6.0.1',
+    'pyparsing>=2.2.1,<3.0.0',
     'lxml',
     'quantities >= 0.12.1',
     'pynn >= 0.9.1, < 0.10.0 ',
@@ -97,7 +87,7 @@ setup(
                 "PyNN 0.9 on the SpiNNaker platform",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     classifiers=[
-        _status_map[__version_type__],
+        "Development Status :: 5 - Production/Stable",
 
         "Environment :: Console",
 
@@ -114,9 +104,10 @@ setup(
 
         "Programming Language :: C",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
 
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Neuroscience",
@@ -125,6 +116,8 @@ setup(
     packages=packages,
     package_data=package_data,
     install_requires=install_requires,
+    extras_require={
+        "graphs": ["graphviz"]},
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com",
     **long_description

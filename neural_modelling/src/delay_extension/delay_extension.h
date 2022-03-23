@@ -49,6 +49,7 @@ struct delay_parameters {
     uint32_t n_atoms;             //!< Number of atoms
     uint32_t n_delay_stages;      //!< Number of delay stages
     uint32_t n_delay_in_a_stage;  //!< Number of delays in a given stage
+    uint32_t clear_packets;       //!< Clear packets each timestep?
     uint32_t delay_blocks[];      //!< Descriptions of delays to apply
 };
 

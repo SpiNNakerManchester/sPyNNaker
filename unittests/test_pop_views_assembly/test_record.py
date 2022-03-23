@@ -16,10 +16,12 @@
 import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestPopulation(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_depricated(self):
         sim.setup(timestep=1.0)

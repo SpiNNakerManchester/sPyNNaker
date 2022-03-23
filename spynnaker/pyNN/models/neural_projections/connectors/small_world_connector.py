@@ -76,8 +76,8 @@ class SmallWorldConnector(AbstractConnector):
                 " SmallWorldConnector on this platform")
 
     @overrides(AbstractConnector.set_projection_information)
-    def set_projection_information(self, machine_time_step, synapse_info):
-        super().set_projection_information(machine_time_step, synapse_info)
+    def set_projection_information(self, synapse_info):
+        super().set_projection_information(synapse_info)
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):
@@ -109,12 +109,12 @@ class SmallWorldConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays, self.__n_connections)
+            synapse_info.delays, self.__n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         return self._get_delay_minimum(
-            synapse_info.delays, self.__n_connections)
+            synapse_info.delays, self.__n_connections, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -130,7 +130,7 @@ class SmallWorldConnector(AbstractConnector):
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays, self.__n_connections, n_connections,
-            min_delay, max_delay)
+            min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -143,7 +143,7 @@ class SmallWorldConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
-            synapse_info.weights, self.__n_connections)
+            synapse_info.weights, self.__n_connections, synapse_info)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -160,11 +160,11 @@ class SmallWorldConnector(AbstractConnector):
         block["target"] = (
             (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            block["source"], block["target"], n_connections, None,
+            pre_vertex_slice, post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
 
         # Re-wire some connections

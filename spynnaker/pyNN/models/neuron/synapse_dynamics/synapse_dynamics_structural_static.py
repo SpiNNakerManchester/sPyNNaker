@@ -83,7 +83,7 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
             The partner selection rule
         :param AbstractFormation formation: The formation rule
         :param AbstractElimination elimination: The elimination rule
-        :param int f_rew: How many rewiring attempts will be done per second.
+        :param float f_rew: How many rewiring attempts will be done per second.
         :param float initial_weight:
             Weight assigned to a newly formed connection
         :param initial_delay:
@@ -259,13 +259,27 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return self.get_weight_maximum(connector, synapse_info)
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector, weights, synapse_info):
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)
     def get_weight_maximum(self, connector, synapse_info):
         w_m = super().get_weight_maximum(connector, synapse_info)
         return max(w_m, self.__initial_weight)
+
+    @overrides(SynapseDynamicsStatic.get_delay_maximum)
+    def get_delay_maximum(self, connector, synapse_info):
+        d_m = super().get_delay_maximum(connector, synapse_info)
+        return max(d_m, self.__initial_delay)
+
+    @overrides(SynapseDynamicsStatic.get_delay_minimum)
+    def get_delay_minimum(self, connector, synapse_info):
+        d_m = super().get_delay_minimum(connector, synapse_info)
+        return min(d_m, self.__initial_delay)
+
+    @overrides(SynapseDynamicsStatic.get_delay_variance)
+    def get_delay_variance(self, connector, delays, synapse_info):
+        return 0.0
 
     @overrides(_Common.get_seeds)
     def get_seeds(self, app_vertex=None):

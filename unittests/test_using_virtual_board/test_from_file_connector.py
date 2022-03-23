@@ -16,7 +16,7 @@
 import os
 import numpy
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 import tempfile
 
 WEIGHT = 5
@@ -24,6 +24,8 @@ DELAY = 2
 
 
 class TestFromFileConnector(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def check_weights(
             self, projection, aslist, w_index, d_index, sources, destinations):

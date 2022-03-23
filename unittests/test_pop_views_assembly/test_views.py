@@ -18,10 +18,12 @@ from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import PopulationView
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class Test_IDMixin(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
 
     def test_simple(self):
         n_neurons = 5

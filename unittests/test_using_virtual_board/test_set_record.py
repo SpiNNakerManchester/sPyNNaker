@@ -15,10 +15,13 @@
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.common import NeuronRecorder
 import spynnaker8 as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spinnaker_testbase import BaseTestCase
 
 
 class TestSetRecord(BaseTestCase):
+
+    # NO unittest_setup() as sim.setup is called
+
     def test_set_spikes(self):
         sim.setup(timestep=1)
         if_curr = sim.Population(1, sim.IF_curr_exp())
@@ -69,7 +72,8 @@ class TestSetRecord(BaseTestCase):
                              additional_parameters={"seed": 1})
         if_curr.record("all")
         self.assertCountEqual(
-            ["spikes", "v", "gsyn_inh", "gsyn_exc", "packets-per-timestep"],
+            ["spikes", "v", "gsyn_inh", "gsyn_exc", "packets-per-timestep",
+             "rewiring"],
             if_curr._recorder.get_all_recording_variables())
         ssa.record("all")
         self.assertCountEqual(
@@ -157,7 +161,8 @@ class TestSetRecord(BaseTestCase):
             "gsyn_inh": DataType.S1615}
 
         recorder = NeuronRecorder(
-            ["v", "gsyn_exc", "gsyn_inh"], data_types, ["spikes"], 5, [], [])
+            ["v", "gsyn_exc", "gsyn_inh"], data_types, ["spikes"], 5, [], [],
+            [], [])
         recorder.set_recording("spikes", True)
         self.assertCountEqual(["spikes"], recorder.recording_variables)
         recorder.set_recording("spikes", False, indexes=[2, 4])
