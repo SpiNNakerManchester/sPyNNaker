@@ -57,6 +57,10 @@ struct synapse_provenance {
     uint32_t n_invalid_master_pop_table_hits;
     //! The number of spikes that a bit field filtered, stopping a DMA
     uint32_t n_filtered_by_bitfield;
+    //! The number of synapses that were skipped due to late spikes
+    uint32_t n_synapses_skipped;
+    //! The number of spikes that were detected as late
+    uint32_t n_late_spikes;
 };
 
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).
@@ -72,6 +76,8 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
     prov->n_failed_bitfield_reads = failed_bit_field_reads;
     prov->n_invalid_master_pop_table_hits = invalid_master_pop_hits;
     prov->n_filtered_by_bitfield = bit_field_filtered_packets;
+    prov->n_synapses_skipped = skipped_synapses;
+    prov->n_late_spikes = late_spikes;
 }
 
 //! \brief Read data to set up synapse processing

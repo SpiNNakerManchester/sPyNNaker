@@ -34,7 +34,11 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         # The number of population table hits on INVALID entries
         ("n_invalid_pop_table_hits", ctypes.c_uint32),
         # The number of spikes that didn't transfer empty rows
-        ("n_filtered_by_bitfield", ctypes.c_uint32)
+        ("n_filtered_by_bitfield", ctypes.c_uint32),
+        # The number of synapses skipped due to late spikes
+        ("n_skipped_synapses", ctypes.c_uint32),
+        # The number of spikes detecte as late
+        ("n_late_spikes", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -56,6 +60,8 @@ class PopulationMachineSynapsesProvenance(object):
     INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
     BIT_FIELD_FILTERED_PACKETS = \
         "How many packets were filtered by the bitfield filterer."
+    SYNAPSES_SKIPPED = "Skipped synapses"
+    LATE_SPIKES = "Late spikes"
 
     @abstractproperty
     def _app_vertex(self):
@@ -129,3 +135,15 @@ class PopulationMachineSynapsesProvenance(object):
             db.insert_core(
                 x, y, p, self.BIT_FIELD_FILTERED_PACKETS,
                 synapse_prov.n_filtered_by_bitfield)
+
+            db.insert_core(
+                x, y, p, self.SYNAPSES_SKIPPED,
+                synapse_prov.n_skipped_synapses)
+            if synapse_prov.n_skipped_synapses > 0:
+                db.insert_report(
+                    f"On {label}, there were {synapse_prov.n_skipped_synapses}"
+                    " that were skipped because a spike was received later"
+                    " than the delay in the synapse")
+
+            db.insert_core(
+                x, y, p, self.LATE_SPIKES, synapse_prov.n_late_spikes)

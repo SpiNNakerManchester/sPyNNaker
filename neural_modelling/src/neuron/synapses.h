@@ -52,6 +52,13 @@ extern uint32_t synapse_delay_mask;
 //! Count of the number of times the synapses have saturated their weights.
 extern uint32_t synapses_saturation_count;
 
+//! Count of the synapses that have been skipped because the delay wasn't
+//! big enough given how long the spike took to arrive
+extern uint32_t skipped_synapses;
+
+//! Count of the spikes that are received late
+extern uint32_t late_spikes;
+
 
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form

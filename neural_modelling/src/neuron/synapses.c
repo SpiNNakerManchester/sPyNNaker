@@ -84,6 +84,9 @@ uint32_t synapses_saturation_count = 0;
 //! big enough given how long the spike took to arrive
 uint32_t skipped_synapses = 0;
 
+//! Count of the spikes that are received late
+uint32_t late_spikes = 0;
+
 //! Number of neurons
 static uint32_t n_neurons_peak;
 
@@ -365,6 +368,7 @@ bool synapses_process_synaptic_row(
     // 8 - 13 = -5; -5 & 0xF = 11, so spike was sent 11 steps ago.
     uint32_t time_colour = time & 0xF;
     int32_t colour_diff = time_colour - spike_colour;
+    late_spikes += colour_diff & 0x1;
     uint32_t colour_delay = colour_diff & 0xF;
 
     // By default don't write back
