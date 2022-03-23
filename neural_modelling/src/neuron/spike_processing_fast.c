@@ -40,6 +40,9 @@ typedef struct dma_buffer {
     //! Number of bytes transferred in the read
     uint32_t n_bytes_transferred;
 
+    //! Spike colour
+    uint32_t colour;
+
     //! Row data
     synaptic_row_t row;
 } dma_buffer;
@@ -202,12 +205,13 @@ static inline void process_end_of_time_step(uint32_t time) {
 }
 
 //! \brief Read a synaptic row from SDRAM into a local buffer.
-static inline void read_synaptic_row(spike_t spike, synaptic_row_t row,
-        uint32_t n_bytes) {
+static inline void read_synaptic_row(spike_t spike, uint32_t colour,
+        synaptic_row_t row, uint32_t n_bytes) {
     dma_buffer *buffer = &dma_buffers[next_buffer_to_fill];
     buffer->sdram_writeback_address = row;
     buffer->originating_spike = spike;
     buffer->n_bytes_transferred = n_bytes;
+    buffer->colour = colour;
     do_fast_dma_read(row, buffer->row, n_bytes);
     next_buffer_to_fill = (next_buffer_to_fill + 1) & DMA_BUFFER_MOD_MASK;
 }
@@ -245,7 +249,7 @@ static inline bool start_first_dma(uint32_t time, spike_t *spike, uint32_t *colo
 
     do {
         if (population_table_get_first_address(*spike, &row, &n_bytes, colour)) {
-            read_synaptic_row(*spike, row, n_bytes);
+            read_synaptic_row(*spike, *colour, row, n_bytes);
             return true;
         }
     } while (!is_end_of_time_step() && get_next_spike(time, spike));
@@ -314,11 +318,11 @@ static inline void handle_row_error(dma_buffer *buffer) {
 //! \brief Process a row that has been transferred
 //! \param[in] time The current time step of the simulation
 //! \param[in] dma_in_progress Whether there was a DMA started and not checked
-static inline void process_current_row(uint32_t time, bool dma_in_progress, uint32_t colour) {
+static inline void process_current_row(uint32_t time, bool dma_in_progress) {
     bool write_back = false;
     dma_buffer *buffer = &dma_buffers[next_buffer_to_process];
 
-    if (!synapses_process_synaptic_row(time, colour, buffer->row, &write_back)) {
+    if (!synapses_process_synaptic_row(time, buffer->colour, buffer->row, &write_back)) {
         handle_row_error(buffer);
     }
     synaptogenesis_spike_received(time, buffer->originating_spike);
@@ -538,11 +542,11 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
             }
             dma_complete_count++;
             if (dma_in_progress) {
-                read_synaptic_row(spike, row, n_bytes);
+                read_synaptic_row(spike, colour, row, n_bytes);
             }
 
             // Process the row we already have while the DMA progresses
-            process_current_row(time, dma_in_progress, colour);
+            process_current_row(time, dma_in_progress);
         }
     }
 }
