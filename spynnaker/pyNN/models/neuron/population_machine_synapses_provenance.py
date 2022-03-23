@@ -38,7 +38,9 @@ class SynapseProvenance(ctypes.LittleEndianStructure):
         # The number of synapses skipped due to late spikes
         ("n_skipped_synapses", ctypes.c_uint32),
         # The number of spikes detecte as late
-        ("n_late_spikes", ctypes.c_uint32)
+        ("n_late_spikes", ctypes.c_uint32),
+        # The maximum lateness of a spike
+        ("max_late_spike", ctypes.c_uint32)
     ]
 
     N_ITEMS = len(_fields_)
@@ -62,6 +64,7 @@ class PopulationMachineSynapsesProvenance(object):
         "How many packets were filtered by the bitfield filterer."
     SYNAPSES_SKIPPED = "Skipped synapses"
     LATE_SPIKES = "Late spikes"
+    MAX_LATE_SPIKE = "Max late spike"
 
     @abstractproperty
     def _app_vertex(self):
@@ -147,3 +150,5 @@ class PopulationMachineSynapsesProvenance(object):
 
             db.insert_core(
                 x, y, p, self.LATE_SPIKES, synapse_prov.n_late_spikes)
+            db.insert_core(
+                x, y, p, self.MAX_LATE_SPIKE, synapse_prov.max_late_spike)

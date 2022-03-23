@@ -61,6 +61,8 @@ struct synapse_provenance {
     uint32_t n_synapses_skipped;
     //! The number of spikes that were detected as late
     uint32_t n_late_spikes;
+    //! The maximum lateness of a spike
+    uint32_t max_late_spike;
 };
 
 //! \brief Callback to store synapse provenance data (format: synapse_provenance).
@@ -78,6 +80,7 @@ static inline void store_synapse_provenance(struct synapse_provenance *prov) {
     prov->n_filtered_by_bitfield = bit_field_filtered_packets;
     prov->n_synapses_skipped = skipped_synapses;
     prov->n_late_spikes = late_spikes;
+    prov->max_late_spike = max_late_spike;
 }
 
 //! \brief Read data to set up synapse processing

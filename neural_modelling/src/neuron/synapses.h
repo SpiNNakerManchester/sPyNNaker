@@ -59,6 +59,9 @@ extern uint32_t skipped_synapses;
 //! Count of the spikes that are received late
 extern uint32_t late_spikes;
 
+//! The maximum lateness of a spike
+extern uint32_t max_late_spike;
+
 
 //! \brief Print the weight of a synapse
 //! \param[in] weight: the weight to print in synapse-row form

@@ -87,6 +87,9 @@ uint32_t skipped_synapses = 0;
 //! Count of the spikes that are received late
 uint32_t late_spikes = 0;
 
+//! The maximum lateness of a spike
+uint32_t max_late_spike = 0;
+
 //! Number of neurons
 static uint32_t n_neurons_peak;
 
@@ -207,7 +210,7 @@ static inline bool process_fixed_synapses(
 
     // Pre-mask the time and account for colour delay
     uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
-    uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
+    uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -217,7 +220,6 @@ static inline bool process_fixed_synapses(
         // If the delay is too small, skip
         if ((synaptic_word & synapse_type_index_mask) < colour_delay_shifted) {
             skipped_synapses++;
-            continue;
         }
 
         // The ring buffer index can be found by adding on the time to the delay
@@ -368,8 +370,12 @@ bool synapses_process_synaptic_row(
     // 8 - 13 = -5; -5 & 0xF = 11, so spike was sent 11 steps ago.
     uint32_t time_colour = time & 0xF;
     int32_t colour_diff = time_colour - spike_colour;
-    late_spikes += colour_diff & 0x1;
     uint32_t colour_delay = colour_diff & 0xF;
+
+    late_spikes += colour_delay & 0x1;
+    if (colour_delay > max_late_spike) {
+        max_late_spike = colour_delay;
+    }
 
     // By default don't write back
     *write_back = false;
