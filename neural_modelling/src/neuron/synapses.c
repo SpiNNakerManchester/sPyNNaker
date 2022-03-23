@@ -210,6 +210,7 @@ static inline bool process_fixed_synapses(
 
     // Pre-mask the time and account for colour delay
     uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
+    uint32_t synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
     uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -218,7 +219,7 @@ static inline bool process_fixed_synapses(
         uint32_t synaptic_word = *synaptic_words++;
 
         // If the delay is too small, skip
-        if ((synaptic_word & synapse_type_index_mask) < colour_delay_shifted) {
+        if ((synaptic_word & synapse_delay_mask_shifted) < colour_delay_shifted) {
             skipped_synapses++;
         }
 
