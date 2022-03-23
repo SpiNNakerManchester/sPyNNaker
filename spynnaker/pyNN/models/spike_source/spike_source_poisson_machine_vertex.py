@@ -591,3 +591,7 @@ class SpikeSourcePoissonMachineVertex(
             return sdram_machine_edge.post_vertex.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown post vertex type in edge {}".format(sdram_machine_edge))
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition_id):
+        return self._vertex_slice.n_atoms * 16

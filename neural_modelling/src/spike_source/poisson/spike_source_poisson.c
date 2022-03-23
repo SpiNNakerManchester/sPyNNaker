@@ -244,6 +244,9 @@ static uint16_t *input_this_timestep;
 //! The timesteps per second
 static UREAL ts_per_second;
 
+//! The time step colour
+static uint32_t colour;
+
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
 //! \return A random number
@@ -836,7 +839,7 @@ static void process_fast_source(
             // If no key has been given, do not send spikes to fabric
             if (ssp_params.has_key) {
                 // Send spikes
-                const uint32_t spike_key = ssp_params.key | s_id;
+                const uint32_t spike_key = ssp_params.key | (s_id << 4) | colour;
                 tdma_processing_send_packet(
                     spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
@@ -876,8 +879,9 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
+                const uint32_t spike_key = ssp_params.key | (s_id << 4) | colour;
                 tdma_processing_send_packet(
-                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+                    spike_key, count, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * count;
@@ -961,6 +965,8 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     if (recording_flags > 0) {
         record_spikes(time);
     }
+
+    colour = (colour + 1) & 0xF;
 }
 
 

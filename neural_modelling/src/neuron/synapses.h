@@ -93,7 +93,7 @@ bool synapses_initialise(
 //! \param[out] write_back: whether to write back to SDRAM
 //! \return True if successful
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool *write_back);
+        uint32_t time, uint32_t spike_colour, synaptic_row_t row, bool *write_back);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or

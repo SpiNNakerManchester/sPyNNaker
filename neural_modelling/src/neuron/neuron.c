@@ -39,6 +39,9 @@ uint32_t latest_send_time = 0xFFFFFFFF;
 //! Earliest time in a timestep that any neuron has sent a spike
 uint32_t earliest_send_time = 0;
 
+//! The colour of the time step to handle delayed spikes
+uint32_t colour = 0;
+
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
@@ -174,6 +177,9 @@ void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // Record the recorded variables
     neuron_recording_record(time);
+
+    // Update the colour
+    colour = (colour + 1) & 0xF;
 }
 
 void neuron_transfer(weight_t *syns) { // EXPORTED

@@ -38,6 +38,9 @@ static uint32_t synaptic_rows_base_address;
 //! \brief The last spike received
 static spike_t last_spike = 0;
 
+//! \brief The last colour received
+static uint32_t last_colour = 0;
+
 //! \brief The last neuron id for the key
 static uint32_t last_neuron_id = 0;
 
@@ -285,7 +288,7 @@ bool population_table_initialise(
 
 bool population_table_get_first_address(
         spike_t spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer) {
+        size_t *n_bytes_to_transfer, uint32_t *colour) {
     // locate the position in the binary search / array
     log_debug("Searching for key %d", spike);
 
@@ -315,9 +318,12 @@ bool population_table_get_first_address(
     items_to_go = entry.count;
     if (entry.extra_info_flag) {
         uint32_t local_neuron_id = get_local_neuron_id(entry, spike);
-        last_neuron_id = local_neuron_id + get_core_sum(entry, spike);
+        last_colour = local_neuron_id & 0xF;
+        last_neuron_id = (local_neuron_id >> 4) + get_core_sum(entry, spike);
     } else {
-        last_neuron_id = get_neuron_id(entry, spike);
+        uint32_t local_neuron_id = get_neuron_id(entry, spike);
+        last_colour = local_neuron_id & 0xF;
+        last_neuron_id = local_neuron_id >> 4;
     }
 
     // check we have a entry in the bit field for this (possible not to due to
@@ -345,7 +351,7 @@ bool population_table_get_first_address(
     // to be passed in but using the address of an argument is odd!
     uint32_t local_spike_id;
     bool get_next = population_table_get_next_address(
-            &local_spike_id, row_address, n_bytes_to_transfer);
+            &local_spike_id, row_address, n_bytes_to_transfer, colour);
 
     // tracks surplus DMAs
     if (!get_next) {
@@ -357,7 +363,7 @@ bool population_table_get_first_address(
 
 bool population_table_get_next_address(
         spike_t *spike, synaptic_row_t *row_address,
-        size_t *n_bytes_to_transfer) {
+        size_t *n_bytes_to_transfer, uint32_t *colour) {
     // If there are no more items in the list, return false
     if (items_to_go == 0) {
         return false;
@@ -379,6 +385,7 @@ bool population_table_get_next_address(
                     last_neuron_id, block_address, row_length, *row_address,
                     *n_bytes_to_transfer);
             *spike = last_spike;
+            *colour = last_colour;
             is_valid = true;
         }
 

@@ -205,7 +205,7 @@ bool population_table_load_bitfields(filter_region_t *filter_region);
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
         spike_t spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer);
+        size_t* n_bytes_to_transfer, uint32_t *colour);
 
 //! \brief Determine if there are more items with the same key
 //! \return Whether there are more items
@@ -221,6 +221,6 @@ static inline bool population_table_is_next(void) {
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
         spike_t *spike, synaptic_row_t* row_address,
-        size_t* n_bytes_to_transfer);
+        size_t* n_bytes_to_transfer, uint32_t *colour);
 
 #endif // _POPULATION_TABLE_H_

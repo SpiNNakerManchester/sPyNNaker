@@ -84,7 +84,7 @@ class _MasterPopEntryCType(ctypes.LittleEndianStructure):
         ("core_mask", ctypes.c_uint32, 16),
         # The shift to apply to the key to get the core part (0-31)
         ("mask_shift", ctypes.c_uint32, 16),
-        # The number of neurons per core (up to 2048)
+        # The number of neurons per core
         ("n_neurons", ctypes.c_uint32, 16),
         # The number of words required for n_neurons
         ("n_words", ctypes.c_uint32, 16)
