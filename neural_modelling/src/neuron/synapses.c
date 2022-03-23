@@ -211,7 +211,7 @@ static inline bool process_fixed_synapses(
     // Pre-mask the time and account for colour delay
     uint32_t colour_delay_shifted = colour_delay << synapse_type_index_bits;
     uint32_t synapse_delay_mask_shifted = synapse_delay_mask << synapse_type_index_bits;
-    uint32_t masked_time = (time & synapse_delay_mask) << synapse_type_index_bits;
+    uint32_t masked_time = ((time - colour_delay) & synapse_delay_mask) << synapse_type_index_bits;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row
@@ -221,6 +221,7 @@ static inline bool process_fixed_synapses(
         // If the delay is too small, skip
         if ((synaptic_word & synapse_delay_mask_shifted) < colour_delay_shifted) {
             skipped_synapses++;
+            continue;
         }
 
         // The ring buffer index can be found by adding on the time to the delay
