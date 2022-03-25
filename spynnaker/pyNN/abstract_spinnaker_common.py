@@ -17,8 +17,6 @@ import logging
 import math
 import os
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.make_tools.log_sqllite_database import (
-    set_alternative_log_path)
 from spinn_utilities.config_holder import get_config_bool, get_config_str
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -95,7 +93,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         # add model binaries
         self.__EXECUTABLE_FINDER.add_path(
             os.path.dirname(model_binaries.__file__))
-        set_alternative_log_path(os.path.dirname(model_binaries.__file__))
 
         # pynn population objects
         self._populations = []
