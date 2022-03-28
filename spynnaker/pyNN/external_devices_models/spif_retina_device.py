@@ -40,7 +40,7 @@ _RC_KEY = 0xFFFFFF00
 _N_PIPES = 2
 
 #: The number of fields supported for each pipe
-_N_FIELDS = 2
+_N_FIELDS = 4
 
 #: The number of filters supported for each pipe
 _N_FILTERS = 8
