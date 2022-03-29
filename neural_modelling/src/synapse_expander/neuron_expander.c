@@ -408,6 +408,12 @@ static bool run_neuron_expander(data_specification_metadata_t *ds_regions,
         read_recorded_bitfield(&address, &sdram_address, n_neurons, n_neurons_max);
     }
 
+    // Clear checksums to avoid later issues
+    ds_regions->regions[config->neuron_params_region].checksum = 0;
+    ds_regions->regions[config->neuron_params_region].n_words = 0;
+    ds_regions->regions[config->neuron_recording_region].checksum = 0;
+    ds_regions->regions[config->neuron_recording_region].n_words = 0;
+
     return true;
 }
 

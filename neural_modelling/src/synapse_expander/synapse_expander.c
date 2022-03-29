@@ -192,6 +192,10 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
     // We are changing this region, so void the checksum
     ds_regions->regions[config->bitfield_filter_region].n_words = 0;
     ds_regions->regions[config->bitfield_filter_region].checksum = 0;
+    log_info("Region %u set to 0 at 0x%08x and 0x%08x",
+    		config->bitfield_filter_region,
+			&(ds_regions->regions[config->bitfield_filter_region].n_words),
+			&(ds_regions->regions[config->bitfield_filter_region].checksum));
     return do_bitfield_generation(n_atom_data_sdram, master_pop,
             synaptic_matrix, bitfield_filter, structural_matrix);
 }
