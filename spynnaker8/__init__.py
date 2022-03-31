@@ -110,7 +110,7 @@ from spynnaker8 import external_devices
 from spynnaker8 import extra_models
 
 # big stuff
-from spynnaker8.spinnaker import SpiNNaker
+from spynnaker.pyNN.spinnaker import SpiNNaker
 
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
