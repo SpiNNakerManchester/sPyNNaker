@@ -119,7 +119,8 @@ def continue_simulation():
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.continue_simulation` instead.
+        :py:method:`spynnaker.pyNN.external_devices.continue_simulation`
+        instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -165,7 +166,8 @@ def EthernetControlPopulation(
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.EthernetControlPopulation` instead.
+        :py:method:
+        `spynnaker.pyNN.external_devices.EthernetControlPopulation` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -182,7 +184,8 @@ def EthernetSensorPopulation(
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.EthernetSensorPopulation` instead.
+        :py:method:`spynnaker.pyNN.external_devices.EthernetSensorPopulation`
+        instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
