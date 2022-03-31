@@ -97,7 +97,7 @@ def run_forever(sync_time=0):
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.run_forever` instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
