@@ -348,7 +348,7 @@ def moved_in_v6(old_location, new_location):
     """
     Warns the users that they are using an old import.
 
-    In version 7 this will ne upgraded to a exception and then later removed
+    In version 7 this will be upgraded to a exception and then later removed
 
     :param str old_location: old import
     :param str new_location: new import

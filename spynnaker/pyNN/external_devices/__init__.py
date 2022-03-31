@@ -58,10 +58,6 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
 from spynnaker.pyNN.models.populations import Population
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
-
-
-moved_in_v6("spynnaker8.external_devices", "spynnaker.pyNN.external_devices")
 
 # useful functions
 add_database_socket_address = Plugins.add_database_socket_address
