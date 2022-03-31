@@ -30,30 +30,13 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.external_devices_models import (
-    AbstractEthernetController, AbstractEthernetSensor,
-    ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    AbstractEthernetController, AbstractEthernetSensor)
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as
     ExternalDeviceSpikeInjector)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
-    EthernetCommandConnection, EthernetControlConnection,
-    SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
-from spynnaker.pyNN.external_devices_models.push_bot.control import (
-    PushBotLifEthernet, PushBotLifSpinnakerLink)
-from spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link import (
-    PushBotSpiNNakerLinkRetinaDevice,
-    PushBotSpiNNakerLinkLaserDevice, PushBotSpiNNakerLinkLEDDevice,
-    PushBotSpiNNakerLinkMotorDevice, PushBotSpiNNakerLinkSpeakerDevice)
-from spynnaker.pyNN.external_devices_models.push_bot.ethernet import (
-    PushBotEthernetLaserDevice, PushBotEthernetLEDDevice,
-    PushBotEthernetMotorDevice, PushBotEthernetRetinaDevice,
-    PushBotEthernetSpeakerDevice)
-from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
-    PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
-    PushBotSpeaker, PushBotRetinaViewer)
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+    EthernetCommandConnection, EthernetControlConnection)
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
@@ -70,32 +53,6 @@ AbstractSpiNNakerCommon.register_binary_search_path(
 spynnaker_external_devices = Plugins()
 
 __all__ = [
-    "EIEIOType",
-
-    # General Devices
-    "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
-    "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
-
-    # PushBot Parameters
-    "MunichIoSpiNNakerLinkProtocol",
-    "PushBotLaser", "PushBotLED", "PushBotMotor", "PushBotSpeaker",
-    "PushBotRetinaResolution",
-
-    # PushBot Ethernet Parts
-    "PushBotLifEthernet", "PushBotEthernetLaserDevice",
-    "PushBotEthernetLEDDevice", "PushBotEthernetMotorDevice",
-    "PushBotEthernetSpeakerDevice", "PushBotEthernetRetinaDevice",
-
-    # PushBot SpiNNaker Link Parts
-    "PushBotLifSpinnakerLink", "PushBotSpiNNakerLinkLaserDevice",
-    "PushBotSpiNNakerLinkLEDDevice", "PushBotSpiNNakerLinkMotorDevice",
-    "PushBotSpiNNakerLinkSpeakerDevice", "PushBotSpiNNakerLinkRetinaDevice",
-
-    # Connections
-    "SpynnakerLiveSpikesConnection",
-    "SpynnakerPoissonControlConnection",
-
     # Provided functions
     "activate_live_output_for",
     "activate_live_output_to",

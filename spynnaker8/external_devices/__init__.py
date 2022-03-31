@@ -88,6 +88,9 @@ __all__ = [
     "add_poisson_live_rate_control"
 ]
 
+moved_in_v6("spynnaker8.external_devices",
+            "spynnaker.pyNN.external_devices")
+
 
 def run_forever(sync_time=0):
     """ Supports running forever in PyNN 0.8/0.9 format
