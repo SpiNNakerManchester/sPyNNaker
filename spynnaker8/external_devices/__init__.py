@@ -22,23 +22,11 @@ PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
     SpiNNaker system to run in real-time mode, which usually reduces numerical
     accuracy to gain performance.
 """
-import os
-from spinn_utilities.socket_address import SocketAddress
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.external_devices_models import (
-    AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
-from spynnaker.pyNN.models.utility_models.spike_injector import (
-    SpikeInjector as
-    ExternalDeviceSpikeInjector)
-from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
-    EthernetCommandConnection, EthernetControlConnection,
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
 from spynnaker.pyNN.external_devices_models.push_bot.control import (
     PushBotLifEthernet, PushBotLifSpinnakerLink)
@@ -54,24 +42,15 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
     PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
-    SpynnakerExternalDevicePluginManager as
-    Plugins)
-from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
-
-moved_in_v6("spynnaker8.external_devices", "spynnaker.pyNN.external_devices")
+import spynnaker.pyNN.external_devices as moved_code
 
 # useful functions
-add_database_socket_address = Plugins.add_database_socket_address
-activate_live_output_to = Plugins.activate_live_output_to
-activate_live_output_for = Plugins.activate_live_output_for
-add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
-
-AbstractSpiNNakerCommon.register_binary_search_path(
-    os.path.dirname(model_binaries.__file__))
-spynnaker_external_devices = Plugins()
+add_database_socket_address = moved_code.add_database_socket_address
+activate_live_output_to = moved_code.activate_live_output_to
+activate_live_output_for = moved_code.activate_live_output_for
+add_poisson_live_rate_control = moved_code.add_poisson_live_rate_control
 
 __all__ = [
     "EIEIOType",
@@ -113,46 +92,65 @@ __all__ = [
 def run_forever(sync_time=0):
     """ Supports running forever in PyNN 0.8/0.9 format
 
-    :param sync_time:
-        The time in milliseconds after which to pause before the host must
-        continue the simulation
-    :return: when the application has started running on the SpiNNaker platform
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.run_forever` instead.
     """
-    get_simulator().run(None, sync_time)
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    moved_code.run_forever(sync_time)
 
 
 def run_sync(run_time, sync_time):
     """ Run in steps of the given number of milliseconds pausing between\
         for a signal to be sent from the host
 
-    :param float run_time: The time in milliseconds to run the simulation for
-    :param float sync_time: The time in milliseconds to pause before allowing
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.run_sync` instead.
     """
-    get_simulator().run(run_time, sync_time)
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    moved_code.run_sync(run_time, sync_time)
 
 
 def continue_simulation():
     """ Continue a synchronised simulation
+
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.continue_simulation` instead.
     """
-    get_simulator().continue_simulation()
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    moved_code.continue_simulation()
 
 
 def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
+
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.request_stop` instead.
     """
-    get_simulator().stop_run()
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    moved_code.request_stop()
 
 
 def register_database_notification_request(hostname, notify_port, ack_port):
     """ Adds a socket system which is registered with the notification protocol
 
-    :param str hostname: hostname to connect to
-    :param int notify_port: port num for the notify command
-    :param int ack_port: port num for the acknowledge command
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.register_database_notification_request`
+        instead.
     """
-    spynnaker_external_devices.add_socket_address(
-        SocketAddress(hostname, notify_port, ack_port))
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    moved_code.register_database_notification_request(
+        hostname, notify_port, ack_port)
 
 
 # Store the connection to be used by multiple users
@@ -165,68 +163,15 @@ def EthernetControlPopulation(
     """ Create a PyNN population that can be included in a network to\
         control an external device which is connected to the host
 
-    :param int n_neurons: The number of neurons in the control population
-    :param type model:
-        Class of a model that creates a vertex of type
-        :py:class:`AbstractEthernetController`
-    :param label: An optional label for the population
-    :type label: str or None
-    :param local_host:
-        The optional local host IP address to listen on for commands
-    :type local_host: str or None
-    :param local_port: The optional local port to listen on for commands
-    :type local_port: int or None
-    :param database_ack_port_num:
-        The optional port to which responses to the database notification
-        protocol are to be sent
-    :type database_ack_port_num: int or None
-    :param database_notify_port_num:
-        The optional port to which notifications from the database
-        notification protocol are to be sent
-    :type database_notify_port_num: int or None
-    :return:
-        A pyNN Population which can be used as the target of a Projection.
-        Note that the Population can also be used as the source of a
-        Projection, but it might not send spikes.
-    :rtype: ~spynnaker.pyNN.models.populations.Population
-    :raises Exception: If an invalid model class is used.
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.EthernetControlPopulation` instead.
     """
-    # pylint: disable=protected-access, too-many-arguments, too-many-locals
-    population = Population(n_neurons, model, label=label)
-    vertex = population._vertex
-    if not isinstance(vertex, AbstractEthernetController):
-        raise Exception(
-            "Vertex must be an instance of AbstractEthernetController")
-    translator = vertex.get_message_translator()
-    live_packet_gather_label = "EthernetControlReceiver"
-    global __ethernet_control_connection
-    if __ethernet_control_connection is None:
-        __ethernet_control_connection = EthernetControlConnection(
-            translator, vertex.label, live_packet_gather_label, local_host,
-            local_port)
-        Plugins.add_database_socket_address(
-            __ethernet_control_connection.local_ip_address,
-            __ethernet_control_connection.local_port, database_ack_port_num)
-    else:
-        __ethernet_control_connection.add_translator(vertex.label, translator)
-    devices_with_commands = [
-        device for device in vertex.get_external_devices()
-        if isinstance(device, AbstractSendMeMulticastCommandsVertex)]
-    if devices_with_commands:
-        ethernet_command_connection = EthernetCommandConnection(
-            translator, devices_with_commands, local_host,
-            database_notify_port_num)
-        Plugins.add_database_socket_address(
-            ethernet_command_connection.local_ip_address,
-            ethernet_command_connection.local_port, database_ack_port_num)
-    Plugins.update_live_packet_gather_tracker(
-        vertex, live_packet_gather_label,
-        port=__ethernet_control_connection.local_port,
-        hostname=__ethernet_control_connection.local_ip_address,
-        message_type=EIEIOType.KEY_PAYLOAD_32_BIT,
-        payload_as_time_stamps=False, use_payload_prefix=False,
-        partition_ids=vertex.get_outgoing_partition_ids())
-    return population
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    return moved_code.EthernetControlPopulation(
+        n_neurons, model, label, local_host, local_port,
+        database_notify_port_num, database_ack_port_num)
 
 
 def EthernetSensorPopulation(
@@ -235,45 +180,14 @@ def EthernetSensorPopulation(
     """ Create a pyNN population which can be included in a network to\
         receive spikes from a device connected to the host
 
-    :param AbstractEthernetSensor device: The sensor model
-    :param local_host:
-        The optional local host IP address to listen on for database
-        notification
-    :type local_host: str or None
-    :param database_ack_port_num:
-        The optional port to which responses to the database notification
-        protocol are to be sent
-    :type database_ack_port_num: int or None
-    :param database_notify_port_num:
-        The optional port to which notifications from the database
-        notification protocol are to be sent
-    :type database_notify_port_num: int or None
-    :return:
-        A pyNN Population which can be used as the source of a Projection.
-        Note that the Population cannot be used as the target of a Projection.
-    :rtype: ~spynnaker.pyNN.models.populations.Population
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.EthernetSensorPopulation` instead.
     """
-    if not isinstance(device, AbstractEthernetSensor):
-        raise Exception("Device must be an instance of AbstractEthernetSensor")
-    injector_params = dict(device.get_injector_parameters())
-
-    population = Population(
-        device.get_n_neurons(), SpikeInjector(notify=False),
-        label=device.get_injector_label(),
-        additional_parameters=injector_params)
-    if isinstance(device, AbstractSendMeMulticastCommandsVertex):
-        cmd_conn = EthernetCommandConnection(
-            device.get_translator(), [device], local_host,
-            database_notify_port_num)
-        Plugins.add_database_socket_address(
-            cmd_conn.local_ip_address, cmd_conn.local_port,
-            database_ack_port_num)
-    db_conn = device.get_database_connection()
-    if db_conn is not None:
-        Plugins.add_database_socket_address(
-            db_conn.local_ip_address, db_conn.local_port,
-            database_ack_port_num)
-    return population
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    return moved_code.EthernetSensorPopulation(
+        device, local_host, database_notify_port_num, database_ack_port_num)
 
 
 def SpikeInjector(
@@ -282,24 +196,13 @@ def SpikeInjector(
     """ Supports creating a spike injector that can be added to the\
         application graph.
 
-    :param bool notify: Whether to register for notifications
-    :param database_notify_host: the hostname for the device which is
-        listening to the database notification.
-    :type database_notify_host: str or None
-    :param database_ack_port_num: the port number to which a external device
-        will acknowledge that they have finished reading the database and are
-        ready for it to start execution
-    :type database_ack_port_num: int or None
-    :param database_notify_port_num: The port number to which a external
-        device will receive the database is ready command
-    :type database_notify_port_num: int or None
-    :return: The spike injector model object that can be placed in a pyNN
-        :py:class:`~spynnaker.pyNN.models.populations.Population`.
-    :rtype: ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel
+    .. deprecated:: 6.0
+        Use
+        :py:method:`spynnaker.pyNN.external_devices.SpikeInjector` instead.
     """
     # pylint: disable=too-many-arguments
-    if notify:
-        Plugins.add_database_socket_address(
-            database_notify_host, database_notify_port_num,
-            database_ack_port_num)
-    return ExternalDeviceSpikeInjector()
+    moved_in_v6("spynnaker8.external_devices",
+                "spynnaker.pyNN.external_devices")
+    return moved_code.SpikeInjector(
+        notify, database_notify_host, database_notify_port_num,
+        database_ack_port_num)
