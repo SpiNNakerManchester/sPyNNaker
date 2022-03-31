@@ -110,7 +110,7 @@ def run_sync(run_time, sync_time):
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.run_sync` instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -122,8 +122,7 @@ def continue_simulation():
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.continue_simulation`
-        instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -136,7 +135,7 @@ def request_stop():
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.request_stop` instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -148,8 +147,7 @@ def register_database_notification_request(hostname, notify_port, ack_port):
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.register_database_notification_request`
-        instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -169,8 +167,7 @@ def EthernetControlPopulation(
 
     .. deprecated:: 6.0
         Use
-        :py:method:
-        `spynnaker.pyNN.external_devices.EthernetControlPopulation` instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -187,8 +184,7 @@ def EthernetSensorPopulation(
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.EthernetSensorPopulation`
-        instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     moved_in_v6("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
@@ -204,7 +200,7 @@ def SpikeInjector(
 
     .. deprecated:: 6.0
         Use
-        :py:method:`spynnaker.pyNN.external_devices.SpikeInjector` instead.
+        :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     # pylint: disable=too-many-arguments
     moved_in_v6("spynnaker8.external_devices",
