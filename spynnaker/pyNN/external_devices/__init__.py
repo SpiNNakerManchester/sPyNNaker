@@ -28,14 +28,10 @@ from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
-from spynnaker.pyNN.models.utility_models.spike_injector import (
-    SpikeInjector as
-    ExternalDeviceSpikeInjector)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
@@ -54,10 +50,13 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
     PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.spinnaker import SpiNNaker
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
 from spynnaker.pyNN.models.populations import Population
+from spynnaker.pyNN.models.utility_models.spike_injector import (
+    SpikeInjector as ExternalDeviceSpikeInjector)
 
 # useful functions
 add_database_socket_address = Plugins.add_database_socket_address
@@ -65,7 +64,7 @@ activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
 
-AbstractSpiNNakerCommon.register_binary_search_path(
+SpiNNaker.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 
