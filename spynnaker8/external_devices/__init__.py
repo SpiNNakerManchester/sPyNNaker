@@ -94,10 +94,6 @@ __all__ = [
 
 moved_in_v6("spynnaker8.external_devices",
             "spynnaker.pyNN.external_devices")
-logger.warning("For imports from spynnaker8.external_devices see imports in "
-               "https://github.com/SpiNNakerManchester/sPyNNaker/blob/"
-               "master/spynnaker8/external_devices/__init__.py")
-
 
 def run_forever(sync_time=0):
     """ Supports running forever in PyNN 0.8/0.9 format

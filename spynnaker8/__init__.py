@@ -107,7 +107,7 @@ from spynnaker.pyNN.models.populations import (
 from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 
 from spynnaker.pyNN import external_devices
-from spynnaker8 import extra_models
+from spynnaker.pyNN import extra_models
 
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
