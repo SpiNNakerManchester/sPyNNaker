@@ -149,13 +149,25 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("lazyarray_version", lazyarray_version)
 
     def run(self, run_time, sync_time=0.0):
-        """ Run the simulation for a span of simulation time.
+        """ Run the model created.
 
-        :param run_time: the time to run for, in milliseconds
-        :return: None
+        :param run_time: the time (in milliseconds) to run the simulation for
+        :type run_time: float or int
+        :param float sync_time:
+            If not 0, this specifies that the simulation should pause after
+            this duration.  The continue_simulation() method must then be
+            called for the simulation to continue.
+        :rtype: None
         """
+        # pylint: disable=protected-access
+
+        # extra post run algorithms
+        for projection in self._projections:
+            projection._clear_cache()
 
         self._run_wait(run_time, sync_time)
+        for projection in self._projections:
+            projection._clear_cache()
 
     def run_until(self, tstop):
         """ Run the simulation until the given simulation time.
@@ -495,26 +507,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
 
-    def run(self, run_time, sync_time=0.0):
-        """ Run the model created.
-
-        :param run_time: the time (in milliseconds) to run the simulation for
-        :type run_time: float or int
-        :param float sync_time:
-            If not 0, this specifies that the simulation should pause after
-            this duration.  The continue_simulation() method must then be
-            called for the simulation to continue.
-        :rtype: None
-        """
-        # pylint: disable=protected-access
-
-        # extra post run algorithms
-        for projection in self._projections:
-            projection._clear_cache()
-
-        super().run(run_time, sync_time)
-        for projection in self._projections:
-            projection._clear_cache()
 
     @staticmethod
     def register_binary_search_path(search_path):
