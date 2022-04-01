@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import collections
+from collections.abc import Iterable
 import numpy
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
@@ -189,7 +189,9 @@ class SynapseDynamicsStructuralCommon(
         spec.write_array(self.get_seeds(app_vertex))
 
         # write local seed (4 words), generated randomly!
-        spec.write_array(self.get_seeds())
+        # Note that in case of a reset, these need a key to ensure subsequent
+        # runs match the first run
+        spec.write_array(self.get_seeds(vertex_slice))
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)
@@ -240,7 +242,7 @@ class SynapseDynamicsStructuralCommon(
             delay_scale = (
                     MICRO_TO_MILLISECOND_CONVERSION /
                     machine_time_step())
-            if isinstance(dynamics.initial_delay, collections.Iterable):
+            if isinstance(dynamics.initial_delay, Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
                 spec.write_value(int(dynamics.initial_delay[1] * delay_scale),
@@ -420,7 +422,7 @@ class SynapseDynamicsStructuralCommon(
         :param float max_delay_ms: The maximum delay supported, in milliseconds
         :raises Exception: if the delay is out of range
         """
-        if isinstance(self.initial_delay, collections.Iterable):
+        if isinstance(self.initial_delay, Iterable):
             # pylint: disable=unsubscriptable-object
             init_del = self.initial_delay
             if init_del[0] > max_delay_ms or init_del[1] > max_delay_ms:

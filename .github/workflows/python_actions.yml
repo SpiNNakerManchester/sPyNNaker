@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9, "3.10"]
 
     steps:
     - name: Checkout
@@ -85,11 +85,11 @@ jobs:
       if: matrix.python-version == 3.8
       uses: ./support/actions/check-copyrights
 
-    - name: Validate all XML
-      if: matrix.python-version == 3.8
-      uses: ./support/actions/validate-xml
-      with:
-        base-path: spynnaker
+    #- name: Validate all XML
+    #  if: matrix.python-version == 3.8
+    #  uses: ./support/actions/validate-xml
+    #  with:
+    #    base-path: spynnaker
 
     - name: Build documentation with sphinx (3.8 only)
       uses: ./support/actions/sphinx

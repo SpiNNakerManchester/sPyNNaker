@@ -68,7 +68,8 @@ class NeuronRecorder(object):
         "__events_per_core_datatypes",
         "__events_per_core_recording",
         "__events_per_ts",
-        "__region_ids"]
+        "__region_ids",
+        "__offset_added"]
 
     _N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     _N_BYTES_PER_RATE = BYTES_PER_WORD
@@ -162,14 +163,20 @@ class NeuronRecorder(object):
                     events_per_core_variables, per_timestep_variables)):
             self.__region_ids[variable] = region_id
 
+        self.__offset_added = False
+
     def add_region_offset(self, offset):
         """ Add an offset to the regions.  Used when there are multiple\
             recorders on a single core
 
         :param int offset: The offset to add
         """
-        self.__region_ids = dict((var, region + offset)
-                                 for var, region in self.__region_ids.items())
+        if not self.__offset_added:
+            self.__region_ids = dict(
+                (var, region + offset)
+                for var, region in self.__region_ids.items())
+
+        self.__offset_added = True
 
     def _count_recording_per_slice(
             self, variable, vertex_slice):
@@ -224,7 +231,7 @@ class NeuronRecorder(object):
     @staticmethod
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
-            sampling_rate, label, placement_data):
+            sampling_rate, label, placement_data, region):
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -236,10 +243,10 @@ class NeuronRecorder(object):
             if len(local_indexes[0]) == 1:
                 fragment[i] = placement_data[local_indexes[0]]
             elif len(local_indexes[0]) > 1:
-                fragment[i] = placement_data[local_indexes[0], 1:]
+                fragment[i] = placement_data[local_indexes[0][0]]
                 logger.warning(
-                    "Population {} has multiple recorded data for time {}",
-                    label, time)
+                    "Population {} has multiple recorded data for time {}"
+                    " in region {} ", label, time, region)
             else:
                 # Set row to nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -301,7 +308,7 @@ class NeuronRecorder(object):
         # process data from core for missing data
         placement_data = self._process_missing_data(
             missing_str, placement, expected_rows, n_per_timestep, times,
-            sampling_rate, label, placement_data)
+            sampling_rate, label, placement_data, region)
         return placement_data
 
     def __read_data(
