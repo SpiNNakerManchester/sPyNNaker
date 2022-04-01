@@ -30,6 +30,8 @@ from pyNN.random import NumpyRNG, RandomDistribution as _PynnRandomDistribution
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
+
+import traceback
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException, SimulatorNotSetupException,
@@ -112,6 +114,10 @@ from spynnaker.pyNN import extra_models
 # big stuff
 from spynnaker.pyNN.spinnaker import SpiNNaker
 
+
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
+from spynnaker.pyNN.setup_pynn import setup_pynn
+
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
 
@@ -157,6 +163,22 @@ __all__ = [
 
 # Dynamically-extracted operations from PyNN
 __pynn = {}
+
+
+def is_pynn_call():
+    tr = traceback.extract_stack()
+    for frame_summary in tr:
+        if 'pyNN' in frame_summary.filename:
+            return True
+    return False
+
+
+if is_pynn_call():
+    setup_pynn()
+    raise Exception("Pynn needed to be setup. Now done. Please try again")
+else:
+    moved_in_v6("spynnaker8.", "spynnaker.pyNN")
+    logger.warning("The recommended way is to do import pyNN.spinnaker")
 
 
 class RandomDistribution(_PynnRandomDistribution):

@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker8.models.synapse_dynamics.timing_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceRecurrent as RecurrentRule,
     TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
     TimingDependenceVogels2011 as Vogels2011Rule,
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsNeuromodulation as Neuromodulation)
-from spynnaker8.models.synapse_dynamics.weight_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
