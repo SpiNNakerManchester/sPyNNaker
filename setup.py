@@ -19,7 +19,6 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
-
 __version__ = None
 __version_type__ = None
 exec(open("spynnaker/_version.py").read())
@@ -77,6 +76,10 @@ def find(main_package):
                     main_package, dirname[start:].replace(os.sep, '.'))
                 package_data[package].append(filename)
 
+def setup_pynn():
+    import pyNN
+    from spynnaker8.setup_pynn import install_sPyNNaker8_into
+    install_sPyNNaker8_into(pyNN)
 
 find("spynnaker")
 find("spynnaker8")
@@ -122,3 +125,4 @@ setup(
     maintainer_email="spinnakerusers@googlegroups.com",
     **long_description
 )
+setup_pynn()
