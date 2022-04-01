@@ -507,7 +507,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         super().stop(turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
 
-
     @staticmethod
     def register_binary_search_path(search_path):
         """ Register an additional binary search path for executables.
