@@ -17,7 +17,7 @@ from unittest import SkipTest
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spynnaker.pyNN.exceptions import ConfigurationException
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker_integration_tests.scripts import check_data
 from spinnaker_testbase import BaseTestCase
 

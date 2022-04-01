@@ -15,7 +15,7 @@
 
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.populations.population import Population
-import spynnaker8
+import pyNN.spiNNaker
 
 # NO unittest_step as sim.setup call is needed before creating a Population
 

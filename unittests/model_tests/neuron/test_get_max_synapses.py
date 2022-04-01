@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
-import spynnaker8
+import pyNN.spiNNaker
 
 
 def test_get_max_synapses():

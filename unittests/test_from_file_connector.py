@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FromFileConnector)
 from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
-import spynnaker8
+import pyNN.spiNNaker
 
 # NO unittest_setup() as sim.setup is called
 

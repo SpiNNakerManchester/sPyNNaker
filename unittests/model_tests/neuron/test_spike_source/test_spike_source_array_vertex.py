@@ -15,7 +15,7 @@
 
 import unittest
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
-import spynnaker8
+import pyNN.spiNNaker
 
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):

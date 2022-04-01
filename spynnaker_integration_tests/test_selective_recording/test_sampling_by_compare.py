@@ -16,7 +16,7 @@
 import os
 import sys
 import numpy
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.models.populations import PopulationView
 from spinnaker_testbase import BaseTestCase
 
