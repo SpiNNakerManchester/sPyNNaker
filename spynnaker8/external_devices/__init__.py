@@ -22,6 +22,8 @@ PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
     SpiNNaker system to run in real-time mode, which usually reduces numerical
     accuracy to gain performance.
 """
+import logging
+from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio import EIEIOType
 from spynnaker.pyNN.external_devices_models import (
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
@@ -45,6 +47,8 @@ from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 import spynnaker.pyNN.external_devices as moved_code
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 # useful functions
 add_database_socket_address = moved_code.add_database_socket_address
@@ -90,6 +94,9 @@ __all__ = [
 
 moved_in_v6("spynnaker8.external_devices",
             "spynnaker.pyNN.external_devices")
+logger.warning("For imports from spynnaker8.external_devices see imports in "
+               "https://github.com/SpiNNakerManchester/sPyNNaker/blob/"
+               "master/spynnaker8/external_devices/__init__.py")
 
 
 def run_forever(sync_time=0):
