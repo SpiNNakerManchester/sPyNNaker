@@ -21,6 +21,7 @@ import tempfile
 import os
 import traceback
 import sys
+import time
 
 
 class WholeBoardTest(object):
@@ -193,6 +194,8 @@ boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 def test_run(x, y, b):
     job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
               owner="Jenkins Machine Test")
+    # Sleep before checking for queued in case of multiple jobs running
+    time.sleep(2.0)
     if job.state == JobState.queued:
         job.destroy("Queued")
         pytest.skip(f"Board {x}, {y}, {b} is in use")
