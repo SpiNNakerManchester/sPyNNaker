@@ -199,7 +199,8 @@ def test_run(x, y, b):
     elif job.state == JobState.destroyed:
         pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
     with job:
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory(
+                prefix=f"{x}_{y}_{b}", dir=os.getcwd()) as tmpdir:
             os.chdir(tmpdir)
             with open("spynnaker.cfg", "w") as f:
                 f.write("[Machine]\n")
