@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
+
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -51,7 +53,9 @@ class NoisyCurrentSource(AbstractCurrentSource):
         self.__start = start * time_convert_ms
         self.__stop = stop * time_convert_ms
         self.__dt = dt * time_convert_ms
-        self.__rng = rng
+        if rng is None:
+            seed = None
+            self.__rng = numpy.random.RandomState(seed)
 
         # Error if dt is not the same as machine time step
         if dt != (1 / time_convert_ms):
