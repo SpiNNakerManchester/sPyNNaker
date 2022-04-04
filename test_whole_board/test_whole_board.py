@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker8 as sim
+import spynnaker
 from spalloc.job import Job
 from spalloc.states import JobState
 import pytest
@@ -192,6 +193,7 @@ boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 
 @pytest.mark.parametrize("x,y,b", boards)
 def test_run(x, y, b):
+    tmp_dir = os.path.join(spynnaker.__path__, "test_whole_board")
     job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
               owner="Jenkins Machine Test")
     # Sleep before checking for queued in case of multiple jobs running
@@ -203,7 +205,7 @@ def test_run(x, y, b):
         pytest.skip(f"Board {x}, {y}, {b} could not be allocated")
     with job:
         with tempfile.TemporaryDirectory(
-                prefix=f"{x}_{y}_{b}", dir=os.getcwd()) as tmpdir:
+                prefix=f"{x}_{y}_{b}", dir=tmp_dir) as tmpdir:
             os.chdir(tmpdir)
             with open("spynnaker.cfg", "w") as f:
                 f.write("[Machine]\n")
