@@ -193,7 +193,7 @@ boards = [(x, y, b) for x in range(20) for y in range(20) for b in range(3)]
 
 @pytest.mark.parametrize("x,y,b", boards)
 def test_run(x, y, b):
-    tmp_dir = os.path.join(spynnaker.__path__, "test_whole_board")
+    tmp_dir = os.path.join(spynnaker.__path__[0], "test_whole_board")
     job = Job(x, y, b, hostname="spinnaker.cs.man.ac.uk",
               owner="Jenkins Machine Test")
     # Sleep before checking for queued in case of multiple jobs running
