@@ -87,7 +87,7 @@ bool neuron_resume(void) { // EXPORTED
     }
 
     // (re)load the current source parameters
-    current_source_impl_load_parameters(current_source_address);
+    current_source_load_parameters(current_source_address);
 
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters();
@@ -154,12 +154,12 @@ bool neuron_initialise(
     }
 
     // Initialise for current sources
-    if (!current_source_impl_initialise(cs_address)) {
+    if (!current_source_initialise(cs_address)) {
         return false;
     }
 
     // load the current source data into the allocated DTCM spaces
-    if (!current_source_impl_load_parameters(cs_address)) {
+    if (!current_source_load_parameters(cs_address)) {
         return false;
     }
 
