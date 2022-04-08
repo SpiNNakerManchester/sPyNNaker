@@ -42,7 +42,8 @@ static step_current_source_amps_t **step_cs_amps;
 static REAL *step_cs_amp_last;
 static uint32_t *step_cs_index;
 
-static bool current_source_step_init(address_t cs_address, uint32_t n_step_current_sources, uint32_t *next) {
+static bool current_source_step_init(
+		address_t cs_address, uint32_t n_step_current_sources, uint32_t *next) {
 	if (n_step_current_sources > 0) {
 		step_cs_times = spin1_malloc(n_step_current_sources * sizeof(uint32_t*));
 		step_cs_amps = spin1_malloc(n_step_current_sources * sizeof(uint32_t*));
