@@ -40,7 +40,7 @@ def install_sPyNNaker_into(module):
     if not os.path.exists(spinnaker_dir):
         os.mkdir(spinnaker_dir)
 
-    spinnaker_init = os.path.join(spinnaker_dir, "pyNN/__init__.py")
+    spinnaker_init = os.path.join(spinnaker_dir, "__init__.py")
     with open(spinnaker_init, "w") as spinn_file:
         spinn_file.write("from spynnaker.pyNN import *\n")
 
