@@ -53,8 +53,10 @@ if not version_satisfies(pyNN, "0.9"):
         "PyNN version {} found; sPyNNaker requires PyNN version 0.9".format(
             pyNN.__version__))
 
+
 def setup_pynn():
     # Perform the installation
     install_sPyNNaker_into(pyNN)
+
 
 setup_pynn()
