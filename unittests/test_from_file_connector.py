@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FromFileConnector)
 from unittests.mocks import MockPopulation
 from spynnaker.pyNN.models.neural_projections import SynapseInformation
-import pyNN.spiNNaker
+import pyNN.spiNNaker as sim
 
 # NO unittest_setup() as sim.setup is called
 
@@ -55,7 +55,7 @@ def test_connector(
         clist, column_names, weights, delays, expected_clist, expected_weights,
         expected_delays, expected_extra_parameters,
         expected_extra_parameter_names):
-    spynnaker8.setup()
+    sim.setup()
     temp = tempfile.NamedTemporaryFile(delete=False)
     with temp as f:
         header = ''

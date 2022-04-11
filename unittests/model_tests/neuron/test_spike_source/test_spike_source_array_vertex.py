@@ -15,13 +15,13 @@
 
 import unittest
 from spynnaker.pyNN.models.spike_source import SpikeSourceArrayVertex
-import pyNN.spiNNaker
+import pyNN.spiNNaker as sim
 
 
 class TestSpikeSourceArrayVertex(unittest.TestCase):
 
     def setUp(cls):
-        spynnaker8.setup()
+        sim.setup()
 
     def test_no_spikes(self):
         v = SpikeSourceArrayVertex(

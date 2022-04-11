@@ -24,7 +24,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
-import pyNN.spiNNaker
+import pyNN.spiNNaker as sim
 
 # No unittest_setup as sim.setup must be called before SynapseDynamicsStatic
 
@@ -50,7 +50,7 @@ import pyNN.spiNNaker
       20, None, 20)])
 def test_get_allowed_row_length(
         dynamics_class, timing, weight, size, exception, max_size):
-    spynnaker8.setup()
+    sim.setup()
     if timing is not None and weight is not None:
         dynamics = dynamics_class(timing(), weight())
     else:

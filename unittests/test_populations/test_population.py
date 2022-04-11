@@ -15,13 +15,13 @@
 
 from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.populations.population import Population
-import pyNN.spiNNaker
+import pyNN.spiNNaker as sim
 
 # NO unittest_step as sim.setup call is needed before creating a Population
 
 
 def test_selector():
-    spynnaker8.setup()
+    sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
         size=5, label="Test", constraints=None, cellclass=model,
@@ -43,7 +43,7 @@ def test_selector():
 
 
 def test_round():
-    spynnaker8.setup()
+    sim.setup()
     model = IFCurrExpBase()
     pop_1 = Population(
         size=4.999999, label="Test", cellclass=model,
