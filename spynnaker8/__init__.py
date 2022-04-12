@@ -105,7 +105,7 @@ from spynnaker.pyNN import extra_models
 
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 from spynnaker.pyNN.setup_pynn import setup_pynn
-import pyNN.spiNNaker as sim
+import spynnaker.pyNN as sim
 
 #: The timestep to use of "auto" is specified as a timestep
 SPYNNAKER_AUTO_TIMESTEP = 1.0
