@@ -103,10 +103,6 @@ from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 from spynnaker.pyNN import external_devices
 from spynnaker.pyNN import extra_models
 
-# big stuff
-from spynnaker.pyNN.spinnaker import SpiNNaker
-
-
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 from spynnaker.pyNN.setup_pynn import setup_pynn
 import pyNN.spiNNaker as sim
@@ -214,9 +210,10 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         :py:class:`spynnaker.pyNN` instead.
     """
     use_spynnaker_pynn()
-    return sim.setup(timestep, min_delay, max_delay, graph_label,
-          database_socket_addresses, time_scale_factor,
-          n_chips_required, n_boards_required, **extra_params)
+    return sim.setup(
+        timestep, min_delay, max_delay, graph_label,
+        database_socket_addresses, time_scale_factor, n_chips_required,
+        n_boards_required, **extra_params)
 
 
 def name():
