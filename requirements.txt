@@ -21,7 +21,6 @@ SpiNNaker_DataSpecification == 1!6.0.1
 spalloc == 1!6.0.1
 SpiNNFrontEndCommon == 1!6.0.1
 lxml
-statistics
 matplotlib < 3.4; python_version == '3.6'
 matplotlib; python_version >= '3.7'
 quantities >= 0.12.1
