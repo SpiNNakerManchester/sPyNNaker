@@ -16,6 +16,8 @@ from datetime import datetime
 import logging
 import numpy
 import neo
+from packaging import version
+import pyNN
 import quantities
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
@@ -709,12 +711,16 @@ class Recorder(object):
             sampling_period=sampling_period,
             name=variable,
             source_population=label,
-            source_ids=ids)
-        channel_index = self.__get_channel_index(indexes, block)
-        data_array.channel_index = channel_index
+            source_ids=ids,
+        )
         data_array.shape = (data_array.shape[0], data_array.shape[1])
+        if version.parse(pyNN.__version__) >= version.parse("0.10"):
+            data_array.array_annotations = {"channel_index": numpy.array(ids)}
+        else:
+            channel_index = self.__get_channel_index(indexes, block)
+            data_array.channel_index = channel_index
+            channel_index.analogsignals.append(data_array)
         segment.analogsignals.append(data_array)
-        channel_index.analogsignals.append(data_array)
 
     def __read_in_event(
             self, segment, event_array, variable, recording_start_time):
