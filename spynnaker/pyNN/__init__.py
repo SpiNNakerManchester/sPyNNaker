@@ -161,7 +161,7 @@ __all__ = [
     'Projection',
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
-    'record', 'record_v', 'record_gsyn']
+    'record', 'record_v', 'record_gsyn', "get_machine"]
 
 # Dynamically-extracted operations from PyNN
 __pynn = {}
