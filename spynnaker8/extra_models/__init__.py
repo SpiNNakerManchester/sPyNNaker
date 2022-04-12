@@ -32,7 +32,7 @@ from spynnaker.pyNN.models.neuron.builds import (
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
 __all__ = [
     # sPyNNaker 8 models
@@ -51,5 +51,5 @@ __all__ = [
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
 
-moved_in_v6("spynnaker8.extra_models",
+moved_in_v7("spynnaker8.extra_models",
             "spynnaker.pyNN.extra_models")

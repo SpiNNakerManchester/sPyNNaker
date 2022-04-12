@@ -14,13 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spynnaker.pyNN.spinnaker import SpiNNaker as _BaseClass
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
 
 class SpiNNaker(_BaseClass):
     """ Main interface for the sPyNNaker implementation of PyNN 0.8/0.9
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.SpiNNaker` instead.
     """
@@ -30,7 +30,7 @@ class SpiNNaker(_BaseClass):
             time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         # pylint: disable=too-many-arguments, too-many-locals
-        moved_in_v6("spynnaker8.spinnaker",
+        moved_in_v7("spynnaker8.spinnaker",
                     "spynnaker.pyNN.spinnaker")
         super(SpiNNaker, self).__init__(
             database_socket_addresses, time_scale_factor, min_delay,

@@ -355,9 +355,25 @@ def moved_in_v6(old_location, new_location):
     if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
         raise NotImplementedError("Old import: {}".format(old_location))
     logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 8 this will fail completely."
+                   "In version 7 this will fail completely."
                    "".format(old_location, new_location))
 
+
+def moved_in_v7(old_location, new_location):
+    """
+    Warns the users that they are using an old import.
+
+    In version 8 this will be upgraded to a exception and then later removed
+
+    :param str old_location: old import
+    :param str new_location: new import
+    :raise: an exception if in CONTINUOUS_INTEGRATION
+    """
+    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
+        raise NotImplementedError("Old import: {}".format(old_location))
+    logger.warning("File {} moved to {}. Please fix your imports. "
+                   "In version 8 this will fail completely."
+                   "".format(old_location, new_location))
 
 def get_time_to_write_us(n_bytes, n_cores):
     """ Determine how long a write of a given number of bytes will take in us

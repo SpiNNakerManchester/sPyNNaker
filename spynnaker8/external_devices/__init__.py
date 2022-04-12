@@ -44,7 +44,7 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
     PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
+from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
 import spynnaker.pyNN.external_devices as moved_code
 
@@ -92,18 +92,18 @@ __all__ = [
     "add_poisson_live_rate_control"
 ]
 
-moved_in_v6("spynnaker8.external_devices",
+moved_in_v7("spynnaker8.external_devices",
             "spynnaker.pyNN.external_devices")
 
 
 def run_forever(sync_time=0):
     """ Supports running forever in PyNN 0.8/0.9 format
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     moved_code.run_forever(sync_time)
 
@@ -112,11 +112,11 @@ def run_sync(run_time, sync_time):
     """ Run in steps of the given number of milliseconds pausing between\
         for a signal to be sent from the host
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     moved_code.run_sync(run_time, sync_time)
 
@@ -124,11 +124,11 @@ def run_sync(run_time, sync_time):
 def continue_simulation():
     """ Continue a synchronised simulation
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     moved_code.continue_simulation()
 
@@ -137,11 +137,11 @@ def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     moved_code.request_stop()
 
@@ -149,11 +149,11 @@ def request_stop():
 def register_database_notification_request(hostname, notify_port, ack_port):
     """ Adds a socket system which is registered with the notification protocol
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     moved_code.register_database_notification_request(
         hostname, notify_port, ack_port)
@@ -169,11 +169,11 @@ def EthernetControlPopulation(
     """ Create a PyNN population that can be included in a network to\
         control an external device which is connected to the host
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     return moved_code.EthernetControlPopulation(
         n_neurons, model, label, local_host, local_port,
@@ -186,11 +186,11 @@ def EthernetSensorPopulation(
     """ Create a pyNN population which can be included in a network to\
         receive spikes from a device connected to the host
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     return moved_code.EthernetSensorPopulation(
         device, local_host, database_notify_port_num, database_ack_port_num)
@@ -202,12 +202,12 @@ def SpikeInjector(
     """ Supports creating a spike injector that can be added to the\
         application graph.
 
-    .. deprecated:: 6.0
+    .. deprecated:: 7.0
         Use
         :py:class:`spynnaker.pyNN.external_devices` instead.
     """
     # pylint: disable=too-many-arguments
-    moved_in_v6("spynnaker8.external_devices",
+    moved_in_v7("spynnaker8.external_devices",
                 "spynnaker.pyNN.external_devices")
     return moved_code.SpikeInjector(
         notify, database_notify_host, database_notify_port_num,
