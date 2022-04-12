@@ -35,8 +35,8 @@ class AbstractSpiNNakerCommon(SpiNNaker):
         moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
                     "spynnaker.pyNN.spinnaker")
         super(database_socket_addresses,
-            time_scale_factor, min_delay, graph_label,
-            n_chips_required, n_boards_required, timestep)
+              time_scale_factor, min_delay, graph_label,
+              n_chips_required, n_boards_required, timestep)
 
     @staticmethod
     def register_binary_search_path(search_path):
