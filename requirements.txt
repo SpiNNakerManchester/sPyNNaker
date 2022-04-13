@@ -31,4 +31,3 @@ appdirs >= 1.4.2 , < 2.0.0
 neo >= 0.5.2, < 0.10.0
 # csa  # needed but excluded due to readthedocs
 # spinnaker_tools
-Loading complete
