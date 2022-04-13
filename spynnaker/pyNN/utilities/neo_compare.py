@@ -15,6 +15,9 @@
 
 # from __future__ import print_function
 
+from packaging import version
+import pyNN
+
 
 def compare_spiketrain(spiketrain1, spiketrain2, same_length=True):
     """ Checks two Spiketrains have the exact same data
@@ -88,8 +91,12 @@ def compare_analogsignal(as1, as2, same_length=True):
         data extracted part way with data extracted at the end.
     :raises AssertionError: If the analogsignals are not equal
     """
-    as1_index = as1.channel_index.index
-    as2_index = as2.channel_index.index
+    if version.parse(pyNN.__version__) >= version.parse("0.10"):
+        as1_index = as1.array_annotations["channel_index"]
+        as2_index = as2.array_annotations["channel_index"]
+    else:
+        as1_index = as1.channel_index.index
+        as2_index = as2.channel_index.index
 
     if as1.name != as2.name:
         raise AssertionError(

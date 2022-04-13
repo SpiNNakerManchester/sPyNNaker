@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from packaging import version
+import pyNN
 import quantities
 import numpy as np
 
@@ -25,7 +27,10 @@ def convert_analog_signal(signal_array, time_unit=quantities.ms):
         Data time unit for time index
     :rtype: ~numpy.ndarray
     """
-    ids = signal_array.channel_index.index.astype(int)
+    if version.parse(pyNN.__version__) >= version.parse("0.10"):
+        ids = signal_array.array_annotations["channel_index"]
+    else:
+        ids = signal_array.channel_index.index.astype(int)
     xs = range(len(ids))
     if time_unit == quantities.ms:
         times = signal_array.times.magnitude
@@ -132,8 +137,12 @@ def convert_gsyn(gsyn_exc, gsyn_inh):
     """
     exc = gsyn_exc.segments[0].filter(name='gsyn_exc')[0]
     inh = gsyn_inh.segments[0].filter(name='gsyn_inh')[0]
-    ids = exc.channel_index
-    ids2 = inh.channel_index
+    if version.parse(pyNN.__version__) >= version.parse("0.10"):
+        ids = exc.array_annotations["channel_index"]
+        ids2 = inh.array_annotations["channel_index"]
+    else:
+        ids = exc.channel_index
+        ids2 = inh.channel_index
     if len(ids) != len(ids2):
         raise ValueError(
             "Found {} neuron IDs in gsyn_exc but {} in  gsyn_inh".format(

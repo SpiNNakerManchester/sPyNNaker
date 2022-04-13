@@ -12,6 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from packaging import version
+import pyNN
 import numpy
 import math
 from spynnaker.pyNN.models.populations import PopulationView
@@ -58,7 +61,10 @@ class PatternSpiker(object):
         if v_rec_indexes is None:
             v_rec_indexes = range(len(v[0]))
         else:
-            actual_indexes = list(v.channel_index.index)
+            if version.parse(pyNN.__version__) >= version.parse("0.10"):
+                actual_indexes = list(v.array_annotations["channel_index"])
+            else:
+                actual_indexes = list(v.channel_index.index)
             if missing:
                 v_rec_indexes = [index for index in v_rec_indexes
                                  if index in actual_indexes]

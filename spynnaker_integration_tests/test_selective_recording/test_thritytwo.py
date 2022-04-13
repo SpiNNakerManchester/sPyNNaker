@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from packaging import version
+import pyNN
 import spynnaker8 as sim
 from spinnaker_testbase import BaseTestCase
 
@@ -44,6 +46,9 @@ class TestSampling(BaseTestCase):
         for i in range(32, 40):
             self.assertEqual(0, len(spikes[i]))
         v = neo.segments[0].filter(name='v')[0]
-        self.assertEqual(32, len(v.channel_index.index))
+        if version.parse(pyNN.__version__) >= version.parse("0.10"):
+            self.assertEqual(32, len(v.array_annotations["channel_index"]))
+        else:
+            self.assertEqual(32, len(v.channel_index.index))
         self.assertEqual(32, len(v[0]))
         sim.end()

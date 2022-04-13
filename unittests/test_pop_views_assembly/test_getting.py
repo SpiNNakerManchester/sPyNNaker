@@ -12,10 +12,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from packaging import version
 import pickle
+import pyNN
+import pytest
 from unittest import SkipTest
 import numpy
-import pytest
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.recorder import Recorder
@@ -184,10 +187,14 @@ class TestGetting(BaseTestCase):
 
         view = pop[0:3]
         neo = view.get_data("v")
-        v = neo.segments[0].filter(name='v')[0].magnitude
+        v_neo = neo.segments[0].filter(name='v')[0]
+        v = v_neo.magnitude
         (target, _, _) = mock_v_one_two(None, "v")
-        assert numpy.array_equal(
-            [1, 2], neo.segments[0].filter(name='v')[0].channel_index.index)
+        if version.parse(pyNN.__version__) >= version.parse("0.10"):
+            ids = v_neo.array_annotations["channel_index"]
+        else:
+            ids = v_neo.channel_index.index
+        assert numpy.array_equal([1, 2], ids)
         assert v.shape == target.shape
         assert numpy.array_equal(v,  target)
 
