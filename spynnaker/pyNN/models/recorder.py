@@ -784,10 +784,14 @@ class Recorder(object):
 
     @staticmethod
     def __get_channel_index(ids, block):
+        """
+        This method is only valid for pynn 0.9
+        """
         for channel_index in block.channel_indexes:
             if numpy.array_equal(channel_index.index, ids):
                 return channel_index
         count = len(block.channel_indexes)
+        # pylint: disable=no-member
         channel_index = neo.ChannelIndex(
             name="Index {}".format(count), index=ids)
         block.channel_indexes.append(channel_index)
