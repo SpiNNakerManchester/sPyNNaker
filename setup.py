@@ -46,10 +46,10 @@ install_requires = [
     'pyparsing>=2.2.1,<3.0.0',
     'lxml',
     'quantities >= 0.12.1',
-    'pynn >= 0.9.1, < 0.10.0 ',
+    'pynn >= 0.9.1',
     'lazyarray >= 0.2.9, <= 0.4.0',
     'appdirs >= 1.4.2 , < 2.0.0',
-    'neo >= 0.5.2, < 0.10.0']
+    'neo >= 0.5.2']
 if os.environ.get('READTHEDOCS', None) != 'True':
     # scipy must be added in config.py as a mock
     # csa is a badly written package

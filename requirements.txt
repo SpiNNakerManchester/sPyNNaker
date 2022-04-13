@@ -25,9 +25,9 @@ statistics
 matplotlib < 3.4; python_version == '3.6'
 matplotlib; python_version >= '3.7'
 quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
+pynn >= 0.9.1
 lazyarray >= 0.2.9, <= 0.4.0
 appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
+neo >= 0.5.2
 # csa  # needed but excluded due to readthedocs
 # spinnaker_tools
