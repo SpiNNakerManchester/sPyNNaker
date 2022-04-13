@@ -47,7 +47,7 @@ install_requires = [
     'lxml',
     'quantities >= 0.12.1',
     'pynn >= 0.9.1',
-    'lazyarray >= 0.2.9, <= 0.4.0',
+    'lazyarray >= 0.2.9',
     'appdirs >= 1.4.2 , < 2.0.0',
     'neo >= 0.5.2']
 if os.environ.get('READTHEDOCS', None) != 'True':
