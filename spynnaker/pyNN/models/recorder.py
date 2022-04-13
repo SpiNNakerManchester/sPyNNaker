@@ -461,6 +461,9 @@ class Recorder(object):
             name="segment{}".format(get_simulator().segment_counter),
             description=self.__population.describe(),
             rec_datetime=datetime.now())
+        # Hack to get around plotting bug
+        # https://github.com/NeuralEnsemble/PyNN/issues/750
+        segment.spiketrains = []
 
         # sort out variables for using
         variables = self._clean_variables(variables)
@@ -522,6 +525,9 @@ class Recorder(object):
             name="segment{}".format(segment_number),
             description=data_cache.description,
             rec_datetime=data_cache.rec_datetime)
+        # Hack to get around plotting bug
+        # https://github.com/NeuralEnsemble/PyNN/issues/750
+        segment.spiketrains = []
 
         for variable in variables:
             if variable not in data_cache.variables:
