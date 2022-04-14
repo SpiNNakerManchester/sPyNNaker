@@ -57,10 +57,13 @@ def calculate_spike_pair_additive_stdp_weight(
         pre_spikes, post_spikes, plastic_delay)
 
     # Work out the weight according to the additive rule
-    potentiations = max_weight * a_plus * numpy.exp(
+    potentiations = a_plus * numpy.exp(
         (potentiation_times / tau_plus))
-    depressions = max_weight * a_minus * numpy.exp(
+    depressions = a_minus * numpy.exp(
         (depression_times / tau_minus))
+
+    print("Potentiations: ", potentiation_times, potentiations)
+    print("Depressions:", depression_times, depressions)
     return initial_weight + numpy.sum(potentiations) - numpy.sum(depressions)
 
 

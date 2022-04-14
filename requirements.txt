@@ -20,12 +20,6 @@ SpiNNaker_PACMAN == 1!6.0.1
 SpiNNaker_DataSpecification == 1!6.0.1
 spalloc == 1!6.0.1
 SpiNNFrontEndCommon == 1!6.0.1
-numpy > 1.13, < 1.20; python_version == '3.6'
-numpy > 1.13, < 1.21; python_version == '3.7'
-numpy; python_version >= '3.8'
-scipy
-lxml
-statistics
 matplotlib < 3.4; python_version == '3.6'
 matplotlib; python_version >= '3.7'
 quantities >= 0.12.1

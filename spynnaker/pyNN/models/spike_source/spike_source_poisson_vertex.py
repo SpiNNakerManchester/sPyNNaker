@@ -129,7 +129,6 @@ class SpikeSourcePoissonVertex(
         self.__model = model
         self.__seed = seed
         self.__kiss_seed = dict()
-        self.__rng = None
         self.__n_subvertices = 0
         self.__n_data_specs = 0
 
@@ -500,7 +499,7 @@ class SpikeSourcePoissonVertex(
     def seed(self, seed):
         self.__seed = seed
         self.__kiss_seed = dict()
-        self.__rng = None
+        self.__rng = numpy.random.RandomState(seed)
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -534,7 +533,7 @@ class SpikeSourcePoissonVertex(
     def kiss_seed(self, vertex_slice):
         if vertex_slice not in self.__kiss_seed:
             self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(
-                self.__rng, self.__seed)
+                self.__rng)
         return self.__kiss_seed[vertex_slice]
 
     def update_kiss_seed(self, vertex_slice, seed):

@@ -168,7 +168,7 @@ static inline const char *synapse_types_get_type_char(
 //! \param[in] parameters: the pointer to the parameters to use
 static inline void synapse_types_print_input(
         synapse_param_t *parameters) {
-    io_printf(IO_BUF, "%12.6k - %12.6k",
+    log_debug("%12.6k - %12.6k",
             parameters->exc.synaptic_input_value,
             parameters->inh.synaptic_input_value);
 }
