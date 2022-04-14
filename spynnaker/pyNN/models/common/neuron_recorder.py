@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from collections import OrderedDict
 import itertools
 import logging
 import math
@@ -134,7 +133,7 @@ class NeuronRecorder(object):
         :param list(str) bitfield_variables:
         :param int n_neurons:
         """
-        self.__sampling_rates = OrderedDict()
+        self.__sampling_rates = dict()
         self.__indexes = dict()
         self.__data_types = data_types
         self.__n_neurons = n_neurons
