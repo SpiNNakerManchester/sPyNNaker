@@ -13,19 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SpiNNUtilities == 1!6.0.1
-SpiNNMachine == 1!6.0.1
-SpiNNMan == 1!6.0.1
-SpiNNaker_PACMAN == 1!6.0.1
-SpiNNaker_DataSpecification == 1!6.0.1
-spalloc == 1!6.0.1
-SpiNNFrontEndCommon == 1!6.0.1
-matplotlib < 3.4; python_version == '3.6'
-matplotlib; python_version >= '3.7'
-quantities >= 0.12.1
-pynn >= 0.9.1, < 0.10
-lazyarray >= 0.2.9, <= 0.4.0
-appdirs >= 1.4.2 , < 2.0.0
-neo >= 0.5.2, < 0.10.0
-# csa  # needed but excluded due to readthedocs
-# spinnaker_tools
+from spinnaker_testbase import BaseTestCase
+from spynnaker_integration_tests.test_onchip_compressor.many_routes \
+    import do_run
+from spynnaker_integration_tests.test_onchip_compressor.one_route \
+    import do_one_run
+
+
+class TestPairNoRangeCompressor(BaseTestCase):
+
+    def test_do_run(self):
+        self.runsafe(do_run)
+
+    def test_do_one_run(self):
+        self.runsafe(do_one_run)
