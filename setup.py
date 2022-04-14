@@ -44,7 +44,6 @@ install_requires = [
     'spalloc == 1!6.0.1',
     'SpiNNFrontEndCommon == 1!6.0.1',
     'pyparsing>=2.2.1,<3.0.0',
-    'lxml',
     'quantities >= 0.12.1',
     'pynn >= 0.9.1',
     'lazyarray >= 0.2.9',
