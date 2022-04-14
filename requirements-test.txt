@@ -24,6 +24,5 @@ pytest-forked
 pytest-progress
 sphinx >= 4
 testfixtures
-statistics
 mock
 graphviz

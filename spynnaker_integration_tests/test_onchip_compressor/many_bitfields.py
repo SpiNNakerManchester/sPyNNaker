@@ -49,8 +49,6 @@ def do_bitfield_run():
                     n_boards)) from oops
         raise oops
     target_x, target_y = find_good_chip(machine, n_target)
-    print(machine)
-    print(target_x, target_y)
 
     sources = []
     for s in range(n_source):

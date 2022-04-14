@@ -837,6 +837,7 @@ class AbstractPopulationVertex(
         """
         weight_scale = self.__neuron_impl.get_global_weight_scale()
         weight_scale_squared = weight_scale * weight_scale
+        # This only gets ring buffer shifts for neuron synapses
         n_synapse_types = self.__neuron_impl.get_n_synapse_types()
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
@@ -848,6 +849,9 @@ class AbstractPopulationVertex(
 
         for proj in incoming_projections:
             synapse_info = proj._synapse_information
+            # Skip if this is a synapse dynamics synapse type
+            if synapse_info.synapse_type_from_dynamics:
+                continue
             synapse_type = synapse_info.synapse_type
             synapse_dynamics = synapse_info.synapse_dynamics
             connector = synapse_info.connector
@@ -972,6 +976,8 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
+        # This will only hold ring buffer scaling for the neuron synapse
+        # types
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__neuron_impl.get_n_synapse_types()))
 
