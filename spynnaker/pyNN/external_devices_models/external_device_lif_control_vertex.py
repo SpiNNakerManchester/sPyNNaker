@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -80,7 +79,7 @@ class ExternalDeviceLifControlVertex(
             raise ConfigurationException("No devices specified")
 
         # Create a partition to key map
-        self.__partition_id_to_key = OrderedDict(
+        self.__partition_id_to_key = dict(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
 
