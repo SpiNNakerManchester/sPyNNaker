@@ -485,26 +485,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         self._projections.append(projection)
 
-    def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None):
+    def stop(self):
         """
-        :param turn_off_machine: decides if the machine should be powered down
-            after running the execution. Note that this powers down all boards
-            connected to the BMP connections given to the transceiver
-        :type turn_off_machine: bool or None
-        :param clear_routing_tables: informs the tool chain if it
-            should turn off the clearing of the routing tables
-        :type clear_routing_tables: bool or None
-        :param clear_tags: informs the tool chain if it should clear the tags
-            off the machine at stop
-        :type clear_tags: bool or None
         :rtype: None
         """
         # pylint: disable=protected-access
         for population in self._populations:
             population._end()
 
-        super().stop(turn_off_machine, clear_routing_tables, clear_tags)
+        super().stop()
         self.reset_number_of_neurons_per_core()
 
     @staticmethod
