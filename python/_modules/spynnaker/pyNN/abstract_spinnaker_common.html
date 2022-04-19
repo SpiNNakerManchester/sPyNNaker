@@ -286,26 +286,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.stop"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turn_off_machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">clear_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpiNNakerCommon.stop"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param turn_off_machine: decides if the machine should be powered down</span>
-<span class="sd">            after running the execution. Note that this powers down all boards</span>
-<span class="sd">            connected to the BMP connections given to the transceiver</span>
-<span class="sd">        :type turn_off_machine: bool or None</span>
-<span class="sd">        :param clear_routing_tables: informs the tool chain if it</span>
-<span class="sd">            should turn off the clearing of the routing tables</span>
-<span class="sd">        :type clear_routing_tables: bool or None</span>
-<span class="sd">        :param clear_tags: informs the tool chain if it should clear the tags</span>
-<span class="sd">            off the machine at stop</span>
-<span class="sd">        :type clear_tags: bool or None</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span><span class="p">:</span>
             <span class="n">population</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="n">turn_off_machine</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="p">,</span> <span class="n">clear_tags</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
