@@ -193,7 +193,7 @@ class _DelaySupportAdder(object):
         post_splitter = app_edge.post_vertex.splitter
         if not isinstance(
                 post_splitter, AbstractSpynnakerSplitterDelay):
-             raise DelayExtensionException(
+            raise DelayExtensionException(
                 f"The app vertex {app_edge.post_vertex} "
                 f"with splitter {post_splitter} does not support delays "
                 f"and yet requires a delay support for edge {app_edge}. "
