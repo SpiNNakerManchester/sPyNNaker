@@ -156,21 +156,16 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         unique_keys = {command.key for command in commands}
         return len(unique_keys)
 
-    def stop(self, clear_routing_tables=None, clear_tags=None):
+
+    def stop(self):
         """
-        :param clear_routing_tables: informs the tool chain if it
-            should turn off the clearing of the routing tables
-        :type clear_routing_tables: bool or None
-        :param clear_tags: informs the tool chain if it should clear the tags
-            off the machine at stop
-        :type clear_tags: bool or None
         :rtype: None
         """
         # pylint: disable=protected-access
         for population in self._data_writer.iterate_populations():
             population._end()
 
-        super().stop(clear_routing_tables, clear_tags)
+        super().stop()
         self._data_writer.reset_number_of_neurons_per_core()
 
     def run(self, run_time, sync_time=0.0):
