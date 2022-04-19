@@ -156,7 +156,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase):
         unique_keys = {command.key for command in commands}
         return len(unique_keys)
 
-
     def stop(self):
         """
         :rtype: None
