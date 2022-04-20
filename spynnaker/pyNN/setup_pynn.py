@@ -44,7 +44,7 @@ def install_sPyNNaker_into(module):
     with open(spinnaker_init, "w") as spinn_file:
         spinn_file.write("from spynnaker.pyNN import *\n")
 
-    print("Created {}".format(spinnaker_init))
+    print(f"Created {spinnaker_init} to point to spynnaker.pyNN")
 
 
 def setup_pynn():
