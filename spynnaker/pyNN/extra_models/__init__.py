@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker8.models.synapse_dynamics.timing_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceRecurrent as RecurrentRule,
     TimingDependenceSpikeNearestPair as SpikeNearestPairRule,
     TimingDependenceVogels2011 as Vogels2011Rule,
     TimingDependencePfisterSpikeTriplet as PfisterSpikeTriplet)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsNeuromodulation as Neuromodulation)
-from spynnaker8.models.synapse_dynamics.weight_dependence import (
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditiveTriplet)
 from spynnaker.pyNN.models.neuron.builds import (
     IFCondExpStoc,
@@ -32,10 +32,9 @@ from spynnaker.pyNN.models.neuron.builds import (
 
 # Variable rate poisson
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonVariable
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
 
 __all__ = [
-    # sPyNNaker 8 models
+    # sPyNNaker models not currently part of full pyNN
     'IFCurDelta', 'IFCurrExpCa2Adaptive', 'IFCondExpStoc',
     'Izhikevich_cond', 'IF_curr_dual_exp', 'IF_curr_exp_sEMD',
 
@@ -50,6 +49,3 @@ __all__ = [
 
     # Variable rate Poisson
     'SpikeSourcePoissonVariable']
-
-moved_in_v7("spynnaker8.extra_models",
-            "spynnaker.pyNN.extra_models")

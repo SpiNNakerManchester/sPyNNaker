@@ -42,18 +42,20 @@ def install_sPyNNaker_into(module):
 
     spinnaker_init = os.path.join(spinnaker_dir, "__init__.py")
     with open(spinnaker_init, "w") as spinn_file:
-        # TODO change when spynnaker8 stuff removed.
-        # spinn_file.write("from spynnaker.pyNN import *\n")
-        spinn_file.write("from spynnaker8 import *\n")
+        spinn_file.write("from spynnaker.pyNN import *\n")
 
     print("Created {}".format(spinnaker_init))
+
+
+def setup_pynn():
+    # Perform the installation
+    install_sPyNNaker_into(pyNN)
 
 
 # Check the version; we really want PyNN 0.9
 if not version_satisfies(pyNN, "0.9"):
     raise Exception(
-        "PyNN version {} found; sPyNNaker 9 requires PyNN version 0.9".format(
-            pyNN.__version__))
+        f"PyNN version {pyNN.__version__} found; "
+        f"sPyNNaker requires PyNN version 0.9")
 
-# Perform the installation
-install_sPyNNaker_into(pyNN)
+setup_pynn()
