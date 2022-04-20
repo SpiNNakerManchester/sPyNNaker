@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-print("spannker8 s no longer being used")
-print("Setup_pynn has moved to spynnaker.pyNN")
+print("spannker8 is no longer being used")
+print("setup_pynn has moved to spynnaker.pyNN")
 print("Please run it from there instead")
