@@ -20,7 +20,7 @@ Synfirechain-like example
 """
 import unittest
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 

@@ -16,7 +16,7 @@
 import random
 from spinnaker_testbase import BaseTestCase
 import numpy
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 class MyTestCase(BaseTestCase):
