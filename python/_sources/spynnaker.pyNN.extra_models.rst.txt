@@ -1,10 +1,10 @@
-spynnaker8.models.connectors package
+spynnaker.pyNN.extra\_models package
 ====================================
 
 Module contents
 ---------------
 
-.. automodule:: spynnaker8.models.connectors
+.. automodule:: spynnaker.pyNN.extra_models
    :members:
    :undoc-members:
    :show-inheritance:

@@ -25,7 +25,8 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_retina_device</a></li> 
       </ul>
     </div>  
@@ -92,23 +93,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__retina_injector_label</span><span class="p">,</span> <span class="n">pushbot_wifi_connection</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
             <span class="n">local_host</span><span class="p">,</span> <span class="n">local_port</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_n_neurons</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_n_neurons</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">n_neurons</span></div>
 
-<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_injector_parameters"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_injector_parameters</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_injector_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_injector_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_injector_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__injector_port</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_injector_label"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_injector_label">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_injector_label</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_injector_label"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_label">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_injector_label</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_injector_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__retina_injector_label</span></div>
 
-<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_translator"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_translator">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_translator</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_translator"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_translator">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_translator</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_translator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__translator</span></div>
 
-<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_database_connection"><a class="viewcode-back" href="../../../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetRetinaDevice.get_database_connection">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_database_connection</span><span class="p">)</span>
+<div class="viewcode-block" id="PushBotEthernetRetinaDevice.get_database_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_database_connection">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetSensor</span><span class="o">.</span><span class="n">get_database_connection</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_database_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: PushBotRetinaConnection</span>
@@ -147,6 +148,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_retina_device</a></li> 
       </ul>
     </div>

@@ -25,7 +25,8 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.spike_source.spike_source_poisson</a></li> 
       </ul>
     </div>  
@@ -74,17 +75,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span> <span class="o">=</span> <span class="n">duration</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__rate</span> <span class="o">=</span> <span class="n">rate</span>
 
-<div class="viewcode-block" id="SpikeSourcePoisson.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.set_model_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SpikeSourcePoisson.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.SpikeSourcePoisson.set_model_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">set_model_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoisson.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.get_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SpikeSourcePoisson.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.SpikeSourcePoisson.get_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">get_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoisson.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
+<div class="viewcode-block" id="SpikeSourcePoisson.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.SpikeSourcePoisson.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="n">default_population_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">max_rate</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
@@ -127,6 +128,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.spike_source.spike_source_poisson</a></li> 
       </ul>
     </div>

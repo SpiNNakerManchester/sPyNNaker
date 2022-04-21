@@ -25,7 +25,8 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.abstract_spinnaker_common</a></li> 
       </ul>
     </div>  
@@ -36,7 +37,7 @@
           <div class="body" role="main">
             
   <h1>Source code for spynnaker.pyNN.abstract_spinnaker_common</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span></span><span class="c1"># Copyright (c) 2022 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -51,491 +52,36 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span><span class="p">,</span> <span class="n">get_config_str</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.abstract_spinnaker_base</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractSpinnakerBase</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="n">LOADING</span><span class="p">,</span> <span class="n">MAPPING</span><span class="p">,</span> <span class="n">RUN_LOOP</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The code that used to be here has been merged into SpiNNaker</span>
 
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">FecTimer</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">CommandSender</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">model_binaries</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.config_setup</span> <span class="kn">import</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">,</span> <span class="n">setup_configs</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">delay_support_adder</span><span class="p">,</span> <span class="n">on_chip_bitfield_generator</span><span class="p">,</span>
-    <span class="n">redundant_packet_count_report</span><span class="p">,</span>
-    <span class="n">spynnaker_data_specification_writer</span><span class="p">,</span>
-    <span class="n">spynnaker_neuron_graph_network_specification_report</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.</span>\
-    <span class="n">spynnaker_machine_bit_field_router_compressor</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">spynnaker_machine_bitfield_ordered_covering_compressor</span><span class="p">,</span>
-        <span class="n">spynnaker_machine_bitField_pair_router_compressor</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.connection_holder_finisher</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">finish_connection_holders</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.splitter_components</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">spynnaker_splitter_partitioner</span><span class="p">,</span> <span class="n">spynnaker_splitter_selector</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.extra_algorithms.synapse_expander</span> <span class="kn">import</span> <span class="n">synapse_expander</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="sd">This is now just a depreciation redirect hook</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">moved_in_v7</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.spinnaker</span> <span class="kn">import</span> <span class="n">SpiNNaker</span>
+
+<span class="n">moved_in_v7</span><span class="p">(</span><span class="s2">&quot;spynnaker.pyNN.abstract_spinnaker_common&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;spynnaker.pyNN.spinnaker&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Main interface for neural code.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__command_edge_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__edge_count&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__id_counter&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__live_spike_recorder&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__min_delay&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__neurons_per_core_set&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_populations&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_projections&quot;</span><span class="p">]</span>
-
-    <span class="n">__EXECUTABLE_FINDER</span> <span class="o">=</span> <span class="n">ExecutableFinder</span><span class="p">()</span>
+<div class="viewcode-block" id="AbstractSpiNNakerCommon"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpiNNakerCommon</span><span class="p">(</span><span class="n">SpiNNaker</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span> <span class="n">database_socket_addresses</span><span class="p">,</span> <span class="n">n_chips_required</span><span class="p">,</span>
             <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span>
             <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param str graph_label:</span>
-<span class="sd">        :param database_socket_addresses:</span>
-<span class="sd">        :type database_socket_addresses:</span>
-<span class="sd">            iterable(~spinn_utilities.socket_address.SocketAddress)</span>
-<span class="sd">        :param n_chips_required:</span>
-<span class="sd">        :type n_chips_required: int or None</span>
-<span class="sd">        :param n_boards_required:</span>
-<span class="sd">        :type n_boards_required: int or None</span>
-<span class="sd">        :param timestep:</span>
-<span class="sd">            machine_time_step but in milli seconds. If None uses the cfg value</span>
-<span class="sd">        :type timestep: float or None</span>
-<span class="sd">        :param float min_delay:</span>
-<span class="sd">        :param str hostname:</span>
-<span class="sd">        :param time_scale_factor:</span>
-<span class="sd">        :type time_scale_factor: float or None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
-
-        <span class="n">setup_configs</span><span class="p">()</span>
-
-        <span class="c1"># add model binaries</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">model_binaries</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
-
-        <span class="c1"># pynn population objects</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__edge_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="c1"># the number of edges that are associated with commands being sent to</span>
-        <span class="c1"># a vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__command_edge_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__live_spike_recorder</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="c1"># timing parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">executable_finder</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="p">,</span>
-            <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
-            <span class="n">database_socket_addresses</span><span class="o">=</span><span class="n">database_socket_addresses</span><span class="p">,</span>
-            <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
-            <span class="n">n_boards_required</span><span class="o">=</span><span class="n">n_boards_required</span><span class="p">)</span>
-
-        <span class="c1"># set up machine targeted data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_machine_specifics</span><span class="p">()</span>
-
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting time scale factor to &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
-
-        <span class="c1"># get the machine time step</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Setting machine time step to &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="si">}</span><span class="s1"> &#39;</span>
-                    <span class="sa">f</span><span class="s1">&#39;micro-seconds.&#39;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_set_up_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param timestep: machine_time_Step in milli seconds</span>
-<span class="sd">        :type timestep: float or None</span>
-<span class="sd">        :tpye min_delay: int or None</span>
-<span class="sd">        :type time_scale_factor: int or None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Get the standard values</span>
-        <span class="k">if</span> <span class="n">timestep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up_timings</span><span class="p">(</span><span class="n">timestep</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">set_up_timings</span><span class="p">(</span>
-                <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">timestep</span> <span class="o">*</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">),</span>
-                <span class="n">time_scale_factor</span><span class="p">)</span>
-
-        <span class="c1"># Sort out the minimum delay</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="n">min_delay</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Pacman does not support min delays below &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">constants</span><span class="o">.</span><span class="n">MIN_SUPPORTED_DELAY</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;ms with the current machine time step&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="n">min_delay</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span>
-
-        <span class="c1"># Sort out the time scale factor if not user specified</span>
-        <span class="c1"># (including config)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-                <span class="mf">1.0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
-                    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">))</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;A timestep was entered that has forced sPyNNaker to &quot;</span>
-                    <span class="s2">&quot;automatically slow the simulation down from real time &quot;</span>
-                    <span class="s2">&quot;by a factor of </span><span class="si">{}</span><span class="s2">. To remove this automatic behaviour, &quot;</span>
-                    <span class="s2">&quot;please enter a timescaleFactor value in your .</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">CONFIG_FILE_NAME</span><span class="p">)</span>
-
-        <span class="c1"># Check the combination of machine time step and time scale factor</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_time_step_ms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_scale_factor</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span>
-                    <span class="s2">&quot;Mode&quot;</span><span class="p">,</span> <span class="s2">&quot;violate_1ms_wall_clock_restriction&quot;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                    <span class="s2">&quot;The combination of simulation time step and the machine &quot;</span>
-                    <span class="s2">&quot;time scale factor results in a wall clock timer tick &quot;</span>
-                    <span class="s2">&quot;that is currently not reliably supported by the&quot;</span>
-                    <span class="s2">&quot;SpiNNaker machine.  If you would like to override this&quot;</span>
-                    <span class="s2">&quot;behaviour (at your own risk), please add &quot;</span>
-                    <span class="s2">&quot;violate_1ms_wall_clock_restriction = True to the [Mode] &quot;</span>
-                    <span class="s2">&quot;section of your .</span><span class="si">{}</span><span class="s2"> file&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CONFIG_FILE_NAME</span><span class="p">))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;****************************************************&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;*** The combination of simulation time step and  ***&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;*** the machine time scale factor results in a   ***&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;*** wall clock timer tick that is currently not  ***&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;*** reliably supported by the SpiNNaker machine. ***&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;****************************************************&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_detect_if_graph_has_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reset_flags</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Iterate though the graph and look for changes.</span>
-
-<span class="sd">        :param bool reset_flags:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">changed</span><span class="p">,</span> <span class="n">data_changed</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_detect_if_graph_has_changed</span><span class="p">(</span>
-            <span class="n">reset_flags</span><span class="p">)</span>
-
-        <span class="c1"># Additionally check populations for changes</span>
-        <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">population</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">:</span>
-                <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">reset_flags</span><span class="p">:</span>
-                <span class="n">population</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">()</span>
-
-        <span class="c1"># Additionally check projections for changes</span>
-        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">projection</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">:</span>
-                <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">reset_flags</span><span class="p">:</span>
-                <span class="n">projection</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">changed</span><span class="p">,</span> <span class="n">data_changed</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">min_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.add_application_vertex"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_application_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">add_application_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">CommandSender</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Please contact spinnker team as adding a CommandSender &quot;</span>
-                <span class="s2">&quot;currently disabled&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_application_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span></div>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_count_unique_keys</span><span class="p">(</span><span class="n">commands</span><span class="p">):</span>
-        <span class="n">unique_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">command</span><span class="o">.</span><span class="n">key</span> <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">commands</span><span class="p">}</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_keys</span><span class="p">)</span>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.add_population"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_population">[docs]</a>    <span class="k">def</span> <span class="nf">add_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Called by each population to add itself to the list.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">population</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.add_projection"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.add_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Called by each projection to add itself to the list.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.stop"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span><span class="p">:</span>
-            <span class="n">population</span><span class="o">.</span><span class="n">_end</span><span class="p">()</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Run the model created.</span>
-
-<span class="sd">        :param run_time: the time (in milliseconds) to run the simulation for</span>
-<span class="sd">        :type run_time: float or int</span>
-<span class="sd">        :param float sync_time:</span>
-<span class="sd">            If not 0, this specifies that the simulation should pause after</span>
-<span class="sd">            this duration.  The continue_simulation() method must then be</span>
-<span class="sd">            called for the simulation to continue.</span>
-<span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-
-        <span class="c1"># extra post run algorithms</span>
-        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
-            <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
-            <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span></div>
+        <span class="n">moved_in_v7</span><span class="p">(</span><span class="s2">&quot;spynnaker.pyNN.abstract_spinnaker_common&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;spynnaker.pyNN.spinnaker&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">database_socket_addresses</span><span class="p">,</span>
+              <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">graph_label</span><span class="p">,</span>
+              <span class="n">n_chips_required</span><span class="p">,</span> <span class="n">n_boards_required</span><span class="p">,</span> <span class="n">timestep</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.register_binary_search_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Register an additional binary search path for executables.</span>
-
-<span class="sd">        :param str search_path: absolute search path for binaries</span>
-<span class="sd">        :rtype: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="n">AbstractSpiNNakerCommon</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.set_number_of_neurons_per_core"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.set_number_of_neurons_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_number_of_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;set_model_max_atoms_per_core&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a Vertex type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;get_max_atoms_per_core&quot;</span><span class="p">):</span>
-            <span class="n">previous</span> <span class="o">=</span> <span class="n">neuron_type</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">previous</span> <span class="o">&lt;</span> <span class="n">max_permitted</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Attempt to increase number_of_neurons_per_core &quot;</span>
-                    <span class="s2">&quot;from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> ignored&quot;</span><span class="p">,</span> <span class="n">previous</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">)</span>
-                <span class="k">return</span>
-        <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span><span class="n">max_permitted</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="AbstractSpiNNakerCommon.reset_number_of_neurons_per_core"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.reset_number_of_neurons_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">reset_number_of_neurons_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">neuron_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neurons_per_core_set</span><span class="p">:</span>
-            <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">()</span></div>
-
-    <span class="k">def</span> <span class="nf">_locate_receivers_from_projections</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">projections</span><span class="p">,</span> <span class="n">gatherers</span><span class="p">,</span> <span class="n">extra_monitors_per_chip</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Locate receivers and their corresponding monitor cores for\</span>
-<span class="sd">            setting router time-outs.</span>
-
-<span class="sd">        :param list projections: the projections going to be read</span>
-<span class="sd">        :param gatherers: the gatherers per Ethernet chip</span>
-<span class="sd">        :param extra_monitors_per_chip: the extra monitor cores per chip</span>
-<span class="sd">        :return: list of tuples with gatherer and its extra monitor cores</span>
-<span class="sd">        :rtype: list</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="n">important_gathers</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-
-        <span class="c1"># iterate though projections</span>
-        <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projections</span><span class="p">:</span>
-            <span class="c1"># iteration though the projections machine edges to locate chips</span>
-            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
-                <span class="n">placement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
-                    <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
-                <span class="n">chip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="o">.</span><span class="n">get_chip_at</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-
-                <span class="c1"># locate extra monitor cores on the board of this chip</span>
-                <span class="n">extra_monitor_cores_on_board</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-                    <span class="n">extra_monitors_per_chip</span><span class="p">[</span><span class="n">xy</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="o">.</span><span class="n">get_existing_xys_on_board</span><span class="p">(</span><span class="n">chip</span><span class="p">))</span>
-
-                <span class="c1"># map gatherer to extra monitor cores for board</span>
-                <span class="n">important_gathers</span><span class="o">.</span><span class="n">add</span><span class="p">((</span>
-                    <span class="n">gatherers</span><span class="p">[(</span><span class="n">chip</span><span class="o">.</span><span class="n">nearest_ethernet_x</span><span class="p">,</span>
-                               <span class="n">chip</span><span class="o">.</span><span class="n">nearest_ethernet_y</span><span class="p">)],</span>
-                    <span class="nb">frozenset</span><span class="p">(</span><span class="n">extra_monitor_cores_on_board</span><span class="p">)))</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">important_gathers</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">id_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The id_counter, currently used by the populations.</span>
-
-<span class="sd">        .. note::</span>
-<span class="sd">            Maybe it could live in the pop class???</span>
-
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span>
-
-    <span class="nd">@id_counter</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">id_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Setter for id_counter, currently used by the populations.</span>
-
-<span class="sd">        .. note::</span>
-<span class="sd">            Maybe it could live in the pop class???</span>
-
-<span class="sd">        :param int new_value: new value for id_counter</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_graph_data_specification_writer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_execute_graph_data_specification_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">DATA_GENERATION</span><span class="p">,</span> <span class="s2">&quot;Spynnaker data specification writer&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_targets</span> <span class="o">=</span> <span class="n">spynnaker_data_specification_writer</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipaddress</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_run_time_steps</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_execute_spynnaker_ordered_covering_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
-                <span class="n">LOADING</span><span class="p">,</span>
-                <span class="s2">&quot;Spynnaker machine bitfield ordered covering compressor&quot;</span><span class="p">)</span> \
-                <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
-                <span class="k">return</span>
-            <span class="n">spynnaker_machine_bitfield_ordered_covering_compressor</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
-                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_multicast_routes_loaded</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="k">def</span> <span class="nf">_execute_spynnaker_pair_compressor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
-                <span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Spynnaker machine bitfield pair router compressor&quot;</span><span class="p">)</span> \
-                <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
-                <span class="k">return</span>
-            <span class="n">spynnaker_machine_bitField_pair_router_compressor</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_router_tables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_id</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_targets</span><span class="p">,</span>
-                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_multicast_routes_loaded</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">return</span> <span class="kc">None</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_delayed_compression</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_do_delayed_compression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">compressed</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;SpynnakerMachineBitFieldOrderedCoveringCompressor&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_spynnaker_ordered_covering_compressor</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;SpynnakerMachineBitFieldPairRouterCompressor&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_spynnaker_pair_compressor</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_delayed_compression</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">compressed</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_execute_synapse_expander</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Synapse expander&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
-                <span class="k">return</span>
-            <span class="n">synapse_expander</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>
-                <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_execute_on_chip_bit_field_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Execute on chip bitfield generator&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_virtual_board</span><span class="p">():</span>
-                <span class="k">return</span>
-            <span class="n">on_chip_bitfield_generator</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">application_graph</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_executable_finder</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_txrx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_routing_infos</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_execute_finish_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">LOADING</span><span class="p">,</span> <span class="s2">&quot;Finish connection holders&quot;</span><span class="p">):</span>
-            <span class="n">finish_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_graph</span><span class="p">)</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_extra_load_algorithms</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_do_extra_load_algorithms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_synapse_expander</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_on_chip_bit_field_generator</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_finish_connection_holders</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_execute_write_network_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span>
-                <span class="n">MAPPING</span><span class="p">,</span>
-                <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_network_graph&quot;</span><span class="p">):</span>
-                <span class="k">return</span>
-            <span class="n">spynnaker_neuron_graph_network_specification_report</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_extra_mapping_algorithms</span><span class="p">,</span>
-               <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_do_extra_mapping_algorithms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_execute_write_network_graph</span><span class="p">()</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_provenance_reports</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_do_provenance_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_do_provenance_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_report_redundant_packet_count</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_report_redundant_packet_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">RUN_LOOP</span><span class="p">,</span> <span class="s2">&quot;Redundant packet count report&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">skip_if_cfg_false</span><span class="p">(</span>
-                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">):</span>
-                <span class="k">return</span>
-            <span class="n">redundant_packet_count_report</span><span class="p">()</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_splitter_selector</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_execute_splitter_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;Spynnaker splitter selector&quot;</span><span class="p">):</span>
-            <span class="n">spynnaker_splitter_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_delay_support_adder</span><span class="p">,</span>
-               <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_execute_delay_support_adder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Runs, times and logs the DelaySupportAdder if required</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Mapping&quot;</span><span class="p">,</span> <span class="s2">&quot;delay_support_adder&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DelaySupportAdder&quot;</span><span class="p">:</span>
-                <span class="n">delay_support_adder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">)</span>
-                <span class="k">return</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unexpected cfg setting delay_support_adder: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpinnakerBase</span><span class="o">.</span><span class="n">_execute_splitter_partitioner</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_execute_splitter_partitioner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_allocated_resources</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="o">.</span><span class="n">n_vertices</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="k">with</span> <span class="n">FecTimer</span><span class="p">(</span><span class="n">MAPPING</span><span class="p">,</span>  <span class="s2">&quot;SpynnakerSplitterPartitioner&quot;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="p">:</span>
-                <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_machine</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_machine_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_chips_needed</span> <span class="o">=</span> \
-                <span class="n">spynnaker_splitter_partitioner</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_application_graph</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plan_n_timesteps</span><span class="p">,</span>
-                    <span class="n">pre_allocated_resources</span><span class="p">)</span></div>
+        <span class="n">moved_in_v7</span><span class="p">(</span><span class="s2">&quot;spynnaker.pyNN.abstract_spinnaker_common&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;spynnaker.pyNN.spinnaker&quot;</span><span class="p">)</span>
+        <span class="n">SpiNNaker</span><span class="o">.</span><span class="n">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -569,6 +115,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.abstract_spinnaker_common</a></li> 
       </ul>
     </div>

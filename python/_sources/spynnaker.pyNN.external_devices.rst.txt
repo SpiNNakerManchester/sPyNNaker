@@ -1,0 +1,10 @@
+spynnaker.pyNN.external\_devices package
+========================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.external_devices
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -25,7 +25,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.connections.spynnaker_poisson_control_connection</a></li> 
       </ul>
     </div>  
@@ -101,7 +102,7 @@
             <span class="n">live_packet_gather_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">send_labels</span><span class="o">=</span><span class="n">control_labels</span><span class="p">,</span>
             <span class="n">local_host</span><span class="o">=</span><span class="n">local_host</span><span class="p">,</span> <span class="n">local_port</span><span class="o">=</span><span class="n">local_port</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_poisson_label"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_poisson_label">[docs]</a>    <span class="k">def</span> <span class="nf">add_poisson_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_poisson_label"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_poisson_label">[docs]</a>    <span class="k">def</span> <span class="nf">add_poisson_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str label: The label of the Poisson source population.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -132,37 +133,37 @@
     <span class="k">def</span> <span class="nf">_stop_callback_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span>
         <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">connection</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">)</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_start_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_callback</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_start_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_start_callback_wrapper</span><span class="p">,</span> <span class="n">start_callback</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_resume_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_resume_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">)</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_start_resume_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_resume_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_start_resume_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_resume_callback</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_start_resume_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_start_callback_wrapper</span><span class="p">,</span> <span class="n">start_resume_callback</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_init_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_init_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">)</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_init_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_init_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_init_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">init_callback</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_init_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init_callback_wrapper</span><span class="p">,</span> <span class="n">init_callback</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_receive_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_receive_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">)</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_receive_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_receive_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_receive_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">live_event_callback</span><span class="p">,</span>
                              <span class="n">translate_key</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
             <span class="s2">&quot;SpynnakerPoissonControlPopulation can&#39;t receive data&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_pause_stop_callback"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_pause_stop_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">)</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.add_pause_stop_callback"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_pause_stop_callback">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_pause_stop_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_pause_stop_callback</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__control_label</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_stop_callback_wrapper</span><span class="p">,</span> <span class="n">pause_stop_callback</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rate"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rate">[docs]</a>    <span class="k">def</span> <span class="nf">set_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rate"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rate">[docs]</a>    <span class="k">def</span> <span class="nf">set_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id</span><span class="p">,</span> <span class="n">rate</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the rate of a Poisson neuron within a Poisson source</span>
 
 <span class="sd">        :param str label: The label of the Population to set the rates of</span>
@@ -171,7 +172,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_rates</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">[(</span><span class="n">neuron_id</span><span class="p">,</span> <span class="n">rate</span><span class="p">)])</span></div>
 
-<div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rates"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rates">[docs]</a>    <span class="k">def</span> <span class="nf">set_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id_rates</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerPoissonControlConnection.set_rates"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rates">[docs]</a>    <span class="k">def</span> <span class="nf">set_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">neuron_id_rates</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the rates of multiple Poisson neurons within a Poisson source</span>
 
 <span class="sd">        :param str label: The label of the Population to set the rates of</span>
@@ -216,6 +217,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.connections.spynnaker_poisson_control_connection</a></li> 
       </ul>
     </div>

@@ -25,7 +25,8 @@
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.populations.population_view</a></li> 
       </ul>
     </div>  
@@ -221,7 +222,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PopulationView.all"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.all">[docs]</a>    <span class="k">def</span> <span class="nf">all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.all"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.all">[docs]</a>    <span class="k">def</span> <span class="nf">all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Iterator over cell IDs (on all MPI nodes).</span>
 
 <span class="sd">        :rtype: iterable(~.IDMixin)</span>
@@ -229,7 +230,7 @@
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">IDMixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.can_record"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.can_record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.can_record">[docs]</a>    <span class="k">def</span> <span class="nf">can_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine whether variable can be recorded from this population.</span>
 
 <span class="sd">        :rtype: bool</span>
@@ -245,7 +246,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">conductance_based</span>
 
-<div class="viewcode-block" id="PopulationView.describe"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;populationview_default.txt&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="PopulationView.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;populationview_default.txt&#39;</span><span class="p">,</span>
                  <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a human-readable description of the population view.</span>
 
@@ -267,7 +268,7 @@
         <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__annotations</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">descriptions</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.find_units"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.find_units">[docs]</a>    <span class="k">def</span> <span class="nf">find_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.find_units"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.find_units">[docs]</a>    <span class="k">def</span> <span class="nf">find_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the units of a variable</span>
 
 <span class="sd">        .. warning::</span>
@@ -279,7 +280,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">find_units</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.get"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.get"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">simplify</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the values of the given parameters for every local cell in\</span>
 <span class="sd">            the population, or, if ``gather=True``,\</span>
 <span class="sd">            for all cells in the population.</span>
@@ -305,7 +306,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_get_by_selector</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">parameter_names</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.get_data"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
+<div class="viewcode-block" id="PopulationView.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a Neo Block containing the data(spikes, state variables)\</span>
 <span class="sd">            recorded from the Population.</span>
@@ -344,7 +345,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">get_data_by_indexes</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="n">clear</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.get_spike_counts">[docs]</a>    <span class="k">def</span> <span class="nf">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.get_spike_counts">[docs]</a>    <span class="k">def</span> <span class="nf">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a dict containing the number of spikes for each neuron.</span>
 
 <span class="sd">        The dict keys are neuron IDs, not indices.</span>
@@ -384,7 +385,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span>
 
-<div class="viewcode-block" id="PopulationView.id_to_index"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.id_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">id_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
+<div class="viewcode-block" id="PopulationView.id_to_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.id_to_index">[docs]</a>    <span class="k">def</span> <span class="nf">id_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
         <span class="sd">&quot;&quot;&quot; Given the ID(s) of cell(s) in the PopulationView, return its /\</span>
 <span class="sd">            their index / indices(order in the PopulationView).</span>
 
@@ -398,7 +399,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="PopulationView.index_in_grandparent"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.index_in_grandparent">[docs]</a>    <span class="k">def</span> <span class="nf">index_in_grandparent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.index_in_grandparent"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.index_in_grandparent">[docs]</a>    <span class="k">def</span> <span class="nf">index_in_grandparent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Given an array of indices, return the indices in the parent\</span>
 <span class="sd">            population at the root of the tree.</span>
 
@@ -407,7 +408,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="PopulationView.initialize"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set initial values of state variables, e.g. the membrane\</span>
 <span class="sd">            potential.  Values passed to ``initialize()`` may be:</span>
 
@@ -431,7 +432,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.record"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span>  <span class="c1"># pylint: disable=arguments-differ</span>
+<div class="viewcode-block" id="PopulationView.record"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span>  <span class="c1"># pylint: disable=arguments-differ</span>
                <span class="n">to_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Record the specified variable or variables for all cells in the\</span>
 <span class="sd">            Population or view.</span>
@@ -453,7 +454,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_record</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="n">to_file</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.sample"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.sample"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Randomly sample `n` cells from the Population view, and return a\</span>
 <span class="sd">            new PopulationView object.</span>
 
@@ -469,7 +470,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Random sample size </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="PopulationView.set"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationView.set"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set one or more parameters for every cell in the population.\</span>
 <span class="sd">            Values passed to `set()` may be:</span>
 
@@ -496,7 +497,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">set_by_selector</span><span class="p">(</span>
                 <span class="n">selector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationView.write_data"><a class="viewcode-back" href="../../../../../spynnaker8.html#spynnaker.pyNN.models.populations.PopulationView.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="PopulationView.write_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.write_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">clear</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write recorded data to file, using one of the file formats\</span>
 <span class="sd">            supported by Neo.</span>
@@ -570,6 +571,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.populations.population_view</a></li> 
       </ul>
     </div>

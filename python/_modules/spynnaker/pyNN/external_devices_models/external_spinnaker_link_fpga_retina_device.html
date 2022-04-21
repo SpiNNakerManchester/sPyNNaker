@@ -25,7 +25,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device</a></li> 
       </ul>
     </div>  
@@ -158,7 +159,7 @@
         <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
             <span class="s2">&quot;the FPGA retina does not recognise this mode&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">MODE_128</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">polarity</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">UP_POLARITY</span> <span class="ow">or</span>
@@ -200,7 +201,7 @@
     <span class="k">def</span> <span class="nf">timed_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
             <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)])]</span></div>
 </pre></div>
@@ -236,6 +237,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device</a></li> 
       </ul>
     </div>

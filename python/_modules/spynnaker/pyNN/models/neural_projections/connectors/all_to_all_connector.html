@@ -25,7 +25,8 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector</a></li> 
       </ul>
     </div>  
@@ -116,21 +117,21 @@
                 <span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_post_neurons</span><span class="p">,</span>
                 <span class="n">n_post_neurons</span><span class="p">)]</span>
 
-<div class="viewcode-block" id="AllToAllConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AllToAllConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AllToAllConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -144,18 +145,18 @@
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AllToAllConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span></div>
 
-<div class="viewcode-block" id="AllToAllConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">n_conns</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AllToAllConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -214,7 +215,7 @@
     <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">ALL_TO_ALL_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
 
-<div class="viewcode-block" id="AllToAllConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.AllToAllConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
+<div class="viewcode-block" id="AllToAllConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.AllToAllConnector.gen_connector_params">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -261,6 +262,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector</a></li> 
       </ul>
     </div>

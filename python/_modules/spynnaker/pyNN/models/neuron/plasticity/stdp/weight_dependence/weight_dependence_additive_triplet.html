@@ -25,7 +25,8 @@
           <a href="../../../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet</a></li> 
       </ul>
     </div>  
@@ -124,7 +125,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__a3_minus</span>
 
-<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
+<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.is_same_as">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_dependence</span><span class="p">,</span> <span class="n">WeightDependenceAdditiveTriplet</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -144,7 +145,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;additive&quot;</span>
 
-<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
+<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">n_weight_terms</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">n_weight_terms</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -152,7 +153,7 @@
                 <span class="s2">&quot;Additive weight dependence only supports one or two terms&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_SPACE_PER_SYNAPSE_TYPE</span> <span class="o">*</span> <span class="n">n_synapse_types</span></div>
 
-<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
+<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.write_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span> <span class="n">synapse_weight_scales</span><span class="p">,</span>
             <span class="n">n_weight_terms</span><span class="p">):</span>
@@ -191,7 +192,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__w_max</span>
 
-<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
+<div class="viewcode-block" id="WeightDependenceAdditiveTriplet.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.extra_models.WeightDependenceAdditiveTriplet.get_parameter_names">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__PARAM_NAMES</span></div>
 </pre></div>
@@ -227,6 +228,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet</a></li> 
       </ul>
     </div>

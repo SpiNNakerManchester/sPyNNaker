@@ -25,7 +25,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.munich_spinnaker_link_motor_device</a></li> 
       </ul>
     </div>  
@@ -110,11 +111,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__dependent_vertices</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">_MunichMotorDevice</span><span class="p">(</span><span class="n">spinnaker_link_id</span><span class="p">,</span> <span class="n">board_address</span><span class="p">)]</span>
 
-<div class="viewcode-block" id="MunichMotorDevice.dependent_vertices"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.MunichMotorDevice.dependent_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="o">.</span><span class="n">dependent_vertices</span><span class="p">)</span>
+<div class="viewcode-block" id="MunichMotorDevice.dependent_vertices"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.MunichMotorDevice.dependent_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="o">.</span><span class="n">dependent_vertices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">dependent_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dependent_vertices</span></div>
 
-<div class="viewcode-block" id="MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex"><a class="viewcode-back" href="../../../../spynnaker8.external_devices.html#spynnaker.pyNN.external_devices_models.MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="o">.</span>
+<div class="viewcode-block" id="MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractVertexWithEdgeToDependentVertices</span><span class="o">.</span>
                <span class="n">edge_partition_identifiers_for_dependent_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">edge_partition_identifiers_for_dependent_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
         <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertex</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span></div>
@@ -151,6 +152,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.munich_spinnaker_link_motor_device</a></li> 
       </ul>
     </div>

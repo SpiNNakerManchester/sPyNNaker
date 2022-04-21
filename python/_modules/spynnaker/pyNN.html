@@ -5,28 +5,28 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>spynnaker8 &#8212; sPyNNaker 6.0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <title>spynnaker.pyNN &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">spynnaker8</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN</a></li> 
       </ul>
     </div>  
 
@@ -35,8 +35,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for spynnaker8</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+  <h1>Source code for spynnaker.pyNN</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2022 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -58,6 +58,7 @@
 
 <span class="sd">This package contains the profile of that code for PyNN 0.9</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
 <span class="c1"># common imports</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">__numpy</span>
@@ -68,11 +69,13 @@
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Space</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span><span class="p">,</span> <span class="n">Cuboid</span><span class="p">,</span> <span class="n">Sphere</span><span class="p">,</span> <span class="n">RandomStructure</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">distance</span> <span class="k">as</span> <span class="n">_pynn_distance</span>
+
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConfigurationException</span><span class="p">,</span> <span class="n">SimulatorNotSetupException</span><span class="p">,</span>
     <span class="n">SimulatorShutdownException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 
 <span class="c1"># connections</span>
@@ -84,7 +87,6 @@
     <span class="n">FromFileConnector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">,</span> <span class="n">IndexBasedProbabilityConnector</span><span class="p">,</span>
     <span class="n">KernelConnector</span><span class="p">,</span> <span class="n">MultapseConnector</span> <span class="k">as</span> <span class="n">FixedTotalNumberConnector</span><span class="p">,</span>
     <span class="n">OneToOneConnector</span><span class="p">,</span> <span class="n">SmallWorldConnector</span><span class="p">)</span>
-
 <span class="c1"># synapse structures</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseDynamicsStatic</span> <span class="k">as</span> <span class="n">StaticSynapse</span><span class="p">)</span>
@@ -144,11 +146,17 @@
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.projection</span> <span class="kn">import</span> <span class="n">Projection</span> <span class="k">as</span> <span class="n">SpiNNakerProjection</span>
 
-<span class="kn">from</span> <span class="nn">spynnaker8</span> <span class="kn">import</span> <span class="n">external_devices</span>
-<span class="kn">from</span> <span class="nn">spynnaker8</span> <span class="kn">import</span> <span class="n">extra_models</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">external_devices</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_models</span>
 
 <span class="c1"># big stuff</span>
-<span class="kn">from</span> <span class="nn">spynnaker8.spinnaker</span> <span class="kn">import</span> <span class="n">SpiNNaker</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.spinnaker</span> <span class="kn">import</span> <span class="n">SpiNNaker</span>
+
+<span class="kn">from</span> <span class="nn">spynnaker._version</span> <span class="kn">import</span> <span class="n">__version__</span>  <span class="c1"># NOQA</span>
+<span class="kn">from</span> <span class="nn">spynnaker._version</span> <span class="kn">import</span> <span class="n">__version_name__</span>  <span class="c1"># NOQA</span>
+<span class="kn">from</span> <span class="nn">spynnaker._version</span> <span class="kn">import</span> <span class="n">__version_month__</span>  <span class="c1"># NOQA</span>
+<span class="kn">from</span> <span class="nn">spynnaker._version</span> <span class="kn">import</span> <span class="n">__version_year__</span>  <span class="c1"># NOQA</span>
+
 
 <span class="c1">#: The timestep to use of &quot;auto&quot; is specified as a timestep</span>
 <span class="n">SPYNNAKER_AUTO_TIMESTEP</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -191,13 +199,13 @@
     <span class="s1">&#39;Projection&#39;</span><span class="p">,</span>
     <span class="s1">&#39;get_current_time&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;connect&#39;</span><span class="p">,</span> <span class="s1">&#39;get_time_step&#39;</span><span class="p">,</span> <span class="s1">&#39;get_min_delay&#39;</span><span class="p">,</span>
     <span class="s1">&#39;get_max_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;initialize&#39;</span><span class="p">,</span> <span class="s1">&#39;list_standard_models&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;record&#39;</span><span class="p">,</span> <span class="s1">&#39;record_v&#39;</span><span class="p">,</span> <span class="s1">&#39;record_gsyn&#39;</span><span class="p">]</span>
+    <span class="s1">&#39;record&#39;</span><span class="p">,</span> <span class="s1">&#39;record_v&#39;</span><span class="p">,</span> <span class="s1">&#39;record_gsyn&#39;</span><span class="p">,</span> <span class="s2">&quot;get_machine&quot;</span><span class="p">]</span>
 
 <span class="c1"># Dynamically-extracted operations from PyNN</span>
 <span class="n">__pynn</span> <span class="o">=</span> <span class="p">{}</span>
 
 
-<div class="viewcode-block" id="RandomDistribution"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.RandomDistribution">[docs]</a><span class="k">class</span> <span class="nc">RandomDistribution</span><span class="p">(</span><span class="n">_PynnRandomDistribution</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomDistribution"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.RandomDistribution">[docs]</a><span class="k">class</span> <span class="nc">RandomDistribution</span><span class="p">(</span><span class="n">_PynnRandomDistribution</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class which defines a next(n) method which returns an array of ``n``\</span>
 <span class="sd">        random numbers from a given distribution.</span>
 
@@ -272,7 +280,7 @@
 
 
 <span class="c1"># Patch the bugs in the PyNN documentation... Ugh!</span>
-<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+<div class="viewcode-block" id="distance"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.distance">[docs]</a><span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
              <span class="n">periodic_boundaries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Return the Euclidian distance between two cells.</span>
 
@@ -293,7 +301,7 @@
         <span class="n">src</span><span class="p">,</span> <span class="n">tgt</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">scale_factor</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">periodic_boundaries</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="setup"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
+<div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
           <span class="n">min_delay</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_MIN_DELAY</span><span class="p">,</span>
           <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">graph_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -382,7 +390,7 @@
     <span class="k">return</span> <span class="n">rank</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="name"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.name">[docs]</a><span class="k">def</span> <span class="nf">name</span><span class="p">():</span>
+<div class="viewcode-block" id="name"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.name">[docs]</a><span class="k">def</span> <span class="nf">name</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Returns the name of the simulator</span>
 
 <span class="sd">    :rtype: str</span>
@@ -390,7 +398,7 @@
     <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_last_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
 
 
-<div class="viewcode-block" id="Projection"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.Projection">[docs]</a><span class="k">def</span> <span class="nf">Projection</span><span class="p">(</span>
+<div class="viewcode-block" id="Projection"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.Projection">[docs]</a><span class="k">def</span> <span class="nf">Projection</span><span class="p">(</span>
         <span class="n">presynaptic_population</span><span class="p">,</span> <span class="n">postsynaptic_population</span><span class="p">,</span>
         <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor_type</span><span class="o">=</span><span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
         <span class="n">space</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -447,7 +455,7 @@
     <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;record&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pynn_common</span><span class="o">.</span><span class="n">build_record</span><span class="p">(</span><span class="n">spinnaker_simulator</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="end"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.end">[docs]</a><span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="n">_</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="end"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.end">[docs]</a><span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="n">_</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Cleans up the SpiNNaker machine and software</span>
 
 <span class="sd">    :param _: was named compatible_output, which we don&#39;t care about,</span>
@@ -469,7 +477,7 @@
     <span class="n">simulator</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="record_v"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.record_v">[docs]</a><span class="k">def</span> <span class="nf">record_v</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="record_v"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.record_v">[docs]</a><span class="k">def</span> <span class="nf">record_v</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Deprecated method for getting voltage.\</span>
 <span class="sd">        This is not documented in the public facing API.</span>
 
@@ -486,7 +494,7 @@
     <span class="n">record</span><span class="p">([</span><span class="s1">&#39;v&#39;</span><span class="p">],</span> <span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="record_gsyn"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.record_gsyn">[docs]</a><span class="k">def</span> <span class="nf">record_gsyn</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="record_gsyn"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.record_gsyn">[docs]</a><span class="k">def</span> <span class="nf">record_gsyn</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Deprecated method for getting both types of gsyn.\</span>
 <span class="sd">        This is not documented in the public facing API</span>
 
@@ -503,7 +511,7 @@
     <span class="n">record</span><span class="p">([</span><span class="s1">&#39;gsyn_exc&#39;</span><span class="p">,</span> <span class="s1">&#39;gsyn_inh&#39;</span><span class="p">],</span> <span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="list_standard_models"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.list_standard_models">[docs]</a><span class="k">def</span> <span class="nf">list_standard_models</span><span class="p">():</span>
+<div class="viewcode-block" id="list_standard_models"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.list_standard_models">[docs]</a><span class="k">def</span> <span class="nf">list_standard_models</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Return a list of all the StandardCellType classes available for this\</span>
 <span class="sd">        simulator.</span>
 
@@ -516,7 +524,7 @@
     <span class="k">return</span> <span class="n">results</span></div>
 
 
-<div class="viewcode-block" id="set_number_of_neurons_per_core"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.set_number_of_neurons_per_core">[docs]</a><span class="k">def</span> <span class="nf">set_number_of_neurons_per_core</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
+<div class="viewcode-block" id="set_number_of_neurons_per_core"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.set_number_of_neurons_per_core">[docs]</a><span class="k">def</span> <span class="nf">set_number_of_neurons_per_core</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Sets a ceiling on the number of neurons of a given type that can be\</span>
 <span class="sd">        placed on a single core.</span>
 
@@ -535,7 +543,7 @@
 <span class="c1"># These methods will defer to PyNN methods if a simulator exists</span>
 
 
-<div class="viewcode-block" id="connect"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.connect">[docs]</a><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<div class="viewcode-block" id="connect"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.connect">[docs]</a><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Builds a projection</span>
 
@@ -552,7 +560,7 @@
     <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;connect&quot;</span><span class="p">](</span><span class="n">pre</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="create"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cellclass</span><span class="p">,</span> <span class="n">cellparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Builds a population with certain params</span>
 
 <span class="sd">    :param cellclass: population class</span>
@@ -574,7 +582,7 @@
     <span class="n">__numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed_value</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_current_time"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_current_time">[docs]</a><span class="k">def</span> <span class="nf">get_current_time</span><span class="p">():</span>
+<div class="viewcode-block" id="get_current_time"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.get_current_time">[docs]</a><span class="k">def</span> <span class="nf">get_current_time</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Gets the time within the simulation</span>
 
 <span class="sd">    :return: returns the current time</span>
@@ -583,7 +591,7 @@
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_current_time&quot;</span><span class="p">]()</span></div>
 
 
-<div class="viewcode-block" id="get_min_delay"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_min_delay">[docs]</a><span class="k">def</span> <span class="nf">get_min_delay</span><span class="p">():</span>
+<div class="viewcode-block" id="get_min_delay"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.get_min_delay">[docs]</a><span class="k">def</span> <span class="nf">get_min_delay</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; The minimum allowed synaptic delay; delays will be clamped to be at\</span>
 <span class="sd">        least this.</span>
 
@@ -594,7 +602,7 @@
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_min_delay&quot;</span><span class="p">]()</span></div>
 
 
-<div class="viewcode-block" id="get_max_delay"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_max_delay">[docs]</a><span class="k">def</span> <span class="nf">get_max_delay</span><span class="p">():</span>
+<div class="viewcode-block" id="get_max_delay"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.get_max_delay">[docs]</a><span class="k">def</span> <span class="nf">get_max_delay</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Part of the PyNN api but does not make sense for sPyNNaker as</span>
 <span class="sd">     different Projection, Vertex splitter combination could have different</span>
 <span class="sd">     delays they can support</span>
@@ -607,7 +615,7 @@
         <span class="s2">&quot;sPyNNaker does not have a system wide max_delay&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_time_step"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.get_time_step">[docs]</a><span class="k">def</span> <span class="nf">get_time_step</span><span class="p">():</span>
+<div class="viewcode-block" id="get_time_step"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.get_time_step">[docs]</a><span class="k">def</span> <span class="nf">get_time_step</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; The integration time step</span>
 
 <span class="sd">    :return: get the time step of the simulation (in ms)</span>
@@ -617,7 +625,7 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;get_time_step&quot;</span><span class="p">]())</span></div>
 
 
-<div class="viewcode-block" id="initialize"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.initialize">[docs]</a><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
+<div class="viewcode-block" id="initialize"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.initialize">[docs]</a><span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Sets cells to be initialised to the given values</span>
 
 <span class="sd">    :param cells: the cells to change params on</span>
@@ -629,7 +637,7 @@
     <span class="n">pynn_common</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="num_processes"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.num_processes">[docs]</a><span class="k">def</span> <span class="nf">num_processes</span><span class="p">():</span>
+<div class="viewcode-block" id="num_processes"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.num_processes">[docs]</a><span class="k">def</span> <span class="nf">num_processes</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; The number of MPI processes.</span>
 
 <span class="sd">    .. note::</span>
@@ -642,7 +650,7 @@
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;num_processes&quot;</span><span class="p">]()</span></div>
 
 
-<div class="viewcode-block" id="rank"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.rank">[docs]</a><span class="k">def</span> <span class="nf">rank</span><span class="p">():</span>
+<div class="viewcode-block" id="rank"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.rank">[docs]</a><span class="k">def</span> <span class="nf">rank</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; The MPI rank of the current node.</span>
 
 <span class="sd">    .. note::</span>
@@ -655,7 +663,7 @@
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;rank&quot;</span><span class="p">]()</span></div>
 
 
-<div class="viewcode-block" id="record"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.record">[docs]</a><span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="record"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.record">[docs]</a><span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
            <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Sets variables to be recorded.</span>
 
@@ -679,7 +687,7 @@
                             <span class="n">annotations</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="reset"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="reset"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Resets the simulation to t = 0</span>
 
 <span class="sd">    :param annotations: the annotations to the data objects</span>
@@ -692,7 +700,7 @@
     <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;reset&quot;</span><span class="p">](</span><span class="n">annotations</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="run"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">simtime</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">simtime</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The run() function advances the simulation for a given number of \</span>
 <span class="sd">        milliseconds, e.g.:</span>
 
@@ -710,7 +718,7 @@
 <span class="n">run_for</span> <span class="o">=</span> <span class="n">run</span>
 
 
-<div class="viewcode-block" id="run_until"><a class="viewcode-back" href="../spynnaker8.html#spynnaker8.run_until">[docs]</a><span class="k">def</span> <span class="nf">run_until</span><span class="p">(</span><span class="n">tstop</span><span class="p">):</span>
+<div class="viewcode-block" id="run_until"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.run_until">[docs]</a><span class="k">def</span> <span class="nf">run_until</span><span class="p">(</span><span class="n">tstop</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Run until a (simulation) time period has completed.</span>
 
 <span class="sd">    :param float tstop: the time to stop at (in milliseconds)</span>
@@ -721,14 +729,14 @@
     <span class="k">return</span> <span class="n">__pynn</span><span class="p">[</span><span class="s2">&quot;run_until&quot;</span><span class="p">](</span><span class="n">tstop</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">get_machine</span><span class="p">():</span>
+<div class="viewcode-block" id="get_machine"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.get_machine">[docs]</a><span class="k">def</span> <span class="nf">get_machine</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Get the SpiNNaker machine in use.</span>
 
 <span class="sd">    :return: the machine object</span>
 <span class="sd">    :rtype: ~spinn_machine.Machine</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">globals_variables</span><span class="o">.</span><span class="n">check_simulator</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine</span>
+    <span class="k">return</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -740,7 +748,7 @@
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
+    <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
     </form>
@@ -755,14 +763,14 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
+          <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
+          <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">spynnaker8</a></li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

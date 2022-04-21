@@ -25,7 +25,8 @@
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.utilities.utility_calls</a></li> 
       </ul>
     </div>  
@@ -380,11 +381,21 @@
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n_values</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span></div>
 
 
-<div class="viewcode-block" id="moved_in_v6"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v6">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v6</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">):</span>
+<div class="viewcode-block" id="moved_in_v6"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v6">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v6</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Tells the users that old code is no lonfger implemented</span>
+
+<span class="sd">    :param str old_location: old import</span>
+<span class="sd">    :raise: NotImplementedError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Old import: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="moved_in_v7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v7">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v7</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Warns the users that they are using an old import.</span>
 
-<span class="sd">    In version 7 this will ne upgraded to a exception and then later removed</span>
+<span class="sd">    In version 8 this will be upgraded to a exception and then later removed</span>
 
 <span class="sd">    :param str old_location: old import</span>
 <span class="sd">    :param str new_location: new import</span>
@@ -393,7 +404,7 @@
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONTINUOUS_INTEGRATION&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Old import: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">))</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> moved to </span><span class="si">{}</span><span class="s2">. Please fix your imports. &quot;</span>
-                   <span class="s2">&quot;In version 7 this will fail completely.&quot;</span>
+                   <span class="s2">&quot;In version 8 this will fail completely.&quot;</span>
                    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">))</span></div>
 
 
@@ -439,6 +450,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.utilities.utility_calls</a></li> 
       </ul>
     </div>

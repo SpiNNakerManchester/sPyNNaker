@@ -967,7 +967,7 @@ returned by field_types</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>param</strong> (<a class="reference internal" href="spynnaker8.html#spynnaker8.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or
+<li><p><strong>param</strong> (<a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or
 </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – the param to convert</p></li>
 <li><p><strong>no_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of atoms available for conversion of param</p></li>
 </ul>
@@ -1117,9 +1117,23 @@ generator for seeds.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.moved_in_v6">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">moved_in_v6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#moved_in_v6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v6" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">moved_in_v6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#moved_in_v6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tells the users that old code is no lonfger implemented</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>old_location</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – old import</p>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>NotImplementedError</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.moved_in_v7">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">moved_in_v7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_location</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#moved_in_v7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v7" title="Permalink to this definition">¶</a></dt>
 <dd><p>Warns the users that they are using an old import.</p>
-<p>In version 7 this will ne upgraded to a exception and then later removed</p>
+<p>In version 8 this will be upgraded to a exception and then later removed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

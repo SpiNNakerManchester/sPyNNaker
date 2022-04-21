@@ -25,7 +25,8 @@
           <a href="../../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector</a></li> 
       </ul>
     </div>  
@@ -127,7 +128,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">__index_expression</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">),</span>
                 <span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">))</span>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
@@ -137,7 +138,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_minimum_selected</span><span class="p">(</span>
@@ -147,7 +148,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_minimum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -164,14 +165,14 @@
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">n_connections</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__probs</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
@@ -181,7 +182,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker8.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -282,6 +283,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector</a></li> 
       </ul>
     </div>
