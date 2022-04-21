@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 class TestListStandardModules(unittest.TestCase):

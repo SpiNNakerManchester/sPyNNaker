@@ -20,7 +20,7 @@ Synfirechain-like example
 """
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
