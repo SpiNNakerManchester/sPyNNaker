@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase

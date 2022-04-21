@@ -19,7 +19,7 @@
 Synfirechain-like example
 """
 import numpy
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase.root_test_case import RootTestCase
 
 

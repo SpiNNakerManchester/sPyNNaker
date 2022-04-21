@@ -16,7 +16,7 @@
 """
 Synfirechain-like example
 """
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.data import SpynnakerDataView
 

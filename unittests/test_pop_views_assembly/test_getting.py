@@ -19,7 +19,7 @@ import pytest
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.recorder import Recorder
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
