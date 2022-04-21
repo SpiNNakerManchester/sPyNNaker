@@ -34,7 +34,6 @@ from spinn_front_end_common.data import FecTimer
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utility_models import CommandSender
 
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
@@ -54,7 +53,6 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
-from spynnaker.pyNN.utilities import constants
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -68,6 +66,28 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     def __init__(
             self, time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
+        """
+
+        :param time_scale_factor: multiplicative factor to the machine time step
+            (does not affect the neuron models accuracy)
+        :type time_scale_factor: int or None
+        :param min_delay:
+        :param graph_label:
+        :param n_chips_required:
+            Deprecated! Use n_boards_required instead.
+            Must be None if n_boards_required specified.
+        :type n_chips_required: int or None
+        :param n_boards_required:
+            if you need to be allocated a machine (for spalloc) before building
+            your graph, then fill this in with a general idea of the number of
+            boards you need so that the spalloc system can allocate you a machine
+            big enough for your needs.
+        :type n_boards_required: int or None
+        :param timestep:
+            the time step of the simulations in micro seconds
+            if None the cfg value is used
+        :type timestep: float or None
+        """
         # pylint: disable=too-many-arguments, too-many-locals
 
         # change min delay auto to be the min delay supported by simulator
@@ -135,7 +155,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """ Clear the current recordings and reset the simulation
         """
         self.recorders = set([])
-        self.id_counter = 0
         self.reset()
 
         # Stop any currently running SpiNNaker application
@@ -422,18 +441,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                                chip.nearest_ethernet_y)],
                     frozenset(extra_monitor_cores_on_board)))
         return list(important_gathers)
-
-    @property
-    def id_counter(self):
-        """ The id_counter, currently used by the populations.
-
-        .. note::
-            Maybe it could live in the pop class???
-
-        :rtype: int
-        """
-        # todo fix or remove method
-        pop = 1/0
 
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
 import pyNN.spiNNaker as sim
 from spinn_front_end_common.data import FecTimer
 from spinn_front_end_common.utilities.globals_variables import get_simulator

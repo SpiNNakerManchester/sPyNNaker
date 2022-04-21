@@ -25,10 +25,6 @@ PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.abstract_models import (
-    AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models import (
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
     MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
