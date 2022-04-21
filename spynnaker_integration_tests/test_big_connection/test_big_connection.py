@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 import random
 import time
 from spinn_utilities.config_holder import get_config_bool
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 

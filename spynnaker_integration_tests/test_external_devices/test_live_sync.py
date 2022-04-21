@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The University of Manchester
+# Copyright (c) 2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from time import sleep
 import traceback
 
+from spynnaker8.external_devices import SpynnakerLiveSpikesConnection
 
 sim_finished = False
 n_spikes = list()
@@ -61,7 +62,7 @@ def test_live_sync():
     """
     global sim_finished
     global n_spikes
-    conn = p.external_devices.SpynnakerLiveSpikesConnection(
+    conn = SpynnakerLiveSpikesConnection(
         receive_labels=["ssa"], local_port=None)
     conn.add_receive_callback("ssa", recv)
     conn.add_start_resume_callback("ssa", send_sync)
