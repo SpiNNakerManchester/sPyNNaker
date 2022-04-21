@@ -60,7 +60,8 @@ jobs:
       uses: ./support/actions/install-matplotlib
     - name: Setup
       uses: ./support/actions/run-setup
-
+    - name: Setup PyNN
+      uses: ./support/actions/pynn-setup
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker
       with:

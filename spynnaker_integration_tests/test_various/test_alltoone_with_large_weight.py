@@ -17,7 +17,7 @@
 
 from data_specification.enums import DataType
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 class AllToOneWithLargeWeightCase(BaseTestCase):

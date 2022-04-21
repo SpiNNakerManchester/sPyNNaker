@@ -17,7 +17,7 @@
 Synfirechain-like example
 """
 from pyNN.random import NumpyRNG
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker8 import IF_curr_exp
 from spynnaker8 import SpikeSourceArray
 from spynnaker.pyNN.utilities import neo_convertor

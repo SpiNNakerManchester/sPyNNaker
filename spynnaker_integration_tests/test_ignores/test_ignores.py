@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ from unittest import SkipTest
 from spinn_utilities.config_holder import set_config
 from spinnman.processes.get_machine_process import GetMachineProcess
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 def hacked_receive_chip_info(self, scp_read_chip_info_response):
