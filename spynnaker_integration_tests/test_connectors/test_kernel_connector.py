@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 

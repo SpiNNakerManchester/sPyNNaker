@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_additive_stdp_weight)
 from spinnaker_testbase import BaseTestCase
