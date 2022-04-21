@@ -17,7 +17,7 @@ from collections import defaultdict
 from random import randint
 import time
 import unittest
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 

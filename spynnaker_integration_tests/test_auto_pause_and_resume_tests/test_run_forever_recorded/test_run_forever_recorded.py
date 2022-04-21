@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spinn_front_end_common.utilities.database.database_connection import (
     DatabaseConnection)
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (

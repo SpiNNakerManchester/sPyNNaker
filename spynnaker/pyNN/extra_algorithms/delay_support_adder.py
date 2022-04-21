@@ -54,26 +54,6 @@ class _DelaySupportAdder(object):
         "_delay_post_edge_map",
         "_delay_pre_edges"]
 
-    INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG = (
-        "The app vertex {} with splitter {} does not support delays and yet "
-        "requires a delay support for edge {}. Please use a Splitter which "
-        "utilises the AbstractSpynnakerSplitterDelay interface.")
-
-    DELAYS_NOT_SUPPORTED_SPLITTER = (
-        "The app vertex {} with splitter {} does not support delays and yet "
-        "requires a delay support for edge {}. Please use a Splitter which "
-        "does not have accepts_edges_from_delay_vertex turned off.")
-
-    NOT_SUPPORTED_DELAY_ERROR_MSG = (
-        "The maximum delay {}ms for projection {} is not supported "
-        "by the splitter {} (max supported delay of the splitter is {}ms and "
-        "a delay extension can add {}ms extra delay). either reduce "
-        "the delay, or use a splitter which supports a larger delay, or "
-        "finally implement the code to allow multiple delay extensions. "
-        "good luck.")
-
-    APP_DELAY_PROGRESS_BAR_TEXT = "Adding delay extensions as required"
-
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
@@ -90,7 +70,7 @@ class _DelaySupportAdder(object):
         # progress abr and data holders
         progress = ProgressBar(
             len(list(app_graph.outgoing_edge_partitions)),
-            self.APP_DELAY_PROGRESS_BAR_TEXT)
+            "Adding delay extensions as required")
 
         # go through all partitions.
         for app_outgoing_edge_partition in progress.over(
@@ -219,8 +199,11 @@ class _DelaySupportAdder(object):
         if not isinstance(
                 post_splitter, AbstractSpynnakerSplitterDelay):
             raise DelayExtensionException(
-                self.INVALID_SPLITTER_FOR_DELAYS_ERROR_MSG.format(
-                    app_edge.post_vertex, post_splitter, app_edge))
+                f"The app vertex {app_edge.post_vertex} "
+                f"with splitter {post_splitter} does not support delays "
+                f"and yet requires a delay support for edge {app_edge}. "
+                f"Please use a Splitter which utilises the "
+                f"AbstractSpynnakerSplitterDelay interface.")
 
         max_delay_steps = app_edge.post_vertex.splitter.max_support_delay()
         max_delay_ms = max_delay_steps * machine_time_step_ms()
@@ -232,8 +215,11 @@ class _DelaySupportAdder(object):
         # Check post vertex is ok with getting a delay
         if not post_splitter.accepts_edges_from_delay_vertex():
             raise DelayExtensionException(
-                self.DELAYS_NOT_SUPPORTED_SPLITTER.format(
-                    app_edge.post_vertex, post_splitter, app_edge))
+                f"The app vertex {app_edge.post_vertex} "
+                f"with splitter {post_splitter} does not support delays "
+                f"and yet requires a delay support for edge {app_edge}. "
+                f"Please use a Splitter which does not have "
+                f"accepts_edges_from_delay_vertex turned off.")
 
         # needs a delay extension, check can be supported with 1 delay
         # extension. coz we dont do more than 1 at the moment
@@ -242,10 +228,11 @@ class _DelaySupportAdder(object):
         total_delay_ms = ext_provided_ms + max_delay_ms
         if total_delay_ms < max_delay_needed_ms:
             raise DelayExtensionException(
-                self.NOT_SUPPORTED_DELAY_ERROR_MSG.format(
-                    max_delay_needed_ms, app_edge,
-                    app_edge.post_vertex.splitter,
-                    max_delay_ms, ext_provided_ms))
+                f"Edge:{app_edge.label} "
+                f"has a max delay of {max_delay_needed_ms}. "
+                f"But at a timestep of "
+                f"{machine_time_step_ms} "
+                f"the max delay supported is {total_delay_ms}")
 
         # return data for building delay extensions
         n_stages = int(math.ceil(max_delay_needed_ms / max_delay_ms)) - 1

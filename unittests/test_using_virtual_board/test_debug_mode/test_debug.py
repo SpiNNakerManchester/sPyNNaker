@@ -26,7 +26,7 @@ from spinn_front_end_common.utilities.globals_variables import (
 from spinnaker_testbase import BaseTestCase
 from spynnaker.pyNN.extra_algorithms.\
     spynnaker_neuron_network_specification_report import (_GRAPH_NAME)
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 class TestDebug(BaseTestCase):
