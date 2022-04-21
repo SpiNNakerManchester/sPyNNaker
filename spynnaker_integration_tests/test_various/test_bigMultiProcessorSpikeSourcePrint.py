@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker.plot_utils as plot_utils
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 

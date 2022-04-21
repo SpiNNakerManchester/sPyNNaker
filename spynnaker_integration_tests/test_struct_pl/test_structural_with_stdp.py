@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_additive_stdp_weight)
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 import numpy
 
 
