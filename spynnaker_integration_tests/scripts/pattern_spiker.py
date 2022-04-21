@@ -137,7 +137,7 @@ if __name__ == '__main__':
     """
     Main method for algorithm checking
     """
-    import spynnaker8 as sim
+    import pyNN.spiNNaker as sim
     ps = PatternSpiker()
     sim.setup(timestep=1)
     simtime = 100
