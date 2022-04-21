@@ -68,7 +68,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         """
 
-        :param time_scale_factor: multiplicative factor to the machine time step
+        :param time_scale_factor:
+            multiplicative factor to the machine time step
             (does not affect the neuron models accuracy)
         :type time_scale_factor: int or None
         :param min_delay:
@@ -78,10 +79,10 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             Must be None if n_boards_required specified.
         :type n_chips_required: int or None
         :param n_boards_required:
-            if you need to be allocated a machine (for spalloc) before building
-            your graph, then fill this in with a general idea of the number of
-            boards you need so that the spalloc system can allocate you a machine
-            big enough for your needs.
+            if you need to be allocated a machine (for spalloc) before
+            building your graph, then fill this in with a general idea of
+            the number of boards you need so that the spalloc system can
+            allocate you a machine big enough for your needs.
         :type n_boards_required: int or None
         :param timestep:
             the time step of the simulations in micro seconds
