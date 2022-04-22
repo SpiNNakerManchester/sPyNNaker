@@ -50,6 +50,4 @@ spynnaker/pyNN/utilities/spynnaker_failed_state.py
 spynnaker/pyNN/utilities/struct.py
 spynnaker/pyNN/utilities/utility_calls.py
 spynnaker/pyNN/utilities/variable_cache.py
-spynnaker8/spynnaker_plotting.py
-spynnaker8/spynnaker8_simulator_interface.py
-spynnaker8/utilities/neo_convertor.py
+spynnaker/pyNN/spynnaker_plotting.py

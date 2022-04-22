@@ -15,7 +15,7 @@
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 
 
 class TestDoNotAllowViolate(BaseTestCase):
