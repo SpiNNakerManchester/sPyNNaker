@@ -368,6 +368,7 @@ def moved_in_v7(old_location, new_location):
                    "In version 8 this will fail completely."
                    "".format(old_location, new_location))
 
+
 def moved_in_v7_warning(message):
     """
     Warns the user that they are using old code
