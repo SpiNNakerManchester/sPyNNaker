@@ -102,8 +102,7 @@ class _OnChipBitFieldGenerator(object):
 
         """
         self.__txrx = None
-        executable_finder = SpynnakerDataView.get_executable_finder()
-        self.__aplx = executable_finder.get_executable_path(
+        self.__aplx = SpynnakerDataView.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
     def _run(self):

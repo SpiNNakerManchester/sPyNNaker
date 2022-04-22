@@ -48,8 +48,7 @@ def _locate_expander_rerun_targets(bitfield_targets):
     """
 
     # locate expander executable path
-    executable_finder = SpynnakerDataView.get_executable_finder()
-    expander_executable_path = executable_finder.get_executable_path(
+    expander_executable_path = SpynnakerDataView.get_executable_path(
         SYNAPSE_EXPANDER_APLX)
 
     # if any ones are going to be ran on host, ignore them from the new

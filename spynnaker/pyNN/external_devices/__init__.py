@@ -64,7 +64,7 @@ activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
 
-SpynnakerDataView.get_executable_finder().add_path(
+SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 

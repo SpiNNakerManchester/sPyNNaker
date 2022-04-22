@@ -39,9 +39,8 @@ def synapse_expander():
         Needs to be done after data has been loaded.
 
     """
-    executable_finder = SpynnakerDataView.get_executable_finder()
-    synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER_APLX)
-    delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER_APLX)
+    synapse_bin = SpynnakerDataView.get_executable_path(SYNAPSE_EXPANDER_APLX)
+    delay_bin = SpynnakerDataView.get_executable_path(DELAY_EXPANDER_APLX)
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(

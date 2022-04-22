@@ -105,7 +105,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         setup_configs()
 
         # add model binaries
-        SpynnakerDataWriter.get_executable_finder().add_path(
+        # called before super.init as that logs the paths
+        # writer not yet created so must user reader
+        SpynnakerDataWriter.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
