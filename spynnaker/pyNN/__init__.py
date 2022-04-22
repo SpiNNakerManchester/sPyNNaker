@@ -698,4 +698,4 @@ def get_machine():
     :rtype: ~spinn_machine.Machine
     """
     SpynnakerDataView.check_user_can_act()
-    return globals_variables.get_simulator().machine
+    return SpynnakerDataView.get_machine()
