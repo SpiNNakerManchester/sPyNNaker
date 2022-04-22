@@ -139,11 +139,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pylint: disable=protected-access
 
         # extra post run algorithms
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections:
             projection._clear_cache()
 
         self._run_wait(run_time, sync_time)
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections:
             projection._clear_cache()
 
     def run_until(self, tstop):
@@ -175,8 +175,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         for population in self._data_writer.iterate_populations():
             population._cache_data()
-
-        self.__segment_counter += 1
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)
