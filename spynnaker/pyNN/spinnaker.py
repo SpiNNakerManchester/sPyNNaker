@@ -139,11 +139,11 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pylint: disable=protected-access
 
         # extra post run algorithms
-        for projection in self._data_writer.iterate_projections:
+        for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
         self._run_wait(run_time, sync_time)
-        for projection in self._data_writer.iterate_projections:
+        for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
     def run_until(self, tstop):
