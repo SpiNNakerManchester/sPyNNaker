@@ -19,7 +19,7 @@ from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM, ConstantSDRAM)
+    MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
