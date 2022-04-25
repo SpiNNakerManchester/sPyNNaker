@@ -71,9 +71,9 @@ def _plan_expansion(synapse_expander_bin, delay_expander_bin):
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
-    placements = SpynnakerDataView.get_placements()
-    progress = ProgressBar(len(placements), "Preparing to Expand Synapses")
-    for placement in progress.over(placements):
+    progress = ProgressBar(
+        SpynnakerDataView.get_n_placements(), "Preparing to Expand Synapses")
+    for placement in progress.over(SpynnakerDataView.iterate_placemements()):
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         vertex = placement.vertex
