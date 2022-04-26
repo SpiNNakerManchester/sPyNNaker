@@ -227,7 +227,6 @@ class PopulationNeuronsMachineVertex(
     def generate_data_specification(
             self, spec, placement, routing_info, data_n_time_steps):
         """
-        :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
         :param n_key_map: (injected)

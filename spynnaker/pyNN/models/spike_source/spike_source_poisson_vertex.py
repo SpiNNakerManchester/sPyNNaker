@@ -121,7 +121,6 @@ class SpikeSourcePoissonVertex(
         self.__model = model
         self.__seed = seed
         self.__kiss_seed = dict()
-        self.__rng = None
         self.__n_subvertices = 0
 
         # check for changes parameters
