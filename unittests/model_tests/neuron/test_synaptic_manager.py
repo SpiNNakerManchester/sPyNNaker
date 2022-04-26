@@ -56,7 +56,7 @@ from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.config_setup import unittest_setup
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 
 
 class MockTransceiverRawData(object):
