@@ -18,8 +18,8 @@ import numpy
 import random
 import matplotlib.pyplot as plt
 from pyNN.utility.plotting import Figure, Panel
-import spynnaker8 as p
-from spynnaker8.utilities import neo_convertor
+import pyNN.spiNNaker as p
+from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
 

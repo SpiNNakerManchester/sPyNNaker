@@ -16,8 +16,8 @@
 import unittest
 from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
-import spynnaker8 as p
-import spynnaker8.external_devices as e
+import pyNN.spiNNaker as p
+import spynnaker.pyNN.external_devices as e
 from spinnaker_testbase import BaseTestCase
 
 
@@ -51,7 +51,7 @@ class TestMultiBoardSpikeOutput(BaseTestCase):
             e.activate_live_output_for(pop)
             TestMultiBoardSpikeOutput.counts[label] = 0
 
-        live_output = e.SpynnakerLiveSpikesConnection(
+        live_output = p.external_devices.SpynnakerLiveSpikesConnection(
             receive_labels=labels, local_port=None)
         p.external_devices.add_database_socket_address(
             live_output.local_ip_address, live_output.local_port, None)

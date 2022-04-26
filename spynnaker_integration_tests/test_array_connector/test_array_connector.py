@@ -16,7 +16,7 @@
 import matplotlib.pyplot as plt
 import numpy
 from pyNN.utility.plotting import Figure, Panel
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 
