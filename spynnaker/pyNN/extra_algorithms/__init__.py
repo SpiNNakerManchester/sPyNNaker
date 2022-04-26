@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .connection_holder_finisher import finish_connection_holders
-from .graph_edge_weight_updater import GraphEdgeWeightUpdater
 from .redundant_packet_count_report import redundant_packet_count_report
 from .spynnaker_connection_holder_generations import (
     SpYNNakerConnectionHolderGenerator)
@@ -32,7 +31,6 @@ from .neuron_expander import neuron_expander
 __all__ = [
     "delay_support_adder",
     "finish_connection_holders",
-    "GraphEdgeWeightUpdater",
     "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",
     "spynnaker_data_specification_writer",

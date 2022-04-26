@@ -147,18 +147,6 @@ class ProjectionApplicationEdge(
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
-    def get_machine_edge(self, pre_vertex, post_vertex):
-        """ Get a specific machine edge of this edge
-
-        :param PopulationMachineVertex pre_vertex:
-            The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertex:
-            The vertex at the end of the machine edge
-        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
-        """
-        return self.__machine_edges_by_slices.get(
-            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
-
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, src_machine_vertex, dest_machine_vertex):
         if not self.__filter:
