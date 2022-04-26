@@ -16,7 +16,7 @@
 from unittest import SkipTest
 import pytest
 from pyNN.space import Sphere, RandomStructure
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 
 

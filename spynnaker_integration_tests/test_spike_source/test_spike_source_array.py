@@ -16,7 +16,7 @@
 import random
 from spinnaker_testbase import BaseTestCase
 import numpy
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 
 
 class TestSpikeSourceArray(BaseTestCase):

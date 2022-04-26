@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
 from neo.io import PickleIO
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.utilities import neo_compare
 from spinnaker_testbase import BaseTestCase
 

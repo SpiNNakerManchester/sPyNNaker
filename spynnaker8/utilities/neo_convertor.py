@@ -221,4 +221,7 @@ def count_spikes(neo):
     :param ~neo.core.Block neo: Neo Object which has spikes in it
     :return: The number of spikes in the first segment
     """
+    moved_in_v6(
+        "spynnaker8.utilities.neo_convertor",
+        "spynnaker.pyNN.utilities.neo_convertor")
     return count_spiketrains(neo.segments[0].spiketrains)
