@@ -15,7 +15,7 @@
 import random
 from threading import Condition
 import time
-import spynnaker8 as Frontend
+import pyNN.spiNNaker as Frontend
 from spynnaker.pyNN.utilities import neo_convertor
 from spinnaker_testbase import BaseTestCase
 

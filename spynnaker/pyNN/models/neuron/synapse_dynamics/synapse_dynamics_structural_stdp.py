@@ -275,10 +275,10 @@ class SynapseDynamicsStructuralSTDP(
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
                 self.__seeds[app_vertex] = (
-                    create_mars_kiss_seeds(self.__rng, self.__seed))
+                    create_mars_kiss_seeds(self.__rng))
             return self.__seeds[app_vertex]
         else:
-            return create_mars_kiss_seeds(self.__rng, self.__seed)
+            return create_mars_kiss_seeds(self.__rng)
 
     @overrides(SynapseDynamicsSTDP.generate_on_machine)
     def generate_on_machine(self):

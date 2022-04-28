@@ -16,7 +16,7 @@
 import os
 import numpy
 import unittest
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
 from spinn_front_end_common.utilities.globals_variables import (

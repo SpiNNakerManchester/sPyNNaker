@@ -17,7 +17,7 @@
 retina example that just feeds data from a retina to live output via an
 intermediate population
 """
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 
