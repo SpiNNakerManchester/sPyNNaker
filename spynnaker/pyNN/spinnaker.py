@@ -41,7 +41,7 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder,
+    delay_support_adder, neuron_expander,
     redundant_packet_count_report,
     spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
