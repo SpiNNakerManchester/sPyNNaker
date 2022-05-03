@@ -65,11 +65,10 @@ class AbstractNeuronRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps):
+    def get_data(self, variable):
         """ Get the recorded data
 
         :param str variable: PyNN name of the variable
-        :param int n_machine_time_steps:
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """

@@ -310,7 +310,8 @@ class NeuronRecorder(object):
 
     def __read_data(
             self, label, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps):
+            sampling_rate, data_type, variable):
+        n_machine_time_steps = SpynnakerDataView.get_max_run_time_steps()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
@@ -358,8 +359,7 @@ class NeuronRecorder(object):
 
         return pop_level_data, indexes, sampling_interval
 
-    def get_matrix_data(
-            self, label, application_vertex, variable, n_machine_time_steps):
+    def get_matrix_data(self, label, application_vertex, variable):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
@@ -368,7 +368,6 @@ class NeuronRecorder(object):
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :param int n_machine_time_steps:
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray, list(int), float)
         """
@@ -387,8 +386,7 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         return self.__read_data(
-            label, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps)
+            label, application_vertex, sampling_rate, data_type, variable)
 
     def get_spikes(self, label, application_vertex, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
@@ -930,7 +928,6 @@ class NeuronRecorder(object):
             recorded or not, with those that are not having a size of 0
 
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
-        :param int n_machine_time_steps:
         :rtype: list(int)
         """
         values = list()

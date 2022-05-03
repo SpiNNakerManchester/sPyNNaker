@@ -471,14 +471,14 @@ class AbstractPopulationVertex(
             self.__raise_var_not_supported(variable)
         self.__change_requires_mapping = not self.is_recording(variable)
 
-    def get_data(self, variable, n_machine_time_steps):
+    def get_data(self, variable):
         # pylint: disable=too-many-arguments
         if self.__neuron_recorder.is_recordable(variable):
             return self.__neuron_recorder.get_matrix_data(
-                self.label, self, variable, n_machine_time_steps)
+                self.label, self, variable)
         elif self.__synapse_recorder.is_recordable(variable):
             return self.__synapse_recorder.get_matrix_data(
-                self.label, self, variable, n_machine_time_steps)
+                self.label, self, variable)
         self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)

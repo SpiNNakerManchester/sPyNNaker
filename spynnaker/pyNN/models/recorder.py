@@ -258,8 +258,7 @@ class Recorder(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            results = self.__vertex.get_data(
-                variable, SpynnakerDataView.get_current_run_timesteps())
+            results = self.__vertex.get_data(variable)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
