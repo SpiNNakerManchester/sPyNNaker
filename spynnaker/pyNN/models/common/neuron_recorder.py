@@ -311,7 +311,7 @@ class NeuronRecorder(object):
     def __read_data(
             self, label, application_vertex,
             sampling_rate, data_type, variable):
-        n_machine_time_steps = SpynnakerDataView.get_max_run_time_steps()
+        n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
