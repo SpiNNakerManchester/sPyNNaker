@@ -78,7 +78,6 @@ def find(main_package):
 
 
 find("spynnaker")
-find("spynnaker8")
 setup(
     name="sPyNNaker",
     version=__version__,
