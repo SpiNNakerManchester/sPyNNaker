@@ -135,7 +135,7 @@ class PopulationMachineSynapses(
             placement=placement, region=self._synapse_regions.bitfield_key_map)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
-    def bit_field_builder_region(self, transceiver, placement):
+    def bit_field_builder_region(self, placement):
         return locate_memory_region_for_placement(
             placement=placement,
             region=self._synapse_regions.bitfield_builder)

@@ -300,7 +300,7 @@ class _OnChipBitFieldGenerator(object):
             executable_type=ExecutableType.SYSTEM)
 
         bit_field_builder_region = placement.vertex.bit_field_builder_region(
-            self.__txrx, placement)
+            placement)
         # update user 1 with location
         user_1_base_address = \
             self.__txrx.get_user_1_register_address_from_core(placement.p)
