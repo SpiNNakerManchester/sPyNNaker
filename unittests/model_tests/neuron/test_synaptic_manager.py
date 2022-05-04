@@ -122,7 +122,7 @@ def test_write_data_spec():
         delay_support_adder(app_graph)
         spynnaker_splitter_partitioner(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, flexible=False)
+        routing_info = allocator.__call__(app_graph, [], flexible=False)
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -449,7 +449,7 @@ def test_pop_based_master_pop_table_standard(
         delay_support_adder(app_graph)
         spynnaker_splitter_partitioner(app_graph, 100)
         allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, flexible=False)
+        routing_info = allocator.__call__(app_graph, [], flexible=False)
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
