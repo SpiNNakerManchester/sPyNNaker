@@ -123,18 +123,12 @@ class PopulationMachineSynapses(
             self._synapse_references.pop_table,
             self._synapse_references.connection_builder)
 
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+               bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               key_to_atom_map_region_base_address)
-    def key_to_atom_map_region_base_address(self, transceiver, placement):
-        return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_key_map)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
     def bit_field_builder_region(self, transceiver, placement):
