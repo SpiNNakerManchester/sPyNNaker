@@ -15,7 +15,6 @@
 
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.connections import LiveEventConnection
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 
 class EthernetControlConnection(LiveEventConnection):
@@ -38,8 +37,7 @@ class EthernetControlConnection(LiveEventConnection):
         """
         super().__init__(
             live_packet_gather_label, receive_labels=[label],
-            local_host=local_host, local_port=local_port,
-            simulator=get_simulator())
+            local_host=local_host, local_port=local_port)
         self.__translators = dict()
         self.__translators[label] = translator
         self.add_receive_callback(label, self._translate, translate_key=False)

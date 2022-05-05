@@ -19,7 +19,6 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
@@ -62,8 +61,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
         super().__init__(
             live_packet_gather_label=None, send_labels=control_labels,
-            local_host=local_host, local_port=local_port,
-            simulator=get_simulator())
+            local_host=local_host, local_port=local_port)
 
     def add_poisson_label(self, label):
         """

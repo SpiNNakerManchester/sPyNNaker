@@ -15,7 +15,6 @@
 
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 # The maximum number of 32-bit keys that will fit in a packet
 _MAX_FULL_KEYS_PER_PACKET = 63
@@ -48,7 +47,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         # pylint: disable=too-many-arguments
         super().__init__(
             live_packet_gather_label, receive_labels, send_labels,
-            local_host, local_port, simulator=get_simulator())
+            local_host, local_port)
 
     def send_spike(self, label, neuron_id, send_full_keys=False):
         """ Send a spike from a single neuron
