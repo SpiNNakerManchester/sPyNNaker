@@ -20,6 +20,7 @@ from spinn_utilities.abstract_base import abstractproperty
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -49,6 +50,7 @@ SynapseReferences = namedtuple(
 
 class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
+        AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, allow_derivation=True):
@@ -121,12 +123,24 @@ class PopulationMachineSynapses(
             self._synapse_references.pop_table,
             self._synapse_references.connection_builder)
 
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               bit_field_base_address)
+    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=self._synapse_regions.bitfield_filter)
+
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+               key_to_atom_map_region_base_address)
+    def key_to_atom_map_region_base_address(self, transceiver, placement):
+        return locate_memory_region_for_placement(
+            placement=placement, transceiver=transceiver,
+            region=self._synapse_regions.bitfield_key_map)
+
+    @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
+    def bit_field_builder_region(self, transceiver, placement):
+        return locate_memory_region_for_placement(
+            placement=placement, transceiver=transceiver,
+            region=self._synapse_regions.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)

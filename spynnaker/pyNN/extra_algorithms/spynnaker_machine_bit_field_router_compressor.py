@@ -17,6 +17,8 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         machine_bit_field_ordered_covering_compressor,
@@ -77,6 +79,8 @@ def __machine_expandables(cores, placements):
     for place in placements.placements:
         vertex = place.vertex
         if (cores.is_core(place.x, place.y, place.p)
+                # Have we overwritten it?
+                and isinstance(vertex, AbstractSupportsBitFieldGeneration)
                 # Can we fix it by rerunning?
                 and isinstance(vertex, AbstractSynapseExpandable)
                 and vertex.gen_on_machine()):
