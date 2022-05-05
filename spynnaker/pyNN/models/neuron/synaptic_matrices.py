@@ -80,7 +80,9 @@ class SynapticMatrices(object):
         # Reference to give the master population table
         "__poptable_ref",
         # Reference to give the connection builder
-        "__connection_builder_ref"
+        "__connection_builder_ref",
+        # The maximum generated data, for calculating timeouts
+        "__max_gen_data"
     ]
 
     def __init__(
@@ -144,6 +146,15 @@ class SynapticMatrices(object):
 
         # Determine whether to generate on machine
         self.__gen_on_machine = False
+        self.__max_gen_data = 0
+
+    @property
+    def max_gen_data(self):
+        """  The maximum amount of data to be generated for the synapses.
+
+        :rtype: int
+        """
+        return self.__max_gen_data
 
     @property
     def host_generated_block_addr(self):
@@ -262,9 +273,11 @@ class SynapticMatrices(object):
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
+        self.__max_gen_data = 0
         for app_matrix in generate_on_machine:
             block_addr = app_matrix.write_on_chip_matrix_data(
                 generator_data, block_addr)
+            self.__max_gen_data += app_matrix.gen_size
             self.__gen_on_machine = True
 
         self.__on_chip_generated_block_addr = block_addr

@@ -63,3 +63,11 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
         """
+
+    @abstractproperty
+    def max_gen_data(self):
+        """ The maximum amount of synaptic data to be generated.  This
+            is used to calculate the timeout of the execution.
+
+        :rtype: int
+        """
