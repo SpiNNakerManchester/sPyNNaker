@@ -118,7 +118,9 @@
         <span class="c1"># Reference to give the master population table</span>
         <span class="s2">&quot;__poptable_ref&quot;</span><span class="p">,</span>
         <span class="c1"># Reference to give the connection builder</span>
-        <span class="s2">&quot;__connection_builder_ref&quot;</span>
+        <span class="s2">&quot;__connection_builder_ref&quot;</span><span class="p">,</span>
+        <span class="c1"># The maximum generated data, for calculating timeouts</span>
+        <span class="s2">&quot;__max_gen_data&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -182,6 +184,15 @@
 
         <span class="c1"># Determine whether to generate on machine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_gen_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;  The maximum amount of data to be generated for the synapses.</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">host_generated_block_addr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -303,9 +314,11 @@
         <span class="c1"># Skip blocks that will be written on the machine, but add them</span>
         <span class="c1"># to the master population table</span>
         <span class="n">generator_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">app_matrix</span> <span class="ow">in</span> <span class="n">generate_on_machine</span><span class="p">:</span>
             <span class="n">block_addr</span> <span class="o">=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">write_on_chip_matrix_data</span><span class="p">(</span>
                 <span class="n">generator_data</span><span class="p">,</span> <span class="n">block_addr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_gen_data</span> <span class="o">+=</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">gen_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__on_chip_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>

@@ -121,7 +121,9 @@
         <span class="c1"># A cache of the received synaptic matrix</span>
         <span class="s2">&quot;__received_block&quot;</span><span class="p">,</span>
         <span class="c1"># A cache of the received delayed synaptic matrix</span>
-        <span class="s2">&quot;__delay_received_block&quot;</span>
+        <span class="s2">&quot;__delay_received_block&quot;</span><span class="p">,</span>
+        <span class="c1"># The number of rows in all generated blocks</span>
+        <span class="s2">&quot;__gen_n_rows&quot;</span>
     <span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -188,6 +190,14 @@
         <span class="c1"># These are stored when blocks are read</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gen_n_rows</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gen_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_row_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_bytes</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_bytes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_row_length</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_n_rows</span>
 
     <span class="k">def</span> <span class="nf">__get_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get or create a matrix object</span>
@@ -483,6 +493,8 @@
                           <span class="nb">min</span><span class="p">(</span><span class="n">lo_atom</span> <span class="o">+</span> <span class="n">MAX_GENERATED_ATOMS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_atom</span><span class="p">))</span>
                     <span class="k">for</span> <span class="n">lo_atom</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">MAX_GENERATED_ATOMS</span><span class="p">)]</span>
             <span class="k">for</span> <span class="n">pre_slice</span> <span class="ow">in</span> <span class="n">pre_slices</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__gen_n_rows</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">pre_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
                 <span class="n">syn_addr</span><span class="p">,</span> <span class="n">syn_mat_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_app_on_chip_address</span><span class="p">(</span>
                     <span class="n">syn_addr</span><span class="p">,</span> <span class="n">syn_max_addr</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">)</span>
                 <span class="n">del_addr</span><span class="p">,</span> <span class="n">d_mat_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next_app_delay_on_chip_address</span><span class="p">(</span>
@@ -497,6 +509,9 @@
         <span class="c1"># generator</span>
         <span class="k">for</span> <span class="n">m_edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__m_edges</span><span class="p">:</span>
             <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_matrix</span><span class="p">(</span><span class="n">m_edge</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gen_n_rows</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="n">syn_mat_offset</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">next_on_chip_address</span><span class="p">(</span>
                 <span class="n">block_addr</span><span class="p">)</span>
             <span class="n">block_addr</span><span class="p">,</span> <span class="n">d_mat_offset</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">next_delay_on_chip_address</span><span class="p">(</span>
