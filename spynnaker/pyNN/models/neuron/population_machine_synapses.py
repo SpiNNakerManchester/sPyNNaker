@@ -243,3 +243,13 @@ class PopulationMachineSynapses(
         """
         return self._synaptic_matrices.get_connections_from_machine(
             transceiver, placement, app_edge, synapse_info, self._vertex_slice)
+
+    @property
+    @overrides(AbstractSynapseExpandable.max_gen_data)
+    def max_gen_data(self):
+        return self._synaptic_matrices.max_gen_data
+
+    @property
+    @overrides(AbstractSynapseExpandable.bit_field_size)
+    def bit_field_size(self):
+        return self._synaptic_matrices.bit_field_size

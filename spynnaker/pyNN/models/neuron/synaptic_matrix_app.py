@@ -113,6 +113,14 @@ class SynapticMatrixApp(object):
         self.__index = None
         self.__delay_index = None
 
+    @property
+    def gen_size(self):
+        max_row_length = max(
+            self.__max_row_info.undelayed_max_bytes,
+            self.__max_row_info.delayed_max_bytes)
+        return (max_row_length * self.__app_edge.pre_vertex.n_atoms *
+                (self.__app_edge.n_delay_stages + 1))
+
     def reserve_matrices(self, block_addr, poptable):
         """ Allocate the master pop table entries for the blocks
 
