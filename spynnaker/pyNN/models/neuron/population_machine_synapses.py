@@ -18,7 +18,6 @@ from spinn_utilities.abstract_base import abstractproperty
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
-    AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -34,7 +33,6 @@ from .synaptic_matrices import SynapseRegions, SYNAPSE_FIELDS
 
 class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
-        AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, allow_derivation=True):
@@ -97,12 +95,6 @@ class PopulationMachineSynapses(
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
-    def bit_field_builder_region(self, transceiver, placement):
-        return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
