@@ -37,14 +37,6 @@
 #include "current_source_noisy.h"
 #endif
 
-// Global struct for current source ID value relating to indices in individual structs
-//typedef struct current_source_t {
-//    uint32_t current_source_id;  // the current source ID value
-//    uint32_t current_source_index;  // the index this refers to in this current source type's struct
-//    uint32_t n_neuron_ids;  // the number of neurons this current source applies to
-//    uint32_t neuron_id_list[];  // the list of IDs of these neurons
-//} current_source_t;
-
 // Struct for current source id type and current source index of that type
 typedef struct cs_id_index_t {
     uint32_t cs_id;
@@ -54,7 +46,7 @@ typedef struct cs_id_index_t {
 // Global struct for each neuron's current source IDs and indices
 typedef struct neuron_current_source_t {
     uint32_t n_current_sources;  // the number of current sources for this neuron
-    cs_id_index_t cs_id_index_list[];  // the list of current source type ID and index within that type
+    cs_id_index_t cs_id_index_list[];  // the list of CS type ID and index in that type
 } neuron_current_source_t;
 
 // Global values for the total number of current sources and number of each type
@@ -233,11 +225,14 @@ static inline REAL current_source_get_offset(uint32_t time, uint32_t neuron_inde
     // TODO: use an enum or something like that instead for the IDs
     REAL current_offset = ZERO;
 
-    uint32_t n_current_sources_neuron = neuron_current_source[neuron_index]->n_current_sources;
+    uint32_t n_current_sources_neuron =
+            neuron_current_source[neuron_index]->n_current_sources;
     if (n_current_sources_neuron > 0) {
         for (uint32_t n_cs=0; n_cs < n_current_sources_neuron; n_cs++) {
-            uint32_t cs_id = neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_id;
-            uint32_t cs_index = neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_index;
+            uint32_t cs_id =
+                    neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_id;
+            uint32_t cs_index =
+                    neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_index;
             // Now do the appropriate calculation based on the ID value
             #ifdef _CURRENT_SOURCE_DC_H_
             if (cs_id == 1) {  // DCSource
