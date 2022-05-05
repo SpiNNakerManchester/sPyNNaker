@@ -191,6 +191,9 @@ void c_main(void) {
             " expander params at 0x%08x",
             delay_params_address, params_address);
 
+    ds_regions->regions[DELAY_PARAMS].checksum = 0;
+    ds_regions->regions[DELAY_PARAMS].n_words = 0;
+
     // Run the expander
     if (!run_delay_expander(
             (address_t) delay_params_address, (address_t) params_address)) {

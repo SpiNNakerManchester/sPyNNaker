@@ -153,6 +153,9 @@ void read_in_addresses(void) {
     bit_field_base_address = data_specification_get_region(
             builder_data->bit_field_region_id, dsg_metadata);
 
+    dsg_metadata->regions[builder_data->bit_field_region_id].checksum = 0;
+    dsg_metadata->regions[builder_data->bit_field_region_id].n_words = 0;
+
     // fill in size zero in case population table never read in
     bit_field_base_address->n_filters = 0;
     direct_matrix_region_base_address = data_specification_get_region(
