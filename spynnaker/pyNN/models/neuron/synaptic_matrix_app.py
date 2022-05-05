@@ -85,7 +85,9 @@ class SynapticMatrixApp(object):
         # A cache of the received synaptic matrix
         "__received_block",
         # A cache of the received delayed synaptic matrix
-        "__delay_received_block"
+        "__delay_received_block",
+        # The number of rows in all generated blocks
+        "__gen_n_rows"
     ]
 
     def __init__(
@@ -153,6 +155,14 @@ class SynapticMatrixApp(object):
         # These are stored when blocks are read
         self.__received_block = None
         self.__delay_received_block = None
+        self.__gen_n_rows = 0
+
+    @property
+    def gen_size(self):
+        max_row_length = max(
+            self.__max_row_info.undelayed_max_bytes,
+            self.__max_row_info.delayed_max_bytes)
+        return max_row_length * self.__gen_n_rows
 
     def __get_matrix(self, m_vertex):
         """ Get or create a matrix object
@@ -456,6 +466,8 @@ class SynapticMatrixApp(object):
                           min(lo_atom + MAX_GENERATED_ATOMS - 1, max_atom))
                     for lo_atom in range(0, max_atom + 1, MAX_GENERATED_ATOMS)]
             for pre_slice in pre_slices:
+                self.__gen_n_rows += (
+                    pre_slice.n_atoms * (self.__app_edge.n_delay_stages + 1))
                 syn_addr, syn_mat_offset = self.__next_app_on_chip_address(
                     syn_addr, syn_max_addr, pre_slice)
                 del_addr, d_mat_offset = self.__next_app_delay_on_chip_address(
@@ -470,6 +482,9 @@ class SynapticMatrixApp(object):
         # generator
         for m_vertex in self.__m_vertices:
             matrix = self.__get_matrix(m_vertex)
+            self.__gen_n_rows += (
+                m_vertex.vertex_slice.n_atoms *
+                (self.__app_edge.n_delay_stages + 1))
             block_addr, syn_mat_offset = matrix.next_on_chip_address(
                 block_addr)
             block_addr, d_mat_offset = matrix.next_delay_on_chip_address(

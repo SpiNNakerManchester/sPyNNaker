@@ -28,6 +28,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
 from spinn_front_end_common.utilities.globals_variables import (
     report_default_directory)
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    get_estimated_sdram_for_bit_field_region)
 
 _THREE_WORDS = struct.Struct("<III")
 # bits in a word
@@ -138,7 +140,11 @@ class _OnChipBitFieldGenerator(object):
             "Finding cores where bitfields are to be generated")
 
         # get data
-        expander_cores = self._calculate_core_data(app_graph, progress)
+        expander_cores, max_bit_data_size = self._calculate_core_data(
+            app_graph, progress)
+
+        # Allow 1s per 8000 bits (=1000 bytes), minimum of 2 seconds
+        timeout = max(2.0, max_bit_data_size / 1000.0)
 
         # load data
         bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
@@ -152,7 +158,8 @@ class _OnChipBitFieldGenerator(object):
             executable_finder,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
-            "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
+            "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress,
+            timeout=timeout)
 
         # read in bit fields for debugging purposes
         if get_config_bool("Reports", "generate_bit_field_report"):
@@ -303,11 +310,19 @@ class _OnChipBitFieldGenerator(object):
 
         # bit field expander executable file path
         # locate verts which can have a synaptic matrix to begin with
+        max_bit_data_size = 0
         for app_vertex in progress.over(app_graph.vertices):
+            is_bit_fields = False
             for placement in self.__bitfield_placements(app_vertex):
                 self.__write_single_core_data(placement, expander_cores)
+                is_bit_fields = True
+            if is_bit_fields:
+                max_bit_data_size = max(
+                    max_bit_data_size,
+                    get_estimated_sdram_for_bit_field_region(
+                        app_vertex.incoming_projections))
 
-        return expander_cores
+        return expander_cores, max_bit_data_size
 
     def __write_single_core_data(self, placement, expander_cores):
         """
