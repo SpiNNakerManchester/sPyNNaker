@@ -41,7 +41,7 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.extra_algorithms import (
-    delay_support_adder, neuron_expander,
+    delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
     spynnaker_data_specification_writer,
     spynnaker_neuron_graph_network_specification_report)
@@ -53,7 +53,6 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
     finish_connection_holders)
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
-from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
 from spynnaker.pyNN.utilities import constants
 
 logger = FormatAdapter(logging.getLogger(__name__))

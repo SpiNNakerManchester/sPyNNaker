@@ -103,7 +103,9 @@ class SynapticMatrices(object):
         # The size of the bit field data to be allocated
         "__bit_field_size",
         # The bit field key map generated
-        "__bit_field_key_map"
+        "__bit_field_key_map",
+        # The maximum generated data, for calculating timeouts
+        "__max_gen_data"
     ]
 
     def __init__(
@@ -129,6 +131,23 @@ class SynapticMatrices(object):
         # Determine whether to generate on machine
         self.__gen_on_machine = False
         self.__data_generated = False
+        self.__max_gen_data = 0
+
+    @property
+    def max_gen_data(self):
+        """  The maximum amount of data to be generated for the synapses.
+
+        :rtype: int
+        """
+        return self.__max_gen_data
+
+    @property
+    def bit_field_size(self):
+        """ The size of the bit field data
+
+        :rtype: int
+        """
+        return self.__bit_field_size
 
     @property
     def host_generated_block_addr(self):
@@ -205,11 +224,13 @@ class SynapticMatrices(object):
         self.__host_generated_block_addr = block_addr
 
         # Now add the blocks on machine to keep these all together
+        self.__max_gen_data = 0
         for app_matrix in generate_on_machine:
             block_addr = app_matrix.reserve_matrices(block_addr, poptable)
             gen_data = app_matrix.get_generator_data()
             self.__generated_data_size += gen_data.size
             generated_data.extend(gen_data.gen_data)
+            self.__max_gen_data += app_matrix.gen_size
         if generated_data:
             self.__gen_on_machine = True
             self.__n_generated_matrices = len(generate_on_machine)

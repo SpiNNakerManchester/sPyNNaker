@@ -18,7 +18,6 @@ from spinn_utilities.abstract_base import abstractproperty
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
-    AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -34,7 +33,6 @@ from .synaptic_matrices import SynapseRegions, SYNAPSE_FIELDS
 
 class PopulationMachineSynapses(
         PopulationMachineSynapsesProvenance,
-        AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression,
         AbstractSynapseExpandable,
         HasSynapses, allow_derivation=True):
@@ -91,24 +89,12 @@ class PopulationMachineSynapses(
         """
         return SynapseRegions(*[None for _ in range(len(SYNAPSE_FIELDS))])
 
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+               bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               key_to_atom_map_region_base_address)
-    def key_to_atom_map_region_base_address(self, transceiver, placement):
-        return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_key_map)
-
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
-    def bit_field_builder_region(self, transceiver, placement):
-        return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_builder)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
@@ -243,3 +229,13 @@ class PopulationMachineSynapses(
         """
         return self._synaptic_matrices.get_connections_from_machine(
             transceiver, placement, app_edge, synapse_info, self._vertex_slice)
+
+    @property
+    @overrides(AbstractSynapseExpandable.max_gen_data)
+    def max_gen_data(self):
+        return self._synaptic_matrices.max_gen_data
+
+    @property
+    @overrides(AbstractSynapseExpandable.bit_field_size)
+    def bit_field_size(self):
+        return self._synaptic_matrices.bit_field_size
