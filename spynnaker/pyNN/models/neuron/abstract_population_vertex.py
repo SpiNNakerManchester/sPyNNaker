@@ -435,11 +435,15 @@ class AbstractPopulationVertex(
 
         # First part is the number of current sources
         sdram_usage = BYTES_PER_WORD
+
+        # Each neuron has a value to indicate how many current sources it has
+        sdram_usage += vertex_slice.n_atoms * BYTES_PER_WORD
+
         # Then everywhere there is a current source, add the usage for that
         for current_source, current_source_ids in zip(
                 current_sources, current_source_id_list):
             # Usage for list of IDs for this current source on this vertex
-            sdram_usage += (3 + len(current_source_ids)) * BYTES_PER_WORD
+            sdram_usage += (2 * len(current_source_ids)) * BYTES_PER_WORD
             # Usage for the parameters of the current source itself
             sdram_usage += current_source.get_sdram_usage_in_bytes()
 

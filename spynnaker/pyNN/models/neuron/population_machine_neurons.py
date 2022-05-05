@@ -253,28 +253,39 @@ class PopulationMachineNeurons(
         current_sources = sorted(
             current_sources, key=lambda x: x.current_source_id)
 
+        # Array to keep track of the number of each type of current source
+        # (there are four, but they are numbered 1 to 4, so need five elements)
         cs_index_array = [0, 0, 0, 0, 0]
+
+        # Data sent to the machine will be current sources per neuron
+        # This array will have the first entry indicating the number of
+        # sources for each neuron, then if this is non-zero, follow it with
+        # the IDs indicating the current source ID value, and then the index
+        # within that type of current source
+        neuron_current_sources = [[0] for n in range(lo_atom, hi_atom + 1)]
         for current_source in current_sources:
-            # Write the ID of the current source
+            # Get the ID of the current source
             cs_id = current_source.current_source_id
-            spec.write_value(cs_id)
 
-            spec.write_value(cs_index_array[cs_id])
-            cs_index_array[cs_id] += 1
-
-            # Only write IDs that are on this core
-            n_neuron_ids = 0
-            id_list = []
-            for n in range(lo_atom, hi_atom + 1):
+            # Only use IDs that are on this core
+            for n in range(0, hi_atom + 1 - lo_atom):
                 if (n in current_source_id_list[current_source]):
-                    id_list.append(n)
-                    n_neuron_ids += 1
+                    neuron_current_sources[n][0] += 1
+                    neuron_current_sources[n].append(cs_id)
+                    neuron_current_sources[n].append(cs_index_array[cs_id])
+                    cs_index_array[cs_id] += 1
 
-            spec.write_value(n_neuron_ids)
+        # Now loop over the neurons on this core and write the current source
+        # ID and index for sources attached to each neuron
+        for n in range(0, hi_atom + 1 - lo_atom):
+            n_current_sources = neuron_current_sources[n][0]
+            spec.write_value(n_current_sources)
+            if n_current_sources != 0:
+                for csid in range(n_current_sources * 2):
+                    spec.write_value(neuron_current_sources[n][csid+1])
 
-            for n in id_list:
-                spec.write_value(n - lo_atom)
-
+        # Now loop over the current sources and write the data required
+        # for each type of current source
         for current_source in current_sources:
             cs_data_types = current_source.get_parameter_types
             cs_id = current_source.current_source_id

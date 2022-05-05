@@ -154,7 +154,7 @@ bool neuron_initialise(
     }
 
     // Initialise for current sources
-    if (!current_source_initialise(cs_address)) {
+    if (!current_source_initialise(cs_address, n_neurons)) {
         return false;
     }
 
