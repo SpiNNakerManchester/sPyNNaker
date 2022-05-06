@@ -249,67 +249,69 @@ class PopulationMachineNeurons(
         # Write the number of sources
         spec.write_value(n_current_sources)
 
-        # Sort the current sources into current_source_id order
-        current_sources = sorted(
-            current_sources, key=lambda x: x.current_source_id)
+        # Don't write anything else if there are no current sources
+        if n_current_sources != 0:
+            # Sort the current sources into current_source_id order
+            current_sources = sorted(
+                current_sources, key=lambda x: x.current_source_id)
 
-        # Array to keep track of the number of each type of current source
-        # (there are four, but they are numbered 1 to 4, so need five elements)
-        cs_index_array = [0, 0, 0, 0, 0]
+            # Array to keep track of the number of each type of current source
+            # (there are four, but they are numbered 1 to 4, so five elements)
+            cs_index_array = [0, 0, 0, 0, 0]
 
-        # Data sent to the machine will be current sources per neuron
-        # This array will have the first entry indicating the number of
-        # sources for each neuron, then if this is non-zero, follow it with
-        # the IDs indicating the current source ID value, and then the index
-        # within that type of current source
-        neuron_current_sources = [[0] for n in range(lo_atom, hi_atom + 1)]
-        for current_source in current_sources:
-            # Get the ID of the current source
-            cs_id = current_source.current_source_id
+            # Data sent to the machine will be current sources per neuron
+            # This array will have the first entry indicating the number of
+            # sources for each neuron, then if this is non-zero, follow it with
+            # the IDs indicating the current source ID value, and then the
+            # index within that type of current source
+            neuron_current_sources = [[0] for n in range(lo_atom, hi_atom + 1)]
+            for current_source in current_sources:
+                # Get the ID of the current source
+                cs_id = current_source.current_source_id
 
-            # Only use IDs that are on this core
+                # Only use IDs that are on this core
+                for n in range(0, hi_atom + 1 - lo_atom):
+                    if (n in current_source_id_list[current_source]):
+                        neuron_current_sources[n][0] += 1
+                        neuron_current_sources[n].append(cs_id)
+                        neuron_current_sources[n].append(cs_index_array[cs_id])
+                        cs_index_array[cs_id] += 1
+
+            # Now loop over the neurons on this core and write the current
+            # source ID and index for sources attached to each neuron
             for n in range(0, hi_atom + 1 - lo_atom):
-                if (n in current_source_id_list[current_source]):
-                    neuron_current_sources[n][0] += 1
-                    neuron_current_sources[n].append(cs_id)
-                    neuron_current_sources[n].append(cs_index_array[cs_id])
-                    cs_index_array[cs_id] += 1
+                n_current_sources = neuron_current_sources[n][0]
+                spec.write_value(n_current_sources)
+                if n_current_sources != 0:
+                    for csid in range(n_current_sources * 2):
+                        spec.write_value(neuron_current_sources[n][csid+1])
 
-        # Now loop over the neurons on this core and write the current source
-        # ID and index for sources attached to each neuron
-        for n in range(0, hi_atom + 1 - lo_atom):
-            n_current_sources = neuron_current_sources[n][0]
-            spec.write_value(n_current_sources)
-            if n_current_sources != 0:
-                for csid in range(n_current_sources * 2):
-                    spec.write_value(neuron_current_sources[n][csid+1])
-
-        # Now loop over the current sources and write the data required
-        # for each type of current source
-        for current_source in current_sources:
-            cs_data_types = current_source.get_parameter_types
-            cs_id = current_source.current_source_id
-            for key, value in current_source.get_parameters.items():
-                # StepCurrentSource currently handled with arrays
-                if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
-                    n_params = len(current_source.get_parameters[key])
-                    spec.write_value(n_params)
-                    for n_p in range(n_params):
-                        value_convert = convert_to(
-                            value[n_p], cs_data_types[key]).view("uint32")
-                        spec.write_value(data=value_convert)
-                # All other sources have single-valued params
-                else:
-                    if hasattr(value, "__getitem__"):
-                        for m in range(len(value)):
+            # Now loop over the current sources and write the data required
+            # for each type of current source
+            for current_source in current_sources:
+                cs_data_types = current_source.get_parameter_types
+                cs_id = current_source.current_source_id
+                for key, value in current_source.get_parameters.items():
+                    # StepCurrentSource currently handled with arrays
+                    if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
+                        n_params = len(current_source.get_parameters[key])
+                        spec.write_value(n_params)
+                        for n_p in range(n_params):
                             value_convert = convert_to(
-                                value[m],
-                                cs_data_types[key]).view("uint32")
+                                value[n_p], cs_data_types[key]).view("uint32")
                             spec.write_value(data=value_convert)
+                    # All other sources have single-valued params
                     else:
-                        value_convert = convert_to(
-                            value, cs_data_types[key]).view("uint32")
-                        spec.write_value(data=value_convert)
+                        if hasattr(value, "__getitem__"):
+                            for m in range(len(value)):
+                                value_convert = convert_to(
+                                    value[m],
+                                    cs_data_types[key]).view("uint32")
+                                spec.write_value(data=value_convert)
+                        else:
+                            value_convert = convert_to(
+                                value, cs_data_types[key]).view("uint32")
+                            spec.write_value(data=value_convert)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(

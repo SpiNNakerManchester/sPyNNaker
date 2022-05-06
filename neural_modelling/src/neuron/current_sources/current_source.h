@@ -84,78 +84,83 @@ static bool current_source_initialise(address_t cs_address, uint32_t n_neurons) 
     // Read from cs_address; the first value is the number of current sources
     n_current_sources = cs_address[0];
 
-    neuron_current_source = spin1_malloc(n_neurons * sizeof(uint32_t*));
+    // Don't initialise if no current sources
+    if (n_current_sources != 0) {
 
-    // Loop over neurons and read in the current IDs and indices
-    uint32_t next = 1;
-    for (uint32_t n=0; n < n_neurons; n++) {
-        uint32_t n_sources = (uint32_t) cs_address[next];
-        uint32_t struct_size = (1 + (2 * n_sources)) * sizeof(uint32_t);
-        neuron_current_source[n] = spin1_malloc(struct_size);
-        spin1_memcpy(neuron_current_source[n], &cs_address[next], struct_size);
+		neuron_current_source = spin1_malloc(n_neurons * sizeof(uint32_t*));
 
-        if (n_sources > 0) {
-            // Still need to count source types...
-            for (uint32_t ncs=0; ncs < n_sources; ncs++) {
-                  if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 1) {
-                      n_dc_sources++;
-                  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 2) {
-                      n_ac_sources++;
-                  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 3) {
-                      n_step_sources++;
-                  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 4) {
-                      n_noisy_sources++;
-                  }
-            }
-        }
-        next += 1 + (n_sources * 2);
+		// Loop over neurons and read in the current IDs and indices
+		uint32_t next = 1;
+		for (uint32_t n=0; n < n_neurons; n++) {
+			uint32_t n_sources = (uint32_t) cs_address[next];
+			uint32_t struct_size = (1 + (2 * n_sources)) * sizeof(uint32_t);
+			neuron_current_source[n] = spin1_malloc(struct_size);
+			spin1_memcpy(neuron_current_source[n], &cs_address[next], struct_size);
 
-    }
+			if (n_sources > 0) {
+				// Still need to count source types...
+				for (uint32_t ncs=0; ncs < n_sources; ncs++) {
+					  if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 1) {
+						  n_dc_sources++;
+					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 2) {
+						  n_ac_sources++;
+					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 3) {
+						  n_step_sources++;
+					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 4) {
+						  n_noisy_sources++;
+					  }
+				}
+			}
+			next += 1 + (n_sources * 2);
 
-	// Now initialise separate sources
+		}
+
+		// Now initialise separate sources
 #ifdef _CURRENT_SOURCE_DC_H_
-	if (!current_source_dc_init(n_dc_sources, &next)) {
-		return false;
-	}
+		if (!current_source_dc_init(n_dc_sources, &next)) {
+			return false;
+		}
 #else
-	if (n_dc_sources > 0) {
-		log_error("DC current source is not supported for this build");
-		return false;
-	}
+		if (n_dc_sources > 0) {
+			log_error("DC current source is not supported for this build");
+			return false;
+		}
 #endif
 
 #ifdef _CURRENT_SOURCE_AC_H_
-	if (!current_source_ac_init(n_ac_sources, &next)) {
-		return false;
-	}
+		if (!current_source_ac_init(n_ac_sources, &next)) {
+			return false;
+		}
 #else
-	if (n_ac_sources > 0) {
-		log_error("AC current source is not supported for this build");
-		return false;
-	}
+		if (n_ac_sources > 0) {
+			log_error("AC current source is not supported for this build");
+			return false;
+		}
 #endif
 
 #ifdef _CURRENT_SOURCE_STEP_H_
-	if (!current_source_step_init(cs_address, n_step_sources, &next)) {
-		return false;
-	}
+		if (!current_source_step_init(cs_address, n_step_sources, &next)) {
+			return false;
+		}
 #else
-	if (n_step_sources > 0) {
-		log_error("Step current source is not supported for this build");
-		return false;
-	}
+		if (n_step_sources > 0) {
+			log_error("Step current source is not supported for this build");
+			return false;
+		}
 #endif
 
 #ifdef _CURRENT_SOURCE_NOISY_H_
-	if (!current_source_noisy_init(n_noisy_sources, &next)) {
-		return false;
-	}
+		if (!current_source_noisy_init(n_noisy_sources, &next)) {
+			return false;
+		}
 #else
-	if (n_noisy_sources > 0) {
-		log_error("Noisy current source is not supported for this build");
-		return false;
-	}
+		if (n_noisy_sources > 0) {
+			log_error("Noisy current source is not supported for this build");
+			return false;
+		}
 #endif
+
+    }
 
     return true;
 
@@ -177,31 +182,35 @@ static bool current_source_load_parameters(address_t cs_address) {
     // Read the number of current sources
     n_current_sources = cs_address[0];
 
-    uint32_t next = 1;
+    // Don't load if no current sources
+    if (n_current_sources != 0) {
+		uint32_t next = 1;
 
-    // Copy data into neuron_current_source array
-    for (uint32_t n=0; n < n_neurons_on_core; n++) {
-        uint32_t n_sources = (uint32_t) cs_address[next];
-        uint32_t struct_size = (1 + (2 * n_sources)) * sizeof(uint32_t);
-        neuron_current_source[n] = spin1_malloc(struct_size);
-        spin1_memcpy(neuron_current_source[n], &cs_address[next], struct_size);
+		// Copy data into neuron_current_source array
+		for (uint32_t n=0; n < n_neurons_on_core; n++) {
+			uint32_t n_sources = (uint32_t) cs_address[next];
+			uint32_t struct_size = (1 + (2 * n_sources)) * sizeof(uint32_t);
+			neuron_current_source[n] = spin1_malloc(struct_size);
+			spin1_memcpy(neuron_current_source[n], &cs_address[next], struct_size);
 
-        next += 1 + (n_sources * 2);
-    }
+			next += 1 + (n_sources * 2);
+		}
 
-    // Copy into individual source arrays
+		// Copy into individual source arrays
 #ifdef _CURRENT_SOURCE_DC_H_
-    current_source_dc_load_parameters(cs_address, n_dc_sources, &next);
+		current_source_dc_load_parameters(cs_address, n_dc_sources, &next);
 #endif
 #ifdef _CURRENT_SOURCE_AC_H_
-    current_source_ac_load_parameters(cs_address, n_ac_sources, &next);
+		current_source_ac_load_parameters(cs_address, n_ac_sources, &next);
 #endif
 #ifdef _CURRENT_SOURCE_STEP_H_
-    current_source_step_load_parameters(cs_address, n_step_sources, &next);
+		current_source_step_load_parameters(cs_address, n_step_sources, &next);
 #endif
 #ifdef _CURRENT_SOURCE_NOISY_H_
-    current_source_noisy_load_parameters(cs_address, n_noisy_sources, &next);
+		current_source_noisy_load_parameters(cs_address, n_noisy_sources, &next);
 #endif
+
+    }
 
     return true;
 
@@ -215,47 +224,48 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] neuron_index: The neuron index to calculate the value for
 //! \return True if successful
 static inline REAL current_source_get_offset(uint32_t time, uint32_t neuron_index) {
-    // Avoid the loops if no current sources
+    // Avoid the loops if no current sources defined
     #if !defined(_CURRENT_SOURCE_DC_H_) && !defined(_CURRENT_SOURCE_AC_H) && \
 		!defined(_CURRENT_SOURCE_STEP_H_) && !defined(_CURRENT_SOURCE_NOISY_H_)
     return ZERO;
     #else
 
-    // Could simply just have the different cases in here
-    // TODO: use an enum or something like that instead for the IDs
     REAL current_offset = ZERO;
 
-    uint32_t n_current_sources_neuron =
-            neuron_current_source[neuron_index]->n_current_sources;
-    if (n_current_sources_neuron > 0) {
-        for (uint32_t n_cs=0; n_cs < n_current_sources_neuron; n_cs++) {
-            uint32_t cs_id =
-                    neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_id;
-            uint32_t cs_index =
-                    neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_index;
-            // Now do the appropriate calculation based on the ID value
-            #ifdef _CURRENT_SOURCE_DC_H_
-            if (cs_id == 1) {  // DCSource
-                current_offset += current_source_dc_get_offset(cs_index, time);
-            }
-            #endif
-            #ifdef _CURRENT_SOURCE_AC_H_
-            if (cs_id == 2) {  // ACSource
-                current_offset += current_source_ac_get_offset(cs_index, time);
-            }
-            #endif
-            #ifdef _CURRENT_SOURCE_STEP_H_
-            if (cs_id == 3) {  // StepCurrentSource
-                current_offset += current_source_step_get_offset(cs_index, time);
-            }
-            #endif
-            #ifdef _CURRENT_SOURCE_NOISY_H_
-            if (cs_id == 4) {  // NoisyCurrentSource
-                current_offset += current_source_noisy_get_offset(cs_index, time);
-            }
-            #endif
-        }
+    // Also avoid the loop if no current sources set by user
+    if (n_current_sources != 0) {
+		uint32_t n_current_sources_neuron =
+				neuron_current_source[neuron_index]->n_current_sources;
+		if (n_current_sources_neuron > 0) {
+			for (uint32_t n_cs=0; n_cs < n_current_sources_neuron; n_cs++) {
+				uint32_t cs_id =
+						neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_id;
+				uint32_t cs_index =
+						neuron_current_source[neuron_index]->cs_id_index_list[n_cs].cs_index;
+				// Now do the appropriate calculation based on the ID value
+				#ifdef _CURRENT_SOURCE_DC_H_
+				if (cs_id == 1) {  // DCSource
+					current_offset += current_source_dc_get_offset(cs_index, time);
+				}
+				#endif
+				#ifdef _CURRENT_SOURCE_AC_H_
+				if (cs_id == 2) {  // ACSource
+					current_offset += current_source_ac_get_offset(cs_index, time);
+				}
+				#endif
+				#ifdef _CURRENT_SOURCE_STEP_H_
+				if (cs_id == 3) {  // StepCurrentSource
+					current_offset += current_source_step_get_offset(cs_index, time);
+				}
+				#endif
+				#ifdef _CURRENT_SOURCE_NOISY_H_
+				if (cs_id == 4) {  // NoisyCurrentSource
+					current_offset += current_source_noisy_get_offset(cs_index, time);
+				}
+				#endif
+			}
 
+		}
     }
 
 	return current_offset;
