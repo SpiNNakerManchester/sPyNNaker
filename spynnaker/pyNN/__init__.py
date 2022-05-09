@@ -77,6 +77,11 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import (
         RandomByWeightElimination)
 
+# local-only synapses
+from spynnaker.pyNN.models.neuron.local_only import (
+    LocalOnlyConvolution as Convolution,
+    LocalOnlyPoolDense as PoolDense)
+
 # neuron stuff
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.neuron.builds.if_cond_exp_base import (
@@ -138,6 +143,8 @@ __all__ = [
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
     'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
     'SmallWorldConnector', 'ConvolutionConnector', 'PoolDenseConnector',
+    # Local-only
+    'Convolution', 'PoolDense',
     # synapse structures
     'StaticSynapse',
     # plastic stuff
