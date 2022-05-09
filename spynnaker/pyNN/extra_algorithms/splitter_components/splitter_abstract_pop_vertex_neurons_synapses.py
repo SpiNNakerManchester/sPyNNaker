@@ -271,11 +271,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 chip_counter.add_core(poisson_vertex.resources_required)
 
             # Create an SDRAM edge partition
-            sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
-                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             source_vertices = added_poisson_vertices + synapse_vertices
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
-                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, source_vertices)
+                SYNAPSE_SDRAM_PARTITION_ID, source_vertices)
             self.__sdram_partitions.append(sdram_partition)
             neuron_vertex.set_sdram_partition(sdram_partition)
 
