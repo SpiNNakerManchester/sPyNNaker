@@ -277,11 +277,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 chip_counter.add_core(poisson_vertex.resources_required)
 
             # Create an SDRAM edge partition
-            sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
-                label, vertex_slice.lo_atom, vertex_slice.hi_atom)
             source_vertices = added_poisson_vertices + synapse_vertices
             sdram_partition = SourceSegmentedSDRAMMachinePartition(
-                SYNAPSE_SDRAM_PARTITION_ID, sdram_label, source_vertices)
+                SYNAPSE_SDRAM_PARTITION_ID, source_vertices)
             self.__sdram_partitions.append(sdram_partition)
             neuron_vertex.set_sdram_partition(sdram_partition)
 
@@ -290,8 +288,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 edge_label = "SDRAM {}-->{}".format(
                     source_vertex.label, neuron_vertex.label)
                 sdram_partition.add_edge(
-                    SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label),
-                    None)
+                    SDRAMMachineEdge(source_vertex, neuron_vertex, edge_label))
                 source_vertex.set_sdram_partition(sdram_partition)
 
             all_vertices = list(source_vertices)
@@ -426,7 +423,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         if feedback_partition is not None:
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            feedback_partition.add_edge(neuron_to_synapse_edge, None)
+            feedback_partition.add_edge(neuron_to_synapse_edge)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
 
     def __add_plastic_feedback(self, neuron_vertex, synapse_vertex):
@@ -450,7 +447,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             feedback_partition = MulticastEdgePartition(
                 neuron_vertex, SPIKE_PARTITION_ID)
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            feedback_partition.add_edge(neuron_to_synapse_edge, None)
+            feedback_partition.add_edge(neuron_to_synapse_edge)
             self.__multicast_partitions.append(feedback_partition)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
             return feedback_partition
