@@ -48,7 +48,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedProbabilityConnector,
     FromFileConnector, FromListConnector, IndexBasedProbabilityConnector,
     KernelConnector, MultapseConnector as FixedTotalNumberConnector,
-    OneToOneConnector, SmallWorldConnector)
+    OneToOneConnector, SmallWorldConnector, ConvolutionConnector,
+    PoolDenseConnector)
 # synapse structures
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic as StaticSynapse)
@@ -136,7 +137,7 @@ __all__ = [
     'FixedNumberPreConnector', 'FixedProbabilityConnector',
     'FromFileConnector', 'FromListConnector', 'IndexBasedProbabilityConnector',
     'FixedTotalNumberConnector', 'KernelConnector', 'OneToOneConnector',
-    'SmallWorldConnector',
+    'SmallWorldConnector', 'ConvolutionConnector', 'PoolDenseConnector',
     # synapse structures
     'StaticSynapse',
     # plastic stuff
