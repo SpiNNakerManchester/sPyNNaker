@@ -51,8 +51,11 @@ def synapse_expander(
     delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER_APLX)
 
     # Find the places where the synapse expander and delay receivers should run
-    expander_cores, expanded_pop_vertices = _plan_expansion(
+    expander_cores, expanded_pop_vertices, max_data = _plan_expansion(
         placements, synapse_bin, delay_bin, transceiver)
+
+    # Allow 1 seconds per ~1000 synapses, with minimum of 2 seconds
+    timeout = max(2.0, max_data / 1000.0)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Synapses")
@@ -61,7 +64,7 @@ def synapse_expander(
         expander_cores, expander_app_id, transceiver, executable_finder,
         extract_iobuf, None, [CPUState.FINISHED], False,
         "synapse_expander_on_{}_{}_{}.txt", progress_bar=progress,
-        logger=logger)
+        logger=logger, timeout=timeout)
     progress.end()
     _fill_in_connection_data(expanded_pop_vertices, transceiver)
 
@@ -82,6 +85,8 @@ def _plan_expansion(
     expander_cores = ExecutableTargets()
     expanded_pop_vertices = list()
 
+    max_data = 0
+
     progress = ProgressBar(len(placements), "Preparing to Expand Synapses")
     for placement in progress.over(placements):
         # Add all machine vertices of the population vertex to ones
@@ -98,6 +103,7 @@ def _plan_expansion(
                 write_address_to_user1(
                     transceiver, placement.x, placement.y, placement.p,
                     vertex.connection_generator_region)
+                max_data = max(max_data, vertex.max_gen_data)
 
         elif isinstance(vertex, DelayExtensionMachineVertex):
             if vertex.gen_on_machine():
@@ -106,7 +112,7 @@ def _plan_expansion(
                     placement.x, placement.y, placement.p,
                     executable_type=ExecutableType.SYSTEM)
 
-    return expander_cores, expanded_pop_vertices
+    return expander_cores, expanded_pop_vertices, max_data
 
 
 def _fill_in_connection_data(expanded_pop_vertices, transceiver):
