@@ -14,12 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import platform
 import select
 import socket
-import subprocess
 from spinn_utilities.log import FormatAdapter
 from spinnman.connections.abstract_classes import Listenable, Connection
+from spinnman.connections.udp_packet_connections.utils import (
+    connect_socket, get_socket_address, ping, resolve_host)
 from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
 
@@ -71,33 +71,17 @@ class PushBotWIFIConnection(Connection, Listenable):
         self.__remote_port = int(remote_port)
 
         # Get the host to connect to
-        self.__remote_ip_address = socket.gethostbyname(remote_host)
+        self.__remote_ip_address = resolve_host(remote_host)
 
-        try:
-            logger.info("Trying to connect to the PushBot via Wi-Fi")
-            # Connect the socket
-            self.__socket.connect(
-                (self.__remote_ip_address, self.__remote_port))
-            logger.info("Succeeded in connecting to PushBot via Wi-Fi")
-
-        except Exception as e:
-            raise SpinnmanIOException(
-                "Error binding socket to {}:{}: {}".format(
-                    self.__remote_ip_address, self.__remote_port, e)) from e
+        logger.info("Trying to connect to the PushBot via Wi-Fi")
+        # Connect the socket
+        connect_socket(
+            self.__socket, self.__remote_ip_address, self.__remote_port)
+        logger.info("Succeeded in connecting to PushBot via Wi-Fi")
 
         # Get the details of where the socket is connected
-        try:
-            self.__local_ip_address, self.__local_port =\
-                self.__socket.getsockname()
-
-            # Ensure that a standard address is used for the INADDR_ANY
-            # hostname
-            if (self.__local_ip_address is None
-                    or self.__local_ip_address == ""):
-                self.__local_ip_address = "0.0.0.0"
-        except Exception as e:
-            raise SpinnmanIOException(
-                "Error querying socket: {}".format(e)) from e
+        self.__local_ip_address, self.__local_port = get_socket_address(
+            self.__socket)
 
         # Set a general timeout on the socket
         self.__socket.settimeout(0)
@@ -106,19 +90,10 @@ class PushBotWIFIConnection(Connection, Listenable):
         """ See\
             :py:meth:`~spinnman.connections.Connection.is_connected`
         """
-        if platform.platform().lower().startswith("windows"):
-            cmd_args = "-n 1 -w 1"
-        else:
-            cmd_args = "-c 1 -W 1"
-
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...
-            # Start a ping process
-            process = subprocess.Popen(
-                "ping " + cmd_args + " " + self.__remote_ip_address,
-                shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            if process.returncode == 0:
+            # ping the remote address
+            if ping(self.__remote_ip_address).returncode == 0:
                 # ping worked
                 return True
 
