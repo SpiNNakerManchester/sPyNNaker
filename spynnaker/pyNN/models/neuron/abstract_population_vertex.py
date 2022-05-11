@@ -269,6 +269,7 @@ class AbstractPopulationVertex(
         """
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
+        self.__max_row_info.clear()
         self.__incoming_projections.append(projection)
         if projection._projection_edge.pre_vertex == self:
             self.__self_projection = projection
