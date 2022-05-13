@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_front_end_common.utilities.utility_objs.live_packet_gather_parameters import LivePacketGatherParameters
 
 """
 This contains functions and classes for handling external devices such as the
@@ -214,13 +215,14 @@ def EthernetControlPopulation(
         Plugins.add_database_socket_address(
             ethernet_command_connection.local_ip_address,
             ethernet_command_connection.local_port, database_ack_port_num)
-    Plugins.update_live_packet_gather_tracker(
-        vertex, live_packet_gather_label,
+    params = LivePacketGatherParameters(
         port=__ethernet_control_connection.local_port,
         hostname=__ethernet_control_connection.local_ip_address,
         message_type=EIEIOType.KEY_PAYLOAD_32_BIT,
         payload_as_time_stamps=False, use_payload_prefix=False,
-        partition_ids=vertex.get_outgoing_partition_ids())
+        label=live_packet_gather_label)
+    Plugins.update_live_packet_gather_tracker(
+        vertex, params, vertex.get_outgoing_partition_ids())
     return population
 
 

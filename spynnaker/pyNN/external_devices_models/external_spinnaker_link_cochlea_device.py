@@ -14,12 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 
 
-class ExternalCochleaDevice(
-        ApplicationSpiNNakerLinkVertex, ProvidesKeyToAtomMappingImpl):
+class ExternalCochleaDevice(ApplicationSpiNNakerLinkVertex):
     __slots__ = []
 
     def __init__(
