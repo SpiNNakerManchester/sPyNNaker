@@ -50,6 +50,8 @@ from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID)
 
 
 def _flatten(alist):
@@ -519,14 +521,10 @@ class SpikeSourcePoissonMachineVertex(
         # Write the incoming mask if there is one
         incoming_mask = 0
         if self._app_vertex.incoming_control_edge is not None:
-            in_edges = self._app_vertex.incoming_control_edge.machine_edges
-            for in_edge in in_edges:
-                if in_edge.post_vertex == self:
-                    # Get the mask of the incoming keys
-                    incoming_mask = routing_info.get_routing_info_for_edge(
-                        in_edge).first_mask
-                    incoming_mask = ~incoming_mask & 0xFFFFFFFF
-                    break
+            r_info = routing_info.get_routing_info_from_pre_vertex(
+                self._app_vertex.incoming_control_edge.pre_vertex,
+                LIVE_POISSON_CONTROL_PARTITION_ID)
+            incoming_mask = ~r_info.first_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)
