@@ -21,6 +21,7 @@ from spinn_front_end_common.utilities.globals_variables import (
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -53,7 +54,7 @@ class SpikeInjectorVertex(
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints,
-            enable_injection=True,
+            injection_partition_id=SPIKE_PARTITION_ID,
             splitter=splitter)
 
         # Set up for recording

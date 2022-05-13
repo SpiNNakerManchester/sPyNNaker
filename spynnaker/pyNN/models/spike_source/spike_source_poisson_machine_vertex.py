@@ -28,7 +28,7 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
@@ -105,7 +105,7 @@ _FOUR_WORDS = struct.Struct("<4I")
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
         SendsSynapticInputsOverSDRAM):
@@ -214,12 +214,6 @@ class SpikeSourcePoissonMachineVertex(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
-
-    @property
-    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
-    def is_in_injection_mode(self):
-        # pylint: disable=no-value-for-parameter
-        return self._app_vertex.incoming_control_edge is not None
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
