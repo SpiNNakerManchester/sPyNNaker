@@ -16,13 +16,9 @@
 from collections import defaultdict
 import math
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.utilities.constants import (
     BITS_PER_WORD, BYTES_PER_WORD)
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
@@ -36,8 +32,7 @@ _DELAY_PARAM_HEADER_WORDS = 8
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractHasDelayStages,
-        AbstractProvidesOutgoingPartitionConstraints):
+        TDMAAwareApplicationVertex, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -193,11 +188,6 @@ class DelayExtensionVertex(
                 pre_slices, post_slices,
                 pre_vertex_slice, post_vertex_slice,
                 synapse_information, max_stage, max_delay_per_stage))
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
 
     def gen_on_machine(self, vertex_slice):
         """ Determine if the given slice needs to be generated on the machine

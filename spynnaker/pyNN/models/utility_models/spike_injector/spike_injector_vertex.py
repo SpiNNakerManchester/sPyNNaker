@@ -16,10 +16,6 @@
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utilities.globals_variables import (
     machine_time_step)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
@@ -31,7 +27,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 class SpikeInjectorVertex(
         ReverseIpTagMultiCastSource, SimplePopulationSettable,
-        AbstractProvidesOutgoingPartitionConstraints, AbstractSpikeRecordable):
+        AbstractSpikeRecordable):
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
@@ -116,13 +112,6 @@ class SpikeInjectorVertex(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID)
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        constraints = super().get_outgoing_partition_constraints(partition)
-        constraints.append(ContiguousKeyRangeContraint())
-        return constraints
 
     def describe(self):
         """
