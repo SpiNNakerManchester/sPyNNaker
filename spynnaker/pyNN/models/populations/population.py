@@ -428,7 +428,9 @@ class Population(PopulationBase):
             spikes = self._recorder.get_spikes()
             if view_indexes is None:
                 return spikes
-            return spikes[numpy.isin(spikes[:,0], view_indexes)]
+            return spikes[numpy.isin(spikes[:, 0], view_indexes)]
+        return self._recorder.get_recorded_pynn7(
+            variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
     def get_spike_counts(self, gather=True):
