@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_front_end_common.utilities.utility_objs.live_packet_gather_parameters import LivePacketGatherParameters
-
 """
 This contains functions and classes for handling external devices such as the
 PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
@@ -29,6 +27,8 @@ from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.utility_objs import (
+    LivePacketGatherParameters)
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
@@ -58,6 +58,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
+
 
 # useful functions
 add_database_socket_address = Plugins.add_database_socket_address

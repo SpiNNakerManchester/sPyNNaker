@@ -88,22 +88,22 @@ class ExternalFPGARetinaDevice(
         :param str board_address:
         """
         # pylint: disable=too-many-arguments
+        fixed_n_neurons = self.get_n_neurons(mode, polarity)
+        super().__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+            label=label, max_atoms_per_core=fixed_n_neurons,
+            board_address=board_address)
+
         self.__polarity = polarity
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:
             self.__fixed_key |= 0x4000
 
-        fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self.__fixed_mask = self._get_mask(mode)
 
         self.add_constraint(FixedKeyAndMaskConstraint([
             BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
-
-        super().__init__(
-            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            label=label, max_atoms_per_core=fixed_n_neurons,
-            board_address=board_address)
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:

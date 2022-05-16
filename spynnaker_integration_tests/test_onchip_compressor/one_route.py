@@ -50,12 +50,7 @@ def do_one_run():
                     n_boards)) from oops
         raise oops
     target_x, target_y = find_good_chip(machine, n_target)
-    sources = []
-    for s in range(n_source):
-        sources.append(sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
-            additional_parameters={
-                "splitter": SplitterAbstractPopulationVertexFixed()}))
+
     targets = []
     for t in range(n_target):
         pop = sim.Population(
@@ -64,6 +59,13 @@ def do_one_run():
                 "splitter": SplitterAbstractPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
         targets.append(pop)
+
+    sources = []
+    for s in range(n_source):
+        sources.append(sim.Population(
+            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
+            additional_parameters={
+                "splitter": SplitterAbstractPopulationVertexFixed()}))
 
     for s in range(n_source):
         for t in range(n_target):

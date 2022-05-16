@@ -111,13 +111,13 @@ class MunichRetinaDevice(
                 "The external Retina does not recognise this position")
         self.__is_right = position == self.RIGHT_RETINA
 
-        self.add_constraint(FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
-
         super().__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)
+
+        self.add_constraint(FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
