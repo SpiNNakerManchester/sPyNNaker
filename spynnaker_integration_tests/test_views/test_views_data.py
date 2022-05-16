@@ -109,7 +109,7 @@ class TestViews(BaseTestCase):
             d = v2viewmatrix[:, i]
             assert (len(a) == len(b))
             for j in range(len(a)):
-                assert (a[j] == b[j] == c[j], d[j])
+                assert (a[j] == b[j] == c[j] == d[j])
 
         assert (numpy.array_equal(v2allconvert, v2alltuple))
         assert (numpy.array_equal(v2allconvert, v2viewtuple))
