@@ -208,7 +208,7 @@ def test_run(x, y, b):
         with tempfile.TemporaryDirectory(
                 prefix=f"{x}_{y}_{b}", dir=tmp_dir) as tmpdir:
             os.chdir(tmpdir)
-            with open("spynnaker.cfg", "w") as f:
+            with open("spynnaker.cfg", "w", encoding="utf-8") as f:
                 f.write("[Machine]\n")
                 f.write("spalloc_server = None\n")
                 f.write(f"machine_name = {job.hostname}\n")

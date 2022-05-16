@@ -225,6 +225,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return words
 
     def get_synapse_id_by_target(self, target):
+        # pylint:disable=unused-argument
         """ Get the index of the synapse type based on the name, or None
             if the name is not found.
 

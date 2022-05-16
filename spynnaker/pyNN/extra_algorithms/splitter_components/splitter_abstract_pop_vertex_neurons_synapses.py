@@ -248,11 +248,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     max_crs -= 1
 
             if remaining_poisson_vertices:
-                logger.warn(
-                    f"Vertex {label} is using multicast for"
-                    f" {len(remaining_poisson_vertices)} one-to-one Poisson"
+                logger.warning(
+                    "Vertex {} is using multicast for"
+                    " {} one-to-one Poisson"
                     " sources as not enough cores exist to put them on the"
-                    " same chip")
+                    " same chip", label, len(remaining_poisson_vertices))
 
             # Create an SDRAM edge partition
             sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(

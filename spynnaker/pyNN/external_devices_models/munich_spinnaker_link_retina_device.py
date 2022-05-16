@@ -49,9 +49,7 @@ class MunichRetinaDevice(
     """
     __slots__ = [
         "__fixed_key",
-        "__fixed_mask",
-        "__polarity",
-        "__is_right"]
+        "__fixed_mask"]
 
     # key codes for the robot retina
     _MANAGEMENT_BIT = 0x400
@@ -110,7 +108,6 @@ class MunichRetinaDevice(
             fixed_n_neurons = 128 * 128
             self.__fixed_mask = 0xFFFFC000
 
-        self.__polarity = polarity
         if position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this position")
