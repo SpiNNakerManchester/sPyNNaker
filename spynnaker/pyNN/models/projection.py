@@ -443,7 +443,8 @@ class Projection(object):
         """
         # Find edges ending at the postsynaptic vertex
         partitions = get_simulator().original_application_graph.\
-            get_outgoing_edge_partitions_starting_at_vertex(pre_synaptic_vertex)
+            get_outgoing_edge_partitions_starting_at_vertex(
+            pre_synaptic_vertex)
 
         # Partitions and Partition.edges will be OrderedSet but may be empty
         for partition in partitions:
