@@ -264,7 +264,6 @@ class SpikeSourcePoissonVertex(
         elif max_rate is None:
             self.__max_rate = 0
 
-
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
 
