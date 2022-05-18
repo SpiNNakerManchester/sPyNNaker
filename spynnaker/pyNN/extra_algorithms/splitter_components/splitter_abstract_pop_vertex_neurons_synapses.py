@@ -140,10 +140,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__slices = None
         self.__next_synapse_index = 0
 
-        if (self.__max_delay is not None and
-                self.__allow_delay_extension is None):
-            self.__allow_delay_extension = True
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
@@ -171,13 +167,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
-                get_n_bits(self.__get_max_delay)) > MAX_RING_BUFFER_BITS:
+                get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
                 "The combination of the number of neurons per core ({}), "
                 "the number of synapse types ({}), and the maximum delay per "
                 "core ({}) will require too much DTCM.  Please reduce one or "
                 "more of these values.".format(
-                    atoms_per_core, n_synapse_types, self.__get_max_delay))
+                    atoms_per_core, n_synapse_types, self.max_support_delay()))
 
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
@@ -767,11 +763,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 BYTES_PER_WORD))
         return sdram
 
-    @property
-    def __get_max_delay(self):
-        if self.__max_delay is not None:
-            return self.__max_delay
-
+    def __update_max_delay(self):
         # Find the maximum delay from incoming synapses
         app_vertex = self._governed_app_vertex
         max_delay_ms = 0
@@ -793,16 +785,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Pick the smallest between the two, so that not too many bits are used
         final_n_delay_bits = min(n_delay_bits, max_delay_bits)
         self.__max_delay = 2 ** final_n_delay_bits
-        if self.__allow_delay_extension is None:
-            self.__allow_delay_extension = max_delay_bits > final_n_delay_bits
-        return self.__max_delay
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
-        return self.__get_max_delay
+        if self.__max_delay is None:
+            self.__update_max_delay()
+        return self.__max_delay
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self):
         if self.__allow_delay_extension is None:
-            self.__get_max_delay
+            self.__update_max_delay()
         return self.__allow_delay_extension
