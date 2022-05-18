@@ -92,8 +92,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__max_delay",
         # The user-set maximum delay, for reset
         "__user_max_delay",
-        # Whether to allow delay extensions to be created
-        "__allow_delay_extension",
+        # Whether you expect delay extensions to be asked to be created
+        "__expect_delay_extension",
         # The user-set allowing of delay extensions
         "__user_allow_delay_extension",
         # The fixed slices the vertices are divided into
@@ -135,8 +135,15 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
         self.__user_max_delay = max_delay
-        self.__allow_delay_extension = allow_delay_extension
         self.__user_allow_delay_extension = allow_delay_extension
+        if max_delay is None:
+            # to be calcutaed by __update_max_delay
+            self.__expect_delay_extension = None
+        else:
+            # The user may ask for the delay even if then told no
+            self.__expect_delay_extension = True
+            if allow_delay_extension is None:
+                self.__user_allow_delay_extension = True
         self.__slices = None
         self.__next_synapse_index = 0
 
@@ -595,7 +602,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices = None
         self.__synapse_verts_by_neuron = None
         self.__max_delay = self.__user_max_delay
-        self.__allow_delay_extension = self.__user_allow_delay_extension
+        if self.__user_max_delay is None:
+            # to be calcutaed by __update_max_delay
+            self.__expect_delay_extension = None
+        else:
+            self.__expect_delay_extension = True
 
     @property
     def n_synapse_vertices(self):
@@ -785,8 +796,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Pick the smallest between the two, so that not too many bits are used
         final_n_delay_bits = min(n_delay_bits, max_delay_bits)
         self.__max_delay = 2 ** final_n_delay_bits
-        if self.__allow_delay_extension is None:
-            self.__allow_delay_extension = max_delay_bits > final_n_delay_bits
+        if self.__user_allow_delay_extension is None:
+            self.__expect_delay_extension = max_delay_bits > final_n_delay_bits
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
@@ -796,6 +807,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self):
-        if self.__allow_delay_extension is None:
-            self.__update_max_delay()
-        return self.__allow_delay_extension
+        if self.__user_allow_delay_extension is None:
+            if self.__expect_delay_extension is None:
+                self.__update_max_delay()
+            if self.__expect_delay_extension:
+                return True
+            raise NotImplementedError(
+                "This call was unexpected as it was calculated that "
+                "the max needed delay was lesss that the max possible")
+        else:
+            return self.__user_allow_delay_extension
