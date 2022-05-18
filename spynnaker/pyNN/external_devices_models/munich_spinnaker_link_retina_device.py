@@ -49,7 +49,8 @@ class MunichRetinaDevice(
     """
     __slots__ = [
         "__fixed_key",
-        "__fixed_mask"]
+        "__fixed_mask",
+        "__is_right"]
 
     # key codes for the robot retina
     _MANAGEMENT_BIT = 0x400
