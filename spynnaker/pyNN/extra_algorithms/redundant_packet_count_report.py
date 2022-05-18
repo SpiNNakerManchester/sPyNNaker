@@ -98,8 +98,8 @@ def _create_views():
 def _write_report(output):
     reader = ProvenanceReader()
     for data in reader.run_query("select * from redundancy_by_core"):
-        (x, y, p, source, received, filtered, invalid, failed,
-            redundant, total, percent) = data
+        (_, _, _, source, _, filtered, invalid, _,
+         redundant, total, percent) = data
         output.write(f"\ncore {source} \n")
         output.write(f"    {total} packets received. \n")
         output.write(f"    {redundant} were detected as "

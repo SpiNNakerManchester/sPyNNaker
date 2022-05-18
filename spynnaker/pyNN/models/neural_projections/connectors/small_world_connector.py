@@ -68,6 +68,7 @@ class SmallWorldConnector(AbstractConnector):
         super().__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
+        # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
 
         if n_connections is not None:

@@ -249,8 +249,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
             if remaining_poisson_vertices:
                 logger.warning(
-                    "Vertex {} is using multicast for"
-                    " {} one-to-one Poisson"
+                    "Vertex {} is using multicast for {} one-to-one Poisson"
                     " sources as not enough cores exist to put them on the"
                     " same chip", label, len(remaining_poisson_vertices))
 
