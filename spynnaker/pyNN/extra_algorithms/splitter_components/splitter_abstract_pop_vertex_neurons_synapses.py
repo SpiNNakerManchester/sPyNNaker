@@ -785,6 +785,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Pick the smallest between the two, so that not too many bits are used
         final_n_delay_bits = min(n_delay_bits, max_delay_bits)
         self.__max_delay = 2 ** final_n_delay_bits
+        if self.__allow_delay_extension is None:
+            self.__allow_delay_extension = max_delay_bits > final_n_delay_bits
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
