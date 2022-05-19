@@ -223,22 +223,45 @@
                     <span class="s2">&quot;conductance from a model which does not use conductance &quot;</span>
                     <span class="s2">&quot;input. You will receive current measurements instead.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Recorder.get_recorded_pynn7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_pynn7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="Recorder.get_recorded_pynn7"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_pynn7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
 
 <span class="sd">        :param str variable:</span>
 <span class="sd">            The name of the variable to get. Supported variable names are:</span>
 <span class="sd">            ``gsyn_exc``, ``gsyn_inh``, ``v``</span>
+<span class="sd">        :param bool as_matrix: If set True the data is returned as a 2d matrix</span>
+<span class="sd">        :param view_indexes: The indexes for which data should be returned.</span>
+<span class="sd">            If ``None``, all data (view_index = data_indexes)</span>
+<span class="sd">        :type view_indexes: list(int) or None</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SPIKES</span><span class="p">,</span> <span class="n">REWIRING</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
         <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">view_indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELECTIVE_RECORDED_MSG</span><span class="p">)</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="n">ids</span>
+        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="n">ids</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># keep just the view indexes in the data</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">view_indexes</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
+            <span class="c1"># keep just data columns in the view</span>
+            <span class="n">map_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">map_indexes</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="c1"># Convert to triples as Pynn 0,7 did</span>
         <span class="n">n_machine_time_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+        <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
         <span class="n">column_length</span> <span class="o">=</span> <span class="n">n_machine_time_steps</span> <span class="o">*</span> <span class="n">n_neurons</span>
         <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">sampling_interval</span>
                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">indexes</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">),</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">column_length</span><span class="p">)))</span></div>
 
@@ -294,7 +317,7 @@
 
         <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Recorder.get_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Recorder.get_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; How to get spikes (of a population&#39;s neurons) from the recorder.</span>
 
 <span class="sd">        :return: the spikes (event times) from the underlying vertex</span>

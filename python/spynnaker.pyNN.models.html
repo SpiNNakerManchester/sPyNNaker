@@ -624,12 +624,17 @@ are calculated automatically.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7">
-<span class="sig-name descname"><span class="pre">get_recorded_pynn7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_recorded_pynn7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_recorded_pynn7</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_recorded_pynn7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_recorded_pynn7" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get recorded data in PyNN 0.7 format. Must not be spikes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get. Supported variable names are:
-<code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code></p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The name of the variable to get. Supported variable names are:
+<code class="docutils literal notranslate"><span class="pre">gsyn_exc</span></code>, <code class="docutils literal notranslate"><span class="pre">gsyn_inh</span></code>, <code class="docutils literal notranslate"><span class="pre">v</span></code></p></li>
+<li><p><strong>as_matrix</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If set True the data is returned as a 2d matrix</p></li>
+<li><p><strong>view_indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The indexes for which data should be returned.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all data (view_index = data_indexes)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -639,7 +644,7 @@ are calculated automatically.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.recorder.Recorder.get_spikes">
-<span class="sig-name descname"><span class="pre">get_spikes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_spikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recorder.html#Recorder.get_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.recorder.Recorder.get_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>How to get spikes (of a population’s neurons) from the recorder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>

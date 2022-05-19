@@ -441,30 +441,35 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">extract_neo_block</span><span class="p">(</span>
             <span class="n">variables</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">,</span> <span class="n">annotations</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Population.spinnaker_get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.spinnaker_get_data">[docs]</a>    <span class="k">def</span> <span class="nf">spinnaker_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="Population.spinnaker_get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.spinnaker_get_data">[docs]</a>    <span class="k">def</span> <span class="nf">spinnaker_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Public accessor for getting data as a numpy array, instead of\</span>
 <span class="sd">            the neo based object</span>
 
-<span class="sd">        :param variable:</span>
-<span class="sd">            either a single variable name or a list of variable names.</span>
-<span class="sd">            Variables must have been previously recorded, otherwise an</span>
-<span class="sd">            Exception will be raised.</span>
+<span class="sd">        :param str variable: a single variable name.</span>
 <span class="sd">        :type variable: str or list(str)</span>
+<span class="sd">        :param bool as_matrix: If set True the data is returned as a 2d matrix</span>
+<span class="sd">        :param view_indexes: The indexes for which data should be returned.</span>
+<span class="sd">            If ``None``, all data (view_index = data_indexes)</span>
 <span class="sd">        :return: array of the data</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">warn_once</span><span class="p">(</span>
             <span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;spinnaker_get_data is non-standard PyNN and therefore &quot;</span>
-            <span class="s2">&quot;may not be portable to other simulators. Nor do we guarantee &quot;</span>
-            <span class="s2">&quot;that this function will exist in future releases.&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;will not be portable to other simulators.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                     <span class="s2">&quot;Only one type of data at a time is supported&quot;</span><span class="p">)</span>
             <span class="n">variable</span> <span class="o">=</span> <span class="n">variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_recorded_pynn7</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ignoring as matrix for </span><span class="si">{</span><span class="n">SPIKES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">spikes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">view_indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">spikes</span>
+            <span class="k">return</span> <span class="n">spikes</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">view_indexes</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span><span class="o">.</span><span class="n">get_recorded_pynn7</span><span class="p">(</span>
+            <span class="n">variable</span><span class="p">,</span> <span class="n">as_matrix</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Population.get_spike_counts"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.get_spike_counts">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">PopulationBase</span><span class="o">.</span><span class="n">get_spike_counts</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_spike_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
