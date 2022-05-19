@@ -41,6 +41,9 @@ enum send_type {
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include "tdma_processing.h"
 
+#include <neuron/current_sources/current_source_impl.h>
+#include <neuron/current_sources/current_source.h>
+
 // Further includes
 #include <debug.h>
 
@@ -401,6 +404,9 @@ static void neuron_impl_do_timestep_update(
             input_type_convert_inhibitory_input_to_current(
                     inh_input_values, input_types, soma_voltage);
 
+            // Get any input from an injected current source
+            REAL current_offset = current_source_get_offset(time, neuron_index);
+
             uint32_t external_bias = additional_input_get_input_value_as_current(
                     additional_inputs, soma_voltage);
 
@@ -408,7 +414,7 @@ static void neuron_impl_do_timestep_update(
             state_t result = neuron_model_state_update(
                     NUM_EXCITATORY_RECEPTORS, exc_input_values,
                     NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    external_bias, this_neuron);
+                    external_bias, current_offset, this_neuron);
 
             // determine if a packet should fly
             will_fire = _test_will_fire(the_packet_firing);
