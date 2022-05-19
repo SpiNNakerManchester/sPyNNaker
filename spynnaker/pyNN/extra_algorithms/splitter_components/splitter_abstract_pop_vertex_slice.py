@@ -15,8 +15,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    AbstractPartitionerConstraint)
+    MaxVertexAtomsConstraint, AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
@@ -317,8 +316,7 @@ class SplitterAbstractPopulationVertexSlice(
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            supported_constraints=[MaxVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractSplitterSlice.reset_called)

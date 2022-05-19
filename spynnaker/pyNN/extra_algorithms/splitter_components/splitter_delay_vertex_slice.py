@@ -18,8 +18,7 @@ from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    AbstractPartitionerConstraint)
+    MaxVertexAtomsConstraint, AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractDependentSplitter)
@@ -268,8 +267,7 @@ class SplitterDelayVertexSlice(AbstractDependentSplitter):
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            supported_constraints=[MaxVertexAtomsConstraint],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractDependentSplitter.machine_vertices_for_recording)
