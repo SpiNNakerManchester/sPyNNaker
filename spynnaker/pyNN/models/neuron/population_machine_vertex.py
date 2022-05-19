@@ -94,20 +94,21 @@ class PopulationMachineVertex(
         """Regions for populations."""
         SYSTEM = 0
         NEURON_PARAMS = 1
-        SYNAPSE_PARAMS = 2
-        POPULATION_TABLE = 3
-        SYNAPTIC_MATRIX = 4
-        SYNAPSE_DYNAMICS = 5
-        STRUCTURAL_DYNAMICS = 6
-        NEURON_RECORDING = 7
-        PROVENANCE_DATA = 8
-        PROFILING = 9
-        CONNECTOR_BUILDER = 10
-        DIRECT_MATRIX = 11
-        BIT_FIELD_FILTER = 12
-        BIT_FIELD_BUILDER = 13
-        BIT_FIELD_KEY_MAP = 14
-        RECORDING = 15
+        CURRENT_SOURCE_PARAMS = 2
+        SYNAPSE_PARAMS = 3
+        POPULATION_TABLE = 4
+        SYNAPTIC_MATRIX = 5
+        SYNAPSE_DYNAMICS = 6
+        STRUCTURAL_DYNAMICS = 7
+        NEURON_RECORDING = 8
+        PROVENANCE_DATA = 9
+        PROFILING = 10
+        CONNECTOR_BUILDER = 11
+        DIRECT_MATRIX = 12
+        BIT_FIELD_FILTER = 13
+        BIT_FIELD_BUILDER = 14
+        BIT_FIELD_KEY_MAP = 15
+        RECORDING = 16
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -119,6 +120,7 @@ class PopulationMachineVertex(
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
+        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
@@ -309,6 +311,9 @@ class PopulationMachineVertex(
 
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
 
         # close spec
         spec.end_specification()
