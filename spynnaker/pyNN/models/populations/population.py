@@ -24,8 +24,6 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint)
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.globals_variables import (
     get_simulator, get_not_running_simulator)
@@ -1003,8 +1001,7 @@ class Population(PopulationBase):
             the new value for the max atoms per core.
         """
         get_simulator().verify_not_running()
-        self.__vertex.add_constraint(
-            MaxVertexAtomsConstraint(max_atoms_per_core))
+        self.__vertex.set_max_atoms_per_core(max_atoms_per_core)
         # state that something has changed in the population
         self.__change_requires_mapping = True
 
