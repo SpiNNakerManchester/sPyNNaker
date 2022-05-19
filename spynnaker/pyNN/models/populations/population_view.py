@@ -316,6 +316,18 @@ class PopulationView(PopulationBase):
         return self.__population.get_data_by_indexes(
             variables, self.__indexes, clear=clear)
 
+    def spinnaker_get_data(self, variable, as_matrix=False):
+        """ Public accessor for getting data as a numpy array, instead of\
+            the neo based object
+
+        :param str variable: a single variable name
+        :param bool as_matrix: If set True the data is returned as a 2d matrix
+        :return: array of the data
+        :rtype: ~numpy.ndarray
+        """
+        return self.__population.spinnaker_get_data(
+            variable, as_matrix, self.__indexes)
+
     def get_spike_counts(self, gather=True):
         """ Returns a dict containing the number of spikes for each neuron.
 
