@@ -1339,6 +1339,18 @@ we can set this for approximate number of saturation events.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_source_id_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_source_id_list</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_source_id_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current source ID list needs to be available to machine vertex</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_sources">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_sources</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current sources need to be available to machine vertex</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe">
 <span class="sig-name descname"><span class="pre">describe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.describe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.describe" title="Permalink to this definition">¶</a></dt>
@@ -1666,6 +1678,20 @@ Gets the constraints for partitions going out of this vertex.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">
+<span class="sig-name descname"><span class="pre">get_sdram_usage_for_current_source_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the SDRAM usage for the current source parameters region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the slice of atoms.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The SDRAM required for the current source region</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params">
 <span class="sig-name descname"><span class="pre">get_sdram_usage_for_neuron_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_sdram_usage_for_neuron_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the SDRAM usage for just the neuron parameters region.</p>
@@ -1925,6 +1951,12 @@ Get a property of the overall model.</p>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.inject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inject method from population to set up current source</p>
 </dd></dl>
 
 <dl class="py method">
@@ -2499,7 +2531,7 @@ source, target, weight and delay</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.COMMON_REGIONS">
-<span class="sig-name descname"><span class="pre">COMMON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">CommonRegions(system=0,</span> <span class="pre">provenance=8,</span> <span class="pre">profile=9,</span> <span class="pre">recording=15)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.COMMON_REGIONS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">COMMON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">CommonRegions(system=0,</span> <span class="pre">provenance=9,</span> <span class="pre">profile=10,</span> <span class="pre">recording=16)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.COMMON_REGIONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2519,7 +2551,7 @@ source, target, weight and delay</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.NEURON_REGIONS">
-<span class="sig-name descname"><span class="pre">NEURON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">NeuronRegions(neuron_params=1,</span> <span class="pre">neuron_recording=7)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.NEURON_REGIONS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">NEURON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">NeuronRegions(neuron_params=1,</span> <span class="pre">current_source_params=2,</span> <span class="pre">neuron_recording=8)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.NEURON_REGIONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2539,27 +2571,32 @@ source, target, weight and delay</p>
 <p>Regions for populations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_BUILDER">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_BUILDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_BUILDER" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BIT_FIELD_BUILDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_BUILDER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_FILTER">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_FILTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_FILTER" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BIT_FIELD_FILTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">13</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_FILTER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_KEY_MAP">
-<span class="sig-name descname"><span class="pre">BIT_FIELD_KEY_MAP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">14</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_KEY_MAP" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BIT_FIELD_KEY_MAP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.BIT_FIELD_KEY_MAP" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CONNECTOR_BUILDER">
-<span class="sig-name descname"><span class="pre">CONNECTOR_BUILDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">CONNECTOR_BUILDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS">
+<span class="sig-name descname"><span class="pre">CURRENT_SOURCE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.DIRECT_MATRIX">
-<span class="sig-name descname"><span class="pre">DIRECT_MATRIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DIRECT_MATRIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2569,47 +2606,47 @@ source, target, weight and delay</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.NEURON_RECORDING">
-<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.POPULATION_TABLE">
-<span class="sig-name descname"><span class="pre">POPULATION_TABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.POPULATION_TABLE" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">POPULATION_TABLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.POPULATION_TABLE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROFILING">
-<span class="sig-name descname"><span class="pre">PROFILING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PROFILING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROVENANCE_DATA">
-<span class="sig-name descname"><span class="pre">PROVENANCE_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">PROVENANCE_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.RECORDING">
-<span class="sig-name descname"><span class="pre">RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">15</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.RECORDING" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.RECORDING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.STRUCTURAL_DYNAMICS">
-<span class="sig-name descname"><span class="pre">STRUCTURAL_DYNAMICS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.STRUCTURAL_DYNAMICS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">STRUCTURAL_DYNAMICS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.STRUCTURAL_DYNAMICS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_DYNAMICS">
-<span class="sig-name descname"><span class="pre">SYNAPSE_DYNAMICS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_DYNAMICS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SYNAPSE_DYNAMICS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_DYNAMICS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_PARAMS">
-<span class="sig-name descname"><span class="pre">SYNAPSE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_PARAMS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SYNAPSE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPSE_PARAMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPTIC_MATRIX">
-<span class="sig-name descname"><span class="pre">SYNAPTIC_MATRIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPTIC_MATRIX" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SYNAPTIC_MATRIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.SYNAPTIC_MATRIX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2626,7 +2663,7 @@ source, target, weight and delay</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.SYNAPSE_REGIONS">
-<span class="sig-name descname"><span class="pre">SYNAPSE_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">SynapseRegions(synapse_params=2,</span> <span class="pre">direct_matrix=11,</span> <span class="pre">pop_table=3,</span> <span class="pre">synaptic_matrix=4,</span> <span class="pre">synapse_dynamics=5,</span> <span class="pre">structural_dynamics=6,</span> <span class="pre">bitfield_builder=13,</span> <span class="pre">bitfield_key_map=14,</span> <span class="pre">bitfield_filter=12,</span> <span class="pre">connection_builder=10)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.SYNAPSE_REGIONS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SYNAPSE_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">SynapseRegions(synapse_params=3,</span> <span class="pre">direct_matrix=12,</span> <span class="pre">pop_table=4,</span> <span class="pre">synaptic_matrix=5,</span> <span class="pre">synapse_dynamics=6,</span> <span class="pre">structural_dynamics=7,</span> <span class="pre">bitfield_builder=14,</span> <span class="pre">bitfield_key_map=15,</span> <span class="pre">bitfield_filter=13,</span> <span class="pre">connection_builder=11)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.SYNAPSE_REGIONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -2750,7 +2787,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.NEURON_REGIONS">
-<span class="sig-name descname"><span class="pre">NEURON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">NeuronRegions(neuron_params=4,</span> <span class="pre">neuron_recording=5)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.NEURON_REGIONS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">NEURON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">NeuronRegions(neuron_params=4,</span> <span class="pre">current_source_params=5,</span> <span class="pre">neuron_recording=6)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.NEURON_REGIONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py class">
@@ -2759,13 +2796,18 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>Regions for populations.</p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS">
+<span class="sig-name descname"><span class="pre">CURRENT_SOURCE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.NEURON_PARAMS">
 <span class="sig-name descname"><span class="pre">NEURON_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.NEURON_PARAMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.NEURON_RECORDING">
-<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2785,7 +2827,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS">
-<span class="sig-name descname"><span class="pre">SDRAM_EDGE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">SDRAM_EDGE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.SDRAM_EDGE_PARAMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">

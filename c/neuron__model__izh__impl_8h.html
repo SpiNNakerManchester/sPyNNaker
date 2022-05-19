@@ -96,9 +96,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#ae9b257f5e4059af3a5fa30730512f2b6">rk2_kernel_midpoint</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> h, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> <a class="el" href="spike__source__poisson_8c.html#a148ad514a3ea3af1eae2a8a354f242c2">input_this_timestep</a>)</td></tr>
 <tr class="memdesc:ae9b257f5e4059af3a5fa30730512f2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Midpoint is best balance between speed and accuracy so far.  <a href="neuron__model__izh__impl_8h.html#ae9b257f5e4059af3a5fa30730512f2b6">More...</a><br /></td></tr>
 <tr class="separator:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3545d7e7c17f9b82780c3d116b08f394"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#a3545d7e7c17f9b82780c3d116b08f394">neuron_model_state_update</a> (uint16_t num_excitatory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *exc_input, uint16_t num_inhibitory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inh_input, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
-<tr class="memdesc:a3545d7e7c17f9b82780c3d116b08f394"><td class="mdescLeft">&#160;</td><td class="mdescRight">primary function called in timer loop after synaptic updates  <a href="neuron__model__izh__impl_8h.html#a3545d7e7c17f9b82780c3d116b08f394">More...</a><br /></td></tr>
-<tr class="separator:a3545d7e7c17f9b82780c3d116b08f394"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6809c07eadc54841c5970164ca52dc3b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#a6809c07eadc54841c5970164ca52dc3b">neuron_model_state_update</a> (uint16_t num_excitatory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *exc_input, uint16_t num_inhibitory_inputs, const <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *inh_input, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> current_offset, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
+<tr class="memdesc:a6809c07eadc54841c5970164ca52dc3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">primary function called in timer loop after synaptic updates  <a href="neuron__model__izh__impl_8h.html#a6809c07eadc54841c5970164ca52dc3b">More...</a><br /></td></tr>
+<tr class="separator:a6809c07eadc54841c5970164ca52dc3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d9e95529a2c510cc1010163f9ea89ee"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8h.html#a6d9e95529a2c510cc1010163f9ea89ee">neuron_model_has_spiked</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *restrict neuron)</td></tr>
 <tr class="memdesc:a6d9e95529a2c510cc1010163f9ea89ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicates that the neuron has spiked.  <a href="neuron__model__izh__impl_8h.html#a6d9e95529a2c510cc1010163f9ea89ee">More...</a><br /></td></tr>
 <tr class="separator:a6d9e95529a2c510cc1010163f9ea89ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -319,8 +319,8 @@ machine_timestep_ms</td>
 
 </div>
 </div>
-<a id="a3545d7e7c17f9b82780c3d116b08f394"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3545d7e7c17f9b82780c3d116b08f394">&#9670;&nbsp;</a></span>neuron_model_state_update()</h2>
+<a id="a6809c07eadc54841c5970164ca52dc3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6809c07eadc54841c5970164ca52dc3b">&#9670;&nbsp;</a></span>neuron_model_state_update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -357,6 +357,12 @@ machine_timestep_ms</td>
           <td></td>
           <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
           <td class="paramname"><em>external_bias</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>current_offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -499,7 +505,7 @@ machine_timestep_ms</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu May 19 2022 10:06:42 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu May 19 2022 15:36:27 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

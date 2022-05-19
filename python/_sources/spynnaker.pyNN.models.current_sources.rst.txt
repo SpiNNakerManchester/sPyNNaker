@@ -1,0 +1,10 @@
+spynnaker.pyNN.models.current\_sources package
+==============================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.current_sources
+   :members:
+   :undoc-members:
+   :show-inheritance:

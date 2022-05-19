@@ -146,6 +146,11 @@
 <span class="c1"># noinspection PyUnresolvedReferences</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.projection</span> <span class="kn">import</span> <span class="n">Projection</span> <span class="k">as</span> <span class="n">SpiNNakerProjection</span>
 
+<span class="c1"># current sources</span>
+<span class="c1"># noinspection PyUnresolvedReferences</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.current_sources</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DCSource</span><span class="p">,</span> <span class="n">ACSource</span><span class="p">,</span> <span class="n">StepCurrentSource</span><span class="p">,</span> <span class="n">NoisyCurrentSource</span><span class="p">)</span>
+
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">external_devices</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">extra_models</span>
 
@@ -193,6 +198,8 @@
     <span class="s1">&#39;SpiNNakerProjection&#39;</span><span class="p">,</span>
     <span class="c1"># External devices and extra models</span>
     <span class="s1">&#39;external_devices&#39;</span><span class="p">,</span> <span class="s1">&#39;extra_models&#39;</span><span class="p">,</span>
+    <span class="c1"># CurrentSources</span>
+    <span class="s1">&#39;DCSource&#39;</span><span class="p">,</span> <span class="s1">&#39;ACSource&#39;</span><span class="p">,</span> <span class="s1">&#39;StepCurrentSource&#39;</span><span class="p">,</span> <span class="s1">&#39;NoisyCurrentSource&#39;</span><span class="p">,</span>
     <span class="c1"># Stuff that we define</span>
     <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="s1">&#39;setup&#39;</span><span class="p">,</span> <span class="s1">&#39;run&#39;</span><span class="p">,</span> <span class="s1">&#39;run_until&#39;</span><span class="p">,</span> <span class="s1">&#39;run_for&#39;</span><span class="p">,</span> <span class="s1">&#39;num_processes&#39;</span><span class="p">,</span> <span class="s1">&#39;rank&#39;</span><span class="p">,</span>
     <span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="s1">&#39;set_number_of_neurons_per_core&#39;</span><span class="p">,</span>

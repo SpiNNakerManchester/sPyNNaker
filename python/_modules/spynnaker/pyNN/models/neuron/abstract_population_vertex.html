@@ -153,7 +153,9 @@
         <span class="s2">&quot;__incoming_projections&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_dynamics&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__max_row_info&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__self_projection&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__self_projection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__current_sources&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__current_source_id_list&quot;</span><span class="p">]</span>
 
     <span class="c1">#: recording region IDs</span>
     <span class="n">_SPIKE_RECORDING_REGION</span> <span class="o">=</span> <span class="mi">0</span>
@@ -262,6 +264,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Current sources for this vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="c1"># Set up for profiling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span> <span class="o">=</span> <span class="n">get_config_int</span><span class="p">(</span>
@@ -443,6 +449,47 @@
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for the current source parameters region.</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            the slice of atoms.</span>
+<span class="sd">        :return: The SDRAM required for the current source region</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Firstly get the current sources active on the vertex_slice</span>
+        <span class="n">current_sources</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_source_id_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lo_atom</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+        <span class="n">hi_atom</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="k">for</span> <span class="n">current_source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="p">:</span>
+            <span class="n">id_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span><span class="p">[</span><span class="n">current_source</span><span class="p">]):</span>
+                    <span class="n">id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">id_list</span><span class="p">):</span>
+                <span class="n">current_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_source</span><span class="p">)</span>
+                <span class="n">current_source_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_list</span><span class="p">)</span>
+
+        <span class="c1"># First part is the number of current sources</span>
+        <span class="n">sdram_usage</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
+
+        <span class="c1"># If there are no current sources then skip the next bit</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_sources</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+
+            <span class="c1"># Each neuron has a value for how many current sources it has</span>
+            <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+            <span class="c1"># Then everywhere there is a current source, add the usage for that</span>
+            <span class="k">for</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">current_source_ids</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">current_sources</span><span class="p">,</span> <span class="n">current_source_id_list</span><span class="p">):</span>
+                <span class="c1"># Usage for list of IDs for this current source on this vertex</span>
+                <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_source_ids</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+                <span class="c1"># Usage for the parameters of the current source itself</span>
+                <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">current_source</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">sdram_usage</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.is_recording_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">is_recording_spikes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -770,6 +817,32 @@
 <span class="sd">        :param str target: The synapse to get the id of</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">neuron_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Inject method from population to set up current source</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span><span class="p">[</span><span class="n">current_source</span><span class="p">]</span> <span class="o">=</span> <span class="n">neuron_list</span>
+        <span class="c1"># set the associated vertex (for multi-run case)</span>
+        <span class="n">current_source</span><span class="o">.</span><span class="n">set_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># set to reload for multi-run case</span>
+        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
+            <span class="n">m_vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Current sources need to be available to machine vertex</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">current_source_id_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Current source ID list needs to be available to machine vertex</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> with </span><span class="si">{}</span><span class="s2"> atoms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
@@ -1254,6 +1327,9 @@
         <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
             <span class="n">neuron_regions</span><span class="o">.</span><span class="n">neuron_params</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+        <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
+            <span class="n">neuron_regions</span><span class="o">.</span><span class="n">current_source_params</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
         <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
             <span class="n">neuron_regions</span><span class="o">.</span><span class="n">neuron_recording</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_metadata_sdram_usage_in_bytes</span><span class="p">(</span>

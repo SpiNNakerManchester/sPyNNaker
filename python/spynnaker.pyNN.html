@@ -102,6 +102,10 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.current_sources.html">spynnaker.pyNN.models.current_sources package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.current_sources.html#module-spynnaker.pyNN.models.current_sources">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html">spynnaker.pyNN.models.neural_projections package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections">Module contents</a></li>
@@ -502,6 +506,77 @@ used, False if SDP is to be used (default)</p></li>
 and implementation for the PyNN High-level API
 (<a class="reference external" href="http://neuralensemble.org/trac/PyNN">http://neuralensemble.org/trac/PyNN</a>).</p>
 <p>This package contains the profile of that code for PyNN 0.9</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">ACSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.ACSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.current_sources.abstract_current_source.AbstractCurrentSource</span></code></p>
+<p>AC current source (i.e. sine wave) turned on at “start” and off at
+“stop”, given (y-)offset, amplitude, frequency and phase</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource.current_source_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_source_id</span></span><a class="headerlink" href="#spynnaker.pyNN.ACSource.current_source_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The ID of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource.get_parameter_types">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameter_types</span></span><a class="headerlink" href="#spynnaker.pyNN.ACSource.get_parameter_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameter types for the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource.get_parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.ACSource.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameters of the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource.get_sdram_usage_in_bytes">
+<span class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/ac_source.html#ACSource.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ACSource.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sdram usage in bytes of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The sdram usage of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ACSource.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/ac_source.html#ACSource.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ACSource.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current source parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parameters</strong> – the parameters to set</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.AdditiveWeightDependence">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">AdditiveWeightDependence</span></span><a class="headerlink" href="#spynnaker.pyNN.AdditiveWeightDependence" title="Permalink to this definition">¶</a></dt>
@@ -1037,6 +1112,76 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dt class="sig sig-object py" id="spynnaker.pyNN.Cuboid.sample">
 <span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyNN/space.html#Cuboid.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.Cuboid.sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return <cite>n</cite> points distributed randomly with uniform density within the cuboid.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">DCSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.DCSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.current_sources.abstract_current_source.AbstractCurrentSource</span></code></p>
+<p>Current source with amplitude turned on at “start” and off at “stop”</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource.current_source_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_source_id</span></span><a class="headerlink" href="#spynnaker.pyNN.DCSource.current_source_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The ID of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource.get_parameter_types">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameter_types</span></span><a class="headerlink" href="#spynnaker.pyNN.DCSource.get_parameter_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameter types for the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource.get_parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.DCSource.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameters of the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource.get_sdram_usage_in_bytes">
+<span class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/dc_source.html#DCSource.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.DCSource.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sdram usage in bytes of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The sdram usage of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.DCSource.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/dc_source.html#DCSource.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.DCSource.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current source parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parameters</strong> – the parameters to set</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -2935,6 +3080,78 @@ to this structure.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">NoisyCurrentSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stdev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.current_sources.abstract_current_source.AbstractCurrentSource</span></code></p>
+<p>A noisy current source beginning at “start” and ending at “stop”, with
+noise simulated based on the given mean and stdev, and updating every
+dt (dt should default to the machine time step)</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource.current_source_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_source_id</span></span><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource.current_source_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The ID of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource.get_parameter_types">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameter_types</span></span><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource.get_parameter_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameter types for the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource.get_parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameters of the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource.get_sdram_usage_in_bytes">
+<span class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/noisy_current_source.html#NoisyCurrentSource.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sdram usage in bytes of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The sdram usage of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.NoisyCurrentSource.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/noisy_current_source.html#NoisyCurrentSource.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.NoisyCurrentSource.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current source parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parameters</strong> – the parameters to set</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.NumpyRNG">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">NumpyRNG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyNN/random.html#NumpyRNG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.NumpyRNG" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyNN.random.WrappedRNG</span></code></p>
@@ -4099,6 +4316,17 @@ events per second).</p>
 </div>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PopulationView.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PopulationView.inject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Injects the specified current_source into this PopulationView.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>current_source</strong> (<em>NeuronCurrentSource</em>) – the CurrentSource to be injected</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.PopulationView.label">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#spynnaker.pyNN.PopulationView.label" title="Permalink to this definition">¶</a></dt>
@@ -4842,6 +5070,76 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dt class="sig sig-object py" id="spynnaker.pyNN.StaticSynapse">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">StaticSynapse</span></span><a class="headerlink" href="#spynnaker.pyNN.StaticSynapse" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static.SynapseDynamicsStatic</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">StepCurrentSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitudes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.current_sources.abstract_current_source.AbstractCurrentSource</span></code></p>
+<p>Current source where the amplitude changes based on a time array</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource.current_source_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_source_id</span></span><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource.current_source_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The ID of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource.get_parameter_types">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameter_types</span></span><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource.get_parameter_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameter types for the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource.get_parameters">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameters</span></span><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource.get_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the parameters of the current source</p>
+<dl class="simple">
+<dt>:rtype dict(str, Any)</dt><dd><p>Get the parameters of the current source</p>
+</dd>
+</dl>
+<p>:rtype dict(str, Any)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource.get_sdram_usage_in_bytes">
+<span class="sig-name descname"><span class="pre">get_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/step_current_source.html#StepCurrentSource.get_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sdram usage in bytes of the current source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int
+The sdram usage of the current source.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.StepCurrentSource.set_parameters">
+<span class="sig-name descname"><span class="pre">set_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/current_sources/step_current_source.html#StepCurrentSource.set_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.StepCurrentSource.set_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current source parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parameters</strong> – the parameters to set</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py attribute">

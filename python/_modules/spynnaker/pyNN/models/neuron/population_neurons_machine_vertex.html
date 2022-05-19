@@ -111,8 +111,9 @@
         <span class="n">PROFILING</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">RECORDING</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">NEURON_PARAMS</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="n">NEURON_RECORDING</span> <span class="o">=</span> <span class="mi">5</span>
-        <span class="n">SDRAM_EDGE_PARAMS</span> <span class="o">=</span> <span class="mi">6</span></div>
+        <span class="n">CURRENT_SOURCE_PARAMS</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">NEURON_RECORDING</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="n">SDRAM_EDGE_PARAMS</span> <span class="o">=</span> <span class="mi">7</span></div>
 
     <span class="c1"># Regions for this vertex used by common parts</span>
     <span class="n">COMMON_REGIONS</span> <span class="o">=</span> <span class="n">CommonRegions</span><span class="p">(</span>
@@ -124,6 +125,7 @@
     <span class="c1"># Regions for this vertex used by neuron parts</span>
     <span class="n">NEURON_REGIONS</span> <span class="o">=</span> <span class="n">NeuronRegions</span><span class="p">(</span>
         <span class="n">neuron_params</span><span class="o">=</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">NEURON_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="n">current_source_params</span><span class="o">=</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">CURRENT_SOURCE_PARAMS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="n">neuron_recording</span><span class="o">=</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">NEURON_RECORDING</span><span class="o">.</span><span class="n">value</span>
     <span class="p">)</span>
 
@@ -281,6 +283,9 @@
 
         <span class="c1"># write the neuron params into the new DSG region</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_neuron_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">)</span>
+
+        <span class="c1"># write the current source params into the new DSG region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_current_source_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
         <span class="c1"># close spec</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>

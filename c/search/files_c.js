@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ordered_5fcovering_2eh_2909',['ordered_covering.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/ordered__covering_8h.html',1,'']]]
+  ['ordered_5fcovering_2eh_2951',['ordered_covering.h',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/ordered__covering_8h.html',1,'']]]
 ];

@@ -2403,6 +2403,100 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>current_source.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source_8h.html</filename>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <class kind="struct">cs_id_index_t</class>
+    <class kind="struct">neuron_current_source_t</class>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>current_source_initialise</name>
+      <anchorfile>current__source_8h.html</anchorfile>
+      <anchor>a1727a6ad7e793067911f98682712f04f</anchor>
+      <arglist>(address_t cs_address, uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>current_source_load_parameters</name>
+      <anchorfile>current__source_8h.html</anchorfile>
+      <anchor>ab3839d2a4faec82656c552e338002957</anchor>
+      <arglist>(address_t cs_address)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static REAL</type>
+      <name>current_source_get_offset</name>
+      <anchorfile>current__source_8h.html</anchorfile>
+      <anchor>aa5c5460b1828e797dd328c38e48fda6f</anchor>
+      <arglist>(uint32_t time, uint32_t neuron_index)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>current_source_ac.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__ac_8h.html</filename>
+    <class kind="struct">ac_source_t</class>
+  </compound>
+  <compound kind="file">
+    <name>current_source_ac_only_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__ac__only__impl_8h.html</filename>
+    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" imported="no">current_source_ac.h</includes>
+  </compound>
+  <compound kind="file">
+    <name>current_source_dc.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__dc_8h.html</filename>
+    <class kind="struct">dc_source_t</class>
+  </compound>
+  <compound kind="file">
+    <name>current_source_dc_only_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__dc__only__impl_8h.html</filename>
+    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" imported="no">current_source_dc.h</includes>
+  </compound>
+  <compound kind="file">
+    <name>current_source_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__impl_8h.html</filename>
+    <includes id="current__source__dc_8h" name="current_source_dc.h" local="yes" imported="no">current_source_dc.h</includes>
+    <includes id="current__source__ac_8h" name="current_source_ac.h" local="yes" imported="no">current_source_ac.h</includes>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+  </compound>
+  <compound kind="file">
+    <name>current_source_noisy.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__noisy_8h.html</filename>
+    <class kind="struct">noisy_current_source_t</class>
+  </compound>
+  <compound kind="file">
+    <name>current_source_noisy_only_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__noisy__only__impl_8h.html</filename>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+  </compound>
+  <compound kind="file">
+    <name>current_source_step.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__step_8h.html</filename>
+    <class kind="struct">step_current_source_times_t</class>
+    <class kind="struct">step_current_source_amps_t</class>
+  </compound>
+  <compound kind="file">
+    <name>current_source_step_only_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__step__only__impl_8h.html</filename>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
+  </compound>
+  <compound kind="file">
+    <name>current_source_stepnoisy_impl.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/current_sources/</path>
+    <filename>current__source__stepnoisy__impl_8h.html</filename>
+    <includes id="current__source__step_8h" name="current_source_step.h" local="yes" imported="no">current_source_step.h</includes>
+    <includes id="current__source__noisy_8h" name="current_source_noisy.h" local="yes" imported="no">current_source_noisy.h</includes>
+  </compound>
+  <compound kind="file">
     <name>decay.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/</path>
     <filename>decay_8h.html</filename>
@@ -2571,6 +2665,8 @@
     <includes id="synapse__types__exponential__impl_8h" name="synapse_types_exponential_impl.h" local="no" imported="no">neuron/synapse_types/synapse_types_exponential_impl.h</includes>
     <includes id="input__type__current_8h" name="input_type_current.h" local="no" imported="no">neuron/input_types/input_type_current.h</includes>
     <includes id="additional__input__none__impl_8h" name="additional_input_none_impl.h" local="no" imported="no">neuron/additional_inputs/additional_input_none_impl.h</includes>
+    <includes id="current__source__impl_8h" name="current_source_impl.h" local="no" imported="no">neuron/current_sources/current_source_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" imported="no">neuron/current_sources/current_source.h</includes>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
     <class kind="struct">packet_firing_data_t</class>
     <member kind="enumeration">
@@ -2825,6 +2921,7 @@
     <includes id="additional__input_8h" name="additional_input.h" local="no" imported="no">neuron/additional_inputs/additional_input.h</includes>
     <includes id="threshold__type_8h" name="threshold_type.h" local="no" imported="no">neuron/threshold_types/threshold_type.h</includes>
     <includes id="synapse__types_8h" name="synapse_types.h" local="no" imported="no">neuron/synapse_types/synapse_types.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="no" imported="no">neuron/current_sources/current_source.h</includes>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
     <member kind="enumeration">
       <type></type>
@@ -3236,8 +3333,8 @@
       <type>static state_t</type>
       <name>neuron_model_state_update</name>
       <anchorfile>neuron__model_8h.html</anchorfile>
-      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
-      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
+      <anchor>a6809c07eadc54841c5970164ca52dc3b</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, REAL current_offset, neuron_t *restrict neuron)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -3320,8 +3417,8 @@
       <type>static state_t</type>
       <name>neuron_model_state_update</name>
       <anchorfile>neuron__model__izh__impl_8h.html</anchorfile>
-      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
-      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
+      <anchor>a6809c07eadc54841c5970164ca52dc3b</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, REAL current_offset, neuron_t *restrict neuron)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -3404,8 +3501,8 @@
       <type>static state_t</type>
       <name>neuron_model_state_update</name>
       <anchorfile>neuron__model__lif__impl_8h.html</anchorfile>
-      <anchor>a3545d7e7c17f9b82780c3d116b08f394</anchor>
-      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, neuron_t *restrict neuron)</arglist>
+      <anchor>a6809c07eadc54841c5970164ca52dc3b</anchor>
+      <arglist>(uint16_t num_excitatory_inputs, const input_t *exc_input, uint16_t num_inhibitory_inputs, const input_t *inh_input, input_t external_bias, REAL current_offset, neuron_t *restrict neuron)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>
@@ -3429,6 +3526,7 @@
     <includes id="neuron_8h" name="neuron.h" local="yes" imported="no">neuron.h</includes>
     <includes id="neuron__recording_8h" name="neuron_recording.h" local="yes" imported="no">neuron_recording.h</includes>
     <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">implementations/neuron_impl.h</includes>
+    <includes id="current__source_8h" name="current_source.h" local="yes" imported="no">current_sources/current_source.h</includes>
     <includes id="synapse__dynamics_8h" name="synapse_dynamics.h" local="yes" imported="no">plasticity/synapse_dynamics.h</includes>
     <class kind="struct">neuron_parameters</class>
     <member kind="function" static="yes">
@@ -3449,8 +3547,8 @@
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>a787b293eaff911e182c965c07e16e889</anchor>
-      <arglist>(address_t address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>ace6f63d291f13e8e89dc1c8b8d433743</anchor>
+      <arglist>(address_t address, address_t cs_address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -3557,6 +3655,13 @@
       <anchor>a0a022907f7d958b27b03e3e079108327</anchor>
       <arglist></arglist>
     </member>
+    <member kind="variable" static="yes">
+      <type>static address_t</type>
+      <name>current_source_address</name>
+      <anchorfile>neuron_8c.html</anchorfile>
+      <anchor>aa269b2afc1811a0714dcaf06deb457c1</anchor>
+      <arglist></arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>neuron.h</name>
@@ -3568,8 +3673,8 @@
       <type>bool</type>
       <name>neuron_initialise</name>
       <anchorfile>neuron_8h.html</anchorfile>
-      <anchor>a787b293eaff911e182c965c07e16e889</anchor>
-      <arglist>(address_t address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
+      <anchor>ace6f63d291f13e8e89dc1c8b8d433743</anchor>
+      <arglist>(address_t address, address_t cs_address, address_t recording_address, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -6295,6 +6400,12 @@
       <name>NEURON_PARAMS_REGION</name>
       <anchorfile>regions_8h.html</anchorfile>
       <anchor>a94cb8426c71368d0a24cf95fcc70a3d6a0763e3d54f2b5ccc90f6ba223d6b68e8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>CURRENT_SOURCE_PARAMS_REGION</name>
+      <anchorfile>regions_8h.html</anchorfile>
+      <anchor>a94cb8426c71368d0a24cf95fcc70a3d6af43f04c9fca7f11ed6deb850fc90b223</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -10348,6 +10459,11 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>ac_source_t</name>
+    <filename>current__source__ac_8h.html</filename>
+    <anchor>structac__source__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>additional_input_t</name>
     <filename>additional__input__none__impl_8h.html</filename>
     <anchor>structadditional__input__t</anchor>
@@ -10683,6 +10799,11 @@
     <anchor>structconnection__generator</anchor>
   </compound>
   <compound kind="struct">
+    <name>cs_id_index_t</name>
+    <filename>current__source_8h.html</filename>
+    <anchor>structcs__id__index__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>current_state_t</name>
     <filename>sp__structs_8h.html</filename>
     <anchor>structcurrent__state__t</anchor>
@@ -10735,6 +10856,11 @@
       <anchor>a3f02cf224adbd87ab374eff348ac8b3a</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>dc_source_t</name>
+    <filename>current__source__dc_8h.html</filename>
+    <anchor>structdc__source__t</anchor>
   </compound>
   <compound kind="struct">
     <name>delay_builder_config</name>
@@ -11793,6 +11919,11 @@
     <anchor>structneuromodulation__data__t</anchor>
   </compound>
   <compound kind="struct">
+    <name>neuron_current_source_t</name>
+    <filename>current__source_8h.html</filename>
+    <anchor>structneuron__current__source__t</anchor>
+  </compound>
+  <compound kind="struct">
     <name>neuron_parameters</name>
     <filename>neuron_8c.html</filename>
     <anchor>structneuron__parameters</anchor>
@@ -11928,6 +12059,13 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
+      <name>current_source_params</name>
+      <anchorfile>structneuron__regions.html</anchorfile>
+      <anchor>a7978e1f6206107728a1bee7524fa7fc8</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
       <name>neuron_recording</name>
       <anchorfile>structneuron__regions.html</anchorfile>
       <anchor>a5eb67797af3ac013b128589af3237784</anchor>
@@ -11979,6 +12117,11 @@
     <name>nm_update_state_t</name>
     <filename>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</filename>
     <anchor>structnm__update__state__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>noisy_current_source_t</name>
+    <filename>current__source__noisy_8h.html</filename>
+    <anchor>structnoisy__current__source__t</anchor>
   </compound>
   <compound kind="struct">
     <name>normal_clipped_boundary_params</name>
@@ -13052,6 +13195,16 @@
       <anchor>a06c22d077ef52c561ae4d0ea9f64d7ff</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>step_current_source_amps_t</name>
+    <filename>current__source__step_8h.html</filename>
+    <anchor>structstep__current__source__amps__t</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>step_current_source_times_t</name>
+    <filename>current__source__step_8h.html</filename>
+    <anchor>structstep__current__source__times__t</anchor>
   </compound>
   <compound kind="struct">
     <name>structural_recording_values_t</name>

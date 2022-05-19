@@ -974,12 +974,8 @@ simulated on the local node.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationBase.inject">
-<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.inject" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_base.html#PopulationBase.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationBase.inject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connect a current source to all cells in the Population.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Currently unimplemented.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>current_source</strong> (<em>pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource</em>) – </p>
@@ -1545,6 +1541,17 @@ events per second).</p>
 <span class="n">p</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="o">-</span><span class="mi">65</span> <span class="o">+</span> <span class="n">i</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.populations.PopulationView.inject">
+<span class="sig-name descname"><span class="pre">inject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population_view.html#PopulationView.inject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.populations.PopulationView.inject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Injects the specified current_source into this PopulationView.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>current_source</strong> (<em>NeuronCurrentSource</em>) – the CurrentSource to be injected</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">

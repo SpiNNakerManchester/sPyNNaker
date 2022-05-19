@@ -9,6 +9,7 @@ Subpackages
 
    spynnaker.pyNN.models.abstract_models
    spynnaker.pyNN.models.common
+   spynnaker.pyNN.models.current_sources
    spynnaker.pyNN.models.neural_projections
    spynnaker.pyNN.models.neural_properties
    spynnaker.pyNN.models.neuron

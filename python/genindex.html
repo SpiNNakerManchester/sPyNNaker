@@ -138,6 +138,8 @@
 </li>
       <li><a href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits">AbstractContainsUnits (class in spynnaker.pyNN.models.abstract_models)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource">AbstractCurrentSource (class in spynnaker.pyNN.models.current_sources)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination">AbstractElimination (class in spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination)</a>
 </li>
       <li><a href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractEthernetController">AbstractEthernetController (class in spynnaker.pyNN.external_devices_models)</a>
@@ -226,10 +228,18 @@
 </li>
       <li><a href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractWeightUpdatable">AbstractWeightUpdatable (class in spynnaker.pyNN.models.abstract_models)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.AC_SOURCE">AC_SOURCE (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
+</li>
       <li><a href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex">accepts_edges_from_delay_vertex() (spynnaker.pyNN.extra_algorithms.splitter_components.AbstractSpynnakerSplitterDelay method)</a>
 
       <ul>
         <li><a href="spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex">(spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses method)</a>
+</li>
+      </ul></li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource">ACSource (class in spynnaker.pyNN)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource">(class in spynnaker.pyNN.models.current_sources)</a>
 </li>
       </ul></li>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.activate_live_output_for">activate_live_output_for() (in module spynnaker.pyNN.external_devices)</a>
@@ -498,6 +508,8 @@
         <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.Population.annotations">(spynnaker.pyNN.Population property)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.app_vertex">app_vertex (spynnaker.pyNN.models.current_sources.AbstractCurrentSource property)</a>
+</li>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.ArbitraryFPGADevice">ArbitraryFPGADevice (class in spynnaker.pyNN.external_devices)</a>
 
       <ul>
@@ -816,8 +828,6 @@
         <li><a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.connections">(spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.connector">connector (spynnaker.pyNN.models.neural_projections.SynapseInformation property)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CONNECTOR_BUILDER">CONNECTOR_BUILDER (spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS attribute)</a>
@@ -830,6 +840,8 @@
 </li>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal">convert_analog_signal() (in module spynnaker.pyNN.utilities.neo_convertor)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_data">convert_data() (in module spynnaker.pyNN.utilities.neo_convertor)</a>
 </li>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_data_list">convert_data_list() (in module spynnaker.pyNN.utilities.neo_convertor)</a>
@@ -1000,7 +1012,39 @@
       </ul></li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.Cuboid">Cuboid (class in spynnaker.pyNN)</a>
 </li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource.current_source_id">current_source_id (spynnaker.pyNN.ACSource property)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource.current_source_id">(spynnaker.pyNN.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.current_source_id">(spynnaker.pyNN.models.current_sources.AbstractCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource.current_source_id">(spynnaker.pyNN.models.current_sources.ACSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource.current_source_id">(spynnaker.pyNN.models.current_sources.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.current_source_id">(spynnaker.pyNN.models.current_sources.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource.current_source_id">(spynnaker.pyNN.models.current_sources.StepCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource.current_source_id">(spynnaker.pyNN.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource.current_source_id">(spynnaker.pyNN.StepCurrentSource property)</a>
+</li>
+      </ul></li>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_source_id_list">current_source_id_list (spynnaker.pyNN.models.neuron.AbstractPopulationVertex property)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS">CURRENT_SOURCE_PARAMS (spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS attribute)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS.CURRENT_SOURCE_PARAMS">(spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.REGIONS attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.current_sources">current_sources (spynnaker.pyNN.models.neuron.AbstractPopulationVertex property)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.NeuronProvenance.current_timer_tick">current_timer_tick (spynnaker.pyNN.models.neuron.NeuronProvenance attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs">CurrentSourceIDs (class in spynnaker.pyNN.models.current_sources)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1020,6 +1064,14 @@
 </li>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.data_cache.DataCache">DataCache (class in spynnaker.pyNN.utilities.data_cache)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.DC_SOURCE">DC_SOURCE (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource">DCSource (class in spynnaker.pyNN)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource">(class in spynnaker.pyNN.models.current_sources)</a>
+</li>
+      </ul></li>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.MunichMotorDevice.default_initial_values">default_initial_values (spynnaker.pyNN.external_devices.MunichMotorDevice attribute)</a>
 
       <ul>
@@ -1154,12 +1206,12 @@
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo.delayed_max_words">delayed_max_words (spynnaker.pyNN.models.neuron.synapse_io.MaxRowInfo property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge">DelayedApplicationEdge (class in spynnaker.pyNN.models.neural_projections)</a>
 </li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.exceptions.DelayExtensionException">DelayExtensionException</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex">DelayExtensionMachineVertex (class in spynnaker.pyNN.models.utility_models.delays)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES (class in spynnaker.pyNN.models.utility_models.delays)</a>
@@ -2388,8 +2440,6 @@
         <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.SmallWorldConnector.get_n_connections_to_post_vertex_maximum">(spynnaker.pyNN.SmallWorldConnector method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_cores">get_n_cores() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
 
       <ul>
@@ -2444,6 +2494,8 @@
         <li><a href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic.get_n_cpu_cycles">(spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row">get_n_fixed_plastic_words_per_row() (spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics method)</a>
 
       <ul>
@@ -2658,6 +2710,46 @@
         <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.RandomSelection.get_parameter_names">(spynnaker.pyNN.RandomSelection method)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource.get_parameter_types">get_parameter_types (spynnaker.pyNN.ACSource property)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource.get_parameter_types">(spynnaker.pyNN.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_parameter_types">(spynnaker.pyNN.models.current_sources.AbstractCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource.get_parameter_types">(spynnaker.pyNN.models.current_sources.ACSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource.get_parameter_types">(spynnaker.pyNN.models.current_sources.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_parameter_types">(spynnaker.pyNN.models.current_sources.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_parameter_types">(spynnaker.pyNN.models.current_sources.StepCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource.get_parameter_types">(spynnaker.pyNN.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource.get_parameter_types">(spynnaker.pyNN.StepCurrentSource property)</a>
+</li>
+      </ul></li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource.get_parameters">get_parameters (spynnaker.pyNN.ACSource property)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource.get_parameters">(spynnaker.pyNN.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_parameters">(spynnaker.pyNN.models.current_sources.AbstractCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource.get_parameters">(spynnaker.pyNN.models.current_sources.ACSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource.get_parameters">(spynnaker.pyNN.models.current_sources.DCSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_parameters">(spynnaker.pyNN.models.current_sources.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_parameters">(spynnaker.pyNN.models.current_sources.StepCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource.get_parameters">(spynnaker.pyNN.NoisyCurrentSource property)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource.get_parameters">(spynnaker.pyNN.StepCurrentSource property)</a>
+</li>
+      </ul></li>
       <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.get_parameters">get_parameters() (spynnaker.pyNN.models.populations.IDMixin method)</a>
 </li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DistanceDependentFormation.get_parameters_sdram_usage_in_bytes">get_parameters_sdram_usage_in_bytes() (spynnaker.pyNN.DistanceDependentFormation method)</a>
@@ -2814,11 +2906,27 @@
 </li>
       <li><a href="spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.get_sdram_edge_params_bytes">get_sdram_edge_params_bytes() (in module spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">get_sdram_usage_for_current_source_params() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params">get_sdram_usage_for_neuron_params() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
 </li>
-      <li><a href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes">get_sdram_usage_in_bytes() (spynnaker.pyNN.models.common.MultiSpikeRecorder method)</a>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource.get_sdram_usage_in_bytes">get_sdram_usage_in_bytes() (spynnaker.pyNN.ACSource method)</a>
 
       <ul>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.DCSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.common.MultiSpikeRecorder method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.current_sources.AbstractCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.current_sources.ACSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.current_sources.DCSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.current_sources.NoisyCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.current_sources.StepCurrentSource method)</a>
+</li>
         <li><a href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl method)</a>
 </li>
         <li><a href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent method)</a>
@@ -2826,6 +2934,10 @@
         <li><a href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard method)</a>
 </li>
         <li><a href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_sdram_usage_in_bytes">(spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.NoisyCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource.get_sdram_usage_in_bytes">(spynnaker.pyNN.StepCurrentSource method)</a>
 </li>
       </ul></li>
       <li><a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_seeds">get_seeds() (spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon method)</a>
@@ -3468,16 +3580,26 @@
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.initialize_parameters">(spynnaker.pyNN.models.neuron.AbstractPopulationVertex property)</a>
 </li>
       </ul></li>
-      <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.inject">inject() (spynnaker.pyNN.models.populations.IDMixin method)</a>
+      <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.inject">inject() (spynnaker.pyNN.models.neuron.AbstractPopulationVertex method)</a>
 
       <ul>
+        <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.inject">(spynnaker.pyNN.models.populations.IDMixin method)</a>
+</li>
         <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.inject">(spynnaker.pyNN.models.populations.Population method)</a>
 </li>
         <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.inject">(spynnaker.pyNN.models.populations.PopulationBase method)</a>
 </li>
+        <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationView.inject">(spynnaker.pyNN.models.populations.PopulationView method)</a>
+</li>
         <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.Population.inject">(spynnaker.pyNN.Population method)</a>
 </li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.PopulationView.inject">(spynnaker.pyNN.PopulationView method)</a>
+</li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.inject_into">inject_into() (spynnaker.pyNN.models.current_sources.AbstractCurrentSource method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.INPUT_BUFFER_FULL_NAME">INPUT_BUFFER_FULL_NAME (spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice attribute)</a>
 
       <ul>
@@ -3486,8 +3608,6 @@
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.INPUT_BUFFER_FULL_NAME">(spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.INPUT_BUFFER_LOST_NAME">INPUT_BUFFER_LOST_NAME (spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeConductance">InputTypeConductance (class in spynnaker.pyNN.models.neuron.input_types)</a>
@@ -4156,6 +4276,8 @@
 </li>
         <li><a href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils</a>
 </li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#module-spynnaker.pyNN.models.current_sources">spynnaker.pyNN.models.current_sources</a>
+</li>
         <li><a href="spynnaker.pyNN.models.html#module-spynnaker.pyNN.models.defaults">spynnaker.pyNN.models.defaults</a>
 </li>
         <li><a href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections">spynnaker.pyNN.models.neural_projections</a>
@@ -4495,13 +4617,15 @@
         <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.N_REWIRES_NAME">(spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SynapseProvenance.n_saturations">n_saturations (spynnaker.pyNN.models.neuron.SynapseProvenance attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.N_SKIPPED_TIME_STEPS">N_SKIPPED_TIME_STEPS (spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SpikeProcessingFastProvenance.n_skipped_time_steps">n_skipped_time_steps (spynnaker.pyNN.models.neuron.SpikeProcessingFastProvenance attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.N_SOURCES">N_SOURCES (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.SpikeProcessingFastProvenance.n_spikes_processed">n_spikes_processed (spynnaker.pyNN.models.neuron.SpikeProcessingFastProvenance attribute)</a>
 
@@ -4619,6 +4743,16 @@
 </li>
       <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaPayload.NO_PAYLOAD">NO_PAYLOAD (spynnaker.pyNN.protocols.RetinaPayload attribute)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.NO_SOURCE">NO_SOURCE (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.NOISY_CURRENT_SOURCE">NOISY_CURRENT_SOURCE (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource">NoisyCurrentSource (class in spynnaker.pyNN)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource">(class in spynnaker.pyNN.models.current_sources)</a>
+</li>
+      </ul></li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NumpyRNG.normal_clipped">normal_clipped() (spynnaker.pyNN.NumpyRNG method)</a>
 </li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NumpyRNG.normal_clipped_to_boundary">normal_clipped_to_boundary() (spynnaker.pyNN.NumpyRNG method)</a>
@@ -4803,6 +4937,8 @@
         <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population">(class in spynnaker.pyNN.models.populations)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.population">population (spynnaker.pyNN.models.current_sources.AbstractCurrentSource property)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS.POPULATION_TABLE">POPULATION_TABLE (spynnaker.pyNN.models.neuron.PopulationMachineVertex.REGIONS attribute)</a>
 
       <ul>
@@ -4971,14 +5107,14 @@
         <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_active_time_key">(spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period">push_bot_laser_config_total_period() (spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol method)</a>
 
       <ul>
         <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period">(spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.push_bot_laser_config_total_period_key">push_bot_laser_config_total_period_key (spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol property)</a>
 
       <ul>
@@ -5831,6 +5967,8 @@
       </ul></li>
       <li><a href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.set_a_plus_a_minus">set_a_plus_a_minus() (spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus method)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_app_vertex">set_app_vertex() (spynnaker.pyNN.models.current_sources.AbstractCurrentSource method)</a>
+</li>
       <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population.set_by_selector">set_by_selector() (spynnaker.pyNN.models.populations.Population method)</a>
 
       <ul>
@@ -5963,8 +6101,28 @@
         <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_output_pattern_for_payload_key">(spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol property)</a>
 </li>
       </ul></li>
-      <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.set_parameters">set_parameters() (spynnaker.pyNN.models.populations.IDMixin method)</a>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.ACSource.set_parameters">set_parameters() (spynnaker.pyNN.ACSource method)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DCSource.set_parameters">(spynnaker.pyNN.DCSource method)</a>
 </li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_parameters">(spynnaker.pyNN.models.current_sources.AbstractCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.ACSource.set_parameters">(spynnaker.pyNN.models.current_sources.ACSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.DCSource.set_parameters">(spynnaker.pyNN.models.current_sources.DCSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.NoisyCurrentSource.set_parameters">(spynnaker.pyNN.models.current_sources.NoisyCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource.set_parameters">(spynnaker.pyNN.models.current_sources.StepCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.set_parameters">(spynnaker.pyNN.models.populations.IDMixin method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.NoisyCurrentSource.set_parameters">(spynnaker.pyNN.NoisyCurrentSource method)</a>
+</li>
+        <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource.set_parameters">(spynnaker.pyNN.StepCurrentSource method)</a>
+</li>
+      </ul></li>
       <li><a href="spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance">set_payload_pins_to_high_impedance() (spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol method)</a>
 
       <ul>
@@ -5977,6 +6135,8 @@
         <li><a href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_payload_pins_to_high_impedance_key">(spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol property)</a>
 </li>
       </ul></li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.AbstractCurrentSource.set_population">set_population() (spynnaker.pyNN.models.current_sources.AbstractCurrentSource method)</a>
+</li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.DistanceDependentProbabilityConnector.set_projection_information">set_projection_information() (spynnaker.pyNN.DistanceDependentProbabilityConnector method)</a>
 
       <ul>
@@ -6360,6 +6520,8 @@
         <li><a href="spynnaker.pyNN.external_devices_models.push_bot.control.html#module-spynnaker.pyNN.external_devices_models.push_bot.control">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     spynnaker.pyNN.external_devices_models.push_bot.ethernet
 
@@ -6367,8 +6529,6 @@
         <li><a href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#module-spynnaker.pyNN.external_devices_models.push_bot.ethernet">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     spynnaker.pyNN.external_devices_models.push_bot.parameters
 
@@ -6444,6 +6604,13 @@
 
       <ul>
         <li><a href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.recording_utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    spynnaker.pyNN.models.current_sources
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#module-spynnaker.pyNN.models.current_sources">module</a>
 </li>
       </ul></li>
       <li>
@@ -6955,6 +7122,14 @@
       </ul></li>
       <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.STDPMechanism">STDPMechanism (in module spynnaker.pyNN)</a>
 </li>
+      <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.CurrentSourceIDs.STEP_CURRENT_SOURCE">STEP_CURRENT_SOURCE (spynnaker.pyNN.models.current_sources.CurrentSourceIDs attribute)</a>
+</li>
+      <li><a href="spynnaker.pyNN.html#spynnaker.pyNN.StepCurrentSource">StepCurrentSource (class in spynnaker.pyNN)</a>
+
+      <ul>
+        <li><a href="spynnaker.pyNN.models.current_sources.html#spynnaker.pyNN.models.current_sources.StepCurrentSource">(class in spynnaker.pyNN.models.current_sources)</a>
+</li>
+      </ul></li>
       <li><a href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct">Struct (class in spynnaker.pyNN.utilities.struct)</a>
 </li>
       <li><a href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct">struct (spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent property)</a>

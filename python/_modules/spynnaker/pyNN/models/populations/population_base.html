@@ -186,18 +186,14 @@
             <span class="s1">&#39;Call transfered to get_data(&quot;v&quot;) without additional arguments&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s2">&quot;v&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PopulationBase.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
+<div class="viewcode-block" id="PopulationBase.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.inject">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Connect a current source to all cells in the Population.</span>
-
-<span class="sd">        .. warning::</span>
-<span class="sd">            Currently unimplemented.</span>
 
 <span class="sd">        :param current_source:</span>
 <span class="sd">        :type current_source:</span>
 <span class="sd">            pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO:</span>
-        <span class="n">_we_dont_do_this_now</span><span class="p">(</span><span class="n">current_source</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="PopulationBase.is_local"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.PopulationBase.is_local">[docs]</a>    <span class="k">def</span> <span class="nf">is_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="nb">id</span><span class="p">):</span>  <span class="c1"># pylint: disable=unused-argument, redefined-builtin</span>
