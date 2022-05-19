@@ -24,19 +24,6 @@
 
 #include <common/neuron-typedefs.h>
 
-#ifdef _CURRENT_SOURCE_DC_H_
-#include "current_source_dc.h"
-#endif
-#ifdef _CURRENT_SOURCE_AC_H_
-#include "current_source_ac.h"
-#endif
-#ifdef _CURRENT_SOURCE_STEP_H_
-#include "current_source_step.h"
-#endif
-#ifdef _CURRENT_SOURCE_NOISY_H_
-#include "current_source_noisy.h"
-#endif
-
 // Struct for current source id type and current source index of that type
 typedef struct cs_id_index_t {
     uint32_t cs_id;
