@@ -38,6 +38,8 @@ struct neuron_provenance {
 struct neuron_regions {
     //! The neuron parameters
     uint32_t neuron_params;
+    //! The current source parameters
+    uint32_t current_source_params;
     //! The neuron recording details
     uint32_t neuron_recording;
 };
@@ -72,6 +74,7 @@ static inline bool initialise_neuron_regions(
     // Set up the neurons
     if (!neuron_initialise(
             data_specification_get_region(regions.neuron_params, ds_regions),
+            data_specification_get_region(regions.current_source_params, ds_regions),
             data_specification_get_region(regions.neuron_recording, ds_regions),
             n_rec_regions_used)) {
         return false;

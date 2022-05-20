@@ -72,8 +72,9 @@ class PopulationNeuronsMachineVertex(
         PROFILING = 2
         RECORDING = 3
         NEURON_PARAMS = 4
-        NEURON_RECORDING = 5
-        SDRAM_EDGE_PARAMS = 6
+        CURRENT_SOURCE_PARAMS = 5
+        NEURON_RECORDING = 6
+        SDRAM_EDGE_PARAMS = 7
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -85,6 +86,7 @@ class PopulationNeuronsMachineVertex(
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
+        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
@@ -242,6 +244,9 @@ class PopulationNeuronsMachineVertex(
 
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__min_weights)
+
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
 
         # close spec
         spec.end_specification()
