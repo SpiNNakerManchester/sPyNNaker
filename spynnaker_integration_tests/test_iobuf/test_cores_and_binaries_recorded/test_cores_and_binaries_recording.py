@@ -56,11 +56,11 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                         machine_vertex)
                     data.add(placement)
 
-        for processor in range(0, 16):
-            if not placements.is_processor_occupied(0, 0, processor):
-                false_data.append(processor)
-            elif placements._placements[(0, 0, processor)] not in data:
-                false_data.append(processor)
+        for p in range(0, 16):
+            if not placements.is_processor_occupied(0, 0, p):
+                false_data.append(p)
+            elif placements.get_placement_on_processor(0, 0, p) not in data:
+                false_data.append(p)
 
         for placement in data:
             self.assertIn(

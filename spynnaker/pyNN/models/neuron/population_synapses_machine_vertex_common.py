@@ -23,6 +23,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
@@ -236,8 +237,9 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(0)
             spec.write_value(0)
         else:
-            r_info = routing_info.get_routing_info_for_edge(
-                self.__neuron_to_synapse_edge)
+            r_info = routing_info.get_routing_info_from_pre_vertex(
+                self.__neuron_to_synapse_edge.pre_vertex,
+                SPIKE_PARTITION_ID)
             spec.write_value(r_info.first_key)
             spec.write_value(r_info.first_mask)
             spec.write_value(~r_info.first_mask & 0xFFFFFFFF)

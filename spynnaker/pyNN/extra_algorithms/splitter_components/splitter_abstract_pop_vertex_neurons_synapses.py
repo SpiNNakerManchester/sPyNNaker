@@ -554,7 +554,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Split the incoming machine vertices so that they are in ~power of 2
         # groups
-        sources = pre_vertex.splitter.get_out_going_vertices(partition_id)
+        sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
         sources_per_vertex = max(1, int(2 ** math.ceil(math.log(
             n_sources / self.__n_synapse_vertices))))

@@ -14,12 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
@@ -31,8 +27,7 @@ _DELAY_PARAM_HEADER_WORDS = 8
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractHasDelayStages,
-        AbstractProvidesOutgoingPartitionConstraints):
+        TDMAAwareApplicationVertex, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -130,11 +125,6 @@ class DelayExtensionVertex(
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
         return self.__source_vertex
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
 
     def delay_params_size(self):
         """ The size of the delay parameters

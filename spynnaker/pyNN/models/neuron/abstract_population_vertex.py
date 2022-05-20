@@ -23,16 +23,14 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.ranged import RangeDictionary
 from data_specification.enums.data_type import DataType
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractCanReset, AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractCanReset,
+    AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -92,10 +90,10 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractEventRecordable, AbstractProvidesOutgoingPartitionConstraints,
+        AbstractEventRecordable,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
-        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
@@ -283,6 +281,7 @@ class AbstractPopulationVertex(
         """
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
+        self.__max_row_info.clear()
         self.__incoming_projections.append(projection)
         if projection._projection_edge.pre_vertex == self:
             self.__self_projection = projection
@@ -671,16 +670,6 @@ class AbstractPopulationVertex(
         """ Flush the cache of connection information; needed for a second run
         """
         self.__connection_cache.clear()
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex.
-
-        :param partition: the partition that leaves this vertex
-        :return: list of constraints
-        """
-        return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractNeuronRecordable.clear_recording)
     def clear_recording(self, variable, buffer_manager, placements):
