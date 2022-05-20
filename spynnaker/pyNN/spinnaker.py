@@ -40,6 +40,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, on_chip_bitfield_generator,
     redundant_packet_count_report,
@@ -513,12 +514,14 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         if hasattr(neuron_type, "get_max_atoms_per_core"):
             previous = neuron_type.get_max_atoms_per_core()
             if previous < max_permitted:
-                logger.warning(
-                    "Attempt to increase number_of_neurons_per_core "
-                    "from {} to {} ignored", previous, max_permitted)
-                return
+                raise SpynnakerException(
+                    f"Attempt to increase number_of_neurons_per_core "
+                    "from {previous} to {previous} not supported")
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         self.__neurons_per_core_set.add(neuron_type)
+        if self._populations:
+            logger.warning("Calling set_number_of_neurons_per_core will not "
+                           "affect previously created Populations")
 
     def reset_number_of_neurons_per_core(self):
         for neuron_type in self.__neurons_per_core_set:

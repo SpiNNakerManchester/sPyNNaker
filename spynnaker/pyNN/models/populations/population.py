@@ -29,7 +29,8 @@ from spinn_front_end_common.utilities.globals_variables import (
     get_simulator, get_not_running_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.exceptions import (
+    InvalidParameterType, SpynnakerException)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractContainsUnits, AbstractReadParametersBeforeSet,
     AbstractPopulationInitializable, AbstractPopulationSettable)
@@ -1009,6 +1010,11 @@ class Population(PopulationBase):
             the new value for the max atoms per core.
         """
         get_simulator().verify_not_running()
+        cap = self.celltype.get_max_atoms_per_core()
+        if max_atoms_per_core > cap:
+            raise SpynnakerException(
+                f"Set the max_atoms_per_core to {max_atoms_per_core} blocked "
+                f"as the current limit for the model is {cap}")
         self.__vertex.set_max_atoms_per_core(max_atoms_per_core)
         # state that something has changed in the population
         self.__change_requires_mapping = True
