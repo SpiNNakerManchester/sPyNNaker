@@ -28,7 +28,7 @@ def find_good_chip(machine, n_target):
             if chip:
                 # Must be greater than to allow the extra monitor
                 if chip.n_user_processors > n_target:
-                    print(chip.n_user_processors)
+                    print(chip.n_user_processors, "processors on", x, y)
                     return (x, y)
     raise SkipTest("No Chip found with You Need at least {} user processors"
                    .format(n_target))
@@ -51,12 +51,6 @@ def do_run():
         raise oops
     target_x, target_y = find_good_chip(machine, n_target)
 
-    sources = []
-    for s in range(n_source):
-        sources.append(sim.Population(
-            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
-            additional_parameters={
-                "splitter": SplitterAbstractPopulationVertexFixed()}))
     targets = []
     for t in range(n_target):
         pop = sim.Population(
@@ -65,6 +59,13 @@ def do_run():
                 "splitter": SplitterAbstractPopulationVertexFixed()})
         pop.add_placement_constraint(x=target_x, y=target_y)
         targets.append(pop)
+
+    sources = []
+    for s in range(n_source):
+        sources.append(sim.Population(
+            n_neurons, sim.IF_curr_exp(), label="source_{}".format(s),
+            additional_parameters={
+                "splitter": SplitterAbstractPopulationVertexFixed()}))
 
     for s in range(n_source):
         for t in range(n_target):

@@ -28,7 +28,7 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
@@ -131,7 +131,7 @@ _FOUR_WORDS = struct.Struct("<4I")
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
         SendsSynapticInputsOverSDRAM):
@@ -234,12 +234,6 @@ class SpikeSourcePoissonMachineVertex(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
-
-    @property
-    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
-    def is_in_injection_mode(self):
-        # pylint: disable=no-value-for-parameter
-        return self._app_vertex.incoming_control_edge is not None
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
@@ -485,16 +479,13 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
-        in_mask = 0
+        incoming_mask = 0
         if self._app_vertex.incoming_control_edge is not None:
-            in_vertex = self._app_vertex.incoming_control_edge.pre_vertex
-            for m_vertex in in_vertex.machine_vertices:
-                # Get the mask of the incoming keys
-                r_info = routing_info.get_routing_info_from_pre_vertex(
-                    m_vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
-                in_mask = ~r_info.first_mask & 0xFFFFFFFF
-                break
-        spec.write_value(in_mask)
+            r_info = routing_info.get_routing_info_from_pre_vertex(
+                self._app_vertex.incoming_control_edge.pre_vertex,
+                LIVE_POISSON_CONTROL_PARTITION_ID)
+            incoming_mask = ~r_info.first_mask & 0xFFFFFFFF
+        spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(

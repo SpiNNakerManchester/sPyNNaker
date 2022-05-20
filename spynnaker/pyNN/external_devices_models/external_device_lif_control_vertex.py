@@ -18,8 +18,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints,
-    AbstractVertexWithEdgeToDependentVertices)
+    AbstractVertexWithEdgeToDependentVertices, HasCustomAtomKeyMap)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from .abstract_ethernet_controller import AbstractEthernetController
@@ -28,8 +27,8 @@ from .abstract_ethernet_controller import AbstractEthernetController
 class ExternalDeviceLifControlVertex(
         AbstractPopulationVertex,
         AbstractEthernetController,
-        AbstractProvidesOutgoingPartitionConstraints,
-        AbstractVertexWithEdgeToDependentVertices):
+        AbstractVertexWithEdgeToDependentVertices,
+        HasCustomAtomKeyMap):
     """ Abstract control module for the pushbot, based on the LIF neuron,\
         but without spikes, and using the voltage as the output to the various\
         devices
@@ -37,9 +36,7 @@ class ExternalDeviceLifControlVertex(
     __slots__ = [
         "__dependent_vertices",
         "__devices",
-        "__message_translator",
-        "__partition_id_to_atom",
-        "__partition_id_to_key"]
+        "__message_translator"]
 
     # all commands will use this mask
     _DEFAULT_COMMAND_MASK = 0xFFFFFFFF
@@ -73,25 +70,13 @@ class ExternalDeviceLifControlVertex(
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals
+        super().__init__(
+            len(devices), label, constraints, max_atoms_per_core,
+            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
+            neuron_impl, pynn_model, drop_late_spikes, splitter)
 
         if not devices:
             raise ConfigurationException("No devices specified")
-
-        # Create a partition to key map
-        self.__partition_id_to_key = dict(
-            (str(dev.device_control_partition_id), dev.device_control_key)
-            for dev in devices)
-
-        # Check for same partition name
-        if len(self.__partition_id_to_key) != len(devices):
-            raise Exception(
-                "Partition names for each device must be different")
-
-        # Create a partition to atom map
-        self.__partition_id_to_atom = {
-            partition: i
-            for (i, partition) in enumerate(self.__partition_id_to_key.keys())
-        }
 
         self.__devices = devices
         self.__message_translator = translator
@@ -101,23 +86,11 @@ class ExternalDeviceLifControlVertex(
         if create_edges:
             self.__dependent_vertices = devices
 
-        super().__init__(
-            len(devices), label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_spikes, splitter, seed)
-
-    def routing_key_partition_atom_mapping(self, routing_info, partition):
-        # pylint: disable=arguments-differ
-        key = self.__partition_id_to_key[partition.identifier]
-        atom = self.__partition_id_to_atom[partition.identifier]
-        return [(atom, key)]
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([BaseKeyAndMask(
-            self.__partition_id_to_key[partition.identifier],
-            self._DEFAULT_COMMAND_MASK)])]
+        for dev in devices:
+            self.add_constraint(FixedKeyAndMaskConstraint([
+                BaseKeyAndMask(
+                    dev.device_control_key, self._DEFAULT_COMMAND_MASK)],
+                partition=dev.device_control_partition_id))
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):
@@ -143,4 +116,10 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
     def get_outgoing_partition_ids(self):
-        return self.__partition_id_to_key.keys()
+        return [dev.device_control_partition_id for dev in self.__devices]
+
+    @overrides(HasCustomAtomKeyMap.get_atom_key_map)
+    def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
+        for i, device in enumerate(self.__devices):
+            if device.device_control_partition_id == partition_id:
+                return [(i, device.device_control_key)]
