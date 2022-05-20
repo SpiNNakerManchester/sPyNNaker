@@ -17,7 +17,7 @@ import pyNN.spiNNaker as p
 from time import sleep
 import traceback
 
-from spynnaker8.external_devices import SpynnakerLiveSpikesConnection
+from spynnaker.pyNN.external_devices import SpynnakerLiveSpikesConnection
 
 sim_finished = False
 n_spikes = list()
