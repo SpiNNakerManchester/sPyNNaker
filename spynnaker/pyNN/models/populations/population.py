@@ -402,30 +402,35 @@ class Population(PopulationBase):
         return self._recorder.extract_neo_block(
             variables, indexes, clear, annotations)
 
-    def spinnaker_get_data(self, variable):
+    def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
         """ Public accessor for getting data as a numpy array, instead of\
             the neo based object
 
-        :param variable:
-            either a single variable name or a list of variable names.
-            Variables must have been previously recorded, otherwise an
-            Exception will be raised.
+        :param str variable: a single variable name.
         :type variable: str or list(str)
+        :param bool as_matrix: If set True the data is returned as a 2d matrix
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
         :return: array of the data
         :rtype: ~numpy.ndarray
         """
         warn_once(
             logger, "spinnaker_get_data is non-standard PyNN and therefore "
-            "may not be portable to other simulators. Nor do we guarantee "
-            "that this function will exist in future releases.")
+            "will not be portable to other simulators.")
         if isinstance(variable, list):
             if len(variable) != 1:
                 raise ConfigurationException(
                     "Only one type of data at a time is supported")
             variable = variable[0]
         if variable == SPIKES:
-            return self._recorder.get_spikes()
-        return self._recorder.get_recorded_pynn7(variable)
+            if as_matrix:
+                logger.warning(f"Ignoring as matrix for {SPIKES}")
+            spikes = self._recorder.get_spikes()
+            if view_indexes is None:
+                return spikes
+            return spikes[numpy.isin(spikes[:, 0], view_indexes)]
+        return self._recorder.get_recorded_pynn7(
+            variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
     def get_spike_counts(self, gather=True):
@@ -807,8 +812,11 @@ class Population(PopulationBase):
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
-        # TODO:
-        _we_dont_do_this_now(current_source)
+        # Pass this into the vertex
+        self.__vertex.inject(current_source, [n for n in range(self._size)])
+        current_source.set_population(self)
+        # Must remap if called between runs (with reset)
+        self.__change_requires_mapping = True
 
     def __len__(self):
         """ Get the total number of cells in the population.
