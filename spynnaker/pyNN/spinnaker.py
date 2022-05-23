@@ -149,8 +149,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
 
-    def run(self, run_time, sync_time=0.0):
-        """ Run the model created.
+    def _clear_and_run(self, run_time, sync_time=0.0):
+        """ Clears the projections and Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
@@ -166,9 +166,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self._projections:
             projection._clear_cache()
 
-        self._run_wait(run_time, sync_time)
+        super(SpiNNaker, self).run(run_time, sync_time)
         for projection in self._projections:
             projection._clear_cache()
+
+    def run(self, run_time, sync_time=0.0):
+        """ Run the simulation for a span of simulation time.
+        :param run_time: the time to run for, in milliseconds
+        :return: None
+        """
+        self._clear_and_run(run_time, sync_time)
 
     def run_until(self, tstop):
         """ Run the simulation until the given simulation time.
@@ -176,7 +183,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param tstop: when to run until in milliseconds
         """
         # Build data
-        self._run_wait(tstop - self.t)
+        self._clear_and_run(tstop - self.t)
 
     def clear(self):
         """ Clear the current recordings and reset the simulation
@@ -199,15 +206,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)
-
-    def _run_wait(self, duration_ms, sync_time=0.0):
-        """ Run the simulation for a length of simulation time.
-
-        :param duration_ms: The run duration, in milliseconds
-        :type duration_ms: int or float
-        """
-
-        super(SpiNNaker, self).run(duration_ms, sync_time)
 
     @property
     def state(self):
