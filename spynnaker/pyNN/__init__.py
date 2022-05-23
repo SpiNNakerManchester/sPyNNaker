@@ -356,7 +356,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     # get overloaded functions from PyNN in relation of our simulator object
     _create_overloaded_functions(globals_variables.get_simulator())
-
+    SpynnakerDataView.add_database_socket_addresses(database_socket_addresses)
     return rank()
 
 
