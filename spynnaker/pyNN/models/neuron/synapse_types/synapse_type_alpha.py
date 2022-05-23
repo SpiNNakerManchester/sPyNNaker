@@ -131,8 +131,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         """
         # pylint: disable=arguments-differ
 
-        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa
-        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa
+        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa: E731
+        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa: E731
 
         # Add the rest of the data
         return [state_variables[EXC_RESPONSE],
