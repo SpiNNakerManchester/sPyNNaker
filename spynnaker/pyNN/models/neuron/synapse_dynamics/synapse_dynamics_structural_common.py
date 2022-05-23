@@ -381,13 +381,13 @@ class SynapseDynamicsStructuralCommon(
         :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
         """
-        # Note noqa because exact type comparison is required here
+        # Note noqa:E721  because exact type comparison is required here
         return (
             self.s_max == synapse_dynamics.s_max and
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
-            (type(self.partner_selection) ==
+            (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==
              type(synapse_dynamics.formation)) and
