@@ -410,44 +410,28 @@ class AbstractPopulationVertex(
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
 
-    def get_sdram_usage_for_current_source_params(self, vertex_slice):
+    def get_sdram_usage_for_current_source_params(self, n_atoms):
         """ Calculate the SDRAM usage for the current source parameters region.
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms.
+        :param int n_atoms: The number of atoms to account for
         :return: The SDRAM required for the current source region
         """
-        # Firstly get the current sources active on the vertex_slice
-        current_sources = []
-        current_source_id_list = []
-        lo_atom = vertex_slice.lo_atom
-        hi_atom = vertex_slice.hi_atom
+        # If non at all, just output size of 0 declaration
+        if not self.__current_sources:
+            return BYTES_PER_WORD
+
+        # This is a worst-case count, assuming all sources apply to all atoms
+        # Start with the count of sources + count of sources per neuron
+        sdram_usage = BYTES_PER_WORD + (n_atoms * BYTES_PER_WORD)
+
+        # Add on size of neuron id list per source (remember assume all atoms)
+        sdram_usage += (
+            len(self.__current_sources) * 2 * n_atoms * BYTES_PER_WORD)
+
+        # Add on the size of the current source data + neuron id list per
+        # source (remember, assume all neurons for worst case)
         for current_source in self.__current_sources:
-            id_list = []
-            for n in range(lo_atom, hi_atom + 1):
-                if (n in self.__current_source_id_list[current_source]):
-                    id_list.append(n)
-
-            if len(id_list):
-                current_sources.append(current_source)
-                current_source_id_list.append(id_list)
-
-        # First part is the number of current sources
-        sdram_usage = BYTES_PER_WORD
-
-        # If there are no current sources then skip the next bit
-        if len(current_sources) != 0:
-
-            # Each neuron has a value for how many current sources it has
-            sdram_usage += vertex_slice.n_atoms * BYTES_PER_WORD
-
-            # Then everywhere there is a current source, add the usage for that
-            for current_source, current_source_ids in zip(
-                    current_sources, current_source_id_list):
-                # Usage for list of IDs for this current source on this vertex
-                sdram_usage += (2 * len(current_source_ids)) * BYTES_PER_WORD
-                # Usage for the parameters of the current source itself
-                sdram_usage += current_source.get_sdram_usage_in_bytes()
+            sdram_usage += current_source.get_sdram_usage_in_bytes()
 
         return sdram_usage
 
@@ -1301,7 +1285,7 @@ class AbstractPopulationVertex(
             self.get_sdram_usage_for_neuron_params(n_atoms))
         sdram.add_cost(
             neuron_regions.current_source_params,
-            self.get_sdram_usage_for_current_source_params(vertex_slice))
+            self.get_sdram_usage_for_current_source_params(n_atoms))
         sdram.add_cost(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
