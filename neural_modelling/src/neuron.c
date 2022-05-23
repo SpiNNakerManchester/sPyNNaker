@@ -22,6 +22,7 @@
 #include "neuron.h"
 #include "neuron_recording.h"
 #include "implementations/neuron_impl.h"
+#include "current_sources/current_source.h"
 #include "plasticity/synapse_dynamics.h"
 #include "tdma_processing.h"
 #include <debug.h>
@@ -54,6 +55,9 @@ static uint32_t *ring_buffer_to_input_left_shifts;
 //! The address where the actual neuron parameters start
 static void *saved_neuron_params_address;
 
+//! The address for the current source parameters
+static void *current_source_address;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_core_parameters {
     uint32_t has_key;
@@ -82,13 +86,17 @@ bool neuron_resume(void) { // EXPORTED
         return false;
     }
 
+    // (re)load the current source parameters
+    current_source_load_parameters(current_source_address);
+
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters();
 }
 
 bool neuron_initialise(
         void *core_params_address, void *neuron_params_address,
-        void *recording_address, uint32_t *n_rec_regions_used) {
+        void *current_sources_address, void *recording_address,
+        uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -131,6 +139,7 @@ bool neuron_initialise(
 
     // Store where the actual neuron parameters start
     saved_neuron_params_address = neuron_params_address;
+    current_source_address = current_sources_address;
 
     log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
             n_neurons, n_neurons_peak, n_synapse_types);
@@ -140,8 +149,18 @@ bool neuron_initialise(
         return false;
     }
 
-    // load the data into the allocated DTCM spaces.
+    // load the neuron data into the allocated DTCM spaces.
     if (!neuron_load_neuron_parameters()) {
+        return false;
+    }
+
+    // Initialise for current sources
+    if (!current_source_initialise(current_sources_address, n_neurons)) {
+        return false;
+    }
+
+    // load the current source data into the allocated DTCM spaces
+    if (!current_source_load_parameters(current_sources_address)) {
         return false;
     }
 

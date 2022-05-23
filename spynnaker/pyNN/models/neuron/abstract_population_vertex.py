@@ -120,6 +120,8 @@ class AbstractPopulationVertex(
         "__synapse_dynamics",
         "__max_row_info",
         "__self_projection",
+        "__current_sources",
+        "__current_source_id_list",
         "__rng",
         "__pop_seed",
         "__connection_cache"]
@@ -227,6 +229,10 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__change_requires_data_generation = False
         self.__has_run = False
+
+        # Current sources for this vertex
+        self.__current_sources = []
+        self.__current_source_id_list = dict()
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
@@ -436,6 +442,31 @@ class AbstractPopulationVertex(
             _NEURON_GENERATOR_PER_PARAM * n_params,
             _NEURON_GENERATOR_PER_ITEM * n_params * n_atoms
         ])
+
+    def get_sdram_usage_for_current_source_params(self, n_atoms):
+        """ Calculate the SDRAM usage for the current source parameters region.
+
+        :param int n_atoms: The number of atoms to account for
+        :return: The SDRAM required for the current source region
+        """
+        # If non at all, just output size of 0 declaration
+        if not self.__current_sources:
+            return BYTES_PER_WORD
+
+        # This is a worst-case count, assuming all sources apply to all atoms
+        # Start with the count of sources + count of sources per neuron
+        sdram_usage = BYTES_PER_WORD + (n_atoms * BYTES_PER_WORD)
+
+        # Add on size of neuron id list per source (remember assume all atoms)
+        sdram_usage += (
+            len(self.__current_sources) * 2 * n_atoms * BYTES_PER_WORD)
+
+        # Add on the size of the current source data + neuron id list per
+        # source (remember, assume all neurons for worst case)
+        for current_source in self.__current_sources:
+            sdram_usage += current_source.get_sdram_usage_in_bytes()
+
+        return sdram_usage
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -751,6 +782,32 @@ class AbstractPopulationVertex(
         :param str target: The synapse to get the id of
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
+
+    def inject(self, current_source, neuron_list):
+        """ Inject method from population to set up current source
+
+        """
+        self.__current_sources.append(current_source)
+        self.__current_source_id_list[current_source] = neuron_list
+        # set the associated vertex (for multi-run case)
+        current_source.set_app_vertex(self)
+        # set to reload for multi-run case
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_reload_required(True)
+
+    @property
+    def current_sources(self):
+        """ Current sources need to be available to machine vertex
+
+        """
+        return self.__current_sources
+
+    @property
+    def current_source_id_list(self):
+        """ Current source ID list needs to be available to machine vertex
+
+        """
+        return self.__current_source_id_list
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)
@@ -1263,6 +1320,9 @@ class AbstractPopulationVertex(
         sdram.add_cost(
             neuron_regions.neuron_params,
             self.get_sdram_usage_for_neuron_params(n_atoms))
+        sdram.add_cost(
+            neuron_regions.current_source_params,
+            self.get_sdram_usage_for_current_source_params(n_atoms))
         sdram.add_cost(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(

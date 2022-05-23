@@ -137,12 +137,19 @@ else
 		    SYNAPSE_TYPE_H := $(call replace_source_dirs,$(SYNAPSE_TYPE_H))
 		endif
 		
+		ifndef CURRENT_SOURCE_H
+		    CURRENT_SOURCE_H = $(MODIFIED_DIR)neuron/current_sources/current_source_impl.h
+		else
+		    CURRENT_SOURCE_H := $(call replace_source_dirs,$(CURRENT_SOURCE_H))
+		endif
+		
 		NEURON_INCLUDES := \
 	      -include $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
 	      -include $(ADDITIONAL_INPUT_H) \
+	      -include $(CURRENT_SOURCE_H) \
 	      -include $(NEURON_IMPL_H)
     endif
 endif

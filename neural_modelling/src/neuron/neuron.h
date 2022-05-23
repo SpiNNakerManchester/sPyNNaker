@@ -42,13 +42,16 @@
 //!            of the core parameters data region in SDRAM
 //! \param[in] neuron_params_address: The absolute address in SDRAM for the
 //!            start of the neuron parameters data region in SDRAM
+//! \param[in] current_sources_address: The abosolute address in SDRAM for the
+//!            start of the current sources data region in SDRAM
 //! \param[in] recording_address: the recording parameters in SDRAM
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_rec_regions_used: The number of regions used by neuron recording
 //! \return True if the translation was successful, otherwise False
 bool neuron_initialise(
         void *core_params_address, void *neuron_params_address,
-        void *recording_address, uint32_t *n_rec_regions_used);
+        void *current_sources_address, void *recording_address,
+        uint32_t *n_rec_regions_used);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

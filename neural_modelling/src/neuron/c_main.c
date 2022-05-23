@@ -75,6 +75,7 @@ const struct common_priorities COMMON_PRIORITIES = {
 const struct neuron_regions NEURON_REGIONS = {
     .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
+    .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
 };
 
