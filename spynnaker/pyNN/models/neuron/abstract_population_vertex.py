@@ -112,7 +112,9 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__self_projection"]
+        "__self_projection",
+        "__current_sources",
+        "__current_source_id_list"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -221,6 +223,10 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__change_requires_data_generation = False
         self.__has_run = False
+
+        # Current sources for this vertex
+        self.__current_sources = []
+        self.__current_source_id_list = dict()
 
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
@@ -403,6 +409,47 @@ class AbstractPopulationVertex(
             (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
             self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
+
+    def get_sdram_usage_for_current_source_params(self, vertex_slice):
+        """ Calculate the SDRAM usage for the current source parameters region.
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms.
+        :return: The SDRAM required for the current source region
+        """
+        # Firstly get the current sources active on the vertex_slice
+        current_sources = []
+        current_source_id_list = []
+        lo_atom = vertex_slice.lo_atom
+        hi_atom = vertex_slice.hi_atom
+        for current_source in self.__current_sources:
+            id_list = []
+            for n in range(lo_atom, hi_atom + 1):
+                if (n in self.__current_source_id_list[current_source]):
+                    id_list.append(n)
+
+            if len(id_list):
+                current_sources.append(current_source)
+                current_source_id_list.append(id_list)
+
+        # First part is the number of current sources
+        sdram_usage = BYTES_PER_WORD
+
+        # If there are no current sources then skip the next bit
+        if len(current_sources) != 0:
+
+            # Each neuron has a value for how many current sources it has
+            sdram_usage += vertex_slice.n_atoms * BYTES_PER_WORD
+
+            # Then everywhere there is a current source, add the usage for that
+            for current_source, current_source_ids in zip(
+                    current_sources, current_source_id_list):
+                # Usage for list of IDs for this current source on this vertex
+                sdram_usage += (2 * len(current_source_ids)) * BYTES_PER_WORD
+                # Usage for the parameters of the current source itself
+                sdram_usage += current_source.get_sdram_usage_in_bytes()
+
+        return sdram_usage
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -720,6 +767,32 @@ class AbstractPopulationVertex(
         :param str target: The synapse to get the id of
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
+
+    def inject(self, current_source, neuron_list):
+        """ Inject method from population to set up current source
+
+        """
+        self.__current_sources.append(current_source)
+        self.__current_source_id_list[current_source] = neuron_list
+        # set the associated vertex (for multi-run case)
+        current_source.set_app_vertex(self)
+        # set to reload for multi-run case
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_reload_required(True)
+
+    @property
+    def current_sources(self):
+        """ Current sources need to be available to machine vertex
+
+        """
+        return self.__current_sources
+
+    @property
+    def current_source_id_list(self):
+        """ Current source ID list needs to be available to machine vertex
+
+        """
+        return self.__current_source_id_list
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)
@@ -1226,6 +1299,9 @@ class AbstractPopulationVertex(
         sdram.add_cost(
             neuron_regions.neuron_params,
             self.get_sdram_usage_for_neuron_params(n_atoms))
+        sdram.add_cost(
+            neuron_regions.current_source_params,
+            self.get_sdram_usage_for_current_source_params(vertex_slice))
         sdram.add_cost(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
