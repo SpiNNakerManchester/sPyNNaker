@@ -142,9 +142,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
-        self._run_wait(run_time, sync_time)
         super(SpiNNaker, self).run(run_time, sync_time)
-        for projection in self._projections:
+        for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
     def run(self, run_time, sync_time=0.0):
