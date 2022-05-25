@@ -278,7 +278,7 @@ class Recorder(object):
 
         return (data, indexes, sampling_interval)
 
-    def get_spikes(self, view_indexes=None):
+    def get_spikes(self):
         """ How to get spikes (of a population's neurons) from the recorder.
 
         :return: the spikes (event times) from the underlying vertex
