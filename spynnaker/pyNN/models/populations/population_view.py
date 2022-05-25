@@ -415,8 +415,7 @@ class PopulationView(PopulationBase):
             self.__population._initialize(
                 variable, value, self.__indexes)
 
-    def record(self, variables,  # pylint: disable=arguments-differ
-               to_file=None, sampling_interval=None):
+    def record(self, variables,  to_file=None, sampling_interval=None):
         """ Record the specified variable or variables for all cells in the\
             Population or view.
 

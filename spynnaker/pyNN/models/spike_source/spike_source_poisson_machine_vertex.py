@@ -464,7 +464,6 @@ class SpikeSourcePoissonMachineVertex(
         is_fast_source = spikes_per_tick >= self.SLOW_RATE_PER_TICK_CUTOFF
         is_faster_source = spikes_per_tick >= self.FAST_RATE_PER_TICK_CUTOFF
         not_zero = spikes_per_tick > 0
-        # pylint: disable=assignment-from-no-return
         is_slow_source = numpy.logical_not(is_fast_source)
 
         # Compute the e^-(spikes_per_tick) for fast sources to allow fast
@@ -524,7 +523,7 @@ class SpikeSourcePoissonMachineVertex(
         :param ~pacman.model.placements.Placement placement:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         spec.comment("\nWriting Parameters for {} poisson sources:\n"
                      .format(self.vertex_slice.n_atoms))
 
@@ -713,7 +712,6 @@ class SpikeSourcePoissonMachineVertex(
             spikes_per_tick[is_fast_source] = numpy.log(
                 exp_minus_lambda[is_fast_source]) * -1.0
             is_faster_source = sqrt_lambda > 0
-            # pylint: disable=assignment-from-no-return
             spikes_per_tick[is_faster_source] = numpy.square(
                 sqrt_lambda[is_faster_source])
             slow_elements = isi > 0

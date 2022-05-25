@@ -152,7 +152,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param ~numpy.ndarray delays:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays, synapse_info)
 
     def get_weight_mean(self, connector, synapse_info):
@@ -161,7 +160,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
     def get_weight_maximum(self, connector, synapse_info):
@@ -170,7 +168,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_variance(self, connector, weights, synapse_info):
@@ -179,7 +176,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights, synapse_info)
 
     def convert_per_connection_data_to_rows(
@@ -225,7 +221,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         return words
 
     def get_synapse_id_by_target(self, target):
-        # pylint:disable=unused-argument
         """ Get the index of the synapse type based on the name, or None
             if the name is not found.
 

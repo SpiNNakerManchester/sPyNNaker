@@ -151,7 +151,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
         tsfloat = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
 
         def decay(x):
