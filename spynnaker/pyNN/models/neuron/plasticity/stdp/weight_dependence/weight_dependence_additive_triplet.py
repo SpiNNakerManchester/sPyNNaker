@@ -157,9 +157,7 @@ class WeightDependenceAdditiveTriplet(
 
     @overrides(AbstractWeightDependence.weight_change_minimum)
     def weight_change_minimum(self, min_delta):
-        pot, dep = min_delta
-        a2_plus, a3_plus = pot
-        a2_minus, a3_minus = dep
+        (a2_plus, a3_plus), (a2_minus, a3_minus) = min_delta
         min_pot = a2_plus * self.A_plus + a3_plus * self.__a3_plus
         min_dep = a2_minus * self.A_minus + a3_minus * self.__a3_minus
         return min(min_pot, min_dep)
