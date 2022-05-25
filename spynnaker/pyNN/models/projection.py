@@ -54,7 +54,6 @@ class Projection(object):
     plasticity mechanisms) between two populations, together with methods to
     set parameters of those connections, including of plasticity mechanisms.
     """
-    # pylint: disable=redefined-builtin
     __slots__ = [
         "__projection_edge",
         "__requires_mapping",
@@ -78,7 +77,7 @@ class Projection(object):
         :param ~pyNN.space.Space space:
         :param str label:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
                 "sPyNNaker {} does not yet support multi-compartmental "

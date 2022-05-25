@@ -186,7 +186,7 @@ def EthernetControlPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
-    # pylint: disable=protected-access, too-many-arguments, too-many-locals
+    # pylint: disable=protected-access, too-many-arguments
     population = Population(n_neurons, model, label=label)
     vertex = population._vertex
     if not isinstance(vertex, AbstractEthernetController):

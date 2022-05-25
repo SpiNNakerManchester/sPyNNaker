@@ -167,7 +167,7 @@ class AbstractPopulationVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
 
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")

@@ -142,7 +142,6 @@ class SplitterAbstractPopulationVertexSlice(
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :rtype: ~pacman.model.resources.ResourceContainer
         """
-        # pylint: disable=arguments-differ
         variable_sdram = self.__get_variable_sdram(vertex_slice)
         constant_sdram = self.__get_constant_sdram(vertex_slice)
         sdram = MultiRegionSDRAM()
