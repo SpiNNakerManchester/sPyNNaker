@@ -26,7 +26,7 @@ from data_specification.enums.data_type import DataType
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import (
-    get_config_int, get_config_float, get_config_bool, get_config_str)
+    get_config_int, get_config_float, get_config_bool)
 
 from pacman.model.resources import MultiRegionSDRAM
 
