@@ -151,6 +151,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
 
         :param AbstractConnector connector:
         :param SynapseInformation synapse_info:
+        :param ~numpy.ndarray delays:
         """
         # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays, synapse_info)
