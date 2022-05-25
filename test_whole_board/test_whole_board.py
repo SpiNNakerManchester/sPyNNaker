@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 import spynnaker
 from spalloc.job import Job
 from spalloc.states import JobState
