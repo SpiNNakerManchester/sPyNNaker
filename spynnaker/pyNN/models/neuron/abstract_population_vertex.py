@@ -149,10 +149,10 @@ class AbstractPopulationVertex(
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, min_weights,
-            weight_random_sigma, max_stdp_spike_delta,
+            spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, neuron_impl, pynn_model,
-            drop_late_spikes, splitter):
+            drop_late_spikes, splitter, min_weights, weight_random_sigma,
+            max_stdp_spike_delta):
         """
         :param int n_neurons: The number of neurons in the population
         :param str label: The label on the population
@@ -167,12 +167,6 @@ class AbstractPopulationVertex(
             size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
-        :param min_weights: minimum weight list
-        :type min_weights: float or None
-        :param weight_random_sigma: sigma value for ?
-        :type weight_random_sigma: float or None
-        :param max_stdp_spike_delta: delta
-        :type max_stdp_spike_delta: float or None
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
         :param bool drop_late_spikes: control flag for dropping late packets.
@@ -183,6 +177,12 @@ class AbstractPopulationVertex(
         :param splitter: splitter object
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
+        :param min_weights: minimum weight list
+        :type min_weights: float array or None
+        :param weight_random_sigma: sigma value when using random weights
+        :type weight_random_sigma: float or None
+        :param max_stdp_spike_delta: the maximum expected spike time difference
+        :type max_stdp_spike_delta: float or None
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
@@ -268,30 +268,20 @@ class AbstractPopulationVertex(
         # meaning "auto calculate"; the number of weights needs to match
         # the number of synapse types
         self.__min_weights = min_weights
-        if self.__min_weights is None:
-            config_min_weights = get_config_str("Simulation", "min_weights")
-            if config_min_weights is not None:
-                self.__min_weights = [float(v)
-                                      for v in config_min_weights.split(',')]
         self.__min_weights_auto = True
         if self.__min_weights is not None:
             self.__min_weights_auto = False
             n_synapse_types = self.__neuron_impl.get_n_synapse_types()
             if len(self.__min_weights) != n_synapse_types:
                 raise SynapticConfigurationException(
-                    "The number of minimum weights provided ({}) does not"
+                    "The number of minimum weights provided ({} - {}) does not"
                     " match the number of synapse types ({})".format(
-                        self.__min_weights, n_synapse_types))
+                        len(self.__min_weights), self.__min_weights,
+                        n_synapse_types))
 
-        # Read the other minimum weight configuration parameters
+        # Get the other minimum weight configuration parameters
         self.__weight_random_sigma = weight_random_sigma
-        if self.__weight_random_sigma is None:
-            self.__weight_random_sigma = get_config_float(
-                "Simulation", "weight_random_sigma")
         self.__max_stdp_spike_delta = max_stdp_spike_delta
-        if self.__max_stdp_spike_delta is None:
-            self.__max_stdp_spike_delta = get_config_float(
-                "Simulation", "max_stdp_spike_delta")
 
         # Store weight provenance information mapping from
         # (real weight, represented weight) -> projections
@@ -1045,6 +1035,11 @@ class AbstractPopulationVertex(
         if self.__min_weights is None:
             self.__min_weights = self.__calculate_min_weights(
                 incoming_projections)
+        else:
+            weight_scale = self.__neuron_impl.get_global_weight_scale()
+            self.__check_weights(
+                self.__min_weights, weight_scale, incoming_projections)
+
         return self.__min_weights
 
     def get_weight_scales(self, min_weights):

@@ -47,9 +47,10 @@ class ExternalDeviceLifControlVertex(
     def __init__(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
-            ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
-            max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
-            drop_late_spikes=None, constraints=None, splitter=None):
+            ring_buffer_sigma=None, incoming_spike_buffer_size=None,
+            drop_late_spikes=None, constraints=None, splitter=None,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -67,14 +68,14 @@ class ExternalDeviceLifControlVertex(
         :param float spikes_per_second:
         :param str label:
         :param float ring_buffer_sigma:
-        :param list min_weights:
-        :param float weight_random_sigma:
-        :param float max_stdp_spike_delta:
         :param int incoming_spike_buffer_size:
         :param splitter: splitter from app to machine
         :type splitter: None or
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+        :param list min_weights:
+        :param float weight_random_sigma:
+        :param float max_stdp_spike_delta:
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -107,10 +108,10 @@ class ExternalDeviceLifControlVertex(
 
         super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, min_weights,
-            weight_random_sigma, max_stdp_spike_delta,
+            spikes_per_second, ring_buffer_sigma,
             incoming_spike_buffer_size, neuron_impl, pynn_model,
-            drop_late_spikes, splitter)
+            drop_late_spikes, splitter, min_weights,
+            weight_random_sigma, max_stdp_spike_delta)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ
