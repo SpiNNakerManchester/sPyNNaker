@@ -60,8 +60,7 @@ from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
 from spynnaker.pyNN.utilities.utility_calls import float_gcd
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
-    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
+    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
