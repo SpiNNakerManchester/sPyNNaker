@@ -131,8 +131,7 @@ class MunichRetinaDevice(
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
-        key_set_payload = (self._virtual_chip_x << 24 |
-                           self._virtual_chip_y << 16)
+        key_set_payload = self.__fixed_key
 
         commands.append(MultiCastCommand(
             key=key_set_command, payload=key_set_payload, repeat=5,
