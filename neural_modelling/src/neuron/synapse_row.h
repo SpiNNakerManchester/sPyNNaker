@@ -232,22 +232,6 @@ static inline weight_t synapse_row_sparse_weight(uint32_t x) {
     return x >> (32 - SYNAPSE_WEIGHT_BITS);
 }
 
-////! \brief Converts a weight stored in a synapse row to an input
-////! \param[in] weight: the weight to convert in synapse-row form
-////! \param[in] left_shift: the shift to use when decoding
-////! \return the actual input weight for the model
-//static inline input_t synapse_row_convert_weight_to_input(
-//        weight_t weight, uint32_t left_shift) {
-//    union {
-//        int_k_t input_type;
-//        s1615 output_type;
-//    } converter;
-//
-//    converter.input_type = (int_k_t) (weight) << left_shift;
-//
-//    return converter.output_type;
-//}
-
 //! \brief Converts a weight stored in a synapse row to an input
 //! \param[in] weight: the weight to convert in synapse-row form
 //! \param[in] min_weight: the minimum weight to use in the conversion
