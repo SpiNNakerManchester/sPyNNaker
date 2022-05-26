@@ -41,10 +41,9 @@ class AllToOneWithLargeWeightCase(BaseTestCase):
         sim.end()
 
         weight_sum = sum(weight[2] for weight in weight_list)
-        # 50.0 is not exactly representable so work out the actual value
-        weight_used = 1 / (
-            DataType.S1615.closest_representable_value_above(1 / weights))
-        self.assertAlmostEqual(weight_sum, sources * weight_used)
+        # 50.0 is not exactly representable so specify a relevant tolerance
+        self.assertAlmostEqual(weight_sum, sources * weights,
+                               delta=sources*0.05)
 
     def test_run(self):
         self.runsafe(self.do_run)
