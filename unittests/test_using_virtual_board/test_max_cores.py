@@ -67,3 +67,23 @@ class Test_Max_Cores(BaseTestCase):
         with self.assertRaises(SpynnakerException):
             pop1.set_max_atoms_per_core(100)
         sim.end()
+
+    def test_raise_sim_cap(self):
+        sim.setup(timestep=1, min_delay=1)
+        with self.assertRaises(SpynnakerException):
+            sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 500)
+        pop1 = sim.Population(500, sim.IF_curr_exp)
+        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
+        vertex1 = pop1._Population__vertex
+        self.assertEqual(256, vertex1.get_max_atoms_per_core())
+        with self.assertRaises(SpynnakerException):
+            # This does not work because we have not programmed it
+            pop1.set_max_atoms_per_core(200)
+        pop1.set_max_atoms_per_core(50)
+        self.assertEqual(50, vertex1.get_max_atoms_per_core())
+        pop1.set_max_atoms_per_core(100)
+        self.assertEqual(100, vertex1.get_max_atoms_per_core())
+        with self.assertRaises(SpynnakerException):
+            # This does not work because we have not programmed it
+            sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 200)
+        sim.end()
