@@ -244,3 +244,18 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: int or None
         """
         return None
+
+    def calculate_min_weight(self, min_weights, max_stdp_spike_delta,
+                             weight_scale, conn_weight_min, synapse_type):
+        """ Do any further calculations required to work out the minimum
+            weight value used on the machine.
+
+        :param list min_weights: the current minimum weights
+        :param int max_stdp_spike_delta: the max time between spikes
+        :param float weight_scale: the amount to scale the weights, from input
+        :param float conn_weight_min: the weight minimum from the connector
+        :param int synapse_type: the synapse ID for which to calculate the min
+        :rtype: list
+        """
+        # By default no further calculation is required
+        return min_weights

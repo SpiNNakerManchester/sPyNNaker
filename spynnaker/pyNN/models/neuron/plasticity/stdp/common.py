@@ -74,8 +74,6 @@ def get_min_lut_value(
         spike times in milliseconds
     :rtype: float
     """
-    if not len(exp_lut_array):
-        return None
     values = exp_lut_array.view("uint16")
 
     # If there isn't a time step and a limit

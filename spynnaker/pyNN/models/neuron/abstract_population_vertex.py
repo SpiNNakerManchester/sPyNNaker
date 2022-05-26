@@ -919,36 +919,23 @@ class AbstractPopulationVertex(
             connector = synapse_info.connector
             synapse_dynamics = synapse_info.synapse_dynamics
 
-            weight_min = synapse_dynamics.get_weight_minimum(
+            conn_weight_min = synapse_dynamics.get_weight_minimum(
                 connector, self.__weight_random_sigma, synapse_info)
 
-            if weight_min == 0:
-                weight_min = DataType.S1615.decode_from_int(1)
-            weight_min *= weight_scale
-            if not numpy.isnan(weight_min):
+            if conn_weight_min == 0:
+                conn_weight_min = DataType.S1615.decode_from_int(1)
+            conn_weight_min *= weight_scale
+            if not numpy.isnan(conn_weight_min):
                 if min_weights[synapse_type] != sys.maxsize:
-                    weight_min = float_gcd(
-                        min_weights[synapse_type], weight_min)
+                    conn_weight_min = float_gcd(
+                        min_weights[synapse_type], conn_weight_min)
                 min_weights[synapse_type] = min(
-                    min_weights[synapse_type], weight_min)
+                    min_weights[synapse_type], conn_weight_min)
 
-            if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
-                min_delta = synapse_dynamics.get_weight_min_delta(
-                    self.__max_stdp_spike_delta)
-                min_delta *= weight_scale
-                if min_delta is not None and min_delta != 0:
-                    # This also depends on the earlier calculated minimum
-                    min_delta = float_gcd(min_delta, weight_min)
-                    min_weights[synapse_type] = min(
-                        min_weights[synapse_type], min_delta)
-            elif isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic):
-                weight_min = synapse_dynamics.initial_weight
-                weight_min *= weight_scale
-                if weight_min != 0:
-                    weight_min = float_gcd(min_weights[synapse_type],
-                                           weight_min)
-                    min_weights[synapse_type] = min(
-                        min_weights[synapse_type], weight_min)
+            # Do any remaining calculations inside the synapse dynamics
+            min_weights = synapse_dynamics.calculate_min_weight(
+                min_weights, self.__max_stdp_spike_delta, weight_scale,
+                conn_weight_min, synapse_type)
 
         # Convert values to their closest representable value to ensure
         # that division works for the minimum value
