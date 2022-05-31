@@ -514,7 +514,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if previous < max_permitted:
                 raise SpynnakerException(
                     f"Attempt to increase number_of_neurons_per_core "
-                    f"from {previous} to {previous} not supported")
+                    f"from {previous} to {max_permitted} not supported")
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         self.__neurons_per_core_set.add(neuron_type)
         if self._populations:
