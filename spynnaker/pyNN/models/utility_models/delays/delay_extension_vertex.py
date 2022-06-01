@@ -42,13 +42,14 @@ class DelayExtensionVertex(
         of a neuron (typically 16 or 32)
     """
     __slots__ = [
+        # The parition this Delay is supporting
+        "__partition",
         "__delay_blocks",
         "__delay_per_stage",
-        "__n_atoms",
         "__n_delay_stages",
-        "__source_vertex",
         "__delay_generator_data",
-        "__drop_late_spikes"]
+        "__drop_late_spikes",
+        "__post_delay_edges"]
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -60,15 +61,14 @@ class DelayExtensionVertex(
         "yet feasible. Please report it to Spinnaker user mail list.")
 
     def __init__(
-            self, n_neurons, delay_per_stage, n_delay_stages,
-            source_vertex, constraints=None, label="DelayExtension"):
+            self, partition, delay_per_stage, n_delay_stages,
+            constraints=None, label="DelayExtension"):
         """
-        :param int n_neurons: the number of neurons
+        :param partition: The parition this Delay is supporting
+        :type partition:
+            ~pacman.mode.graph.application.ApplicationEdgePartition
         :param int delay_per_stage: the delay per stage
         :param int n_delay_stages: the (initial) number of delay stages needed
-        :param ~pacman.model.graphs.application.ApplicationVertex \
-                source_vertex:
-            where messages are coming from
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
                 constraints:
             the vertex constraints
@@ -78,13 +78,10 @@ class DelayExtensionVertex(
         super().__init__(
             label, constraints, POP_TABLE_MAX_ROW_LENGTH, splitter=None)
 
-        self.__source_vertex = source_vertex
+        self.__partition = partition
         self.__n_delay_stages = n_delay_stages
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
-
-        # atom store
-        self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
 
         # Dictionary of vertex_slice -> delay block for data specification
         self.__delay_blocks = dict()
@@ -92,9 +89,11 @@ class DelayExtensionVertex(
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
 
+        self.__post_delay_edges = set()
+
     @property
     def n_atoms(self):
-        return self.__n_atoms
+        return self.__partition.pre_vertex.n_atoms
 
     @property
     def drop_late_spikes(self):
@@ -133,7 +132,7 @@ class DelayExtensionVertex(
         """
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
-        return self.__source_vertex
+        return self.__partition.pre_vertex
 
     def add_delays(self, vertex_slice, source_ids, stages):
         """ Add delayed connections for a given vertex slice
@@ -221,3 +220,17 @@ class DelayExtensionVertex(
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
         return len(self._splitter.get_out_going_slices()[0])
+
+    @property
+    def partition(self):
+        return self.__partition
+
+    def add_post_delay_edge(self, post_delay_edge):
+        self.__post_delay_edges.add(post_delay_edge)
+
+    @property
+    def post_delay_edges(self):
+        """
+        Set of post_delay_edges from this Delay
+        """
+        return self.__post_delay_edges

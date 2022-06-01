@@ -66,6 +66,12 @@ class _DelaySupportAdder(object):
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
             the app graph
         """
+        for vertex in app_graph.vertices:
+            if isinstance(vertex, DelayExtensionVertex):
+                self._app_to_delay_map[vertex.partition] = vertex
+                for edge in vertex.post_delay_edges:
+                    self._delay_post_edge_map[(vertex, edge.post_vertex)] = \
+                        edge
 
         # progress abr and data holders
         progress = ProgressBar(
@@ -158,8 +164,8 @@ class _DelaySupportAdder(object):
             # build delay app vertex
             delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
             delay_app_vertex = DelayExtensionVertex(
-                app_edge.pre_vertex.n_atoms, delay_per_stage, n_delay_stages,
-                app_edge.pre_vertex, label=delay_name)
+                app_outgoing_edge_partition, delay_per_stage, n_delay_stages,
+                label=delay_name)
 
             # set trackers
             delay_app_vertex.splitter = (

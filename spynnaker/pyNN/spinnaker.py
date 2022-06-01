@@ -681,7 +681,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     @overrides(AbstractSpinnakerBase._execute_splitter_selector)
     def _execute_splitter_selector(self):
         with FecTimer(MAPPING, "Spynnaker splitter selector"):
-            spynnaker_splitter_selector(self._application_graph)
+            spynnaker_splitter_selector(self._original_application_graph)
 
     @overrides(AbstractSpinnakerBase._execute_delay_support_adder,
                extend_doc=False)
@@ -694,7 +694,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             return
         with FecTimer(MAPPING, "DelaySupportAdder"):
             if name == "DelaySupportAdder":
-                delay_support_adder(self._application_graph)
+                delay_support_adder(self._original_application_graph)
                 return
             raise ConfigurationException(
                 f"Unexpected cfg setting delay_support_adder: {name}")
