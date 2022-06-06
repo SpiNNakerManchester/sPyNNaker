@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.external_devices_models.push_bot.control package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -49,16 +50,16 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-external-devices-models-push-bot-control-package">
-<h1>spynnaker.pyNN.external_devices_models.push_bot.control package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-control-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.external_devices_models.push_bot.control package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-control-package" title="Permalink to this heading">¶</a></h1>
 <section id="module-spynnaker.pyNN.external_devices_models.push_bot.control">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.control" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.control" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.control.PushBotLifEthernet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.control.</span></span><span class="sig-name descname"><span class="pre">PushBotLifEthernet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.control.PushBotLifEthernet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a></p>
 <p>Leaky integrate and fire neuron with an exponentially decaying         current input</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – How to talk to the bot.</p></li>
 <li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
@@ -90,10 +91,10 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.control.PushBotLifSpinnakerLink">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.control.</span></span><span class="sig-name descname"><span class="pre">PushBotLifSpinnakerLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.control.PushBotLifSpinnakerLink" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a></p>
 <p>Control module for a PushBot connected to a SpiNNaker Link</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – How to talk to the bot.</p></li>
 <li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
@@ -166,7 +167,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -197,7 +198,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.protocols package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,13 +48,13 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-protocols-package">
-<h1>spynnaker.pyNN.protocols package<a class="headerlink" href="#spynnaker-pynn-protocols-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.protocols package<a class="headerlink" href="#spynnaker-pynn-protocols-package" title="Permalink to this heading">¶</a></h1>
 <section id="module-spynnaker.pyNN.protocols">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.protocols" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.protocols" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.MUNICH_MODES">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.protocols.</span></span><span class="sig-name descname"><span class="pre">MUNICH_MODES</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.protocols.MUNICH_MODES" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>types of modes supported by this protocol</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.MUNICH_MODES.BALL_BALANCER">
@@ -196,7 +197,7 @@ ethernet.</p>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Provides Multicast commands for the Munich SpiNNaker-Link protocol</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> – The mode of operation of the protocol</p></li>
 <li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The optional instance key to use</p></li>
@@ -314,7 +315,7 @@ ethernet.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance_key</span></span><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.instance_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>The key of this instance of the protocol</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -349,7 +350,7 @@ ethernet.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES"><em>MUNICH_MODES</em></a></p>
 </dd>
 </dl>
@@ -706,17 +707,17 @@ ethernet.</p>
 <span class="sig-name descname"><span class="pre">set_retina_transmission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RetinaKey.NATIVE_128_X_128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the retina transmission key</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>retina_key</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) – the new key for the retina</p></li>
 <li><p><strong>retina_payload</strong> (<a class="reference internal" href="#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><em>None</em>) – the new payload for the set retina key command packet</p></li>
 <li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – when to transmit this packet</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the command to send</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a></p>
 </dd>
 </dl>
@@ -741,7 +742,7 @@ ethernet.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uart_id</span></span><a class="headerlink" href="#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.uart_id" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -752,7 +753,7 @@ ethernet.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.RetinaKey">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.protocols.</span></span><span class="sig-name descname"><span class="pre">RetinaKey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaKey" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.RetinaKey.DOWNSAMPLE_16_X_16">
@@ -799,7 +800,7 @@ ethernet.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.RetinaPayload">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.protocols.</span></span><span class="sig-name descname"><span class="pre">RetinaPayload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.protocols.RetinaPayload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.protocols.RetinaPayload.ABSOLUTE_2_BYTE_TIMESTAMPS">
@@ -884,7 +885,7 @@ ethernet.</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -913,7 +914,7 @@ ethernet.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

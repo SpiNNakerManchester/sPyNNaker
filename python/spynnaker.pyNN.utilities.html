@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.utilities package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,9 +48,9 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-utilities-package">
-<h1>spynnaker.pyNN.utilities package<a class="headerlink" href="#spynnaker-pynn-utilities-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.utilities package<a class="headerlink" href="#spynnaker-pynn-utilities-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html">spynnaker.pyNN.utilities.random_stats package</a><ul>
@@ -64,10 +65,10 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-spynnaker.pyNN.utilities.bit_field_utilities">
-<span id="spynnaker-pynn-utilities-bit-field-utilities-module"></span><h2>spynnaker.pyNN.utilities.bit_field_utilities module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.bit_field_utilities" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-bit-field-utilities-module"></span><h2>spynnaker.pyNN.utilities.bit_field_utilities module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.bit_field_utilities" title="Permalink to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">ELEMENTS_USED_IN_BIT_FIELD_HEADER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.ELEMENTS_USED_IN_BIT_FIELD_HEADER" title="Permalink to this definition">¶</a></dt>
@@ -105,10 +106,10 @@ bit_field_key, structural region)</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">exact_sdram_for_bit_field_builder_region</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#exact_sdram_for_bit_field_builder_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the SDRAM requirement for the builder region</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the SDRAM requirement for the builder region</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -119,13 +120,13 @@ bit_field_key, structural region)</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_bit_field_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>estimates the SDRAM for the bit field region</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the estimated number of bytes used by the bit field region</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -136,13 +137,13 @@ bit_field_key, structural region)</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">get_estimated_sdram_for_key_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_key_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets an estimate of the bitfield builder region</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>incoming_projections</strong> (<em>iterable</em><em>(</em><em>Projection</em><em>)</em>) – The projections that target the vertex in question</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>SDRAM needed</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -153,7 +154,7 @@ bit_field_key, structural region)</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">reserve_bit_field_regions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_filter_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_region_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#reserve_bit_field_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>reserves the regions for the bitfields</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – dsg spec writer</p></li>
 <li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
@@ -173,7 +174,7 @@ bit_field_key, structural region)</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes the init data needed for the bitfield generator</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data spec writer</p></li>
 <li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
@@ -194,7 +195,7 @@ bit_field_key, structural region)</p>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.constants">
-<span id="spynnaker-pynn-utilities-constants-module"></span><h2>spynnaker.pyNN.utilities.constants module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.constants" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-constants-module"></span><h2>spynnaker.pyNN.utilities.constants module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.constants" title="Permalink to this heading">¶</a></h2>
 <dl class="py data">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.constants.LIVE_POISSON_CONTROL_PARTITION_ID">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.constants.</span></span><span class="sig-name descname"><span class="pre">LIVE_POISSON_CONTROL_PARTITION_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CONTROL'</span></em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.LIVE_POISSON_CONTROL_PARTITION_ID" title="Permalink to this definition">¶</a></dt>
@@ -252,7 +253,7 @@ bit_field_key, structural region)</p>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.data_cache">
-<span id="spynnaker-pynn-utilities-data-cache-module"></span><h2>spynnaker.pyNN.utilities.data_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.data_cache" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-data-cache-module"></span><h2>spynnaker.pyNN.utilities.data_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.data_cache" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.data_cache.DataCache">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.data_cache.</span></span><span class="sig-name descname"><span class="pre">DataCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording_start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache" title="Permalink to this definition">¶</a></dt>
@@ -265,7 +266,7 @@ bit_field_key, structural region)</p>
 <p>Stores the Data shared by all variable types at the top level
 and holds a cache for the variable specific data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – cache label</p></li>
 <li><p><strong>description</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a>) – cache description</p></li>
@@ -285,13 +286,13 @@ and holds a cache for the variable specific data.</p>
 <span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the variable cache for the named variable</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of variable to get cache for</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The cache data, IDs, indexes and units</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache" title="spynnaker.pyNN.utilities.variable_cache.VariableCache">VariableCache</a></p>
 </dd>
 </dl>
@@ -302,13 +303,13 @@ and holds a cache for the variable specific data.</p>
 <span class="sig-name descname"><span class="pre">has_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.has_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.has_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if data for a variable has been cached</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of variable</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if there is cached data</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
@@ -334,7 +335,7 @@ and holds a cache for the variable specific data.</p>
 <span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/data_cache.html#DataCache.save_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.save_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Saves the data for one variable in this segment</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – name of variable data applies to</p></li>
 <li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – raw data in sPyNNaker format</p></li>
@@ -363,7 +364,7 @@ regardless of if they where recording or not.</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variables</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.data_cache.DataCache.variables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provides a list of which variables data has been cached for</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Iterator (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -373,7 +374,7 @@ regardless of if they where recording or not.</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.extracted_data">
-<span id="spynnaker-pynn-utilities-extracted-data-module"></span><h2>spynnaker.pyNN.utilities.extracted_data module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.extracted_data" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-extracted-data-module"></span><h2>spynnaker.pyNN.utilities.extracted_data module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.extracted_data" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.extracted_data.ExtractedData">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.extracted_data.</span></span><span class="sig-name descname"><span class="pre">ExtractedData</span></span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData" title="Permalink to this definition">¶</a></dt>
@@ -384,16 +385,16 @@ regardless of if they where recording or not.</p></li>
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allow getting data from a given projection and attribute</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – the projection data was extracted from</p></li>
 <li><p><strong>attribute</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – the attribute to retrieve</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the attribute data in a connection holder</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder">ConnectionHolder</a></p>
 </dd>
 </dl>
@@ -404,14 +405,14 @@ regardless of if they where recording or not.</p></li>
 <span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attribute</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allow the addition of data from a projection and attribute.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>) – the projection data was extracted from</p></li>
 <li><p><strong>attribute</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – the attribute to store</p></li>
 <li><p><strong>data</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a>) – attribute data in a connection holder</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -421,7 +422,7 @@ regardless of if they where recording or not.</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">
-<span id="spynnaker-pynn-utilities-fake-hbp-portal-machine-provider-module"></span><h2>spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-fake-hbp-portal-machine-provider-module"></span><h2>spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.</span></span><span class="sig-name descname"><span class="pre">FakeHBPPortalMachineProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_boards</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider" title="Permalink to this definition">¶</a></dt>
@@ -455,13 +456,13 @@ regardless of if they where recording or not.</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.neo_compare">
-<span id="spynnaker-pynn-utilities-neo-compare-module"></span><h2>spynnaker.pyNN.utilities.neo_compare module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.neo_compare" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-neo-compare-module"></span><h2>spynnaker.pyNN.utilities.neo_compare module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.neo_compare" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_compare.compare_analogsignal">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_analogsignal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">as1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_analogsignal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_analogsignal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares two analogsignal Objects to see if they are the same</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>as1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – first analogsignal holding list of individual analogsignal Objects</p></li>
 <li><p><strong>as2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – second analogsignal holding list of individual analogsignal Objects</p></li>
@@ -471,7 +472,7 @@ to have additional data after the first ends. This is used to compare
 data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the analogsignals are not equal</p>
 </dd>
 </dl>
@@ -482,7 +483,7 @@ data extracted part way with data extracted at the end.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_blocks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neo1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neo2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_blocks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_blocks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compares two neo Blocks to see if they hold the same data.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>neo1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – First block to check</p></li>
 <li><p><strong>neo2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Second block to check</p></li>
@@ -497,7 +498,7 @@ to have additional data after the first ends. This is used to compare
 data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the blocks are not equal</p>
 </dd>
 </dl>
@@ -507,7 +508,7 @@ data extracted part way with data extracted at the end.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_compare.compare_segments">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seg1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seg2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_segments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_segments" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>seg1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.10)"><em>Segment</em></a>) – First Segment to check</p></li>
 <li><p><strong>seg2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Segment" title="(in Neo v0.10)"><em>Segment</em></a>) – Second Segment to check</p></li>
@@ -520,7 +521,7 @@ to have additional data after the first ends. This is used to compare
 data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the segments are not equal</p>
 </dd>
 </dl>
@@ -531,7 +532,7 @@ data extracted part way with data extracted at the end.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_spiketrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrain1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrain2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_spiketrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks two Spiketrains have the exact same data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spiketrain1</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a>) – first spiketrain</p></li>
 <li><p><strong>spiketrain2</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a>) – second spiketrain</p></li>
@@ -541,10 +542,10 @@ to have additional spikes after the first ends. This is used to
 compare data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
-<dt class="field-odd">Raises</dt>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
 </dd>
 </dl>
@@ -555,7 +556,7 @@ compare data extracted part way with data extracted at the end.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_compare.</span></span><span class="sig-name descname"><span class="pre">compare_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spiketrains2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">same_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_compare.html#compare_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_compare.compare_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check two Lists of SpikeTrains have the exact same data</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spiketrains1</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – First list SpikeTrains to compare</p></li>
 <li><p><strong>spiketrains2</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – Second list of SpikeTrains to compare</p></li>
@@ -569,7 +570,7 @@ to have additional spikes after the first ends. This is used to compare
 data extracted part way with data extracted at the end.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raises</dt>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#AssertionError" title="(in Python v3.8)"><strong>AssertionError</strong></a> – If the spiketrains are not equal</p>
 </dd>
 </dl>
@@ -577,19 +578,19 @@ data extracted part way with data extracted at the end.</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.neo_convertor">
-<span id="spynnaker-pynn-utilities-neo-convertor-module"></span><h2>spynnaker.pyNN.utilities.neo_convertor module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.neo_convertor" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-neo-convertor-module"></span><h2>spynnaker.pyNN.utilities.neo_convertor module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.neo_convertor" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_analog_signal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UnitTime('millisecond',</span> <span class="pre">0.001</span> <span class="pre">*</span> <span class="pre">s,</span> <span class="pre">'ms')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_analog_signal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts part of a NEO object into told spynnaker7 format</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>signal_array</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.AnalogSignal" title="(in Neo v0.10)"><em>AnalogSignal</em></a>) – Extended Quantities object</p></li>
 <li><p><strong>time_unit</strong> (<em>quantities.unitquantity.UnitTime</em>) – Data time unit for time index</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -600,7 +601,7 @@ data extracted part way with data extracted at the end.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the data into a numpy array in the format ID, time, value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
@@ -608,7 +609,7 @@ Same values as used in getData()</p></li>
 <li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -619,7 +620,7 @@ Same values as used in getData()</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_data_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_data_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_data_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the data into a list of numpy arrays in the format ID, time,        value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Data as returned by a getData() call</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the data to be extracted.
@@ -628,7 +629,7 @@ Same values as used in getData()</p></li>
 Or None to extract all runs</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>)</p>
 </dd>
 </dl>
@@ -643,13 +644,13 @@ Or None to extract all runs</p></li>
 <p>It is acceptable for both neo parameters to be the same object</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gsyn_exc</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
 <li><p><strong>gsyn_inh</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo with gsyn_exc data</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -660,14 +661,14 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_gsyn_exc_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_gsyn_exc_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_exc_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the gsyn_exc into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have Gsyn_exc data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>)</p>
 </dd>
 </dl>
@@ -678,14 +679,14 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_gsyn_inh_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_gsyn_inh_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_gsyn_inh_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the gsyn_inh into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have Gsyn_inh data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>)</p>
 </dd>
 </dl>
@@ -696,13 +697,13 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_spikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts the spikes for run one from a Neo Object</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – neo Object including Spike Data</p></li>
 <li><p><strong>run</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Zero based index of the run to extract data for</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -713,10 +714,10 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a list of spiketrains into spynnaker7 format</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -727,14 +728,14 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">convert_v_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#convert_v_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.convert_v_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the voltage into a list numpy array one per segment (all        runs) in the format ID, time, value</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – The data to convert; it must have V data in it</p></li>
 <li><p><strong>runs</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – List of Zero based index of the run to extract data for.
 Or None to extract all runs</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>)</p>
 </dd>
 </dl>
@@ -746,10 +747,10 @@ Or None to extract all runs</p></li>
 <dd><p>Help function to count the number of spikes in a list of spiketrains</p>
 <p>Only counts run 0</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>neo</strong> (<a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a>) – Neo Object which has spikes in it</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of spikes in the first segment</p>
 </dd>
 </dl>
@@ -760,13 +761,13 @@ Or None to extract all runs</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.neo_convertor.</span></span><span class="sig-name descname"><span class="pre">count_spiketrains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spiketrains</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/neo_convertor.html#count_spiketrains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.neo_convertor.count_spiketrains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Help function to count the number of spikes in a list of spiketrains</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>spiketrains</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.SpikeTrain" title="(in Neo v0.10)"><em>SpikeTrain</em></a><em>)</em>) – List of SpikeTrains</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Total number of spikes in all the spiketrains</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -774,7 +775,7 @@ Or None to extract all runs</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.running_stats">
-<span id="spynnaker-pynn-utilities-running-stats-module"></span><h2>spynnaker.pyNN.utilities.running_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.running_stats" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-running-stats-module"></span><h2>spynnaker.pyNN.utilities.running_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.running_stats" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.running_stats.RunningStats">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.running_stats.</span></span><span class="sig-name descname"><span class="pre">RunningStats</span></span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats" title="Permalink to this definition">¶</a></dt>
@@ -786,7 +787,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <span class="sig-name descname"><span class="pre">add_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats.add_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds an item to the running statistics.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The item to add</p>
 </dd>
 </dl>
@@ -797,7 +798,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <span class="sig-name descname"><span class="pre">add_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats.add_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_items" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a bunch of items (via their statistics).</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mean</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The mean of the items to add.</p></li>
 <li><p><strong>variance</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The variance of the items to add.</p></li>
@@ -812,7 +813,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mean</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>The mean of the items seen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -823,7 +824,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_items</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.n_items" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of items seen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -834,7 +835,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">standard_deviation</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.standard_deviation" title="Permalink to this definition">¶</a></dt>
 <dd><p>The population standard deviation of the items seen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -845,7 +846,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">variance</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.variance" title="Permalink to this definition">¶</a></dt>
 <dd><p>The variance of the items seen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -855,14 +856,14 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.struct">
-<span id="spynnaker-pynn-utilities-struct-module"></span><h2>spynnaker.pyNN.utilities.struct module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.struct" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-struct-module"></span><h2>spynnaker.pyNN.utilities.struct module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.struct" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.struct.Struct">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.struct.</span></span><span class="sig-name descname"><span class="pre">Struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Represents a C code structure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>field_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a><em>)</em>) – The types of the fields, ordered as they appear in the struct.</p>
 </dd>
 </dl>
@@ -871,7 +872,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">field_types</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.field_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>The types of the fields, ordered as they appear in the struct.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>)</p>
 </dd>
 </dl>
@@ -882,7 +883,7 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a numpy array of uint32 of data for the given values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or
 </em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v6.0)"><em>RangedList</em></a><em>)</em>) – A list of values with length the same size as the number of fields
@@ -891,7 +892,7 @@ returned by field_types</p></li>
 <li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of structs to generate</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(dtype=”uint32”)</p>
 </dd>
 </dl>
@@ -902,10 +903,10 @@ returned by field_types</p></li>
 <span class="sig-name descname"><span class="pre">get_size_in_whole_words</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_size_in_whole_words"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the size of the struct in whole words in an array of given            size (default 1 item)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of elements in an array of structs</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -916,7 +917,7 @@ returned by field_types</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">numpy_dtype</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>The numpy data type of the struct</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v1.20)"><em>dtype</em></a></p>
 </dd>
 </dl>
@@ -927,17 +928,17 @@ returned by field_types</p></li>
 <span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.read_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a bytearray of data and convert to struct values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytes" title="(in Python v3.8)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)"><em>bytearray</em></a>) – The data to be read</p></li>
 <li><p><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the byte at the start of the valid data</p></li>
 <li><p><strong>array_size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of struct elements to read</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a list of lists of data values, one list for each struct element</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
 </dd>
 </dl>
@@ -947,14 +948,14 @@ returned by field_types</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.utility_calls">
-<span id="spynnaker-pynn-utilities-utility-calls-module"></span><h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.utility_calls" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-utility-calls-module"></span><h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.utility_calls" title="Permalink to this heading">¶</a></h2>
 <p>utility class containing simple helper methods</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">check_directory_exists_and_create_if_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#check_directory_exists_and_create_if_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a parent directory for a file if it doesn’t exist</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The file whose parent directory is to be created</p>
 </dd>
 </dl>
@@ -965,17 +966,17 @@ returned by field_types</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">convert_param_to_numpy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#convert_param_to_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.convert_param_to_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert parameters into numpy arrays.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>param</strong> (<a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or
 </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – the param to convert</p></li>
 <li><p><strong>no_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of atoms available for conversion of param</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the converted param as an array of floats</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>)</p>
 </dd>
 </dl>
@@ -986,16 +987,16 @@ returned by field_types</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">convert_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#convert_to"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.convert_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a value to a given data type</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>value</strong> – The value to convert</p></li>
 <li><p><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v6.0)"><em>DataType</em></a>) – The data type to convert to</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The converted data as a numpy data type</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(int32)</p>
 </dd>
 </dl>
@@ -1006,17 +1007,17 @@ returned by field_types</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">create_mars_kiss_seeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#create_mars_kiss_seeds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds" title="Permalink to this definition">¶</a></dt>
 <dd><p>generates and checks that the seed values generated by the given        random number generator or seed to a random number generator are        suitable for use as a mars 64 kiss seed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rng</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/random/legacy.html#numpy.random.RandomState" title="(in NumPy v1.20)"><em>RandomState</em></a>) – the random number generator.</p></li>
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – the seed to create a random number generator if not handed.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a list of 4 ints which are used by the mars64 kiss random number
 generator for seeds.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
@@ -1045,13 +1046,13 @@ generator for seeds.</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_n_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_n_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_n_bits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine how many bits are required for the given number of values</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of values (starting at 0)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the number of bits required to express that many values</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -1086,7 +1087,7 @@ generator for seeds.</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">get_time_to_write_us</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cores</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_time_to_write_us"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine how long a write of a given number of bytes will take in us</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bytes to transfer</p></li>
 <li><p><strong>n_cores</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – How many cores will be writing at the same time</p></li>
@@ -1120,10 +1121,10 @@ generator for seeds.</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">moved_in_v6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#moved_in_v6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v6" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tells the users that old code is no lonfger implemented</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>old_location</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – old import</p>
 </dd>
-<dt class="field-even">Raise</dt>
+<dt class="field-even">Raise<span class="colon">:</span></dt>
 <dd class="field-even"><p>NotImplementedError</p>
 </dd>
 </dl>
@@ -1135,13 +1136,13 @@ generator for seeds.</p>
 <dd><p>Warns the users that they are using an old import.</p>
 <p>In version 8 this will be upgraded to a exception and then later removed</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>old_location</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – old import</p></li>
 <li><p><strong>new_location</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – new import</p></li>
 </ul>
 </dd>
-<dt class="field-even">Raise</dt>
+<dt class="field-even">Raise<span class="colon">:</span></dt>
 <dd class="field-even"><p>an exception if in CONTINUOUS_INTEGRATION</p>
 </dd>
 </dl>
@@ -1155,7 +1156,7 @@ generator for seeds.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – absolute path to a file containing the data</p></li>
 <li><p><strong>min_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – min neuron ID to which neurons to read in</p></li>
@@ -1165,10 +1166,10 @@ generator for seeds.</p>
 <li><p><strong>max_time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – max time slot to read neurons values of.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a numpy array of (time stamp, atom ID, data value)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a>))</p>
 </dd>
 </dl>
@@ -1182,7 +1183,7 @@ generator for seeds.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file_path</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – absolute path to a file containing spike values</p></li>
 <li><p><strong>min_atom</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – min neuron ID to which neurons to read in</p></li>
@@ -1192,10 +1193,10 @@ generator for seeds.</p>
 <li><p><strong>split_value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the pattern to split by</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a numpy array with max_atom elements each of which is a list of        spike times.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
@@ -1203,7 +1204,7 @@ generator for seeds.</p>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities.variable_cache">
-<span id="spynnaker-pynn-utilities-variable-cache-module"></span><h2>spynnaker.pyNN.utilities.variable_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.variable_cache" title="Permalink to this headline">¶</a></h2>
+<span id="spynnaker-pynn-utilities-variable-cache-module"></span><h2>spynnaker.pyNN.utilities.variable_cache module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.variable_cache" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.variable_cache.</span></span><span class="sig-name descname"><span class="pre">VariableCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">units</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/variable_cache.html#VariableCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache" title="Permalink to this definition">¶</a></dt>
@@ -1212,7 +1213,7 @@ generator for seeds.</p>
 <p>Typically used to recreate the Neo object for one type of variable for
 one segment.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – raw data in sPyNNaker format</p></li>
 <li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – Population indexes for which data was collected</p></li>
@@ -1227,7 +1228,7 @@ regardless of whether they were recording or not.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache.data">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.data" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
@@ -1237,7 +1238,7 @@ regardless of whether they were recording or not.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache.indexes">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indexes</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.indexes" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
@@ -1247,7 +1248,7 @@ regardless of whether they were recording or not.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache.n_neurons">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_neurons</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.n_neurons" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -1257,7 +1258,7 @@ regardless of whether they were recording or not.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache.sampling_interval">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sampling_interval</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.sampling_interval" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a> or <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -1267,7 +1268,7 @@ regardless of whether they were recording or not.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.variable_cache.VariableCache.units">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">units</span></span><a class="headerlink" href="#spynnaker.pyNN.utilities.variable_cache.VariableCache.units" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -1277,7 +1278,7 @@ regardless of whether they were recording or not.</p></li>
 
 </section>
 <section id="module-spynnaker.pyNN.utilities">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -1337,7 +1338,7 @@ regardless of whether they were recording or not.</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1366,7 +1367,7 @@ regardless of whether they were recording or not.</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

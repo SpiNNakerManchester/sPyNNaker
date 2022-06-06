@@ -11,6 +11,7 @@
     <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../_static/jquery.js"></script>
     <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
@@ -63,14 +64,13 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints</span> <span class="kn">import</span> <span class="n">AbstractConstraint</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.placer_constraints</span> <span class="kn">import</span> <span class="n">ChipAndCoreConstraint</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.partitioner_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MaxVertexAtomsConstraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_simulator</span><span class="p">,</span> <span class="n">get_not_running_simulator</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SpynnakerException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractContainsUnits</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
     <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">)</span>
@@ -1050,8 +1050,12 @@
 <span class="sd">            the new value for the max atoms per core.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span>
-            <span class="n">MaxVertexAtomsConstraint</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">))</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">max_atoms_per_core</span> <span class="o">&gt;</span> <span class="n">cap</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Set the max_atoms_per_core to </span><span class="si">{</span><span class="n">max_atoms_per_core</span><span class="si">}</span><span class="s2"> blocked &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;as the current limit for the model is </span><span class="si">{</span><span class="n">cap</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_max_atoms_per_core</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="c1"># state that something has changed in the population</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
 
@@ -1245,7 +1249,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -1267,7 +1271,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

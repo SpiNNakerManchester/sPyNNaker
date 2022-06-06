@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.external_devices_models.push_bot package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,9 +49,9 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-external-devices-models-push-bot-package">
-<h1>spynnaker.pyNN.external_devices_models.push_bot package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.external_devices_models.push_bot package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-package" title="Permalink to this heading">¶</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.control.html">spynnaker.pyNN.external_devices_models.push_bot.control package</a><ul>
@@ -73,11 +74,11 @@
 </div>
 </section>
 <section id="module-spynnaker.pyNN.external_devices_models.push_bot">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.</span></span><span class="sig-name descname"><span class="pre">AbstractPushBotOutputDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Superclass of all output device descriptors</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.max_value">
@@ -93,7 +94,7 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.protocol_property">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protocol_property</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.protocol_property" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#property" title="(in Python v3.8)">property</a></p>
 </dd>
 </dl>
@@ -103,7 +104,7 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.send_type">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_type</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.send_type" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>SendType</p>
 </dd>
 </dl>
@@ -113,7 +114,7 @@
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.time_between_send">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">time_between_send</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotOutputDevice.time_between_send" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -124,10 +125,10 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.</span></span><span class="sig-name descname"><span class="pre">AbstractPushBotRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>An abstraction of a silicon retina attached to a SpiNNaker system.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a><em> or
 </em><a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – </p></li>
@@ -140,7 +141,7 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -151,7 +152,7 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -162,7 +163,7 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.AbstractPushBotRetinaDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -217,7 +218,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -247,7 +248,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -51,9 +52,9 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-models-neuron-plasticity-stdp-synapse-structure-package">
-<h1>spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package<a class="headerlink" href="#spynnaker-pynn-models-neuron-plasticity-stdp-synapse-structure-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package<a class="headerlink" href="#spynnaker-pynn-models-neuron-plasticity-stdp-synapse-structure-package" title="Permalink to this heading">¶</a></h1>
 <section id="module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.</span></span><span class="sig-name descname"><span class="pre">AbstractSynapseStructure</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure" title="Permalink to this definition">¶</a></dt>
@@ -63,7 +64,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_half_words_per_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/abstract_synapse_structure.html#AbstractSynapseStructure.get_n_half_words_per_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure.get_n_half_words_per_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of bytes for each connection</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -74,7 +75,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_weight_half_word</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/abstract_synapse_structure.html#AbstractSynapseStructure.get_weight_half_word"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure.get_weight_half_word" title="Permalink to this definition">¶</a></dt>
 <dd><p>The index of the half-word where the weight should be written</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -85,13 +86,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightAccumulator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.</span></span><span class="sig-name descname"><span class="pre">SynapseStructureWeightAccumulator</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightAccumulator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure" title="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure" title="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSynapseStructure</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightAccumulator.get_n_half_words_per_connection">
 <span class="sig-name descname"><span class="pre">get_n_half_words_per_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator.html#SynapseStructureWeightAccumulator.get_n_half_words_per_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightAccumulator.get_n_half_words_per_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of bytes for each connection</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -102,7 +103,7 @@
 <span class="sig-name descname"><span class="pre">get_weight_half_word</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator.html#SynapseStructureWeightAccumulator.get_weight_half_word"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightAccumulator.get_weight_half_word" title="Permalink to this definition">¶</a></dt>
 <dd><p>The index of the half-word where the weight should be written</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -113,13 +114,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightOnly">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.</span></span><span class="sig-name descname"><span class="pre">SynapseStructureWeightOnly</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure" title="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure" title="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.AbstractSynapseStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSynapseStructure</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightOnly.get_n_half_words_per_connection">
 <span class="sig-name descname"><span class="pre">get_n_half_words_per_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_only.html#SynapseStructureWeightOnly.get_n_half_words_per_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightOnly.get_n_half_words_per_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of bytes for each connection</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -130,7 +131,7 @@
 <span class="sig-name descname"><span class="pre">get_weight_half_word</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_only.html#SynapseStructureWeightOnly.get_weight_half_word"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.SynapseStructureWeightOnly.get_weight_half_word" title="Permalink to this definition">¶</a></dt>
 <dd><p>The index of the half-word where the weight should be written</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -184,7 +185,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -217,7 +218,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

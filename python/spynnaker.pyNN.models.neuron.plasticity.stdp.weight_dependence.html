@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -52,9 +53,9 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-models-neuron-plasticity-stdp-weight-dependence-package">
-<h1>spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package<a class="headerlink" href="#spynnaker-pynn-models-neuron-plasticity-stdp-weight-dependence-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package<a class="headerlink" href="#spynnaker-pynn-models-neuron-plasticity-stdp-weight-dependence-package" title="Permalink to this heading">¶</a></h1>
 <section id="module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.</span></span><span class="sig-name descname"><span class="pre">AbstractHasAPlusAMinus</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="Permalink to this definition">¶</a></dt>
@@ -65,7 +66,7 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">A_minus</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_minus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(A^-\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -76,7 +77,7 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">A_plus</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_plus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Settable model parameter: <span class="math notranslate nohighlight">\(A^+\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -87,7 +88,7 @@
 <span class="sig-name descname"><span class="pre">set_a_plus_a_minus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a_plus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_minus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_has_a_plus_a_minus.html#AbstractHasAPlusAMinus.set_a_plus_a_minus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.set_a_plus_a_minus" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the values of <span class="math notranslate nohighlight">\(A^+\)</span> and <span class="math notranslate nohighlight">\(A^-\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a_plus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^+\)</span></p></li>
 <li><p><strong>a_minus</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(A^-\)</span></p></li>
@@ -107,7 +108,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_weight_dependence.html#AbstractWeightDependence.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameter_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the parameter names</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -118,13 +119,13 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_parameters_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_weight_dependence.html#AbstractWeightDependence.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>n_weight_terms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -135,10 +136,10 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_weight_dependence.html#AbstractWeightDependence.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.is_same_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this weight dependence is the same as another</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>weight_dependence</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
@@ -149,7 +150,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vertex_executable_suffix</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>The suffix to be appended to the vertex executable for this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -160,7 +161,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight_maximum</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.weight_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum weight that will ever be set in a synapse as a result            of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -171,7 +172,7 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">write_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_weight_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_weight_dependence.html#AbstractWeightDependence.write_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.write_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the parameters of the rule to the spec</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The specification to write to</p></li>
 <li><p><strong>global_weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight scale applied globally</p></li>
@@ -188,10 +189,10 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.</span></span><span class="sig-name descname"><span class="pre">WeightDependenceAdditive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightDependence</span></code></a></p>
 <p>An additive weight dependence STDP rule.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>w_min</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{min}\)</span></p></li>
 <li><p><strong>w_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{max}\)</span></p></li>
@@ -203,7 +204,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive.html#WeightDependenceAdditive.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.get_parameter_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the parameter names</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -214,13 +215,13 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameters_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive.html#WeightDependenceAdditive.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>n_weight_terms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -231,10 +232,10 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive.html#WeightDependenceAdditive.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.is_same_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this weight dependence is the same as another</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>weight_dependence</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
@@ -245,7 +246,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vertex_executable_suffix</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>The suffix to be appended to the vertex executable for this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -256,7 +257,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_max</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_max" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{max}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -267,7 +268,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_min</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_min" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{min}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -278,7 +279,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight_maximum</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.weight_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum weight that will ever be set in a synapse as a result            of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -289,7 +290,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">write_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_weight_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive.html#WeightDependenceAdditive.write_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.write_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the parameters of the rule to the spec</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The specification to write to</p></li>
 <li><p><strong>global_weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight scale applied globally</p></li>
@@ -306,10 +307,10 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.</span></span><span class="sig-name descname"><span class="pre">WeightDependenceAdditiveTriplet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A3_plus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A3_minus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightDependence</span></code></a></p>
 <p>An triplet-based additive weight dependence STDP rule.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>w_min</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{min}\)</span></p></li>
 <li><p><strong>w_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{max}\)</span></p></li>
@@ -323,7 +324,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">A3_minus</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_minus" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(A_3^-\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -334,7 +335,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">A3_plus</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_plus" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(A_3^+\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -350,7 +351,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive_triplet.html#WeightDependenceAdditiveTriplet.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameter_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the parameter names</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -361,13 +362,13 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameters_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive_triplet.html#WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>n_weight_terms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -378,10 +379,10 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive_triplet.html#WeightDependenceAdditiveTriplet.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.is_same_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this weight dependence is the same as another</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>weight_dependence</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
@@ -392,7 +393,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vertex_executable_suffix</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>The suffix to be appended to the vertex executable for this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -403,7 +404,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_max</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_max" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{max}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -414,7 +415,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_min</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_min" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{min}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -425,7 +426,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight_maximum</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.weight_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum weight that will ever be set in a synapse as a result            of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -436,7 +437,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">write_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_weight_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_additive_triplet.html#WeightDependenceAdditiveTriplet.write_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.write_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the parameters of the rule to the spec</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The specification to write to</p></li>
 <li><p><strong>global_weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight scale applied globally</p></li>
@@ -453,10 +454,10 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.</span></span><span class="sig-name descname"><span class="pre">WeightDependenceMultiplicative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAPlusAMinus</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWeightDependence</span></code></a></p>
 <p>A multiplicative weight dependence STDP rule.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>w_min</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{min}\)</span></p></li>
 <li><p><strong>w_max</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – <span class="math notranslate nohighlight">\(w^{max}\)</span></p></li>
@@ -468,7 +469,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameter_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_multiplicative.html#WeightDependenceMultiplicative.get_parameter_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.get_parameter_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the parameter names</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -479,13 +480,13 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">get_parameters_sdram_usage_in_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_synapse_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_multiplicative.html#WeightDependenceMultiplicative.get_parameters_sdram_usage_in_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.get_parameters_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amount of SDRAM used by the parameters of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_synapse_types</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>n_weight_terms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -496,10 +497,10 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">is_same_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_multiplicative.html#WeightDependenceMultiplicative.is_same_as"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.is_same_as" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if this weight dependence is the same as another</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>weight_dependence</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence" title="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence"><em>AbstractWeightDependence</em></a>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
 </dd>
 </dl>
@@ -510,7 +511,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vertex_executable_suffix</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.vertex_executable_suffix" title="Permalink to this definition">¶</a></dt>
 <dd><p>The suffix to be appended to the vertex executable for this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -521,7 +522,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_max</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_max" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{max}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -532,7 +533,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">w_min</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_min" title="Permalink to this definition">¶</a></dt>
 <dd><p><span class="math notranslate nohighlight">\(w^{min}\)</span></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -543,7 +544,7 @@ weight scale</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weight_maximum</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.weight_maximum" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum weight that will ever be set in a synapse as a result            of this rule</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
 </dd>
 </dl>
@@ -554,7 +555,7 @@ weight scale</p></li>
 <span class="sig-name descname"><span class="pre">write_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_weight_scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_weight_terms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/weight_dependence_multiplicative.html#WeightDependenceMultiplicative.write_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.write_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the parameters of the rule to the spec</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The specification to write to</p></li>
 <li><p><strong>global_weight_scale</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – The weight scale applied globally</p></li>
@@ -614,7 +615,7 @@ weight scale</p></li>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -647,7 +648,7 @@ weight scale</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>

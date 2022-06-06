@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>spynnaker.pyNN.external_devices package &#8212; sPyNNaker 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -12,6 +12,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -47,9 +48,9 @@
           <div class="body" role="main">
             
   <section id="spynnaker-pynn-external-devices-package">
-<h1>spynnaker.pyNN.external_devices package<a class="headerlink" href="#spynnaker-pynn-external-devices-package" title="Permalink to this headline">¶</a></h1>
+<h1>spynnaker.pyNN.external_devices package<a class="headerlink" href="#spynnaker-pynn-external-devices-package" title="Permalink to this heading">¶</a></h1>
 <section id="module-spynnaker.pyNN.external_devices">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices" title="Permalink to this heading">¶</a></h2>
 <p>This contains functions and classes for handling external devices such as the
 PushBot (<a class="reference external" href="http://spinnakermanchester.github.io/docs/push_bot/">http://spinnakermanchester.github.io/docs/push_bot/</a>).</p>
 <div class="admonition note">
@@ -61,9 +62,9 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ArbitraryFPGADevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ArbitraryFPGADevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ArbitraryFPGADevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_fpga_vertex.ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of neurons</p></li>
 <li><p><strong>fpga_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
@@ -78,7 +79,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.EIEIOType">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">EIEIOType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.EIEIOType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Possible types of EIEIO packets</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.EIEIOType.KEY_16_BIT">
@@ -105,7 +106,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">key_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.EIEIOType.key_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of bytes used by each key element</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -116,7 +117,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_value</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.EIEIOType.max_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The maximum value of the key or payload (if there is a payload)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -127,7 +128,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">payload_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.EIEIOType.payload_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of bytes used by each payload element</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -138,9 +139,9 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalCochleaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ExternalCochleaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalCochleaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of neurons</p></li>
 <li><p><strong>spinnaker_link</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNaker link to which the cochlea is connected</p></li>
@@ -154,10 +155,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalDeviceLifControl">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ExternalDeviceLifControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPyNNNeuronModelStandard</span></code></p>
 <p>Abstract control module for the PushBot, based on the LIF neuron,        but without spikes, and using the voltage as the output to the various        devices</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the model.</p></li>
 <li><p><strong>binary</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Name of the implementation executable.</p></li>
@@ -174,17 +175,17 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps_per_timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of neurons in the population</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label to give to the vertex</p></li>
 <li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) – A list of constraints to give to the vertex, or None</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An application vertex for the population</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a></p>
 </dd>
 </dl>
@@ -195,9 +196,9 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ExternalFPGARetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The retina “mode”</p></li>
 <li><p><strong>retina_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The value of the top 16-bits of the key</p></li>
@@ -253,13 +254,13 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_spinnaker_link_fpga_retina_device.html#ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
@@ -270,7 +271,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -281,7 +282,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -292,7 +293,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -306,7 +307,7 @@ accuracy to gain performance.</p>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Provides Multicast commands for the Munich SpiNNaker-Link protocol</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mode</strong> – The mode of operation of the protocol</p></li>
 <li><p><strong>instance_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The optional instance key to use</p></li>
@@ -424,7 +425,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instance_key</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.instance_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>The key of this instance of the protocol</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -459,7 +460,7 @@ accuracy to gain performance.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.mode">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mode</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.mode" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MUNICH_MODES" title="spynnaker.pyNN.protocols.MUNICH_MODES"><em>MUNICH_MODES</em></a></p>
 </dd>
 </dl>
@@ -816,17 +817,17 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">set_retina_transmission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RetinaKey.NATIVE_128_X_128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_payload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/protocols/munich_io_spinnaker_link_protocol.html#MunichIoSpiNNakerLinkProtocol.set_retina_transmission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.set_retina_transmission" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the retina transmission key</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>retina_key</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaKey" title="spynnaker.pyNN.protocols.RetinaKey"><em>RetinaKey</em></a>) – the new key for the retina</p></li>
 <li><p><strong>retina_payload</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.RetinaPayload" title="spynnaker.pyNN.protocols.RetinaPayload"><em>RetinaPayload</em></a><em> or </em><em>None</em>) – the new payload for the set retina key command packet</p></li>
 <li><p><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – when to transmit this packet</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the command to send</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a></p>
 </dd>
 </dl>
@@ -851,7 +852,7 @@ accuracy to gain performance.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.uart_id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">uart_id</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichIoSpiNNakerLinkProtocol.uart_id" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -862,10 +863,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">MunichMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continue_if_not_different</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.abstract.abstract_one_app_one_machine_vertex.AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_vertex_with_dependent_vertices.AbstractVertexWithEdgeToDependentVertices</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractOneAppOneMachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractVertexWithEdgeToDependentVertices</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNaker link to which the motor is connected</p></li>
 <li><p><strong>board_address</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – </p></li>
@@ -894,7 +895,7 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">dependent_vertices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.dependent_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.dependent_vertices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the vertices which this vertex depends upon</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>)</p>
 </dd>
 </dl>
@@ -905,10 +906,10 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">edge_partition_identifiers_for_dependent_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_motor_device.html#MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichMotorDevice.edge_partition_identifiers_for_dependent_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the dependent edge identifiers for a particular dependent            vertex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v6.0)"><em>ApplicationVertex</em></a>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>)</p>
 </dd>
 </dl>
@@ -919,10 +920,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">MunichRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MunichRetinaDevice'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>An Omnibot silicon retina device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>retina_key</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
 <li><p><strong>spinnaker_link_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The SpiNNaker link to which the retina is connected</p></li>
@@ -968,13 +969,13 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_retina_device.html#MunichRetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of constraints</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
 </dd>
 </dl>
@@ -985,7 +986,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -996,7 +997,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1007,7 +1008,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1018,10 +1019,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLEDDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">led</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_front</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_back</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_device.PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>The LED of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED"><em>PushBotLED</em></a>) – The PushBotLED parameter to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1038,7 +1039,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1049,7 +1050,7 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_led_device.html#PushBotEthernetLEDDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
 </dd>
 </dl>
@@ -1060,7 +1061,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1071,7 +1072,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1082,10 +1083,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLaserDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">laser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_device.PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>The Laser of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>laser</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser"><em>PushBotLaser</em></a>) – The PushBotLaser value to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1101,7 +1102,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1112,7 +1113,7 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_laser_device.html#PushBotEthernetLaserDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
 </dd>
 </dl>
@@ -1123,7 +1124,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1134,7 +1135,7 @@ accuracy to gain performance.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1145,10 +1146,10 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_device.PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>The motor of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor"><em>PushBotMotor</em></a>) – a PushBotMotor value to indicate the motor to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol used to control the device</p></li>
@@ -1162,7 +1163,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1173,7 +1174,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_motor_device.html#PushBotEthernetMotorDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
 </dd>
 </dl>
@@ -1184,7 +1185,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1195,7 +1196,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1206,9 +1207,9 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pushbot_ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pushbot_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">56000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">injector_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_injector_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'PushBotRetinaInjector'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.abstract_ethernet_sensor.AbstractEthernetSensor</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEthernetSensor</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – </p></li>
 <li><p><strong>resolution</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotRetinaResolution"><em>PushBotRetinaResolution</em></a>) – </p></li>
@@ -1226,10 +1227,10 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">get_database_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_database_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_database_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a Database Connection instance that this device uses            to inject packets</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection"><em>SpynnakerLiveSpikesConnection</em></a></p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotRetinaConnection">PushBotRetinaConnection</a></p>
 </dd>
 </dl>
@@ -1240,7 +1241,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">get_injector_label</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_injector_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_label" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the label to give to the Spike Injector</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
@@ -1251,7 +1252,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">get_injector_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_injector_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_injector_parameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the parameters of the Spike Injector to use with this device</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>,Any)</p>
 </dd>
 </dl>
@@ -1262,7 +1263,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">get_n_neurons</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_n_neurons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_n_neurons" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of neurons that will be sent out by the device</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -1273,7 +1274,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">get_translator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_retina_device.html#PushBotEthernetRetinaDevice.get_translator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetRetinaDevice.get_translator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a translator of multicast commands to Ethernet commands</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator">AbstractEthernetTranslator</a></p>
 </dd>
 </dl>
@@ -1284,10 +1285,10 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetSpeakerDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_melody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.push_bot_device.PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex.AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>The Speaker of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><em>PushBotSpeaker</em></a>) – The PushBotSpeaker value to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1304,7 +1305,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when pausing or stopping simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1315,7 +1316,7 @@ or None to use the default</p></li>
 <span class="sig-name descname"><span class="pre">set_command_protocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command_protocol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/ethernet/push_bot_speaker_device.html#PushBotEthernetSpeakerDevice.set_command_protocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.set_command_protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the protocol use to send setup and shutdown commands,            separately from the protocol used to control the device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command_protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol to use for this device</p>
 </dd>
 </dl>
@@ -1326,7 +1327,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1337,7 +1338,7 @@ or None to use the default</p></li>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">timed_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice.timed_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands to be sent at given times in the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1348,7 +1349,7 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLED">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotLED</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotLED" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_output_device.AbstractPushBotOutputDevice</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice</span></code></p>
 <p>The properties of the LED device that may be set.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLED.LED_BACK_ACTIVE_TIME">
@@ -1375,7 +1376,7 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLaser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotLaser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotLaser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_output_device.AbstractPushBotOutputDevice</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice</span></code></p>
 <p>The properties of the laser device that may be set.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLaser.LASER_ACTIVE_TIME">
@@ -1397,10 +1398,10 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLifEthernet">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotLifEthernet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotLifEthernet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a></p>
 <p>Leaky integrate and fire neuron with an exponentially decaying         current input</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoEthernetProtocol" title="spynnaker.pyNN.protocols.MunichIoEthernetProtocol"><em>MunichIoEthernetProtocol</em></a>) – How to talk to the bot.</p></li>
 <li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
@@ -1432,10 +1433,10 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotLifSpinnakerLink">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotLifSpinnakerLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotLifSpinnakerLink" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl" title="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExternalDeviceLifControl</span></code></a></p>
 <p>Control module for a PushBot connected to a SpiNNaker Link</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – How to talk to the bot.</p></li>
 <li><p><strong>devices</strong> (<em>iterable</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice" title="spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice"><em>AbstractMulticastControllableDevice</em></a><em>)</em>) – The devices on the bot that we are interested in.</p></li>
@@ -1465,7 +1466,7 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotMotor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotMotor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotMotor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_output_device.AbstractPushBotOutputDevice</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice</span></code></p>
 <p>The properties of the motor devices that may be set.
 The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py attribute">
@@ -1493,7 +1494,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotRetinaResolution">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotRetinaResolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
 <p>Resolutions supported by the pushbot retina device</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotRetinaResolution.DOWNSAMPLE_16_X_16">
@@ -1520,11 +1521,11 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotRetinaViewer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotRetinaViewer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">33.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_time_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_time_constant_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotRetinaViewer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/threading.html#threading.Thread" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/threading.html#threading.Thread" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Thread</span></code></a></p>
 <p>A viewer for the pushbot’s retina. This is a thread that can be         launched in parallel with the control code.</p>
 <p>Based on matplotlib</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>resolution</strong> (<a class="reference internal" href="#spynnaker.pyNN.external_devices.PushBotRetinaResolution" title="spynnaker.pyNN.external_devices.PushBotRetinaResolution"><em>PushBotRetinaResolution</em></a>) – </p></li>
 <li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
@@ -1555,7 +1556,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpeaker">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpeaker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpeaker" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_output_device.AbstractPushBotOutputDevice</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotOutputDevice</span></code></p>
 <p>The properties of the speaker device that may be set.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpeaker.SPEAKER_ACTIVE_TIME">
@@ -1582,10 +1583,10 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLEDDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpiNNakerLinkLEDDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">led</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_front</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_back</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLEDDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLEDDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetLEDDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <p>The LED of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLED"><em>PushBotLED</em></a>) – The LED device to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1610,10 +1611,10 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLaserDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpiNNakerLinkLaserDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">laser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkLaserDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetLaserDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetLaserDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <p>The Laser of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>laser</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotLaser"><em>PushBotLaser</em></a>) – Which laser device to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1637,10 +1638,10 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpiNNakerLinkMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetMotorDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetMotorDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <p>The motor of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotMotor"><em>PushBotMotor</em></a>) – the motor to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol used to control the device</p></li>
@@ -1661,9 +1662,9 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpiNNakerLinkRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPushBotRetinaDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spinnaker_link_id</strong> – </p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – </p></li>
@@ -1683,13 +1684,13 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <span class="sig-name descname"><span class="pre">new_key_command_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/spinnaker_link/push_bot_retina_device.html#PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Support method to obtain the key after the key allocator has run</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>routing_info</strong> – </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the key</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
@@ -1700,7 +1701,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_resume_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>The commands needed when starting or resuming simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models/#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v6.0)"><em>MultiCastCommand</em></a>)</p>
 </dd>
 </dl>
@@ -1711,10 +1712,10 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkSpeakerDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotSpiNNakerLinkSpeakerDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_melody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkSpeakerDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice" title="spynnaker.pyNN.external_devices_models.push_bot.ethernet.PushBotEthernetSpeakerDevice"><code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetSpeakerDevice</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <p>The speaker of a PushBot</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.parameters.html#spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.parameters.PushBotSpeaker"><em>PushBotSpeaker</em></a>) – Which speaker device to control</p></li>
 <li><p><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) – The protocol instance to get commands from</p></li>
@@ -1741,7 +1742,7 @@ The pushbot has two motors, 0 (left) and 1 (right).</p>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">SpikeInjector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_ack_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices.html#SpikeInjector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpikeInjector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supports creating a spike injector that can be added to the        application graph.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>notify</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether to register for notifications</p></li>
 <li><p><strong>database_notify_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – the hostname for the device which is
@@ -1753,11 +1754,11 @@ ready for it to start execution</p></li>
 device will receive the database is ready command</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The spike injector model object that can be placed in a pyNN
 <a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><code class="xref py py-class docutils literal notranslate"><span class="pre">Population</span></code></a>.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><em>AbstractPyNNModel</em></a></p>
 </dd>
 </dl>
@@ -1766,10 +1767,10 @@ device will receive the database is ready command</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">SpynnakerLiveSpikesConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">receive_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">19999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_packet_gather_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LiveSpikeReceiver'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LiveEventConnection</span></code></p>
 <p>A connection for receiving and sending live spikes from and to        SpiNNaker</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>receive_labels</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – Labels of population from which live spikes will be received.</p></li>
 <li><p><strong>send_labels</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – Labels of population to which live spikes will be sent</p></li>
@@ -1786,7 +1787,7 @@ by default)</p></li>
 <span class="sig-name descname"><span class="pre">send_spike</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_full_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spike"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection.send_spike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a spike from a single neuron</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the population from which the spike will originate</p></li>
 <li><p><strong>neuron_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the neuron sending a spike</p></li>
@@ -1803,7 +1804,7 @@ whether to send 16-bit neuron IDs directly</p></li>
 <span class="sig-name descname"><span class="pre">send_spikes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send_full_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spikes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerLiveSpikesConnection.send_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a number of spikes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the population from which the spikes will originate</p></li>
 <li><p><strong>neuron_ids</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – array-like of neuron IDs sending spikes</p></li>
@@ -1820,9 +1821,9 @@ whether to send 16-bit neuron IDs directly</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">SpynnakerPoissonControlConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poisson_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">19999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_label_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_control'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LiveEventConnection</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>poisson_labels</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>)</em>) – Labels of Poisson populations to be controlled</p></li>
 <li><p><strong>local_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Optional specification of the local hostname or
@@ -1839,7 +1840,7 @@ by default)</p></li>
 <span class="sig-name descname"><span class="pre">add_init_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_init_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_init_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a callback to be called to initialise a vertex</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex to be notified about. Must be one of the
 vertices listed in the constructor</p></li>
@@ -1858,7 +1859,7 @@ milliseconds</p></li>
 <span class="sig-name descname"><span class="pre">add_pause_stop_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pause_stop_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_pause_stop_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_pause_stop_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a callback for the pause and stop state of the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the label of the function to be sent</p></li>
 <li><p><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the pause
@@ -1867,7 +1868,7 @@ label of the referenced  vertex, and an instance of this class,
 which can be used to send events.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -1877,7 +1878,7 @@ which can be used to send events.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_poisson_label">
 <span class="sig-name descname"><span class="pre">add_poisson_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_poisson_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_poisson_label" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the Poisson source population.</p>
 </dd>
 </dl>
@@ -1888,7 +1889,7 @@ which can be used to send events.</p></li>
 <span class="sig-name descname"><span class="pre">add_receive_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">live_event_callback</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_receive_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_receive_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a callback for the reception of live events from a vertex</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex to be notified about.
 Must be one of the vertices listed in the constructor</p></li>
@@ -1908,7 +1909,7 @@ key should stay a key</p></li>
 <span class="sig-name descname"><span class="pre">add_start_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_start_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a callback for the start of the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>start_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start
 message has been received. This function should take the label of
@@ -1925,7 +1926,7 @@ be used to send events</p></li>
 <span class="sig-name descname"><span class="pre">add_start_resume_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_resume_callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_resume_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.add_start_resume_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a callback for the start and resume state of the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – the label of the function to be sent</p></li>
 <li><p><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) – A function to be called when the start
@@ -1934,7 +1935,7 @@ the label of the referenced vertex, and an instance of this
 class, which can be used to send events.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -1945,7 +1946,7 @@ class, which can be used to send events.</p></li>
 <span class="sig-name descname"><span class="pre">set_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.set_rate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the rate of a Poisson neuron within a Poisson source</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the Population to set the rates of</p></li>
 <li><p><strong>neuron_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The neuron ID to set the rate of</p></li>
@@ -1960,7 +1961,7 @@ class, which can be used to send events.</p></li>
 <span class="sig-name descname"><span class="pre">set_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_id_rates</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.SpynnakerPoissonControlConnection.set_rates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the rates of multiple Poisson neurons within a Poisson source</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the Population to set the rates of</p></li>
 <li><p><strong>neuron_id_rates</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em><em>)</em>) – A list of tuples of (neuron ID, rate) to be set</p></li>
@@ -1976,7 +1977,7 @@ class, which can be used to send events.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">activate_live_output_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_ack_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_sdp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">EIEIOType.KEY_32_BIT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_as_time_stamps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_payload_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload_right_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_of_packets_sent_per_time_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translate_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.activate_live_output_for" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output the spikes from a given population from SpiNNaker as they            occur in the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – The population to activate the live output for</p></li>
 <li><p><strong>database_notify_host</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The hostname for the device which is listening to the database
@@ -2025,7 +2026,7 @@ to global keys rather than core-based keys</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">activate_live_output_to</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SPIKE'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.activate_live_output_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Activate the output of spikes from a population to an external            device. Note that all spikes will be sent to the device.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – The pyNN population object from which spikes will be sent.</p></li>
 <li><p><strong>device</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a><em> or
@@ -2042,7 +2043,7 @@ sent.</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">add_poisson_live_rate_control</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poisson_population</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_label_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'_control'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receive_port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_notify_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_ack_port_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserve_reverse_ip_tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.add_poisson_live_rate_control" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a live rate controller to a Poisson population.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>poisson_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – The population to control</p></li>
 <li><p><strong>control_label_extension</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – An extension to add to the label of the Poisson source. Must match
@@ -2068,7 +2069,7 @@ used, False if SDP is to be used (default)</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">register_database_notification_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hostname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ack_port</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices.html#register_database_notification_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.register_database_notification_request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a socket system which is registered with the notification protocol</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hostname</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – hostname to connect to</p></li>
 <li><p><strong>notify_port</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – port num for the notify command</p></li>
@@ -2083,11 +2084,11 @@ used, False if SDP is to be used (default)</p></li>
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">run_forever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sync_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices.html#run_forever"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.run_forever" title="Permalink to this definition">¶</a></dt>
 <dd><p>Supports running forever in PyNN 0.8/0.9 format</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sync_time</strong> – The time in milliseconds after which to pause before the host must
 continue the simulation</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>when the application has started running on the SpiNNaker platform</p>
 </dd>
 </dl>
@@ -2139,7 +2140,7 @@ continue the simulation</p>
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -2168,7 +2169,7 @@ continue the simulation</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
     </div>
   </body>
 </html>
