@@ -270,12 +270,17 @@ class PopulationMachineNeurons(
                 cs_id = current_source.current_source_id
 
                 # Only use IDs that are on this core
-                for n in range(0, hi_atom + 1 - lo_atom):
+                for n in range(lo_atom, hi_atom + 1):
                     if (n in current_source_id_list[current_source]):
-                        neuron_current_sources[n][0] += 1
-                        neuron_current_sources[n].append(cs_id)
-                        neuron_current_sources[n].append(cs_index_array[cs_id])
-                        cs_index_array[cs_id] += 1
+                        # I think this is now right, but test it more...
+                        neuron_current_sources[n-lo_atom][0] += 1
+                        neuron_current_sources[n-lo_atom].append(cs_id)
+                        neuron_current_sources[n-lo_atom].append(
+                            cs_index_array[cs_id])
+
+                # Increase the ID value in case a (different) current source
+                # of the same type is also used
+                cs_index_array[cs_id] += 1
 
             # Now loop over the neurons on this core and write the current
             # source ID and index for sources attached to each neuron
@@ -285,6 +290,10 @@ class PopulationMachineNeurons(
                 if n_current_sources != 0:
                     for csid in range(n_current_sources * 2):
                         spec.write_value(neuron_current_sources[n][csid+1])
+
+            # Write the number of each type of current source
+            for n in range(1,5):
+                spec.write_value(cs_index_array[n])
 
             # Now loop over the current sources and write the data required
             # for each type of current source
