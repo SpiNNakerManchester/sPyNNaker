@@ -191,7 +191,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """ Reset the state of the current network to time t = 0.
         """
         for population in self._populations:
-            population._cache_data()
+            population._cache_data()   # pylint: disable=protected-access
 
         self.__segment_counter += 1
 

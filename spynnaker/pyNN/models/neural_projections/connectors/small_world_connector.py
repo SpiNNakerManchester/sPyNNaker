@@ -70,6 +70,8 @@ class SmallWorldConnector(AbstractConnector):
         self.__degree = degree
         # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
+        self.__mask = None
+        self.__n_connections = None
 
         if n_connections is not None:
             raise NotImplementedError(

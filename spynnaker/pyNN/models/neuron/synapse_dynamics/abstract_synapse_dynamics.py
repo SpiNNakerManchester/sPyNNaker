@@ -227,4 +227,5 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param str target: The name of the synapse
         :rtype: int or None
         """
+        # pylint: disable=unused-argument
         return None

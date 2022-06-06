@@ -67,6 +67,7 @@ def default_parameters(parameters):
         The names of the arguments that are parameters
     """
     def wrap(method):
+        # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):
@@ -103,6 +104,7 @@ def default_initial_values(state_variables):
         The names of the arguments that are state variables
     """
     def wrap(method):
+        # pylint: disable=protected-access
         # Find the real method in case we use multiple of these decorators
         wrapped = method
         while hasattr(method, "_method"):

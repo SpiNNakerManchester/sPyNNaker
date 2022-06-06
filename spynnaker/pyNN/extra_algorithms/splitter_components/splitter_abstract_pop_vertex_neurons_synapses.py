@@ -146,6 +146,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__user_allow_delay_extension = True
         self.__slices = None
         self.__next_synapse_index = 0
+        # redefined by create_machine_vertices before first use so style
+        self.__poisson_edges = set()
+        self.__synapse_verts_by_neuron = None
+        self.__neuron_vertices = list()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -251,6 +255,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     max_crs -= 1
 
             if remaining_poisson_vertices:
+                # pylint: disable=logging-too-many-args
                 logger.warning(
                     "Vertex {} is using multicast for {} one-to-one Poisson"
                     " sources as not enough cores exist to put them on the"
@@ -495,6 +500,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__poisson_edges = set()
         incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             conn = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
@@ -778,6 +784,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         app_vertex = self._governed_app_vertex
         max_delay_ms = 0
         for proj in app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             s_info = proj._synapse_information
             proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
                 s_info.connector, s_info)

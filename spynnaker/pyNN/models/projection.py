@@ -228,7 +228,7 @@ class Projection(object):
                 "Projections over views not currently supported with the {}"
                 .format(connector))
         # Check whether the array is contiguous or not
-        inds = param._indexes
+        inds = param._indexes  # pylint: disable=protected-access
         if inds != tuple(range(inds[0], inds[-1] + 1)):
             raise NotImplementedError(
                 "Projections over views only work on contiguous arrays, "

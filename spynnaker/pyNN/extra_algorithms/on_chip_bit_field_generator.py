@@ -75,6 +75,7 @@ def on_chip_bitfield_generator(
     """
     generator = _OnChipBitFieldGenerator(
         placements, executable_finder, transceiver)
+    # pylint: disable=protected-access
     generator._run(app_graph, executable_finder, machine_graph)
 
 

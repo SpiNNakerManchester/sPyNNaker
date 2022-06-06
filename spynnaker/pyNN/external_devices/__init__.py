@@ -194,6 +194,7 @@ def EthernetControlPopulation(
             "Vertex must be an instance of AbstractEthernetController")
     translator = vertex.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
+    # pylint: disable=global-statement
     global __ethernet_control_connection
     if __ethernet_control_connection is None:
         __ethernet_control_connection = EthernetControlConnection(

@@ -377,6 +377,7 @@ class SpikeSourcePoissonMachineVertex(
         else:
             size = self.__sdram_partition.get_sdram_size_of_region_for(self)
             proj = self._app_vertex.outgoing_projections[0]
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             spec.write_value(
                 self.__sdram_partition.get_sdram_base_address_for(self))

@@ -29,6 +29,9 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
+# needed as dealing with quantities
+# pylint: disable=c-extension-no-member
+
 logger = FormatAdapter(logging.getLogger(__name__))
 _DEFAULT_UNITS = {
     SPIKES: "spikes",

@@ -110,7 +110,7 @@ class SynapseDynamicsStructuralCommon(
             spec, pop_index, app_vertex, vertex_slice)
 
         # Write the component parameters
-        # pylint: disable=no-member
+        # pylint: disable=no-member, protected-access
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
@@ -134,6 +134,7 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = list()
         seen_app_edges = set()
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             for synapse_info in app_edge.synapse_information:
                 if isinstance(synapse_info.synapse_dynamics,
@@ -222,6 +223,7 @@ class SynapseDynamicsStructuralCommon(
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
                 proj.label))
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
@@ -349,6 +351,7 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = self.__get_structural_projections(
             incoming_projections)
         for proj in structural_projections:
+            # pylint: disable=protected-access
             dynamics = proj._synapse_information.synapse_dynamics
             app_edge = proj._projection_edge
             n_sub_edges += len(
