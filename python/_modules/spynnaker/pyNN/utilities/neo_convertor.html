@@ -56,6 +56,9 @@
 <span class="kn">import</span> <span class="nn">quantities</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="c1"># needed as dealing with quantities</span>
+<span class="c1"># pylint: disable=c-extension-no-member</span>
+
 
 <div class="viewcode-block" id="convert_analog_signal"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.neo_convertor.convert_analog_signal">[docs]</a><span class="k">def</span> <span class="nf">convert_analog_signal</span><span class="p">(</span><span class="n">signal_array</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="n">quantities</span><span class="o">.</span><span class="n">ms</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Converts part of a NEO object into told spynnaker7 format</span>

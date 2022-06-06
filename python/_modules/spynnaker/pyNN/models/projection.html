@@ -94,10 +94,9 @@
 <span class="sd">    plasticity mechanisms) between two populations, together with methods to</span>
 <span class="sd">    set parameters of those connections, including of plasticity mechanisms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># &quot;format&quot; param name defined by PyNN/</span>
     <span class="c1"># pylint: disable=redefined-builtin</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__has_retrieved_synaptic_list_from_machine&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__host_based_synapse_list&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__projection_edge&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__requires_mapping&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
@@ -120,7 +119,7 @@
 <span class="sd">        :param ~pyNN.space.Space space:</span>
 <span class="sd">        :param str label:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;sPyNNaker </span><span class="si">{}</span><span class="s2"> does not yet support multi-compartmental &quot;</span>
@@ -128,8 +127,6 @@
 
         <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__host_based_synapse_list</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_retrieved_synaptic_list_from_machine</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
 
@@ -271,7 +268,7 @@
                 <span class="s2">&quot;Projections over views not currently supported with the </span><span class="si">{}</span><span class="s2">&quot;</span>
                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">connector</span><span class="p">))</span>
         <span class="c1"># Check whether the array is contiguous or not</span>
-        <span class="n">inds</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">_indexes</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">_indexes</span>  <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="n">inds</span> <span class="o">!=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">inds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">inds</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                 <span class="s2">&quot;Projections over views only work on contiguous arrays, &quot;</span>

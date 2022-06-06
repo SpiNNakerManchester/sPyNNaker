@@ -153,6 +153,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">():</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">results</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_get_by_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__id</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span></div>
 
@@ -202,6 +203,7 @@
 <span class="sd">        :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\</span>
 <span class="sd">            current_source:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__id</span><span class="p">])</span>
         <span class="n">current_source</span><span class="o">.</span><span class="n">set_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
@@ -212,6 +214,7 @@
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_get_initial_value</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IDMixin.set_initial_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.set_initial_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_initial_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -219,6 +222,7 @@
 <span class="sd">        :param str variable: The name of the variable</span>
 <span class="sd">        :param float value: The value of the variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IDMixin.initialize"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_values</span><span class="p">):</span>
@@ -226,6 +230,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">initial_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IDMixin.as_view"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.IDMixin.as_view">[docs]</a>    <span class="k">def</span> <span class="nf">as_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

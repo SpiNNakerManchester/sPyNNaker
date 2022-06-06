@@ -69,6 +69,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.data_cache</span> <span class="kn">import</span> <span class="n">DataCache</span>
 
+<span class="c1"># needed as dealing with quantities</span>
+<span class="c1"># pylint: disable=c-extension-no-member</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_DEFAULT_UNITS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">SPIKES</span><span class="p">:</span> <span class="s2">&quot;spikes&quot;</span><span class="p">,</span>
@@ -318,7 +321,7 @@
 
         <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Recorder.get_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view_indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Recorder.get_spikes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; How to get spikes (of a population&#39;s neurons) from the recorder.</span>
 
 <span class="sd">        :return: the spikes (event times) from the underlying vertex</span>

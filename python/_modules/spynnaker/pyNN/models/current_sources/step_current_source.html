@@ -72,9 +72,13 @@
         <span class="s2">&quot;__parameters&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__parameter_types&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="p">[],</span> <span class="n">amplitudes</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># There&#39;s probably no need to actually store these as you can&#39;t</span>
         <span class="c1"># access them directly in pynn anyway</span>
+        <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">amplitudes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
         <span class="n">machine_ts</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span>
         <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_ts</span>

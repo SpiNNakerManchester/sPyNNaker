@@ -101,7 +101,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__display_max</span> <span class="o">=</span> <span class="n">display_max</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span> <span class="o">=</span> <span class="n">frame_time_ms</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__image</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__ani</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Open socket to receive UDP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_socket</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
@@ -180,7 +179,7 @@
             <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__display_max</span><span class="p">)</span>
 
         <span class="c1"># Play animation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__ani</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
             <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_frame</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_updatefig</span><span class="p">()),</span>
             <span class="n">interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__frame_time_ms</span><span class="p">,</span> <span class="n">blit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>

@@ -417,6 +417,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span><span class="o">.</span><span class="n">get_sdram_size_of_region_for</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span><span class="o">.</span><span class="n">get_sdram_base_address_for</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
@@ -504,7 +505,6 @@
         <span class="n">is_fast_source</span> <span class="o">=</span> <span class="n">spikes_per_tick</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SLOW_RATE_PER_TICK_CUTOFF</span>
         <span class="n">is_faster_source</span> <span class="o">=</span> <span class="n">spikes_per_tick</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">FAST_RATE_PER_TICK_CUTOFF</span>
         <span class="n">not_zero</span> <span class="o">=</span> <span class="n">spikes_per_tick</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="c1"># pylint: disable=assignment-from-no-return</span>
         <span class="n">is_slow_source</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">is_fast_source</span><span class="p">)</span>
 
         <span class="c1"># Compute the e^-(spikes_per_tick) for fast sources to allow fast</span>
@@ -564,7 +564,7 @@
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing Parameters for </span><span class="si">{}</span><span class="s2"> poisson sources:</span><span class="se">\n</span><span class="s2">&quot;</span>
                      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
 
@@ -753,7 +753,6 @@
             <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">is_fast_source</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="n">exp_minus_lambda</span><span class="p">[</span><span class="n">is_fast_source</span><span class="p">])</span> <span class="o">*</span> <span class="o">-</span><span class="mf">1.0</span>
             <span class="n">is_faster_source</span> <span class="o">=</span> <span class="n">sqrt_lambda</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="c1"># pylint: disable=assignment-from-no-return</span>
             <span class="n">spikes_per_tick</span><span class="p">[</span><span class="n">is_faster_source</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
                 <span class="n">sqrt_lambda</span><span class="p">[</span><span class="n">is_faster_source</span><span class="p">])</span>
             <span class="n">slow_elements</span> <span class="o">=</span> <span class="n">isi</span> <span class="o">&gt;</span> <span class="mi">0</span>

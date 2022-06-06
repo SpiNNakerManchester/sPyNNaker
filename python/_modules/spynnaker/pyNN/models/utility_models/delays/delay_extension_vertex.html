@@ -184,7 +184,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">vertex_slice</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">DelayBlock</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">source_id</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">source_ids</span><span class="p">,</span> <span class="n">stages</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span><span class="o">.</span><span class="n">add_delay</span><span class="p">(</span><span class="n">source_id</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span></div>
 
@@ -193,7 +193,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span><span class="p">[</span><span class="n">vertex_slice</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DelayBlock</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DelayExtensionVertex.add_generator_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_generator_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_generator_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">max_row_n_synapses</span><span class="p">,</span> <span class="n">max_delayed_row_n_synapses</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>

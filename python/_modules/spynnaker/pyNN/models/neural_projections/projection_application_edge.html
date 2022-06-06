@@ -66,6 +66,7 @@
 
 
 <span class="k">def</span> <span class="nf">are_dynamics_structural</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=global-statement</span>
     <span class="k">global</span> <span class="n">_DynamicsStructural</span>
     <span class="k">if</span> <span class="n">_DynamicsStructural</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Avoid import loop by postponing this import</span>
@@ -76,6 +77,7 @@
 
 
 <span class="k">def</span> <span class="nf">are_dynamics_stdp</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=global-statement</span>
     <span class="k">global</span> <span class="n">_DynamicsSTDP</span>
     <span class="k">if</span> <span class="n">_DynamicsSTDP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Avoid import loop by postponing this import</span>
@@ -86,6 +88,7 @@
 
 
 <span class="k">def</span> <span class="nf">are_dynamics_neuromodulation</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=global-statement</span>
     <span class="k">global</span> <span class="n">_DynamicsNeuromodulation</span>
     <span class="k">if</span> <span class="n">_DynamicsNeuromodulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Avoid import loop by postponing this import</span>

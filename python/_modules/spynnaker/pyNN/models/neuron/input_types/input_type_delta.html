@@ -83,7 +83,6 @@
 
 <div class="viewcode-block" id="InputTypeDelta.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeDelta.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">scale_factor</span> <span class="o">=</span> <span class="mf">1000.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">scale_factor</span><span class="p">]</span></div>
 

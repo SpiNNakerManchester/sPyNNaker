@@ -181,7 +181,6 @@
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice: the slice</span>
 <span class="sd">        :rtype: ~pacman.model.resources.ResourceContainer</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">variable_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_variable_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">constant_sdram</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_constant_sdram</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>

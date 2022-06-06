@@ -159,7 +159,6 @@
 
 <div class="viewcode-block" id="NeuronModelIzh.get_global_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">get_global_values</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_global_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="NeuronModelIzh.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_values">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractStandardNeuronComponent</span><span class="o">.</span><span class="n">get_values</span><span class="p">)</span>
@@ -167,8 +166,6 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ts: machine time step</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
-
         <span class="c1"># Add the rest of the data</span>
         <span class="k">return</span> <span class="p">[</span>
             <span class="n">parameters</span><span class="p">[</span><span class="n">A</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">B</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">C</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">D</span><span class="p">],</span>

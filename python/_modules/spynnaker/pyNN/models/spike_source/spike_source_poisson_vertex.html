@@ -128,13 +128,11 @@
         <span class="s2">&quot;__time_to_spike&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__kiss_seed&quot;</span><span class="p">,</span>  <span class="c1"># dict indexed by vertex slice</span>
         <span class="s2">&quot;__n_subvertices&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__n_data_specs&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__max_rate&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__rate_change&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_profile_samples&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_variable_rate&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__max_spikes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">]</span>
 
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
@@ -170,7 +168,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_data_specs</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># check for changes parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
@@ -306,15 +303,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">max_rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="n">total_rate</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">all_rates</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__max_spikes</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">total_rate</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># Note we have to do this per rate, as the whole array is not numpy</span>
-            <span class="n">max_rates</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">]])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_spikes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">poisson</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span>
-                <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">max_rates</span><span class="p">),</span> <span class="n">max_rates</span><span class="p">))</span>
 
         <span class="c1"># Keep track of how many outgoing projections exist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_projections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -490,7 +478,6 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">poisson_params_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
         <span class="n">sdram_sz</span> <span class="o">=</span> <span class="n">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">other</span> <span class="o">=</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
@@ -520,7 +507,7 @@
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>

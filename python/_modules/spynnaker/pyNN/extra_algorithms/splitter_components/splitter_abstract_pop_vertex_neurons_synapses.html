@@ -132,8 +132,8 @@
         <span class="s2">&quot;__max_delay&quot;</span><span class="p">,</span>
         <span class="c1"># The user-set maximum delay, for reset</span>
         <span class="s2">&quot;__user_max_delay&quot;</span><span class="p">,</span>
-        <span class="c1"># Whether to allow delay extensions to be created</span>
-        <span class="s2">&quot;__allow_delay_extension&quot;</span><span class="p">,</span>
+        <span class="c1"># Whether you expect delay extensions to be asked to be created</span>
+        <span class="s2">&quot;__expect_delay_extension&quot;</span><span class="p">,</span>
         <span class="c1"># The user-set allowing of delay extensions</span>
         <span class="s2">&quot;__user_allow_delay_extension&quot;</span><span class="p">,</span>
         <span class="c1"># The fixed slices the vertices are divided into</span>
@@ -175,14 +175,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_vertices</span> <span class="o">=</span> <span class="n">n_synapse_vertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__user_max_delay</span> <span class="o">=</span> <span class="n">max_delay</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="o">=</span> <span class="n">allow_delay_extension</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span> <span class="o">=</span> <span class="n">allow_delay_extension</span>
+        <span class="k">if</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># to be calcutaed by __update_max_delay</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The user may ask for the delay even if then told no</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__slices</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__next_synapse_index</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># redefined by create_machine_vertices before first use so style</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_verts_by_neuron</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
@@ -211,13 +218,13 @@
             <span class="n">app_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">(),</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="n">n_synapse_types</span> <span class="o">=</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">get_n_bits</span><span class="p">(</span><span class="n">atoms_per_core</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span> <span class="o">+</span>
-                <span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_max_delay</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">MAX_RING_BUFFER_BITS</span><span class="p">:</span>
+                <span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span> <span class="o">&gt;</span> <span class="n">MAX_RING_BUFFER_BITS</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The combination of the number of neurons per core (</span><span class="si">{}</span><span class="s2">), &quot;</span>
                 <span class="s2">&quot;the number of synapse types (</span><span class="si">{}</span><span class="s2">), and the maximum delay per &quot;</span>
                 <span class="s2">&quot;core (</span><span class="si">{}</span><span class="s2">) will require too much DTCM.  Please reduce one or &quot;</span>
                 <span class="s2">&quot;more of these values.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">atoms_per_core</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_max_delay</span><span class="p">))</span>
+                    <span class="n">atoms_per_core</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_vertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -288,11 +295,11 @@
                     <span class="n">max_crs</span> <span class="o">-=</span> <span class="mi">1</span>
 
             <span class="k">if</span> <span class="n">remaining_poisson_vertices</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Vertex </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> is using multicast for&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">remaining_poisson_vertices</span><span class="p">)</span><span class="si">}</span><span class="s2"> one-to-one Poisson&quot;</span>
+                <span class="c1"># pylint: disable=logging-too-many-args</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Vertex </span><span class="si">{}</span><span class="s2"> is using multicast for </span><span class="si">{}</span><span class="s2"> one-to-one Poisson&quot;</span>
                     <span class="s2">&quot; sources as not enough cores exist to put them on the&quot;</span>
-                    <span class="s2">&quot; same chip&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot; same chip&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">remaining_poisson_vertices</span><span class="p">))</span>
 
             <span class="c1"># Create an SDRAM edge partition</span>
             <span class="n">sdram_label</span> <span class="o">=</span> <span class="s2">&quot;SDRAM </span><span class="si">{}</span><span class="s2"> Synapses--&gt;Neurons:</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -533,6 +540,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">incoming_direct_poisson</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
             <span class="n">conn</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
@@ -639,7 +647,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_vertices</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_verts_by_neuron</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_max_delay</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># to be calcutaed by __update_max_delay</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_synapse_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -807,15 +819,12 @@
                 <span class="n">BYTES_PER_WORD</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sdram</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">__get_max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span>
-
+    <span class="k">def</span> <span class="nf">__update_max_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Find the maximum delay from incoming synapses</span>
         <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
         <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">s_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="n">proj_max_delay</span> <span class="o">=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
                 <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span>
@@ -833,19 +842,27 @@
         <span class="c1"># Pick the smallest between the two, so that not too many bits are used</span>
         <span class="n">final_n_delay_bits</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_delay_bits</span><span class="p">,</span> <span class="n">max_delay_bits</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">final_n_delay_bits</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="o">=</span> <span class="n">max_delay_bits</span> <span class="o">&gt;</span> <span class="n">final_n_delay_bits</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="o">=</span> <span class="n">max_delay_bits</span> <span class="o">&gt;</span> <span class="n">final_n_delay_bits</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.max_support_delay">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">max_support_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_max_delay</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__update_max_delay</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_delay</span></div>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.accepts_edges_from_delay_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpynnakerSplitterDelay</span><span class="o">.</span><span class="n">accepts_edges_from_delay_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">accepts_edges_from_delay_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__get_max_delay</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_delay_extension</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__update_max_delay</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__expect_delay_extension</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;This call was unexpected as it was calculated that &quot;</span>
+                <span class="s2">&quot;the max needed delay was less that the max possible&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__user_allow_delay_extension</span></div>
 </pre></div>
 
             <div class="clearer"></div>

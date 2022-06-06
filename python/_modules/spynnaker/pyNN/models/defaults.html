@@ -107,6 +107,7 @@
 <span class="sd">        The names of the arguments that are parameters</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="c1"># Find the real method in case we use multiple of these decorators</span>
         <span class="n">wrapped</span> <span class="o">=</span> <span class="n">method</span>
         <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">):</span>
@@ -143,6 +144,7 @@
 <span class="sd">        The names of the arguments that are state variables</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">method</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="c1"># Find the real method in case we use multiple of these decorators</span>
         <span class="n">wrapped</span> <span class="o">=</span> <span class="n">method</span>
         <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">):</span>

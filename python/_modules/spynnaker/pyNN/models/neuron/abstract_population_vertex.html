@@ -207,7 +207,7 @@
 <span class="sd">            ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">,</span> <span class="n">splitter</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
@@ -316,6 +316,7 @@
         <span class="c1"># Reset the ring buffer shifts as a projection has been added</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_projections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="o">==</span> <span class="bp">self</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__self_projection</span> <span class="o">=</span> <span class="n">projection</span></div>
 
@@ -961,6 +962,7 @@
         <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="c1"># Skip if this is a synapse dynamics synapse type</span>
             <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type_from_dynamics</span><span class="p">:</span>
@@ -994,6 +996,7 @@
             <span class="n">spikes_per_tick</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
                 <span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span> <span class="o">/</span> <span class="n">steps_per_second</span><span class="p">)</span>
             <span class="n">spikes_per_second</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spikes_per_second</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">AbstractMaxSpikes</span><span class="p">):</span>
                 <span class="n">rate</span> <span class="o">=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">max_spikes_per_second</span><span class="p">()</span>
@@ -1149,6 +1152,7 @@
 <span class="sd">            The slice projected to</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">projection</span><span class="o">.</span><span class="n">_synapse_information</span>
         <span class="n">app_edge</span> <span class="o">=</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span>
 
@@ -1199,6 +1203,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
             <span class="n">n_sub_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>

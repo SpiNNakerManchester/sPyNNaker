@@ -622,6 +622,7 @@
         <span class="c1"># Convert to native Python integer; provenance system assumption</span>
         <span class="n">ncd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">ProvenanceWriter</span><span class="p">()</span> <span class="k">as</span> <span class="n">db</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=expression-not-assigned</span>
             <span class="n">db</span><span class="o">.</span><span class="n">insert_connector</span><span class="p">(</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>

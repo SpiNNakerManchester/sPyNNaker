@@ -59,7 +59,7 @@
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">csa</span>
     <span class="n">_csa_found</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">_ex</span><span class="p">:</span>  <span class="c1"># noqa: F821</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">_ex</span><span class="p">:</span>
     <span class="c1"># Importing csa causes problems with readthedocs so allowing it to fail</span>
     <span class="n">_csa_found</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">_ex</span><span class="p">)</span>
 

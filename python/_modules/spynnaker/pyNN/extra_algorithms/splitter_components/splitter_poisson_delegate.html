@@ -89,6 +89,7 @@
         <span class="c1"># it to the target</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
             <span class="n">connector</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">connector</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span><span class="o">.</span><span class="n">synapse_dynamics</span>
@@ -121,6 +122,7 @@
     <span class="k">def</span> <span class="nf">get_in_coming_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
             <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
             <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span></div>
@@ -129,6 +131,7 @@
     <span class="k">def</span> <span class="nf">get_out_going_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
             <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">outgoing_projections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
             <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span></div>

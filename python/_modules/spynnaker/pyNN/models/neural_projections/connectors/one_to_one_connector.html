@@ -196,6 +196,7 @@
         <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
             <span class="c1"># work out which atoms are on this pre-slice</span>
             <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
+                <span class="c1"># pylint: disable=protected-access</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;</span> <span class="n">view_lo</span> <span class="o">&lt;</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">:</span>
                 <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">view_lo</span>
@@ -212,6 +213,7 @@
         <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
             <span class="c1"># work out which atoms are on this post-slice</span>
             <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
+                <span class="c1"># pylint: disable=protected-access</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&lt;</span> <span class="n">view_lo</span> <span class="o">&lt;</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">:</span>
                 <span class="n">post_lo</span> <span class="o">=</span> <span class="n">view_lo</span>
@@ -259,6 +261,7 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span> <span class="ow">and</span>
 
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">):</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">post_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -275,6 +278,7 @@
         <span class="c1"># Filter edge if pre-pop is outside limit and post_lo is bigger</span>
         <span class="c1"># than n_pre_neurons</span>
         <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">pre_lo</span> <span class="o">&lt;</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">or</span>
@@ -285,6 +289,7 @@
         <span class="c1"># Filter edge if post-pop is outside limit and pre_lo is bigger</span>
         <span class="c1"># than n_post_neurons</span>
         <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">post_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">post_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>

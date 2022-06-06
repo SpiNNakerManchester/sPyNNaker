@@ -226,7 +226,7 @@
 <span class="sd">    :rtype: ~spynnaker.pyNN.models.populations.Population</span>
 <span class="sd">    :raises Exception: If an invalid model class is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=protected-access, too-many-arguments, too-many-locals</span>
+    <span class="c1"># pylint: disable=protected-access, too-many-arguments</span>
     <span class="n">population</span> <span class="o">=</span> <span class="n">Population</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
     <span class="n">vertex</span> <span class="o">=</span> <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractEthernetController</span><span class="p">):</span>
@@ -234,6 +234,7 @@
             <span class="s2">&quot;Vertex must be an instance of AbstractEthernetController&quot;</span><span class="p">)</span>
     <span class="n">translator</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_message_translator</span><span class="p">()</span>
     <span class="n">live_packet_gather_label</span> <span class="o">=</span> <span class="s2">&quot;EthernetControlReceiver&quot;</span>
+    <span class="c1"># pylint: disable=global-statement</span>
     <span class="k">global</span> <span class="n">__ethernet_control_connection</span>
     <span class="k">if</span> <span class="n">__ethernet_control_connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">__ethernet_control_connection</span> <span class="o">=</span> <span class="n">EthernetControlConnection</span><span class="p">(</span>

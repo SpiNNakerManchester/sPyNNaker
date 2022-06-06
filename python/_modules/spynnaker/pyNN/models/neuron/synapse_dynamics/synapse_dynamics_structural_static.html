@@ -80,8 +80,6 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># Frequency of rewiring (Hz)</span>
         <span class="s2">&quot;__f_rew&quot;</span><span class="p">,</span>
-        <span class="c1"># Period of rewiring (ms)</span>
-        <span class="s2">&quot;__p_rew&quot;</span><span class="p">,</span>
         <span class="c1"># Initial weight assigned to a newly formed connection</span>
         <span class="s2">&quot;__initial_weight&quot;</span><span class="p">,</span>
         <span class="c1"># Delay assigned to a newly formed connection</span>
@@ -92,16 +90,11 @@
         <span class="s2">&quot;__seed&quot;</span><span class="p">,</span>
         <span class="c1"># Holds initial connectivity as defined via connector</span>
         <span class="s2">&quot;__connections&quot;</span><span class="p">,</span>
-        <span class="c1"># Maximum synaptic row length for created synapses</span>
-        <span class="s2">&quot;__actual_row_max_length&quot;</span><span class="p">,</span>
         <span class="c1"># The actual type of weights: static through the simulation or those</span>
         <span class="c1"># that can be change through STDP</span>
         <span class="s2">&quot;__weight_dynamics&quot;</span><span class="p">,</span>
         <span class="c1"># Shared RNG seed to be written on all cores</span>
         <span class="s2">&quot;__seeds&quot;</span><span class="p">,</span>
-        <span class="c1"># Stores the actual SDRAM usage (value obtained only after writing spec</span>
-        <span class="c1"># is finished)</span>
-        <span class="s2">&quot;__actual_sdram_usage&quot;</span><span class="p">,</span>
         <span class="c1"># The RNG used with the seed that is passed in</span>
         <span class="s2">&quot;__rng&quot;</span><span class="p">,</span>
         <span class="c1"># The partner selection rule</span>
@@ -149,7 +142,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span> <span class="o">=</span> <span class="n">formation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span> <span class="o">=</span> <span class="n">elimination</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__f_rew</span> <span class="o">=</span> <span class="n">f_rew</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__p_rew</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__f_rew</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_weight</span> <span class="o">=</span> <span class="n">initial_weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__initial_delay</span> <span class="o">=</span> <span class="n">initial_delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span> <span class="o">=</span> <span class="n">s_max</span>
@@ -157,13 +149,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actual_row_max_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">__rng</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__seeds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="c1"># Addition information -- used for SDRAM usage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actual_sdram_usage</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralStatic.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.merge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -218,7 +205,6 @@
 <div class="viewcode-block" id="SynapseDynamicsStructuralStatic.get_n_words_for_static_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_n_words_for_static_connections">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="o">.</span><span class="n">get_n_words_for_static_connections</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_words_for_static_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_n_words_for_static_connections</span><span class="p">(</span><span class="n">n_connections</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actual_row_max_length</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="SynapseDynamicsStructuralStatic.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.set_connections">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">set_connections</span><span class="p">)</span>

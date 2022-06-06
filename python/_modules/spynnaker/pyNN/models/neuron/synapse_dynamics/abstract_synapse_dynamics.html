@@ -192,7 +192,6 @@
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray delays:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_delay_variance</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_mean">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -201,7 +200,6 @@
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -210,7 +208,6 @@
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_weight_variance"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_weight_variance">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -219,7 +216,6 @@
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">        :param ~numpy.ndarray weights:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.convert_per_connection_data_to_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.convert_per_connection_data_to_rows">[docs]</a>    <span class="k">def</span> <span class="nf">convert_per_connection_data_to_rows</span><span class="p">(</span>
@@ -271,6 +267,7 @@
 <span class="sd">        :param str target: The name of the synapse</span>
 <span class="sd">        :rtype: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=unused-argument</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 </pre></div>
 

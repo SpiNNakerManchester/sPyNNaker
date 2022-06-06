@@ -331,8 +331,7 @@
 <span class="sd">        tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,</span>
 <span class="sd">        ~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
-    <span class="c1"># pylint: disable=assignment-from-no-return</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="c1"># Get delays in timesteps</span>
     <span class="n">max_delay</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()</span>
 
@@ -425,7 +424,7 @@
 <span class="sd">    :param int max_row_n_words: The maximum number of words in a row</span>
 <span class="sd">    :rtype: tuple(int, ~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
+    <span class="c1"># pylint: disable=too-many-arguments</span>
     <span class="n">row_ids</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)</span>
     <span class="n">ff_data</span><span class="p">,</span> <span class="n">ff_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
     <span class="n">fp_data</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">,</span> <span class="n">pp_size</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>

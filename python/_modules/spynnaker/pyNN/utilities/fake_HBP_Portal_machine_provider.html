@@ -57,11 +57,10 @@
 
 
 <div class="viewcode-block" id="FakeHBPPortalMachineProvider"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider">[docs]</a><span class="k">class</span> <span class="nc">FakeHBPPortalMachineProvider</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__bmp_details&quot;</span><span class="p">,</span> <span class="s2">&quot;__height&quot;</span><span class="p">,</span> <span class="s2">&quot;__ip_addresses&quot;</span><span class="p">,</span> <span class="s2">&quot;__width&quot;</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__height&quot;</span><span class="p">,</span> <span class="s2">&quot;__ip_addresses&quot;</span><span class="p">,</span> <span class="s2">&quot;__width&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_boards</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__ip_addresses</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;machineName&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__bmp_details</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;bmp_names&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">=</span> <span class="mi">8</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="mi">8</span>
         <span class="k">if</span> <span class="n">n_boards</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
