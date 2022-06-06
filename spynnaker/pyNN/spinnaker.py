@@ -68,10 +68,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     """
 
     __slots__ = [
-        "__command_edge_count",
-        "__edge_count",
         "__id_counter",
-        "__live_spike_recorder",
         "__min_delay",
         "__neurons_per_core_set",
         "_populations",
@@ -110,13 +107,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pynn population objects
         self._populations = []
         self._projections = []
-        self.__edge_count = 0
         self.__id_counter = 0
-
-        # the number of edges that are associated with commands being sent to
-        # a vertex
-        self.__command_edge_count = 0
-        self.__live_spike_recorder = dict()
 
         # timing parameters
         self.__min_delay = None
@@ -200,7 +191,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """ Reset the state of the current network to time t = 0.
         """
         for population in self._populations:
-            population._cache_data()
+            population._cache_data()   # pylint: disable=protected-access
 
         self.__segment_counter += 1
 
@@ -642,8 +633,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             on_chip_bitfield_generator(
                 self.placements, self.application_graph,
-                self._executable_finder,  self._txrx, self._machine_graph,
-                self._routing_infos)
+                self._executable_finder,  self._txrx, self._machine_graph)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

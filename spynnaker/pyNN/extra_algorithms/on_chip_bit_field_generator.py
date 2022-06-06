@@ -59,7 +59,7 @@ def _percent(amount, total):
 
 def on_chip_bitfield_generator(
         placements, app_graph, executable_finder, transceiver,
-        machine_graph, routing_infos):
+        machine_graph):
     """ Loads and runs the bit field generator on chip.
 
     :param ~pacman.model.placements.Placements placements: placements
@@ -72,12 +72,11 @@ def on_chip_bitfield_generator(
         the SpiNNMan instance
     :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         the machine graph
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        the key to edge map
     """
     generator = _OnChipBitFieldGenerator(
         placements, executable_finder, transceiver)
-    generator._run(app_graph, executable_finder, machine_graph, routing_infos)
+    # pylint: disable=protected-access
+    generator._run(app_graph, executable_finder, machine_graph)
 
 
 class _OnChipBitFieldGenerator(object):
@@ -137,7 +136,7 @@ class _OnChipBitFieldGenerator(object):
             self._BIT_FIELD_EXPANDER_APLX)
 
     def _run(
-            self, app_graph, executable_finder, machine_graph, routing_infos):
+            self, app_graph, executable_finder, machine_graph):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
@@ -199,7 +198,7 @@ class _OnChipBitFieldGenerator(object):
         progress = ProgressBar(
             app_graph.n_vertices,
             "reading back bitfields from chip for summary report")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts
@@ -245,7 +244,7 @@ class _OnChipBitFieldGenerator(object):
         """
         progress = ProgressBar(
             app_graph.n_vertices, "reading back bitfields from chip")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts

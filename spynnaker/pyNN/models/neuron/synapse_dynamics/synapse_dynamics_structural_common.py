@@ -110,7 +110,7 @@ class SynapseDynamicsStructuralCommon(
             spec, pop_index, app_vertex, vertex_slice)
 
         # Write the component parameters
-        # pylint: disable=no-member
+        # pylint: disable=no-member, protected-access
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
@@ -134,6 +134,7 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = list()
         seen_app_edges = set()
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             for synapse_info in app_edge.synapse_information:
                 if isinstance(synapse_info.synapse_dynamics,
@@ -222,6 +223,7 @@ class SynapseDynamicsStructuralCommon(
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
                 proj.label))
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
@@ -349,6 +351,7 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = self.__get_structural_projections(
             incoming_projections)
         for proj in structural_projections:
+            # pylint: disable=protected-access
             dynamics = proj._synapse_information.synapse_dynamics
             app_edge = proj._projection_edge
             n_sub_edges += len(
@@ -381,13 +384,13 @@ class SynapseDynamicsStructuralCommon(
         :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
         """
-        # Note noqa because exact type comparison is required here
+        # Note noqa:E721  because exact type comparison is required here
         return (
             self.s_max == synapse_dynamics.s_max and
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
-            (type(self.partner_selection) ==  # noqa
+            (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==
              type(synapse_dynamics.formation)) and

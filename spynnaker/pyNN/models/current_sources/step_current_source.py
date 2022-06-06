@@ -32,9 +32,13 @@ class StepCurrentSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types"]
 
-    def __init__(self, times=[], amplitudes=[]):
+    def __init__(self, times=None, amplitudes=None):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
+        if times is None:
+            times = []
+        if amplitudes is None:
+            amplitudes = []
         sim = get_simulator()
         machine_ts = sim.machine_time_step
         time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
