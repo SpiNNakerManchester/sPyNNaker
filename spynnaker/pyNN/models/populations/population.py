@@ -470,7 +470,7 @@ class Population(PopulationBase):
         """
         return self._get_variable_unit(variable)
 
-    def set(self, **parameters):  # pylint: disable=arguments-differ
+    def set(self, **parameters):
         """ Set parameters of this population.
 
         :param parameters: The parameters to set.

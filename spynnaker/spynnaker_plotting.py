@@ -85,6 +85,7 @@ def plot_spiketrains(ax, spiketrains, label='', **options):
     :param str label: Label for the graph
     :param options: plotting options
     """
+    # pylint: disable=c-extension-no-member
     ax.set_xlim(0, spiketrains[0].t_stop / quantities.ms)
     _handle_options(ax, options)
     neurons = np.concatenate(

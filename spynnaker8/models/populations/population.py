@@ -17,6 +17,7 @@ from spynnaker.pyNN.models.populations import Population as _BaseClass
 from spynnaker.pyNN.utilities.utility_calls import moved_in_v6
 
 
+# pylint: disable=abstract-method
 class Population(_BaseClass):
     """ PyNN 0.9 population object.
 
