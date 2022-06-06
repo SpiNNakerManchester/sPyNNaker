@@ -226,7 +226,7 @@ class SpynnakerExternalDevicePluginManager(object):
         :param list(str) partition_ids:
         :param bool translate_keys:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         params = LivePacketGatherParameters(
             port=port, hostname=hostname, tag=tag, strip_sdp=strip_sdp,
             use_prefix=use_prefix, key_prefix=key_prefix,

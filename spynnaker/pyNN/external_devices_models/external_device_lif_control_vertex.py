@@ -72,7 +72,7 @@ class ExternalDeviceLifControlVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
 
         if not devices:
             raise ConfigurationException("No devices specified")
@@ -107,7 +107,6 @@ class ExternalDeviceLifControlVertex(
             neuron_impl, pynn_model, drop_late_spikes, splitter)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
-        # pylint: disable=arguments-differ
         key = self.__partition_id_to_key[partition.identifier]
         atom = self.__partition_id_to_atom[partition.identifier]
         return [(atom, key)]

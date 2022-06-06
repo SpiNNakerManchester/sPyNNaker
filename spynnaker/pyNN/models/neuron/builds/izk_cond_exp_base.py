@@ -73,7 +73,7 @@ class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
             self, a=0.02, b=0.2, c=-65.0, d=2.0, i_offset=0.0, u=-14.0,
             v=-70.0, tau_syn_E=5.0, tau_syn_I=5.0, e_rev_E=0.0, e_rev_I=-70.0,
             isyn_exc=0.0, isyn_inh=0.0):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelIzh(a, b, c, d, v, u, i_offset)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)

@@ -113,6 +113,7 @@ class IDMixin(object):
         """
         results = dict()
         for name in self.celltype.get_parameter_names():
+            # pylint: disable=protected-access
             results[name] = self.__population._get_by_selector(self.__id, name)
         return results
 
@@ -162,6 +163,7 @@ class IDMixin(object):
         :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\
             current_source:
         """
+        # pylint: disable=protected-access
         self.__population._vertex.inject(current_source, [self.__id])
         current_source.set_population(self.__population)
         self.__population.requires_mapping = True
@@ -172,6 +174,7 @@ class IDMixin(object):
         :param str variable: The name of the variable
         :rtype: float
         """
+        # pylint: disable=protected-access
         return self.__population._get_initial_value(variable, self.__id)
 
     def set_initial_value(self, variable, value):
@@ -179,6 +182,7 @@ class IDMixin(object):
         :param str variable: The name of the variable
         :param float value: The value of the variable
         """
+        # pylint: disable=protected-access
         self.__population._initialize(variable, value, self.__id)
 
     def initialize(self, **initial_values):
@@ -186,6 +190,7 @@ class IDMixin(object):
 
         """
         for variable, value in initial_values.items():
+            # pylint: disable=protected-access
             self.__population._initialize(variable, value, self.__id)
 
     def as_view(self):
