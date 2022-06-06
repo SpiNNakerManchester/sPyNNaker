@@ -813,6 +813,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 return True
             raise NotImplementedError(
                 "This call was unexpected as it was calculated that "
-                "the max needed delay was lesss that the max possible")
+                "the max needed delay was less that the max possible")
         else:
             return self.__user_allow_delay_extension
