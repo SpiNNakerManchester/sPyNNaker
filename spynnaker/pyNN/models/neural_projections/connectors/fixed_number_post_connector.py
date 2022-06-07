@@ -129,7 +129,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
                     '_to_' + synapse_info.post_population.label + \
                     '_fixednumberpost-conn.csv'
                 print('Output post-connectivity to ', filename)
-                with open(filename, 'w') as file_handle:
+                with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
                                   [(synapse_info.n_pre_neurons,
                                     synapse_info.n_post_neurons,

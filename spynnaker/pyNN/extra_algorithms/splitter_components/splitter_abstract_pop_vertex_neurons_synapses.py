@@ -93,8 +93,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__max_delay",
         # The user-set maximum delay, for reset
         "__user_max_delay",
-        # Whether to allow delay extensions to be created
-        "__allow_delay_extension",
+        # Whether you expect delay extensions to be asked to be created
+        "__expect_delay_extension",
         # The user-set allowing of delay extensions
         "__user_allow_delay_extension",
         # The fixed slices the vertices are divided into
@@ -136,14 +136,21 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
         self.__user_max_delay = max_delay
-        self.__allow_delay_extension = allow_delay_extension
         self.__user_allow_delay_extension = allow_delay_extension
+        if max_delay is None:
+            # to be calcutaed by __update_max_delay
+            self.__expect_delay_extension = None
+        else:
+            # The user may ask for the delay even if then told no
+            self.__expect_delay_extension = True
+            if allow_delay_extension is None:
+                self.__user_allow_delay_extension = True
         self.__slices = None
         self.__next_synapse_index = 0
-
-        if (self.__max_delay is not None and
-                self.__allow_delay_extension is None):
-            self.__allow_delay_extension = True
+        # redefined by create_machine_vertices before first use so style
+        self.__poisson_edges = set()
+        self.__synapse_verts_by_neuron = None
+        self.__neuron_vertices = list()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -172,13 +179,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
-                get_n_bits(self.__get_max_delay)) > MAX_RING_BUFFER_BITS:
+                get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
                 "The combination of the number of neurons per core ({}), "
                 "the number of synapse types ({}), and the maximum delay per "
                 "core ({}) will require too much DTCM.  Please reduce one or "
                 "more of these values.".format(
-                    atoms_per_core, n_synapse_types, self.__get_max_delay))
+                    atoms_per_core, n_synapse_types, self.max_support_delay()))
 
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
@@ -249,11 +256,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     max_crs -= 1
 
             if remaining_poisson_vertices:
+                # pylint: disable=logging-too-many-args
                 logger.warning(
-                    f"Vertex {label} is using multicast for"
-                    f" {len(remaining_poisson_vertices)} one-to-one Poisson"
+                    "Vertex {} is using multicast for {} one-to-one Poisson"
                     " sources as not enough cores exist to put them on the"
-                    " same chip")
+                    " same chip", label, len(remaining_poisson_vertices))
 
             # Create an SDRAM edge partition
             sdram_label = "SDRAM {} Synapses-->Neurons:{}-{}".format(
@@ -494,6 +501,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__poisson_edges = set()
         incoming_direct_poisson = defaultdict(list)
         for proj in self._governed_app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             conn = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
@@ -600,7 +608,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__synapse_vertices = None
         self.__synapse_verts_by_neuron = None
         self.__max_delay = self.__user_max_delay
-        self.__allow_delay_extension = self.__user_allow_delay_extension
+        if self.__user_max_delay is None:
+            # to be calcutaed by __update_max_delay
+            self.__expect_delay_extension = None
+        else:
+            self.__expect_delay_extension = True
 
     @property
     def n_synapse_vertices(self):
@@ -768,15 +780,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 BYTES_PER_WORD))
         return sdram
 
-    @property
-    def __get_max_delay(self):
-        if self.__max_delay is not None:
-            return self.__max_delay
-
+    def __update_max_delay(self):
         # Find the maximum delay from incoming synapses
         app_vertex = self._governed_app_vertex
         max_delay_ms = 0
         for proj in app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             s_info = proj._synapse_information
             proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
                 s_info.connector, s_info)
@@ -794,16 +803,24 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         # Pick the smallest between the two, so that not too many bits are used
         final_n_delay_bits = min(n_delay_bits, max_delay_bits)
         self.__max_delay = 2 ** final_n_delay_bits
-        if self.__allow_delay_extension is None:
-            self.__allow_delay_extension = max_delay_bits > final_n_delay_bits
-        return self.__max_delay
+        if self.__user_allow_delay_extension is None:
+            self.__expect_delay_extension = max_delay_bits > final_n_delay_bits
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
-        return self.__get_max_delay
+        if self.__max_delay is None:
+            self.__update_max_delay()
+        return self.__max_delay
 
     @overrides(AbstractSpynnakerSplitterDelay.accepts_edges_from_delay_vertex)
     def accepts_edges_from_delay_vertex(self):
-        if self.__allow_delay_extension is None:
-            self.__get_max_delay
-        return self.__allow_delay_extension
+        if self.__user_allow_delay_extension is None:
+            if self.__expect_delay_extension is None:
+                self.__update_max_delay()
+            if self.__expect_delay_extension:
+                return True
+            raise NotImplementedError(
+                "This call was unexpected as it was calculated that "
+                "the max needed delay was less that the max possible")
+        else:
+            return self.__user_allow_delay_extension

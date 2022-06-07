@@ -132,7 +132,6 @@ class DistanceDependentFormation(AbstractFormation):
         :return: the distance
         :rtype: float
         """
-        # pylint: disable=assignment-from-no-return
         x0 = numpy.asarray(x0)
         x1 = numpy.asarray(x1)
         delta = numpy.abs(x0 - x1)

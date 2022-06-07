@@ -26,6 +26,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class NeuronProvenance(ctypes.LittleEndianStructure):
@@ -48,7 +50,7 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
 # Identifiers for neuron regions
 NeuronRegions = namedtuple(
     "NeuronRegions",
-    ["neuron_params", "neuron_recording"])
+    ["neuron_params", "current_source_params", "neuron_recording"])
 
 
 class PopulationMachineNeurons(
@@ -148,6 +150,9 @@ class PopulationMachineNeurons(
         # Write the neuron parameters
         self._write_neuron_parameters(spec, ring_buffer_shifts)
 
+        # Write the current source parameters
+        self._write_current_source_parameters(spec)
+
         # Write the neuron recording region
         neuron_recorder = self._app_vertex.neuron_recorder
         spec.reserve_memory_region(
@@ -214,6 +219,104 @@ class PopulationMachineNeurons(
             self._app_vertex.parameters, self._app_vertex.state_variables,
             self._vertex_slice, self._app_vertex.atoms_shape)
         spec.write_array(neuron_data)
+
+    def _write_current_source_parameters(self, spec):
+        # pylint: disable=too-many-arguments
+        n_atoms = self._vertex_slice.n_atoms
+        lo_atom = self._vertex_slice.lo_atom
+        hi_atom = self._vertex_slice.hi_atom
+
+        spec.comment(
+            "\nWriting Current Source Parameters for {} Neurons:\n".format(
+                n_atoms))
+
+        # Reserve and switch to the current source region
+        params_size = self._app_vertex.\
+            get_sdram_usage_for_current_source_params(self._vertex_slice)
+        spec.reserve_memory_region(
+            region=self._neuron_regions.current_source_params,
+            size=params_size, label='CurrentSourceParams')
+        spec.switch_write_focus(self._neuron_regions.current_source_params)
+
+        # Get the current sources from the app vertex
+        app_current_sources = self._app_vertex.current_sources
+        current_source_id_list = self._app_vertex.current_source_id_list
+
+        # Work out which current sources are on this core
+        current_sources = set()
+        for app_current_source in app_current_sources:
+            for n in range(lo_atom, hi_atom + 1):
+                if (n in current_source_id_list[app_current_source]):
+                    current_sources.add(app_current_source)
+
+        n_current_sources = len(current_sources)
+
+        # Write the number of sources
+        spec.write_value(n_current_sources)
+
+        # Don't write anything else if there are no current sources
+        if n_current_sources != 0:
+            # Sort the current sources into current_source_id order
+            current_sources = sorted(
+                current_sources, key=lambda x: x.current_source_id)
+
+            # Array to keep track of the number of each type of current source
+            # (there are four, but they are numbered 1 to 4, so five elements)
+            cs_index_array = [0, 0, 0, 0, 0]
+
+            # Data sent to the machine will be current sources per neuron
+            # This array will have the first entry indicating the number of
+            # sources for each neuron, then if this is non-zero, follow it with
+            # the IDs indicating the current source ID value, and then the
+            # index within that type of current source
+            neuron_current_sources = [[0] for n in range(lo_atom, hi_atom + 1)]
+            for current_source in current_sources:
+                # Get the ID of the current source
+                cs_id = current_source.current_source_id
+
+                # Only use IDs that are on this core
+                for n in range(0, hi_atom + 1 - lo_atom):
+                    if (n in current_source_id_list[current_source]):
+                        neuron_current_sources[n][0] += 1
+                        neuron_current_sources[n].append(cs_id)
+                        neuron_current_sources[n].append(cs_index_array[cs_id])
+                        cs_index_array[cs_id] += 1
+
+            # Now loop over the neurons on this core and write the current
+            # source ID and index for sources attached to each neuron
+            for n in range(0, hi_atom + 1 - lo_atom):
+                n_current_sources = neuron_current_sources[n][0]
+                spec.write_value(n_current_sources)
+                if n_current_sources != 0:
+                    for csid in range(n_current_sources * 2):
+                        spec.write_value(neuron_current_sources[n][csid+1])
+
+            # Now loop over the current sources and write the data required
+            # for each type of current source
+            for current_source in current_sources:
+                cs_data_types = current_source.get_parameter_types
+                cs_id = current_source.current_source_id
+                for key, value in current_source.get_parameters.items():
+                    # StepCurrentSource currently handled with arrays
+                    if (cs_id == CurrentSourceIDs.STEP_CURRENT_SOURCE.value):
+                        n_params = len(current_source.get_parameters[key])
+                        spec.write_value(n_params)
+                        for n_p in range(n_params):
+                            value_convert = convert_to(
+                                value[n_p], cs_data_types[key]).view("uint32")
+                            spec.write_value(data=value_convert)
+                    # All other sources have single-valued params
+                    else:
+                        if hasattr(value, "__getitem__"):
+                            for m in range(len(value)):
+                                value_convert = convert_to(
+                                    value[m],
+                                    cs_data_types[key]).view("uint32")
+                                spec.write_value(data=value_convert)
+                        else:
+                            value_convert = convert_to(
+                                value, cs_data_types[key]).view("uint32")
+                            spec.write_value(data=value_convert)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(

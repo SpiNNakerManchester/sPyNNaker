@@ -82,6 +82,7 @@ class DistanceDependentProbabilityConnector(
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
+        self.__probs = None
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"

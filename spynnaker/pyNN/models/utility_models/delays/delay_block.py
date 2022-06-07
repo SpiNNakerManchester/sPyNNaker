@@ -23,9 +23,8 @@ class DelayBlock(object):
     __slots__ = [
         "__delay_block"]
 
-    def __init__(self, n_delay_stages, delay_per_stage, vertex_slice):
+    def __init__(self, n_delay_stages, vertex_slice):
         """
-        :param int n_delay_stages:
         :param int delay_per_stage:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """

@@ -487,7 +487,7 @@ class SpikeSourcePoissonVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(

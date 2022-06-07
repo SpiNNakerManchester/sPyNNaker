@@ -188,7 +188,7 @@ def EthernetControlPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
-    # pylint: disable=protected-access, too-many-arguments, too-many-locals
+    # pylint: disable=protected-access, too-many-arguments
     population = Population(n_neurons, model, label=label)
     vertex = population._vertex
     if not isinstance(vertex, AbstractEthernetController):
@@ -196,6 +196,7 @@ def EthernetControlPopulation(
             "Vertex must be an instance of AbstractEthernetController")
     translator = vertex.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
+    # pylint: disable=global-statement
     global __ethernet_control_connection
     if __ethernet_control_connection is None:
         __ethernet_control_connection = EthernetControlConnection(

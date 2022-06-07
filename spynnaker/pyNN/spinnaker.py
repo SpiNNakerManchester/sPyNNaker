@@ -40,6 +40,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, on_chip_bitfield_generator,
     redundant_packet_count_report,
@@ -67,10 +68,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     """
 
     __slots__ = [
-        "__command_edge_count",
-        "__edge_count",
         "__id_counter",
-        "__live_spike_recorder",
         "__min_delay",
         "__neurons_per_core_set",
         "_populations",
@@ -109,13 +107,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pynn population objects
         self._populations = []
         self._projections = []
-        self.__edge_count = 0
         self.__id_counter = 0
-
-        # the number of edges that are associated with commands being sent to
-        # a vertex
-        self.__command_edge_count = 0
-        self.__live_spike_recorder = dict()
 
         # timing parameters
         self.__min_delay = None
@@ -148,8 +140,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             db.insert_version("neo_version", neo_version)
             db.insert_version("lazyarray_version", lazyarray_version)
 
-    def run(self, run_time, sync_time=0.0):
-        """ Run the model created.
+    def _clear_and_run(self, run_time, sync_time=0.0):
+        """ Clears the projections and Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
@@ -165,9 +157,16 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         for projection in self._projections:
             projection._clear_cache()
 
-        self._run_wait(run_time, sync_time)
+        super(SpiNNaker, self).run(run_time, sync_time)
         for projection in self._projections:
             projection._clear_cache()
+
+    def run(self, run_time, sync_time=0.0):
+        """ Run the simulation for a span of simulation time.
+        :param run_time: the time to run for, in milliseconds
+        :return: None
+        """
+        self._clear_and_run(run_time, sync_time)
 
     def run_until(self, tstop):
         """ Run the simulation until the given simulation time.
@@ -175,7 +174,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :param tstop: when to run until in milliseconds
         """
         # Build data
-        self._run_wait(tstop - self.t)
+        self._clear_and_run(tstop - self.t)
 
     def clear(self):
         """ Clear the current recordings and reset the simulation
@@ -192,21 +191,12 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """ Reset the state of the current network to time t = 0.
         """
         for population in self._populations:
-            population._cache_data()
+            population._cache_data()   # pylint: disable=protected-access
 
         self.__segment_counter += 1
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)
-
-    def _run_wait(self, duration_ms, sync_time=0.0):
-        """ Run the simulation for a length of simulation time.
-
-        :param duration_ms: The run duration, in milliseconds
-        :type duration_ms: int or float
-        """
-
-        super(SpiNNaker, self).run(duration_ms, sync_time)
 
     @property
     def state(self):
@@ -514,12 +504,14 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 isinstance(max_permitted, int)):
             previous = neuron_type.get_max_atoms_per_core()
             if previous < max_permitted:
-                logger.warning(
-                    "Attempt to increase number_of_neurons_per_core "
-                    "from {} to {} ignored", previous, max_permitted)
-                return
+                raise SpynnakerException(
+                    f"Attempt to increase number_of_neurons_per_core "
+                    f"from {previous} to {max_permitted} not supported")
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         self.__neurons_per_core_set.add(neuron_type)
+        if self._populations:
+            logger.warning("Calling set_number_of_neurons_per_core will not "
+                           "affect previously created Populations")
 
     def reset_number_of_neurons_per_core(self):
         for neuron_type in self.__neurons_per_core_set:
@@ -642,8 +634,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             on_chip_bitfield_generator(
                 self.placements, self.application_graph,
-                self._executable_finder,  self._txrx, self._machine_graph,
-                self._routing_infos)
+                self._executable_finder,  self._txrx, self._machine_graph)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):

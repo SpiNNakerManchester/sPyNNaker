@@ -54,6 +54,7 @@ class Projection(object):
     plasticity mechanisms) between two populations, together with methods to
     set parameters of those connections, including of plasticity mechanisms.
     """
+    # "format" param name defined by PyNN/
     # pylint: disable=redefined-builtin
     __slots__ = [
         "__projection_edge",
@@ -78,7 +79,7 @@ class Projection(object):
         :param ~pyNN.space.Space space:
         :param str label:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
                 "sPyNNaker {} does not yet support multi-compartmental "
@@ -231,7 +232,7 @@ class Projection(object):
                 "Projections over views not currently supported with the {}"
                 .format(connector))
         # Check whether the array is contiguous or not
-        inds = param._indexes
+        inds = param._indexes  # pylint: disable=protected-access
         if inds != tuple(range(inds[0], inds[-1] + 1)):
             raise NotImplementedError(
                 "Projections over views only work on contiguous arrays, "
