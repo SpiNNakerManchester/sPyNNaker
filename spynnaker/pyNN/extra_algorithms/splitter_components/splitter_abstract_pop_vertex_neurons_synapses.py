@@ -482,8 +482,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         app_vertex = self._governed_app_vertex
         if (app_vertex.synapse_dynamics is not None and
                 not isinstance(app_vertex.synapse_dynamics,
-                               SynapseDynamicsStatic) and
-                app_vertex.self_projection is None):
+                               SynapseDynamicsStatic)):
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
             machine_graph.add_edge(neuron_to_synapse_edge, SPIKE_PARTITION_ID)
             synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
