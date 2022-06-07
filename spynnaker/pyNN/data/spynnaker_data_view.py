@@ -16,6 +16,7 @@
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -232,10 +233,9 @@ class SpynnakerDataView(FecDataView):
         if hasattr(neuron_type, "get_max_atoms_per_core"):
             previous = neuron_type.get_max_atoms_per_core()
             if previous < max_permitted:
-                logger.warning(
-                    "Attempt to increase number_of_neurons_per_core "
-                    "from {} to {} ignored", previous, max_permitted)
-                return
+                raise SpynnakerException(
+                    f"Attempt to increase number_of_neurons_per_core "
+                    f"from {previous} to {max_permitted} not supported")
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
 
