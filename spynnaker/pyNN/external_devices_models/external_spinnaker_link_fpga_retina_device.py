@@ -64,8 +64,7 @@ class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex):
     __slots__ = [
         "__fixed_key",
-        "__fixed_mask",
-        "__polarity"]
+        "__fixed_mask"]
 
     MODE_128 = "128"
     MODE_64 = "64"
@@ -94,7 +93,6 @@ class ExternalFPGARetinaDevice(
             label=label, max_atoms_per_core=fixed_n_neurons,
             board_address=board_address)
 
-        self.__polarity = polarity
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:

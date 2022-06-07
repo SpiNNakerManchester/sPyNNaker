@@ -84,13 +84,11 @@ class SpikeSourcePoissonVertex(
         "__time_to_spike",
         "__kiss_seed",  # dict indexed by vertex slice
         "__n_subvertices",
-        "__n_data_specs",
         "__max_rate",
         "__rate_change",
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__max_spikes",
         "__outgoing_projections",
         "__incoming_control_edge"]
 
@@ -127,7 +125,6 @@ class SpikeSourcePoissonVertex(
         self.__seed = seed
         self.__kiss_seed = dict()
         self.__n_subvertices = 0
-        self.__n_data_specs = 0
 
         # check for changes parameters
         self.__change_requires_mapping = True
@@ -263,15 +260,6 @@ class SpikeSourcePoissonVertex(
             self.__max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self.__max_rate = 0
-
-        total_rate = numpy.sum(all_rates)
-        self.__max_spikes = 0
-        if total_rate > 0:
-            # Note we have to do this per rate, as the whole array is not numpy
-            max_rates = numpy.array(
-                [numpy.max(r) for r in self.__data["rates"]])
-            self.__max_spikes = numpy.sum(scipy.stats.poisson.ppf(
-                1.0 - (1.0 / max_rates), max_rates))
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
@@ -448,7 +436,6 @@ class SpikeSourcePoissonVertex(
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        # pylint: disable=arguments-differ
         poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
@@ -478,7 +465,7 @@ class SpikeSourcePoissonVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(

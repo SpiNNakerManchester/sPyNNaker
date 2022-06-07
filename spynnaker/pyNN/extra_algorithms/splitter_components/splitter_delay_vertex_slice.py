@@ -17,7 +17,6 @@ import math
 from pacman.exceptions import (
     PacmanConfigurationException, PacmanInvalidParameterException)
 from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
     AbstractPartitionerConstraint)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
@@ -244,8 +243,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     def check_supported_constraints(self):
         utility_calls.check_algorithm_can_support_constraints(
             constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
+            supported_constraints=[],
             abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)

@@ -39,6 +39,7 @@ def delay_support_adder(app_graph):
         the app graph
     """
     adder = _DelaySupportAdder()
+    # pylint: disable=protected-access
     adder._run(app_graph)
 
 

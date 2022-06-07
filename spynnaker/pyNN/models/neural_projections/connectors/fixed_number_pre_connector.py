@@ -129,7 +129,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
                 filename = synapse_info.pre_population.label + \
                     '_to_' + synapse_info.post_population.label + \
                     '_fixednumberpre-conn.csv'
-                with open(filename, 'w') as file_handle:
+                with open(filename, 'w', encoding="utf-8") as file_handle:
                     numpy.savetxt(file_handle,
                                   [(synapse_info.n_pre_neurons,
                                     synapse_info.n_post_neurons,

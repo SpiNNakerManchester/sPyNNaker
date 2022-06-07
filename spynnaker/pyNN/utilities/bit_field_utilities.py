@@ -52,7 +52,7 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
     sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
     seen_app_edges = set()
     for proj in incoming_projections:
-        app_edge = proj._projection_edge
+        app_edge = proj._projection_edge  # pylint: disable=protected-access
         if app_edge not in seen_app_edges:
             seen_app_edges.add(app_edge)
             slices = app_edge.pre_vertex.splitter.get_out_going_slices()
@@ -86,7 +86,7 @@ def get_estimated_sdram_for_key_region(incoming_projections):
     sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
     seen_app_edges = set()
     for proj in incoming_projections:
-        in_edge = proj._projection_edge
+        in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
 
@@ -204,7 +204,7 @@ def write_bitfield_init_data(
     sources = OrderedSet()
     seen_app_edges = set()
     for proj in incoming_projections:
-        in_edge = proj._projection_edge
+        in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
             srcs = in_edge.pre_vertex.splitter.get_out_going_vertices(

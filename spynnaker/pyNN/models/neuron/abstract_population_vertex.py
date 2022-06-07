@@ -165,7 +165,7 @@ class AbstractPopulationVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
 
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -275,6 +275,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__max_row_info.clear()
         self.__incoming_projections.append(projection)
+        # pylint: disable=protected-access
         if projection._projection_edge.pre_vertex == self:
             self.__self_projection = projection
 
@@ -894,6 +895,7 @@ class AbstractPopulationVertex(
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
 
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             # Skip if this is a synapse dynamics synapse type
             if synapse_info.synapse_type_from_dynamics:
@@ -927,6 +929,7 @@ class AbstractPopulationVertex(
             spikes_per_tick = max(
                 1.0, self.__spikes_per_second / steps_per_second)
             spikes_per_second = self.__spikes_per_second
+            # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             if isinstance(pre_vertex, AbstractMaxSpikes):
                 rate = pre_vertex.max_spikes_per_second()
@@ -1080,6 +1083,7 @@ class AbstractPopulationVertex(
         :param int n_post_atoms: The number of atoms projected to
         :rtype: int
         """
+        # pylint: disable=protected-access
         synapse_info = projection._synapse_information
         app_edge = projection._projection_edge
 
@@ -1129,6 +1133,7 @@ class AbstractPopulationVertex(
         """
         size = 0
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
             n_sub_edges = len(

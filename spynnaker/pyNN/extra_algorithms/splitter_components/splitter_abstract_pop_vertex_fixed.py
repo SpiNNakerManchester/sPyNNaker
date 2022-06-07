@@ -14,15 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    AbstractPartitionerConstraint)
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
     MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import get_remaining_constraints
 from spynnaker.pyNN.models.neuron import (
@@ -267,14 +263,6 @@ class SplitterAbstractPopulationVertexFixed(
             self._governed_app_vertex.get_common_cpu() +
             self._governed_app_vertex.get_neuron_cpu(n_atoms) +
             self._governed_app_vertex.get_synapse_cpu(n_atoms))
-
-    @overrides(AbstractSplitterCommon.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
-            abstract_constraint_type=AbstractPartitionerConstraint)
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
