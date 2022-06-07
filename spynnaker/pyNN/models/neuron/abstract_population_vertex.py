@@ -421,7 +421,6 @@ class AbstractPopulationVertex(
                    else s.get_size_in_whole_words()
                    for s in self.__neuron_impl.structs) * BYTES_PER_WORD
 
-<<<<<<< HEAD
     def get_sdram_usage_for_neuron_generation(self, n_atoms):
         """ Calculate the SDRAM usage for the neuron generation region.
 
@@ -445,8 +444,6 @@ class AbstractPopulationVertex(
             _NEURON_GENERATOR_PER_ITEM * n_params * n_atoms
         ])
 
-=======
->>>>>>> refs/heads/reduce_overhead
     def get_sdram_usage_for_current_source_params(self, n_atoms):
         """ Calculate the SDRAM usage for the current source parameters region.
 
