@@ -46,6 +46,7 @@ enum regions {
     PROFILER_REGION,
     RECORDING_REGION,
     NEURON_PARAMS_REGION,
+    CURRENT_SOURCE_PARAMS_REGION,
     NEURON_RECORDING_REGION,
     LOCAL_ONLY_REGION,
     LOCAL_ONLY_PARAMS_REGION,
@@ -69,6 +70,7 @@ const struct common_priorities COMMON_PRIORITIES = {
 //! From the regions, extract those that are neuron-specific
 const struct neuron_regions NEURON_REGIONS = {
     .neuron_params = NEURON_PARAMS_REGION,
+    .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
     .neuron_recording = NEURON_RECORDING_REGION
 };
 

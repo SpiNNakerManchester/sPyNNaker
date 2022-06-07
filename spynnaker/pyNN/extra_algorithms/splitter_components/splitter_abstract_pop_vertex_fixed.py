@@ -14,16 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.constraints.partitioner_constraints import (
-    MaxVertexAtomsConstraint, FixedVertexAtomsConstraint,
-    AbstractPartitionerConstraint)
 from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import (
     ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
     MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities\
     .partition_algorithm_utilities import (
         get_multidimensional_slices, get_remaining_constraints)
@@ -42,7 +38,6 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     exact_sdram_for_bit_field_builder_region)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
-from spynnaker.pyNN.exceptions import SpynnakerSplitterConfigurationException
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 
 
@@ -72,9 +67,7 @@ class SplitterAbstractPopulationVertexFixed(
         # The pre-calculated slices of the vertex
         "__slices",
         # All the machine vertices
-        "__vertices",
-        # The maximum atoms per core
-        "__max_atoms"
+        "__vertices"
     ]
 
     """ The name of the splitter """
@@ -99,7 +92,6 @@ class SplitterAbstractPopulationVertexFixed(
         self.__next_index = 0
         self.__slices = None
         self.__edge_map = None
-        self.__max_atoms = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -107,25 +99,6 @@ class SplitterAbstractPopulationVertexFixed(
         if not isinstance(app_vertex, AbstractPopulationVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
-
-    @overrides(AbstractSplitterCommon.set_max_atoms_per_core)
-    def set_max_atoms_per_core(self, max_atoms_per_core, is_fixed_atoms):
-        n_atoms = self._governed_app_vertex.atoms_shape
-
-        if self.__max_atoms is None:
-            self.__max_atoms = list(n_atoms)
-        if isinstance(max_atoms_per_core, int):
-            for i in range(len(self.__max_atoms)):
-                self.__max_atoms[i] = min(
-                    self.__max_atoms[i], max_atoms_per_core)
-        else:
-            if len(max_atoms_per_core) != len(n_atoms):
-                raise SpynnakerSplitterConfigurationException(
-                    "The length of max_atoms_per_core does not match the "
-                    " number of dimensions")
-            for i in range(len(self.__max_atoms)):
-                self.__max_atoms[i] = min(
-                    self.__max_atoms[i], max_atoms_per_core[i])
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, resource_tracker, machine_graph):
@@ -406,14 +379,6 @@ class SplitterAbstractPopulationVertexFixed(
             self._governed_app_vertex.get_neuron_cpu(vertex_slice) +
             self._governed_app_vertex.get_synapse_cpu(vertex_slice))
 
-    @overrides(AbstractSplitterCommon.check_supported_constraints)
-    def check_supported_constraints(self):
-        utility_calls.check_algorithm_can_support_constraints(
-            constrained_vertices=[self._governed_app_vertex],
-            supported_constraints=[
-                MaxVertexAtomsConstraint, FixedVertexAtomsConstraint],
-            abstract_constraint_type=AbstractPartitionerConstraint)
-
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
         super(SplitterAbstractPopulationVertexFixed, self).reset_called()
@@ -431,4 +396,5 @@ class SplitterAbstractPopulationVertexFixed(
         if self.__slices is not None:
             return
         n_atoms = self._governed_app_vertex.atoms_shape
-        self.__slices = get_multidimensional_slices(n_atoms, self.__max_atoms)
+        self.__slices = get_multidimensional_slices(
+            n_atoms, self._governed_app_vertex.get_max_atoms_per_core())
