@@ -77,7 +77,8 @@ class SplitterAbstractPopulationVertexFixed(
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
-        max_atoms_per_core = min(self._max_atoms_per_core, app_vertex.n_atoms)
+        max_atoms_per_core = min(
+            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         projections = app_vertex.incoming_projections
         constraints = get_remaining_constraints(app_vertex)
@@ -275,7 +276,7 @@ class SplitterAbstractPopulationVertexFixed(
         if self.__slices is not None:
             return
         n_atoms = self._governed_app_vertex.n_atoms
-        per_core = self._max_atoms_per_core
+        per_core = self._governed_app_vertex.get_max_atoms_per_core()
         self.__slices = [Slice(i, min(i + per_core - 1, n_atoms - 1))
                          for i in range(0, n_atoms, per_core)]
 
