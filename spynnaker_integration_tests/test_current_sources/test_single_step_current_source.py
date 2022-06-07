@@ -46,7 +46,7 @@ class TestSingleStepCurrentSource(BaseTestCase):
         # Test a single source injected into 5 neurons (across both cores)
         # with an amplitude large enough to cause spikes on these 5 neurons
         step_source2 = sim.StepCurrentSource(
-            times=[300, 301], amplitudes=[1.1, -0.2])
+            times=[300, 301], amplitudes=[10.1, -0.2])
         pop_lif[3:8].inject(step_source2)
 
         pop_lif.record(["spikes"])
