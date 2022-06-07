@@ -38,7 +38,7 @@ def spynnaker_data_specification_writer(
     :raises ~spinn_front_end_common.exceptions.ConfigurationException:
         If the DSG asks to use more SDRAM than is available.
     """
-    # pylint: disable=too-many-arguments, signature-differs
+    # pylint: disable=too-many-arguments
 
     delay_extensions = list()
     placement_order = list()

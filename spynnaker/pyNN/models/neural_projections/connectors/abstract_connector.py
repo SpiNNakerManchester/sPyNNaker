@@ -524,6 +524,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         with ProvenanceWriter() as db:
+            # pylint: disable=expression-not-assigned
             db.insert_connector(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,

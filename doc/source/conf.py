@@ -411,7 +411,7 @@ def setup(app):
 
 
 def filtered_files(base, unfiltered_files_filename):
-    with open(unfiltered_files_filename) as f:
+    with open(unfiltered_files_filename, encoding="utf-8") as f:
         lines = [line.rstrip() for line in f]
     # Skip comments and empty lines to get list of files we DON'T want to
     # filter out; this is definitely complicated

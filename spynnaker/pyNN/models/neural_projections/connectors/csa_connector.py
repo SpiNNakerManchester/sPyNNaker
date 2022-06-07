@@ -19,7 +19,7 @@ from .abstract_connector import AbstractConnector
 try:
     import csa
     _csa_found = (True, ImportError)
-except ImportError as _ex:  # noqa: F821
+except ImportError as _ex:
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
 

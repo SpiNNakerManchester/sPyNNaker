@@ -69,7 +69,7 @@ class ExternalDeviceLifControlVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         super().__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,

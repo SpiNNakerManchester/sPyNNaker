@@ -138,7 +138,7 @@ def read_in_data_from_file(
     atom_ids = list()
     data_items = list()
     evaluator = SafeEval()
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
@@ -195,7 +195,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as f_source:
+    with open(file_path, 'r', encoding="utf-8") as f_source:
         read_data = f_source.readlines()
 
     evaluator = SafeEval()

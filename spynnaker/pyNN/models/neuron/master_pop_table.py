@@ -336,6 +336,7 @@ class MasterPopTableAsBinarySearch(object):
         n_vertices = 0
         seen_edges = set()
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             in_edge = proj._projection_edge
 
             # Each projection with a delay will have an additional entry

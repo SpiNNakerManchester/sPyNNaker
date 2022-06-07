@@ -230,7 +230,8 @@ class PopulationMachineNeurons(
 
         # Reserve and switch to the current source region
         params_size = self._app_vertex.\
-            get_sdram_usage_for_current_source_params(self._vertex_slice)
+            get_sdram_usage_for_current_source_params(
+                self._vertex_slice.n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')

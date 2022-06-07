@@ -164,6 +164,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         if (synapse_info.prepop_is_view and
 
                 synapse_info.postpop_is_view):
+            # pylint: disable=protected-access
             pre_lo = synapse_info.pre_population._indexes[0]
             pre_hi = synapse_info.pre_population._indexes[-1]
             post_lo = synapse_info.post_population._indexes[0]
@@ -180,6 +181,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         # Filter edge if pre-pop is outside limit and post_lo is bigger
         # than n_pre_neurons
         elif synapse_info.prepop_is_view:
+            # pylint: disable=protected-access
             pre_lo = synapse_info.pre_population._indexes[0]
             pre_hi = synapse_info.pre_population._indexes[-1]
             if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom) or
@@ -190,6 +192,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         # Filter edge if post-pop is outside limit and pre_lo is bigger
         # than n_post_neurons
         elif synapse_info.postpop_is_view:
+            # pylint: disable=protected-access
             post_lo = synapse_info.post_population._indexes[0]
             post_hi = synapse_info.post_population._indexes[-1]
             if ((pre_slice.hi_atom < post_slice.lo_atom - post_lo) or

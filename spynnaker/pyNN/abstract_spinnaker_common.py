@@ -32,6 +32,7 @@ class AbstractSpiNNakerCommon(SpiNNaker):
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay,
             time_scale_factor=None):
+        # pylint: disable=super-init-not-called
         moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
                     "spynnaker.pyNN.spinnaker")
         super(database_socket_addresses,

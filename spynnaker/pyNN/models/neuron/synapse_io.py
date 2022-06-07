@@ -286,8 +286,7 @@ def get_synapses(
     :rtype:
         tuple(~numpy.ndarray, ~numpy.ndarray)
     """
-    # pylint: disable=too-many-arguments, too-many-locals
-    # pylint: disable=assignment-from-no-return
+    # pylint: disable=too-many-arguments
     # Get delays in timesteps
     max_delay = app_edge.post_vertex.splitter.max_support_delay()
 
@@ -375,7 +374,7 @@ def _get_row_data(
     :param int max_atoms_per_core: The maximum number of atoms per core
     :rtype: tuple(int, ~numpy.ndarray)
     """
-    # pylint: disable=too-many-arguments, too-many-locals
+    # pylint: disable=too-many-arguments
     row_ids = range(n_rows)
     ff_data, ff_size = None, None
     fp_data, pp_data, fp_size, pp_size = None, None, None, None

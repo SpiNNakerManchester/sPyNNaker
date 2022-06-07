@@ -41,7 +41,7 @@ def get_sdram_for_bit_field_region(incoming_projections):
     sdram = FILTER_HEADER_WORDS * BYTES_PER_WORD
     seen_app_edges = set()
     for proj in incoming_projections:
-        app_edge = proj._projection_edge
+        app_edge = proj._projection_edge  # pylint: disable=protected-access
         if app_edge not in seen_app_edges:
             seen_app_edges.add(app_edge)
             n_atoms = app_edge.pre_vertex.n_atoms
@@ -67,7 +67,7 @@ def get_sdram_for_keys(incoming_projections):
     sdram = 0
     seen_app_edges = set()
     for proj in incoming_projections:
-        in_edge = proj._projection_edge
+        in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
             sdram += BYTES_PER_WORD
