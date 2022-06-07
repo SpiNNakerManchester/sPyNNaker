@@ -132,52 +132,54 @@ $(function() {
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        uint32_t struct_size = (arr_len + 1) * <span class="keyword">sizeof</span>(uint32_t);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        step_cs_times[n_step] = spin1_malloc(struct_size);</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">if</span> (step_cs_times[n_step] == NULL) {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source times - out of DTCM&quot;</span>);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        step_cs_amps[n_step] = spin1_malloc(struct_size);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordflow">if</span> (step_cs_amps[n_step] == NULL) {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amplitudes - out of DTCM&quot;</span>);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        *next += 2 * (arr_len + 1);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="comment">// Initialise last value and current index along the array for this source</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        step_cs_amp_last[n_step] = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        step_cs_index[n_step] = 0;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> current_source_step_load_parameters(</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordflow">for</span> (uint32_t n_step=0; n_step &lt; n_step_current_sources; n_step++) {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        uint32_t arr_len = (uint32_t) cs_address[*next];</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        uint32_t struct_size = (arr_len + 1) * <span class="keyword">sizeof</span>(uint32_t);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_times[n_step], &amp;cs_address[*next], struct_size);</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_amps[n_step], &amp;cs_address[*next+arr_len+1], struct_size);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        *next += 2 * (arr_len + 1);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source times - out of DTCM&quot;</span>,</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                    <span class="stringliteral">&quot;struct_size is %u next %u n_step %u)&quot;</span>, struct_size, *next, n_step);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        step_cs_amps[n_step] = spin1_malloc(struct_size);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">if</span> (step_cs_amps[n_step] == NULL) {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a>(<span class="stringliteral">&quot;Unable to allocate step current source amplitudes - out of DTCM&quot;</span>,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                    <span class="stringliteral">&quot;(struct_size is %u next %u n_step %u)&quot;</span>, struct_size, *next, n_step);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        *next += 2 * (arr_len + 1);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="comment">// Initialise last value and current index along the array for this source</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        step_cs_amp_last[n_step] = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        step_cs_index[n_step] = 0;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> current_source_step_load_parameters(</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> cs_address, uint32_t n_step_current_sources, uint32_t *next) {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">for</span> (uint32_t n_step=0; n_step &lt; n_step_current_sources; n_step++) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        uint32_t arr_len = (uint32_t) cs_address[*next];</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        uint32_t struct_size = (arr_len + 1) * <span class="keyword">sizeof</span>(uint32_t);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_times[n_step], &amp;cs_address[*next], struct_size);</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a8c23f19c28f2c3ed0a9b86ce8c98802d">spin1_memcpy</a>(step_cs_amps[n_step], &amp;cs_address[*next+arr_len+1], struct_size);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="comment">// Does this need to happen here too?  (What happens on reload??)</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        step_cs_amp_last[n_step] = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        step_cs_index[n_step] = 0;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;}</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">static</span> <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> current_source_step_get_offset(uint32_t cs_index, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>) {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a> &gt;= step_cs_times[cs_index]-&gt;times[step_cs_index[cs_index]]) {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        step_cs_amp_last[cs_index] =</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                step_cs_amps[cs_index]-&gt;amplitudes[step_cs_index[cs_index]];</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        step_cs_index[cs_index]++;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordflow">return</span> step_cs_amp_last[cs_index];</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;}</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CURRENT_SOURCE_STEP_H_</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        *next += 2 * (arr_len + 1);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="comment">// Does this need to happen here too?  (What happens on reload??)</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        step_cs_amp_last[n_step] = <a class="code" href="maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941">ZERO</a>;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        step_cs_index[n_step] = 0;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">static</span> <a class="code" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> current_source_step_get_offset(uint32_t cs_index, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>) {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a> &gt;= step_cs_times[cs_index]-&gt;times[step_cs_index[cs_index]]) {</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        step_cs_amp_last[cs_index] =</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                step_cs_amps[cs_index]-&gt;amplitudes[step_cs_index[cs_index]];</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        step_cs_index[cs_index]++;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    }</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordflow">return</span> step_cs_amp_last[cs_index];</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;}</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CURRENT_SOURCE_STEP_H_</span></div>
 <div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
 <div class="ttc" id="acurrent__source__step_8h_html_structstep__current__source__amps__t"><div class="ttname"><a href="current__source__step_8h.html#structstep__current__source__amps__t">step_current_source_amps_t</a></div><div class="ttdef"><b>Definition:</b> <a href="current__source__step_8h_source.html#l00034">current_source_step.h:34</a></div></div>
 <div class="ttc" id="acurrent__source__step_8h_html_structstep__current__source__times__t"><div class="ttname"><a href="current__source__step_8h.html#structstep__current__source__times__t">step_current_source_times_t</a></div><div class="ttdef"><b>Definition:</b> <a href="current__source__step_8h_source.html#l00029">current_source_step.h:29</a></div></div>
@@ -191,7 +193,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Jun 7 2022 07:02:25 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Tue Jun 7 2022 15:34:02 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

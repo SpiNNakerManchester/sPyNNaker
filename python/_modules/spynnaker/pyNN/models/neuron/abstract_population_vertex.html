@@ -483,6 +483,9 @@
             <span class="c1"># Each neuron has a value for how many current sources it has</span>
             <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
+            <span class="c1"># There is a number of each different type of current source</span>
+            <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
             <span class="c1"># Then everywhere there is a current source, add the usage for that</span>
             <span class="k">for</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">current_source_ids</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
                     <span class="n">current_sources</span><span class="p">,</span> <span class="n">current_source_id_list</span><span class="p">):</span>
