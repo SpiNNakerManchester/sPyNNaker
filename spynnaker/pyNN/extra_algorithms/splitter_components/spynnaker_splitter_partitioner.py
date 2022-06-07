@@ -30,6 +30,7 @@ def spynnaker_splitter_partitioner(pre_allocated_resources=None):
     :raise PacmanPartitionException: when it cant partition
     """
     partitioner = _SpynnakerSplitterPartitioner()
+    # pylint: disable=protected-access
     return partitioner._run(pre_allocated_resources)
 
 

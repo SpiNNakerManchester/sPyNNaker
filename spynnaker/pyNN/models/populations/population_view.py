@@ -115,6 +115,7 @@ class PopulationView(PopulationBase):
 
         :rtype: dict(str, ...)
         """
+        # pylint: disable=protected-access
         return self.__population._get_initial_values(selector=self.__indexes)
 
     @property
@@ -149,6 +150,7 @@ class PopulationView(PopulationBase):
 
     @property
     def _vertex(self):
+        # pylint: disable=protected-access
         return self.__population._vertex
 
     def __getitem__(self, index):
@@ -274,6 +276,7 @@ class PopulationView(PopulationBase):
         if simplify is not True:
             logger.warning("The simplify value is ignored if not set to true")
 
+        # pylint: disable=protected-access
         return self.__population._get_by_selector(
             self.__indexes, parameter_names)
 
@@ -412,11 +415,10 @@ class PopulationView(PopulationBase):
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
         for variable, value in initial_values.items():
-            self.__population._initialize(
+            self.__population._initialize(  # pylint: disable=protected-access
                 variable, value, self.__indexes)
 
-    def record(self, variables,  # pylint: disable=arguments-differ
-               to_file=None, sampling_interval=None):
+    def record(self, variables,  to_file=None, sampling_interval=None):
         """ Record the specified variable or variables for all cells in the\
             Population or view.
 
@@ -434,7 +436,7 @@ class PopulationView(PopulationBase):
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
         """
-        self.__population._record(
+        self.__population._record(  # pylint: disable=protected-access
             variables, to_file, sampling_interval, self.__indexes)
 
     def sample(self, n, rng=None):

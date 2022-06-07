@@ -248,7 +248,7 @@ class TestGetting(BaseTestCase):
         # Note gather=False will be ignored just testing it can be
         pop.write_data("spikes.pkl", "spikes", gather=False)
         try:
-            with open("spikes.pkl") as pkl:
+            with open("spikes.pkl", encoding="utf-8") as pkl:
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
                 assert numpy.array_equal(spikes,  mock_spikes(None))
@@ -259,7 +259,7 @@ class TestGetting(BaseTestCase):
 
         pop.printSpikes("spikes.pkl")
         try:
-            with open("spikes.pkl") as pkl:
+            with open("spikes.pkl", encoding="utf-8") as pkl:
                 neo = pickle.load(pkl)
                 spikes = neo_convertor.convert_spikes(neo)
                 assert numpy.array_equal(spikes,  mock_spikes(None))
@@ -271,14 +271,14 @@ class TestGetting(BaseTestCase):
         (target, _, _) = mock_v_all(None, "any")
 
         pop.print_v("v.pkl")
-        with open("v.pkl") as pkl:
+        with open("v.pkl", encoding="utf-8") as pkl:
             neo = pickle.load(pkl)
             v = neo.segments[0].filter(name='v')[0].magnitude
             assert v.shape == target.shape
             assert numpy.array_equal(v,  target)
 
         pop.print_gsyn("gsyn.pkl")
-        with open("gsyn.pkl") as pkl:
+        with open("gsyn.pkl", encoding="utf-8") as pkl:
             neo = pickle.load(pkl)
             exc = neo.segments[0].filter(name='gsyn_exc')[0].magnitude
             assert numpy.array_equal(exc,  target)

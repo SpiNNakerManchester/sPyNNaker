@@ -180,9 +180,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             else:
                 logger.error("Ignoring the repeated reset call")
             return
-
         for population in self._data_writer.iterate_populations():
-            population._cache_data()
+            population._cache_data()  # pylint: disable=protected-access
 
         # Call superclass implementation
         AbstractSpinnakerBase.reset(self)

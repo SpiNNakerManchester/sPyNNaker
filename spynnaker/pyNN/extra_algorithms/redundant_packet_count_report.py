@@ -80,7 +80,7 @@ def redundant_packet_count_report():
 
     try:
         _create_views()
-        with open(file_name, "w") as f:
+        with open(file_name, "w", encoding="utf-8") as f:
             _write_report(f)
     except Exception as e:  # pylint: disable=broad-except
         logger.exception(f"Error {e} doing redundant_packet_count_report"
@@ -97,8 +97,8 @@ def _create_views():
 def _write_report(output):
     reader = ProvenanceReader()
     for data in reader.run_query("select * from redundancy_by_core"):
-        (x, y, p, source, received, filtered, invalid, failed,
-            redundant, total, percent) = data
+        (_, _, _, source, _, filtered, invalid, _,
+         redundant, total, percent) = data
         output.write(f"\ncore {source} \n")
         output.write(f"    {total} packets received. \n")
         output.write(f"    {redundant} were detected as "

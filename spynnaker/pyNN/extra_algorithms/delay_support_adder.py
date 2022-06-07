@@ -36,6 +36,7 @@ def delay_support_adder():
 
     """
     adder = _DelaySupportAdder()
+    # pylint: disable=protected-access
     adder._run()
 
 

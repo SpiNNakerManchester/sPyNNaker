@@ -31,6 +31,9 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
+# needed as dealing with quantities
+# pylint: disable=c-extension-no-member
+
 logger = FormatAdapter(logging.getLogger(__name__))
 _DEFAULT_UNITS = {
     SPIKES: "spikes",
@@ -286,7 +289,7 @@ class Recorder(object):
 
         return (data, indexes, sampling_interval)
 
-    def get_spikes(self, view_indexes=None):
+    def get_spikes(self):
         """ How to get spikes (of a population's neurons) from the recorder.
 
         :return: the spikes (event times) from the underlying vertex

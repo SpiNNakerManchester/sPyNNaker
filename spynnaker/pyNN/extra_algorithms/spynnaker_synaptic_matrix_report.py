@@ -69,7 +69,7 @@ class SpYNNakerSynapticMatrixReport(object):
     def _write_file(self, file_name, connection_holder, edge):
         # open writer
         try:
-            with open(file_name, "w") as f:
+            with open(file_name, "w", encoding="utf-8") as f:
                 # write all data for all synapse_information's in same file
                 for info in edge.synapse_information:
                     f.write("{}".format(connection_holder[edge, info]))

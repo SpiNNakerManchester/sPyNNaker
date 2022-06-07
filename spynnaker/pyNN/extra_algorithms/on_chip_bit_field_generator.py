@@ -61,6 +61,7 @@ def on_chip_bitfield_generator():
 
     """
     generator = _OnChipBitFieldGenerator()
+    # pylint: disable=protected-access
     generator._run()
 
 
@@ -161,7 +162,7 @@ class _OnChipBitFieldGenerator(object):
         progress = ProgressBar(
             app_graph.n_vertices,
             "reading back bitfields from chip for summary report")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts
@@ -207,7 +208,7 @@ class _OnChipBitFieldGenerator(object):
         """
         progress = ProgressBar(
             app_graph.n_vertices, "reading back bitfields from chip")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts

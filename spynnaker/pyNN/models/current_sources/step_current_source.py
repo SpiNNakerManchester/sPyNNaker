@@ -31,7 +31,7 @@ class StepCurrentSource(AbstractCurrentSource):
         "__parameters",
         "__parameter_types"]
 
-    def __init__(self, times=[], amplitudes=[]):
+    def __init__(self, times=None, amplitudes=None):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
         time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
