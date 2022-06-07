@@ -189,7 +189,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
-        atoms_per_core = min(self._max_atoms_per_core, app_vertex.n_atoms)
+        atoms_per_core = min(
+            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
         if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
                 get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
