@@ -87,8 +87,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
                 parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),

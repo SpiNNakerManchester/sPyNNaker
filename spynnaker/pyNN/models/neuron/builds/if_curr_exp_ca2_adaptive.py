@@ -84,7 +84,7 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
             i_offset=0.0, tau_ca2=50.0, i_ca2=0.0, i_alpha=0.1, v=-65.0,
             isyn_exc=0.0, isyn_inh=0.0):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(

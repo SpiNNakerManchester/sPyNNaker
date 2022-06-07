@@ -372,6 +372,7 @@ class SynapticMatrices(object):
         pre_vertices = set()
 
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
 
             # Skip if already done

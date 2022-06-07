@@ -16,6 +16,9 @@
 import quantities
 import numpy as np
 
+# needed as dealing with quantities
+# pylint: disable=c-extension-no-member
+
 
 def convert_analog_signal(signal_array, time_unit=quantities.ms):
     """ Converts part of a NEO object into told spynnaker7 format

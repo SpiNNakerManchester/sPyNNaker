@@ -119,8 +119,6 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
         init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
