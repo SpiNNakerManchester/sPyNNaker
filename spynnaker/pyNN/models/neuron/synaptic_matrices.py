@@ -366,7 +366,7 @@ class SynapticMatrices(object):
         mask_size = r_info.n_bits_atoms
         core_mask = (r_info.machine_mask - r_info.first_mask) >> mask_size
         pre = r_info.vertex
-        n_atoms = min(pre.splitter.max_atoms_per_core, pre.n_atoms)
+        n_atoms = min(pre.get_max_atoms_per_core(), pre.n_atoms)
 
         return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
                            mask_size, n_atoms * n_stages)
