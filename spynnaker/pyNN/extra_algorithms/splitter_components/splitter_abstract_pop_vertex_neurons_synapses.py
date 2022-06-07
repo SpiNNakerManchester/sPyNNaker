@@ -483,9 +483,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if (app_vertex.synapse_dynamics is not None and
                 not isinstance(app_vertex.synapse_dynamics,
                                SynapseDynamicsStatic)):
-            neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            machine_graph.add_edge(neuron_to_synapse_edge, SPIKE_PARTITION_ID)
-            synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
+            if (app_vertex.self_projection is None):
+                neuron_to_synapse_edge = MachineEdge(
+                    neuron_vertex, synapse_vertex)
+                machine_graph.add_edge(
+                    neuron_to_synapse_edge, SPIKE_PARTITION_ID)
+                synapse_vertex.set_neuron_to_synapse_edge(
+                    neuron_to_synapse_edge)
+            else:
+                synapse_vertex.set_neuron_vertex_and_partition_id(
+                    neuron_vertex, SPIKE_PARTITION_ID)
 
     def __handle_poisson_sources(self, label, machine_graph):
         """ Go through the incoming projections and find Poisson sources with
