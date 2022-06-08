@@ -181,7 +181,7 @@ static void setup_stdp_rows(uint32_t *matrix, uint32_t n_rows,
         // Use word writing for efficiency
         uint32_t *data = (uint32_t *) &row->plastic_plastic_data[0];
         for (uint32_t j = 0; j < n_half_words_per_pp_header >> 1; j++) {
-            data[i] = 0;
+            data[j] = 0;
         }
         row->plastic_plastic_size = plastic_words;
         row_fixed_t *fixed = get_stdp_fixed_row(row, n_half_words_per_pp_header,
