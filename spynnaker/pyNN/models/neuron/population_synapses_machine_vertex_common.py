@@ -86,7 +86,6 @@ class PopulationSynapsesMachineVertexCommon(
 
     __slots__ = [
         "__sdram_partition",
-        "__neuron_to_synapse_edge",
         "__neuron_vertex",
         "__partition_id"]
 
@@ -173,15 +172,6 @@ class PopulationSynapsesMachineVertexCommon(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
 
-    def set_neuron_to_synapse_edge(self, neuron_to_synapse_edge):
-        """ Set the edge that goes from the neuron core back to the synapse\
-            core.
-
-        :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
-            The edge that we will receive spikes from
-        """
-        self.__neuron_to_synapse_edge = neuron_to_synapse_edge
-
     def set_neuron_vertex_and_partition_id(self, neuron_vertex, partition_id):
         """ Set the neuron vertex and partition ID for the case with a self-
             connection.
@@ -240,27 +230,19 @@ class PopulationSynapsesMachineVertexCommon(
             region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
             label="Key Config")
         spec.switch_write_focus(self.REGIONS.KEY_REGION.value)
-        if self.__neuron_to_synapse_edge is not None:
-            r_info = routing_info.get_routing_info_for_edge(
-                self.__neuron_to_synapse_edge)
-            spec.write_value(r_info.first_key)
-            spec.write_value(r_info.first_mask)
-            spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
-            spec.write_value(int(self._app_vertex.self_projection is not None))
-        elif self.__neuron_vertex is not None:
-            # This is the self-connected case
+        if self.__neuron_vertex is None:
+            # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
+            spec.write_value(1)
+            spec.write_value(0)
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
             r_info = routing_info.get_routing_info_from_pre_vertex(
                 self.__neuron_vertex, self.__partition_id)
             spec.write_value(r_info.first_key)
             spec.write_value(r_info.first_mask)
             spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
             spec.write_value(int(self._app_vertex.self_projection is not None))
-        else:
-            # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
-            spec.write_value(1)
-            spec.write_value(0)
-            spec.write_value(0)
-            spec.write_value(0)
 
     @overrides(SendsSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

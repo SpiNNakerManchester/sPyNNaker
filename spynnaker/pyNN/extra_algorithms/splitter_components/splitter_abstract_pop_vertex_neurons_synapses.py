@@ -488,8 +488,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                     neuron_vertex, synapse_vertex)
                 machine_graph.add_edge(
                     neuron_to_synapse_edge, SPIKE_PARTITION_ID)
-                synapse_vertex.set_neuron_to_synapse_edge(
-                    neuron_to_synapse_edge)
+                synapse_vertex.set_neuron_vertex_and_partition_id(
+                    neuron_vertex, SPIKE_PARTITION_ID)
             else:
                 synapse_vertex.set_neuron_vertex_and_partition_id(
                     neuron_vertex, SPIKE_PARTITION_ID)
