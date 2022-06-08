@@ -49,6 +49,7 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
         # it to the target
         if len(self._governed_app_vertex.outgoing_projections) == 1:
             proj = self._governed_app_vertex.outgoing_projections[0]
+            # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             connector = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
@@ -81,6 +82,7 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
     def get_in_coming_slices(self):
         if self.send_over_sdram:
             proj = self._governed_app_vertex.outgoing_projections[0]
+            # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_in_coming_slices()
         return super(SplitterPoissonDelegate, self).get_in_coming_slices()
@@ -89,6 +91,7 @@ class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
     def get_out_going_slices(self):
         if self.send_over_sdram:
             proj = self._governed_app_vertex.outgoing_projections[0]
+            # pylint: disable=protected-access
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_out_going_slices()
         return super(SplitterPoissonDelegate, self).get_out_going_slices()

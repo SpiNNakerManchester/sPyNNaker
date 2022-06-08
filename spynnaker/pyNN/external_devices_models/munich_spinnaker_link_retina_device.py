@@ -45,7 +45,6 @@ class MunichRetinaDevice(
     __slots__ = [
         "__fixed_key",
         "__fixed_mask",
-        "__polarity",
         "__is_right"]
 
     # key codes for the robot retina
@@ -105,7 +104,6 @@ class MunichRetinaDevice(
             fixed_n_neurons = 128 * 128
             self.__fixed_mask = 0xFFFFC000
 
-        self.__polarity = polarity
         if position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this position")
@@ -131,8 +129,7 @@ class MunichRetinaDevice(
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
-        key_set_payload = (self._virtual_chip_x << 24 |
-                           self._virtual_chip_y << 16)
+        key_set_payload = self.__fixed_key
 
         commands.append(MultiCastCommand(
             key=key_set_command, payload=key_set_payload, repeat=5,

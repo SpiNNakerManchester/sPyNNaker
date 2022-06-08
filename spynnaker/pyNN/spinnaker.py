@@ -40,6 +40,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, neuron_expander, synapse_expander,
     redundant_packet_count_report,
@@ -66,10 +67,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     """
 
     __slots__ = [
-        "__command_edge_count",
-        "__edge_count",
         "__id_counter",
-        "__live_spike_recorder",
         "__min_delay",
         "__neurons_per_core_set",
         "_populations",
@@ -108,13 +106,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         # pynn population objects
         self._populations = []
         self._projections = []
-        self.__edge_count = 0
         self.__id_counter = 0
-
-        # the number of edges that are associated with commands being sent to
-        # a vertex
-        self.__command_edge_count = 0
-        self.__live_spike_recorder = dict()
 
         # timing parameters
         self.__min_delay = None
@@ -198,7 +190,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """ Reset the state of the current network to time t = 0.
         """
         for population in self._populations:
-            population._cache_data()
+            population._cache_data()   # pylint: disable=protected-access
 
         self.__segment_counter += 1
 
@@ -510,12 +502,14 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         if hasattr(neuron_type, "get_max_atoms_per_core"):
             previous = neuron_type.get_max_atoms_per_core()
             if previous < max_permitted:
-                logger.warning(
-                    "Attempt to increase number_of_neurons_per_core "
-                    "from {} to {} ignored", previous, max_permitted)
-                return
+                raise SpynnakerException(
+                    f"Attempt to increase number_of_neurons_per_core "
+                    f"from {previous} to {max_permitted} not supported")
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         self.__neurons_per_core_set.add(neuron_type)
+        if self._populations:
+            logger.warning("Calling set_number_of_neurons_per_core will not "
+                           "affect previously created Populations")
 
     def reset_number_of_neurons_per_core(self):
         for neuron_type in self.__neurons_per_core_set:
