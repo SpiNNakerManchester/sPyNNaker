@@ -18,12 +18,10 @@ import logging
 import numpy
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
-from pyNN.random import RandomDistribution
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, machine_time_step_ms, machine_time_step_per_ms)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.abstract_models import (
@@ -141,15 +139,6 @@ class Projection(object):
         # if any) and add them to the synapse dynamics object
         if isinstance(connector, FromListConnector):
             connector._apply_parameters_to_synapse_type(synaptic_type)
-
-        # round the delays to multiples of full timesteps
-        # (otherwise SDRAM estimation calculations can go wrong)
-        if ((not isinstance(synapse_dynamics.delay, RandomDistribution))
-                and (not isinstance(synapse_dynamics.delay, str))):
-            synapse_dynamics.set_delay(
-                numpy.rint(numpy.array(synapse_dynamics.delay) *
-                           machine_time_step_per_ms()) *
-                machine_time_step_ms())
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
