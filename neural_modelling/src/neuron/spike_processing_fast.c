@@ -217,8 +217,10 @@ static inline bool get_next_spike(uint32_t time, spike_t *spike) {
     }
     // Detect a looped back spike
     if ((*spike & key_config.mask) == key_config.key) {
-        synapse_dynamics_process_post_synaptic_event(
-                time, *spike & key_config.spike_id_mask);
+    	if (!key_config.self_connected) {
+			synapse_dynamics_process_post_synaptic_event(
+					time, *spike & key_config.spike_id_mask);
+    	}
         return key_config.self_connected;
     }
     return true;
@@ -525,6 +527,11 @@ void spike_processing_fast_time_step_loop(uint32_t time, uint32_t n_rewires) {
 
             // Process the row we already have while the DMA progresses
             process_current_row(time, dma_in_progress);
+        }
+        // If self-connected looped back spike then process post synaptic event here
+        if (((spike & key_config.mask) == key_config.key) && (key_config.self_connected)) {
+            synapse_dynamics_process_post_synaptic_event(
+                    time, spike & key_config.spike_id_mask);
         }
     }
 }
