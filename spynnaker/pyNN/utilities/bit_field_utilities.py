@@ -55,21 +55,19 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
         app_edge = proj._projection_edge  # pylint: disable=protected-access
         if app_edge not in seen_app_edges:
             seen_app_edges.add(app_edge)
-            slices = app_edge.pre_vertex.splitter.get_out_going_slices()
-            n_machine_vertices = len(slices)
 
-            atoms_per_core = max(
-                vertex_slice.n_atoms for vertex_slice in slices)
-            n_words_for_atoms = int(math.ceil(atoms_per_core / BIT_IN_A_WORD))
+            n_words_for_atoms = int(math.ceil(
+                app_edge.pre_vertex.n_atoms / BIT_IN_A_WORD))
             sdram += (
-                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-                 n_machine_vertices) * BYTES_PER_WORD)
+                (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
+                BYTES_PER_WORD)
             # Also add for delay vertices if needed
             n_words_for_delays = int(math.ceil(
-                atoms_per_core * app_edge.n_delay_stages / BIT_IN_A_WORD))
+                (app_edge.pre_vertex.n_atoms * app_edge.n_delay_stages) /
+                BIT_IN_A_WORD))
             sdram += (
-                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_delays) *
-                 n_machine_vertices) * BYTES_PER_WORD)
+                (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_delays) *
+                BYTES_PER_WORD)
     return sdram
 
 
@@ -90,14 +88,9 @@ def get_estimated_sdram_for_key_region(incoming_projections):
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
 
-            # Get the number of likely vertices
-            slices = in_edge.pre_vertex.splitter.get_out_going_slices()
-
-            sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                      BYTES_PER_WORD)
+            sdram += N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD
             if in_edge.n_delay_stages:
-                sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                          BYTES_PER_WORD)
+                sdram += N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD
 
     return sdram
 
@@ -207,10 +200,10 @@ def write_bitfield_init_data(
         in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-            srcs = in_edge.pre_vertex.splitter.get_out_going_vertices(
-                SPIKE_PARTITION_ID)
-            for source_vertex in srcs:
-                sources.add(source_vertex)
+            sources.add(in_edge.pre_vertex)
+            delay_edge = in_edge.delay_edge
+            if delay_edge is not None:
+                sources.add(delay_edge.pre_vertex)
 
     # write n keys max atom map
     spec.write_value(len(sources))
@@ -219,7 +212,7 @@ def write_bitfield_init_data(
     for source_vertex in sources:
         spec.write_value(routing_info.get_first_key_from_pre_vertex(
             source_vertex, SPIKE_PARTITION_ID))
-        spec.write_value(source_vertex.vertex_slice.n_atoms)
+        spec.write_value(source_vertex.n_atoms)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)
