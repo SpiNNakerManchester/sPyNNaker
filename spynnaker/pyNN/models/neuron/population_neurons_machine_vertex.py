@@ -240,8 +240,6 @@ class PopulationNeuronsMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__min_weights)
 

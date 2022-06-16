@@ -87,7 +87,7 @@ class LargePopWeightDelayRetrival(BaseTestCase):
             pre_weights_list, post_delays_array, post_delays_list,
             post_weights_array, post_weights_list) = do_run()
         assert(os.path.isfile("test_file.txt"))
-        with open("test_file.txt") as f:
+        with open("test_file.txt", encoding="utf-8") as f:
             file_weights = numpy.loadtxt(f)
         np_list = numpy.array([numpy.array(wl) for wl in post_weights_list])
         np_weights = np_list.view(
@@ -148,5 +148,5 @@ if __name__ == '__main__':
     print("list")
     print(len(post_weights_list))
     print(len(post_weights_list[0]))
-    with open("test_file.txt") as f:
+    with open("test_file.txt", encoding="utf-8") as f:
         print(numpy.loadtxt(f))

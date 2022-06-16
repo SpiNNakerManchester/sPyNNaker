@@ -77,7 +77,7 @@ class ExternalDeviceLifControlVertex(
         :param float weight_random_sigma:
         :param float max_stdp_spike_delta:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
 
         if not devices:
             raise ConfigurationException("No devices specified")
@@ -114,7 +114,6 @@ class ExternalDeviceLifControlVertex(
             weight_random_sigma, max_stdp_spike_delta)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
-        # pylint: disable=arguments-differ
         key = self.__partition_id_to_key[partition.identifier]
         atom = self.__partition_id_to_atom[partition.identifier]
         return [(atom, key)]

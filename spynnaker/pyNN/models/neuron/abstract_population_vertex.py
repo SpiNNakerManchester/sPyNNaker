@@ -184,7 +184,7 @@ class AbstractPopulationVertex(
         :type max_stdp_spike_delta: float or None
         """
 
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -319,6 +319,7 @@ class AbstractPopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
         self.__incoming_projections.append(projection)
+        # pylint: disable=protected-access
         if projection._projection_edge.pre_vertex == self:
             self.__self_projection = projection
 
@@ -484,6 +485,9 @@ class AbstractPopulationVertex(
 
             # Each neuron has a value for how many current sources it has
             sdram_usage += vertex_slice.n_atoms * BYTES_PER_WORD
+
+            # There is a number of each different type of current source
+            sdram_usage += 4 * BYTES_PER_WORD
 
             # Then everywhere there is a current source, add the usage for that
             for current_source, current_source_ids in zip(
@@ -910,6 +914,7 @@ class AbstractPopulationVertex(
         weight_scale = self.__neuron_impl.get_global_weight_scale()
 
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             # Skip if this is a synapse dynamics synapse type
             if synapse_info.synapse_type_from_dynamics:
@@ -1122,6 +1127,7 @@ class AbstractPopulationVertex(
             The slice projected to
         :rtype: int
         """
+        # pylint: disable=protected-access
         synapse_info = projection._synapse_information
         app_edge = projection._projection_edge
 
@@ -1172,6 +1178,7 @@ class AbstractPopulationVertex(
         """
         size = 0
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
             n_sub_edges = len(

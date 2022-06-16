@@ -144,7 +144,7 @@ class DelayExtensionVertex(
         """
         if vertex_slice not in self.__delay_blocks:
             self.__delay_blocks[vertex_slice] = DelayBlock(
-                self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
+                self.__n_delay_stages, vertex_slice)
         for (source_id, stage) in zip(source_ids, stages):
             self.__delay_blocks[vertex_slice].add_delay(source_id, stage)
 
@@ -153,7 +153,7 @@ class DelayExtensionVertex(
             return self.__delay_blocks[vertex_slice]
         else:
             return DelayBlock(
-                self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
+                self.__n_delay_stages, vertex_slice)
 
     def add_generator_data(
             self, max_row_n_synapses, max_delayed_row_n_synapses, pre_slices,

@@ -153,7 +153,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info:
         :param ~numpy.ndarray delays:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays, synapse_info)
 
     def get_weight_mean(self, connector, synapse_info):
@@ -162,7 +161,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param SynapseInformation synapse_info:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_mean(synapse_info.weights, synapse_info)
 
     def get_weight_maximum(self, connector, synapse_info):
@@ -171,7 +169,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param SynapseInformation synapse_info:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
 
     def get_weight_minimum(self, connector, weight_random_sigma, synapse_info):
@@ -191,7 +188,6 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param AbstractConnector connector:
         :param ~numpy.ndarray weights:
         """
-        # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights, synapse_info)
 
     def convert_per_connection_data_to_rows(
@@ -243,6 +239,7 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :param str target: The name of the synapse
         :rtype: int or None
         """
+        # pylint: disable=unused-argument
         return None
 
     def calculate_min_weight(self, min_weights, max_stdp_spike_delta,

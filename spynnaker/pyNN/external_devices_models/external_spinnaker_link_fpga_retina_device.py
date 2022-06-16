@@ -70,8 +70,7 @@ class ExternalFPGARetinaDevice(
         ProvidesKeyToAtomMappingImpl):
     __slots__ = [
         "__fixed_key",
-        "__fixed_mask",
-        "__polarity"]
+        "__fixed_mask"]
 
     MODE_128 = "128"
     MODE_64 = "64"
@@ -94,7 +93,6 @@ class ExternalFPGARetinaDevice(
         :param str board_address:
         """
         # pylint: disable=too-many-arguments
-        self.__polarity = polarity
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:

@@ -100,9 +100,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
-        # pylint: disable=protected-access
-        if timing_dependence is None or not isinstance(
-                timing_dependence, TimingDependenceVogels2011):
+        if not isinstance(timing_dependence, TimingDependenceVogels2011):
             return False
         return (self.__tau == timing_dependence.tau and
                 self.__alpha == timing_dependence.alpha)
