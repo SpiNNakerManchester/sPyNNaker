@@ -45,8 +45,6 @@ static uint32_t n_noisy_sources;
 
 static uint32_t n_neurons_on_core;
 
-//static current_source_t **current_source;
-
 static neuron_current_source_t **neuron_current_source;
 
 #ifndef SOMETIMES_UNUSED
@@ -84,23 +82,18 @@ static bool current_source_initialise(address_t cs_address, uint32_t n_neurons) 
 			neuron_current_source[n] = spin1_malloc(struct_size);
 			spin1_memcpy(neuron_current_source[n], &cs_address[next], struct_size);
 
-			if (n_sources > 0) {
-				// Still need to count source types...
-				for (uint32_t ncs=0; ncs < n_sources; ncs++) {
-					  if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 1) {
-						  n_dc_sources++;
-					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 2) {
-						  n_ac_sources++;
-					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 3) {
-						  n_step_sources++;
-					  } else if (neuron_current_source[n]->cs_id_index_list[ncs].cs_id == 4) {
-						  n_noisy_sources++;
-					  }
-				}
-			}
 			next += 1 + (n_sources * 2);
 
 		}
+
+		// Read number of each type of current source
+        n_dc_sources = (uint32_t) cs_address[next++];
+        n_ac_sources = (uint32_t) cs_address[next++];
+        n_step_sources = (uint32_t) cs_address[next++];
+        n_noisy_sources = (uint32_t) cs_address[next++];
+
+        log_debug("Check numbers of sources: AC %u DC %u STEP %u NOISY %u",
+                n_dc_sources, n_ac_sources, n_step_sources, n_noisy_sources);
 
 		// Now initialise separate sources
 #ifdef _CURRENT_SOURCE_DC_H_
@@ -182,6 +175,12 @@ static bool current_source_load_parameters(address_t cs_address) {
 
 			next += 1 + (n_sources * 2);
 		}
+
+        // Read number of each type of current source
+        n_dc_sources = (uint32_t) cs_address[next++];
+        n_ac_sources = (uint32_t) cs_address[next++];
+        n_step_sources = (uint32_t) cs_address[next++];
+        n_noisy_sources = (uint32_t) cs_address[next++];
 
 		// Copy into individual source arrays
 #ifdef _CURRENT_SOURCE_DC_H_
