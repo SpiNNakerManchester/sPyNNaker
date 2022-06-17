@@ -22,7 +22,6 @@ from .from_list_connector import FromListConnector
 class FromFileConnector(FromListConnector):
     """ Make connections according to a list read from a file.
     """
-    # pylint: disable=redefined-builtin
     __slots__ = ["_file"]
 
     def __init__(

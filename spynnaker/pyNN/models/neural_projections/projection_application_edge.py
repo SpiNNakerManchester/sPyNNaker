@@ -26,6 +26,7 @@ _DynamicsNeuromodulation = None
 
 
 def are_dynamics_structural(synapse_dynamics):
+    # pylint: disable=global-statement
     global _DynamicsStructural
     if _DynamicsStructural is None:
         # Avoid import loop by postponing this import
@@ -36,6 +37,7 @@ def are_dynamics_structural(synapse_dynamics):
 
 
 def are_dynamics_stdp(synapse_dynamics):
+    # pylint: disable=global-statement
     global _DynamicsSTDP
     if _DynamicsSTDP is None:
         # Avoid import loop by postponing this import
@@ -46,6 +48,7 @@ def are_dynamics_stdp(synapse_dynamics):
 
 
 def are_dynamics_neuromodulation(synapse_dynamics):
+    # pylint: disable=global-statement
     global _DynamicsNeuromodulation
     if _DynamicsNeuromodulation is None:
         # Avoid import loop by postponing this import

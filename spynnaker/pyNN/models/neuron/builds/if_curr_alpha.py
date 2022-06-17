@@ -80,7 +80,7 @@ class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
             v_thresh=-50.0, tau_syn_E=0.5, tau_syn_I=0.5, tau_refrac=0.1,
             i_offset=0.0, v=-65.0, exc_response=0.0, exc_exp_response=0.0,
             inh_response=0.0, inh_exp_response=0.0):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
 

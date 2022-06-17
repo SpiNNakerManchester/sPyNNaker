@@ -87,7 +87,7 @@ class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
             i_offset=0.0, e_rev_E=0.0, e_rev_I=-70.0, du_th=0.5, tau_th=20.0,
             v=-65.0, isyn_exc=0.0, isyn_inh=0.0):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
