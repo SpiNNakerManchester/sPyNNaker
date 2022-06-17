@@ -390,7 +390,7 @@ if _on_rtd:
 # Automatically called by sphinx at startup
 def setup(app):
     # NB: extra dot at end is deliberate!
-    trim = ("spynnaker.", "spynnaker8.", "spinn_front_end_common.", "pacman.",
+    trim = ("spynnaker.", "spinn_front_end_common.", "pacman.",
             "spinnman.", "spinn_machine.", "data_specification.",
             "spinn_utilities.")
 
@@ -411,7 +411,7 @@ def setup(app):
 
 
 def filtered_files(base, unfiltered_files_filename):
-    with open(unfiltered_files_filename) as f:
+    with open(unfiltered_files_filename, encoding="utf-8") as f:
         lines = [line.rstrip() for line in f]
     # Skip comments and empty lines to get list of files we DON'T want to
     # filter out; this is definitely complicated
@@ -438,6 +438,5 @@ os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
 apidoc.main([
     '-o', _output_dir, ".",
     # Exclude test and setup code
-    "spynnaker_integration_tests/*", "unittests/*", "setup.py",
-    *filtered_files("spynnaker", _unfiltered_files),
-    *filtered_files("spynnaker8", _unfiltered_files)])
+    "spynnaker_integration_tests/*", "unittests/*", "setup.py", "spynnaker8/*",
+    *filtered_files("spynnaker", _unfiltered_files)])

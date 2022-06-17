@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_additive_stdp_weight)
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 import numpy
 
 
@@ -102,10 +102,10 @@ def structural_with_stdp():
     print(conns_4)
 
     w_final_1 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes_last_neuron, spikes_1[0], w_init_1, delay_1, w_max,
+        pre_spikes_last_neuron, spikes_1[0], w_init_1, delay_1,
         A_plus, A_minus, tau_plus, tau_minus)
     w_final_2 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, spikes_2[0], w_init_2, delay_2, w_max, A_plus, A_minus,
+        pre_spikes, spikes_2[0], w_init_2, delay_2, A_plus, A_minus,
         tau_plus, tau_minus)
     print(w_final_1, spikes_1[0])
     print(w_final_2, spikes_2[0])

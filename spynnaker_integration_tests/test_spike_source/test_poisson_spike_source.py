@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinnaker_testbase import BaseTestCase
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 import math
 import time
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -78,7 +78,6 @@ class TestPoissonSpikeSource(BaseTestCase):
     def recording_poisson_spikes_big(self):
         sim.setup(timestep=1.0, min_delay=1.0)
         n_neurons = 2560  # number of neurons in each population
-        sim.set_number_of_neurons_per_core(sim.IF_curr_exp, n_neurons / 2)
 
         cell_params_lif = {'cm': 0.25,
                            'i_offset': 0.0,

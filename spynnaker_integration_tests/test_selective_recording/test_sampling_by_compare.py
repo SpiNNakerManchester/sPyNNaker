@@ -16,7 +16,7 @@
 import os
 import sys
 import numpy
-import spynnaker8 as sim
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.models.populations import PopulationView
 from spinnaker_testbase import BaseTestCase
 
@@ -287,7 +287,7 @@ def run_and_compare_script(
 
 
 def write_spikes(spikes, spike_file):
-    with open(spike_file, "w") as f:
+    with open(spike_file, "w", encoding="utf-8") as f:
         for spiketrain in spikes:
             f.write("{}".format(spiketrain.annotations["source_index"]))
             for time in spiketrain.times:
@@ -313,7 +313,7 @@ def ordered_rounded_set(in_list, factor, simtime):
 
 def read_spikes(name, simtime, n_neurons, rate=1, indexes=None):
     spikes = []
-    with open(name) as f:
+    with open(name, encoding="utf-8") as f:
         for line in f:
             parts = line.split(",")
             if len(parts) > 1:

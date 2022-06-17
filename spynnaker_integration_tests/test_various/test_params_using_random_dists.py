@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pyNN.random import NumpyRNG
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 

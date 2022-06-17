@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
 import numpy
 import unittest
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     calculate_spike_pair_additive_stdp_weight)
 from spinnaker_testbase import BaseTestCase
@@ -100,7 +100,7 @@ class TestIFCondExpSTDPPairAdditive(BaseTestCase):
         p.end()
 
         new_weight_exact = calculate_spike_pair_additive_stdp_weight(
-            pre_spikes, post_spikes, initial_weight, plastic_delay, max_weight,
+            pre_spikes, post_spikes, initial_weight, plastic_delay,
             a_plus, a_minus, tau_plus, tau_minus)
 
         print("Pre neuron spikes at: {}".format(pre_spikes))

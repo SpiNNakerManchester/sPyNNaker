@@ -38,7 +38,7 @@ def calculate_stdp_times(pre_spikes, post_spikes, plastic_delay):
 
 
 def calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, post_spikes, initial_weight, plastic_delay, max_weight,
+        pre_spikes, post_spikes, initial_weight, plastic_delay,
         a_plus, a_minus, tau_plus, tau_minus):
     """ Calculates the expected stdp weight for SpikePair Additive STDP
 
@@ -46,7 +46,6 @@ def calculate_spike_pair_additive_stdp_weight(
     :param post_spikes:
     :param initial_weight:
     :param plastic_delay:
-    :param max_weight:
     :param a_plus:
     :param a_minus:
     :param tau_plus:

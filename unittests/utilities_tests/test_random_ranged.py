@@ -15,7 +15,7 @@
 
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 
 

@@ -45,6 +45,7 @@ class AbstractConnectorSupportsViewsOnMachine(object):
         pre_view_hi = synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
             pre_view_lo, pre_view_hi = self.get_view_lo_hi(
+                # pylint: disable=protected-access
                 synapse_info.pre_population._indexes)
         params.extend([pre_view_lo, pre_view_hi])
 
@@ -52,6 +53,7 @@ class AbstractConnectorSupportsViewsOnMachine(object):
         post_view_hi = synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
             post_view_lo, post_view_hi = self.get_view_lo_hi(
+                # pylint: disable=protected-access
                 synapse_info.post_population._indexes)
         params.extend([post_view_lo, post_view_hi])
 

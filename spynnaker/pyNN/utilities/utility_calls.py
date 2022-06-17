@@ -137,7 +137,7 @@ def read_in_data_from_file(
     atom_ids = list()
     data_items = list()
     evaluator = SafeEval()
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
@@ -194,7 +194,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as f_source:
+    with open(file_path, 'r', encoding="utf-8") as f_source:
         read_data = f_source.readlines()
 
     evaluator = SafeEval()
@@ -342,11 +342,21 @@ def get_n_bits(n_values):
     return int(math.ceil(math.log(n_values, 2)))
 
 
-def moved_in_v6(old_location, new_location):
+def moved_in_v6(old_location, _):
+    """
+    Tells the users that old code is no lonfger implemented
+
+    :param str old_location: old import
+    :raise: NotImplementedError
+    """
+    raise NotImplementedError("Old import: {}".format(old_location))
+
+
+def moved_in_v7(old_location, new_location):
     """
     Warns the users that they are using an old import.
 
-    In version 7 this will ne upgraded to a exception and then later removed
+    In version 8 this will be upgraded to a exception and then later removed
 
     :param str old_location: old import
     :param str new_location: new import
@@ -355,7 +365,7 @@ def moved_in_v6(old_location, new_location):
     if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
         raise NotImplementedError("Old import: {}".format(old_location))
     logger.warning("File {} moved to {}. Please fix your imports. "
-                   "In version 7 this will fail completely."
+                   "In version 8 this will fail completely."
                    "".format(old_location, new_location))
 
 

@@ -13,9 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import spynnaker8 as p
+import pyNN.spiNNaker as p
 from spinnman.exceptions import SpiNNManCoresNotInStateException
-from spynnaker8 import RandomDistribution
 import functools
 from spinnaker_testbase import BaseTestCase
 import numpy
@@ -36,16 +35,16 @@ def run_script():
     rng = NumpyRNG(seed=1235)
     param_projections = [
         (1.0, 1.0),
-        (RandomDistribution("uniform", low=1.0, high=10.0, rng=rng), 2.0),
+        (p.RandomDistribution("uniform", low=1.0, high=10.0, rng=rng), 2.0),
         (3.0, 17.0),
-        (4.0, RandomDistribution("normal", mu=22.0, sigma=10.0, rng=rng)),
-        (5.0, RandomDistribution(
+        (4.0, p.RandomDistribution("normal", mu=22.0, sigma=10.0, rng=rng)),
+        (5.0, p.RandomDistribution(
             "normal_clipped", mu=22.0, sigma=10.0,
             low=5.0, high=32.0, rng=rng)),
-        (6.0, RandomDistribution(
+        (6.0, p.RandomDistribution(
             "normal_clipped_to_boundary", mu=12.0, sigma=5.0,
             low=6.0, high=16.0, rng=rng)),
-        (7.0, RandomDistribution("exponential", beta=2.0, rng=rng)),
+        (7.0, p.RandomDistribution("exponential", beta=2.0, rng=rng)),
     ]
     connectors = [
         (p.OneToOneConnector, functools.partial(check_one_to_one, 10)),
@@ -96,7 +95,7 @@ def run_script():
 
 
 def check_params(param, result):
-    if not isinstance(param, RandomDistribution):
+    if not isinstance(param, p.RandomDistribution):
         assert(all(param == value for value in result))
     else:
         # Check the values are "random" (yes I know they might be the same,

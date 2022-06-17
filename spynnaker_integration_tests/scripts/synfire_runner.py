@@ -17,9 +17,7 @@
 Synfirechain-like example
 """
 from pyNN.random import NumpyRNG
-import spynnaker8 as p
-from spynnaker8 import IF_curr_exp
-from spynnaker8 import SpikeSourceArray
+import pyNN.spiNNaker as p
 from spynnaker.pyNN.utilities import neo_convertor
 
 CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
@@ -35,11 +33,11 @@ class SynfireRunner(object):
 
     def do_run(
             self, n_neurons, time_step=1,
-            input_class=SpikeSourceArray, spike_times=None, rate=None,
+            input_class=p.SpikeSourceArray, spike_times=None, rate=None,
             start_time=None, duration=None, seed=None,
             spike_times_list=None,
             placement_constraint=None, weight_to_spike=2.0, delay=17,
-            neurons_per_core=10, cell_class=IF_curr_exp, constraint=None,
+            neurons_per_core=10, cell_class=p.IF_curr_exp, constraint=None,
             cell_params=CELL_PARAMS_LIF, run_times=None, reset=False,
             extract_between_runs=True, set_between_runs=None, new_pop=False,
             record_input_spikes=False, record_input_spikes_7=False,
@@ -402,7 +400,7 @@ class SynfireRunner(object):
         if constraint is not None:
             populations[0].set_constraint(constraint)
 
-        if input_class == SpikeSourceArray:
+        if input_class == p.SpikeSourceArray:
             populations.append(p.Population(
                 1, input_class(**spike_array), label='inputSSA_1'))
         elif seed is None:
