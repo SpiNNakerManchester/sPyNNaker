@@ -522,11 +522,17 @@
         <span class="n">app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
                 <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
-                               <span class="n">SynapseDynamicsStatic</span><span class="p">)</span> <span class="ow">and</span>
-                <span class="n">app_vertex</span><span class="o">.</span><span class="n">self_projection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">neuron_to_synapse_edge</span> <span class="o">=</span> <span class="n">MachineEdge</span><span class="p">(</span><span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">synapse_vertex</span><span class="p">)</span>
-            <span class="n">machine_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">neuron_to_synapse_edge</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-            <span class="n">synapse_vertex</span><span class="o">.</span><span class="n">set_neuron_to_synapse_edge</span><span class="p">(</span><span class="n">neuron_to_synapse_edge</span><span class="p">)</span>
+                               <span class="n">SynapseDynamicsStatic</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">self_projection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">neuron_to_synapse_edge</span> <span class="o">=</span> <span class="n">MachineEdge</span><span class="p">(</span>
+                    <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">synapse_vertex</span><span class="p">)</span>
+                <span class="n">machine_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+                    <span class="n">neuron_to_synapse_edge</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+                <span class="n">synapse_vertex</span><span class="o">.</span><span class="n">set_neuron_vertex_and_partition_id</span><span class="p">(</span>
+                    <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">synapse_vertex</span><span class="o">.</span><span class="n">set_neuron_vertex_and_partition_id</span><span class="p">(</span>
+                    <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__handle_poisson_sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Go through the incoming projections and find Poisson sources with</span>
@@ -902,7 +908,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

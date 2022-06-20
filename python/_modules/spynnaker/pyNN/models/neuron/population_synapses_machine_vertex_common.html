@@ -126,7 +126,8 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__sdram_partition&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__neuron_to_synapse_edge&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__neuron_vertex&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__partition_id&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.REGIONS"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.REGIONS">[docs]</a>    <span class="k">class</span> <span class="nc">REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Regions for populations.&quot;&quot;&quot;</span>
@@ -196,6 +197,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_binary_file_name</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_to_synapse_edge</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__partition_id</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.set_sdram_partition"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.set_sdram_partition">[docs]</a>    <span class="k">def</span> <span class="nf">set_sdram_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdram_partition</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the SDRAM partition.  Must only be called once per instance</span>
@@ -209,14 +212,15 @@
                 <span class="s2">&quot;Trying to set SDRAM partition more than once&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="n">sdram_partition</span></div>
 
-<div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.set_neuron_to_synapse_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.set_neuron_to_synapse_edge">[docs]</a>    <span class="k">def</span> <span class="nf">set_neuron_to_synapse_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuron_to_synapse_edge</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the edge that goes from the neuron core back to the synapse\</span>
-<span class="sd">            core.</span>
+<div class="viewcode-block" id="PopulationSynapsesMachineVertexCommon.set_neuron_vertex_and_partition_id"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationSynapsesMachineVertexCommon.set_neuron_vertex_and_partition_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_neuron_vertex_and_partition_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuron_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the neuron vertex and partition ID for the case with a self-</span>
+<span class="sd">            connection.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:</span>
 <span class="sd">            The edge that we will receive spikes from</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_to_synapse_edge</span> <span class="o">=</span> <span class="n">neuron_to_synapse_edge</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span> <span class="o">=</span> <span class="n">neuron_vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__partition_id</span> <span class="o">=</span> <span class="n">partition_id</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__get_binary_file_name</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">):</span>
@@ -266,15 +270,15 @@
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">KEY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">KEY_CONFIG_SIZE</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Key Config&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">KEY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_to_synapse_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># No Key = make sure it doesn&#39;t match; i.e. spike &amp; 0x0 != 0x1</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_to_synapse_edge</span><span class="p">)</span>
+            <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition_id</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="o">~</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span><span class="p">)</span>
@@ -435,7 +439,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>
