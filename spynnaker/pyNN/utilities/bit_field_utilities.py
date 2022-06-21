@@ -25,8 +25,9 @@ ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
 #: n_filters, pointer for array
 ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2
 
-#: n elements in each key to n atoms map for bitfield (key, n atoms)
-N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
+#: n elements in each key to n atoms map for bitfield (key, n atoms,
+#  core shift/n atoms per core (combined into a word))
+N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 3
 
 #: the regions addresses needed (
 #: pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
@@ -210,9 +211,12 @@ def write_bitfield_init_data(
 
     # load in key to max atoms map
     for source_vertex in sources:
-        spec.write_value(routing_info.get_first_key_from_pre_vertex(
-            source_vertex, SPIKE_PARTITION_ID))
+        r_info = routing_info.get_routing_info_from_pre_vertex(
+            source_vertex, SPIKE_PARTITION_ID)
+        spec.write_value(r_info.first_key)
         spec.write_value(source_vertex.n_atoms)
+        spec.write_value((r_info.n_bits_atoms << 27) |
+                         source_vertex.get_max_atoms_per_core())
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)

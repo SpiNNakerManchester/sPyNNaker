@@ -351,15 +351,19 @@ bool generate_bit_field(void) {
     log_debug("Starting master pop entry bit field generation");
     for (uint32_t i = 0; i < keys_to_max_atoms->n_pairs; i++) {
 
-        // determine keys masks and n_neurons
-        spike_t key = keys_to_max_atoms->pairs[i].key;
+        // Make a filter locally for now
         uint32_t n_neurons = keys_to_max_atoms->pairs[i].n_atoms;
+        filter_info_t filter;
+        filter.key = keys_to_max_atoms->pairs[i].key;
+        filter.n_atoms = n_neurons;
+        filter.core_shift = keys_to_max_atoms->pairs[i].core_shift;
+        filter.n_atoms_per_core = keys_to_max_atoms->pairs[i].n_atoms_per_core;
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = get_bit_field_size(n_neurons);
 
         log_debug("Bitfield %d, key = %d, n_neurons = %d",
-                i, (uint32_t) key, n_neurons);
+                i, filter.key, n_neurons);
         bit_field_t bit_field = bit_field_alloc(n_neurons);
         if (bit_field == NULL) {
             log_error("Could not allocate dtcm for bit field");
@@ -371,9 +375,10 @@ bool generate_bit_field(void) {
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("Searching neuron ids");
+        struct core_atom core_atom = {0, 0};
         for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++) {
             // update key with neuron id
-            spike_t new_key = (spike_t) (key + neuron_id);
+            spike_t new_key = get_bf_key(&filter, &core_atom);
             log_debug("New key for neurons %d is %0x", neuron_id, new_key);
 
             // check if this is governed by the structural stuff. if so,
@@ -433,13 +438,17 @@ bool generate_bit_field(void) {
             if (bit_found) {
                 bit_field_set(bit_field, neuron_id);
             }
+            next_core_atom(&filter, &core_atom);
         }
 
         log_debug("Writing bitfield to sdram for core use");
-        bit_field_base_address->filters[i].key = key;
-        log_debug("Putting master pop key %d in entry %d", key, i);
+        bit_field_base_address->filters[i].key = filter.key;
+        log_debug("Putting master pop key %d in entry %d", filter.key, i);
         bit_field_base_address->filters[i].n_atoms = n_neurons;
         log_debug("Putting n_atom %d in entry %d", n_neurons, i);
+        bit_field_base_address->filters[i].core_shift = filter.core_shift;
+        bit_field_base_address->filters[i].n_atoms_per_core = filter.n_atoms_per_core;
+
         // write bitfield to sdram.
         log_debug("Writing to address %0x, %d words to write",
                 &bit_field_words_location[position], n_words);
