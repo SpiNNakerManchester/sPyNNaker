@@ -457,7 +457,7 @@ class AbstractPopulationVertex(
         # This is a worst-case count, assuming all sources apply to all atoms
         # Start with the count of sources + count of sources per neuron
         sdram_usage = BYTES_PER_WORD + (n_atoms * BYTES_PER_WORD)
-        
+
         # There is a number of each different type of current source
         sdram_usage += 4 * BYTES_PER_WORD
 
