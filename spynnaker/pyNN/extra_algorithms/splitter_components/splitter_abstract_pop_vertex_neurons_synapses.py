@@ -423,7 +423,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if feedback_partition is not None:
             neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
             feedback_partition.add_edge(neuron_to_synapse_edge)
-            synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
+            synapse_vertex.set_neuron_vertex_and_partition_id(
+                neuron_vertex, SPIKE_PARTITION_ID)
 
     def __add_plastic_feedback(self, neuron_vertex, synapse_vertex):
         """ Add an edge if needed from the neuron core back to the synapse core
