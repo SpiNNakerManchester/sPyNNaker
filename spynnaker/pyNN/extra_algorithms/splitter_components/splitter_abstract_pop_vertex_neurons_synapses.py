@@ -441,15 +441,19 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         app_vertex = self._governed_app_vertex
         if (app_vertex.synapse_dynamics is not None and
                 not isinstance(app_vertex.synapse_dynamics,
-                               SynapseDynamicsStatic) and
-                app_vertex.self_projection is None):
-            feedback_partition = MulticastEdgePartition(
+                               SynapseDynamicsStatic)):
+            if (app_vertex.self_projection is None):
+                feedback_partition = MulticastEdgePartition(
+                    neuron_vertex, SPIKE_PARTITION_ID)
+                neuron_to_synapse_edge = MachineEdge(
+                    neuron_vertex, synapse_vertex)
+                feedback_partition.add_edge(neuron_to_synapse_edge)
+                self.__multicast_partitions.append(feedback_partition)
+                synapse_vertex.set_neuron_vertex_and_partition_id(
+                    neuron_vertex, SPIKE_PARTITION_ID)
+                return feedback_partition
+            synapse_vertex.set_neuron_vertex_and_partition_id(
                 neuron_vertex, SPIKE_PARTITION_ID)
-            neuron_to_synapse_edge = MachineEdge(neuron_vertex, synapse_vertex)
-            feedback_partition.add_edge(neuron_to_synapse_edge)
-            self.__multicast_partitions.append(feedback_partition)
-            synapse_vertex.set_neuron_to_synapse_edge(neuron_to_synapse_edge)
-            return feedback_partition
         return None
 
     def __handle_poisson_sources(self, label):

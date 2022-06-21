@@ -23,7 +23,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     ReceivesSynapticInputsOverSDRAM, SendsSynapticInputsOverSDRAM)
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .population_machine_common import CommonRegions, PopulationMachineCommon
 from .population_machine_synapses import SynapseRegions
 from .population_machine_synapses_provenance import SynapseProvenance
@@ -87,7 +86,8 @@ class PopulationSynapsesMachineVertexCommon(
 
     __slots__ = [
         "__sdram_partition",
-        "__neuron_to_synapse_edge"]
+        "__neuron_vertex",
+        "__partition_id"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -157,6 +157,8 @@ class PopulationSynapsesMachineVertexCommon(
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition = None
         self.__neuron_to_synapse_edge = None
+        self.__neuron_vertex = None
+        self.__partition_id = None
 
     def set_sdram_partition(self, sdram_partition):
         """ Set the SDRAM partition.  Must only be called once per instance
@@ -170,14 +172,15 @@ class PopulationSynapsesMachineVertexCommon(
                 "Trying to set SDRAM partition more than once")
         self.__sdram_partition = sdram_partition
 
-    def set_neuron_to_synapse_edge(self, neuron_to_synapse_edge):
-        """ Set the edge that goes from the neuron core back to the synapse\
-            core.
+    def set_neuron_vertex_and_partition_id(self, neuron_vertex, partition_id):
+        """ Set the neuron vertex and partition ID for the case with a self-
+            connection.
 
         :param ~pacman.model.graphs.machine.MachineEdge neuron_to_synapse_edge:
             The edge that we will receive spikes from
         """
-        self.__neuron_to_synapse_edge = neuron_to_synapse_edge
+        self.__neuron_vertex = neuron_vertex
+        self.__partition_id = partition_id
 
     @staticmethod
     def __get_binary_file_name(app_vertex):
@@ -227,7 +230,7 @@ class PopulationSynapsesMachineVertexCommon(
             region=self.REGIONS.KEY_REGION.value, size=KEY_CONFIG_SIZE,
             label="Key Config")
         spec.switch_write_focus(self.REGIONS.KEY_REGION.value)
-        if self.__neuron_to_synapse_edge is None:
+        if self.__neuron_vertex is None:
             # No Key = make sure it doesn't match; i.e. spike & 0x0 != 0x1
             spec.write_value(1)
             spec.write_value(0)
@@ -235,8 +238,7 @@ class PopulationSynapsesMachineVertexCommon(
             spec.write_value(0)
         else:
             r_info = routing_info.get_routing_info_from_pre_vertex(
-                self.__neuron_to_synapse_edge.pre_vertex,
-                SPIKE_PARTITION_ID)
+                self.__neuron_vertex, self.__partition_id)
             spec.write_value(r_info.first_key)
             spec.write_value(r_info.first_mask)
             spec.write_value(~r_info.first_mask & 0xFFFFFFFF)
