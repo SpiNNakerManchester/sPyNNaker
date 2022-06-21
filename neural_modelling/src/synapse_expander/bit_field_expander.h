@@ -149,6 +149,8 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
         // Copy details into SDRAM
         bitfield_filters->filters[i].key = mp_entry->key;
         bitfield_filters->filters[i].n_atoms = n_neurons;
+        bitfield_filters->filters[i].n_atoms_per_core = mp_entry->n_neurons;
+        bitfield_filters->filters[i].core_shift = mp_entry->mask_shift;
         spin1_memcpy(&bit_field_words_location[position], bit_field,
                 n_words * sizeof(uint32_t));
         bitfield_filters->filters[i].data = &bit_field_words_location[position];
