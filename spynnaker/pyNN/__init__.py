@@ -513,8 +513,14 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
               "neuron_type as a class instead of as a str"
         raise ConfigurationException(msg)
     simulator = globals_variables.get_simulator()
+    # Make sure an integer value is passed in here and warn if it's different
+    max_neurons = int(max_permitted)
+    if (max_neurons - max_permitted) != 0:
+        logger.warning(
+            "The number of neurons per core requested {} is not an integer; "
+            "the value has been set to {}", max_permitted, max_neurons)
     simulator.set_number_of_neurons_per_core(
-        neuron_type, max_permitted)
+        neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists
