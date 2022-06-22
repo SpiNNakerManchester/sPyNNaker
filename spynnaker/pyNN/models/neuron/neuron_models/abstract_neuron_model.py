@@ -85,7 +85,7 @@ class AbstractNeuronModel(
         super_data = super().get_data(
             parameters, state_variables, vertex_slice, atoms_shape, ts)
         values = self.get_global_values(ts)
-        global_data = self.__global_struct.get_data(values, Slice(0, 1), (1,))
+        global_data = self.__global_struct.get_data(values, Slice(0, 0), (1,))
         return numpy.concatenate([global_data, super_data])
 
     @overrides(AbstractStandardNeuronComponent.read_data)
