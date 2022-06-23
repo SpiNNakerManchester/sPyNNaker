@@ -33,6 +33,7 @@ from pyNN.space import (
 from pyNN.space import distance as _pynn_distance
 
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.exceptions import (
     ConfigurationException, SimulatorNotSetupException,
     SimulatorShutdownException)
@@ -513,12 +514,16 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
               "neuron_type as a class instead of as a str"
         raise ConfigurationException(msg)
     simulator = globals_variables.get_simulator()
-    # Make sure an integer value is passed in here and warn if it's different
-    max_neurons = int(max_permitted)
-    if (max_neurons - max_permitted) != 0:
-        logger.warning(
-            "The number of neurons per core requested {} is not an integer; "
-            "the value has been set to {}", max_permitted, max_neurons)
+    max_neurons = max_permitted
+    if is_singleton(max_permitted):
+        # Make sure an integer value is passed in here and warn if different
+        max_neurons = int(max_permitted)
+        if (max_neurons - max_permitted) != 0:
+            logger.warning(
+                "The number of neurons per core requested {} is not an "
+                "integer; the value has been set to {}",
+                max_permitted, max_neurons)
+
     simulator.set_number_of_neurons_per_core(
         neuron_type, max_neurons)
 
