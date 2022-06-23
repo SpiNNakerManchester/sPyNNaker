@@ -27,6 +27,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.current_sources import CurrentSourceIDs
+from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
@@ -144,8 +145,12 @@ class PopulationMachineNeurons(
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
-        self._set_key(routing_info.get_first_key_from_pre_vertex(
-            self, SPIKE_PARTITION_ID))
+        key = routing_info.get_first_key_from_pre_vertex(
+            self, SPIKE_PARTITION_ID)
+        print("key is ", key)
+        self._set_key(key)
+        # self._set_key(routing_info.get_first_key_from_pre_vertex(
+        #     self, SPIKE_PARTITION_ID))
 
         # Write the neuron parameters
         self._write_neuron_parameters(spec, ring_buffer_shifts)
@@ -198,7 +203,14 @@ class PopulationMachineNeurons(
             keys = [0] * n_atoms
         else:
             spec.write_value(data=1)
-            keys = get_field_based_keys(self._key, self._vertex_slice)
+            # Quick and dirty way to avoid using field based keys in cases
+            # which use grids but not local-only neuron models
+            if isinstance(self._app_vertex.synapse_dynamics,
+                          AbstractLocalOnly):
+                keys = get_field_based_keys(self._key, self._vertex_slice)
+            else:
+                # keys are consecutive from the base value
+                keys = [self._key + nn for nn in range(n_atoms)]
 
         # Write the number of neurons in the block:
         spec.write_value(data=n_atoms)
