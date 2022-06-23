@@ -358,6 +358,8 @@ bool generate_bit_field(void) {
         filter.n_atoms = n_neurons;
         filter.core_shift = keys_to_max_atoms->pairs[i].core_shift;
         filter.n_atoms_per_core = keys_to_max_atoms->pairs[i].n_atoms_per_core;
+        log_debug("Key 0x%0x has %u atoms with %u per core", filter.key,
+        		filter.n_atoms, filter.n_atoms_per_core);
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = get_bit_field_size(n_neurons);

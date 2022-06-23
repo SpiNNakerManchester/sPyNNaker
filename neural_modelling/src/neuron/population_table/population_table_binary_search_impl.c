@@ -473,7 +473,7 @@ bool population_table_get_first_address(
         spike_t spike, synaptic_row_t *row_address,
         size_t *n_bytes_to_transfer) {
     // locate the position in the binary search / array
-    log_debug("Searching for key %d", spike);
+    log_debug("Searching for key 0x%08x", spike);
 
     // check we don't have a complete miss
     uint32_t position;
@@ -499,15 +499,12 @@ bool population_table_get_first_address(
     last_spike = spike;
     next_item = entry.start;
     items_to_go = entry.count;
-    uint32_t bit_field_id = 0;
     if (entry.extra_info_flag) {
         extra_info extra = address_list[next_item++].extra;
         uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
         last_neuron_id = local_neuron_id + get_core_sum(extra, spike);
-        bit_field_id = local_neuron_id + get_bitfield_sum(extra, spike);
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
-        bit_field_id = last_neuron_id;
     }
 
     // check we have a entry in the bit field for this (possible not to due to
@@ -519,7 +516,7 @@ bool population_table_get_first_address(
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
         if (!bit_field_test(
-                connectivity_bit_field[position], bit_field_id)) {
+                connectivity_bit_field[position], last_neuron_id)) {
             log_debug("Tested and was not set");
             bit_field_filtered_packets += 1;
             items_to_go = 0;

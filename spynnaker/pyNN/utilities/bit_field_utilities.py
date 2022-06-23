@@ -214,13 +214,12 @@ def write_bitfield_init_data(
         r_info = routing_info.get_routing_info_from_pre_vertex(
             source_vertex, SPIKE_PARTITION_ID)
         spec.write_value(r_info.first_key)
+        spec.write_value(source_vertex.n_atoms)
         if len(source_vertex.machine_vertices) > 1:
-            spec.write_value(source_vertex.n_atoms)
-            n_atoms_per_core = min(source_vertex.get_max_atoms_per_core(),
-                                   source_vertex.n_atoms)
-            spec.write_value((r_info.n_bits_atoms << 27) | n_atoms_per_core)
+            n_atoms_per_core = next(iter(
+                source_vertex.machine_vertices)).vertex_slice.n_atoms
+            spec.write_value(r_info.n_bits_atoms | (n_atoms_per_core << 5))
         else:
-            spec.write_value(0)
             spec.write_value(0)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
