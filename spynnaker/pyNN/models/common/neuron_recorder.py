@@ -468,10 +468,16 @@ class NeuronRecorder(object):
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)
-                indices = neurons[local_indices]
-                times = record_time[time_indices].reshape((-1))
-                spike_ids.extend(indices)
-                spike_times.extend(times)
+                if self.__indexes[variable] is None:
+                    indices = neurons[local_indices]
+                    times = record_time[time_indices].reshape((-1))
+                    spike_ids.extend(indices)
+                    spike_times.extend(times)
+                else:
+                    for time_indice, local in zip(time_indices, local_indices):
+                        if local < neurons_recording:
+                            spike_ids.append(neurons[local])
+                            spike_times.append(record_time[time_indice])
 
         if len(missing_str) > 0:
             logger.warning(
