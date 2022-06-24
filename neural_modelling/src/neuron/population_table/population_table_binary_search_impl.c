@@ -287,7 +287,7 @@ bool population_table_get_first_address(
         spike_t spike, synaptic_row_t *row_address,
         size_t *n_bytes_to_transfer) {
     // locate the position in the binary search / array
-    log_debug("Searching for key %d", spike);
+    log_debug("Searching for key 0x%08x", spike);
 
     // check we don't have a complete miss
     uint32_t position;
