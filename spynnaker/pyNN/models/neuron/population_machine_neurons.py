@@ -145,12 +145,8 @@ class PopulationMachineNeurons(
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
-        key = routing_info.get_first_key_from_pre_vertex(
-            self, SPIKE_PARTITION_ID)
-        print("key is ", key)
-        self._set_key(key)
-        # self._set_key(routing_info.get_first_key_from_pre_vertex(
-        #     self, SPIKE_PARTITION_ID))
+        self._set_key(routing_info.get_first_key_from_pre_vertex(
+            self, SPIKE_PARTITION_ID))
 
         # Write the neuron parameters
         self._write_neuron_parameters(spec, ring_buffer_shifts)
