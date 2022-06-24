@@ -471,7 +471,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             pre_vertex = proj._projection_edge.pre_vertex
             conn = proj._synapse_information.connector
             dynamics = proj._synapse_information.synapse_dynamics
-            if self.__is_direct_poisson_source(pre_vertex, conn, dynamics):
+            if self.is_direct_poisson_source(pre_vertex, conn, dynamics):
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
@@ -489,7 +489,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__poisson_sources.add(pre_vertex)
         return incoming_direct_poisson
 
-    def __is_direct_poisson_source(self, pre_vertex, connector, dynamics):
+    @staticmethod
+    def is_direct_poisson_source(pre_vertex, connector, dynamics):
         """ Determine if a given Poisson source can be created by this splitter
 
         :param ~pacman.model.graphs.application.ApplicationVertex pre_vertex:

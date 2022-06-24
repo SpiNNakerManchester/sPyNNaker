@@ -20,7 +20,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
-ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
+#  key, n atoms, atoms_per_core, pointer to bitfield
+ELEMENTS_USED_IN_EACH_BIT_FIELD = 4
 
 #: n_filters, pointer for array
 ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2
@@ -201,6 +202,13 @@ def write_bitfield_init_data(
         in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
+            if hasattr(in_edge.post_vertex.splitter,
+                       "is_direct_poisson_source"):
+                s_info = proj._synapse_information
+                if in_edge.post_vertex.splitter.is_direct_poisson_source(
+                        in_edge.pre_vertex, s_info.connector,
+                        s_info.synapse_dynamics):
+                    continue
             sources.add(in_edge.pre_vertex)
             delay_edge = in_edge.delay_edge
             if delay_edge is not None:
