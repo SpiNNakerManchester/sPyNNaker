@@ -196,7 +196,7 @@ def write_bitfield_init_data(
     spec.switch_write_focus(bit_field_key_map_region_id)
 
     # Gather the source vertices that target this core
-    sources = OrderedSet()
+    sources = list()
     seen_app_edges = set()
     for proj in incoming_projections:
         in_edge = proj._projection_edge  # pylint: disable=protected-access
@@ -209,23 +209,28 @@ def write_bitfield_init_data(
                         in_edge.pre_vertex, s_info.connector,
                         s_info.synapse_dynamics):
                     continue
-            sources.add(in_edge.pre_vertex)
+            n_atoms_per_core = next(iter(
+                in_edge.pre_vertex.machine_vertices)).vertex_slice.n_atoms
+            sources.append(
+                (in_edge.pre_vertex, in_edge.pre_vertex.n_atoms,
+                 n_atoms_per_core))
             delay_edge = in_edge.delay_edge
             if delay_edge is not None:
-                sources.add(delay_edge.pre_vertex)
+                sources.append(
+                    (delay_edge.pre_vertex,
+                     in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages,
+                     n_atoms_per_core * in_edge.n_delay_stages))
 
     # write n keys max atom map
     spec.write_value(len(sources))
 
     # load in key to max atoms map
-    for source_vertex in sources:
+    for source_vertex, n_atoms, n_atoms_per_core in sources:
         r_info = routing_info.get_routing_info_from_pre_vertex(
             source_vertex, SPIKE_PARTITION_ID)
         spec.write_value(r_info.first_key)
-        spec.write_value(source_vertex.n_atoms)
+        spec.write_value(n_atoms)
         if len(source_vertex.machine_vertices) > 1:
-            n_atoms_per_core = next(iter(
-                source_vertex.machine_vertices)).vertex_slice.n_atoms
             spec.write_value(r_info.n_bits_atoms | (n_atoms_per_core << 5))
         else:
             spec.write_value(0)
