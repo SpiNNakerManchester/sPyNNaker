@@ -20,7 +20,8 @@ from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
-FILTER_INFO_WORDS = 3  # n words, key, pointer to bitfield
+#  key, n atoms, atoms_per_core, pointer to bitfield
+FILTER_INFO_WORDS = 4
 
 #: n_filters, pointer for array
 FILTER_HEADER_WORDS = 2
