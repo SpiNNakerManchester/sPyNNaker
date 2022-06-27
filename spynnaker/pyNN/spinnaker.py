@@ -39,7 +39,6 @@ from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
-from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, on_chip_bitfield_generator,
     redundant_packet_count_report,
