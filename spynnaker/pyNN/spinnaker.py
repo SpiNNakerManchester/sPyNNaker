@@ -403,7 +403,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             population._end()
 
         super().stop()
-        self._data_writer.reset_number_of_neurons_per_core()
 
     @staticmethod
     def register_binary_search_path(search_path):
@@ -414,26 +413,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         # pylint: disable=protected-access
         SpiNNaker.__EXECUTABLE_FINDER.add_path(search_path)
-
-    def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
-        if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
-            raise Exception("{} is not a Vertex type".format(neuron_type))
-
-        if hasattr(neuron_type, "get_max_atoms_per_core"):
-            previous = neuron_type.get_max_atoms_per_core()
-            if previous < max_permitted:
-                raise SpynnakerException(
-                    f"Attempt to increase number_of_neurons_per_core "
-                    f"from {previous} to {max_permitted} not supported")
-        neuron_type.set_model_max_atoms_per_core(max_permitted)
-        self.__neurons_per_core_set.add(neuron_type)
-        if self._populations:
-            logger.warning("Calling set_number_of_neurons_per_core will not "
-                           "affect previously created Populations")
-
-    def reset_number_of_neurons_per_core(self):
-        for neuron_type in self.__neurons_per_core_set:
-            neuron_type.set_model_max_atoms_per_core()
 
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):

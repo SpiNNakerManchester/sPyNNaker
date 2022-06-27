@@ -227,6 +227,7 @@ class SpynnakerDataView(FecDataView):
         :param int max_permitted: the number to set to
         :return:
         """
+        cls.check_valid_simulator()
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
             raise TypeError(f"{neuron_type} is not a Vertex type")
 

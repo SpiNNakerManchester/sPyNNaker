@@ -108,9 +108,8 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
 
         self.__spy_data._min_delay = min_delay
 
-    def reset_number_of_neurons_per_core(self):
-        """
-        Clears all previously added ceiling on the number of neurons per core
-        """
+    def shut_down(self):
+        FecDataWriter.shut_down(self)
+        # Clears all previously added ceiling on the number of neurons per core
         for neuron_type in self.__spy_data._neurons_per_core_set:
             neuron_type.set_model_max_atoms_per_core()
