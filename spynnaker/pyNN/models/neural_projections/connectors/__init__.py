@@ -39,6 +39,7 @@ from .convolution_connector import ConvolutionConnector
 from .pool_dense_connector import PoolDenseConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
+           "AbstractGenerateConnectorOnHost",
            "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
            "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
