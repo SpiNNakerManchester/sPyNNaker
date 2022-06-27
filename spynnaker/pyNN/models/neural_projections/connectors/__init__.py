@@ -16,6 +16,8 @@
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 from .all_to_all_connector import AllToAllConnector
