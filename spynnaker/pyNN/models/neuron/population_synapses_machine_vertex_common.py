@@ -157,7 +157,6 @@ class PopulationSynapsesMachineVertexCommon(
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__sdram_partition = None
-        self.__neuron_to_synapse_edge = None
         self.__neuron_vertex = None
         self.__partition_id = None
 
