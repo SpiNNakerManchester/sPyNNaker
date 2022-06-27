@@ -19,6 +19,7 @@ from spinn_front_end_common.data import FecDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = FormatAdapter(logging.getLogger(__name__))
+# pylint: disable=protected-access
 
 
 class _SpynnakerDataModel(object):
@@ -93,6 +94,7 @@ class SpynnakerDataView(FecDataView):
     Use this class weherever possible as it inherits all methods from all View
     classes.
     """
+    # pylint: disable=attribute-defined-outside-init
 
     __spy_data = _SpynnakerDataModel()
 

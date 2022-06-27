@@ -21,6 +21,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .spynnaker_data_view import SpynnakerDataView, _SpynnakerDataModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
+# pylint: disable=protected-access
 
 
 class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
