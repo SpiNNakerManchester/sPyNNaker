@@ -464,6 +464,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor()
+            # pylint: disable=attribute-defined-outside-init
             self._multicast_routes_loaded = True
             return None
 
@@ -474,6 +475,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitField_pair_router_compressor()
+            # pylint: disable=attribute-defined-outside-init
             self._multicast_routes_loaded = True
             return None
 
