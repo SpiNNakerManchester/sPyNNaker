@@ -172,7 +172,7 @@ class SpikeSourcePoissonMachineVertex(
 
     # Seed offset in parameters and size on bytes
     SEED_SIZE_BYTES = 4 * BYTES_PER_WORD
-    SEED_OFFSET_BYTES = PARAMS_BASE_WORDS - SEED_SIZE_BYTES
+    SEED_OFFSET_BYTES = (PARAMS_BASE_WORDS * 4) - SEED_SIZE_BYTES
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -513,6 +513,7 @@ class SpikeSourcePoissonMachineVertex(
         final_data = numpy.concatenate([
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
+
         spec.write_array(final_data)
 
     def _write_poisson_parameters(self, spec, graph, placement, routing_info):
