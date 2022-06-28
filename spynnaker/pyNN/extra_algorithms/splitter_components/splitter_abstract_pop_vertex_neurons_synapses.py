@@ -151,7 +151,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
 
-
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
