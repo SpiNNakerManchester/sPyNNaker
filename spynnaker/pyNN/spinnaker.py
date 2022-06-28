@@ -38,6 +38,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker import _version
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.config_setup import CONFIG_FILE_NAME, setup_configs
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.extra_algorithms import (
     delay_support_adder, on_chip_bitfield_generator,
@@ -53,6 +54,8 @@ from spynnaker.pyNN.extra_algorithms.connection_holder_finisher import (
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     spynnaker_splitter_partitioner, spynnaker_splitter_selector)
 from spynnaker.pyNN.extra_algorithms.synapse_expander import synapse_expander
+from spynnaker.pyNN.utilities.utility_calls import (
+    moved_in_v7_warning)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -106,8 +109,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
         # add model binaries
         # called before super.init as that logs the paths
-        # writer not yet created so must user reader
-        SpynnakerDataWriter.register_binary_search_path(
+        SpynnakerDataView.register_binary_search_path(
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
@@ -306,7 +308,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :return: the name of the simulator.
         :rtype: str
         """
-        return _version._NAME
+        return _version._NAME  # pylint: disable=protected-access
 
     @property
     def recorders(self):
@@ -411,7 +413,8 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         :rtype: None
         """
         # pylint: disable=protected-access
-        SpiNNaker.__EXECUTABLE_FINDER.add_path(search_path)
+        moved_in_v7_warning("register_binary_search_path is now a View method")
+        SpynnakerDataView.register_binary_search_path(search_path)
 
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):

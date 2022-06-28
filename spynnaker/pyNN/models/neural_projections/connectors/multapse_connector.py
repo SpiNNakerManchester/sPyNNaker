@@ -324,6 +324,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         params = []
 
         if synapse_info.prepop_is_view:
+            # pylint: disable=protected-access
             pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
                 synapse_info.pre_population._indexes, pre_vertex_slice)
             post_size, post_view_lo, post_view_hi = self._get_connection_param(

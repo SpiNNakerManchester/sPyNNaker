@@ -636,7 +636,7 @@ class Recorder(object):
             'first_id': int(self.__population.first_id),
             'last_id': int(self.__population.last_id),
             'label': self.__population.label,
-            'simulator': _version._NAME,
+            'simulator': _version._NAME, # pylint: disable=protected-access
         }
         metadata.update(self.__population.annotations)
         metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()

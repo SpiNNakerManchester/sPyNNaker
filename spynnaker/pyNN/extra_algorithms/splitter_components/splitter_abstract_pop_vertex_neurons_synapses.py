@@ -147,8 +147,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__next_synapse_index = 0
         # redefined by create_machine_vertices before first use so style
         self.__poisson_edges = set()
-        self.__synapse_verts_by_neuron = None
+        self.__synapse_verts_by_neuron = defaultdict(list)
         self.__neuron_vertices = list()
+        self.__synapse_vertices = list()
+
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -608,9 +610,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
-        self.__neuron_vertices = None
-        self.__synapse_vertices = None
-        self.__synapse_verts_by_neuron = None
+        self.__neuron_vertices = list()
+        self.__synapse_vertices = list()
+        self.__synapse_verts_by_neuron = defaultdict(list)
         self.__max_delay = self.__user_max_delay
         if self.__user_max_delay is None:
             # to be calcutaed by __update_max_delay
