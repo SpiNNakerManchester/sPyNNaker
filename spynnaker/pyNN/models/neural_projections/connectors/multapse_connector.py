@@ -178,7 +178,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
 
-        # If the chance of their being a connection in the slice is almost 0,
+        # If the chance of there being a connection in the slice is almost 0,
         # there will probably be at least 1 connection somewhere
         prob_in_slice = min(
             n_post_atoms / float(synapse_info.n_post_neurons),
@@ -186,7 +186,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         max_in_slice = max(utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice), 1.0)
 
-        # Similarly if the chance of their being one in a row is 0, there will
+        # Similarly if the chance of there being one in a row is 0, there will
         # probably be 1
         prob_in_row = 1.0 / synapse_info.n_pre_neurons
         n_connections = max(utility_calls.get_probable_maximum_selected(

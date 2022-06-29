@@ -804,7 +804,6 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         spike_source->is_fast_source = true;
         if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
             spike_source->sqrt_lambda = SQRT(rate_per_tick);
-            // warning: sqrtk is untested...
         } else {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
             spike_source->sqrt_lambda = ZERO;
