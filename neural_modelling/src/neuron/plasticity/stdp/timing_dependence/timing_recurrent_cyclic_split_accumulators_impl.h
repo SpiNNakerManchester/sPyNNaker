@@ -259,91 +259,56 @@ static inline update_state_t timing_apply_pre_spike(
             io_printf(IO_BUF, "                                Pre spike has occurred inside a post window!\n");
             io_printf(IO_BUF, "                                longest post window closing time: %u \n", previous_state.longest_post_pre_window_closing_time);
         }
-        // The pre-spike has occurred inside a post window.
-        // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
         //io_printf(IO_BUF, "Dep time: %d was: %d\n", time, previous_state.dep_accumulator);
-
-        if (previous_state.dep_accumulator >
-            recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
+        if (previous_state.dep_accumulator > recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
             // If accumulator's not going to hit depression limit, decrement it
             if (print_plasticity){ io_printf(IO_BUF, "        Decrementing Accumulator from: %d", previous_state.dep_accumulator); }
             previous_state.dep_accumulator = previous_state.dep_accumulator - (1<<ACCUM_SCALING);
             if (print_plasticity){ io_printf(IO_BUF, " to %d \n", previous_state.dep_accumulator); }
-
         } else  {
-            //rndCountDep++;
-            //if ((mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1))< (uint32_t)150){ // SD 110221 add stochasticity
-            //rndYesCountDep++;
             //io_printf(IO_BUF, "Dep: Y: %u from %u\n", rndCountDep, rndYesCountDep);
-            // We are hitting the depression threshold, so take action.
-                // io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
-        	if (print_plasticity){ io_printf(IO_BUF, "        Accumulator limit reached: Depressing diff %k\n", voltage_difference); }
-                if (previous_state.lock == 0){
-                    // 24/5/21: SD Adding special case for inhib synapse, perform anti-Hebb learning, irrespective of voltage:
-                    if (syn_type == 2) {  // Inhib synapse perform anti-Hebbian potentiation
-                        // XXXX Print inhib potentiation event
-                        //io_printf(IO_BUF, "Pot inh: %d : %d \n", time, previous_state.dep_accumulator);
-	            	previous_state.lock = 1;
-		     	previous_state.dep_accumulator = 0;
-                        if (post_synaptic_neuron->V_membrane == 0.0k) { // Still in refrac. Allowed to potentiate this inhib synapse:
-				previous_state.weight_state.weight = previous_state.weight_state.weight_region->max_weight;
-				//previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-                        } 
-                        //else previous_state.weight_state.weight = previous_state.weight_state.weight + 1; // Detect locked synapse
-                    } // End of if syn_type == 2....
-
-                    //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
-                    // SD 9/2/21: Reverse order of these conditions: 
-                    else if ((voltage_difference > v_diff_pot_threshold) && (voltage_difference < 900.0k)) {
-                        // Neuron fired by teacher and is far away from firing by FF alone.
-                        // This synapse is probably in the post window. Full depress.
-			previous_state.lock = 1;
-			previous_state.dep_accumulator = 0;
-			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-                        // Just assign w_min to the weight: SD 29/11/21:
-			//previous_state.weight_state.weight = previous_state.weight_state.weight_region->min_weight;
-			if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
+            // io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
+            if (print_plasticity){ io_printf(IO_BUF, "        Accumulator limit reached: Depressing diff %k\n", voltage_difference); }
+            if (previous_state.lock == 0){
+                //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
+                if ((voltage_difference > v_diff_pot_threshold) && (voltage_difference < 900.0k)) {
+                    // Neuron fired by teacher and is far away from firing by FF alone.  // This synapse is probably in the post window. Full depress.
+	            previous_state.lock = 1;
+		    previous_state.dep_accumulator = 0;
+                    //io_printf(IO_BUF, "%d : dep syn - teach fired dep tuning, v_dff : %k, thresh: %k\n", time, voltage_difference, v_diff_pot_threshold);
+		    previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                    // Just assign w_min to the weight: SD 29/11/21:
+		    //previous_state.weight_state.weight = previous_state.weight_state.weight_region->min_weight;
+		    if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
                         
-                    } else{
-                        // Neuron is firing slightly too early or by teacher. No major adjustment here.
-                        // SD 19/5/21: Reduce synapse values to two (pot and dep) by eliminating neutral value.
-                        // SD 20/12/21: Let's try full depression to keep the spike time oscillating:
-	            	previous_state.lock = 1;
-		     	previous_state.dep_accumulator = 0;
-                       if (!locked_weights_unchanged) {
-                           // 8/6/21: SD Put back lock at baseline
-                           // SD 20/12/21: Dont' leave as is! Full depression:
-                           //previous_state.weight_state.weight = previous_state.weight_state.weight + 8*inc_LL_dep;
-			   previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-                           //previous_state.weight_state.weight = previous_state.weight_state.weight - inc_LL_dep;
-                       }
+                } else {
+                    // Neuron is firing slightly too early or by teacher.
+	            previous_state.lock = 1;
+		    previous_state.dep_accumulator = 0;
+                    if (!locked_weights_unchanged) {
+                        //io_printf(IO_BUF, "%d : dep syn - dep tuning, v_dff : %k, thresh: %k\n", time, voltage_difference, v_diff_pot_threshold);
+		        previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                        //previous_state.weight_state.weight = previous_state.weight_state.weight - inc_LL_dep;
                     }
-                    /* SD 9/2/21: Reverse ordering of conditions.
-                    if ((voltage_difference < v_diff_pot_threshold) || (voltage_difference > 900.0k)) {
-                        // Either voltage near thresh when teacher arrived, or neuron fired based on FF alone.
-                        // Near perfect balance. Don't depress this synapse significantly:
-                        //io_printf(IO_BUF, "%d : LL dep - near balance\n", time);
-	            	previous_state.lock = 1;
-		     	previous_state.dep_accumulator = 0;
-                       if (!locked_weights_unchanged) {
-                           previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
-                       }
-                    } else {
-                        // Neuron fires by feedforward input alone. Probably firing too early. 
-                        // Enable full depression, which should push the firing a bit later.
-                        //io_printf(IO_BUF, "%d : Full dep\n", time);
-			previous_state.lock = 1;
-			previous_state.dep_accumulator = 0;
-			previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
-			if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
-                    } */ 
-                } // previous_state.lock == 0
-                else {
-                    //io_printf(IO_BUF, "%d : Dep LOCKED\n", time);
-                    if (print_plasticity){ io_printf(IO_BUF, "Synapse already locked, so cannot depress\n"); }
-                } // previous_state==lock, else
-
+                }
+	        //    previous_state.lock = 1;
+		//    previous_state.dep_accumulator = 0;
+                //    if (!locked_weights_unchanged) {
+                //        previous_state.weight_state.weight = previous_state.weight_state.weight + inc_LL_dep;
+                //    }
+                //} else {
+                //    // Neuron fires by feedforward input alone. Probably firing too early. Enable full depression, which should push the firing a bit later.  //io_printf(IO_BUF, "%d : Full dep\n", time);
+		//    previous_state.lock = 1;
+		//    previous_state.dep_accumulator = 0;
+		//    previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+		//    if (print_plasticity) { io_printf(IO_BUF, "            Applying full depression (gap to threshold: %k)\n", voltage_difference); }
+                //    } 
+            } // previous_state.lock == 0
+            else {
+                //io_printf(IO_BUF, "%d : Dep LOCKED\n", time);
+                if (print_plasticity){ io_printf(IO_BUF, "Synapse already locked, so cannot depress\n"); }
+            } // previous_state==lock, else
         } // previous_state.dep_accumulator >..., else clause
     }  // ((time > last_post_time) && ....
     else { if (print_plasticity){ io_printf (IO_BUF, "        PRE SPIKE WAS NOT IN POST WINDOW!!\n"); } }
@@ -433,15 +398,16 @@ static inline update_state_t timing_apply_post_spike(
                // Check synapse is unlocked
                if (previous_state.lock == 0) {
                    //io_printf(IO_BUF, "Thresh: %k, v: %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
-                   if (syn_type == 2) { // For inhibitory synapses do nothing but lock the synapse and reset accumulator:
-                       previous_state.lock = 1;
-                       previous_state.pot_accumulator = 0;
-                       //previous_state.weight_state.weight = previous_state.weight_state.weight + 256; // XXXX TEMP! for debug purposes!
-                   }
-                   else if (voltage_difference > 900.0k) {
+                   //if (syn_type == 2) { // For inhibitory synapses do nothing but lock the synapse and reset accumulator:
+                   //    previous_state.lock = 1;
+                   //    previous_state.pot_accumulator = 0;
+                   //    //previous_state.weight_state.weight = previous_state.weight_state.weight + 256; // XXXX TEMP! for debug purposes!
+                   //}
+                   //else 
+                   if (voltage_difference > 900.0k) {
                        // Neuron fired through feed-forward input, ahead of desired time. Therefore, depress!! (New functionality!)
                        if (print_plasticity){ io_printf(IO_BUF, "was FF pot\n"); }
-                       //io_printf(IO_BUF, "%d : pot syn - dep tuning\n", time);
+                       //io_printf(IO_BUF, "%d : pot syn - dep tuning, v_dff : %k\n", time, voltage_difference);
                        previous_state.lock = 1;
                        previous_state.pot_accumulator = 0;
 		       previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
@@ -453,6 +419,7 @@ static inline update_state_t timing_apply_post_spike(
                    } else if (voltage_difference > v_diff_pot_threshold) {
                        // Neuron fired through teacher but still far from threshold using FF alone
                        //io_printf(IO_BUF, "%d : pot syn - big potentiation\n", time);
+                       //io_printf(IO_BUF, "%d : pot syn - pot tuning, v_dff : %k, thresh: %k\n", time, voltage_difference, v_diff_pot_threshold);
                        previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
                        // Remove mult and just set weight to max value:
                        //previous_state.weight_state.weight = previous_state.weight_state.weight_region->max_weight;
@@ -466,6 +433,7 @@ static inline update_state_t timing_apply_post_spike(
                        // SD 19/02/21: When nearly able to fire by FF alone, do a locked low, so that spike is kept a bit late, but 
                        //              does not jump to be much earlier. (Comment out potentiation and do a LL-pot:
                        //SD 250821 - remove this: previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+                       //io_printf(IO_BUF, "%d : pot syn - LL tuning, v_dff : %d\n", time, voltage_difference);
                        if (!locked_weights_unchanged) {
                            // 20/12/21: Full potentiation:
                            //previous_state.weight_state.weight = previous_state.weight_state.weight + inc_tune_pot;

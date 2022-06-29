@@ -27,7 +27,7 @@ state_t neuron_model_state_update(
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
-//	neuron_model_print_parameters(neuron);
+	//neuron_model_print_parameters(neuron);
 
 	// track previous timestep membrane voltage
     neuron->V_mem_hist = neuron->V_membrane;
@@ -40,6 +40,13 @@ state_t neuron_model_state_update(
     	if (exc_input[1]>0){
     		// Teacher input received, so fire
     		neuron->V_membrane = 1024.0k;
+    	}
+
+    	if (inh_input[0]>0){
+    		// Forced reset
+    		neuron->V_membrane = neuron->V_reset;
+                exc_input[0] = 0.0k;
+                //io_printf(IO_BUF, "X\n");
     	}
 
     	// Otherwise evolve subthreshold dynamics
@@ -55,9 +62,10 @@ state_t neuron_model_state_update(
 		total_exc = exc_input[0];
 
 
-		for (int i=0; i< num_inhibitory_inputs; i++){
-			total_inh += inh_input[i];
-		}
+		total_inh += inh_input[1];
+		//for (int i=0; i< num_inhibitory_inputs; i++){
+		//	total_inh += inh_input[i];
+		//}
         // Get the input in nA
         input_t input_this_timestep =
             total_exc - total_inh + external_bias + neuron->I_offset;
