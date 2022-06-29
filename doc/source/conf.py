@@ -59,7 +59,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'matplotlib': ('https://matplotlib.org', None),
-    'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'pynn': ("http://neuralensemble.github.io/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
     # We don't link to quantities; their docs are too awful
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
