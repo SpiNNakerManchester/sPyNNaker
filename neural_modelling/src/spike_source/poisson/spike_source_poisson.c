@@ -788,8 +788,6 @@ static void process_slow_source(
     }
 }
 
-
-
 //! \brief Set the spike source rate as required
 //! \param[in] id: the ID of the source to be updated
 //! \param[in] rate:
