@@ -34,6 +34,7 @@
 #include <stdfix-full-iso.h>
 #include <limits.h>
 #include <tdma_processing.h>
+#include <circular_buffer.h>
 
 #include "profile_tags.h"
 #include <profiler.h>
@@ -243,6 +244,8 @@ static uint16_t *input_this_timestep;
 
 //! The timesteps per second
 static UREAL ts_per_second;
+
+static circular_buffer rate_change_buffer;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -740,6 +743,14 @@ static bool initialize(void) {
         }
     }
 
+    // Allocate buffer to allow rate change (2 ints) per source
+    rate_change_buffer = circular_buffer_initialize(
+    		ssp_params.n_spike_sources * 2);
+    if (rate_change_buffer == NULL) {
+    	log_error("Could not allocate rate change buffer!");
+    	return false;
+    }
+
     log_info("Initialise: completed successfully");
 
     return true;
@@ -924,6 +935,15 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
+    // Do any rate changes
+    while (circular_buffer_size(rate_change_buffer) >= 2) {
+    	uint32_t id = 0;
+    	REAL rate = 0.0k;
+    	circular_buffer_get_next(rate_change_buffer, &id);
+    	circular_buffer_get_next(rate_change_buffer, (uint32_t *) &rate);
+        set_spike_source_rate(id, rate);
+    }
+
     // Reset the inputs this timestep if using them
     if (sdram_inputs->address != 0) {
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
@@ -974,10 +994,9 @@ static void multicast_packet_callback(uint key, uint payload) {
             (id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
         return;
     }
-    REAL rate = kbits(payload);
-    uint32_t sub_id = id - ssp_params.first_source_id;
-    source_data[sub_id]->details[source_data[sub_id]->index].rate = rate;
-    set_spike_source_rate(sub_id, rate);
+    int32_t sub_id = id - ssp_params.first_source_id;
+    circular_buffer_add(rate_change_buffer, sub_id);
+    circular_buffer_add(rate_change_buffer, payload);
 }
 
 //! The entry point for this model
