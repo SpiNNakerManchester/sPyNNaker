@@ -23,8 +23,6 @@ from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl, ProvenanceWriter)
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -36,7 +34,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 
 class MachineMunichMotorDevice(
         MachineVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, ProvidesKeyToAtomMappingImpl,
+        AbstractHasAssociatedBinary,
         ProvidesProvenanceDataFromMachineImpl):
     """ An Omnibot motor control device. This has a real vertex and an \
         external device vertex.
@@ -198,8 +196,8 @@ class MachineMunichMotorDevice(
         self.reserve_provenance_data_region(spec)
 
     @overrides(MachineVertex.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, _partition):
-        if _partition == self.MOTOR_PARTITION_ID:
+    def get_n_keys_for_partition(self, partition_id):
+        if partition_id == self.MOTOR_PARTITION_ID:
             return self._MOTOR_N_KEYS
         return super(MachineMunichMotorDevice, self).get_n_keys_for_partition(
-            _partition)
+            partition_id)

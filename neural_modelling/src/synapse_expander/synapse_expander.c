@@ -176,6 +176,8 @@ static bool run_synapse_expander(data_specification_metadata_t *ds_regions,
     // Get the synaptic matrix region
     address_t synaptic_matrix_region = data_specification_get_region(
             config.synaptic_matrix_region, ds_regions);
+    ds_regions->regions[config.synaptic_matrix_region].checksum = 0;
+    ds_regions->regions[config.synaptic_matrix_region].n_words = 0;
 
     // Go through each connector and generate
     for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {

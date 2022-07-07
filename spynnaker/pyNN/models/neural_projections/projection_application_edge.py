@@ -66,13 +66,6 @@ class ProjectionApplicationEdge(
     __slots__ = [
         "__delay_edge",
         "__synapse_information",
-        # Slices of the pre_vertexes of the machine_edges
-        "__pre_slices",
-        # Slices of the post_vertexes of the machine_edges
-        "__post_slices",
-        # True if slices have been convered to sorted lists
-        "__slices_list_mode",
-        "__machine_edges_by_slices",
         "__filter",
         "__is_neuromodulation"
     ]
@@ -97,13 +90,6 @@ class ProjectionApplicationEdge(
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge = None
-
-        # Keep the machine edges by pre- and post-vertex
-        self.__machine_edges_by_slices = dict()
-
-        self.__pre_slices = set()
-        self.__post_slices = set()
-        self.__slices_list_mode = False
 
         # By default, allow filtering
         self.__filter = True
@@ -164,18 +150,6 @@ class ProjectionApplicationEdge(
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
-    def get_machine_edge(self, pre_vertex, post_vertex):
-        """ Get a specific machine edge of this edge
-
-        :param PopulationMachineVertex pre_vertex:
-            The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertex:
-            The vertex at the end of the machine edge
-        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
-        """
-        return self.__machine_edges_by_slices.get(
-            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
-
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, src_machine_vertex, dest_machine_vertex):
         if not self.__filter:
@@ -188,70 +162,6 @@ class ProjectionApplicationEdge(
                     synapse_info, src_machine_vertex, dest_machine_vertex):
                 return True
         return False
-
-    @overrides(ApplicationEdge.remember_associated_machine_edge)
-    def remember_associated_machine_edge(self, machine_edge):
-        super().remember_associated_machine_edge(machine_edge)
-        if self.__slices_list_mode:
-            # Unexpected but if extra remember after a get convert back to sets
-            self.__pre_slices = set(self.__pre_slices)
-            self.__post_slices = set(self.__post_slices)
-            self.__slices_list_mode = False
-        self.__pre_slices.add(machine_edge.pre_vertex.vertex_slice)
-        self.__post_slices.add(machine_edge.post_vertex.vertex_slice)
-        self.__machine_edges_by_slices[
-            machine_edge.pre_vertex.vertex_slice,
-            machine_edge.post_vertex.vertex_slice] = machine_edge
-
-    @overrides(ApplicationEdge.forget_machine_edges)
-    def forget_machine_edges(self):
-        super().forget_machine_edges()
-        self.__pre_slices = set()
-        self.__post_slices = set()
-        self.__slices_list_mode = False
-
-    def __check_list_mode(self):
-        """
-        Makes sure the pre- and post-slices are sorted lists
-        """
-        if not self.__slices_list_mode:
-            self.__pre_slices = sorted(
-                list(self.__pre_slices), key=lambda x: x.lo_atom)
-            self.__post_slices = sorted(
-                list(self.__post_slices), key=lambda x: x.lo_atom)
-            self.__slices_list_mode = True
-
-    @property
-    def pre_slices(self):
-        """ Get the slices for the pre_vertexes of the MachineEdges
-
-        While the remember machine_edges remain unchanged this will return a
-        list with a consistent id. If the edges change a new list is created
-
-        The List will be sorted by lo_atom.
-        No checking is done for overlaps or gaps
-
-        :return: Ordered list of pre-slices
-        :rtype: list(~pacman.model.graphs.common.Slice)
-        """
-        self.__check_list_mode()
-        return self.__pre_slices
-
-    @property
-    def post_slices(self):
-        """ Get the slices for the post_vertexes of the MachineEdges
-
-        While the remember machine_edges remain unchanged this will return a
-        list with a consistent id. If the edges change a new list is created
-
-        The List will be sorted by lo_atom.
-        No checking is done for overlaps or gaps
-
-        :return: Ordered list of post-slices
-        :rtype: list(~pacman.model.graphs.common.Slice)
-        """
-        self.__check_list_mode()
-        return self.__post_slices
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
