@@ -60,16 +60,13 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">LegacyPartitionerAPI</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConstantSDRAM</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">ResourceContainer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
-    <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
+    <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -108,9 +105,8 @@
 
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
-        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">,</span>
-        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">LegacyPartitionerAPI</span><span class="p">):</span>
+        <span class="n">LegacyPartitionerAPI</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -133,7 +129,8 @@
         <span class="s2">&quot;__n_profile_samples&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_variable_rate&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__incoming_control_edge&quot;</span><span class="p">]</span>
 
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -306,6 +303,7 @@
 
         <span class="c1"># Keep track of how many outgoing projections exist</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_projections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.add_outgoing_projection"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.add_outgoing_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an outgoing projection from this vertex</span>
@@ -579,11 +577,6 @@
             <span class="n">SpikeSourcePoissonVertex</span><span class="o">.</span><span class="n">SPIKE_RECORDING_REGION_ID</span><span class="p">,</span>
             <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
-               <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ContiguousKeyRangeContraint</span><span class="p">()]</span></div>
-
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
@@ -619,7 +612,16 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_n_cores"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_n_cores">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_n_cores</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_live_poisson_control_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_live_poisson_control_edge">[docs]</a>    <span class="k">def</span> <span class="nf">set_live_poisson_control_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The Poisson can only be controlled by one source&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span> <span class="o">=</span> <span class="n">edge</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">incoming_control_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span>
 </pre></div>
 
             <div class="clearer"></div>

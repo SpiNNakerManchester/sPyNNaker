@@ -72,8 +72,12 @@
         <span class="s2">&quot;__poptable&quot;</span><span class="p">,</span>
         <span class="c1"># The synapse info used to generate the matrices</span>
         <span class="s2">&quot;__synapse_info&quot;</span><span class="p">,</span>
-        <span class="c1"># The machine edge these matrices are for</span>
-        <span class="s2">&quot;__machine_edge&quot;</span><span class="p">,</span>
+        <span class="c1"># The index of the source machine vertex</span>
+        <span class="s2">&quot;__pre_index&quot;</span><span class="p">,</span>
+        <span class="c1"># The source machine vertex slice these matrices are for</span>
+        <span class="s2">&quot;__pre_slice&quot;</span><span class="p">,</span>
+        <span class="c1"># The target machine vertex slice these matrices are for</span>
+        <span class="s2">&quot;__post_slice&quot;</span><span class="p">,</span>
         <span class="c1"># The app edge of the machine edge</span>
         <span class="s2">&quot;__app_edge&quot;</span><span class="p">,</span>
         <span class="c1"># The number of synapse types</span>
@@ -114,17 +118,18 @@
         <span class="s2">&quot;__delay_received_block&quot;</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">poptable</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">,</span>
-                 <span class="n">app_edge</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-                 <span class="n">delay_routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span>
-                 <span class="n">all_single_syn_sz</span><span class="p">,</span> <span class="n">is_direct_capable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">poptable</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_index</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span>
+                 <span class="n">post_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">max_row_info</span><span class="p">,</span>
+                 <span class="n">routing_info</span><span class="p">,</span> <span class="n">delay_routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+                 <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">all_single_syn_sz</span><span class="p">,</span> <span class="n">is_direct_capable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param MasterPopTableAsBinarySearch poptable:</span>
 <span class="sd">            The master population table</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The projection synapse information</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:</span>
-<span class="sd">            The projection machine edge</span>
+<span class="sd">        :param int pre_index: The index of the pre vertex</span>
+<span class="sd">        :param Slice pre_slice: The slice of the pre vertex</span>
+<span class="sd">        :param Slice post_slice: The slice of the post vertex</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The projection application edge</span>
 <span class="sd">        :param int n_synapse_types: The number of synapse types accepted</span>
@@ -144,7 +149,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span> <span class="o">=</span> <span class="n">poptable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span> <span class="o">=</span> <span class="n">synapse_info</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span> <span class="o">=</span> <span class="n">machine_edge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_index</span> <span class="o">=</span> <span class="n">pre_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span> <span class="o">=</span> <span class="n">pre_slice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span> <span class="o">=</span> <span class="n">post_slice</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span> <span class="o">=</span> <span class="n">app_edge</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span> <span class="o">=</span> <span class="n">n_synapse_types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span> <span class="o">=</span> <span class="n">max_row_info</span>
@@ -157,14 +164,12 @@
 
         <span class="c1"># The matrix size can be calculated up-front; use for checking later</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_bytes</span> <span class="o">*</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_bytes</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_matrix_size</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_bytes</span> <span class="o">*</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_bytes</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__single_matrix_size</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span>
             <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="kc">None</span>
@@ -196,13 +201,11 @@
 
         <span class="c1"># Get the actual connections</span>
         <span class="n">pre_slices</span> <span class="o">=</span>\
-            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
         <span class="n">post_slices</span> <span class="o">=</span>\
-            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-        <span class="n">post_vertex_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">(</span>
-            <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">)</span>
 
         <span class="c1"># Get the row data; note that we use the availability of the routing</span>
@@ -212,7 +215,7 @@
          <span class="n">delay_stages</span><span class="p">)</span> <span class="o">=</span> <span class="n">get_synapses</span><span class="p">(</span>
             <span class="n">connections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="p">,</span>
-            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delay_routing_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -220,13 +223,12 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
                       <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">set_connections</span><span class="p">(</span>
-                <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="p">)</span>
+                <span class="n">connections</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">add_delays</span><span class="p">(</span>
-                <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">delayed_source_ids</span><span class="p">,</span> <span class="n">delay_stages</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="n">delayed_source_ids</span><span class="p">,</span> <span class="n">delay_stages</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">delayed_source_ids</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
                 <span class="s2">&quot;Found delayed source IDs but no delay &quot;</span>
@@ -413,10 +415,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span></div>
 
@@ -430,10 +431,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">add_generator_data</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_n_synapses</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">())</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_n_synapses</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -492,8 +492,6 @@
 <span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pre_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-        <span class="n">post_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -505,7 +503,7 @@
                     <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">undelayed_max_words</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
                 <span class="kc">False</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
@@ -515,7 +513,7 @@
                 <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">delayed_max_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span>
                 <span class="kc">True</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>

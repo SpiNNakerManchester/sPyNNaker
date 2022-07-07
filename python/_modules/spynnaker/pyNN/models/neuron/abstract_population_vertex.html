@@ -62,16 +62,14 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_config_int</span><span class="p">,</span> <span class="n">get_config_float</span><span class="p">,</span> <span class="n">get_config_bool</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">MultiRegionSDRAM</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
-    <span class="n">AbstractCanReset</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractCanReset</span><span class="p">,</span>
+    <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
+    <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span> <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
@@ -124,10 +122,10 @@
 <span class="k">class</span> <span class="nc">AbstractPopulationVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">,</span>
         <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span>
-        <span class="n">AbstractEventRecordable</span><span class="p">,</span> <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
+        <span class="n">AbstractEventRecordable</span><span class="p">,</span>
         <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
-        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">AbstractCanReset</span><span class="p">):</span>
+        <span class="n">AbstractCanReset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Underlying vertex model for Neural Populations.\</span>
 <span class="sd">        Not actually abstract.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -315,6 +313,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Reset the ring buffer shifts as a projection has been added</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_projections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="k">if</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="o">==</span> <span class="bp">self</span><span class="p">:</span>
@@ -335,7 +334,7 @@
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_n_cores"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_n_cores">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_n_cores</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -439,7 +438,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_neuron_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_neuron_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_neuron_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for just the neuron parameters region.</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -450,49 +449,33 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span> <span class="o">+</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_sdram_usage_for_current_source_params"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_sdram_usage_for_current_source_params">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Calculate the SDRAM usage for the current source parameters region.</span>
 
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            the slice of atoms.</span>
+<span class="sd">        :param int n_atoms: The number of atoms to account for</span>
 <span class="sd">        :return: The SDRAM required for the current source region</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Firstly get the current sources active on the vertex_slice</span>
-        <span class="n">current_sources</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">current_source_id_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">lo_atom</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
-        <span class="n">hi_atom</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="c1"># If non at all, just output size of 0 declaration</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">BYTES_PER_WORD</span>
+
+        <span class="c1"># This is a worst-case count, assuming all sources apply to all atoms</span>
+        <span class="c1"># Start with the count of sources + count of sources per neuron</span>
+        <span class="n">sdram_usage</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span> <span class="o">+</span> <span class="p">(</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+
+        <span class="c1"># There is a number of each different type of current source</span>
+        <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+        <span class="c1"># Add on size of neuron id list per source (remember assume all atoms)</span>
+        <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+
+        <span class="c1"># Add on the size of the current source data + neuron id list per</span>
+        <span class="c1"># source (remember, assume all neurons for worst case)</span>
         <span class="k">for</span> <span class="n">current_source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_sources</span><span class="p">:</span>
-            <span class="n">id_list</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_source_id_list</span><span class="p">[</span><span class="n">current_source</span><span class="p">]):</span>
-                    <span class="n">id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">id_list</span><span class="p">):</span>
-                <span class="n">current_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_source</span><span class="p">)</span>
-                <span class="n">current_source_id_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_list</span><span class="p">)</span>
-
-        <span class="c1"># First part is the number of current sources</span>
-        <span class="n">sdram_usage</span> <span class="o">=</span> <span class="n">BYTES_PER_WORD</span>
-
-        <span class="c1"># If there are no current sources then skip the next bit</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_sources</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-
-            <span class="c1"># Each neuron has a value for how many current sources it has</span>
-            <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-
-            <span class="c1"># There is a number of each different type of current source</span>
-            <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-
-            <span class="c1"># Then everywhere there is a current source, add the usage for that</span>
-            <span class="k">for</span> <span class="n">current_source</span><span class="p">,</span> <span class="n">current_source_ids</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                    <span class="n">current_sources</span><span class="p">,</span> <span class="n">current_source_id_list</span><span class="p">):</span>
-                <span class="c1"># Usage for list of IDs for this current source on this vertex</span>
-                <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_source_ids</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-                <span class="c1"># Usage for the parameters of the current source itself</span>
-                <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">current_source</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">()</span>
+            <span class="n">sdram_usage</span> <span class="o">+=</span> <span class="n">current_source</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">sdram_usage</span></div>
 
@@ -731,16 +714,6 @@
         <span class="k">for</span> <span class="n">post_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">HasSynapses</span><span class="p">):</span>
                 <span class="n">post_vertex</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="AbstractPopulationVertex.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
-               <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Gets the constraints for partitions going out of this vertex.</span>
-
-<span class="sd">        :param partition: the partition that leaves this vertex</span>
-<span class="sd">        :return: list of constraints</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ContiguousKeyRangeContraint</span><span class="p">()]</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
@@ -1100,7 +1073,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES</span> <span class="o">+</span>
                 <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">()))</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the synapse dynamics region</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1111,9 +1084,9 @@
             <span class="k">return</span> <span class="mi">0</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span></div>
+            <span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_synapse_types</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_structural_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_structural_dynamics_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_dynamics_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the structural dynamics region</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1130,29 +1103,27 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span>\
             <span class="o">.</span><span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span></div>
+                <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_synapses_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_synapses_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapses_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum SDRAM usage for the synapses on a vertex slice</span>
 
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice of the vertex to get the usage of</span>
+<span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
 <span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
 <span class="sd">            The projections to consider in the calculations</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">addr</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
-            <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_matrix_size</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="n">addr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add_matrix_size</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">proj</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">addr</span></div>
 
-    <span class="k">def</span> <span class="nf">__add_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__add_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add to the address the size of the matrices for the projection to</span>
 <span class="sd">            the vertex slice</span>
 
 <span class="sd">        :param int addr: The address to start from</span>
 <span class="sd">        :param ~spynnaker.pyNN.models.Projection: The projection to add</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice projected to</span>
+<span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
@@ -1160,7 +1131,7 @@
         <span class="n">app_edge</span> <span class="o">=</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span>
 
         <span class="n">max_row_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_row_info</span><span class="p">(</span>
-            <span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
+            <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
 
         <span class="n">vertex</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
         <span class="n">n_sub_atoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">(),</span> <span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span>
@@ -1181,19 +1152,18 @@
                 <span class="n">addr</span> <span class="o">+=</span> <span class="n">size</span>
         <span class="k">return</span> <span class="n">addr</span>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_row_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_row_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get maximum row length data</span>
 
 <span class="sd">        :param SynapseInformation synapse_info: Information about synapses</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">            The slice projected to</span>
+<span class="sd">        :param int n_post_atoms: The number of atoms projected to</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge: The edge of the projection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="n">max_row_info</span> <span class="o">=</span> <span class="n">get_max_row_info</span><span class="p">(</span>
-            <span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
+            <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_row_info</span>
         <span class="k">return</span> <span class="n">max_row_info</span></div>
 
@@ -1210,7 +1180,7 @@
             <span class="n">synapse_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
             <span class="n">n_sub_edges</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">n_sub_edges</span><span class="p">:</span>
                 <span class="n">vertex</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
                 <span class="n">max_atoms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">(),</span>
@@ -1308,6 +1278,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="AbstractPopulationVertex.get_max_neuron_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_neuron_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_neuron_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by neuron parts</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of neurons to get the size of</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_max_variable_sdram_usage</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by synapse parts</span>
@@ -1323,7 +1303,22 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_variable_sdram_usage</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_constant_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_max_synapse_variable_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_synapse_variable_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_synapse_variable_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM per timestep used by synapse parts</span>
+
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of neurons to get the size of</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
+                      <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">set_max_rewires_per_ts</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_max_rewires_per_ts</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_max_variable_sdram_usage</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_constant_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_constant_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_constant_sdram</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">neuron_regions</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot; Get the amount of fixed SDRAM used by neuron parts</span>
 
@@ -1335,14 +1330,14 @@
         <span class="n">sdram</span> <span class="o">=</span> <span class="n">MultiRegionSDRAM</span><span class="p">()</span>
         <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
             <span class="n">neuron_regions</span><span class="o">.</span><span class="n">neuron_params</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_neuron_params</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span>
         <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
             <span class="n">neuron_regions</span><span class="o">.</span><span class="n">current_source_params</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_sdram_usage_for_current_source_params</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span>
         <span class="n">sdram</span><span class="o">.</span><span class="n">add_cost</span><span class="p">(</span>
             <span class="n">neuron_regions</span><span class="o">.</span><span class="n">neuron_recording</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_metadata_sdram_usage_in_bytes</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">))</span>
+                <span class="n">n_atoms</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">sdram</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_common_dtcm"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_dtcm">[docs]</a>    <span class="k">def</span> <span class="nf">get_common_dtcm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1353,7 +1348,7 @@
         <span class="c1"># TODO: Get some real numbers here</span>
         <span class="k">return</span> <span class="mi">0</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_dtcm"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_dtcm">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_dtcm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_dtcm"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_dtcm">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_dtcm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of DTCM used by neuron parts</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1362,11 +1357,11 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_dtcm"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_dtcm">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_dtcm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_dtcm"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_dtcm">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_dtcm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of DTCM used by synapse parts</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1374,7 +1369,7 @@
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_common_cpu"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_common_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">get_common_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of CPU used by common parts</span>
@@ -1383,7 +1378,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_C_MAIN_BASE_N_CPU_CYCLES</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_cpu"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_cpu"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of CPU used by neuron parts</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1393,12 +1388,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_NEURON_BASE_N_CPU_CYCLES</span> <span class="o">+</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NEURON_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span>
-             <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_NEURON_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span> <span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_cpu"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_cpu"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_cpu">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_cpu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of CPU used by synapse parts</span>
 
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
@@ -1408,9 +1402,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_SYNAPSE_BASE_N_CPU_CYCLES</span> <span class="o">+</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span>
-             <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">))</span></div>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span> <span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">))</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">incoming_projections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

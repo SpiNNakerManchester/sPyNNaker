@@ -215,16 +215,22 @@
 
 <div class="viewcode-block" id="MultapseConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.MultapseConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="c1"># If the chance of there being a connection in the slice is almost 0,</span>
+        <span class="c1"># there will probably be at least 1 connection somewhere</span>
         <span class="n">prob_in_slice</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-            <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">),</span>
+            <span class="n">n_post_atoms</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">),</span>
             <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">max_in_slice</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="n">prob_in_slice</span><span class="p">)</span>
+        <span class="n">max_in_slice</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="n">prob_in_slice</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># Similarly if the chance of there being one in a row is 0, there will</span>
+        <span class="c1"># probably be 1</span>
         <span class="n">prob_in_row</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span>
-        <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="n">max_in_slice</span><span class="p">,</span> <span class="n">prob_in_row</span><span class="p">)</span>
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__num_synapses</span><span class="p">,</span> <span class="n">max_in_slice</span><span class="p">,</span> <span class="n">prob_in_row</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_connections</span><span class="p">))</span>

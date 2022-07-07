@@ -707,13 +707,18 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">spikes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
+        <span class="c1"># Put the times for each neuron into the right place</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">neuron_id</span><span class="p">,</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">:</span>
+            <span class="n">times</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">neuron_id</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
         <span class="n">t_stop</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">quantities</span><span class="o">.</span><span class="n">ms</span>
 
         <span class="k">if</span> <span class="n">indexes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">:</span>
             <span class="n">spiketrain</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">SpikeTrain</span><span class="p">(</span>
-                <span class="n">times</span><span class="o">=</span><span class="n">spikes</span><span class="p">[</span><span class="n">spikes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
                 <span class="n">t_start</span><span class="o">=</span><span class="n">recording_start_time</span><span class="p">,</span>
                 <span class="n">t_stop</span><span class="o">=</span><span class="n">t_stop</span><span class="p">,</span>
                 <span class="n">units</span><span class="o">=</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span>

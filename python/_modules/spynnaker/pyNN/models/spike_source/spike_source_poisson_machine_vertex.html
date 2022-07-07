@@ -68,13 +68,12 @@
 <span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractSupportsDatabaseInjection</span><span class="p">,</span>
+    <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span>
     <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management.buffer_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractReceiveBuffersToHost</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
@@ -87,12 +86,12 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractMaxSpikes</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.struct</span> <span class="kn">import</span> <span class="n">Struct</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">,</span> <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="n">alist</span><span class="p">):</span>
@@ -146,7 +145,7 @@
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonMachineVertex</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractReceiveBuffersToHost</span><span class="p">,</span>
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span>
-        <span class="n">AbstractSupportsDatabaseInjection</span><span class="p">,</span> <span class="n">AbstractHasProfileData</span><span class="p">,</span>
+        <span class="n">AbstractHasProfileData</span><span class="p">,</span>
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
         <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">):</span>
@@ -256,22 +255,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">POISSON_SPIKE_SOURCE_REGIONS</span><span class="o">.</span><span class="n">SPIKE_HISTORY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="n">txrx</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSupportsDatabaseInjection</span><span class="o">.</span><span class="n">is_in_injection_mode</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">is_in_injection_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=no-value-for-parameter</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_in_injection_mode</span><span class="p">()</span>
-
-    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineGraph&quot;</span><span class="p">})</span>
-    <span class="k">def</span> <span class="nf">_is_in_injection_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">):</span>
-        <span class="c1"># pylint: disable=arguments-differ</span>
-        <span class="n">in_edges</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex_with_partition_name</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Poisson source can only have one incoming control&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.get_profile_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_profile_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasProfileData</span><span class="o">.</span><span class="n">get_profile_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_profile_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">get_profiling_data</span><span class="p">(</span>
@@ -317,18 +300,15 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.regenerate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.regenerate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstMachineTimeStep&quot;</span><span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractRewritesDataSpecification</span><span class="o">.</span><span class="n">regenerate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span> <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">})</span>
+            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">})</span>
     <span class="k">def</span> <span class="nf">regenerate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>
-            <span class="n">first_machine_time_step</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
 <span class="sd">        :param int first_machine_time_step:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
@@ -338,8 +318,7 @@
 
         <span class="c1"># write parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="o">=</span><span class="n">routing_info</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="o">=</span><span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="o">=</span><span class="n">routing_info</span><span class="p">)</span>
 
         <span class="c1"># write rates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
@@ -350,23 +329,20 @@
 <div class="viewcode-block" id="SpikeSourcePoissonMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span><span class="p">,</span>
         <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;first_machine_time_step&quot;</span><span class="p">:</span> <span class="s2">&quot;FirstMachineTimeStep&quot;</span>
     <span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;first_machine_time_step&quot;</span>
+            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;first_machine_time_step&quot;</span>
         <span class="p">}</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">,</span>
             <span class="n">first_machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        :param int data_n_time_steps:</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
 <span class="sd">        :param int first_machine_time_step:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
@@ -391,8 +367,7 @@
             <span class="n">recorded_region_sizes</span><span class="p">))</span>
 
         <span class="c1"># write parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_parameters</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">)</span>
 
         <span class="c1"># write rates</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_poisson_rates</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">first_machine_time_step</span><span class="p">)</span>
@@ -555,12 +530,11 @@
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">core_data_split</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])])</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">final_data</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_poisson_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_poisson_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generate Parameter data for Poisson spike sources</span>
 
 <span class="sd">        :param ~data_specification.DataSpecification spec:</span>
 <span class="sd">            the data specification writer</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph graph:</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -579,19 +553,12 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">key</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># Write the incoming mask if there is one</span>
-        <span class="n">in_edges</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex_with_partition_name</span><span class="p">(</span>
-            <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
-                <span class="s2">&quot;Only one control edge can end at a Poisson vertex&quot;</span><span class="p">)</span>
         <span class="n">incoming_mask</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">in_edge</span> <span class="o">=</span> <span class="n">in_edges</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-            <span class="c1"># Get the mask of the incoming keys</span>
-            <span class="n">incoming_mask</span> <span class="o">=</span> \
-                <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span><span class="o">.</span><span class="n">first_mask</span>
-            <span class="n">incoming_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">incoming_mask</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_control_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">incoming_control_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span>
+                <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
+            <span class="n">incoming_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">incoming_mask</span><span class="p">)</span>
 
         <span class="c1"># Write the number of seconds per timestep (unsigned long fract)</span>

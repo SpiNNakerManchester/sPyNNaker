@@ -106,13 +106,6 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__delay_edge&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
-        <span class="c1"># Slices of the pre_vertexes of the machine_edges</span>
-        <span class="s2">&quot;__pre_slices&quot;</span><span class="p">,</span>
-        <span class="c1"># Slices of the post_vertexes of the machine_edges</span>
-        <span class="s2">&quot;__post_slices&quot;</span><span class="p">,</span>
-        <span class="c1"># True if slices have been convered to sorted lists</span>
-        <span class="s2">&quot;__slices_list_mode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__machine_edges_by_slices&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__filter&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_neuromodulation&quot;</span>
     <span class="p">]</span>
@@ -137,13 +130,6 @@
         <span class="c1"># The edge from the delay extension of the pre_vertex to the</span>
         <span class="c1"># post_vertex - this might be None if no long delays are present</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Keep the machine edges by pre- and post-vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># By default, allow filtering</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__filter</span> <span class="o">=</span> <span class="kc">True</span>
@@ -204,18 +190,6 @@
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
 
-<div class="viewcode-block" id="ProjectionApplicationEdge.get_machine_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_machine_edge">[docs]</a>    <span class="k">def</span> <span class="nf">get_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get a specific machine edge of this edge</span>
-
-<span class="sd">        :param PopulationMachineVertex pre_vertex:</span>
-<span class="sd">            The vertex at the start of the machine edge</span>
-<span class="sd">        :param PopulationMachineVertex post_vertex:</span>
-<span class="sd">            The vertex at the end of the machine edge</span>
-<span class="sd">        :rtype: ~pacman.model.graphs.machine.MachineEdge or None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="ProjectionApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filter</span><span class="p">:</span>
@@ -228,70 +202,6 @@
                     <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
-
-<div class="viewcode-block" id="ProjectionApplicationEdge.remember_associated_machine_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="o">.</span><span class="n">remember_associated_machine_edge</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">remember_associated_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">remember_associated_machine_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span><span class="p">:</span>
-            <span class="c1"># Unexpected but if extra remember after a get convert back to sets</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__machine_edges_by_slices</span><span class="p">[</span>
-            <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span>
-            <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">machine_edge</span></div>
-
-<div class="viewcode-block" id="ProjectionApplicationEdge.forget_machine_edges"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="o">.</span><span class="n">forget_machine_edges</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">forget_machine_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">forget_machine_edges</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span> <span class="o">=</span> <span class="kc">False</span></div>
-
-    <span class="k">def</span> <span class="nf">__check_list_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Makes sure the pre- and post-slices are sorted lists</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__slices_list_mode</span> <span class="o">=</span> <span class="kc">True</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pre_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the slices for the pre_vertexes of the MachineEdges</span>
-
-<span class="sd">        While the remember machine_edges remain unchanged this will return a</span>
-<span class="sd">        list with a consistent id. If the edges change a new list is created</span>
-
-<span class="sd">        The List will be sorted by lo_atom.</span>
-<span class="sd">        No checking is done for overlaps or gaps</span>
-
-<span class="sd">        :return: Ordered list of pre-slices</span>
-<span class="sd">        :rtype: list(~pacman.model.graphs.common.Slice)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__check_list_mode</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slices</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">post_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the slices for the post_vertexes of the MachineEdges</span>
-
-<span class="sd">        While the remember machine_edges remain unchanged this will return a</span>
-<span class="sd">        list with a consistent id. If the edges change a new list is created</span>
-
-<span class="sd">        The List will be sorted by lo_atom.</span>
-<span class="sd">        No checking is done for overlaps or gaps</span>
-
-<span class="sd">        :return: Ordered list of post-slices</span>
-<span class="sd">        :rtype: list(~pacman.model.graphs.common.Slice)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__check_list_mode</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slices</span>
 
 <div class="viewcode-block" id="ProjectionApplicationEdge.get_local_provenance_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_local_provenance_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesLocalProvenanceData</span><span class="o">.</span><span class="n">get_local_provenance_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_local_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

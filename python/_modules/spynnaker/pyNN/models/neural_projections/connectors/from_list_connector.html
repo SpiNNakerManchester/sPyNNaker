@@ -214,26 +214,33 @@
 
 <div class="viewcode-block" id="FromListConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&gt;=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="o">&amp;</span>
-                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&lt;=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&gt;=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="o">&amp;</span>
-                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__targets</span> <span class="o">&lt;=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)</span> <span class="o">&amp;</span>
-                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">&gt;=</span> <span class="n">min_delay</span><span class="p">)</span> <span class="o">&amp;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">&gt;=</span> <span class="n">min_delay</span><span class="p">)</span> <span class="o">&amp;</span>
                     <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">&lt;=</span> <span class="n">max_delay</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">sources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sources</span>
+            <span class="n">conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sources</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">sources</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">conns</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
-        <span class="n">max_targets</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span>
-            <span class="n">sources</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span>
+
+        <span class="c1"># Make targets be core indices</span>
+        <span class="n">conns</span><span class="p">[:,</span> <span class="n">_TARGET</span><span class="p">]</span> <span class="o">//=</span> <span class="n">n_post_atoms</span>
+
+        <span class="c1"># Split into sources</span>
+        <span class="n">source_split_conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__numpy_group</span><span class="p">(</span><span class="n">conns</span><span class="p">,</span> <span class="n">_SOURCE</span><span class="p">)</span>
+
+        <span class="c1"># Split into groups by post_n_atoms</span>
+        <span class="n">target_split_conns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__numpy_group</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_TARGET</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">source_split_conns</span><span class="p">]</span>
+
+        <span class="c1"># Find the biggest group</span>
+        <span class="n">max_targets</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">target_split_conns</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">s</span><span class="p">])</span>
 
         <span class="c1"># If no delays just return max targets as this is for all delays</span>
         <span class="c1"># If there are delays in the list, this was also handled above</span>
@@ -246,6 +253,18 @@
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">max_targets</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__numpy_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conns</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
+        <span class="c1"># Sort by the column to group by</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">conns</span><span class="p">[</span><span class="n">conns</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()]</span>
+
+        <span class="c1"># Find split points by getting the first indices of the unique items</span>
+        <span class="c1"># and then removing the first (as that will be 0 and we don&#39;t want to</span>
+        <span class="c1"># split at 0)</span>
+        <span class="n">split_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">s</span><span class="p">[:,</span> <span class="n">column</span><span class="p">],</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># Perform the split</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">conns</span><span class="p">,</span> <span class="n">split_points</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FromListConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -331,17 +350,6 @@
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span>
-
-<div class="viewcode-block" id="FromListConnector.get_n_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_n_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
-<span class="sd">        :param int pre_hi:</span>
-<span class="sd">        :param int post_hi:</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span></div>
 
     <span class="nd">@conn_list</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">conn_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conn_list</span><span class="p">):</span>
@@ -465,9 +473,9 @@
     <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
         <span class="n">pre_slices</span> <span class="o">=</span> \
-            <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
         <span class="n">post_slices</span> <span class="o">=</span> \
-            <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
         <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
         <span class="n">post_hi</span> <span class="o">=</span> <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>

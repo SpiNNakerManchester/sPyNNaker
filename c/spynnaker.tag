@@ -9138,19 +9138,19 @@
       <anchor>ae6b1e1c0aee533b40075573aca35b72f</anchor>
       <arglist>(index_t s_id, spike_source_t *source, uint timer_count)</arglist>
     </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>timer_callback</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>ab3ba3db2e11b1db9fd9d1986558eee30</anchor>
-      <arglist>(uint timer_count, uint unused)</arglist>
-    </member>
     <member kind="function">
       <type>void</type>
       <name>set_spike_source_rate</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>a12c72782cb450237076bc0622fc90125</anchor>
       <arglist>(uint32_t id, REAL rate)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>timer_callback</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>ab3ba3db2e11b1db9fd9d1986558eee30</anchor>
+      <arglist>(uint timer_count, uint unused)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static void</type>

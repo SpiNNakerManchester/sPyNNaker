@@ -153,35 +153,6 @@ but may return a false positives</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.get_machine_edge">
-<span class="sig-name descname"><span class="pre">get_machine_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge.get_machine_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.get_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a specific machine edge from this edge</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex" title="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex"><em>DelayExtensionMachineVertex</em></a>) – The vertex at the start of the machine edge</p></li>
-<li><p><strong>post_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="spynnaker.pyNN.models.neuron.PopulationMachineVertex"><em>PopulationMachineVertex</em></a>) – The vertex at the end of the machine edge</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineEdge" title="(in PACMAN v6.0)"><em>MachineEdge</em></a> or None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.remember_associated_machine_edge">
-<span class="sig-name descname"><span class="pre">remember_associated_machine_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_edge</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge.remember_associated_machine_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.remember_associated_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Machine Edge to the iterable returned by machine_edges</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>machine_edge</strong> (<em>MachineEdge</em>) – A pointer to a machine_edge.
-This edge may not be fully initialised</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.synapse_information">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">synapse_information</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.synapse_information" title="Permalink to this definition">¶</a></dt>
@@ -267,33 +238,9 @@ but may return a false positives</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges">
-<span class="sig-name descname"><span class="pre">forget_machine_edges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.forget_machine_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.forget_machine_edges" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear the collection of machine edges created by this application
-edge.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_local_provenance_data">
 <span class="sig-name descname"><span class="pre">get_local_provenance_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.get_local_provenance_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_local_provenance_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an iterable of provenance data items.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_machine_edge">
-<span class="sig-name descname"><span class="pre">get_machine_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.get_machine_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a specific machine edge of this edge</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>pre_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="spynnaker.pyNN.models.neuron.PopulationMachineVertex"><em>PopulationMachineVertex</em></a>) – The vertex at the start of the machine edge</p></li>
-<li><p><strong>post_vertex</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="spynnaker.pyNN.models.neuron.PopulationMachineVertex"><em>PopulationMachineVertex</em></a>) – The vertex at the end of the machine edge</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineEdge" title="(in PACMAN v6.0)"><em>MachineEdge</em></a> or None</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -313,54 +260,6 @@ edge.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.post_slices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">post_slices</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.post_slices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the slices for the post_vertexes of the MachineEdges</p>
-<p>While the remember machine_edges remain unchanged this will return a
-list with a consistent id. If the edges change a new list is created</p>
-<p>The List will be sorted by lo_atom.
-No checking is done for overlaps or gaps</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Ordered list of post-slices</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.pre_slices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pre_slices</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.pre_slices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the slices for the pre_vertexes of the MachineEdges</p>
-<p>While the remember machine_edges remain unchanged this will return a
-list with a consistent id. If the edges change a new list is created</p>
-<p>The List will be sorted by lo_atom.
-No checking is done for overlaps or gaps</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Ordered list of pre-slices</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge">
-<span class="sig-name descname"><span class="pre">remember_associated_machine_edge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_edge</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.remember_associated_machine_edge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.remember_associated_machine_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the Machine Edge to the iterable returned by machine_edges</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>machine_edge</strong> (<em>MachineEdge</em>) – A pointer to a machine_edge.
-This edge may not be fully initialised</p>
 </dd>
 </dl>
 </dd></dl>

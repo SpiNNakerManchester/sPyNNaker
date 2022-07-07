@@ -246,7 +246,6 @@
     <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param machine_graph: (injected)</span>
 <span class="sd">        :param routing_info: (injected)</span>
 <span class="sd">        :param data_n_time_steps: (injected)</span>
 <span class="sd">        :param n_key_map: (injected)</span>
@@ -312,16 +311,22 @@
     <span class="k">def</span> <span class="nf">weight_scales</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span>
 
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">n_bytes_for_transfer</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">n_bytes_for_transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">n_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_target_neurons</span><span class="p">)</span> <span class="o">*</span>
-                   <span class="bp">self</span><span class="o">.</span><span class="n">n_target_synapse_types</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_BYTES_PER_INPUT</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationNeuronsMachineVertex.get_n_bytes_for_transfer"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.get_n_bytes_for_transfer">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_n_bytes_for_transfer</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
+        <span class="n">n_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span> <span class="o">*</span>
+                   <span class="n">n_synapse_types</span> <span class="o">*</span>
+                   <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">N_BYTES_PER_INPUT</span><span class="p">)</span>
         <span class="c1"># May need to add some padding if not a round number of words</span>
         <span class="n">extra_bytes</span> <span class="o">=</span> <span class="n">n_bytes</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span>
         <span class="k">if</span> <span class="n">extra_bytes</span><span class="p">:</span>
             <span class="n">n_bytes</span> <span class="o">+=</span> <span class="n">BYTES_PER_WORD</span> <span class="o">-</span> <span class="n">extra_bytes</span>
-        <span class="k">return</span> <span class="n">n_bytes</span>
+        <span class="k">return</span> <span class="n">n_bytes</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">n_bytes_for_transfer</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">n_bytes_for_transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_n_bytes_for_transfer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_target_neurons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_target_synapse_types</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PopulationNeuronsMachineVertex.sdram_requirement"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationNeuronsMachineVertex.sdram_requirement">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="o">.</span><span class="n">sdram_requirement</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">sdram_requirement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdram_machine_edge</span><span class="p">):</span>

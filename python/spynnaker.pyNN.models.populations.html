@@ -258,7 +258,7 @@ simulation timestep.</p></li>
 <li><p><strong>cellparams</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a><em>) or </em><em>None</em>) – Parameters to pass to <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> if it
 is a class to instantiate. Must be <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">cellclass</span></code> is an
 instantiated object.</p></li>
-<li><p><strong>structure</strong> (<a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a>) – </p></li>
+<li><p><strong>structure</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a>) – </p></li>
 <li><p><strong>initial_values</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – Initial values of state variables</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the population</p></li>
 <li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – Any constraints on how the population is deployed to SpiNNaker.</p></li>
@@ -587,7 +587,7 @@ record.</p>
 <dd><p>Set initial values of state variables, e.g. the membrane            potential.  Values passed to <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> may be:</p>
 <ul class="simple">
 <li><p>single numeric values (all neurons set to the same value), or</p></li>
-<li><p><a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
+<li><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
 <li><p>lists / arrays of numbers of the same size as the population
 mapping functions, where a mapping function accepts a single
 argument (the cell index) and returns a single number.</p></li>
@@ -836,7 +836,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <dd><p>Return the structure for the population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a> or None</p>
+<dd class="field-odd"><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1210,7 +1210,7 @@ with the extra non-PyNN <cite>sampling_interval</cite> and <cite>indexes</cite><
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.10)"><em>BaseStructure</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1528,7 +1528,7 @@ be just the parent, or the great, great, great, …, grandparent.</p>
 <dd><p>Set initial values of state variables, e.g. the membrane            potential.  Values passed to <code class="docutils literal notranslate"><span class="pre">initialize()</span></code> may be:</p>
 <ul class="simple">
 <li><p>single numeric values (all neurons set to the same value), or</p></li>
-<li><p><a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
+<li><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
 <li><p>lists / arrays of numbers of the same size as the population
 mapping functions, where a mapping function accepts a single
 argument (the cell index) and returns a single number.</p></li>
@@ -1633,7 +1633,7 @@ simulation timestep.</p></li>
 <dd><p>Set one or more parameters for every cell in the population.            Values passed to <cite>set()</cite> may be:</p>
 <ul class="simple">
 <li><p>single values,</p></li>
-<li><p><a class="reference external" href="https://neuralensemble.github.io/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
+<li><p><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.RandomDistribution" title="(in PyNN v0.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomDistribution</span></code></a> objects, or</p></li>
 <li><p>lists / arrays of values of the same size as the population
 mapping functions, where a mapping function accepts a single
 argument (the cell index) and returns a single value.</p></li>

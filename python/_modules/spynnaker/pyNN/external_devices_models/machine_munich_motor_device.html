@@ -63,8 +63,6 @@
     <span class="n">AbstractHasAssociatedBinary</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span> <span class="n">ProvenanceWriter</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
@@ -76,7 +74,7 @@
 
 <span class="k">class</span> <span class="nc">MachineMunichMotorDevice</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
-        <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span>
+        <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span>
         <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An Omnibot motor control device. This has a real vertex and an \</span>
 <span class="sd">        external device vertex.</span>
@@ -238,11 +236,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MachineMunichMotorDevice.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_n_keys_for_partition">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_partition</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">_partition</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">partition_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTOR_PARTITION_ID</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_MOTOR_N_KEYS</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">MachineMunichMotorDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">(</span>
-            <span class="n">_partition</span><span class="p">)</span></div>
+            <span class="n">partition_id</span><span class="p">)</span></div>
 </pre></div>
 
             <div class="clearer"></div>

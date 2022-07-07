@@ -62,7 +62,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ArbitraryFPGADevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ArbitraryFPGADevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ArbitraryFPGADevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -139,7 +139,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalCochleaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ExternalCochleaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalCochleaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -196,7 +196,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">ExternalFPGARetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -248,23 +248,6 @@ accuracy to gain performance.</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_n_neurons">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_neurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_spinnaker_link_fpga_retina_device.html#ExternalFPGARetinaDevice.get_n_neurons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_n_neurons" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">
-<span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_spinnaker_link_fpga_retina_device.html#ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of constraints</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.pause_stop_commands">
@@ -920,7 +903,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">MunichRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MunichRetinaDevice'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>An Omnibot silicon retina device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -964,23 +947,6 @@ accuracy to gain performance.</p>
 <span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'board_address':</span> <span class="pre">None,</span> <span class="pre">'label':</span> <span class="pre">'MunichRetinaDevice',</span> <span class="pre">'polarity':</span> <span class="pre">None}</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichRetinaDevice.get_outgoing_partition_constraints">
-<span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_retina_device.html#MunichRetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of constraints</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.MunichRetinaDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices.MunichRetinaDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
@@ -1019,7 +985,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLEDDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">led</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_front</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time_back</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLEDDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>The LED of a PushBot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1083,7 +1049,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetLaserDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">laser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetLaserDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>The Laser of a PushBot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1146,7 +1112,7 @@ accuracy to gain performance.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>The motor of a PushBot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1285,7 +1251,7 @@ or None to use the default</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices.</span></span><span class="sig-name descname"><span class="pre">PushBotEthernetSpeakerDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speaker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_active_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_total_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_melody</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timesteps_between_send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices.PushBotEthernetSpeakerDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PushBotEthernetDevice</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>The Speaker of a PushBot</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

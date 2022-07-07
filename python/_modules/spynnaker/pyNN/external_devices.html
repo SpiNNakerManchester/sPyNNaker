@@ -52,7 +52,6 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
-
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This contains functions and classes for handling external devices such as the</span>
 <span class="sd">PushBot (http://spinnakermanchester.github.io/docs/push_bot/).</span>
@@ -68,6 +67,8 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LivePacketGatherParameters</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractEthernetController</span><span class="p">,</span> <span class="n">AbstractEthernetSensor</span><span class="p">,</span>
     <span class="n">ArbitraryFPGADevice</span><span class="p">,</span> <span class="n">ExternalCochleaDevice</span><span class="p">,</span> <span class="n">ExternalFPGARetinaDevice</span><span class="p">,</span>
@@ -97,6 +98,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations</span> <span class="kn">import</span> <span class="n">Population</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.spike_injector</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpikeInjector</span> <span class="k">as</span> <span class="n">ExternalDeviceSpikeInjector</span><span class="p">)</span>
+
 
 <span class="c1"># useful functions</span>
 <span class="n">add_database_socket_address</span> <span class="o">=</span> <span class="n">Plugins</span><span class="o">.</span><span class="n">add_database_socket_address</span>
@@ -255,13 +257,14 @@
         <span class="n">Plugins</span><span class="o">.</span><span class="n">add_database_socket_address</span><span class="p">(</span>
             <span class="n">ethernet_command_connection</span><span class="o">.</span><span class="n">local_ip_address</span><span class="p">,</span>
             <span class="n">ethernet_command_connection</span><span class="o">.</span><span class="n">local_port</span><span class="p">,</span> <span class="n">database_ack_port_num</span><span class="p">)</span>
-    <span class="n">Plugins</span><span class="o">.</span><span class="n">update_live_packet_gather_tracker</span><span class="p">(</span>
-        <span class="n">vertex</span><span class="p">,</span> <span class="n">live_packet_gather_label</span><span class="p">,</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">LivePacketGatherParameters</span><span class="p">(</span>
         <span class="n">port</span><span class="o">=</span><span class="n">__ethernet_control_connection</span><span class="o">.</span><span class="n">local_port</span><span class="p">,</span>
         <span class="n">hostname</span><span class="o">=</span><span class="n">__ethernet_control_connection</span><span class="o">.</span><span class="n">local_ip_address</span><span class="p">,</span>
         <span class="n">message_type</span><span class="o">=</span><span class="n">EIEIOType</span><span class="o">.</span><span class="n">KEY_PAYLOAD_32_BIT</span><span class="p">,</span>
         <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_payload_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">partition_ids</span><span class="o">=</span><span class="n">vertex</span><span class="o">.</span><span class="n">get_outgoing_partition_ids</span><span class="p">())</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">live_packet_gather_label</span><span class="p">)</span>
+    <span class="n">Plugins</span><span class="o">.</span><span class="n">update_live_packet_gather_tracker</span><span class="p">(</span>
+        <span class="n">vertex</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_outgoing_partition_ids</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">population</span>
 
 

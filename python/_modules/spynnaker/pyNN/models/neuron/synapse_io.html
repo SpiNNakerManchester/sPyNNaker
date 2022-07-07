@@ -176,15 +176,15 @@
 
 
 <div class="viewcode-block" id="get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.get_max_row_info">[docs]</a><span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span>
-        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">):</span>
+        <span class="n">synapse_info</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span> <span class="n">in_edge</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get the information about the maximum lengths of delayed and\</span>
 <span class="sd">        undelayed rows in bytes (including header), words (without header)\</span>
 <span class="sd">        and number of synapses</span>
 
 <span class="sd">    :param SynapseInformation synapse_info:</span>
 <span class="sd">        The synapse information to get the row data for</span>
-<span class="sd">    :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        The slice of the machine vertex being represented</span>
+<span class="sd">    :param int n_post_atoms:</span>
+<span class="sd">        The number of post atoms to get the maximum for</span>
 <span class="sd">    :param int n_delay_stages:</span>
 <span class="sd">        The number of delay stages on the edge</span>
 <span class="sd">    :param ProjectionApplicationEdge in_edge:</span>
@@ -205,7 +205,7 @@
     <span class="c1"># row length for the non-delayed synaptic matrix</span>
     <span class="n">max_undelayed_n_synapses</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span> \
         <span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
-            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_delay_supported</span><span class="p">)</span>
+            <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_delay_supported</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">pad_to_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">max_undelayed_n_synapses</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
             <span class="n">pad_to_length</span><span class="p">,</span> <span class="n">max_undelayed_n_synapses</span><span class="p">)</span>
@@ -215,7 +215,7 @@
     <span class="k">if</span> <span class="n">n_delay_stages</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">max_delayed_n_synapses</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span> \
             <span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
-                <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
+                <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
                 <span class="n">min_delay_for_delay_extension</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pad_to_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">max_delayed_n_synapses</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>

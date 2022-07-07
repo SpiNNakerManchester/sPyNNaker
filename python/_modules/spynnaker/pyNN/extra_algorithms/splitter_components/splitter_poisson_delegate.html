@@ -61,12 +61,12 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">OneToOneConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="n">SynapseDynamicsStatic</span>
-<span class="kn">from</span> <span class="nn">.spynnaker_splitter_slice_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterSliceLegacy</span>
+<span class="kn">from</span> <span class="nn">.spynnaker_splitter_fixed_legacy</span> <span class="kn">import</span> <span class="n">SpynnakerSplitterFixedLegacy</span>
 <span class="kn">from</span> <span class="nn">.abstract_supports_one_to_one_sdram_input</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSupportsOneToOneSDRAMInput</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SplitterPoissonDelegate</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A splitter for Poisson sources that will ignore sources that are</span>
 <span class="sd">        one-to-one connected to a single Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -101,22 +101,22 @@
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="SplitterPoissonDelegate.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
+<div class="viewcode-block" id="SplitterPoissonDelegate.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
         <span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">PacmanConfigurationException</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POP_ERROR_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterSliceLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
+<div class="viewcode-block" id="SplitterPoissonDelegate.create_machine_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.create_machine_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SpynnakerSplitterFixedLegacy</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chip_counter</span><span class="p">):</span>
         <span class="c1"># If sending over SDRAM, let the target handle this</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="c1"># If we passed this part, use the super class</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_machine_vertices</span><span class="p">(</span>
-            <span class="n">resource_tracker</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">)</span></div>
+            <span class="n">chip_counter</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterPoissonDelegate.get_in_coming_slices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_in_coming_slices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_in_coming_slices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -135,6 +135,19 @@
             <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
             <span class="k">return</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.get_out_going_vertices"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_out_going_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_out_going_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+            <span class="n">partition_id</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SplitterPoissonDelegate.get_same_chip_groups"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterPoissonDelegate.get_same_chip_groups">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">get_same_chip_groups</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_same_chip_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_over_sdram</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SplitterPoissonDelegate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_same_chip_groups</span><span class="p">()</span></div>
 </pre></div>
 
             <div class="clearer"></div>

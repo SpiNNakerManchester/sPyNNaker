@@ -479,13 +479,16 @@
 <span class="sd">        :rtype: ~.ApplicationEdge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Find edges ending at the postsynaptic vertex</span>
-        <span class="n">graph_edges</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">original_application_graph</span><span class="o">.</span>\
-            <span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">post_synaptic_vertex</span><span class="p">)</span>
+        <span class="n">partitions</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">original_application_graph</span><span class="o">.</span>\
+            <span class="n">get_outgoing_edge_partitions_starting_at_vertex</span><span class="p">(</span>
+            <span class="n">pre_synaptic_vertex</span><span class="p">)</span>
 
-        <span class="c1"># Search the edges for any that start at the presynaptic vertex</span>
-        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">graph_edges</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="o">==</span> <span class="n">pre_synaptic_vertex</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">edge</span>
+        <span class="c1"># Partitions and Partition.edges will be OrderedSet but may be empty</span>
+        <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span> <span class="o">==</span> <span class="n">post_synaptic_vertex</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">edge</span>
+
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_get_synaptic_data</span><span class="p">(</span>

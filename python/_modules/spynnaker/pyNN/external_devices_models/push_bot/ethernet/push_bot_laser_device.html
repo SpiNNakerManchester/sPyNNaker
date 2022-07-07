@@ -56,8 +56,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">.push_bot_device</span> <span class="kn">import</span> <span class="n">PushBotEthernetDevice</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot.parameters</span> <span class="kn">import</span> <span class="p">(</span>
@@ -65,8 +63,7 @@
 
 
 <span class="k">class</span> <span class="nc">PushBotEthernetLaserDevice</span><span class="p">(</span>
-        <span class="n">PushBotEthernetDevice</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
-        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
+        <span class="n">PushBotEthernetDevice</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The Laser of a PushBot</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

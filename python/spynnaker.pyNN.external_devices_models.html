@@ -301,7 +301,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ArbitraryFPGADevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fpga_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ArbitraryFPGADevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationFPGAVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -318,7 +318,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalCochleaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ExternalCochleaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalCochleaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -375,7 +375,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">ExternalFPGARetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -428,23 +428,6 @@
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_neurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_spinnaker_link_fpga_retina_device.html#ExternalFPGARetinaDevice.get_n_neurons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">
-<span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_spinnaker_link_fpga_retina_device.html#ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of constraints</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.pause_stop_commands">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pause_stop_commands</span></span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.pause_stop_commands" title="Permalink to this definition">¶</a></dt>
@@ -483,7 +466,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">MachineMunichMotorDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">continue_if_not_different</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesProvenanceDataFromMachineImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MachineVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesProvenanceDataFromMachineImpl</span></code></p>
 <p>An Omnibot motor control device. This has a real vertex and an         external device vertex.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -551,11 +534,11 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_n_keys_for_partition">
-<span class="sig-name descname"><span class="pre">get_n_keys_for_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.get_n_keys_for_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_n_keys_for_partition" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_n_keys_for_partition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/machine_munich_motor_device.html#MachineMunichMotorDevice.get_n_keys_for_partition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MachineMunichMotorDevice.get_n_keys_for_partition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the number of keys required by the given partition of edges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>_partition</strong> (<em>OutgoingEdgePartition</em>) – An partition that comes out of this vertex</p>
+<dd class="field-odd"><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The identifier of the partition</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of keys required</p>
@@ -676,7 +659,7 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichRetinaDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.external_devices_models.</span></span><span class="sig-name descname"><span class="pre">MunichRetinaDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retina_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinnaker_link_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MunichRetinaDevice'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">board_address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationSpiNNakerLinkVertex</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSendMeMulticastCommandsVertex</span></code></p>
 <p>An Omnibot silicon retina device.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -719,23 +702,6 @@ position) to be used for provenance error reporting to the user.</p></li>
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichRetinaDevice.default_parameters">
 <span class="sig-name descname"><span class="pre">default_parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'board_address':</span> <span class="pre">None,</span> <span class="pre">'label':</span> <span class="pre">'MunichRetinaDevice',</span> <span class="pre">'polarity':</span> <span class="pre">None}</span></em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_outgoing_partition_constraints">
-<span class="sig-name descname"><span class="pre">get_outgoing_partition_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/munich_spinnaker_link_retina_device.html#MunichRetinaDevice.get_outgoing_partition_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) – An edge that comes out of this vertex</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of constraints</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="spynnaker.pyNN.external_devices_models.MunichRetinaDevice.pause_stop_commands">

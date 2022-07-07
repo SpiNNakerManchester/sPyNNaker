@@ -60,6 +60,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isnan</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
@@ -258,7 +259,13 @@
 <span class="sd">        with a probability of selection of selection_prob</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">prob</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">chance</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_total_trials</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span></div>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">selection_prob</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Could not find maximum selected from </span><span class="si">{</span><span class="n">n_trials</span><span class="si">}</span><span class="s2"> out of&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">n_total_trials</span><span class="si">}</span><span class="s2"> trials, with selection probability of&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">selection_prob</span><span class="si">}</span><span class="s2"> and chance </span><span class="si">{</span><span class="n">chance</span><span class="si">}</span><span class="s2">.  Final chance = </span><span class="si">{</span><span class="n">prob</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span></div>
 
 
 <div class="viewcode-block" id="get_probable_minimum_selected"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_probable_minimum_selected">[docs]</a><span class="k">def</span> <span class="nf">get_probable_minimum_selected</span><span class="p">(</span>

@@ -184,13 +184,21 @@
             <span class="n">host</span> <span class="o">=</span> <span class="n">get_config_str</span><span class="p">(</span><span class="s2">&quot;Recording&quot;</span><span class="p">,</span> <span class="s2">&quot;live_spike_host&quot;</span><span class="p">)</span>
 
         <span class="c1"># add new edge and vertex if required to SpiNNaker graph</span>
+
+        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">LivePacketGatherParameters</span><span class="p">(</span>
+            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="n">host</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">strip_sdp</span><span class="o">=</span><span class="n">strip_sdp</span><span class="p">,</span>
+            <span class="n">use_prefix</span><span class="o">=</span><span class="n">use_prefix</span><span class="p">,</span> <span class="n">key_prefix</span><span class="o">=</span><span class="n">key_prefix</span><span class="p">,</span>
+            <span class="n">prefix_type</span><span class="o">=</span><span class="n">prefix_type</span><span class="p">,</span> <span class="n">message_type</span><span class="o">=</span><span class="n">message_type</span><span class="p">,</span>
+            <span class="n">right_shift</span><span class="o">=</span><span class="n">right_shift</span><span class="p">,</span> <span class="n">payload_prefix</span><span class="o">=</span><span class="n">payload_prefix</span><span class="p">,</span>
+            <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="n">payload_as_time_stamps</span><span class="p">,</span>
+            <span class="n">use_payload_prefix</span><span class="o">=</span><span class="n">use_payload_prefix</span><span class="p">,</span>
+            <span class="n">payload_right_shift</span><span class="o">=</span><span class="n">payload_right_shift</span><span class="p">,</span>
+            <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">number_of_packets_sent_per_time_step</span><span class="p">),</span>
+            <span class="n">label</span><span class="o">=</span><span class="s2">&quot;LiveSpikeReceiver&quot;</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">update_live_packet_gather_tracker</span><span class="p">(</span>
-            <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="s2">&quot;LiveSpikeReceiver&quot;</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span>
-            <span class="n">strip_sdp</span><span class="p">,</span> <span class="n">use_prefix</span><span class="p">,</span> <span class="n">key_prefix</span><span class="p">,</span> <span class="n">prefix_type</span><span class="p">,</span> <span class="n">message_type</span><span class="p">,</span>
-            <span class="n">right_shift</span><span class="p">,</span> <span class="n">payload_as_time_stamps</span><span class="p">,</span> <span class="n">use_payload_prefix</span><span class="p">,</span>
-            <span class="n">payload_prefix</span><span class="p">,</span> <span class="n">payload_right_shift</span><span class="p">,</span>
-            <span class="n">number_of_packets_sent_per_time_step</span><span class="p">,</span>
-            <span class="n">partition_ids</span><span class="o">=</span><span class="p">[</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">],</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
+            <span class="n">population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="p">[</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">notify</span><span class="p">:</span>
             <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_database_socket_address</span><span class="p">(</span>
@@ -233,13 +241,7 @@
 
 <div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">update_live_packet_gather_tracker</span><span class="p">(</span>
-            <span class="n">vertex_to_record_from</span><span class="p">,</span> <span class="n">lpg_label</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strip_sdp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">key_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">prefix_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">message_type</span><span class="o">=</span><span class="n">EIEIOType</span><span class="o">.</span><span class="n">KEY_32_BIT</span><span class="p">,</span>
-            <span class="n">right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">use_payload_prefix</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">payload_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">payload_right_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">partition_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">vertex_to_record_from</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">partition_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an edge from a vertex to the live packet gatherer, builds as\</span>
 <span class="sd">            needed and has all the parameters for the creation of the live\</span>
 <span class="sd">            packet gatherer if needed.</span>
@@ -266,18 +268,6 @@
 <span class="sd">        :param list(str) partition_ids:</span>
 <span class="sd">        :param bool translate_keys:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># pylint: disable=too-many-arguments</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="n">LivePacketGatherParameters</span><span class="p">(</span>
-            <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="n">hostname</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">,</span> <span class="n">strip_sdp</span><span class="o">=</span><span class="n">strip_sdp</span><span class="p">,</span>
-            <span class="n">use_prefix</span><span class="o">=</span><span class="n">use_prefix</span><span class="p">,</span> <span class="n">key_prefix</span><span class="o">=</span><span class="n">key_prefix</span><span class="p">,</span>
-            <span class="n">prefix_type</span><span class="o">=</span><span class="n">prefix_type</span><span class="p">,</span> <span class="n">message_type</span><span class="o">=</span><span class="n">message_type</span><span class="p">,</span>
-            <span class="n">right_shift</span><span class="o">=</span><span class="n">right_shift</span><span class="p">,</span> <span class="n">payload_prefix</span><span class="o">=</span><span class="n">payload_prefix</span><span class="p">,</span>
-            <span class="n">payload_as_time_stamps</span><span class="o">=</span><span class="n">payload_as_time_stamps</span><span class="p">,</span>
-            <span class="n">use_payload_prefix</span><span class="o">=</span><span class="n">use_payload_prefix</span><span class="p">,</span>
-            <span class="n">payload_right_shift</span><span class="o">=</span><span class="n">payload_right_shift</span><span class="p">,</span>
-            <span class="n">number_of_packets_sent_per_time_step</span><span class="o">=</span><span class="p">(</span>
-                <span class="n">number_of_packets_sent_per_time_step</span><span class="p">),</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">lpg_label</span><span class="p">,</span> <span class="n">translate_keys</span><span class="o">=</span><span class="n">translate_keys</span><span class="p">)</span>
 
         <span class="c1"># add to the tracker</span>
         <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">add_live_packet_gatherer_parameters</span><span class="p">(</span>
@@ -317,10 +307,12 @@
         <span class="n">controller</span> <span class="o">=</span> <span class="n">ReverseIpTagMultiCastSource</span><span class="p">(</span>
             <span class="n">n_keys</span><span class="o">=</span><span class="n">vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">control_label</span><span class="p">,</span>
             <span class="n">receive_port</span><span class="o">=</span><span class="n">receive_port</span><span class="p">,</span>
-            <span class="n">reserve_reverse_ip_tag</span><span class="o">=</span><span class="n">reserve_reverse_ip_tag</span><span class="p">)</span>
+            <span class="n">reserve_reverse_ip_tag</span><span class="o">=</span><span class="n">reserve_reverse_ip_tag</span><span class="p">,</span>
+            <span class="n">injection_partition_id</span><span class="o">=</span><span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
         <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_application_vertex</span><span class="p">(</span><span class="n">controller</span><span class="p">)</span>
-        <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+        <span class="n">edge</span> <span class="o">=</span> <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
             <span class="n">controller</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">LIVE_POISSON_CONTROL_PARTITION_ID</span><span class="p">)</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">set_live_poisson_control_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">notify</span><span class="p">:</span>
             <span class="n">SpynnakerExternalDevicePluginManager</span><span class="o">.</span><span class="n">add_database_socket_address</span><span class="p">(</span>
                 <span class="n">database_notify_host</span><span class="p">,</span> <span class="n">database_notify_port_num</span><span class="p">,</span>
@@ -340,7 +332,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_spinnaker</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
         <span class="n">edge</span> <span class="o">=</span> <span class="n">ApplicationEdge</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">device_vertex</span><span class="p">)</span>
-        <span class="n">_spinnaker</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span></div>
+        <span class="n">_spinnaker</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">edge</span></div>
 
 <div class="viewcode-block" id="SpynnakerExternalDevicePluginManager.add_application_vertex"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.add_application_vertex">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">add_application_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>

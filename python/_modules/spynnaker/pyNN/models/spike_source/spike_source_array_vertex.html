@@ -60,8 +60,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged</span> <span class="kn">import</span> <span class="n">RangedListOfList</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">ReverseIpTagMultiCastSource</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_simulator</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
@@ -89,8 +87,7 @@
 
 <span class="k">class</span> <span class="nc">SpikeSourceArrayVertex</span><span class="p">(</span>
         <span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
-        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">AbstractChangableAfterRun</span><span class="p">,</span>
-        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
+        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">AbstractChangableAfterRun</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Model for play back of spikes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

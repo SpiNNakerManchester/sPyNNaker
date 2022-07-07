@@ -123,7 +123,7 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)),</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">key</span></div>
 
     <span class="nd">@property</span>

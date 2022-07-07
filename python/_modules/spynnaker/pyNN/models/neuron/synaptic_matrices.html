@@ -65,7 +65,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.master_pop_table</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MasterPopTableAsBinarySearch</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
-<span class="c1"># from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">.key_space_tracker</span> <span class="kn">import</span> <span class="n">KeySpaceTracker</span>
 <span class="kn">from</span> <span class="nn">.synaptic_matrix_app</span> <span class="kn">import</span> <span class="n">SynapticMatrixApp</span>
 
@@ -252,8 +252,6 @@
 <span class="sd">        :param list(float) weight_scales: The weight scale of each synapse</span>
 <span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
 <span class="sd">            The routing information for all edges</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:</span>
-<span class="sd">            The machine graph</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there are no synapses, there is nothing to do!</span>
         <span class="k">if</span> <span class="n">all_syn_block_sz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -272,8 +270,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">initialise_table</span><span class="p">()</span>
 
         <span class="c1"># Convert the data for convenience</span>
-        <span class="n">in_edges_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__in_edges_by_app_edge</span><span class="p">(</span>
-            <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">)</span>
+        <span class="n">incoming_by_app_edge</span><span class="p">,</span> <span class="n">delayed_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_by_app_edge</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">)</span>
 
         <span class="c1"># Set up for single synapses</span>
         <span class="c1"># The list is seeded with an empty array so we can just concatenate</span>
@@ -287,21 +285,26 @@
         <span class="c1"># Store a list of synapse info to be generated on the machine</span>
         <span class="n">generate_on_machine</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="c1"># For each machine edge in the vertex, create a synaptic list</span>
-        <span class="k">for</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">m_edges</span> <span class="ow">in</span> <span class="n">in_edges_by_app_edge</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># For each incoming machine vertex, create a synaptic list</span>
+        <span class="k">for</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">m_vertices</span> <span class="ow">in</span> <span class="n">incoming_by_app_edge</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">delayed_m_vertices</span> <span class="o">=</span> <span class="n">delayed_by_app_edge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="p">[])</span>
 
             <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Writing matrix for edge:</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
             <span class="n">app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_and_mask</span><span class="p">(</span>
-                <span class="n">m_edges</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
+                <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
             <span class="n">d_app_key_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_and_mask</span><span class="p">(</span>
-                <span class="n">m_edges</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
+                <span class="n">delayed_m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
                 <span class="n">app_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+                <span class="n">delay_pre_vertex</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">delay_pre_vertex</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
                 <span class="n">app_matrix</span><span class="o">.</span><span class="n">set_info</span><span class="p">(</span>
                     <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">app_key_info</span><span class="p">,</span> <span class="n">d_app_key_info</span><span class="p">,</span>
-                    <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">m_edges</span><span class="p">)</span>
+                    <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span>
+                    <span class="n">delay_pre_vertex</span><span class="p">)</span>
 
                 <span class="c1"># If we can generate the connector on the machine, do so</span>
                 <span class="k">if</span> <span class="n">app_matrix</span><span class="o">.</span><span class="n">can_generate_on_machine</span><span class="p">(</span><span class="n">single_addr</span><span class="p">):</span>
@@ -398,16 +401,17 @@
             <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">gen_data</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">__in_edges_by_app_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__incoming_by_app_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Convert a list of incoming projections to a dict of</span>
-<span class="sd">            application edge -&gt; list of machine edges, and a key tracker</span>
+<span class="sd">            application edge -&gt; list of pre vertices, and a key tracker</span>
 
 <span class="sd">        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
 <span class="sd">            The incoming projections</span>
 <span class="sd">        :param RoutingInfo routing_info: Routing information for all edges</span>
 <span class="sd">        :rtype: tuple(dict, KeySpaceTracker)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">in_edges_by_app_edge</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">OrderedSet</span><span class="p">)</span>
+        <span class="n">incoming_by_app_edge</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">OrderedSet</span><span class="p">)</span>
+        <span class="n">delayed_by_app_edge</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="n">OrderedSet</span><span class="p">)</span>
         <span class="n">key_space_tracker</span> <span class="o">=</span> <span class="n">KeySpaceTracker</span><span class="p">()</span>
         <span class="n">pre_vertices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -416,46 +420,39 @@
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
 
             <span class="c1"># Skip if already done</span>
-            <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">in_edges_by_app_edge</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">incoming_by_app_edge</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="c1"># Add all incoming machine edges for this slice</span>
-            <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="o">==</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
-                        <span class="k">continue</span>
+            <span class="c1"># Add all incoming machine vertices</span>
+            <span class="n">out_verts</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+                <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">out_verts</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
+                    <span class="k">continue</span>
 
-                    <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
-                    <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span>
-                        <span class="n">machine_edge</span><span class="p">)</span>
-                    <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
+                <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
+                <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                    <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+                <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
 
-                    <span class="n">in_edges_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
+                <span class="n">incoming_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
 
-            <span class="c1"># Also go through the delay edges in case an undelayed edge</span>
-            <span class="c1"># was filtered</span>
+            <span class="c1"># Add all incoming delayed vertices</span>
             <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span>
             <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">delay_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
+                <span class="n">verts</span> <span class="o">=</span> <span class="n">delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+                    <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
+                        <span class="k">continue</span>
 
-                    <span class="k">if</span> <span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="o">==</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">:</span>
-                            <span class="k">continue</span>
+                    <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
+                    <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                        <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+                    <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
+                    <span class="n">delayed_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
 
-                        <span class="n">pre_vertices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
-                        <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span>
-                            <span class="n">machine_edge</span><span class="p">)</span>
-                        <span class="n">key_space_tracker</span><span class="o">.</span><span class="n">allocate_keys</span><span class="p">(</span><span class="n">rinfo</span><span class="p">)</span>
-                        <span class="n">undelayed_machine_edge</span> <span class="o">=</span> <span class="p">(</span>
-                            <span class="n">app_edge</span><span class="o">.</span><span class="n">get_machine_edge</span><span class="p">(</span>
-                                <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span>
-                                <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">))</span>
-                        <span class="n">in_edges_by_app_edge</span><span class="p">[</span><span class="n">app_edge</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-                            <span class="n">undelayed_machine_edge</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">in_edges_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span>
+        <span class="k">return</span> <span class="n">incoming_by_app_edge</span><span class="p">,</span> <span class="n">delayed_by_app_edge</span><span class="p">,</span> <span class="n">key_space_tracker</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__check_keys_adjacent</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">mask_size</span><span class="p">):</span>
@@ -569,13 +566,13 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">__app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_edges</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
                            <span class="n">key_space_tracker</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a key and mask for an incoming application vertex as a whole,\</span>
 <span class="sd">            or say it isn&#39;t possible (return None)</span>
 
-<span class="sd">        :param list(PopulationMachineEdge) m_edges:</span>
-<span class="sd">            The relevant machine edges of the application edge</span>
+<span class="sd">        :param list(MachineVertex) m_vertices:</span>
+<span class="sd">            The relevant incoming machine vertices</span>
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
 <span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
@@ -583,7 +580,7 @@
 <span class="sd">            A tracker pre-filled with the keys of all incoming edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If there are too many pre-cores, give up now</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_edges</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_core_mask</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_core_mask</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># Work out if the keys allow the machine vertices to be merged</span>
@@ -592,10 +589,10 @@
 
         <span class="c1"># Can be merged only if all the masks are the same</span>
         <span class="n">pre_slices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">m_edge</span> <span class="ow">in</span> <span class="n">m_edges</span><span class="p">:</span>
-            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span><span class="n">m_edge</span><span class="p">)</span>
-            <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">m_vertices</span><span class="p">:</span>
+            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
             <span class="c1"># No routing info at all? Must have been filtered, so doesn&#39;t work</span>
             <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -603,7 +600,7 @@
             <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -614,19 +611,27 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_app_key_and_mask</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">key_space_tracker</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__delay_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_edges</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__delay_app_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
                                  <span class="n">key_space_tracker</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a key and mask for a whole incoming delayed application\</span>
 <span class="sd">            vertex, or say it isn&#39;t possible (return None)</span>
 
-<span class="sd">        :param list(PopulationMachineEdge) m_edges:</span>
-<span class="sd">            The relevant machine edges of the application edge</span>
+<span class="sd">        :param list(MachineVertex) m_vertices:</span>
+<span class="sd">            The relevant incoming machine vertices from delays</span>
 <span class="sd">        :param PopulationApplicationEdge app_edge:</span>
 <span class="sd">            The application edge to get the key and mask of</span>
 <span class="sd">        :param RoutingInfo routing_info: The routing information of all edges</span>
 <span class="sd">        :param KeySpaceTracker key_space_tracker:</span>
 <span class="sd">            A tracker pre-filled with the keys of all incoming edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If there are no delay vertices, stop</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">m_vertices</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># If there are too many pre-cores, give up now</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m_vertices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="o">.</span><span class="n">max_core_mask</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
         <span class="c1"># Work out if the keys allow the machine vertices to be</span>
         <span class="c1"># merged</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
@@ -634,19 +639,10 @@
 
         <span class="c1"># Can be merged only if all the masks are the same</span>
         <span class="n">pre_slices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">m_edge</span> <span class="ow">in</span> <span class="n">m_edges</span><span class="p">:</span>
-            <span class="c1"># If the edge doesn&#39;t have a delay edge, give up</span>
-            <span class="n">delayed_app_edge</span> <span class="o">=</span> <span class="n">m_edge</span><span class="o">.</span><span class="n">app_edge</span><span class="o">.</span><span class="n">delay_edge</span>
-            <span class="k">if</span> <span class="n">delayed_app_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">delayed_machine_edge</span> <span class="o">=</span> <span class="n">delayed_app_edge</span><span class="o">.</span><span class="n">get_machine_edge</span><span class="p">(</span>
-                <span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">m_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">delayed_machine_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span>
-                <span class="n">delayed_machine_edge</span><span class="p">)</span>
-            <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">m_vertices</span><span class="p">:</span>
+            <span class="n">rinfo</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+                <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+            <span class="n">pre_slices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
             <span class="c1"># No routing info at all? Must have been filtered, so doesn&#39;t work</span>
             <span class="k">if</span> <span class="n">rinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
@@ -654,7 +650,7 @@
             <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span> <span class="o">!=</span> <span class="n">mask</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">rinfo</span><span class="o">.</span><span class="n">first_mask</span>
-            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">rinfo</span><span class="o">.</span><span class="n">first_key</span><span class="p">,</span> <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_key_slices</span><span class="p">(</span>
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span>
@@ -709,18 +705,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gen_on_machine</span>
 
-<div class="viewcode-block" id="SynapticMatrices.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrices.get_index"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrices.SynapticMatrices.get_index">[docs]</a>    <span class="k">def</span> <span class="nf">get_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">m_vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the index of an incoming projection in the population table</span>
 
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The application edge of the projection</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The synapse information of the projection</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:</span>
-<span class="sd">            The machine edge to get the index of</span>
+<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:</span>
+<span class="sd">            The source machine vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">matrix</span><span class="o">.</span><span class="n">get_index</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">_AppKeyInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

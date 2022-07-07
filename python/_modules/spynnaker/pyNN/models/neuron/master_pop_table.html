@@ -403,7 +403,7 @@
             <span class="k">if</span> <span class="n">in_edge</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen_edges</span><span class="p">:</span>
                 <span class="n">seen_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
                 <span class="n">vertex</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
-                <span class="n">n_cores</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">n_cores</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span>
 
                 <span class="c1"># If there are also delays, double it</span>
                 <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">:</span>

@@ -56,13 +56,9 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BITS_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">DelayExtensionException</span>
@@ -76,8 +72,7 @@
 
 
 <span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
-        <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">,</span>
-        <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">):</span>
+        <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractHasDelayStages</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
 <span class="sd">        of a neuron (typically 16 or 32)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -88,7 +83,8 @@
         <span class="s2">&quot;__n_delay_stages&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__source_vertex&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_generator_data&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__outgoing_edges&quot;</span><span class="p">]</span>
 
     <span class="c1"># this maps to what master assumes</span>
     <span class="n">MAX_SLOTS</span> <span class="o">=</span> <span class="mi">8</span>
@@ -131,6 +127,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__drop_late_spikes</span> <span class="o">=</span> <span class="n">get_config_bool</span><span class="p">(</span>
             <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;drop_late_spikes&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -231,11 +229,6 @@
                 <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
                 <span class="n">synapse_information</span><span class="p">,</span> <span class="n">max_stage</span><span class="p">,</span> <span class="n">max_delay_per_stage</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DelayExtensionVertex.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_outgoing_partition_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
-               <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">ContiguousKeyRangeContraint</span><span class="p">()]</span></div>
-
 <div class="viewcode-block" id="DelayExtensionVertex.gen_on_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.gen_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">gen_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if the given slice needs to be generated on the machine</span>
 
@@ -260,7 +253,22 @@
 
 <div class="viewcode-block" id="DelayExtensionVertex.get_n_cores"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_cores">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">get_n_cores</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="DelayExtensionVertex.add_outgoing_edge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an outgoing edge to the delay extension</span>
+
+<span class="sd">        :param DelayedApplicationEdge delay_edge: The edge to add</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outgoing_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the outgoing edges from this vertex</span>
+
+<span class="sd">        :rtype: list(DelayApplicationEdge)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_edges</span>
 </pre></div>
 
             <div class="clearer"></div>
