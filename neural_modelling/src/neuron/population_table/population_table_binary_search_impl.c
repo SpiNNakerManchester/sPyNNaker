@@ -65,8 +65,6 @@ uint32_t failed_bit_field_reads = 0;
 //!     they don't hit anything
 uint32_t bit_field_filtered_packets = 0;
 
-
-
 //! \brief Prints the master pop table.
 //! \details For debugging
 static inline void print_master_population_table(void) {

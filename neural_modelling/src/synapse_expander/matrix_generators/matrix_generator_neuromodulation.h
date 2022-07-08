@@ -147,7 +147,8 @@ static bool matrix_generator_neuromodulation_write_synapse(void *generator,
     uint32_t pos = fixed_row->fixed_plastic_size;
     if (pos >= conf->max_row_n_synapses) {
         log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, conf->synaptic_matrix, pos, conf->max_row_n_synapses);
+                pre_index, plastic_row, fixed_row, conf->synaptic_matrix, pos,
+				conf->max_row_n_synapses);
         return false;
     }
     fixed_row->fixed_plastic_size = pos + 1;

@@ -235,8 +235,10 @@ static bool matrix_generator_static_write_synapse(void *generator,
                 pre_index, delay, delay_and_stage.delay, delay_and_stage.stage, row);
         pos = row->fixed_fixed_size;
         if (pos >= data->max_delayed_row_n_words) {
-            log_warning("Row %u, stage %u at 0x%08x of delayed matrix 0x%08x is already full (%u of %u)",
-                    pre_index, delay_and_stage.stage, row, data->delayed_synaptic_matrix, pos, data->max_delayed_row_n_words);
+            log_warning("Row %u, stage %u at 0x%08x of delayed matrix 0x%08x"
+            		"is already full (%u of %u)",
+                    pre_index, delay_and_stage.stage, row,
+					data->delayed_synaptic_matrix, pos, data->max_delayed_row_n_words);
             return false;
         }
     }

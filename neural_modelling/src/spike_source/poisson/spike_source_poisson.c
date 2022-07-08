@@ -983,8 +983,6 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 }
 
-
-
 //! \brief Multicast callback used to set rate when injected in a live example
 //! \param[in] key: Received multicast key
 //! \param[in] payload: Received multicast payload

@@ -296,7 +296,8 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
         pos = fixed_row->fixed_plastic_size;
         if (pos >= data->max_row_n_synapses) {
             log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_row_n_synapses);
+                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos,
+				data->max_row_n_synapses);
             return false;
         }
     } else {
@@ -309,7 +310,8 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
         pos = fixed_row->fixed_plastic_size;
         if (pos >= data->max_delayed_row_n_synapses) {
             log_warning("Row %u at 0x%08x, 0x%08x of matrix 0x%08x is already full (%u of %u)",
-                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos, data->max_delayed_row_n_synapses);
+                pre_index, plastic_row, fixed_row, data->synaptic_matrix, pos,
+				data->max_delayed_row_n_synapses);
             return false;
         }
     }
@@ -322,4 +324,3 @@ static bool matrix_generator_stdp_write_synapse(void *generator,
     plastic_row->plastic_plastic_data[plastic_pos] = weight;
     return true;
 }
-
