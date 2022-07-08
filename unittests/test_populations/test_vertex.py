@@ -19,7 +19,6 @@ from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
 from spynnaker.pyNN.models.defaults import default_initial_values, defaults
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -27,7 +26,7 @@ from spynnaker.pyNN.models.neuron.implementations import (
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def __init__(self):
-        super().__init__([])
+        super().__init__([], [])
 
     def get_n_cpu_cycles(self, n_neurons):
         return 0
@@ -62,7 +61,7 @@ class EmptySynapseType(AbstractSynapseType, EmptyNeuronComponent):
         return None
 
 
-class _MyNeuronModel(AbstractNeuronModel):
+class _MyNeuronModel(AbstractStandardNeuronComponent):
     def __init__(self, foo, bar):
         super().__init__([], [])
         self._foo = foo
@@ -112,7 +111,7 @@ class MockNeuron(AbstractPopulationVertex):
             max_atoms_per_core=None, spikes_per_second=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             neuron_impl=foo_bar.model, pynn_model=foo_bar,
-            drop_late_spikes=True, splitter=None)
+            drop_late_spikes=True, splitter=None, seed=None)
 
 
 def test_initializable():
