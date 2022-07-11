@@ -19,11 +19,11 @@ MODELS = IF_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
          IF_curr_delta \
-         IF_curr_exp_ca2_adaptive \
-	     IF_curr_alpha
+         IF_curr_exp_ca2_adaptive
 
 ifneq ($(SPYNNAKER_DEBUG), DEBUG)
     MODELS += external_device_lif_control \
+              IF_curr_alpha \
               IF_cond_exp_stoc \
               IF_curr_exp_sEMD \
               IF_curr_exp_stdp_mad_pair_additive \
