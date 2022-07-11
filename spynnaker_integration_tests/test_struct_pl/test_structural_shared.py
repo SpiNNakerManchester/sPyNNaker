@@ -99,7 +99,7 @@ def structural_shared():
     print(conns_4)
 
     w_final_1 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, spikes_3[0], w_init_stdp, delay_init_stdp, w_max,
+        pre_spikes, spikes_3[0], w_init_stdp, delay_init_stdp,
         A_plus, A_minus, tau_plus, tau_minus)
 
     assert(len(conns) == 1)
