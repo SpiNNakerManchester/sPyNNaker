@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from .connection_holder_finisher import finish_connection_holders
-from .graph_edge_weight_updater import GraphEdgeWeightUpdater
 from .on_chip_bit_field_generator import on_chip_bitfield_generator
 from .redundant_packet_count_report import redundant_packet_count_report
 from .spynnaker_connection_holder_generations import (
@@ -32,7 +31,6 @@ from .delay_support_adder import delay_support_adder
 __all__ = [
     "delay_support_adder",
     "finish_connection_holders",
-    "GraphEdgeWeightUpdater",
     "on_chip_bitfield_generator",
     "redundant_packet_count_report",
     "SpYNNakerConnectionHolderGenerator",

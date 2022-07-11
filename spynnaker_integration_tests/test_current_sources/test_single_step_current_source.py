@@ -15,7 +15,6 @@
 
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
-import random
 from spynnaker.pyNN.utilities import neo_convertor
 
 
@@ -36,7 +35,7 @@ class TestSingleStepCurrentSource(BaseTestCase):
         n_steps = 10
         for n_step in range(n_steps):
             times.append(50.0 + (10 * n_step))
-            amplitudes.append(random.random())
+            amplitudes.append(0.2 + (0.05 * n_step))
 
         # Test a single source injected into all neurons
         # Note the amplitudes are not large enough to cause spikes

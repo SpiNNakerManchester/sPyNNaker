@@ -158,10 +158,10 @@ class MockSplitter(object):
         self.slices = slices
 
     def get_out_going_slices(self):
-        return (self.slices, True)
+        return self.slices
 
     def get_in_coming_slices(self):
-        return (self.slices, True)
+        return self.slices
 
 
 class MockAppVertex(object):
@@ -179,20 +179,26 @@ class MockMachineVertex(object):
 
 def test_could_connect():
     unittest_setup()
-    connector = FromListConnector(
-        [[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8], [4, 1], [5, 0],
-         [6, 2], [4, 8]])
+    pairs = numpy.array([[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8],
+                         [4, 1], [5, 0], [6, 2], [4, 8]])
+    connector = FromListConnector(pairs)
     pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
     post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     for pre_slice in pre_slices:
         pre_vertex = MockMachineVertex(pre_slice, pre_slices)
         for post_slice in post_slices:
             post_vertex = MockMachineVertex(post_slice, post_slices)
-            count = connector.get_n_connections(
-                pre_slices, post_slices, pre_slice.hi_atom,
-                post_slice.hi_atom)
+            count = __get_n_connections(pairs, pre_slice, post_slice)
             if count:
                 assert(connector.could_connect(None, pre_vertex, post_vertex))
             else:
                 assert(not connector.could_connect(
                     None, pre_vertex, post_vertex))
+
+
+def __get_n_connections(pairs, pre_slice, post_slice):
+    conns = pairs[(pairs[:, 0] >= pre_slice.lo_atom) &
+                  (pairs[:, 0] <= pre_slice.hi_atom)]
+    conns = conns[(conns[:, 1] >= post_slice.lo_atom) &
+                  (conns[:, 1] <= post_slice.hi_atom)]
+    return len(conns)
