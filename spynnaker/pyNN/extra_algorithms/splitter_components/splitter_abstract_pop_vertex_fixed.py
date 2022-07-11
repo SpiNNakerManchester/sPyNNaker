@@ -83,7 +83,7 @@ class SplitterAbstractPopulationVertexFixed(
         projections = app_vertex.incoming_projections
         constraints = get_remaining_constraints(app_vertex)
         min_weights = app_vertex.get_min_weights(projections)
-        weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
+        weight_scales = app_vertex.get_weight_scales(min_weights)
         all_syn_block_sz = app_vertex.get_synapses_size(
             max_atoms_per_core, projections)
         structural_sz = app_vertex.get_structural_dynamics_size(
