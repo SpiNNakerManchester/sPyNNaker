@@ -339,10 +339,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         return numpy.clip(self._kernel_h * self._kernel_w, 0,
-                          post_vertex_slice.n_atoms)
+                          n_post_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):

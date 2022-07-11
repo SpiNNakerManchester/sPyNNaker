@@ -24,7 +24,6 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     __slots__ = [
         "__synapse_information",
-        "__machine_edges_by_slices",
         "__undelayed_edge"]
 
     def __init__(
@@ -51,9 +50,6 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
             self.__synapse_information = [synapse_information]
         self.__undelayed_edge = undelayed_edge
 
-        # Keep the machine edges by pre- and post-slice
-        self.__machine_edges_by_slices = dict()
-
     @property
     def synapse_information(self):
         """
@@ -74,25 +70,6 @@ class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
         :rtype: ProjectionApplicationEdge
         """
         return self.__undelayed_edge
-
-    @overrides(ApplicationEdge.remember_associated_machine_edge)
-    def remember_associated_machine_edge(self, machine_edge):
-        super().remember_associated_machine_edge(machine_edge)
-        self.__machine_edges_by_slices[
-            machine_edge.pre_vertex.vertex_slice,
-            machine_edge.post_vertex.vertex_slice] = machine_edge
-
-    def get_machine_edge(self, pre_vertex, post_vertex):
-        """ Get a specific machine edge from this edge
-
-        :param DelayExtensionMachineVertex pre_vertex:
-            The vertex at the start of the machine edge
-        :param PopulationMachineVertex post_vertex:
-            The vertex at the end of the machine edge
-        :rtype: ~pacman.model.graphs.machine.MachineEdge or None
-        """
-        return self.__machine_edges_by_slices.get(
-            (pre_vertex.vertex_slice, post_vertex.vertex_slice), None)
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, src_machine_vertex, dest_machine_vertex):
