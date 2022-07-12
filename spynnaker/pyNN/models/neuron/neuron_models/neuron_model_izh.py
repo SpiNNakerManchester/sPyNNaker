@@ -107,7 +107,7 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
     @overrides(AbstractStandardNeuronComponent.get_precomputed_values)
     def get_precomputed_values(self, parameters, state_variables, ts):
         ts_ms = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
-        return {THIS_H: [ts_ms], TS: [ts_ms]}
+        return {THIS_H: ts_ms, TS: ts_ms}
 
     @property
     def a(self):
