@@ -265,13 +265,11 @@ class SynapticMatrices(object):
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The spec to write to
-        :param list(~spynnaker8.models.Projection) incoming_projection:
-            The projections to generate data for
-        :param int all_syn_block_sz:
-            The size in bytes of the space reserved for synapses
-        :param list(float) weight_scales: The weight scale of each synapse
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of the post-vertex the matrix is for
+        :param SynapseRegions references:
+            Regions which are referenced; each region which is not referenced
+            can be None.
         """
 
         # Reserve the region
