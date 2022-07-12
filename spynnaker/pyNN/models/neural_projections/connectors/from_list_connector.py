@@ -87,6 +87,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.max(synapse_info.delays)
             return self._get_delay_maximum(
                 synapse_info.delays, len(self.__targets), synapse_info)
         else:
@@ -95,6 +97,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_minimum)
     def get_delay_minimum(self, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.min(synapse_info.delays)
             return self._get_delay_minimum(
                 synapse_info.delays, len(self.__targets), synapse_info)
         else:
@@ -103,6 +107,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays, synapse_info):
         if self.__delays is None:
+            if hasattr(synapse_info.delays, "__len__"):
+                return numpy.var(synapse_info.delays)
             return AbstractConnector.get_delay_variance(
                 self, delays, synapse_info)
         else:
@@ -162,10 +168,15 @@ class FromListConnector(AbstractConnector):
             max_delay=None):
 
         mask = None
+        delays_handled = False
         if (min_delay is not None and max_delay is not None and
-                self.__delays is not None):
-            mask = ((self.__delays >= min_delay) &
-                    (self.__delays <= max_delay))
+                (self.__delays is not None or
+                 hasattr(synapse_info.delays, "__len__"))):
+            delays = self.__delays
+            if delays is None:
+                delays = synapse_info.delays
+            mask = ((delays >= min_delay) & (delays <= max_delay))
+            delays_handled = True
         if mask is None:
             conns = self.__conn_list.copy()
         else:
@@ -188,7 +199,7 @@ class FromListConnector(AbstractConnector):
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
-        if min_delay is None or max_delay is None or self.__delays is not None:
+        if min_delay is None or max_delay is None or delays_handled:
             return max_targets
 
         # If here, there must be no delays in the list, so use the passed in
@@ -221,6 +232,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights, synapse_info):
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.mean(synapse_info.weights)
             return AbstractConnector.get_weight_mean(
                 self, weights, synapse_info)
         else:
@@ -230,6 +243,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.amax(synapse_info.weights)
             return self._get_weight_maximum(
                 synapse_info.weights, len(self.__targets), synapse_info)
         else:
@@ -239,6 +254,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(self, weights, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
+            if hasattr(synapse_info.weights, "__len__"):
+                return numpy.var(synapse_info.weights)
             return AbstractConnector.get_weight_variance(
                 self, weights, synapse_info)
         else:
