@@ -229,10 +229,10 @@ class SynapticMatrixApp(object):
         row_data, delay_row_data = self.__get_row_data(post_vertex_slice)
         self.__update_connection_holders(
             row_data, delay_row_data, post_vertex_slice)
-        if self.__syn_mat_offset:
+        if self.__syn_mat_offset is not None:
             spec.set_write_pointer(self.__syn_mat_offset)
             spec.write_array(row_data)
-        if self.__delay_syn_mat_offset:
+        if self.__delay_syn_mat_offset is not None:
             spec.set_write_pointer(self.__delay_syn_mat_offset)
             spec.write_array(delay_row_data)
 
@@ -289,8 +289,8 @@ class SynapticMatrixApp(object):
                 read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
-                    self.__app_edge.pre_vertex.n_atoms,
-                    post_vertex_slice, post_vertex_max_delay_ticks,
+                    post_vertex_slice, self.__app_edge.pre_vertex.n_atoms,
+                    post_vertex_max_delay_ticks,
                     self.__max_row_info, self.__max_atoms_per_core))
 
     def get_generator_data(self):
