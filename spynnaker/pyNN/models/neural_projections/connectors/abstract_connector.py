@@ -169,8 +169,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
             return numpy.max(_expr_context.eval(delays, d=d))
         elif numpy.isscalar(delays):
             return delays
-        raise SpynnakerException("Unrecognised delay format: {:s}".format(
-            type(delays)))
+        raise SpynnakerException(f"Unrecognised delay format: {type(delays)}")
 
     @abstractmethod
     def get_delay_maximum(self, synapse_info):
