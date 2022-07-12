@@ -81,7 +81,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         """
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_first_key_from_pre_vertex(
-            list(self.machine_vertices)[0], SPIKE_PARTITION_ID)
+            next(iter(self.machine_vertices)), SPIKE_PARTITION_ID)
         return key
 
     @property

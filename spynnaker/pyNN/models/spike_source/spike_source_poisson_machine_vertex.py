@@ -26,13 +26,12 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveBuffersToHost)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
@@ -44,12 +43,12 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractMaxSpikes, AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID)
 
 
 def _flatten(alist):
@@ -103,7 +102,7 @@ _FOUR_WORDS = struct.Struct("<4I")
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
         SendsSynapticInputsOverSDRAM):
@@ -211,17 +210,6 @@ class SpikeSourcePoissonMachineVertex(
         return locate_memory_region_for_placement(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value)
-
-    @property
-    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
-    def is_in_injection_mode(self):
-        graph = SpynnakerDataView.get_runtime_machine_graph()
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            self, LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Poisson source can only have one incoming control")
-        return len(in_edges) == 1
 
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, placement):
@@ -493,20 +481,13 @@ class SpikeSourcePoissonMachineVertex(
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
-        graph = SpynnakerDataView.get_runtime_machine_graph()
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Only one control edge can end at a Poisson vertex")
         incoming_mask = 0
-        if len(in_edges) == 1:
-            in_edge = in_edges[0]
-
-            # Get the mask of the incoming keys
-            incoming_mask = \
-                routing_info.get_routing_info_for_edge(in_edge).first_mask
-            incoming_mask = ~incoming_mask & 0xFFFFFFFF
+        if self._app_vertex.incoming_control_edge is not None:
+            routing_info = SpynnakerDataView.get_routing_infos()
+            r_info = routing_info.get_routing_info_from_pre_vertex(
+                self._app_vertex.incoming_control_edge.pre_vertex,
+                LIVE_POISSON_CONTROL_PARTITION_ID)
+            incoming_mask = ~r_info.first_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)

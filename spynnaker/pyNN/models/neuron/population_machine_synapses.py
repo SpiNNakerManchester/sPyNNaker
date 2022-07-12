@@ -123,16 +123,12 @@ class PopulationMachineSynapses(
             self._synapse_references.pop_table,
             self._synapse_references.connection_builder)
 
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
+
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+           bit_field_base_address)
     def bit_field_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               key_to_atom_map_region_base_address)
-    def key_to_atom_map_region_base_address(self, transceiver, placement):
-        return locate_memory_region_for_placement(
-            placement=placement, region=self._synapse_regions.bitfield_key_map)
 
     @overrides(AbstractSupportsBitFieldGeneration.bit_field_builder_region)
     def bit_field_builder_region(self, placement):
@@ -177,7 +173,7 @@ class PopulationMachineSynapses(
         # Write any synapse dynamics
         synapse_dynamics = self._app_vertex.synapse_dynamics
         synapse_dynamics_sz = self._app_vertex.get_synapse_dynamics_size(
-            self._vertex_slice)
+            self._vertex_slice.n_atoms)
         if synapse_dynamics_sz > 0:
             spec.reserve_memory_region(
                 region=self._synapse_regions.synapse_dynamics,

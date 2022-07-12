@@ -21,7 +21,6 @@ import numpy
 import pytest
 
 from spinn_machine import SDRAM
-from spinn_machine.virtual_machine import virtual_machine
 from spinn_utilities.overrides import overrides
 from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
@@ -32,8 +31,6 @@ from pacman.operations.routing_info_allocator_algorithms import (
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spinn_front_end_common.interface.interface_functions import (
-    edge_to_n_keys_mapper)
 from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -53,7 +50,7 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
-    SplitterAbstractPopulationVertexSlice, spynnaker_splitter_partitioner)
+    SplitterAbstractPopulationVertexFixed, spynnaker_splitter_partitioner)
 from spynnaker.pyNN.extra_algorithms import delay_support_adder
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -87,21 +84,21 @@ def say_false(self, weights, delays):
 def test_write_data_spec():
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
+    SDRAM()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
 
     p.setup(1.0)
     load_config()
-    writer.set_machine(virtual_machine(2, 2))
     p.set_number_of_neurons_per_core(p.IF_curr_exp, 100)
     pre_pop = p.Population(
         10, p.IF_curr_exp(), label="Pre",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     post_pop = p.Population(
         10, p.IF_curr_exp(), label="Post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     proj_one_to_one_1 = p.Projection(
         pre_pop, post_pop, p.OneToOneConnector(),
         p.StaticSynapse(weight=1.5, delay=1.0))
@@ -119,13 +116,11 @@ def test_write_data_spec():
 
     writer.start_run()
     writer.clone_graphs()
-    delay_support_adder()
     writer.set_plan_n_timesteps(100)
-    machine_graph, _ = spynnaker_splitter_partitioner()
+    delay_support_adder()
+    spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_runtime_machine_graph(machine_graph)
-    writer.set_machine_partition_n_keys_map(edge_to_n_keys_mapper())
-    writer.set_routing_infos(allocator.__call__(flexible=False))
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -154,6 +149,7 @@ def test_write_data_spec():
         region = executor.get_region(r)
         if region is not None:
             all_data.extend(region.region_data)
+
     writer.set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
     try:
@@ -396,10 +392,10 @@ def test_set_synapse_dynamics():
         ([], range(10), 1000, 100, True, 20),
         # All undelayed and delayed edges exist
         (range(10), range(10), 1000, 100, True, 20),
-        # Only undelayed, some edges are filtered (app keys shouldn't work)
-        ([0, 1, 2, 3, 4], [], 1000, 100, False, None),
-        # Only delayed, some edges are filtered (app keys shouldn't work)
-        ([], [5, 6, 7, 8, 9], 1000, 100, False, 20),
+        # Only undelayed, some connections missing but app keys can still work
+        ([0, 1, 2, 3, 4], [], 1000, 100, True, None),
+        # Only delayed, some connections missing but app keys can still work
+        ([], [5, 6, 7, 8, 9], 1000, 100, True, 20),
         # Both delayed and undelayed, some undelayed edges don't exist
         # (app keys work because undelayed aren't filtered)
         ([3, 4, 5, 6, 7], range(10), 1000, 100, True, 20),
@@ -418,6 +414,7 @@ def test_pop_based_master_pop_table_standard(
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
     writer = SpynnakerDataWriter.mock()
+    SDRAM()
 
     # Build a from list connector with the delays we want
     connections = []
@@ -432,29 +429,26 @@ def test_pop_based_master_pop_table_standard(
     # split into 10 vertices (100 each) and the target has 100 atoms in
     # a single vertex
     p.setup(1.0)
-    machine = virtual_machine(12, 12)
-    writer.set_machine(machine)
     post_pop = p.Population(
         100, p.IF_curr_exp(), label="Post",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     p.IF_curr_exp.set_model_max_atoms_per_core(neurons_per_core)
     pre_pop = p.Population(
         n_pre_neurons, p.IF_curr_exp(), label="Pre",
         additional_parameters={
-            "splitter": SplitterAbstractPopulationVertexSlice()})
+            "splitter": SplitterAbstractPopulationVertexFixed()})
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
     writer.start_run()
     writer.clone_graphs()
-    delay_support_adder()
     writer.set_plan_n_timesteps(100)
-    machine_graph, _ = spynnaker_splitter_partitioner()
+    delay_support_adder()
+    spynnaker_splitter_partitioner()
     allocator = ZonedRoutingInfoAllocator()
-    writer.set_runtime_machine_graph(machine_graph)
-    writer.set_machine_partition_n_keys_map(edge_to_n_keys_mapper())
-    writer.set_routing_infos(allocator.__call__(flexible=False))
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
+
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
 

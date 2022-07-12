@@ -256,19 +256,11 @@ class ConnectorsTest(BaseTestCase):
                               label="test")
         sim.run(1)
         weights = conn.get(['weight', 'delay'], 'list')
-        # As outside of run we have to use hack
-        machine_graph = SpynnakerDataView()._PacmanDataView__pacman_data. \
-            _runtime_machine_graph
-        projection_edges = [edge for edge in machine_graph.edges if (
-            edge.label == 'machine_edge_for_test')]
         sim.end()
         # Check the connections are correct
         target = [[6, 9, 0.5, 2.], [7, 10, 0.5, 2.], [8, 11, 0.5, 2.],
                   [9, 12, 0.5, 2.], [10, 13, 0.5, 2.], [11, 14, 0.5, 2.]]
         self.assertCountEqual(weights, target)
-        # In this instance there should be three MachineEdges: one of the four
-        # possible at the start should have been filtered out
-        self.assertEqual(len(projection_edges), 3)
 
     def fixedprob_population_views(self):
         sim.setup(timestep=1.0)

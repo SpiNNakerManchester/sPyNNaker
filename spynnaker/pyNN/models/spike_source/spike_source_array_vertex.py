@@ -20,8 +20,6 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
@@ -48,8 +46,7 @@ def _send_buffer_times(spike_times, time_step):
 
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun,
-        ProvidesKeyToAtomMappingImpl):
+        SimplePopulationSettable, AbstractChangableAfterRun):
     """ Model for play back of spikes
     """
 

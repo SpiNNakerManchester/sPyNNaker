@@ -21,9 +21,9 @@ from spinn_front_end_common.interface.splitter_selectors import (
     vertex_selector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
-from .splitter_abstract_pop_vertex_slice import (
-    SplitterAbstractPopulationVertexSlice)
-from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from .splitter_abstract_pop_vertex_fixed import (
+    SplitterAbstractPopulationVertexFixed)
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -38,9 +38,9 @@ PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 def spynnaker_splitter_selector():
     """ Add a splitter to every vertex that doesn't already have one.
 
-        default for APV is the SplitterAbstractPopulationVertexSlice\
+        default for APV is the SplitterAbstractPopulationVertexFixed\
         default for external device splitters are SplitterOneToOneLegacy\
-        default for the rest is the SpynnakerSplitterSliceLegacy.
+        default for the rest is the SpynnakerSplitterFixedLegacy.
 
     :raises PacmanConfigurationException: If a bad configuration is set
     """
@@ -65,14 +65,13 @@ def spynakker_vertex_selector(app_vertex):
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):
-            app_vertex.splitter = \
-                SplitterAbstractPopulationVertexSlice()
+            app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             app_vertex.splitter = SplitterOneToOneLegacy()
         elif isinstance(app_vertex, ApplicationFPGAVertex):
             app_vertex.splitter = SplitterOneToOneLegacy()
         elif isinstance(app_vertex, SpikeSourceArrayVertex):
-            app_vertex.splitter = SpynnakerSplitterSliceLegacy()
+            app_vertex.splitter = SpynnakerSplitterFixedLegacy()
         elif isinstance(app_vertex, SpikeSourcePoissonVertex):
             app_vertex.splitter = SplitterPoissonDelegate()
         else:  # go to basic selector. it might know what to do

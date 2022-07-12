@@ -26,6 +26,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0
@@ -230,13 +231,11 @@ class SynapseDynamicsStructuralCommon(
             index += 1
             dynamics = synapse_info.synapse_dynamics
 
-            machine_edges = list()
-            for machine_edge in app_edge.machine_edges:
-                if machine_edge.post_vertex.vertex_slice == post_vertex_slice:
-                    machine_edges.append(machine_edge)
+            # Number of incoming vertices
+            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            spec.write_value(len(out_verts), data_type=DataType.UINT16)
 
-            # Number of machine edges
-            spec.write_value(len(machine_edges), data_type=DataType.UINT16)
             # Controls - currently just if this is a self connection or not
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
@@ -260,15 +259,16 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for machine_edge in machine_edges:
-                r_info = routing_info.get_routing_info_for_edge(machine_edge)
-                vertex_slice = machine_edge.pre_vertex.vertex_slice
+            for m_vertex in out_verts:
+                r_info = routing_info.get_routing_info_from_pre_vertex(
+                    m_vertex, SPIKE_PARTITION_ID)
+                vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
-                    app_edge, synapse_info, machine_edge))
+                    app_edge, synapse_info, m_vertex))
         return pop_index
 
     def __write_post_to_pre_table(
@@ -289,23 +289,22 @@ class SynapseDynamicsStructuralCommon(
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
-            [conn for (conn, _, _, _) in slice_conns])
+            [conn for (conn, _, _, _, _) in slice_conns])
         # Make a single large array of population index
-        conn_lens = [len(conn) for (conn, _, _, _) in slice_conns]
-        for (_, a_edge, _, s_info) in slice_conns:
+        conn_lens = [len(conn) for (conn, _, _, _, _) in slice_conns]
+        for (_, a_edge, _, _, s_info) in slice_conns:
             if (a_edge.pre_vertex, s_info) not in pop_index:
                 print("Help!")
         pop_indices = numpy.repeat(
             [pop_index[a_edge.pre_vertex, s_info]
-             for (_, a_edge, _, s_info) in slice_conns], conn_lens)
+             for (_, a_edge, _, _, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.repeat(
-            [m_edge.pre_vertex.index
-             for (_, _, m_edge, _) in slice_conns], conn_lens)
+            [pre_index for (_, _, pre_index, _, _) in slice_conns], conn_lens)
         # Get the low atom for each source and subtract
         lo_atoms = numpy.repeat(
-            [m_edge.pre_vertex.vertex_slice.lo_atom
-             for (_, _, m_edge, _) in slice_conns], conn_lens)
+            [pre_slice.lo_atom
+             for (_, _, _, pre_slice, _) in slice_conns], conn_lens)
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - vertex_slice.lo_atom
 
@@ -353,7 +352,7 @@ class SynapseDynamicsStructuralCommon(
             dynamics = proj._synapse_information.synapse_dynamics
             app_edge = proj._projection_edge
             n_sub_edges += len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()
             param_sizes += dynamics.elimination\

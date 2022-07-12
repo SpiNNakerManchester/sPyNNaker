@@ -175,16 +175,22 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
+
+        # If the chance of there being a connection in the slice is almost 0,
+        # there will probably be at least 1 connection somewhere
         prob_in_slice = min(
-            post_vertex_slice.n_atoms / float(synapse_info.n_post_neurons),
+            n_post_atoms / float(synapse_info.n_post_neurons),
             1.0)
-        max_in_slice = utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, self.__num_synapses, prob_in_slice)
+        max_in_slice = max(utility_calls.get_probable_maximum_selected(
+            self.__num_synapses, self.__num_synapses, prob_in_slice), 1.0)
+
+        # Similarly if the chance of there being one in a row is 0, there will
+        # probably be 1
         prob_in_row = 1.0 / synapse_info.n_pre_neurons
-        n_connections = utility_calls.get_probable_maximum_selected(
-            self.__num_synapses, max_in_slice, prob_in_row)
+        n_connections = max(utility_calls.get_probable_maximum_selected(
+            self.__num_synapses, max_in_slice, prob_in_row), 1.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))

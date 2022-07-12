@@ -20,16 +20,13 @@ import scipy.stats
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
@@ -67,9 +64,8 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
+        LegacyPartitionerAPI):
     """ A Poisson Spike source object
     """
 
@@ -92,7 +88,8 @@ class SpikeSourcePoissonVertex(
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__outgoing_projections"]
+        "__outgoing_projections",
+        "__incoming_control_edge"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -265,6 +262,7 @@ class SpikeSourcePoissonVertex(
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
+        self.__incoming_control_edge = None
 
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
@@ -537,11 +535,6 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
             self)
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
-
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self):
         buffer_manager = SpynnakerDataView.get_buffer_manager()
@@ -579,4 +572,13 @@ class SpikeSourcePoissonVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
+
+    def set_live_poisson_control_edge(self, edge):
+        if self.__incoming_control_edge is not None:
+            raise Exception("The Poisson can only be controlled by one source")
+        self.__incoming_control_edge = edge
+
+    @property
+    def incoming_control_edge(self):
+        return self.__incoming_control_edge

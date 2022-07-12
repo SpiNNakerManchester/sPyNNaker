@@ -21,33 +21,35 @@ from spinn_front_end_common.utility_models import (
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
-from pacman.model.graphs.machine import MulticastEdgePartition
 
 
 class KeyConstraintAdder(object):
 
     def __call__(self):
-        machine_graph = SpynnakerDataView.get_runtime_machine_graph()
-        for outgoing_partition in machine_graph.outgoing_edge_partitions:
-            if not isinstance(outgoing_partition, MulticastEdgePartition):
-                continue
-            mac_vertex = outgoing_partition.pre_vertex
-            if isinstance(mac_vertex,
-                          ReverseIPTagMulticastSourceMachineVertex):
-                if mac_vertex.vertex_slice.lo_atom == 0:
-                    outgoing_partition.add_constraint(
-                        FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(base_key=0, mask=0xFFFFFFc0)]))
-                else:
-                    outgoing_partition.add_constraint(
-                        FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(base_key=64, mask=0xFFFFFFc0)]))
-            elif isinstance(mac_vertex, DelayExtensionMachineVertex):
-                if mac_vertex.vertex_slice.lo_atom == 0:
-                    outgoing_partition.add_constraint(
-                        FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(base_key=128, mask=0xFFFFFFc0)]))
-                else:
-                    outgoing_partition.add_constraint(
-                        FixedKeyAndMaskConstraint(
-                            [BaseKeyAndMask(base_key=192, mask=0xFFFFFFc0)]))
+        graph = SpynnakerDataView.get_runtime_graph()
+        for partition in graph.outgoing_edge_partitions:
+            for vertex in partition.pre_vertex.splitter.get_out_going_vertices(
+                    partition.identifier):
+                if isinstance(
+                        vertex, ReverseIPTagMulticastSourceMachineVertex):
+                    if vertex.vertex_slice.lo_atom == 0:
+                        vertex.add_constraint(
+                            FixedKeyAndMaskConstraint(
+                                [BaseKeyAndMask(
+                                    base_key=0, mask=0xFFFFFFc0)]))
+                    else:
+                        vertex.add_constraint(
+                            FixedKeyAndMaskConstraint(
+                                [BaseKeyAndMask(
+                                    base_key=64, mask=0xFFFFFFc0)]))
+                elif isinstance(vertex, DelayExtensionMachineVertex):
+                    if vertex.vertex_slice.lo_atom == 0:
+                        vertex.add_constraint(
+                            FixedKeyAndMaskConstraint(
+                                [BaseKeyAndMask(
+                                    base_key=128, mask=0xFFFFFFc0)]))
+                    else:
+                        vertex.add_constraint(
+                            FixedKeyAndMaskConstraint(
+                                [BaseKeyAndMask(
+                                    base_key=192, mask=0xFFFFFFc0)]))

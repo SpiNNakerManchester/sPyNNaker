@@ -26,7 +26,7 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
-# from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .key_space_tracker import KeySpaceTracker
 from .synaptic_matrix_app import SynapticMatrixApp
 
@@ -210,8 +210,6 @@ class SynapticMatrices(object):
         :param int all_syn_block_sz:
             The size in bytes of the space reserved for synapses
         :param list(float) weight_scales: The weight scale of each synapse
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            The machine graph
         """
         # If there are no synapses, there is nothing to do!
         if all_syn_block_sz == 0:
@@ -230,8 +228,8 @@ class SynapticMatrices(object):
         self.__poptable.initialise_table()
 
         # Convert the data for convenience
-        in_edges_by_app_edge, key_space_tracker = self.__in_edges_by_app_edge(
-            incoming_projections)
+        incoming_by_app_edge, delayed_by_app_edge, key_space_tracker = \
+            self.__incoming_by_app_edge(incoming_projections)
 
         # Set up for single synapses
         # The list is seeded with an empty array so we can just concatenate
@@ -245,21 +243,25 @@ class SynapticMatrices(object):
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
 
-        # For each machine edge in the vertex, create a synaptic list
-        for app_edge, m_edges in in_edges_by_app_edge.items():
+        # For each incoming machine vertex, create a synaptic list
+        for app_edge, m_vertices in incoming_by_app_edge.items():
+            delayed_m_vertices = delayed_by_app_edge.get(app_edge, [])
 
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
             app_key_info = self.__app_key_and_mask(
-                m_edges, app_edge, key_space_tracker)
+                m_vertices, app_edge, key_space_tracker)
             d_app_key_info = self.__delay_app_key_and_mask(
-                m_edges, app_edge, key_space_tracker)
+                delayed_m_vertices, app_edge, key_space_tracker)
 
             for synapse_info in app_edge.synapse_information:
                 app_matrix = self.__app_matrix(app_edge, synapse_info)
+                delay_pre_vertex = None
+                if app_edge.delay_edge is not None:
+                    delay_pre_vertex = app_edge.delay_edge.pre_vertex
                 app_matrix.set_info(
                     all_syn_block_sz, app_key_info, d_app_key_info,
-                    weight_scales, m_edges)
+                    weight_scales, m_vertices, delay_pre_vertex)
 
                 # If we can generate the connector on the machine, do so
                 if app_matrix.can_generate_on_machine(single_addr):
@@ -356,64 +358,59 @@ class SynapticMatrices(object):
             items.extend(data.gen_data)
         spec.write_array(numpy.concatenate(items))
 
-    def __in_edges_by_app_edge(self, incoming_projections):
+    def __incoming_by_app_edge(self, incoming_projections):
         """ Convert a list of incoming projections to a dict of
-            application edge -> list of machine edges, and a key tracker
+            application edge -> list of pre vertices, and a key tracker
 
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The incoming projections
         :rtype: tuple(dict, KeySpaceTracker)
         """
-        in_edges_by_app_edge = defaultdict(OrderedSet)
+        incoming_by_app_edge = defaultdict(OrderedSet)
+        delayed_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
         pre_vertices = set()
 
-        routing_info = SpynnakerDataView.get_routing_infos()
         for proj in incoming_projections:
             # pylint: disable=protected-access
             app_edge = proj._projection_edge
 
             # Skip if already done
-            if app_edge in in_edges_by_app_edge:
+            if app_edge in incoming_by_app_edge:
                 continue
 
-            # Add all incoming machine edges for this slice
-            for machine_edge in app_edge.machine_edges:
-                if (machine_edge.post_vertex.vertex_slice ==
-                        self.__post_vertex_slice):
-                    if machine_edge.pre_vertex in pre_vertices:
-                        continue
+            # Add all incoming machine vertices
+            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            for machine_vertex in out_verts:
+                if machine_vertex in pre_vertices:
+                    continue
 
-                    pre_vertices.add(machine_edge.pre_vertex)
-                    rinfo = routing_info.get_routing_info_for_edge(
-                        machine_edge)
-                    key_space_tracker.allocate_keys(rinfo)
+                pre_vertices.add(machine_vertex)
+                routing_info = SpynnakerDataView.get_routing_infos()
+                rinfo = routing_info.get_routing_info_from_pre_vertex(
+                    machine_vertex, SPIKE_PARTITION_ID)
+                key_space_tracker.allocate_keys(rinfo)
 
-                    in_edges_by_app_edge[app_edge].add(machine_edge)
+                incoming_by_app_edge[app_edge].add(machine_vertex)
 
-            # Also go through the delay edges in case an undelayed edge
-            # was filtered
+            # Add all incoming delayed vertices
             delay_edge = app_edge.delay_edge
             if delay_edge is not None:
-                for machine_edge in delay_edge.machine_edges:
+                verts = delay_edge.pre_vertex.splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID)
+                for machine_vertex in verts:
+                    if machine_vertex in pre_vertices:
+                        continue
 
-                    if (machine_edge.post_vertex.vertex_slice ==
-                            self.__post_vertex_slice):
-                        if machine_edge.pre_vertex in pre_vertices:
-                            continue
+                    pre_vertices.add(machine_vertex)
+                    routing_info = SpynnakerDataView.get_routing_infos()
+                    rinfo = routing_info.get_routing_info_from_pre_vertex(
+                        machine_vertex, SPIKE_PARTITION_ID)
+                    key_space_tracker.allocate_keys(rinfo)
+                    delayed_by_app_edge[app_edge].add(machine_vertex)
 
-                        pre_vertices.add(machine_edge.pre_vertex)
-                        rinfo = routing_info.get_routing_info_for_edge(
-                            machine_edge)
-                        key_space_tracker.allocate_keys(rinfo)
-                        undelayed_machine_edge = (
-                            app_edge.get_machine_edge(
-                                machine_edge.pre_vertex,
-                                machine_edge.post_vertex))
-                        in_edges_by_app_edge[app_edge].add(
-                            undelayed_machine_edge)
-
-        return in_edges_by_app_edge, key_space_tracker
+        return incoming_by_app_edge, delayed_by_app_edge, key_space_tracker
 
     @staticmethod
     def __check_keys_adjacent(keys, mask_size):
@@ -527,19 +524,19 @@ class SynapticMatrices(object):
             return False
         return True
 
-    def __app_key_and_mask(self, m_edges, app_edge, key_space_tracker):
+    def __app_key_and_mask(self, m_vertices, app_edge, key_space_tracker):
         """ Get a key and mask for an incoming application vertex as a whole,\
             or say it isn't possible (return None)
 
-        :param list(PopulationMachineEdge) m_edges:
-            The relevant machine edges of the application edge
+        :param list(MachineVertex) m_vertices:
+            The relevant incoming machine vertices
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param KeySpaceTracker key_space_tracker:
             A tracker pre-filled with the keys of all incoming edges
         """
         # If there are too many pre-cores, give up now
-        if len(m_edges) > self.__poptable.max_core_mask:
+        if len(m_vertices) > self.__poptable.max_core_mask:
             return None
 
         # Work out if the keys allow the machine vertices to be merged
@@ -548,11 +545,11 @@ class SynapticMatrices(object):
 
         # Can be merged only if all the masks are the same
         pre_slices = list()
-        routing_info = SpynnakerDataView.get_routing_infos()
-        for m_edge in m_edges:
-            rinfo = routing_info.get_routing_info_for_edge(m_edge)
-            vertex_slice = m_edge.pre_vertex.vertex_slice
-            pre_slices.append(vertex_slice)
+        for m_vertex in m_vertices:
+            routing_info = SpynnakerDataView.get_routing_infos()
+            rinfo = routing_info.get_routing_info_from_pre_vertex(
+                m_vertex, SPIKE_PARTITION_ID)
+            pre_slices.append(m_vertex.vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
                 return None
@@ -560,7 +557,7 @@ class SynapticMatrices(object):
             if mask is not None and rinfo.first_mask != mask:
                 return None
             mask = rinfo.first_mask
-            keys.append((rinfo.first_key, vertex_slice))
+            keys.append((rinfo.first_key, m_vertex.vertex_slice))
 
         if mask is None:
             return None
@@ -571,17 +568,25 @@ class SynapticMatrices(object):
 
         return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
 
-    def __delay_app_key_and_mask(self, m_edges, app_edge, key_space_tracker):
+    def __delay_app_key_and_mask(self, m_vertices, app_edge, key_space_tracker):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or say it isn't possible (return None)
 
-        :param list(PopulationMachineEdge) m_edges:
-            The relevant machine edges of the application edge
+        :param list(MachineVertex) m_vertices:
+            The relevant incoming machine vertices from delays
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param KeySpaceTracker key_space_tracker:
             A tracker pre-filled with the keys of all incoming edges
         """
+        # If there are no delay vertices, stop
+        if not m_vertices:
+            return None
+
+        # If there are too many pre-cores, give up now
+        if len(m_vertices) > self.__poptable.max_core_mask:
+            return None
+
         # Work out if the keys allow the machine vertices to be
         # merged
         mask = None
@@ -589,20 +594,11 @@ class SynapticMatrices(object):
 
         # Can be merged only if all the masks are the same
         pre_slices = list()
-        routing_info = SpynnakerDataView.get_routing_infos()
-        for m_edge in m_edges:
-            # If the edge doesn't have a delay edge, give up
-            delayed_app_edge = m_edge.app_edge.delay_edge
-            if delayed_app_edge is None:
-                return None
-            delayed_machine_edge = delayed_app_edge.get_machine_edge(
-                m_edge.pre_vertex, m_edge.post_vertex)
-            if delayed_machine_edge is None:
-                return None
-            rinfo = routing_info.get_routing_info_for_edge(
-                delayed_machine_edge)
-            vertex_slice = m_edge.pre_vertex.vertex_slice
-            pre_slices.append(vertex_slice)
+        for m_vertex in m_vertices:
+            routing_info = SpynnakerDataView.get_routing_infos()
+            rinfo = routing_info.get_routing_info_from_pre_vertex(
+                m_vertex, SPIKE_PARTITION_ID)
+            pre_slices.append(m_vertex.vertex_slice)
             # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
                 return None
@@ -610,7 +606,7 @@ class SynapticMatrices(object):
             if mask is not None and rinfo.first_mask != mask:
                 return None
             mask = rinfo.first_mask
-            keys.append((rinfo.first_key, vertex_slice))
+            keys.append((rinfo.first_key, m_vertex.vertex_slice))
 
         if not self.__check_key_slices(
                 app_edge.pre_vertex.n_atoms, pre_slices,
@@ -620,9 +616,12 @@ class SynapticMatrices(object):
         return self.__get_app_key_and_mask(
             keys, mask, app_edge.n_delay_stages, key_space_tracker)
 
-    def get_connections_from_machine(self, placement, app_edge, synapse_info):
+    def get_connections_from_machine(
+            self, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
 
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            Used to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
@@ -636,15 +635,17 @@ class SynapticMatrices(object):
         matrix = self.__app_matrix(app_edge, synapse_info)
         return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(self, placement):
+    def read_generated_connection_holders(self, transceiver, placement):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
         for matrix in self.__matrices.values():
-            matrix.read_generated_connection_holders(placement)
+            matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
         """ Clear any values read from the machine
@@ -660,18 +661,18 @@ class SynapticMatrices(object):
         """
         return self.__gen_on_machine
 
-    def get_index(self, app_edge, synapse_info, machine_edge):
+    def get_index(self, app_edge, synapse_info, m_vertex):
         """ Get the index of an incoming projection in the population table
 
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
-            The machine edge to get the index of
+        :param ~pacman.model.graphs.machine.MachineVertex m_vertex:
+            The source machine vertex
         """
         matrix = self.__app_matrix(app_edge, synapse_info)
-        return matrix.get_index(machine_edge)
+        return matrix.get_index(m_vertex)
 
 
 class _AppKeyInfo(object):

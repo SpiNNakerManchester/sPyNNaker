@@ -55,14 +55,15 @@ class AbstractSynapseDynamicsStructural(object, metaclass=AbstractBase):
     @abstractmethod
     def set_connections(
             self, connections, post_vertex_slice, app_edge, synapse_info,
-            machine_edge):
+            pre_index, pre_slice):
         """ Set connections for structural plasticity
 
         :param ~numpy.ndarray connections:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
-        :param ~pacman.model.graphs.machine.MachineEdge machine_edge:
+        :param int pre_index:
+        :param Slice pre_slice:
         """
 
     @abstractproperty

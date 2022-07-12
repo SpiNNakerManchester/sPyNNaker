@@ -673,13 +673,18 @@ class Recorder(object):
         if len(spikes) == 0:
             spikes = numpy.empty(shape=(0, 2))
 
+        # Put the times for each neuron into the right place
+        times = [[] for _ in range(n_neurons)]
+        for neuron_id, time in spikes:
+            times[int(neuron_id)].append(time)
+
         t_stop = t * quantities.ms
 
         if indexes is None:
             indexes = range(n_neurons)
         for index in indexes:
             spiketrain = neo.SpikeTrain(
-                times=spikes[spikes[:, 0] == index][:, 1],
+                times=times[index],
                 t_start=recording_start_time,
                 t_stop=t_stop,
                 units='ms',

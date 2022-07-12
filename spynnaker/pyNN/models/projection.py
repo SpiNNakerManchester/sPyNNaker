@@ -438,13 +438,16 @@ class Projection(object):
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
-        graph_edges = SpynnakerDataView.\
-            get_edges_ending_at_vertex(post_synaptic_vertex)
+        partitions = (
+            SpynnakerDataView.get_outgoing_edge_partitions_starting_at_vertex(
+                pre_synaptic_vertex))
 
-        # Search the edges for any that start at the presynaptic vertex
-        for edge in graph_edges:
-            if edge.pre_vertex == pre_synaptic_vertex:
-                return edge
+        # Partitions and Partition.edges will be OrderedSet but may be empty
+        for partition in partitions:
+            for edge in partition.edges:
+                if edge.post_vertex == post_synaptic_vertex:
+                    return edge
+
         return None
 
     def _get_synaptic_data(

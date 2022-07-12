@@ -466,7 +466,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             if timer.skip_if_virtual_board():
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor()
-            # pylint: disable=attribute-defined-outside-init
             self._multicast_routes_loaded = True
             return None
 
@@ -561,11 +560,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
-    def _execute_splitter_partitioner(self, pre_allocated_resources):
+    def _execute_splitter_partitioner(self):
         if not self._data_writer.get_runtime_graph().n_vertices:
             return
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
-            machine_graph, n_chips_in_graph = spynnaker_splitter_partitioner(
-                pre_allocated_resources)
-            self._data_writer.set_runtime_machine_graph(machine_graph)
+            n_chips_in_graph = spynnaker_splitter_partitioner()
             self._data_writer.set_n_chips_in_graph(n_chips_in_graph)

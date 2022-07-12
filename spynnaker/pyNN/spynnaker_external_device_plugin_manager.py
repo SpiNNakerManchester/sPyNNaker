@@ -132,13 +132,21 @@ class SpynnakerExternalDevicePluginManager(object):
             host = get_config_str("Recording", "live_spike_host")
 
         # add new edge and vertex if required to SpiNNaker graph
+
+        # pylint: disable=too-many-arguments, too-many-locals
+        params = LivePacketGatherParameters(
+            port=port, hostname=host, tag=tag, strip_sdp=strip_sdp,
+            use_prefix=use_prefix, key_prefix=key_prefix,
+            prefix_type=prefix_type, message_type=message_type,
+            right_shift=right_shift, payload_prefix=payload_prefix,
+            payload_as_time_stamps=payload_as_time_stamps,
+            use_payload_prefix=use_payload_prefix,
+            payload_right_shift=payload_right_shift,
+            number_of_packets_sent_per_time_step=(
+                number_of_packets_sent_per_time_step),
+            label="LiveSpikeReceiver", translate_keys=translate_keys)
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, "LiveSpikeReceiver", port, host, tag,
-            strip_sdp, use_prefix, key_prefix, prefix_type, message_type,
-            right_shift, payload_as_time_stamps, use_payload_prefix,
-            payload_prefix, payload_right_shift,
-            number_of_packets_sent_per_time_step,
-            partition_ids=[SPIKE_PARTITION_ID], translate_keys=translate_keys)
+            population._vertex, params, [SPIKE_PARTITION_ID])
 
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
@@ -171,13 +179,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def update_live_packet_gather_tracker(
-            vertex_to_record_from, lpg_label, port=None, hostname=None,
-            tag=None, strip_sdp=True, use_prefix=False, key_prefix=None,
-            prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
-            right_shift=0, payload_as_time_stamps=True,
-            use_payload_prefix=True, payload_prefix=None,
-            payload_right_shift=0, number_of_packets_sent_per_time_step=0,
-            partition_ids=None, translate_keys=False):
+            vertex_to_record_from, params, partition_ids):
         """ Add an edge from a vertex to the live packet gatherer, builds as\
             needed and has all the parameters for the creation of the live\
             packet gatherer if needed.
@@ -204,18 +206,6 @@ class SpynnakerExternalDevicePluginManager(object):
         :param list(str) partition_ids:
         :param bool translate_keys:
         """
-        # pylint: disable=too-many-arguments
-        params = LivePacketGatherParameters(
-            port=port, hostname=hostname, tag=tag, strip_sdp=strip_sdp,
-            use_prefix=use_prefix, key_prefix=key_prefix,
-            prefix_type=prefix_type, message_type=message_type,
-            right_shift=right_shift, payload_prefix=payload_prefix,
-            payload_as_time_stamps=payload_as_time_stamps,
-            use_payload_prefix=use_payload_prefix,
-            payload_right_shift=payload_right_shift,
-            number_of_packets_sent_per_time_step=(
-                number_of_packets_sent_per_time_step),
-            label=lpg_label, translate_keys=translate_keys)
 
         # add to the tracker
         SpynnakerDataView.add_live_packet_gatherer_parameters(
@@ -255,10 +245,12 @@ class SpynnakerExternalDevicePluginManager(object):
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
             receive_port=receive_port,
-            reserve_reverse_ip_tag=reserve_reverse_ip_tag)
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
+            injection_partition_id=LIVE_POISSON_CONTROL_PARTITION_ID)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
-        SpynnakerExternalDevicePluginManager.add_edge(
+        edge = SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
+        vertex.set_live_poisson_control_edge(edge)
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,
@@ -278,6 +270,7 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         edge = ApplicationEdge(vertex, device_vertex)
         SpynnakerDataView.add_edge(edge, partition_id)
+        return edge
 
     @staticmethod
     def add_application_vertex(vertex):
