@@ -81,6 +81,7 @@ class TestPopulation(BaseTestCase):
         sim.setup(timestep=1.0)
         model = sim.IF_curr_exp(i_offset=value)
         pop_1 = sim.Population(n_neurons, model, label=label)
+        sim.run(0)
         values = pop_1.get('i_offset')
         for value in values:
             self.assertGreater(value, range_low)
