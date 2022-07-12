@@ -243,7 +243,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = 0
-        hi = synapse_info.n_pre_neurons
+        hi = synapse_info.n_pre_neurons - 1
 
         # Get number of connections
         n_connections = sum(
