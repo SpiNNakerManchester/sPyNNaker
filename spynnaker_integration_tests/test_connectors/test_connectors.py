@@ -15,7 +15,6 @@
 
 import numpy
 import pyNN.spiNNaker as sim
-from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
 from pyNN.random import NumpyRNG

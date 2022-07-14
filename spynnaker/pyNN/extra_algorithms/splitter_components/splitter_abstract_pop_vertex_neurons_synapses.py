@@ -39,6 +39,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -55,6 +56,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
     exact_sdram_for_bit_field_builder_region)
+
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (

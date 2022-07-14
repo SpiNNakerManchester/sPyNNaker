@@ -568,7 +568,8 @@ class SynapticMatrices(object):
 
         return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
 
-    def __delay_app_key_and_mask(self, m_vertices, app_edge, key_space_tracker):
+    def __delay_app_key_and_mask(
+            self, m_vertices, app_edge, key_space_tracker):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or say it isn't possible (return None)
 

@@ -123,9 +123,8 @@ class PopulationMachineSynapses(
             self._synapse_references.pop_table,
             self._synapse_references.connection_builder)
 
-
     @overrides(AbstractSupportsBitFieldRoutingCompression.
-           bit_field_base_address)
+               bit_field_base_address)
     def bit_field_base_address(self, placement):
         return locate_memory_region_for_placement(
             placement=placement, region=self._synapse_regions.bitfield_filter)
