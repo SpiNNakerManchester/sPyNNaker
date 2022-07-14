@@ -24,6 +24,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     PoolDenseConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSupportsSignedWeights)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 
 
@@ -50,7 +51,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractLocalOnly.get_parameters_usage_in_bytes)
     def get_parameters_usage_in_bytes(
-            self, vertex_slice, incoming_projections):
+            self, n_atoms, incoming_projections):
         n_bytes = 0
         for incoming in incoming_projections:
             s_info = incoming._synapse_information
@@ -59,9 +60,9 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     "Only PoolDenseConnector can be used with a synapse type"
                     " of PoolDense")
             app_edge = incoming._projection_edge
-            in_slices = app_edge.pre_vertex.splitter.get_out_going_slices()[0]
+            in_slices = app_edge.pre_vertex.splitter.get_out_going_slices()
             n_bytes += s_info.connector.local_only_n_bytes(
-                in_slices, vertex_slice)
+                in_slices, n_atoms)
 
         return (2 * BYTES_PER_WORD) + n_bytes
 
@@ -71,18 +72,22 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             machine_vertex, weight_scales):
 
         # Get all the incoming vertices and keys so we can sort
+        # TO DO: now this uses vertices rather than edges some renaming needed
         edge_info = list()
         for incoming in incoming_projections:
             app_edge = incoming._projection_edge
+            s_info = incoming._synapse_information
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
-            for edge in app_edge.machine_edges:
-                if edge.post_vertex == machine_vertex:
-                    r_info = routing_info.get_routing_info_for_edge(edge)
-                    vertex_slice = edge.pre_vertex.vertex_slice
+            for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
+                if s_info.connector.could_connect(
+                        s_info, pre_m_vertex, machine_vertex):
+                    r_info = routing_info.get_routing_info_from_pre_vertex(
+                        pre_m_vertex, SPIKE_PARTITION_ID)
+                    vertex_slice = pre_m_vertex.vertex_slice
                     key = (app_edge.pre_vertex, vertex_slice)
-                    edges_for_source[key].append((edge, r_info))
+                    edges_for_source[key].append((pre_m_vertex, r_info))
 
             # Merge edges with the same source
             for (_, vertex_slice), edge_list in edges_for_source.items():
@@ -96,7 +101,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     (incoming, vertex_slice, group_key, group_mask))
 
         size = self.get_parameters_usage_in_bytes(
-            machine_vertex.vertex_slice, incoming_projections)
+            machine_vertex.vertex_slice.n_atoms, incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 

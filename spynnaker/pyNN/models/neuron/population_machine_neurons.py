@@ -159,7 +159,7 @@ class PopulationMachineNeurons(
         spec.reserve_memory_region(
             region=self._neuron_regions.neuron_recording,
             size=neuron_recorder.get_metadata_sdram_usage_in_bytes(
-                self._vertex_slice),
+                self._vertex_slice.n_atoms),
             label="neuron recording")
         neuron_recorder.write_neuron_recording_region(
             spec, self._neuron_regions.neuron_recording, self._vertex_slice)
@@ -181,7 +181,7 @@ class PopulationMachineNeurons(
 
         # Reserve and switch to the memory region
         params_size = self._app_vertex.get_sdram_usage_for_neuron_params(
-            self._vertex_slice)
+            n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.neuron_params, size=params_size,
             label='NeuronParams')
@@ -240,7 +240,8 @@ class PopulationMachineNeurons(
 
         # Reserve and switch to the current source region
         params_size = self._app_vertex.\
-            get_sdram_usage_for_current_source_params(self._vertex_slice)
+            get_sdram_usage_for_current_source_params(
+                self._vertex_slice.n_atoms)
         spec.reserve_memory_region(
             region=self._neuron_regions.current_source_params,
             size=params_size, label='CurrentSourceParams')
@@ -354,7 +355,7 @@ class PopulationMachineNeurons(
 
         # get size of neuron params
         size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
-            vertex_slice) - neurons_pre_size
+            vertex_slice.n_atoms) - neurons_pre_size
 
         # get data from the machine
         byte_array = transceiver.read_memory(

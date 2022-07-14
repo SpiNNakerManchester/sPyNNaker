@@ -182,14 +182,14 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
             self, connections, post_vertex_slice, app_edge, synapse_info,
-            machine_edge):
+            pre_index, pre_slice):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append(
-            (connections, app_edge, machine_edge, synapse_info))
+            (connections, app_edge, pre_index, pre_slice, synapse_info))
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):

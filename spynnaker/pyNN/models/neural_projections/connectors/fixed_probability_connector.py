@@ -96,12 +96,12 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
         n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
+            n_post_atoms, self._p_connect, chance=1.0/10000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))

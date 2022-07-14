@@ -27,14 +27,14 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.abstract_models import (
-    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveBuffersToHost)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.globals_variables import (
@@ -47,13 +47,12 @@ from spinn_front_end_common.interface.profiling.profile_utils import (
 from spynnaker.pyNN.models.abstract_models import (
     AbstractMaxSpikes, AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.constants import (
-    LIVE_POISSON_CONTROL_PARTITION_ID)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from pacman.utilities.utility_calls import get_field_based_keys
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID)
 
 
 def _flatten(alist):
@@ -107,7 +106,7 @@ _FOUR_WORDS = struct.Struct("<4I")
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
         AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
         SendsSynapticInputsOverSDRAM):
@@ -218,22 +217,6 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
-    @property
-    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
-    def is_in_injection_mode(self):
-        # pylint: disable=no-value-for-parameter
-        return self._is_in_injection_mode()
-
-    @inject_items({"graph": "MachineGraph"})
-    def _is_in_injection_mode(self, graph):
-        # pylint: disable=arguments-differ
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            self, LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Poisson source can only have one incoming control")
-        return len(in_edges) == 1
-
     @overrides(AbstractHasProfileData.get_profile_data)
     def get_profile_data(self, transceiver, placement):
         return get_profiling_data(
@@ -279,18 +262,15 @@ class SpikeSourcePoissonMachineVertex(
 
     @inject_items({
         "routing_info": "RoutingInfos",
-        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "routing_info", "graph", "first_machine_time_step"})
+            "routing_info", "first_machine_time_step"})
     def regenerate_data_specification(
-            self, spec, placement, routing_info, graph,
-            first_machine_time_step):
+            self, spec, placement, routing_info, first_machine_time_step):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
@@ -300,8 +280,7 @@ class SpikeSourcePoissonMachineVertex(
 
         # write parameters
         self._write_poisson_parameters(
-            spec=spec, graph=graph, placement=placement,
-            routing_info=routing_info)
+            spec=spec, placement=placement, routing_info=routing_info)
 
         # write rates
         self._write_poisson_rates(spec, first_machine_time_step)
@@ -312,23 +291,20 @@ class SpikeSourcePoissonMachineVertex(
     @inject_items({
         "routing_info": "RoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "graph": "MachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "routing_info", "data_n_time_steps", "graph",
-            "first_machine_time_step"
+            "routing_info", "data_n_time_steps", "first_machine_time_step"
         }
     )
     def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps, graph,
+            self, spec, placement, routing_info, data_n_time_steps,
             first_machine_time_step):
         """
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param int data_n_time_steps:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
         """
         # pylint: disable=too-many-arguments, arguments-differ
@@ -353,8 +329,7 @@ class SpikeSourcePoissonMachineVertex(
             recorded_region_sizes))
 
         # write parameters
-        self._write_poisson_parameters(
-            spec, graph, placement, routing_info)
+        self._write_poisson_parameters(spec, placement, routing_info)
 
         # write rates
         self._write_poisson_rates(spec, first_machine_time_step)
@@ -516,12 +491,11 @@ class SpikeSourcePoissonMachineVertex(
 
         spec.write_array(final_data)
 
-    def _write_poisson_parameters(self, spec, graph, placement, routing_info):
+    def _write_poisson_parameters(self, spec, placement, routing_info):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param ~pacman.model.placements.Placement placement:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         """
@@ -544,19 +518,12 @@ class SpikeSourcePoissonMachineVertex(
             keys = get_field_based_keys(key, self.vertex_slice)
 
         # Write the incoming mask if there is one
-        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
-        if len(in_edges) > 1:
-            raise ConfigurationException(
-                "Only one control edge can end at a Poisson vertex")
         incoming_mask = 0
-        if len(in_edges) == 1:
-            in_edge = in_edges[0]
-
-            # Get the mask of the incoming keys
-            incoming_mask = \
-                routing_info.get_routing_info_for_edge(in_edge).first_mask
-            incoming_mask = ~incoming_mask & 0xFFFFFFFF
+        if self._app_vertex.incoming_control_edge is not None:
+            r_info = routing_info.get_routing_info_from_pre_vertex(
+                self._app_vertex.incoming_control_edge.pre_vertex,
+                LIVE_POISSON_CONTROL_PARTITION_ID)
+            incoming_mask = ~r_info.first_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
         # Write the number of seconds per timestep (unsigned long fract)

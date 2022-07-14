@@ -16,15 +16,11 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 
 
 class ICUBRetinaDevice(
-        Application2DSpiNNakerLinkVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
-        HasShapeKeyFields):
+        Application2DSpiNNakerLinkVertex, HasShapeKeyFields):
     """ An ICUB retina device connected to SpiNNaker using a SpiNNakerLink
     """
 
@@ -68,14 +64,24 @@ class ICUBRetinaDevice(
         self.__index_by_slice[vertex_slice] = index
         return vertex_slice
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
+    @overrides(Application2DSpiNNakerLinkVertex.set_constraints)
+    def set_constraints(self, partition):
+        # Add constraint
+        # TO DO: check this still works
         machine_vertex = partition.pre_vertex
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[vertex_slice]
-        return [FixedKeyAndMaskConstraint([
-            self._get_key_and_mask(self.__base_key, index)])]
+        self.add_constraint(FixedKeyAndMaskConstraint([
+            self._get_key_and_mask(self.__base_key, index)]))
+
+    # @overrides(AbstractProvidesOutgoingPartitionConstraints.
+    #            get_outgoing_partition_constraints)
+    # def get_outgoing_partition_constraints(self, partition):
+    #     machine_vertex = partition.pre_vertex
+    #     vertex_slice = machine_vertex.vertex_slice
+    #     index = self.__index_by_slice[vertex_slice]
+    #     return [FixedKeyAndMaskConstraint([
+    #         self._get_key_and_mask(self.__base_key, index)])]
 
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):

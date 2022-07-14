@@ -114,12 +114,12 @@ class IndexBasedProbabilityConnector(AbstractConnector,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         self._update_probs_from_index_expression(synapse_info)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, numpy.amax(self.__probs))
+            n_post_atoms, numpy.amax(self.__probs))
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))

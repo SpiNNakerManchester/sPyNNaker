@@ -16,17 +16,18 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
-ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
+#  key, n atoms, atoms_per_core, pointer to bitfield
+ELEMENTS_USED_IN_EACH_BIT_FIELD = 4
 
 #: n_filters, pointer for array
 ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2
 
-#: n elements in each key to n atoms map for bitfield (key, n atoms)
-N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
+#: n elements in each key to n atoms map for bitfield (key, n atoms,
+#  core shift/n atoms per core (combined into a word))
+N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 3
 
 #: the regions addresses needed (
 #: pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
@@ -55,21 +56,19 @@ def get_estimated_sdram_for_bit_field_region(incoming_projections):
         app_edge = proj._projection_edge  # pylint: disable=protected-access
         if app_edge not in seen_app_edges:
             seen_app_edges.add(app_edge)
-            slices, _ = app_edge.pre_vertex.splitter.get_out_going_slices()
-            n_machine_vertices = len(slices)
 
-            atoms_per_core = max(
-                vertex_slice.n_atoms for vertex_slice in slices)
-            n_words_for_atoms = int(math.ceil(atoms_per_core / BIT_IN_A_WORD))
+            n_words_for_atoms = int(math.ceil(
+                app_edge.pre_vertex.n_atoms / BIT_IN_A_WORD))
             sdram += (
-                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-                 n_machine_vertices) * BYTES_PER_WORD)
+                (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
+                BYTES_PER_WORD)
             # Also add for delay vertices if needed
             n_words_for_delays = int(math.ceil(
-                atoms_per_core * app_edge.n_delay_stages / BIT_IN_A_WORD))
+                (app_edge.pre_vertex.n_atoms * app_edge.n_delay_stages) /
+                BIT_IN_A_WORD))
             sdram += (
-                ((ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_delays) *
-                 n_machine_vertices) * BYTES_PER_WORD)
+                (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_delays) *
+                BYTES_PER_WORD)
     return sdram
 
 
@@ -90,14 +89,9 @@ def get_estimated_sdram_for_key_region(incoming_projections):
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
 
-            # Get the number of likely vertices
-            slices, _ = in_edge.pre_vertex.splitter.get_out_going_slices()
-
-            sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                      BYTES_PER_WORD)
+            sdram += N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD
             if in_edge.n_delay_stages:
-                sdram += (len(slices) * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                          BYTES_PER_WORD)
+                sdram += N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP * BYTES_PER_WORD
 
     return sdram
 
@@ -201,24 +195,44 @@ def write_bitfield_init_data(
     spec.switch_write_focus(bit_field_key_map_region_id)
 
     # Gather the source vertices that target this core
-    sources = OrderedSet()
+    sources = list()
     seen_app_edges = set()
     for proj in incoming_projections:
         in_edge = proj._projection_edge  # pylint: disable=protected-access
         if in_edge not in seen_app_edges:
             seen_app_edges.add(in_edge)
-            for machine_edge in in_edge.machine_edges:
-                if machine_edge.post_vertex.vertex_slice == vertex_slice:
-                    sources.add(machine_edge.pre_vertex)
+            if hasattr(in_edge.post_vertex.splitter,
+                       "is_direct_poisson_source"):
+                s_info = proj._synapse_information
+                if in_edge.post_vertex.splitter.is_direct_poisson_source(
+                        in_edge.pre_vertex, s_info.connector,
+                        s_info.synapse_dynamics):
+                    continue
+            n_atoms_per_core = next(iter(
+                in_edge.pre_vertex.machine_vertices)).vertex_slice.n_atoms
+            sources.append(
+                (in_edge.pre_vertex, in_edge.pre_vertex.n_atoms,
+                 n_atoms_per_core))
+            delay_edge = in_edge.delay_edge
+            if delay_edge is not None:
+                sources.append(
+                    (delay_edge.pre_vertex,
+                     in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages,
+                     n_atoms_per_core * in_edge.n_delay_stages))
 
     # write n keys max atom map
     spec.write_value(len(sources))
 
     # load in key to max atoms map
-    for source_vertex in sources:
-        spec.write_value(routing_info.get_first_key_from_pre_vertex(
-            source_vertex, SPIKE_PARTITION_ID))
-        spec.write_value(source_vertex.vertex_slice.n_atoms)
+    for source_vertex, n_atoms, n_atoms_per_core in sources:
+        r_info = routing_info.get_routing_info_from_pre_vertex(
+            source_vertex, SPIKE_PARTITION_ID)
+        spec.write_value(r_info.first_key)
+        spec.write_value(n_atoms)
+        if len(source_vertex.machine_vertices) > 1:
+            spec.write_value(r_info.n_bits_atoms | (n_atoms_per_core << 5))
+        else:
+            spec.write_value(0)
 
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)

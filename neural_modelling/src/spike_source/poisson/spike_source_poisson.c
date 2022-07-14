@@ -34,6 +34,7 @@
 #include <stdfix-full-iso.h>
 #include <limits.h>
 #include <tdma_processing.h>
+#include <circular_buffer.h>
 
 #include "profile_tags.h"
 #include <profiler.h>
@@ -214,6 +215,8 @@ static struct sdram_config *sdram_inputs;
 
 //! The inputs to be sent at the end of this timestep
 static uint16_t *input_this_timestep;
+
+static circular_buffer rate_change_buffer;
 
 //! \brief Random number generation for the Poisson sources.
 //!        This is a local version for speed of operation.
@@ -604,6 +607,14 @@ static bool initialize(void) {
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
     }
 
+    // Allocate buffer to allow rate change (2 ints) per source
+    rate_change_buffer = circular_buffer_initialize(
+    		ssp_params.n_spike_sources * 2);
+    if (rate_change_buffer == NULL) {
+    	log_error("Could not allocate rate change buffer!");
+    	return false;
+    }
+
     log_info("Initialise: completed successfully");
 
     return true;
@@ -788,6 +799,36 @@ static void process_slow_source(
     }
 }
 
+//! \brief Set the spike source rate as required
+//! \param[in] id: the ID of the source to be updated
+//! \param[in] rate:
+//!     the rate in Hz, to be multiplied to get per-tick values
+void set_spike_source_rate(uint32_t id, REAL rate) {
+    REAL rate_per_tick = rate * ssp_params.seconds_per_tick;
+    log_debug("Setting rate of local %u to %kHz (%k per tick)",
+            id, rate, rate_per_tick);
+    spike_source_t *spike_source = &source[id];
+
+    if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
+        spike_source->is_fast_source = true;
+        if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
+            spike_source->sqrt_lambda = SQRT(rate_per_tick);
+        } else {
+            spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
+            spike_source->sqrt_lambda = ZERO;
+        }
+    } else if (rate_per_tick == 0) {
+        spike_source->is_fast_source = false;
+        spike_source->mean_isi_ticks = 0;
+        spike_source->time_to_spike_ticks = 0;
+    } else {
+        spike_source->is_fast_source = false;
+        spike_source->mean_isi_ticks = (uint32_t) (ONE / rate_per_tick);
+        spike_source->time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
+    }
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count: the number of times this call back has been
 //!     executed since start of simulation
@@ -829,6 +870,15 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
         return;
     }
 
+    // Do any rate changes
+    while (circular_buffer_size(rate_change_buffer) >= 2) {
+    	uint32_t id = 0;
+    	REAL rate = 0.0k;
+    	circular_buffer_get_next(rate_change_buffer, &id);
+    	circular_buffer_get_next(rate_change_buffer, (uint32_t *) &rate);
+        set_spike_source_rate(id, rate);
+    }
+
     // Reset the inputs this timestep if using them
     if (sdram_inputs->address != 0) {
         sark_word_set(input_this_timestep, 0, sdram_inputs->size_in_bytes);
@@ -868,50 +918,18 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 }
 
-//! \brief Set the spike source rate as required
-//! \param[in] id: the ID of the source to be updated
-//! \param[in] rate:
-//!     the rate in Hz, to be multiplied to get per-tick values
-void set_spike_source_rate(uint32_t id, REAL rate) {
-    if ((id < ssp_params.first_source_id) ||
-            (id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
-        return;
-    }
-
-    uint32_t sub_id = id - ssp_params.first_source_id;
-    REAL rate_per_tick = rate * ssp_params.seconds_per_tick;
-    log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
-            id, sub_id, rate, rate_per_tick);
-    spike_source_t *spike_source = &source[sub_id];
-
-    if (rate_per_tick >= ssp_params.slow_rate_per_tick_cutoff) {
-        spike_source->is_fast_source = true;
-        if (rate_per_tick >= ssp_params.fast_rate_per_tick_cutoff) {
-            spike_source->sqrt_lambda = SQRT(rate_per_tick);
-            // warning: sqrtk is untested...
-        } else {
-            spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
-            spike_source->sqrt_lambda = ZERO;
-        }
-    } else if (rate_per_tick == 0) {
-        spike_source->is_fast_source = false;
-        spike_source->mean_isi_ticks = 0;
-        spike_source->time_to_spike_ticks = 0;
-    } else {
-        spike_source->is_fast_source = false;
-        spike_source->mean_isi_ticks = (uint32_t) (ONE / rate_per_tick);
-        spike_source->time_to_spike_ticks =
-                slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
-    }
-}
-
 //! \brief Multicast callback used to set rate when injected in a live example
 //! \param[in] key: Received multicast key
 //! \param[in] payload: Received multicast payload
 static void multicast_packet_callback(uint key, uint payload) {
     uint32_t id = key & ssp_params.set_rate_neuron_id_mask;
-    REAL rate = kbits(payload);
-    set_spike_source_rate(id, rate);
+    if ((id < ssp_params.first_source_id) ||
+			(id - ssp_params.first_source_id >= ssp_params.n_spike_sources)) {
+		return;
+	}
+    uint32_t sub_id = id - ssp_params.first_source_id;
+    circular_buffer_add(rate_change_buffer, sub_id);
+    circular_buffer_add(rate_change_buffer, payload);
 }
 
 //! The entry point for this model

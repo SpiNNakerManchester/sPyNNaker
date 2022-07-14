@@ -117,7 +117,7 @@ class PoolDenseConnector(AbstractConnector):
             self, pre_shape, post_shape, pre_vertex_slice, post_vertex_slice):
         if isinstance(self.__weights, (int, float)):
             n_weights = self.__get_n_sub_weights(
-                pre_vertex_slice, post_vertex_slice)
+                pre_vertex_slice, post_vertex_slice.n_atoms)
             return numpy.full(n_weights, self.__weights, dtype="float64")
         elif isinstance(self.__weights, Iterable):
             pre_in_post_shape = tuple(self.__get_pre_in_post_shape(pre_shape))
@@ -132,7 +132,7 @@ class PoolDenseConnector(AbstractConnector):
             return all_weights[pip_slices + post_slices].flatten()
         elif isinstance(self.__weights, RandomDistribution):
             n_weights = self.__get_n_sub_weights(
-                pre_vertex_slice, post_vertex_slice)
+                pre_vertex_slice, post_vertex_slice.n_atoms)
             return numpy.array(self.__weights.next(n_weights), dtype="float64")
         else:
             raise SynapticConfigurationException(
@@ -175,11 +175,11 @@ class PoolDenseConnector(AbstractConnector):
         shape = self.__get_pre_in_post_shape(pre_shape)
         return numpy.prod(shape) * numpy.prod(post_shape)
 
-    def __get_n_sub_weights(self, pre_vertex_slice, post_vertex_slice):
+    def __get_n_sub_weights(self, pre_vertex_slice, n_post_atoms):
         pre_in_post_start = self.__pre_as_post(pre_vertex_slice.start)
         pre_in_post_end = self.__pre_as_post(pre_vertex_slice.end)
         return (numpy.prod((pre_in_post_end - pre_in_post_start) + 1) *
-                post_vertex_slice.n_atoms)
+                n_post_atoms)
 
     @overrides(AbstractConnector.validate_connection)
     def validate_connection(self, application_edge, synapse_info):
@@ -222,10 +222,10 @@ class PoolDenseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         # Every pre connects to every post
-        return post_vertex_slice.n_atoms
+        return n_post_atoms
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -249,8 +249,8 @@ class PoolDenseConnector(AbstractConnector):
             coords //= self.__pool_stride
         return coords
 
-    def local_only_n_bytes(self, incoming_slices, vertex_slice):
-        n_weights = [self.__get_n_sub_weights(s, vertex_slice)
+    def local_only_n_bytes(self, incoming_slices, n_post_atoms):
+        n_weights = [self.__get_n_sub_weights(s, n_post_atoms)
                      for s in incoming_slices]
         n_weights = [n + 1 if n % 2 != 0 else n for n in n_weights]
         n_dims = [len(s.shape) for s in incoming_slices]
@@ -270,7 +270,7 @@ class PoolDenseConnector(AbstractConnector):
         # Write numbers of things
         n_dims = len(pre_vertex_slice.shape)
         n_weights = self.__get_n_sub_weights(
-            pre_vertex_slice, post_vertex_slice)
+            pre_vertex_slice, post_vertex_slice.n_atoms)
         spec.write_value(n_dims, data_type=DataType.UINT32)
         spec.write_value(n_weights, data_type=DataType.UINT32)
 

@@ -14,13 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.model.graphs.application import ApplicationFPGAVertex
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from pacman.model.graphs.application import FPGAConnection
 
 
-class ArbitraryFPGADevice(
-        ApplicationFPGAVertex, ProvidesKeyToAtomMappingImpl):
+class ArbitraryFPGADevice(ApplicationFPGAVertex):
     __slots__ = []
 
     def __init__(
