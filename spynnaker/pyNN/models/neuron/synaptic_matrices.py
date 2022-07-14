@@ -636,17 +636,15 @@ class SynapticMatrices(object):
         matrix = self.__app_matrix(app_edge, synapse_info)
         return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(self, placement):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
         """
         for matrix in self.__matrices.values():
-            matrix.read_generated_connection_holders(transceiver, placement)
+            matrix.read_generated_connection_holders(placement)
 
     def clear_connection_cache(self):
         """ Clear any values read from the machine
