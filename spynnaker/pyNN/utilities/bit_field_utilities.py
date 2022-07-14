@@ -203,6 +203,7 @@ def write_bitfield_init_data(
             seen_app_edges.add(in_edge)
             if hasattr(in_edge.post_vertex.splitter,
                        "is_direct_poisson_source"):
+                # pylint: disable=protected-access
                 s_info = proj._synapse_information
                 if in_edge.post_vertex.splitter.is_direct_poisson_source(
                         in_edge.pre_vertex, s_info.connector,

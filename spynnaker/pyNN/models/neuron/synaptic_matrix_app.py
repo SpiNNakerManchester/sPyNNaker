@@ -33,6 +33,8 @@ class SynapticMatrixApp(object):
         app edge
     """
 
+    # pylint: disable=unused-private-member
+    # https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201
     __slots__ = [
         # The master population table
         "__poptable",

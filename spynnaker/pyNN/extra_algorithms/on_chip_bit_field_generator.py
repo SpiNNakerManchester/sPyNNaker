@@ -69,7 +69,7 @@ class _OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
     """
 
-    __slots__ = ("__aplx")
+    __slots__ = ("__aplx", "__txrx")
 
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0

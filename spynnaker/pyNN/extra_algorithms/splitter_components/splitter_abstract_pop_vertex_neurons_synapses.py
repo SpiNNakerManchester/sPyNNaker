@@ -165,6 +165,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__sdram_partitions = []
         self.__same_chip_groups = []
         self.__neuromodulators = set()
+        self.__incoming_vertices = []
+        self.__poisson_sources = []
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -304,6 +306,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Find incoming neuromodulators
         for proj in app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             if proj._projection_edge.is_neuromodulation:
                 self.__neuromodulators.add(proj._projection_edge.pre_vertex)
 
