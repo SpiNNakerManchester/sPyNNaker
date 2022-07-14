@@ -21,12 +21,12 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
-from .spynnaker_splitter_slice_legacy import SpynnakerSplitterSliceLegacy
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .abstract_supports_one_to_one_sdram_input import (
     AbstractSupportsOneToOneSDRAMInput)
 
 
-class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
+class SplitterPoissonDelegate(SpynnakerSplitterFixedLegacy):
     """ A splitter for Poisson sources that will ignore sources that are
         one-to-one connected to a single Population
     """
@@ -61,22 +61,22 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
                 return True
         return False
 
-    @overrides(SpynnakerSplitterSliceLegacy.set_governed_app_vertex)
+    @overrides(SpynnakerSplitterFixedLegacy.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
         AbstractSplitterCommon.set_governed_app_vertex(self, app_vertex)
         if not isinstance(app_vertex, SpikeSourcePoissonVertex):
             raise PacmanConfigurationException(
                 self.INVALID_POP_ERROR_MESSAGE.format(app_vertex))
 
-    @overrides(SpynnakerSplitterSliceLegacy.create_machine_vertices)
-    def create_machine_vertices(self, resource_tracker, machine_graph):
+    @overrides(SpynnakerSplitterFixedLegacy.create_machine_vertices)
+    def create_machine_vertices(self, chip_counter):
         # If sending over SDRAM, let the target handle this
         if self.send_over_sdram:
             return
 
         # If we passed this part, use the super class
         return super(SplitterPoissonDelegate, self).create_machine_vertices(
-            resource_tracker, machine_graph)
+            chip_counter)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
@@ -95,3 +95,16 @@ class SplitterPoissonDelegate(SpynnakerSplitterSliceLegacy):
             post_vertex = proj._projection_edge.post_vertex
             return post_vertex.splitter.get_out_going_slices()
         return super(SplitterPoissonDelegate, self).get_out_going_slices()
+
+    @overrides(AbstractSplitterCommon.get_out_going_vertices)
+    def get_out_going_vertices(self, partition_id):
+        if self.send_over_sdram:
+            return []
+        return super(SplitterPoissonDelegate, self).get_out_going_vertices(
+            partition_id)
+
+    @overrides(AbstractSplitterCommon.get_same_chip_groups)
+    def get_same_chip_groups(self):
+        if self.send_over_sdram:
+            return []
+        return super(SplitterPoissonDelegate, self).get_same_chip_groups()

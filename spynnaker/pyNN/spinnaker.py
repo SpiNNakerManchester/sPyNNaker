@@ -588,8 +588,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             spynnaker_machine_bitfield_ordered_covering_compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
-                self._machine_graph, self._placements, self._executable_finder,
-                self._routing_infos, self._executable_targets,
+                self._application_graph, self._placements,
+                self._executable_finder, self._routing_infos,
+                self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
             return None
@@ -602,8 +603,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             spynnaker_machine_bitField_pair_router_compressor(
                 self._router_tables, self._txrx, self._machine, self._app_id,
-                self._machine_graph, self._placements, self._executable_finder,
-                self._routing_infos, self._executable_targets,
+                self._application_graph, self._placements,
+                self._executable_finder, self._routing_infos,
+                self._executable_targets,
                 get_config_bool("Reports", "write_expander_iobuf"))
             self._multicast_routes_loaded = True
             return None
@@ -633,7 +635,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 return
             on_chip_bitfield_generator(
                 self.placements, self.application_graph,
-                self._executable_finder,  self._txrx, self._machine_graph)
+                self._executable_finder,  self._txrx)
 
     def _execute_finish_connection_holders(self):
         with FecTimer(LOADING, "Finish connection holders"):
@@ -693,15 +695,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
                 f"Unexpected cfg setting delay_support_adder: {name}")
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
-    def _execute_splitter_partitioner(self, pre_allocated_resources):
+    def _execute_splitter_partitioner(self):
         if not self._application_graph.n_vertices:
             return
         with FecTimer(MAPPING,  "SpynnakerSplitterPartitioner"):
-            if self._machine:
-                machine = self._machine
-            else:
-                machine = self._max_machine
-            self._machine_graph, self._n_chips_needed = \
-                spynnaker_splitter_partitioner(
-                    self._application_graph, machine, self._plan_n_timesteps,
-                    pre_allocated_resources)
+            self._n_chips_needed = spynnaker_splitter_partitioner(
+                self._application_graph, self._plan_n_timesteps)

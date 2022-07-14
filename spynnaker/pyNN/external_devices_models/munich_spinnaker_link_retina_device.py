@@ -19,10 +19,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints,
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -42,9 +39,7 @@ def get_spike_value_from_robot_retina(key):
 
 
 class MunichRetinaDevice(
-        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl):
+        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex):
     """ An Omnibot silicon retina device.
     """
     __slots__ = [
@@ -119,11 +114,8 @@ class MunichRetinaDevice(
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]
+        self.add_constraint(FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -137,8 +129,7 @@ class MunichRetinaDevice(
 
         # to ensure populations receive the correct packets, this needs to be
         # different based on which retina
-        key_set_payload = (self._virtual_chip_x << 24 |
-                           self._virtual_chip_y << 16)
+        key_set_payload = self.__fixed_key
 
         commands.append(MultiCastCommand(
             key=key_set_command, payload=key_set_payload, repeat=5,

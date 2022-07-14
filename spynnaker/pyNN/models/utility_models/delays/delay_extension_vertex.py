@@ -16,13 +16,9 @@
 from collections import defaultdict
 import math
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import get_config_bool
 from spinn_front_end_common.utilities.constants import (
     BITS_PER_WORD, BYTES_PER_WORD)
-from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spynnaker.pyNN.exceptions import DelayExtensionException
@@ -36,8 +32,7 @@ _DELAY_PARAM_HEADER_WORDS = 8
 
 
 class DelayExtensionVertex(
-        TDMAAwareApplicationVertex, AbstractHasDelayStages,
-        AbstractProvidesOutgoingPartitionConstraints):
+        TDMAAwareApplicationVertex, AbstractHasDelayStages):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -49,7 +44,7 @@ class DelayExtensionVertex(
         "__n_delay_stages",
         "__delay_generator_data",
         "__drop_late_spikes",
-        "__post_delay_edges"]
+        "__outgoing_edges"]
 
     # this maps to what master assumes
     MAX_SLOTS = 8
@@ -89,7 +84,7 @@ class DelayExtensionVertex(
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")
 
-        self.__post_delay_edges = set()
+        self.__outgoing_edges = list()
 
     @property
     def n_atoms(self):
@@ -190,11 +185,6 @@ class DelayExtensionVertex(
                 pre_vertex_slice, post_vertex_slice,
                 synapse_information, max_stage, max_delay_per_stage))
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
-
     def gen_on_machine(self, vertex_slice):
         """ Determine if the given slice needs to be generated on the machine
 
@@ -219,18 +209,24 @@ class DelayExtensionVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
 
     @property
     def partition(self):
         return self.__partition
 
-    def add_post_delay_edge(self, post_delay_edge):
-        self.__post_delay_edges.add(post_delay_edge)
+    def add_outgoing_edge(self, edge):
+        """ Add an outgoing edge to the delay extension
+
+        :param DelayedApplicationEdge delay_edge: The edge to add
+        """
+        self.__outgoing_edges.append(edge)
 
     @property
-    def post_delay_edges(self):
+    def outgoing_edges(self):
+        """ Get the outgoing edges from this vertex
+
+        :rtype: list(DelayApplicationEdge)
         """
-        Set of post_delay_edges from this Delay
-        """
-        return self.__post_delay_edges
+        return self.__outgoing_edges
+

@@ -70,7 +70,7 @@ class _DelaySupportAdder(object):
         for vertex in app_graph.vertices:
             if isinstance(vertex, DelayExtensionVertex):
                 self._app_to_delay_map[vertex.partition] = vertex
-                for edge in vertex.post_delay_edges:
+                for edge in vertex.outgoing_edges:
                     self._delay_post_edge_map[(vertex, edge.post_vertex)] = \
                         edge
 
@@ -141,6 +141,7 @@ class _DelaySupportAdder(object):
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
             app_edge.delay_edge = delay_edge
+            delay_app_vertex.add_outgoing_edge(delay_edge)
 
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, delay_per_stage,
@@ -169,8 +170,7 @@ class _DelaySupportAdder(object):
                 label=delay_name)
 
             # set trackers
-            delay_app_vertex.splitter = (
-                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter))
+            delay_app_vertex.splitter = SplitterDelayVertexSlice()
             app_graph.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)

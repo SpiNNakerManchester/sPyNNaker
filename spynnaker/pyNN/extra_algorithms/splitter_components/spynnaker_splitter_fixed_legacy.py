@@ -13,12 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 
 
-class SpynnakerSplitterSliceLegacy(
-        SplitterSliceLegacy, AbstractSpynnakerSplitterDelay):
+class SpynnakerSplitterFixedLegacy(
+        SplitterFixedLegacy, AbstractSpynnakerSplitterDelay):
 
     def __init__(self):
-        super().__init__("spynnaker_splitter_slice_legacy")
+        super().__init__("spynnaker_splitter_fixed_legacy")
