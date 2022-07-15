@@ -349,7 +349,7 @@ class PopulationMachineNeurons(
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
         neurons_pre_size = self._app_vertex.get_neuron_params_position(
-            self._vertex_slice)
+            self._vertex_slice.n_atoms)
         neuron_parameters_sdram_address = (
             neuron_region_sdram_address + neurons_pre_size)
 
