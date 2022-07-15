@@ -29,7 +29,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
-from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 
@@ -69,11 +68,6 @@ def spynakker_vertex_selector(app_vertex):
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):
             app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
-            # if _is_multidimensional(app_vertex) or isinstance(
-            #         app_vertex.synapse_dynamics, AbstractLocalOnly):
-            #     app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
-            # else:
-            #     app_vertex.splitter = SplitterAbstractPopulationVertexSlice()
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             app_vertex.splitter = SplitterExternalDevice()
         elif isinstance(app_vertex, ApplicationFPGAVertex):

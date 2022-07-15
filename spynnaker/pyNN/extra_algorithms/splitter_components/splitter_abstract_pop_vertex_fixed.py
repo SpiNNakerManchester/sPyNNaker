@@ -102,35 +102,6 @@ class SplitterAbstractPopulationVertexFixed(
 
     @overrides(AbstractSplitterCommon.create_machine_vertices)
     def create_machine_vertices(self, chip_counter):
-
-        # app_vertex = self._governed_app_vertex
-        # app_vertex.synapse_recorder.add_region_offset(
-        #     len(app_vertex.neuron_recorder.get_recordable_variables()))
-        #
-        # max_atoms_per_core = min(
-        #     app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
-        #
-        # projections = app_vertex.incoming_projections
-        # constraints = get_remaining_constraints(app_vertex)
-        # ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
-        # weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
-        # all_syn_block_sz = app_vertex.get_synapses_size(
-        #     max_atoms_per_core, projections)
-        # structural_sz = app_vertex.get_structural_dynamics_size(
-        #     max_atoms_per_core, projections)
-        # resources = self.get_resources_used_by_atoms(
-        #     max_atoms_per_core, all_syn_block_sz, structural_sz)
-        #
-        # self.__create_slices()
-        #
-        # for index, vertex_slice in enumerate(self.__slices):
-        #     chip_counter.add_core(resources)
-        #     label = f"Slice {vertex_slice} of {app_vertex.label}"
-        #     machine_vertex = self.create_machine_vertex(
-        #         vertex_slice, resources, label, constraints, all_syn_block_sz,
-        #         structural_sz, ring_buffer_shifts, weight_scales, index)
-        #     self._governed_app_vertex.remember_machine_vertex(machine_vertex)
-
         app_vertex = self._governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
@@ -140,13 +111,10 @@ class SplitterAbstractPopulationVertexFixed(
         self.__vertices = list()
         for vertex_slice in self.__slices:
             resources = self.get_resources_used_by_atoms(vertex_slice)
-            # resource_tracker.allocate_constrained_resources(
-            #     resources, constraints)
             chip_counter.add_core(resources)
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, resources, label, constraints)
-            # machine_graph.add_vertex(machine_vertex)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
             self.__edge_map[machine_vertex] = [MachineEdge]
             self.__vertices.append(machine_vertex)
