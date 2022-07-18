@@ -33,7 +33,7 @@ class TestVeryLow(BaseTestCase):
     tests the run is split buy auto pause resume
     """
 
-    def more_runs(self):
+    def test_more_runs(self):
         with LogCapture() as lc:
             synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                run_times=[runtime])
@@ -41,15 +41,14 @@ class TestVeryLow(BaseTestCase):
             # CB Currently eight but could change
             # Needs to be larger than 1000 timesteps version
             self.assert_logs_messages(
-                lc.records, "*** Running simulation... ***", 'INFO', 2,
-                allow_more=True)
+                lc.records, "*** Running simulation... ***", 'INFO', 3)
 
         self.assertEqual(158, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
         synfire_run.get_output_pop_gsyn_exc_numpy()
         synfire_run.get_output_pop_voltage_numpy()
 
-    def test_more_runs(self):
+    def more_runs(self):
         self.runsafe(self.more_runs)
 
 
