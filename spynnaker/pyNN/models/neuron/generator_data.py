@@ -16,8 +16,7 @@
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_per_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 # Address to indicate that the synaptic region is unused
 SYN_REGION_UNUSED = 0xFFFFFFFF
@@ -107,7 +106,8 @@ class GeneratorData(object):
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
             self.__max_delay_per_stage,
-            DataType.S1615.encode_as_int(machine_time_step_per_ms()),
+            DataType.S1615.encode_as_int(
+                SpynnakerDataView.get_simulation_time_step_per_ms()),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

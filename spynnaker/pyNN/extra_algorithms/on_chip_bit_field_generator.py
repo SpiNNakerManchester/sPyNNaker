@@ -26,8 +26,7 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.helpful_functions import n_word_struct
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region)
 
@@ -57,30 +56,20 @@ def _percent(amount, total):
     return (100.0 * amount) / float(total)
 
 
-def on_chip_bitfield_generator(
-        placements, app_graph, executable_finder, transceiver):
+def on_chip_bitfield_generator():
     """ Loads and runs the bit field generator on chip.
 
-    :param ~pacman.model.placements.Placements placements: placements
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
-    :param executable_finder: the executable finder
-    :type executable_finder:
-        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-    :param ~spinnman.transceiver.Transceiver transceiver:
-        the SpiNNMan instance
     """
-    generator = _OnChipBitFieldGenerator(
-        placements, executable_finder, transceiver)
+    generator = _OnChipBitFieldGenerator()
     # pylint: disable=protected-access
-    generator._run(app_graph, executable_finder)
+    generator._run()
 
 
 class _OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing.
     """
 
-    __slots__ = ("__aplx", "__placements", "__txrx")
+    __slots__ = ("__aplx", "__txrx")
 
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
@@ -111,30 +100,21 @@ class _OnChipBitFieldGenerator(object):
     _CORE_DETAIL = "For core {}:{}:{} ({}), bitfields as follows:\n\n"
     _FIELD_DETAIL = "    For key {}, neuron id {} has bit == {}\n"
 
-    def __init__(self, placements, executable_finder, transceiver):
+    def __init__(self):
         """ Loads and runs the bit field generator on chip.
 
-        :param ~pacman.model.placements.Placements placements: placements
-        :param executable_finder: the executable finder
-        :type executable_finder:
-            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+        """
+        self.__aplx = SpynnakerDataView.get_executable_path(
+            self._BIT_FIELD_EXPANDER_APLX)
+
+    def _run(self):
+        """ Loads and runs the bit field generator on chip.
+
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
         """
-        self.__txrx = transceiver
-        self.__placements = placements
-        self.__aplx = executable_finder.get_executable_path(
-            self._BIT_FIELD_EXPANDER_APLX)
-
-    def _run(self, app_graph, executable_finder):
-        """ Loads and runs the bit field generator on chip.
-
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
-        :param executable_finder: the executable finder
-        :type executable_finder:
-            ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        """
+        self.__txrx = SpynnakerDataView.get_transceiver()
+        app_graph = SpynnakerDataView.get_runtime_graph()
         # progress bar
         progress = ProgressBar(
             app_graph.n_vertices,
@@ -148,27 +128,26 @@ class _OnChipBitFieldGenerator(object):
         timeout = max(2.0, max_bit_data_size / 1000.0)
 
         # load data
-        bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
+        bit_field_app_id = SpynnakerDataView.get_new_id()
 
         # run app
         progress = ProgressBar(
             expander_cores.total_processors,
             "Expanding bitfields on the machine")
         system_control_logic.run_system_application(
-            expander_cores, bit_field_app_id, self.__txrx,
-            executable_finder,
+            expander_cores, bit_field_app_id,
             get_config_bool("Reports", "write_bit_field_iobuf"),
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress,
             timeout=timeout)
 
         # read in bit fields for debugging purposes
+        run_dir_path = SpynnakerDataView.get_run_dir_path()
         if get_config_bool("Reports", "generate_bit_field_report"):
             self._full_report_bit_fields(app_graph, os.path.join(
-                report_default_directory(), self._BIT_FIELD_REPORT_FILENAME))
+                run_dir_path, self._BIT_FIELD_REPORT_FILENAME))
             self._summary_report_bit_fields(app_graph, os.path.join(
-                report_default_directory(),
-                self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
+                run_dir_path, self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
     def _summary_report_bit_fields(self, app_graph, file_path):
         """ summary report of the bitfields that were generated
@@ -258,7 +237,7 @@ class _OnChipBitFieldGenerator(object):
         """
         for vertex in app_vertex.machine_vertices:
             if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                yield self.__placements.get_placement_of_vertex(vertex)
+                yield SpynnakerDataView.get_placement_of_vertex(vertex)
 
     def __bitfields(self, placement):
         """ Reads back the bitfields that have been placed on a vertex.
@@ -269,8 +248,7 @@ class _OnChipBitFieldGenerator(object):
         :rtype: iterable(tuple(int,int,list(int)))
         """
         # get bitfield address
-        address = placement.vertex.bit_field_base_address(
-            self.__txrx, placement)
+        address = placement.vertex.bit_field_base_address(placement)
 
         # read how many bitfields there are; header of filter_region_t
         _merged, _redundant, total = _THREE_WORDS.unpack(
@@ -336,7 +314,7 @@ class _OnChipBitFieldGenerator(object):
             executable_type=ExecutableType.SYSTEM)
 
         bit_field_builder_region = placement.vertex.bit_field_builder_region(
-            self.__txrx, placement)
+            placement)
         # update user 1 with location
         user_1_base_address = \
             self.__txrx.get_user_1_register_address_from_core(placement.p)
@@ -344,7 +322,7 @@ class _OnChipBitFieldGenerator(object):
             placement.x, placement.y, user_1_base_address,
             bit_field_builder_region)
 
-    def __check_for_success(self, executable_targets, transceiver):
+    def __check_for_success(self, executable_targets):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
@@ -353,6 +331,7 @@ class _OnChipBitFieldGenerator(object):
         :param ~.Transceiver transceiver: SpiNNMan instance
         :rtype: bool
         """
+        transceiver = SpynnakerDataView.get_transceiver()
         for core_subset in executable_targets.all_core_subsets:
             x = core_subset.x
             y = core_subset.y

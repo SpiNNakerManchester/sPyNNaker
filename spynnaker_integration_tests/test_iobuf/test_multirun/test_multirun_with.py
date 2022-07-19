@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from spinn_front_end_common.utilities import globals_variables
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestIobuffMultirun(BaseTestCase):
@@ -30,11 +30,11 @@ class TestIobuffMultirun(BaseTestCase):
 
     def do_run(self):
         sim.setup(timestep=1.0, min_delay=1.0)
-        prov_path = globals_variables.app_provenance_file_path()
+        prov_path = SpynnakerDataView.get_app_provenance_dir_path()
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 
-        placements = globals_variables.get_simulator()._placements
+        placements = SpynnakerDataView.get_placements()
         machine_verts = list(pop._vertex.machine_vertices)
         placement = placements.get_placement_of_vertex(machine_verts[0])
 
@@ -59,8 +59,7 @@ class TestIobuffMultirun(BaseTestCase):
         sim.reset()
         sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
-        prov_patha = \
-            globals_variables.app_provenance_file_path()
+        prov_patha = SpynnakerDataView.get_app_provenance_dir_path()
         self.assertNotEqual(prov_path, prov_patha)
         size6 = self.check_size(prov_patha, placement)
         # Should write the same thing again

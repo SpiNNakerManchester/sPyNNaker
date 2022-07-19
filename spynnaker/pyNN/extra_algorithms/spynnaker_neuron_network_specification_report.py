@@ -17,8 +17,7 @@ import os
 from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -47,17 +46,15 @@ def _get_diagram(label):
             graphviz.backend.ExecutableNotFound)
 
 
-def spynnaker_neuron_graph_network_specification_report(application_graph):
+def spynnaker_neuron_graph_network_specification_report():
     """
     Produces a report describing the graph created from the neural \
         populations and projections.
 
     :param str report_folder: the report folder to put figure into
-    :param ~pacman.model.graphs.application.ApplicationGraph \
-            application_graph:
-        the app graph
     """
     # create holders for data
+    application_graph = SpynnakerDataView.get_runtime_graph()
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str("Reports", "network_graph_format")
@@ -85,7 +82,7 @@ def spynnaker_neuron_graph_network_specification_report(application_graph):
 
     # write dot file and generate pdf
     file_to_output = os.path.join(
-        report_default_directory(), _GRAPH_NAME)
+        SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exeNotFoundExn:

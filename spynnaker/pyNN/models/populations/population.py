@@ -19,16 +19,16 @@ import neo
 import inspect
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.graphs.application import ApplicationVertex
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, get_not_running_simulator)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SpynnakerException)
 from spynnaker.pyNN.models.abstract_models import (
@@ -117,9 +117,7 @@ class Population(PopulationBase):
         self._positions = None
 
         # add objects to the SpiNNaker control class
-        sim = get_simulator()
-        sim.add_population(self)
-        sim.add_application_vertex(self.__vertex)
+        SpynnakerDataView.add_vertex(self.__vertex)
 
         # initialise common stuff
         if size is None:
@@ -132,13 +130,9 @@ class Population(PopulationBase):
         self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
-        self._all_ids = numpy.arange(sim.id_counter, sim.id_counter + size)
-        self.__first_id = self._all_ids[0]
-        self.__last_id = self._all_ids[-1]
-
-        # update the simulators id_counter for giving a unique ID for every
-        # atom
-        sim.id_counter += size
+        self.__first_id, self.__last_id = SpynnakerDataView.add_population(
+            self)
+        self._all_ids = numpy.arange(self.__first_id, self.__last_id)
 
         # set up initial values if given
         if initial_values:
@@ -799,10 +793,11 @@ class Population(PopulationBase):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if get_not_running_simulator().has_ran \
-                and not self.__vertex_changeable_after_run:
-            raise Exception("Population does not support changes after run")
-        self._read_parameters_before_set()
+        if SpynnakerDataView.is_ran_last():
+            if not self.__vertex_changeable_after_run:
+                raise Exception(
+                    "Population does not support changes after run")
+            self._read_parameters_before_set()
         self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
@@ -847,13 +842,17 @@ class Population(PopulationBase):
 
     def _set_check(self, parameter, value):
         """ Checks for various set methods.
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         if not self.__vertex_population_settable:
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        sim = get_not_running_simulator()
-        if sim.has_ran and not self.__vertex_changeable_after_run:
+        SpynnakerDataView.check_user_can_act()
+        if (SpynnakerDataView.is_ran_ever()
+                and not self.__vertex_changeable_after_run):
             raise Exception(
                 "Run has been called but vertex is not changable.")
 
@@ -865,7 +864,7 @@ class Population(PopulationBase):
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
 
-        if not sim.has_reset_last:
+        if SpynnakerDataView.is_ran_last():
             self._read_parameters_before_set()
 
     def _set(self, parameter, value=None):
@@ -885,6 +884,9 @@ class Population(PopulationBase):
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         self._set_check(parameter, value)
 
@@ -918,6 +920,9 @@ class Population(PopulationBase):
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
         self._set_check(parameter, value)
 
@@ -934,20 +939,19 @@ class Population(PopulationBase):
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        sim = get_simulator()
-        if (sim.has_ran
+        if (SpynnakerDataView.is_ran_last()
                 and not self.__has_read_neuron_parameters_this_run
-                and not sim.use_virtual_board):
+                and not get_config_bool("Machine", "virtual_board")):
             # go through each machine vertex and read the neuron parameters
             # it contains
             for vertex in self.__vertex.machine_vertices:
                 if isinstance(vertex, AbstractReadParametersBeforeSet):
                     # tell the core to rewrite neuron params back to the
                     # SDRAM space.
-                    placement = sim.placements.get_placement_of_vertex(vertex)
+                    placement = SpynnakerDataView.get_placement_of_vertex(
+                        vertex)
                     vertex.read_parameters_from_machine(
-                        sim.transceiver, placement, vertex.vertex_slice)
-
+                        placement, vertex.vertex_slice)
             self.__has_read_neuron_parameters_this_run = True
 
     @property
@@ -964,8 +968,11 @@ class Population(PopulationBase):
             onto which its atoms will be placed.
 
         :param ~pacman.model.constraints.AbstractConstraint constraint:
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_can_act()
         if not isinstance(constraint, AbstractConstraint):
             raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
@@ -981,8 +988,11 @@ class Population(PopulationBase):
         :param int x: The x-coordinate of the placement constraint
         :param int y: The y-coordinate of the placement constraint
         :param int p: The processor ID of the placement constraint (optional)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_can_act()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
@@ -995,8 +1005,11 @@ class Population(PopulationBase):
         :param dict(str,int) constraint_dict:
             A dictionary containing "x", "y" and optionally "p" as keys, and
             ints as values
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_can_act()
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
@@ -1008,8 +1021,11 @@ class Population(PopulationBase):
 
         :param int max_atoms_per_core:
             the new value for the max atoms per core.
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_can_act()
         cap = self.celltype.get_max_atoms_per_core()
         if max_atoms_per_core > cap:
             raise SpynnakerException(

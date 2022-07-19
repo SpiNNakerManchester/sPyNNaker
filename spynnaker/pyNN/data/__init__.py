@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The University of Manchester
+# Copyright (c) 2021-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,10 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = "1!6.0.1"
-__version_month__ = "May"
-__version_year__ = "2021"
-__version_day__ = "TBD"
-__version_name__ = "Not yet released"
+from .spynnaker_data_view import SpynnakerDataView
 
-_NAME = f"SpiNNaker_under_version({__version__}-{__version_name__})"
+__all__ = ["SpynnakerDataView"]

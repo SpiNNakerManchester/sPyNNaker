@@ -17,9 +17,8 @@ import numpy
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
@@ -45,9 +44,7 @@ class NoisyCurrentSource(AbstractCurrentSource):
                  rng=None):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
-        sim = get_simulator()
-        machine_ts = sim.machine_time_step
-        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
         self.__mean = mean
         self.__stdev = stdev
         self.__start = start * time_convert_ms
