@@ -89,15 +89,14 @@ class SplitterAbstractPopulationVertexFixed(
             print("Using given values for RB left shifts.")
             ring_buffer_shifts = app_vertex.rb_left_shifts
             print("RB left shifts for {:20}".format(app_vertex.label),
-                  "=", self.__ring_buffer_shifts)
+                  "=", ring_buffer_shifts)
             print("-" * 80)
         else:
             print("=" * 80)
             print("Computing RB left shifts for", app_vertex.label)
-            ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(
-                app_vertex.incoming_projections)
+            ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
             print("RB left shifts for {:20}".format(app_vertex.label),
-                  "=", self.__ring_buffer_shifts)
+                  "=", ring_buffer_shifts)
 
         # ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
