@@ -130,7 +130,7 @@ class SpynnakerDataView(FecDataView):
         """
         An iteration of the projections previously added
 
-        The iteration will be emtpy if no projections added.
+        The iteration will be empty if no projections added.
 
         :rtpye: iterable(Projection)
         """
@@ -173,7 +173,7 @@ class SpynnakerDataView(FecDataView):
         """
         An iteration of the populations previously added
 
-        The iteration will be emtpy if no populations added.
+        The iteration will be empty if no populations added.
 
         :rtpye: iterable(~spynnaker.pyNN.models.populations.Population)
         """
