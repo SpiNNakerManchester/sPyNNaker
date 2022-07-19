@@ -58,8 +58,7 @@ def _percent(amount, total):
 
 
 def on_chip_bitfield_generator(
-        placements, app_graph, executable_finder, transceiver,
-        machine_graph, routing_infos):
+        placements, app_graph, executable_finder, transceiver):
     """ Loads and runs the bit field generator on chip.
 
     :param ~pacman.model.placements.Placements placements: placements
@@ -70,14 +69,11 @@ def on_chip_bitfield_generator(
         ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
     :param ~spinnman.transceiver.Transceiver transceiver:
         the SpiNNMan instance
-    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-        the machine graph
-    :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        the key to edge map
     """
     generator = _OnChipBitFieldGenerator(
         placements, executable_finder, transceiver)
-    generator._run(app_graph, executable_finder, machine_graph, routing_infos)
+    # pylint: disable=protected-access
+    generator._run(app_graph, executable_finder)
 
 
 class _OnChipBitFieldGenerator(object):
@@ -119,44 +115,30 @@ class _OnChipBitFieldGenerator(object):
         """ Loads and runs the bit field generator on chip.
 
         :param ~pacman.model.placements.Placements placements: placements
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
         :param ~spinnman.transceiver.Transceiver transceiver:
             the SpiNNMan instance
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            the machine graph
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-            the key to edge map
         """
         self.__txrx = transceiver
         self.__placements = placements
         self.__aplx = executable_finder.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
 
-    def _run(
-            self, app_graph, executable_finder, machine_graph, routing_infos):
+    def _run(self, app_graph, executable_finder):
         """ Loads and runs the bit field generator on chip.
 
-        :param ~pacman.model.placements.Placements placements: placements
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
             the app graph
         :param executable_finder: the executable finder
         :type executable_finder:
             ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            the SpiNNMan instance
-        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
-            the machine graph
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-            the key to edge map
         """
         # progress bar
         progress = ProgressBar(
-            app_graph.n_vertices + machine_graph.n_vertices + 1,
-            "Running bitfield generation on chip")
+            app_graph.n_vertices,
+            "Finding cores where bitfields are to be generated")
 
         # get data
         expander_cores, max_bit_data_size = self._calculate_core_data(
@@ -167,9 +149,11 @@ class _OnChipBitFieldGenerator(object):
 
         # load data
         bit_field_app_id = self.__txrx.app_id_tracker.get_new_id()
-        progress.update(1)
 
         # run app
+        progress = ProgressBar(
+            expander_cores.total_processors,
+            "Expanding bitfields on the machine")
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, self.__txrx,
             executable_finder,
@@ -177,8 +161,6 @@ class _OnChipBitFieldGenerator(object):
             self.__check_for_success, [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress,
             timeout=timeout)
-        # update progress bar
-        progress.end()
 
         # read in bit fields for debugging purposes
         if get_config_bool("Reports", "generate_bit_field_report"):
@@ -199,7 +181,7 @@ class _OnChipBitFieldGenerator(object):
         progress = ProgressBar(
             app_graph.n_vertices,
             "reading back bitfields from chip for summary report")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts
@@ -245,7 +227,7 @@ class _OnChipBitFieldGenerator(object):
         """
         progress = ProgressBar(
             app_graph.n_vertices, "reading back bitfields from chip")
-        with open(file_path, "w") as output:
+        with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
                 # get machine verts
@@ -330,7 +312,7 @@ class _OnChipBitFieldGenerator(object):
         # bit field expander executable file path
         # locate verts which can have a synaptic matrix to begin with
         max_bit_data_size = 0
-        for app_vertex in progress.over(app_graph.vertices, False):
+        for app_vertex in progress.over(app_graph.vertices):
             is_bit_fields = False
             for placement in self.__bitfield_placements(app_vertex):
                 self.__write_single_core_data(placement, expander_cores)

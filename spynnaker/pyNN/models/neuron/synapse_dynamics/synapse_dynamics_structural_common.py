@@ -27,6 +27,7 @@ from spinn_front_end_common.utilities.globals_variables import (
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: Default value for frequency of rewiring
 DEFAULT_F_REW = 10 ** 4.0
@@ -110,7 +111,7 @@ class SynapseDynamicsStructuralCommon(
             spec, pop_index, app_vertex, vertex_slice)
 
         # Write the component parameters
-        # pylint: disable=no-member
+        # pylint: disable=no-member, protected-access
         spec.comment("Writing partner selection parameters")
         self.partner_selection.write_parameters(spec)
         for proj in structural_projections:
@@ -134,6 +135,7 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = list()
         seen_app_edges = set()
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             for synapse_info in app_edge.synapse_information:
                 if isinstance(synapse_info.synapse_dynamics,
@@ -222,19 +224,18 @@ class SynapseDynamicsStructuralCommon(
         for proj in structural_projections:
             spec.comment("Writing pre-population info for {}".format(
                 proj.label))
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
             dynamics = synapse_info.synapse_dynamics
 
-            machine_edges = list()
-            for machine_edge in app_edge.machine_edges:
-                if machine_edge.post_vertex.vertex_slice == post_vertex_slice:
-                    machine_edges.append(machine_edge)
+            # Number of incoming vertices
+            out_verts = app_edge.pre_vertex.splitter.get_out_going_vertices(
+                SPIKE_PARTITION_ID)
+            spec.write_value(len(out_verts), data_type=DataType.UINT16)
 
-            # Number of machine edges
-            spec.write_value(len(machine_edges), data_type=DataType.UINT16)
             # Controls - currently just if this is a self connection or not
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
@@ -260,15 +261,16 @@ class SynapseDynamicsStructuralCommon(
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for machine_edge in machine_edges:
-                r_info = routing_info.get_routing_info_for_edge(machine_edge)
-                vertex_slice = machine_edge.pre_vertex.vertex_slice
+            for m_vertex in out_verts:
+                r_info = routing_info.get_routing_info_from_pre_vertex(
+                    m_vertex, SPIKE_PARTITION_ID)
+                vertex_slice = m_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
                 spec.write_value(synaptic_matrices.get_index(
-                    app_edge, synapse_info, machine_edge))
+                    app_edge, synapse_info, m_vertex))
         return pop_index
 
     def __write_post_to_pre_table(
@@ -289,23 +291,22 @@ class SynapseDynamicsStructuralCommon(
         slice_conns = self.connections[app_vertex, vertex_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
-            [conn for (conn, _, _, _) in slice_conns])
+            [conn for (conn, _, _, _, _) in slice_conns])
         # Make a single large array of population index
-        conn_lens = [len(conn) for (conn, _, _, _) in slice_conns]
-        for (_, a_edge, _, s_info) in slice_conns:
+        conn_lens = [len(conn) for (conn, _, _, _, _) in slice_conns]
+        for (_, a_edge, _, _, s_info) in slice_conns:
             if (a_edge.pre_vertex, s_info) not in pop_index:
                 print("Help!")
         pop_indices = numpy.repeat(
             [pop_index[a_edge.pre_vertex, s_info]
-             for (_, a_edge, _, s_info) in slice_conns], conn_lens)
+             for (_, a_edge, _, _, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.repeat(
-            [m_edge.pre_vertex.index
-             for (_, _, m_edge, _) in slice_conns], conn_lens)
+            [pre_index for (_, _, pre_index, _, _) in slice_conns], conn_lens)
         # Get the low atom for each source and subtract
         lo_atoms = numpy.repeat(
-            [m_edge.pre_vertex.vertex_slice.lo_atom
-             for (_, _, m_edge, _) in slice_conns], conn_lens)
+            [pre_slice.lo_atom
+             for (_, _, _, pre_slice, _) in slice_conns], conn_lens)
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - vertex_slice.lo_atom
 
@@ -349,10 +350,11 @@ class SynapseDynamicsStructuralCommon(
         structural_projections = self.__get_structural_projections(
             incoming_projections)
         for proj in structural_projections:
+            # pylint: disable=protected-access
             dynamics = proj._synapse_information.synapse_dynamics
             app_edge = proj._projection_edge
             n_sub_edges += len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()
             param_sizes += dynamics.elimination\
@@ -381,13 +383,13 @@ class SynapseDynamicsStructuralCommon(
         :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
         """
-        # Note noqa because exact type comparison is required here
+        # Note noqa:E721  because exact type comparison is required here
         return (
             self.s_max == synapse_dynamics.s_max and
             self.f_rew == synapse_dynamics.f_rew and
             self.initial_weight == synapse_dynamics.initial_weight and
             self.initial_delay == synapse_dynamics.initial_delay and
-            (type(self.partner_selection) ==  # noqa
+            (type(self.partner_selection) ==  # noqa: E721
              type(synapse_dynamics.partner_selection)) and
             (type(self.formation) ==
              type(synapse_dynamics.formation)) and

@@ -25,7 +25,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
     def __init__(
             self, spike_time_file, min_atom=None, max_atom=None, min_time=None,
             max_time=None, split_value="\t"):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)

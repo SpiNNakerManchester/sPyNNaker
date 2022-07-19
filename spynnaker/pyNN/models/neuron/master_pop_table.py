@@ -356,13 +356,14 @@ class MasterPopTableAsBinarySearch(object):
         n_vertices = 0
         seen_edges = set()
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             in_edge = proj._projection_edge
 
             # If we haven't seen this edge before, add it in
             if in_edge not in seen_edges:
                 seen_edges.add(in_edge)
                 vertex = in_edge.pre_vertex
-                n_cores = len(vertex.splitter.get_out_going_slices()[0])
+                n_cores = len(vertex.splitter.get_out_going_slices())
 
                 # If there are also delays, double it
                 if in_edge.n_delay_stages:

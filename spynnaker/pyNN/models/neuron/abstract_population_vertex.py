@@ -22,16 +22,14 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums.data_type import DataType
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from spinn_utilities.config_holder import (
     get_config_int, get_config_float, get_config_bool)
 from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractCanReset, AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractCanReset,
+    AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -84,10 +82,10 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 class AbstractPopulationVertex(
         TDMAAwareApplicationVertex, AbstractContainsUnits,
         AbstractSpikeRecordable, AbstractNeuronRecordable,
-        AbstractEventRecordable, AbstractProvidesOutgoingPartitionConstraints,
+        AbstractEventRecordable,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractAcceptsIncomingSynapses,
-        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.\
         Not actually abstract.
     """
@@ -115,7 +113,9 @@ class AbstractPopulationVertex(
         "__incoming_projections",
         "__synapse_dynamics",
         "__max_row_info",
-        "__self_projection"]
+        "__self_projection",
+        "__current_sources",
+        "__current_source_id_list"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -167,7 +167,7 @@ class AbstractPopulationVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
 
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         super().__init__(label, constraints, max_atoms_per_core, splitter)
 
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -228,6 +228,10 @@ class AbstractPopulationVertex(
         self.__change_requires_data_generation = False
         self.__has_run = False
 
+        # Current sources for this vertex
+        self.__current_sources = []
+        self.__current_source_id_list = dict()
+
         # Set up for profiling
         self.__n_profile_samples = get_config_int(
             "Reports", "n_profile_samples")
@@ -273,7 +277,9 @@ class AbstractPopulationVertex(
         """
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
+        self.__max_row_info.clear()
         self.__incoming_projections.append(projection)
+        # pylint: disable=protected-access
         if projection._projection_edge.pre_vertex == self:
             self.__self_projection = projection
 
@@ -292,7 +298,7 @@ class AbstractPopulationVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
 
     @property
     def size(self):
@@ -406,7 +412,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    def get_sdram_usage_for_neuron_params(self, vertex_slice):
+    def get_sdram_usage_for_neuron_params(self, n_atoms):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -417,7 +423,35 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             (self.__neuron_impl.get_n_synapse_types() * BYTES_PER_WORD) +
             self.tdma_sdram_size_in_bytes +
-            self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
+            self.__neuron_impl.get_sdram_usage_in_bytes(n_atoms))
+
+    def get_sdram_usage_for_current_source_params(self, n_atoms):
+        """ Calculate the SDRAM usage for the current source parameters region.
+
+        :param int n_atoms: The number of atoms to account for
+        :return: The SDRAM required for the current source region
+        """
+        # If non at all, just output size of 0 declaration
+        if not self.__current_sources:
+            return BYTES_PER_WORD
+
+        # This is a worst-case count, assuming all sources apply to all atoms
+        # Start with the count of sources + count of sources per neuron
+        sdram_usage = BYTES_PER_WORD + (n_atoms * BYTES_PER_WORD)
+
+        # There is a number of each different type of current source
+        sdram_usage += 4 * BYTES_PER_WORD
+
+        # Add on size of neuron id list per source (remember assume all atoms)
+        sdram_usage += (
+            len(self.__current_sources) * 2 * n_atoms * BYTES_PER_WORD)
+
+        # Add on the size of the current source data + neuron id list per
+        # source (remember, assume all neurons for worst case)
+        for current_source in self.__current_sources:
+            sdram_usage += current_source.get_sdram_usage_in_bytes()
+
+        return sdram_usage
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -655,16 +689,6 @@ class AbstractPopulationVertex(
             if isinstance(post_vertex, HasSynapses):
                 post_vertex.clear_connection_cache()
 
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex.
-
-        :param partition: the partition that leaves this vertex
-        :return: list of constraints
-        """
-        return [ContiguousKeyRangeContraint()]
-
     @overrides(AbstractNeuronRecordable.clear_recording)
     def clear_recording(self, variable, buffer_manager, placements):
         if variable == NeuronRecorder.SPIKES:
@@ -745,6 +769,32 @@ class AbstractPopulationVertex(
         :param str target: The synapse to get the id of
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
+
+    def inject(self, current_source, neuron_list):
+        """ Inject method from population to set up current source
+
+        """
+        self.__current_sources.append(current_source)
+        self.__current_source_id_list[current_source] = neuron_list
+        # set the associated vertex (for multi-run case)
+        current_source.set_app_vertex(self)
+        # set to reload for multi-run case
+        for m_vertex in self.machine_vertices:
+            m_vertex.set_reload_required(True)
+
+    @property
+    def current_sources(self):
+        """ Current sources need to be available to machine vertex
+
+        """
+        return self.__current_sources
+
+    @property
+    def current_source_id_list(self):
+        """ Current source ID list needs to be available to machine vertex
+
+        """
+        return self.__current_source_id_list
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)
@@ -863,6 +913,7 @@ class AbstractPopulationVertex(
         min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
 
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             # Skip if this is a synapse dynamics synapse type
             if synapse_info.synapse_type_from_dynamics:
@@ -898,6 +949,7 @@ class AbstractPopulationVertex(
             spikes_per_tick = max(
                 1.0, self.__spikes_per_second / steps_per_second)
             spikes_per_second = self.__spikes_per_second
+            # pylint: disable=protected-access
             pre_vertex = proj._projection_edge.pre_vertex
             if isinstance(pre_vertex, AbstractMaxSpikes):
                 rate = pre_vertex.max_spikes_per_second()
@@ -1007,7 +1059,7 @@ class AbstractPopulationVertex(
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__neuron_impl.get_n_synapse_types()))
 
-    def get_synapse_dynamics_size(self, vertex_slice):
+    def get_synapse_dynamics_size(self, n_atoms):
         """ Get the size of the synapse dynamics region
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1018,9 +1070,9 @@ class AbstractPopulationVertex(
             return 0
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self.__neuron_impl.get_n_synapse_types())
+            n_atoms, self.__neuron_impl.get_n_synapse_types())
 
-    def get_structural_dynamics_size(self, vertex_slice, incoming_projections):
+    def get_structural_dynamics_size(self, n_atoms, incoming_projections):
         """ Get the size of the structural dynamics region
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1037,36 +1089,35 @@ class AbstractPopulationVertex(
 
         return self.__synapse_dynamics\
             .get_structural_parameters_sdram_usage_in_bytes(
-                incoming_projections, vertex_slice.n_atoms)
+                incoming_projections, n_atoms)
 
-    def get_synapses_size(self, vertex_slice, incoming_projections):
+    def get_synapses_size(self, n_post_atoms, incoming_projections):
         """ Get the maximum SDRAM usage for the synapses on a vertex slice
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice of the vertex to get the usage of
+        :param int n_post_atoms: The number of atoms projected to
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections to consider in the calculations
         """
         addr = 2 * BYTES_PER_WORD
         for proj in incoming_projections:
-            addr = self.__add_matrix_size(addr, proj, vertex_slice)
+            addr = self.__add_matrix_size(addr, proj, n_post_atoms)
         return addr
 
-    def __add_matrix_size(self, addr, projection, vertex_slice):
+    def __add_matrix_size(self, addr, projection, n_post_atoms):
         """ Add to the address the size of the matrices for the projection to
             the vertex slice
 
         :param int addr: The address to start from
         :param ~spynnaker.pyNN.models.Projection: The projection to add
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice projected to
+        :param int n_post_atoms: The number of atoms projected to
         :rtype: int
         """
+        # pylint: disable=protected-access
         synapse_info = projection._synapse_information
         app_edge = projection._projection_edge
 
         max_row_info = self.get_max_row_info(
-            synapse_info, vertex_slice, app_edge)
+            synapse_info, n_post_atoms, app_edge)
 
         vertex = app_edge.pre_vertex
         n_sub_atoms = int(min(vertex.get_max_atoms_per_core(), vertex.n_atoms))
@@ -1087,19 +1138,18 @@ class AbstractPopulationVertex(
                 addr += size
         return addr
 
-    def get_max_row_info(self, synapse_info, vertex_slice, app_edge):
+    def get_max_row_info(self, synapse_info, n_post_atoms, app_edge):
         """ Get maximum row length data
 
         :param SynapseInformation synapse_info: Information about synapses
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            The slice projected to
+        :param int n_post_atoms: The number of atoms projected to
         :param ProjectionApplicationEdge app_edge: The edge of the projection
         """
-        key = (app_edge, synapse_info, vertex_slice)
+        key = (app_edge, synapse_info, n_post_atoms)
         if key in self.__max_row_info:
             return self.__max_row_info[key]
         max_row_info = get_max_row_info(
-            synapse_info, vertex_slice, app_edge.n_delay_stages, app_edge)
+            synapse_info, n_post_atoms, app_edge.n_delay_stages, app_edge)
         self.__max_row_info[key] = max_row_info
         return max_row_info
 
@@ -1112,10 +1162,11 @@ class AbstractPopulationVertex(
         """
         size = 0
         for proj in incoming_projections:
+            # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
             n_sub_edges = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             if not n_sub_edges:
                 vertex = app_edge.pre_vertex
                 max_atoms = float(min(vertex.get_max_atoms_per_core(),
@@ -1213,6 +1264,16 @@ class AbstractPopulationVertex(
         """
         return self.__neuron_recorder.get_variable_sdram_usage(vertex_slice)
 
+    def get_max_neuron_variable_sdram(self, n_neurons):
+        """ Get the amount of SDRAM per timestep used by neuron parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
+        return self.__neuron_recorder.get_max_variable_sdram_usage(n_neurons)
+
     def get_synapse_variable_sdram(self, vertex_slice):
 
         """ Get the amount of SDRAM per timestep used by synapse parts
@@ -1228,7 +1289,22 @@ class AbstractPopulationVertex(
                 self.__synapse_dynamics.get_max_rewires_per_ts())
         return self.__synapse_recorder.get_variable_sdram_usage(vertex_slice)
 
-    def get_neuron_constant_sdram(self, vertex_slice, neuron_regions):
+    def get_max_synapse_variable_sdram(self, n_neurons):
+
+        """ Get the amount of SDRAM per timestep used by synapse parts
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of neurons to get the size of
+
+        :rtype: int
+        """
+        if isinstance(self.__synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
+            self.__synapse_recorder.set_max_rewires_per_ts(
+                self.__synapse_dynamics.get_max_rewires_per_ts())
+        return self.__synapse_recorder.get_max_variable_sdram_usage(n_neurons)
+
+    def get_neuron_constant_sdram(self, n_atoms, neuron_regions):
 
         """ Get the amount of fixed SDRAM used by neuron parts
 
@@ -1240,11 +1316,14 @@ class AbstractPopulationVertex(
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
             neuron_regions.neuron_params,
-            self.get_sdram_usage_for_neuron_params(vertex_slice))
+            self.get_sdram_usage_for_neuron_params(n_atoms))
+        sdram.add_cost(
+            neuron_regions.current_source_params,
+            self.get_sdram_usage_for_current_source_params(n_atoms))
         sdram.add_cost(
             neuron_regions.neuron_recording,
             self.__neuron_recorder.get_metadata_sdram_usage_in_bytes(
-                vertex_slice))
+                n_atoms))
         return sdram
 
     def get_common_dtcm(self):
@@ -1255,7 +1334,7 @@ class AbstractPopulationVertex(
         # TODO: Get some real numbers here
         return 0
 
-    def get_neuron_dtcm(self, vertex_slice):
+    def get_neuron_dtcm(self, n_atoms):
         """ Get the amount of DTCM used by neuron parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1264,11 +1343,11 @@ class AbstractPopulationVertex(
         :rtype: int
         """
         return (
-            self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
-            self.__neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice)
+            self.__neuron_impl.get_dtcm_usage_in_bytes(n_atoms) +
+            self.__neuron_recorder.get_dtcm_usage_in_bytes(n_atoms)
         )
 
-    def get_synapse_dtcm(self, vertex_slice):
+    def get_synapse_dtcm(self, n_atoms):
         """ Get the amount of DTCM used by synapse parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1276,7 +1355,7 @@ class AbstractPopulationVertex(
 
         :rtype: int
         """
-        return self.__synapse_recorder.get_dtcm_usage_in_bytes(vertex_slice)
+        return self.__synapse_recorder.get_dtcm_usage_in_bytes(n_atoms)
 
     def get_common_cpu(self):
         """ Get the amount of CPU used by common parts
@@ -1285,7 +1364,7 @@ class AbstractPopulationVertex(
         """
         return self._C_MAIN_BASE_N_CPU_CYCLES
 
-    def get_neuron_cpu(self, vertex_slice):
+    def get_neuron_cpu(self, n_atoms):
         """ Get the amount of CPU used by neuron parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1295,12 +1374,11 @@ class AbstractPopulationVertex(
         """
         return (
             self._NEURON_BASE_N_CPU_CYCLES +
-            (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON *
-             vertex_slice.n_atoms) +
-            self.__neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms))
+            (self._NEURON_BASE_N_CPU_CYCLES_PER_NEURON * n_atoms) +
+            self.__neuron_recorder.get_n_cpu_cycles(n_atoms) +
+            self.__neuron_impl.get_n_cpu_cycles(n_atoms))
 
-    def get_synapse_cpu(self, vertex_slice):
+    def get_synapse_cpu(self, n_atoms):
         """ Get the amount of CPU used by synapse parts
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1310,9 +1388,8 @@ class AbstractPopulationVertex(
         """
         return (
             self._SYNAPSE_BASE_N_CPU_CYCLES +
-            (self._SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON *
-             vertex_slice.n_atoms) +
-            self.__synapse_recorder.get_n_cpu_cycles(vertex_slice.n_atoms))
+            (self._SYNAPSE_BASE_N_CPU_CYCLES_PER_NEURON * n_atoms) +
+            self.__synapse_recorder.get_n_cpu_cycles(n_atoms))
 
     @property
     def incoming_projections(self):

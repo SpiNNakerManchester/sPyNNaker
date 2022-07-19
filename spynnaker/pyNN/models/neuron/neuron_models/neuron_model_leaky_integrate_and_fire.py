@@ -135,8 +135,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],

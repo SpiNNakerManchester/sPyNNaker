@@ -20,6 +20,7 @@ import logging
 import os
 import math
 import numpy
+from math import isnan
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
@@ -137,7 +138,7 @@ def read_in_data_from_file(
     atom_ids = list()
     data_items = list()
     evaluator = SafeEval()
-    with open(file_path, 'r') as f:
+    with open(file_path, 'r', encoding="utf-8") as f:
         for line in f.readlines():
             if line.startswith('#'):
                 continue
@@ -194,7 +195,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as f_source:
+    with open(file_path, 'r', encoding="utf-8") as f_source:
         read_data = f_source.readlines()
 
     evaluator = SafeEval()
@@ -218,7 +219,13 @@ def get_probable_maximum_selected(
         with a probability of selection of selection_prob
     """
     prob = 1.0 - (chance / float(n_total_trials))
-    return binom.ppf(prob, n_trials, selection_prob)
+    val = binom.ppf(prob, n_trials, selection_prob)
+    if isnan(val):
+        raise Exception(
+            f"Could not find maximum selected from {n_trials} out of"
+            f" {n_total_trials} trials, with selection probability of"
+            f" {selection_prob} and chance {chance}.  Final chance = {prob}.")
+    return val
 
 
 def get_probable_minimum_selected(

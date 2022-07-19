@@ -108,6 +108,11 @@ from spynnaker.pyNN.models.populations import (
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 
+# current sources
+# noinspection PyUnresolvedReferences
+from spynnaker.pyNN.models.current_sources import (
+    DCSource, ACSource, StepCurrentSource, NoisyCurrentSource)
+
 from spynnaker.pyNN import external_devices
 from spynnaker.pyNN import extra_models
 
@@ -155,6 +160,8 @@ __all__ = [
     'SpiNNakerProjection',
     # External devices and extra models
     'external_devices', 'extra_models',
+    # CurrentSources
+    'DCSource', 'ACSource', 'StepCurrentSource', 'NoisyCurrentSource',
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
     'reset', 'set_number_of_neurons_per_core',
@@ -315,7 +322,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         logger.warning(
             "max_delay is not supported by sPyNNaker so will be ignored")
 
-    # pylint: disable=too-many-arguments, too-many-function-args
+    # pylint: disable=too-many-arguments
     # setup PyNN common stuff
     pynn_common.setup(timestep, min_delay, **extra_params)
 

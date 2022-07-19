@@ -15,7 +15,7 @@
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     SplitterPoissonDelegate, SplitterAbstractPopulationVertexNeuronsSynapses)
-from pacman.model.partitioner_splitters import SplitterSliceLegacy
+from pacman.model.partitioner_splitters import SplitterFixedLegacy
 from spinnaker_testbase import BaseTestCase
 import numpy
 
@@ -33,7 +33,7 @@ def run_simple_split():
     rand_source = sim.Population(
         50, sim.SpikeSourcePoisson(rate=10), additional_parameters={
             "seed": 1,
-            "splitter": SplitterSliceLegacy()})
+            "splitter": SplitterFixedLegacy()})
     rand_source.record("spikes")
     target = sim.Population(
         50, sim.IF_curr_exp(), additional_parameters={

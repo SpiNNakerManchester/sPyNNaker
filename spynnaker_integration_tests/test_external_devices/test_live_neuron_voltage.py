@@ -81,7 +81,7 @@ class Device(AbstractMulticastControllableDevice):
 
 
 def spike_receiver(label, time, spikes):
-    print("Received spikes {} from {} at time {}".format(spikes, time, label))
+    print(f"Received spikes {spikes} from {label} at time {time}")
 
 
 def live_neuron_voltage():

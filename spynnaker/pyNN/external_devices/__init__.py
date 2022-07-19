@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This contains functions and classes for handling external devices such as the
 PushBot (http://spinnakermanchester.github.io/docs/push_bot/).
@@ -28,6 +27,8 @@ from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.utility_objs import (
+    LivePacketGatherParameters)
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
@@ -57,6 +58,7 @@ from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
 from spynnaker.pyNN.models.populations import Population
 from spynnaker.pyNN.models.utility_models.spike_injector import (
     SpikeInjector as ExternalDeviceSpikeInjector)
+
 
 # useful functions
 add_database_socket_address = Plugins.add_database_socket_address
@@ -186,7 +188,7 @@ def EthernetControlPopulation(
     :rtype: ~spynnaker.pyNN.models.populations.Population
     :raises Exception: If an invalid model class is used.
     """
-    # pylint: disable=protected-access, too-many-arguments, too-many-locals
+    # pylint: disable=protected-access, too-many-arguments
     population = Population(n_neurons, model, label=label)
     vertex = population._vertex
     if not isinstance(vertex, AbstractEthernetController):
@@ -194,6 +196,7 @@ def EthernetControlPopulation(
             "Vertex must be an instance of AbstractEthernetController")
     translator = vertex.get_message_translator()
     live_packet_gather_label = "EthernetControlReceiver"
+    # pylint: disable=global-statement
     global __ethernet_control_connection
     if __ethernet_control_connection is None:
         __ethernet_control_connection = EthernetControlConnection(
@@ -214,13 +217,14 @@ def EthernetControlPopulation(
         Plugins.add_database_socket_address(
             ethernet_command_connection.local_ip_address,
             ethernet_command_connection.local_port, database_ack_port_num)
-    Plugins.update_live_packet_gather_tracker(
-        vertex, live_packet_gather_label,
+    params = LivePacketGatherParameters(
         port=__ethernet_control_connection.local_port,
         hostname=__ethernet_control_connection.local_ip_address,
         message_type=EIEIOType.KEY_PAYLOAD_32_BIT,
         payload_as_time_stamps=False, use_payload_prefix=False,
-        partition_ids=vertex.get_outgoing_partition_ids())
+        label=live_packet_gather_label)
+    Plugins.update_live_packet_gather_tracker(
+        vertex, params, vertex.get_outgoing_partition_ids())
     return population
 
 

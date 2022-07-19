@@ -59,7 +59,7 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'matplotlib': ('https://matplotlib.org', None),
-    'pynn': ("http://neuralensemble.org/docs/PyNN/", None),
+    'pynn': ("https://neuralensemble.github.io/docs/PyNN/", None),
     'neo': ('https://neo.readthedocs.io/en/stable/', None),
     # We don't link to quantities; their docs are too awful
     'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
@@ -411,7 +411,7 @@ def setup(app):
 
 
 def filtered_files(base, unfiltered_files_filename):
-    with open(unfiltered_files_filename) as f:
+    with open(unfiltered_files_filename, encoding="utf-8") as f:
         lines = [line.rstrip() for line in f]
     # Skip comments and empty lines to get list of files we DON'T want to
     # filter out; this is definitely complicated

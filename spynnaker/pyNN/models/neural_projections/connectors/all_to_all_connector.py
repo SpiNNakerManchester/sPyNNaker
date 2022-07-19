@@ -94,17 +94,17 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
 
         if min_delay is None or max_delay is None:
-            return post_vertex_slice.n_atoms
+            return n_post_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            post_vertex_slice.n_atoms, min_delay, max_delay, synapse_info)
+            n_post_atoms, min_delay, max_delay, synapse_info)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):

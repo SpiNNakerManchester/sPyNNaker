@@ -68,7 +68,10 @@ class SmallWorldConnector(AbstractConnector):
         super().__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
+        # pylint:disable=unused-private-member
         self.__allow_self_connections = allow_self_connections
+        self.__mask = None
+        self.__n_connections = None
 
         if n_connections is not None:
             raise NotImplementedError(
@@ -118,12 +121,19 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        # pylint: disable=too-many-arguments
-        n_connections = numpy.amax([
-            numpy.sum(self.__mask[i, post_vertex_slice.as_slice])
-            for i in range(synapse_info.n_pre_neurons)])
+
+        # Break the array into n_post_atoms units
+        split_positions = numpy.arange(
+            0, synapse_info.n_post_neurons, n_post_atoms)
+        split_array = numpy.array_split(self.__mask, split_positions)
+
+        # Sum the 1s in each split row
+        sum_rows = [numpy.sum(s, axis=1) for s in split_array]
+
+        # Find the maximum of the rows
+        n_connections = max([x for y in sum_rows for x in y])
 
         if min_delay is None or max_delay is None:
             return n_connections

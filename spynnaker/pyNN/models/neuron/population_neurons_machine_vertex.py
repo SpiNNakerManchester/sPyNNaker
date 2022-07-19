@@ -72,8 +72,9 @@ class PopulationNeuronsMachineVertex(
         PROFILING = 2
         RECORDING = 3
         NEURON_PARAMS = 4
-        NEURON_RECORDING = 5
-        SDRAM_EDGE_PARAMS = 6
+        CURRENT_SOURCE_PARAMS = 5
+        NEURON_RECORDING = 6
+        SDRAM_EDGE_PARAMS = 7
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -85,6 +86,7 @@ class PopulationNeuronsMachineVertex(
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
+        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
@@ -204,7 +206,6 @@ class PopulationNeuronsMachineVertex(
     def generate_data_specification(
             self, spec, placement, routing_info, data_n_time_steps):
         """
-        :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
         :param n_key_map: (injected)
@@ -238,10 +239,11 @@ class PopulationNeuronsMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
 
         # close spec
         spec.end_specification()
@@ -269,16 +271,22 @@ class PopulationNeuronsMachineVertex(
     def weight_scales(self):
         return self.__weight_scales
 
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
-    def n_bytes_for_transfer(self):
-        n_bytes = (2 ** get_n_bits(self.n_target_neurons) *
-                   self.n_target_synapse_types * self.N_BYTES_PER_INPUT)
+    @staticmethod
+    def get_n_bytes_for_transfer(n_neurons, n_synapse_types):
+        n_bytes = (2 ** get_n_bits(n_neurons) *
+                   n_synapse_types *
+                   ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT)
         # May need to add some padding if not a round number of words
         extra_bytes = n_bytes % BYTES_PER_WORD
         if extra_bytes:
             n_bytes += BYTES_PER_WORD - extra_bytes
         return n_bytes
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
+    def n_bytes_for_transfer(self):
+        return self.get_n_bytes_for_transfer(
+            self.n_target_neurons, self.n_target_synapse_types)
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

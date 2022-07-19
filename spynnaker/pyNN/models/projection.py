@@ -54,10 +54,9 @@ class Projection(object):
     plasticity mechanisms) between two populations, together with methods to
     set parameters of those connections, including of plasticity mechanisms.
     """
+    # "format" param name defined by PyNN/
     # pylint: disable=redefined-builtin
     __slots__ = [
-        "__has_retrieved_synaptic_list_from_machine",
-        "__host_based_synapse_list",
         "__projection_edge",
         "__requires_mapping",
         "__synapse_information",
@@ -80,7 +79,7 @@ class Projection(object):
         :param ~pyNN.space.Space space:
         :param str label:
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments
         if source is not None:
             raise NotImplementedError(
                 "sPyNNaker {} does not yet support multi-compartmental "
@@ -88,8 +87,6 @@ class Projection(object):
 
         sim = get_simulator()
         self.__projection_edge = None
-        self.__host_based_synapse_list = None
-        self.__has_retrieved_synaptic_list_from_machine = False
         self.__requires_mapping = True
         self.__label = label
 
@@ -231,7 +228,7 @@ class Projection(object):
                 "Projections over views not currently supported with the {}"
                 .format(connector))
         # Check whether the array is contiguous or not
-        inds = param._indexes
+        inds = param._indexes  # pylint: disable=protected-access
         if inds != tuple(range(inds[0], inds[-1] + 1)):
             raise NotImplementedError(
                 "Projections over views only work on contiguous arrays, "
@@ -442,13 +439,16 @@ class Projection(object):
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
-        graph_edges = get_simulator().original_application_graph.\
-            get_edges_ending_at_vertex(post_synaptic_vertex)
+        partitions = get_simulator().original_application_graph.\
+            get_outgoing_edge_partitions_starting_at_vertex(
+            pre_synaptic_vertex)
 
-        # Search the edges for any that start at the presynaptic vertex
-        for edge in graph_edges:
-            if edge.pre_vertex == pre_synaptic_vertex:
-                return edge
+        # Partitions and Partition.edges will be OrderedSet but may be empty
+        for partition in partitions:
+            for edge in partition.edges:
+                if edge.post_vertex == post_synaptic_vertex:
+                    return edge
+
         return None
 
     def _get_synaptic_data(

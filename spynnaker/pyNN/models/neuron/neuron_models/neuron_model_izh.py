@@ -119,7 +119,6 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.get_global_values)
     def get_global_values(self, ts):
-        # pylint: disable=arguments-differ
         return [float(ts) / MICRO_TO_MILLISECOND_CONVERSION]
 
     @overrides(AbstractStandardNeuronComponent.get_values)
@@ -127,8 +126,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         :param ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],

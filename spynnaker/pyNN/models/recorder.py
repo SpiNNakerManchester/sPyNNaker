@@ -29,6 +29,9 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
 
+# needed as dealing with quantities
+# pylint: disable=c-extension-no-member
+
 logger = FormatAdapter(logging.getLogger(__name__))
 _DEFAULT_UNITS = {
     SPIKES: "spikes",
@@ -184,22 +187,45 @@ class Recorder(object):
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
 
-    def get_recorded_pynn7(self, variable):
+    def get_recorded_pynn7(self, variable, as_matrix=False, view_indexes=None):
         """ Get recorded data in PyNN 0.7 format. Must not be spikes.
 
         :param str variable:
             The name of the variable to get. Supported variable names are:
             ``gsyn_exc``, ``gsyn_inh``, ``v``
+        :param bool as_matrix: If set True the data is returned as a 2d matrix
+        :param view_indexes: The indexes for which data should be returned.
+            If ``None``, all data (view_index = data_indexes)
+        :type view_indexes: list(int) or None
         :rtype: ~numpy.ndarray
         """
+        if variable in [SPIKES, REWIRING]:
+            raise NotImplementedError(f"{variable} not supported")
         (data, ids, sampling_interval) = self.get_recorded_matrix(variable)
+        if view_indexes is None:
+            if len(ids) != self.__population.size:
+                warn_once(logger, self._SELECTIVE_RECORDED_MSG)
+            indexes = ids
+        elif view_indexes == ids:
+            indexes = ids
+        else:
+            # keep just the view indexes in the data
+            indexes = [i for i in view_indexes if i in ids]
+            # keep just data columns in the view
+            map_indexes = [ids.index(i) for i in indexes]
+            data = data[:, map_indexes]
+
+        if as_matrix:
+            return data
+
+        # Convert to triples as Pynn 0,7 did
         n_machine_time_steps = len(data)
-        n_neurons = len(ids)
+        n_neurons = len(indexes)
         column_length = n_machine_time_steps * n_neurons
         times = [i * sampling_interval
                  for i in range(0, n_machine_time_steps)]
         return numpy.column_stack((
-                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.repeat(indexes, n_machine_time_steps, 0),
                 numpy.tile(times, n_neurons),
                 numpy.transpose(data).reshape(column_length)))
 
@@ -641,13 +667,18 @@ class Recorder(object):
         if len(spikes) == 0:
             spikes = numpy.empty(shape=(0, 2))
 
+        # Put the times for each neuron into the right place
+        times = [[] for _ in range(n_neurons)]
+        for neuron_id, time in spikes:
+            times[int(neuron_id)].append(time)
+
         t_stop = t * quantities.ms
 
         if indexes is None:
             indexes = range(n_neurons)
         for index in indexes:
             spiketrain = neo.SpikeTrain(
-                times=spikes[spikes[:, 0] == index][:, 1],
+                times=times[index],
                 t_start=recording_start_time,
                 t_stop=t_stop,
                 units='ms',

@@ -100,7 +100,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
-        # pylint: disable=protected-access
         if not isinstance(timing_dependence, TimingDependenceSpikeNearestPair):
             return False
         return (self.__tau_plus == timing_dependence.tau_plus and

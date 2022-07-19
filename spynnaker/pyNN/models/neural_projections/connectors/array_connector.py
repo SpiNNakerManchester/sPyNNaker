@@ -72,20 +72,18 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
-        max_connections_row = 0
-        post_lo = post_vertex_slice.lo_atom
-        post_hi = post_vertex_slice.hi_atom
-        # Max number per row is required
-        for i in range(self.__array_dims[0]):
-            n_connections_row = 0
-            for j in range(post_lo, post_hi+1):
-                if self.__array[i, j] == 1:
-                    n_connections_row += 1
+        # Break the array into n_post_atoms units
+        split_positions = numpy.arange(
+            0, synapse_info.n_post_neurons, n_post_atoms)
+        split_array = numpy.array_split(self.__array, split_positions)
 
-            if n_connections_row > max_connections_row:
-                max_connections_row = n_connections_row
+        # Sum the 1s in each split row
+        sum_rows = [numpy.sum(s, axis=1) for s in split_array]
+
+        # Find the maximum of the rows
+        max_connections_row = max([x for y in sum_rows for x in y])
 
         if min_delay is None and max_delay is None:
             return max_connections_row
