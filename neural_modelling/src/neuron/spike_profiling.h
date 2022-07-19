@@ -82,6 +82,7 @@ static inline accum spike_profiling_get_spike_holder_as_accum(
 	return x.acc;
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
 static inline void spike_profiling_print_spikes_from_spike_holder(
         struct spike_holder_t spikes_orig) {
 	io_printf(IO_BUF, "Spikes from input: a %u, b %u, c %u, d %u \n",
@@ -94,3 +95,4 @@ static inline void spike_profiling_print_spikes_from_int(int32_t output) {
 			(output & 0xFF), (output >> 8 & 0xFF), (output >> 16 & 0xFF),
 			(output >> 24 & 0xFF));
 }
+#endif
