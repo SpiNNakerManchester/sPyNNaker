@@ -19,10 +19,9 @@ import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spynnaker.pyNN.models.common import recording_utils
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.data import SpynnakerDataView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -75,17 +74,12 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region, placements,
+    def get_spikes(self, label, region,
                    application_vertex, base_key_function):
         """ Get the recorded spikes from the object
 
         :param str label:
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -97,13 +91,14 @@ class EIEIOSpikeRecorder(object):
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         results = list()
         missing = []
         vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             # Read the spikes
@@ -147,7 +142,7 @@ class EIEIOSpikeRecorder(object):
         offset = 0
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
-            time *= machine_time_step_ms()
+            time *= SpynnakerDataView.get_simulation_time_step_ms()
             data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(

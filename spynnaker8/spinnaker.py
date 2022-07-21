@@ -26,12 +26,11 @@ class SpiNNaker(_BaseClass):
     """
 
     def __init__(
-            self, database_socket_addresses,
-            time_scale_factor, min_delay, graph_label,
+            self, time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         # pylint: disable=too-many-arguments, too-many-locals
         moved_in_v7("spynnaker8.spinnaker",
                     "spynnaker.pyNN.spinnaker")
         super(SpiNNaker, self).__init__(
-            database_socket_addresses, time_scale_factor, min_delay,
-            graph_label, n_chips_required, n_boards_required, timestep)
+            time_scale_factor, min_delay, graph_label,
+            n_chips_required, n_boards_required, timestep)

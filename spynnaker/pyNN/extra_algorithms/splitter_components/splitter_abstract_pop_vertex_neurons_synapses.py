@@ -28,8 +28,6 @@ from pacman.model.graphs.machine import (
     MulticastEdgePartition)
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import get_remaining_constraints
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -40,6 +38,7 @@ from data_specification.reference_context import ReferenceContext
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
@@ -57,6 +56,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
     get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
     exact_sdram_for_bit_field_builder_region)
+
 from .splitter_poisson_delegate import SplitterPoissonDelegate
 from .abstract_spynnaker_splitter_delay import AbstractSpynnakerSplitterDelay
 from .abstract_supports_one_to_one_sdram_input import (
@@ -165,6 +165,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__sdram_partitions = []
         self.__same_chip_groups = []
         self.__neuromodulators = set()
+        self.__incoming_vertices = []
+        self.__poisson_sources = []
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -304,6 +306,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Find incoming neuromodulators
         for proj in app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             if proj._projection_edge.is_neuromodulation:
                 self.__neuromodulators.add(proj._projection_edge.pre_vertex)
 
@@ -797,7 +800,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             proj_max_delay = s_info.synapse_dynamics.get_delay_maximum(
                 s_info.connector, s_info)
             max_delay_ms = max(max_delay_ms, proj_max_delay)
-        max_delay_steps = math.ceil(max_delay_ms / machine_time_step_ms())
+        max_delay_steps = math.ceil(
+            max_delay_ms / SpynnakerDataView.get_simulation_time_step_ms())
         max_delay_bits = get_n_bits(max_delay_steps)
 
         # Find the maximum possible delay

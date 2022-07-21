@@ -45,15 +45,10 @@ class AbstractAcceptsIncomingSynapses(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_connections_from_machine(
-            self, transceiver, placements, app_edge, synapse_info):
+    def get_connections_from_machine(self, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the connection data
-        :param ~pacman.model.placements.Placements placements:
-            Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
         :param SynapseInformation synapse_info:

@@ -19,9 +19,9 @@ import unittest
 import pyNN.spiNNaker as p
 from spinnaker_testbase import BaseTestCase
 from spynnaker_integration_tests.scripts import SynfireRunner
-from spinn_front_end_common.utilities.globals_variables import (
-    provenance_file_path, report_default_directory)
+from spinn_front_end_common.interface.provenance import ProvenanceReader
 from spinn_front_end_common.utilities.report_functions import EnergyReport
+from spynnaker.pyNN.data import SpynnakerDataView
 import sqlite3
 
 n_neurons = 200  # number of neurons in each population
@@ -37,8 +37,7 @@ synfire_run = SynfireRunner()
 
 class TestPowerMonitoring(BaseTestCase):
     def query_provenance(self, query, *args):
-        prov_file = os.path.join(
-            provenance_file_path(), "provenance.sqlite3")
+        prov_file = ProvenanceReader.get_last_run_database_path()
         with sqlite3.connect(prov_file) as prov_db:
             prov_db.row_factory = sqlite3.Row
             return list(prov_db.execute(query, args))
@@ -55,7 +54,7 @@ class TestPowerMonitoring(BaseTestCase):
         self.assertIsNotNone(hist, "must have a histogram")
         # Did we build the report file like we asked for in config file?
         self.assertIn(EnergyReport._SUMMARY_FILENAME,
-                      os.listdir(report_default_directory()))
+                      os.listdir(SpynnakerDataView.get_run_dir_path()))
         # Did we output power provenance data, as requested?
         num_chips = None
         for row in self.query_provenance(
