@@ -54,6 +54,7 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
@@ -74,7 +75,6 @@
         <span class="s2">&quot;__synapse_dynamics&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_type&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__receptor_type&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__is_virtual_machine&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__weights&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delays&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__pre_run_connection_holders&quot;</span><span class="p">,</span>
@@ -83,8 +83,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">pre_population</span><span class="p">,</span> <span class="n">post_population</span><span class="p">,</span>
                  <span class="n">prepop_is_view</span><span class="p">,</span> <span class="n">postpop_is_view</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span>
                  <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span>
-                 <span class="n">is_virtual_machine</span><span class="p">,</span> <span class="n">synapse_type_from_dynamics</span><span class="p">,</span>
-                 <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">synapse_type_from_dynamics</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param AbstractConnector connector:</span>
 <span class="sd">            The connector connected to the synapse</span>
@@ -102,7 +101,6 @@
 <span class="sd">            The dynamic behaviour of the synapse</span>
 <span class="sd">        :param int synapse_type: The type of the synapse</span>
 <span class="sd">        :param str receptor_type: Description of the receptor (e.g. excitatory)</span>
-<span class="sd">        :param bool is_virtual_machine: Whether the machine is virtual</span>
 <span class="sd">        :param bool synapse_type_from_dynamics:</span>
 <span class="sd">            Whether the synapse type came from synapse dynamics</span>
 <span class="sd">        :param weights: The synaptic weights</span>
@@ -121,7 +119,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__receptor_type</span> <span class="o">=</span> <span class="n">receptor_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span> <span class="o">=</span> <span class="n">weights</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">=</span> <span class="n">delays</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__is_virtual_machine</span> <span class="o">=</span> <span class="n">is_virtual_machine</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type_from_dynamics</span> <span class="o">=</span> <span class="n">synapse_type_from_dynamics</span>
 
         <span class="c1"># Make a list of holders to be updated</span>
@@ -245,7 +242,7 @@
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If we are using a virtual machine, we can&#39;t generate on the machine</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_virtual_machine</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="n">connector_gen</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span> <span class="ow">and</span>

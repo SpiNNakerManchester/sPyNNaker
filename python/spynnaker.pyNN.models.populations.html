@@ -278,6 +278,13 @@ instantiated object.</p></li>
 <li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The processor ID of the placement constraint (optional)</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -752,6 +759,13 @@ pass through method</p></li>
 <li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – the value of the parameter to set.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -762,6 +776,13 @@ pass through method</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>constraint</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>) – </p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -783,6 +804,13 @@ pass through method</p></li>
 <dd class="field-odd"><p><strong>constraint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – A dictionary containing “x”, “y” and optionally “p” as keys, and
 ints as values</p>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -793,6 +821,13 @@ ints as values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the new value for the max atoms per core.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

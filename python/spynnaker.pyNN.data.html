@@ -1,0 +1,284 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>spynnaker.pyNN.data package &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.external_devices package" href="spynnaker.pyNN.external_devices.html" />
+    <link rel="prev" title="spynnaker.pyNN.connections package" href="spynnaker.pyNN.connections.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices.html" title="spynnaker.pyNN.external_devices package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.connections.html" title="spynnaker.pyNN.connections package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.data package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="spynnaker-pynn-data-package">
+<h1>spynnaker.pyNN.data package<a class="headerlink" href="#spynnaker-pynn-data-package" title="Permalink to this heading">¶</a></h1>
+<section id="module-spynnaker.pyNN.data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.data" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.data.</span></span><span class="sig-name descname"><span class="pre">SpynnakerDataView</span></span><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FecDataView</span></code></p>
+<p>Adds the extra Methods to the View for PyNN level.</p>
+<p>See UtilsDataView for a more detailed description.</p>
+<p>Use this class weherever possible as it inherits all methods from all View
+classes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_number_of_neurons_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_number_of_neurons_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a ceiling on the number of neurons of a given type that can be        placed on a single core.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neuron_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – neuron type</p></li>
+<li><p><strong>max_permitted</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number to set to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_population">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by each population to add itself to the list.</p>
+<p>Usage other than from Population.__init__ is not supported and likely
+to raise an exception</p>
+<p>Increments the all population id counter by the size of the population.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.populations.html#spynnaker.pyNN.models.populations.Population" title="spynnaker.pyNN.models.populations.Population"><em>Population</em></a>) – Population to add</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The first and last global ids for this Population</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_projection">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">projection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by each projection to add itself to the list.</p>
+<p>Usage other than from Projection.__init__ is not supported and likely
+to raise an exception</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>projection</strong> (<em>projectionProjection</em>) – Projection to add</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.exceptions.SpiNNUtilsException" title="(in SpiNNUtils v6.0)"><strong>SpiNNUtilsException</strong></a> – If projections should not be added in the current state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_min_delay">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_min_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_min_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_min_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>The minimum supported delay, in milliseconds if available</p>
+<p>Typically simulation_time_step_per_ms but may be a positive multiple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.exceptions.SpiNNUtilsException" title="(in SpiNNUtils v6.0)"><strong>SpiNNUtilsException</strong></a> – If the min_delay is currently unavailable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_n_populations">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_populations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_n_populations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_n_populations" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of populations previously added</p>
+<dl class="field-list simple">
+<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_n_projections">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_n_projections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_n_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_n_projections" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of projections previously added</p>
+<p>rtype: int</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_segment_counter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.get_segment_counter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of the current recording segment being generated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the segment counter</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.has_min_delay">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_min_delay</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.has_min_delay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.has_min_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>report if the minimum supported delay, in milliseconds if available</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.iterate_populations">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterate_populations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.iterate_populations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.iterate_populations" title="Permalink to this definition">¶</a></dt>
+<dd><p>An iteration of the populations previously added</p>
+<p>The iteration will be empty if no populations added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(~spynnaker.pyNN.models.populations.Population)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.iterate_projections">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">iterate_projections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.iterate_projections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.iterate_projections" title="Permalink to this definition">¶</a></dt>
+<dd><p>An iteration of the projections previously added</p>
+<p>The iteration will be empty if no projections added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Rtpye<span class="colon">:</span></dt>
+<dd class="field-odd"><p>iterable(Projection)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.data package</a><ul>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.data">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.connections.html"
+                          title="previous chapter">spynnaker.pyNN.connections package</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="spynnaker.pyNN.external_devices.html"
+                          title="next chapter">spynnaker.pyNN.external_devices package</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.data.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices.html" title="spynnaker.pyNN.external_devices package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.connections.html" title="spynnaker.pyNN.connections package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.data package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

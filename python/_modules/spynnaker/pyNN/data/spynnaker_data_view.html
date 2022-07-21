@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.data.spynnaker_data_view &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.data.spynnaker_data_view</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.data.spynnaker_data_view</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021-2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.data</span> <span class="kn">import</span> <span class="n">FecDataView</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="c1"># pylint: disable=protected-access</span>
+
+
+<span class="k">class</span> <span class="nc">_SpynnakerDataModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Singleton data model</span>
+
+<span class="sd">    This class should not be accessed directly please use the DataView and</span>
+<span class="sd">    DataWriter classes.</span>
+<span class="sd">    Accessing or editing the data held here directly is NOT SUPPORTED</span>
+
+<span class="sd">    There are other DataModel classes which sit next to this one and hold</span>
+<span class="sd">    additional data. The DataView and DataWriter classes will combine these</span>
+<span class="sd">    as needed.</span>
+
+<span class="sd">    What data is held where and how can change without notice.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__singleton</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># Data values cached</span>
+        <span class="s2">&quot;_id_counter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_min_delay&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_neurons_per_core_set&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_populations&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_projections&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_segment_counter&quot;</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__singleton</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__singleton</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__singleton</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_clear</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clears out all data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_min_delay</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Using a dict to verify if later could be stored here only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_neurons_per_core_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_populations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segment_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">_hard_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Puts all data back into the state expected at graph changed and</span>
+<span class="sd">            sim.reset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soft_reset</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_soft_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Puts all data back into the state expected at sim.reset but not</span>
+<span class="sd">        graph changed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># segment_counter is increased by the writer</span>
+
+
+<span class="k">class</span> <span class="nc">SpynnakerDataView</span><span class="p">(</span><span class="n">FecDataView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds the extra Methods to the View for PyNN level.</span>
+
+<span class="sd">    See UtilsDataView for a more detailed description.</span>
+
+<span class="sd">    Use this class weherever possible as it inherits all methods from all View</span>
+<span class="sd">    classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: disable=attribute-defined-outside-init</span>
+
+    <span class="n">__spy_data</span> <span class="o">=</span> <span class="n">_SpynnakerDataModel</span><span class="p">()</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SpynnakerDataView.get_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The minimum supported delay, in milliseconds if available</span>
+
+<span class="sd">        Typically simulation_time_step_per_ms but may be a positive multiple</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:</span>
+<span class="sd">            If the min_delay is currently unavailable</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_min_delay</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.has_min_delay"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.has_min_delay">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">has_min_delay</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        report if the minimum supported delay, in milliseconds if available</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_min_delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">has_time_step</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.iterate_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_projections">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">iterate_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An iteration of the projections previously added</span>
+
+<span class="sd">        The iteration will be empty if no projections added.</span>
+
+<span class="sd">        :rtpye: iterable(Projection)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_projections</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.get_n_projections"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_projections">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_n_projections</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of projections previously added</span>
+
+<span class="sd">        rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_projections</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.add_projection"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_projection">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_projection</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called by each projection to add itself to the list.</span>
+
+<span class="sd">        Usage other than from Projection.__init__ is not supported and likely</span>
+<span class="sd">        to raise an exception</span>
+
+<span class="sd">        :param projection: Projection to add</span>
+<span class="sd">        :type projection: ~spynnaker.pyNN.models.projectionProjection</span>
+<span class="sd">        :raises ~spinn_utilities.exceptions.SpiNNUtilsException:</span>
+<span class="sd">            If projections should not be added in the current state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># UGLY but needed to avoid circular import</span>
+        <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.projection</span> <span class="kn">import</span> <span class="n">Projection</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;This method should only be called from the Projection init&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">Projection</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The projection must be a Projection&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_projections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">projection</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.iterate_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.iterate_populations">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">iterate_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An iteration of the populations previously added</span>
+
+<span class="sd">        The iteration will be empty if no populations added.</span>
+
+<span class="sd">        :rtpye: iterable(~spynnaker.pyNN.models.populations.Population)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.get_n_populations"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_n_populations">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_n_populations</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The number of populations previously added</span>
+
+<span class="sd">        :rtpye: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.add_population"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_population">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_population</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called by each population to add itself to the list.</span>
+
+<span class="sd">        Usage other than from Population.__init__ is not supported and likely</span>
+<span class="sd">        to raise an exception</span>
+
+<span class="sd">        Increments the all population id counter by the size of the population.</span>
+
+<span class="sd">        :param population: Population to add</span>
+<span class="sd">        :type population: ~spynnaker.pyNN.models.populations.Population</span>
+<span class="sd">        :rtype: (int, int)</span>
+<span class="sd">        :return: The first and last global ids for this Population</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># UGLY but needed to avoid circular import</span>
+        <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.populations.population</span> <span class="kn">import</span> <span class="n">Population</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">Population</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The population must be a Projection&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;This method should only be called from the Population init&quot;</span><span class="p">)</span>
+        <span class="n">first_id</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span> <span class="o">+=</span> <span class="n">population</span><span class="o">.</span><span class="n">size</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">first_id</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.add_number_of_neurons_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">add_number_of_neurons_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets a ceiling on the number of neurons of a given type that can be\</span>
+<span class="sd">        placed on a single core.</span>
+
+<span class="sd">        :param AbstractPopulationVertex neuron_type: neuron type</span>
+<span class="sd">        :param int max_permitted: the number to set to</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;set_model_max_atoms_per_core&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">neuron_type</span><span class="si">}</span><span class="s2"> is not a Vertex type&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;get_max_atoms_per_core&quot;</span><span class="p">):</span>
+            <span class="n">previous</span> <span class="o">=</span> <span class="n">neuron_type</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">previous</span> <span class="o">&lt;</span> <span class="n">max_permitted</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Attempt to increase number_of_neurons_per_core &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">previous</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">max_permitted</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
+        <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span><span class="n">max_permitted</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_neurons_per_core_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpynnakerDataView.get_segment_counter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_segment_counter</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of the current recording segment being generated.</span>
+
+<span class="sd">        :return: the segment counter</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_segment_counter</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.data.spynnaker_data_view</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+    </div>
+  </body>
+</html>

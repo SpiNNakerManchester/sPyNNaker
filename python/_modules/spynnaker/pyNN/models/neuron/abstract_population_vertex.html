@@ -71,7 +71,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span><span class="p">,</span> <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling.profile_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_profile_region_size</span><span class="p">)</span>
@@ -80,9 +80,7 @@
        <span class="n">get_recording_header_size</span><span class="p">,</span> <span class="n">get_recording_data_constant_size</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step</span><span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">AbstractEventRecordable</span><span class="p">,</span>
     <span class="n">NeuronRecorder</span><span class="p">)</span>
@@ -501,16 +499,14 @@
             <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_spikes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
-            <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_events">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">get_events</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_recordable_variables">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -549,18 +545,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__raise_var_not_supported</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractPopulationVertex.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_data</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPopulationVertex.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">is_recordable</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_recorder</span><span class="o">.</span><span class="n">get_matrix_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span>
-                <span class="n">n_machine_time_steps</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">is_recordable</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_recorder</span><span class="o">.</span><span class="n">get_matrix_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span>
-                <span class="n">n_machine_time_steps</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__raise_var_not_supported</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">)</span>
@@ -716,7 +708,7 @@
                 <span class="n">post_vertex</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronRecordable</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">SPIKES</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span>
         <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span>
@@ -724,31 +716,28 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variable_index</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_spike_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span>
-            <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.clear_event_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.clear_event_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEventRecordable</span><span class="o">.</span><span class="n">clear_event_recording</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">clear_event_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear_event_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clear_recording_region</span><span class="p">(</span>
-            <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
             <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__neuron_impl</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_clear_recording_region</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">recording_region_id</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_clear_recording_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recording_region_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear a recorded data region from the buffer manager.</span>
 
-<span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :param placements: the placements object</span>
 <span class="sd">        :param recording_region_id: the recorded region ID for clearing</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">machine_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">)</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                <span class="n">machine_vertex</span><span class="p">)</span>
             <span class="n">buffer_manager</span><span class="o">.</span><span class="n">clear_recorded_data</span><span class="p">(</span>
                 <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">recording_region_id</span><span class="p">)</span>
 
@@ -872,9 +861,9 @@
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># E[ number of spikes ] in a timestep</span>
-        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">()</span>
         <span class="n">average_spikes_per_timestep</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">n_synapses_in</span> <span class="o">*</span> <span class="n">spikes_per_second</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_per_second</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">n_synapses_in</span> <span class="o">*</span> <span class="n">spikes_per_second</span><span class="p">)</span> <span class="o">/</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_s</span><span class="p">())</span>
 
         <span class="c1"># Exact variance contribution from inherent Poisson variation</span>
         <span class="n">poisson_variance</span> <span class="o">=</span> <span class="n">average_spikes_per_timestep</span> <span class="o">*</span> <span class="p">(</span><span class="n">weight_mean</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
@@ -935,7 +924,7 @@
         <span class="n">biggest_weight</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)</span>
         <span class="n">weights_signed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">rate_stats</span> <span class="o">=</span> <span class="p">[</span><span class="n">RunningStats</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_synapse_types</span><span class="p">)]</span>
-        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">MICRO_TO_SECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">()</span>
+        <span class="n">steps_per_second</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_s</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
             <span class="c1"># pylint: disable=protected-access</span>
@@ -1048,7 +1037,7 @@
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_connections_from_machine">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAcceptsIncomingSynapses</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># Start with something in the list so that concatenate works</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
                 <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)]</span>
@@ -1058,9 +1047,10 @@
                 <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">post_vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">HasSynapses</span><span class="p">):</span>
-                <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">)</span>
+                <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                    <span class="n">post_vertex</span><span class="p">)</span>
                 <span class="n">connections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
-                    <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span>
+                    <span class="n">placement</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_synapse_params_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_params_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_params_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

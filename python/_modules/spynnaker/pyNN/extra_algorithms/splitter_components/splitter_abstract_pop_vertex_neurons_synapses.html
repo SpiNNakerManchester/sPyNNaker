@@ -68,8 +68,6 @@
     <span class="n">MulticastEdgePartition</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.algorithm_utilities.</span>\
     <span class="n">partition_algorithm_utilities</span> <span class="kn">import</span> <span class="nn">get_remaining_constraints</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PopulationNeuronsMachineVertex</span><span class="p">,</span> <span class="n">PopulationSynapsesMachineVertexLead</span><span class="p">,</span>
     <span class="n">PopulationSynapsesMachineVertexShared</span><span class="p">,</span> <span class="n">NeuronProvenance</span><span class="p">,</span> <span class="n">SynapseProvenance</span><span class="p">,</span>
@@ -80,6 +78,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseDynamicsStatic</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common</span> \
     <span class="kn">import</span> <span class="p">(</span><span class="n">SDRAM_PARAMS_SIZE</span> <span class="k">as</span> <span class="n">SYNAPSES_SDRAM_PARAMS_SIZE</span><span class="p">,</span> <span class="n">KEY_CONFIG_SIZE</span><span class="p">,</span>
@@ -97,6 +96,7 @@
     <span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">,</span>
     <span class="n">get_estimated_sdram_for_key_region</span><span class="p">,</span>
     <span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">)</span>
+
 <span class="kn">from</span> <span class="nn">.splitter_poisson_delegate</span> <span class="kn">import</span> <span class="n">SplitterPoissonDelegate</span>
 <span class="kn">from</span> <span class="nn">.abstract_spynnaker_splitter_delay</span> <span class="kn">import</span> <span class="n">AbstractSpynnakerSplitterDelay</span>
 <span class="kn">from</span> <span class="nn">.abstract_supports_one_to_one_sdram_input</span> <span class="kn">import</span> <span class="p">(</span>
@@ -205,6 +205,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partitions</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__same_chip_groups</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_vertices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__poisson_sources</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexNeuronsSynapses.set_governed_app_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">set_governed_app_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_governed_app_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
@@ -344,6 +346,7 @@
 
         <span class="c1"># Find incoming neuromodulators</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">app_vertex</span><span class="o">.</span><span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="c1"># pylint: disable=protected-access</span>
             <span class="k">if</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">is_neuromodulation</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__neuromodulators</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span></div>
 
@@ -837,7 +840,8 @@
             <span class="n">proj_max_delay</span> <span class="o">=</span> <span class="n">s_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">(</span>
                 <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span>
             <span class="n">max_delay_ms</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_delay_ms</span><span class="p">,</span> <span class="n">proj_max_delay</span><span class="p">)</span>
-        <span class="n">max_delay_steps</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_delay_ms</span> <span class="o">/</span> <span class="n">machine_time_step_ms</span><span class="p">())</span>
+        <span class="n">max_delay_steps</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+            <span class="n">max_delay_ms</span> <span class="o">/</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
         <span class="n">max_delay_bits</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">max_delay_steps</span><span class="p">)</span>
 
         <span class="c1"># Find the maximum possible delay</span>

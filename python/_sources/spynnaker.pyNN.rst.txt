@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    spynnaker.pyNN.connections
+   spynnaker.pyNN.data
    spynnaker.pyNN.external_devices
    spynnaker.pyNN.external_devices_models
    spynnaker.pyNN.extra_algorithms

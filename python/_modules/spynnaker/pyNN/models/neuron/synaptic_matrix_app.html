@@ -58,6 +58,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">.synaptic_matrix</span> <span class="kn">import</span> <span class="n">SynapticMatrix</span>
 <span class="kn">from</span> <span class="nn">.generator_data</span> <span class="kn">import</span> <span class="n">GeneratorData</span><span class="p">,</span> <span class="n">SYN_REGION_UNUSED</span>
 <span class="kn">from</span> <span class="nn">.synapse_io</span> <span class="kn">import</span> <span class="n">read_all_synapses</span><span class="p">,</span> <span class="n">convert_to_connections</span>
@@ -72,6 +73,8 @@
 <span class="sd">        app edge</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c1"># pylint: disable=unused-private-member</span>
+    <span class="c1"># https://github.com/SpiNNakerManchester/sPyNNaker/issues/1201</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="c1"># The master population table</span>
         <span class="s2">&quot;__poptable&quot;</span><span class="p">,</span>
@@ -99,8 +102,6 @@
         <span class="s2">&quot;__app_key_info&quot;</span><span class="p">,</span>
         <span class="c1"># The application-level key information for the incoming delay edge</span>
         <span class="s2">&quot;__delay_app_key_info&quot;</span><span class="p">,</span>
-        <span class="c1"># All routing information</span>
-        <span class="s2">&quot;__routing_info&quot;</span><span class="p">,</span>
         <span class="c1"># The weight scaling used by each synapse type</span>
         <span class="s2">&quot;__weight_scales&quot;</span><span class="p">,</span>
         <span class="c1"># The incoming machine vertices</span>
@@ -172,7 +173,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__m_vertices</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_vertex</span> <span class="o">=</span> <span class="kc">None</span>
@@ -211,16 +211,17 @@
 <span class="sd">            The source machine vertex to get the matrix for</span>
 <span class="sd">        :rtype: SynapticMatrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="p">[</span><span class="n">m_vertex</span><span class="p">]</span>
 
-        <span class="n">r_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+        <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
             <span class="n">m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
         <span class="n">d_r_info</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_vertex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">d_m_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_machine_vertex</span><span class="p">(</span>
                 <span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-            <span class="n">d_r_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
+            <span class="n">d_r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                 <span class="n">d_m_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
         <span class="n">matrix</span> <span class="o">=</span> <span class="n">SynapticMatrix</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__poptable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span>
@@ -288,7 +289,7 @@
             <span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">==</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">))</span>
 
 <div class="viewcode-block" id="SynapticMatrixApp.set_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.set_info">[docs]</a>    <span class="k">def</span> <span class="nf">set_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">app_key_info</span><span class="p">,</span> <span class="n">delay_app_key_info</span><span class="p">,</span>
-                 <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">delay_pre_vertex</span><span class="p">):</span>
+                 <span class="n">weight_scales</span><span class="p">,</span> <span class="n">m_vertices</span><span class="p">,</span> <span class="n">delay_pre_vertex</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set extra information that isn&#39;t necessarily available when the</span>
 <span class="sd">            class is created.</span>
 
@@ -298,8 +299,6 @@
 <span class="sd">            Application-level routing key information for undelayed vertices</span>
 <span class="sd">        :param _AppKeyInfo delay_app_key_info:</span>
 <span class="sd">            Application-level routing key information for delayed vertices</span>
-<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">            Routing key information for all incoming edges</span>
 <span class="sd">        :param list(float) weight_scales:</span>
 <span class="sd">            Weight scale for each synapse edge</span>
 <span class="sd">        :param list(~pacman.model.graphs.machine.MachineVertex) m_vertices:</span>
@@ -310,7 +309,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span> <span class="o">=</span> <span class="n">all_syn_block_sz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__app_key_info</span> <span class="o">=</span> <span class="n">app_key_info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_key_info</span> <span class="o">=</span> <span class="n">delay_app_key_info</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__routing_info</span> <span class="o">=</span> <span class="n">routing_info</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span> <span class="o">=</span> <span class="n">weight_scales</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__m_vertices</span> <span class="o">=</span> <span class="n">m_vertices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_app_vertex</span> <span class="o">=</span> <span class="n">delay_pre_vertex</span>
@@ -772,11 +770,9 @@
                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">next_addr</span><span class="p">,</span> <span class="n">max_addr</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">next_addr</span>
 
-<div class="viewcode-block" id="SynapticMatrixApp.get_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.get_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrixApp.get_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.get_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the connections for this matrix from the machine</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
-<span class="sd">            How to read the data from the machine</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :return: A list of arrays of connections, each with dtype</span>
@@ -787,18 +783,17 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__m_vertices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="n">synapses_address</span> <span class="o">=</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
-            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synaptic_matrix_region</span><span class="p">)</span>
         <span class="n">single_address</span> <span class="o">=</span> <span class="p">(</span><span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
-            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__direct_matrix_region</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__use_app_keys</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_connections</span><span class="p">(</span>
-                <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_connections</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
 
         <span class="n">connections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">read_connections</span><span class="p">(</span>
-                <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">,</span> <span class="n">single_address</span><span class="p">))</span>
+                <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">,</span> <span class="n">single_address</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">connections</span></div>
 
 <div class="viewcode-block" id="SynapticMatrixApp.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -809,26 +804,23 @@
         <span class="k">for</span> <span class="n">matrix</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrices</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">matrix</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SynapticMatrixApp.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapticMatrixApp.read_generated_connection_holders"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix_app.SynapticMatrixApp.read_generated_connection_holders">[docs]</a>    <span class="k">def</span> <span class="nf">read_generated_connection_holders</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read any pre-run connection holders after data has been generated</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
-<span class="sd">            How to read the data from the machine</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">pre_run_connection_holders</span><span class="p">:</span>
-            <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+            <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_connections</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">connections</span><span class="p">:</span>
                 <span class="n">connections</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">holder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="o">.</span><span class="n">pre_run_connection_holders</span><span class="p">:</span>
                     <span class="n">holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clear_connection_cache</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">__read_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__read_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read connections from an address on the machine</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
@@ -840,7 +832,7 @@
         <span class="n">connections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_block</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_block</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span>
@@ -849,8 +841,7 @@
                 <span class="kc">False</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_delayed_block</span><span class="p">(</span>
-                <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_delayed_block</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_vertex_slice</span><span class="p">,</span>
@@ -860,10 +851,9 @@
 
         <span class="k">return</span> <span class="n">connections</span>
 
-    <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for undelayed synapses</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
@@ -872,15 +862,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span>
         <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">+</span> <span class="n">synapses_address</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="o">=</span> <span class="n">block</span>
         <span class="k">return</span> <span class="n">block</span>
 
-    <span class="k">def</span> <span class="nf">__get_delayed_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_delayed_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for delayed synapses</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
@@ -889,7 +878,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span>
         <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="o">+</span> <span class="n">synapses_address</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_matrix_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="o">=</span> <span class="n">block</span>
         <span class="k">return</span> <span class="n">block</span>

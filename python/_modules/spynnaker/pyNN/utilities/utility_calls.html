@@ -416,6 +416,19 @@
                    <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">old_location</span><span class="p">,</span> <span class="n">new_location</span><span class="p">))</span></div>
 
 
+<div class="viewcode-block" id="moved_in_v7_warning"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.moved_in_v7_warning">[docs]</a><span class="k">def</span> <span class="nf">moved_in_v7_warning</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Warns the user that they are using old code</span>
+
+<span class="sd">    In version 8 this will be upgraded to a exception and then later removed</span>
+
+<span class="sd">    :param str message:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CONTINUOUS_INTEGRATION&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2"> In version 8 old call will fail completely.&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="get_time_to_write_us"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_time_to_write_us">[docs]</a><span class="k">def</span> <span class="nf">get_time_to_write_us</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">n_cores</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Determine how long a write of a given number of bytes will take in us</span>
 

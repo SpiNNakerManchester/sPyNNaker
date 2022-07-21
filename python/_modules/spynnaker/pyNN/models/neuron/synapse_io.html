@@ -56,8 +56,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step_ms</span><span class="p">,</span> <span class="n">machine_time_step_per_ms</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapseRowTooBigException</span>
@@ -172,7 +171,8 @@
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex max delay</span>
 <span class="sd">    :rtype: int</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">post_vertex_max_delay_ticks</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">post_vertex_max_delay_ticks</span> <span class="o">*</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="get_max_row_info"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synapse_io.get_max_row_info">[docs]</a><span class="k">def</span> <span class="nf">get_max_row_info</span><span class="p">(</span>
@@ -337,7 +337,8 @@
 
     <span class="c1"># Convert delays to timesteps</span>
     <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_per_ms</span><span class="p">())</span>
+        <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">*</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span>
 
     <span class="c1"># Scale weights</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type_from_dynamics</span><span class="p">:</span>
@@ -712,7 +713,8 @@
 <span class="sd">        The synapse information of the connections</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Return the delays values to milliseconds</span>
-    <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">machine_time_step_per_ms</span><span class="p">()</span>
+    <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">/=</span> \
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">()</span>
     <span class="c1"># Undo the weight scaling</span>
     <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">connections</span>

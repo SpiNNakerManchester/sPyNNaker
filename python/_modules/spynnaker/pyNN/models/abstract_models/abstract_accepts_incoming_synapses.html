@@ -85,15 +85,10 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
-<span class="sd">            How to read the connection data</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            Where the connection data is on the machine</span>
 <span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
 <span class="sd">            The edge for which the data is being read</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>

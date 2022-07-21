@@ -56,7 +56,6 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">ctypes</span>
 
-<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
@@ -311,33 +310,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ids</span></div>
 
-<div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span>
-    <span class="p">})</span>
-    <span class="nd">@overrides</span><span class="p">(</span>
-        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
-        <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
-            <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span> <span class="s2">&quot;data_n_time_steps&quot;</span>
-        <span class="p">})</span>
-    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param routing_info: (injected)</span>
-<span class="sd">        :param data_n_time_steps: (injected)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PopulationMachineVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.PopulationMachineVertex.generate_data_specification">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span>
+        <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">rec_regions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">neuron_recorder</span><span class="o">.</span><span class="n">get_region_sizes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">rec_regions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_vertex</span><span class="o">.</span><span class="n">synapse_recorder</span><span class="o">.</span><span class="n">get_region_sizes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">data_n_time_steps</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_common_data_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">rec_regions</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_write_neuron_data_spec</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_neuron_data_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_synapse_data_spec</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">,</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ring_buffer_shifts</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_syn_block_sz</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__structural_sz</span><span class="p">)</span>
 

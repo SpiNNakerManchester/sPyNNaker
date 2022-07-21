@@ -63,8 +63,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step_ms</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 
@@ -90,7 +89,7 @@
 <span class="sd">    :return: Sampling interval in microseconds</span>
 <span class="sd">    :rtype: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sampling_rate</span> <span class="o">*</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
 
 
 <span class="k">class</span> <span class="nc">NeuronRecorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -311,7 +310,7 @@
         <span class="k">return</span> <span class="n">fragment</span>
 
     <span class="k">def</span> <span class="nf">_get_placement_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
             <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">n_per_timestep</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; processes a placement for matrix data</span>
 
@@ -320,7 +319,6 @@
 <span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex vertex:</span>
 <span class="sd">            the vertex to read from</span>
 <span class="sd">        :param int region: the recording region id</span>
-<span class="sd">        :param ~.BufferManager buffer_manager: the buffer manager</span>
 <span class="sd">        :param int expected_rows:</span>
 <span class="sd">            how many rows the tools think should be recorded</span>
 <span class="sd">        :param str missing_str: string for reporting missing stuff</span>
@@ -329,12 +327,12 @@
 <span class="sd">        :return: placement data</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n_per_timestep</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="c1"># for buffering output info is taken form the buffer manager</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
         <span class="n">record_raw</span><span class="p">,</span> <span class="n">missing_data</span> <span class="o">=</span> <span class="n">buffer_manager</span><span class="o">.</span><span class="n">get_data_by_placement</span><span class="p">(</span>
             <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
         <span class="n">record_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">record_raw</span><span class="p">)</span>
@@ -370,8 +368,9 @@
         <span class="k">return</span> <span class="n">placement_data</span>
 
     <span class="k">def</span> <span class="nf">__read_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="n">n_machine_time_steps</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_timesteps</span><span class="p">()</span>
         <span class="n">vertices</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">application_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">machine_vertices_for_recording</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">))</span>
@@ -397,7 +396,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">placement_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_matrix_data</span><span class="p">(</span>
-                <span class="n">placements</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
+                <span class="n">vertex</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">expected_rows</span><span class="p">,</span>
                 <span class="n">missing_str</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span>
                 <span class="n">n_items_per_timestep</span><span class="p">)</span>
 
@@ -419,23 +418,15 @@
 
         <span class="k">return</span> <span class="n">pop_level_data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span>
 
-<div class="viewcode-block" id="NeuronRecorder.get_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_matrix_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronRecorder.get_matrix_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_matrix_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a data mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine and converts to required data types with scaling if needed.</span>
 
 <span class="sd">        :param str label: vertex label</span>
-<span class="sd">        :param buffer_manager: the manager for buffered data</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)</span>
-<span class="sd">        :param int n_machine_time_steps:</span>
 <span class="sd">        :return: (data, recording_indices, sampling_interval)</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -454,21 +445,13 @@
             <span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
             <span class="n">data_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_data</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-            <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">)</span></div>
+            <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">sampling_rate</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NeuronRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-            <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read spikes mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
 <span class="sd">        :param str label: vertex label</span>
-<span class="sd">        :param buffer_manager: the manager for buffered data</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
@@ -490,7 +473,7 @@
         <span class="n">missing_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting spikes for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
             <span class="n">neurons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_neurons_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
@@ -505,6 +488,7 @@
 
             <span class="c1"># for buffering output info is taken form the buffer manager</span>
             <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__region_ids</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+            <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
             <span class="n">record_raw</span><span class="p">,</span> <span class="n">data_missing</span> <span class="o">=</span> <span class="n">buffer_manager</span><span class="o">.</span><span class="n">get_data_by_placement</span><span class="p">(</span>
                     <span class="n">placement</span><span class="p">,</span> <span class="n">region</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">data_missing</span><span class="p">:</span>
@@ -517,7 +501,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">record_raw</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
+                <span class="n">record_time</span> <span class="o">=</span> <span class="p">(</span><span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span>
+                               <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
                 <span class="n">spikes</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
                 <span class="n">bits</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                     <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_bytes</span> <span class="o">*</span> <span class="mi">8</span><span class="p">))</span>
@@ -544,18 +529,11 @@
         <span class="n">result</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">))]</span></div>
 
-<div class="viewcode-block" id="NeuronRecorder.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-            <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronRecorder.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read events mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
 <span class="sd">        :param str label: vertex label</span>
-<span class="sd">        :param buffer_manager: the manager for buffered data</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
@@ -565,8 +543,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rewires</span><span class="p">(</span>
-                <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-                <span class="n">variable</span><span class="p">)</span>
+                <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Unspecified event variable</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -575,17 +552,11 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_rewires</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
-            <span class="n">variable</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read rewires mapped to time and neuron IDs from the SpiNNaker\</span>
 <span class="sd">            machine.</span>
 
 <span class="sd">        :param str label: vertex label</span>
-<span class="sd">        :param buffer_manager: the manager for buffered data</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
@@ -593,6 +564,7 @@
 <span class="sd">        :return:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int,int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
         <span class="n">rewire_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">rewire_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">rewire_postids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -605,7 +577,7 @@
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting rewires for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
             <span class="n">neurons</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -629,7 +601,9 @@
                 <span class="n">raw_data</span> <span class="o">=</span> <span class="n">record_raw</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">record_time</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
+                <span class="n">record_time</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span>
+                        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
                 <span class="n">rewires_raw</span> <span class="o">=</span> <span class="n">raw_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
                 <span class="n">rew_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rewires_raw</span><span class="p">)</span>
                 <span class="c1"># rewires is 0 (elimination) or 1 (formation) in the first bit</span>
@@ -792,7 +766,7 @@
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
 
-        <span class="n">step</span> <span class="o">=</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
         <span class="n">rate</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sampling_interval</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">sampling_interval</span> <span class="o">!=</span> <span class="n">rate</span> <span class="o">*</span> <span class="n">step</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;sampling_interval </span><span class="si">{}</span><span class="s2"> is not an an integer multiple of the &quot;</span>\
@@ -1008,12 +982,11 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="s2">&quot;Variable </span><span class="si">{}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="NeuronRecorder.get_region_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes">[docs]</a>    <span class="k">def</span> <span class="nf">get_region_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronRecorder.get_region_sizes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_region_sizes">[docs]</a>    <span class="k">def</span> <span class="nf">get_region_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the sizes of the regions for the variables, whether they are</span>
 <span class="sd">            recorded or not, with those that are not having a size of 0</span>
 
 <span class="sd">        :param ~pacman.model.graphs.commmon.Slice vertex_slice:</span>
-<span class="sd">        :param int n_machine_time_steps:</span>
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1021,7 +994,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__events_per_core_variables</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">):</span>
             <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">))</span>
+                <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">values</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.write_neuron_recording_region"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region">[docs]</a>    <span class="k">def</span> <span class="nf">write_neuron_recording_region</span><span class="p">(</span>
@@ -1157,18 +1130,17 @@
         <span class="k">return</span> <span class="n">overflow</span></div>
 
 <div class="viewcode-block" id="NeuronRecorder.get_buffered_sdram"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram">[docs]</a>    <span class="k">def</span> <span class="nf">get_buffered_sdram</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the SDRAM used for this many time steps for a variable</span>
 
 <span class="sd">        If required the total is rounded up so the space will always fit</span>
 
 <span class="sd">        :param str variable: The PyNN variable name to get buffered sdram of</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :param int n_machine_time_steps:</span>
-<span class="sd">            how many machine time steps to run for</span>
 <span class="sd">        :return: data size</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_machine_time_steps</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_max_run_time_steps</span><span class="p">()</span>
         <span class="c1"># Per timestep variables can&#39;t be done at a specific rate</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__per_timestep_variables</span><span class="p">:</span>
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_buffered_sdram_per_record</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>

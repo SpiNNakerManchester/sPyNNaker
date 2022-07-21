@@ -57,10 +57,10 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">,</span> <span class="n">get_exp_lut_array</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">.abstract_plastic_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractPlasticSynapseDynamics</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateOnMachine</span><span class="p">,</span> <span class="n">MatrixGeneratorID</span><span class="p">)</span>
@@ -95,7 +95,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight</span> <span class="o">=</span> <span class="n">weight</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_c</span> <span class="o">=</span> <span class="n">tau_c</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_d</span> <span class="o">=</span> <span class="n">tau_d</span>
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_c_data</span> <span class="o">=</span> <span class="n">get_exp_lut_array</span><span class="p">(</span>
             <span class="n">ts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_c</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">LOOKUP_TAU_C_SHIFT</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__tau_d_data</span> <span class="o">=</span> <span class="n">get_exp_lut_array</span><span class="p">(</span>

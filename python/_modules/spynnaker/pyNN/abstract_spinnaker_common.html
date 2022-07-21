@@ -59,7 +59,9 @@
 <span class="sd">This is now just a depreciation redirect hook</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">moved_in_v7</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">moved_in_v7</span><span class="p">,</span> <span class="n">moved_in_v7_warning</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.spinnaker</span> <span class="kn">import</span> <span class="n">SpiNNaker</span>
 
 <span class="n">moved_in_v7</span><span class="p">(</span><span class="s2">&quot;spynnaker.pyNN.abstract_spinnaker_common&quot;</span><span class="p">,</span>
@@ -81,9 +83,8 @@
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.register_binary_search_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">):</span>
-        <span class="n">moved_in_v7</span><span class="p">(</span><span class="s2">&quot;spynnaker.pyNN.abstract_spinnaker_common&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;spynnaker.pyNN.spinnaker&quot;</span><span class="p">)</span>
-        <span class="n">SpiNNaker</span><span class="o">.</span><span class="n">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span></div></div>
+        <span class="n">moved_in_v7_warning</span><span class="p">(</span><span class="s2">&quot;register_binary_search_path is now a View method&quot;</span><span class="p">)</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

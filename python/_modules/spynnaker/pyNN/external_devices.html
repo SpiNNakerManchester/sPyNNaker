@@ -77,6 +77,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.connections</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EthernetCommandConnection</span><span class="p">,</span> <span class="n">EthernetControlConnection</span><span class="p">,</span>
     <span class="n">SpynnakerLiveSpikesConnection</span><span class="p">,</span> <span class="n">SpynnakerPoissonControlConnection</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot.control</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PushBotLifEthernet</span><span class="p">,</span> <span class="n">PushBotLifSpinnakerLink</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link</span> <span class="kn">import</span> <span class="p">(</span>
@@ -91,7 +92,6 @@
     <span class="n">PushBotLaser</span><span class="p">,</span> <span class="n">PushBotLED</span><span class="p">,</span> <span class="n">PushBotMotor</span><span class="p">,</span> <span class="n">PushBotRetinaResolution</span><span class="p">,</span>
     <span class="n">PushBotSpeaker</span><span class="p">,</span> <span class="n">PushBotRetinaViewer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.protocols</span> <span class="kn">import</span> <span class="n">MunichIoSpiNNakerLinkProtocol</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.spinnaker</span> <span class="kn">import</span> <span class="n">SpiNNaker</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.spynnaker_external_device_plugin_manager</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpynnakerExternalDevicePluginManager</span> <span class="k">as</span>
     <span class="n">Plugins</span><span class="p">)</span>
@@ -106,7 +106,7 @@
 <span class="n">activate_live_output_for</span> <span class="o">=</span> <span class="n">Plugins</span><span class="o">.</span><span class="n">activate_live_output_for</span>
 <span class="n">add_poisson_live_rate_control</span> <span class="o">=</span> <span class="n">Plugins</span><span class="o">.</span><span class="n">add_poisson_live_rate_control</span>
 
-<span class="n">SpiNNaker</span><span class="o">.</span><span class="n">register_binary_search_path</span><span class="p">(</span>
+<span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">register_binary_search_path</span><span class="p">(</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">model_binaries</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
 <span class="n">spynnaker_external_devices</span> <span class="o">=</span> <span class="n">Plugins</span><span class="p">()</span>
 
@@ -188,7 +188,7 @@
 <span class="sd">    :param int notify_port: port num for the notify command</span>
 <span class="sd">    :param int ack_port: port num for the acknowledge command</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">spynnaker_external_devices</span><span class="o">.</span><span class="n">add_socket_address</span><span class="p">(</span>
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_database_socket_address</span><span class="p">(</span>
         <span class="n">SocketAddress</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">notify_port</span><span class="p">,</span> <span class="n">ack_port</span><span class="p">))</span></div>
 
 

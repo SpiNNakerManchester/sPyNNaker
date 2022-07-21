@@ -57,7 +57,7 @@
 <span class="kn">from</span> <span class="nn">pyNN.standardmodels.synapses</span> <span class="kn">import</span> <span class="n">StaticSynapse</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractSettable</span>
 <span class="kn">from</span> <span class="nn">.abstract_static_synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractStaticSynapseDynamics</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
@@ -96,7 +96,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight</span> <span class="o">=</span> <span class="n">weight</span>
         <span class="k">if</span> <span class="n">delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">delay</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">min_delay</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_min_delay</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay</span> <span class="o">=</span> <span class="n">delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span> <span class="o">=</span> <span class="n">pad_to_length</span>
 

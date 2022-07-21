@@ -59,10 +59,9 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinnman.messages.eieio.data_messages</span> <span class="kn">import</span> <span class="n">EIEIODataHeader</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">recording_utils</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step_ms</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">recording_utils</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_TWO_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;II&quot;</span><span class="p">)</span>
@@ -115,17 +114,12 @@
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="mi">4</span></div>
 
-<div class="viewcode-block" id="EIEIOSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+<div class="viewcode-block" id="EIEIOSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
                    <span class="n">application_vertex</span><span class="p">,</span> <span class="n">base_key_function</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded spikes from the object</span>
 
 <span class="sd">        :param str label:</span>
-<span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
 <span class="sd">        :param int region:</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :param application_vertex:</span>
 <span class="sd">        :type application_vertex:</span>
 <span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
@@ -137,13 +131,14 @@
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">buffer_manager</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_buffer_manager</span><span class="p">()</span>
         <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span>
                                <span class="s2">&quot;Getting spikes for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
             <span class="c1"># Read the spikes</span>
@@ -187,7 +182,7 @@
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">number_of_bytes_written</span><span class="p">:</span>
             <span class="n">length</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="n">spike_data</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
-            <span class="n">time</span> <span class="o">*=</span> <span class="n">machine_time_step_ms</span><span class="p">()</span>
+            <span class="n">time</span> <span class="o">*=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
             <span class="n">data_offset</span> <span class="o">=</span> <span class="n">offset</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
 
             <span class="n">eieio_header</span> <span class="o">=</span> <span class="n">EIEIODataHeader</span><span class="o">.</span><span class="n">from_bytestring</span><span class="p">(</span>

@@ -55,10 +55,7 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">machine_time_step</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
 
@@ -408,9 +405,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">delay_column</span> <span class="o">=</span> <span class="n">column_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;delay&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">_FIRST_PARAM</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span><span class="p">[:,</span> <span class="n">delay_column</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span>
-                    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_time_step</span><span class="p">()))</span> <span class="o">*</span>
-                    <span class="p">(</span><span class="n">machine_time_step</span><span class="p">()</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__conn_list</span><span class="p">[:,</span> <span class="n">delay_column</span><span class="p">])</span> <span class="o">*</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span> <span class="o">*</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">pass</span>
 

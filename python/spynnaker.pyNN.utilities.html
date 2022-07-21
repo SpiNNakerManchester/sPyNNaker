@@ -159,7 +159,7 @@ bit_field_key, structural region)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.bit_field_utilities.</span></span><span class="sig-name descname"><span class="pre">write_bitfield_init_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_builder_region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">master_pop_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_matrix_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_field_key_map_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_dynamics_region_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_structural_dynamics_region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>writes the init data needed for the bitfield generator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -167,7 +167,6 @@ bit_field_key, structural region)</p>
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – data spec writer</p></li>
 <li><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to generate bitfields for</p></li>
 <li><p><strong>vertex_slice</strong> (<em>slice</em>) – The slice of the target vertex</p></li>
-<li><p><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v6.0)"><em>RoutingInfo</em></a>) – keys</p></li>
 <li><p><strong>bit_field_builder_region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the bitfield builder</p></li>
 <li><p><strong>master_pop_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the master pop table</p></li>
 <li><p><strong>synaptic_matrix_region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region id for the synaptic matrix</p></li>
@@ -1132,6 +1131,18 @@ generator for seeds.</p>
 </dd>
 <dt class="field-even">Raise<span class="colon">:</span></dt>
 <dd class="field-even"><p>an exception if in CONTINUOUS_INTEGRATION</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spynnaker.pyNN.utilities.utility_calls.moved_in_v7_warning">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.utilities.utility_calls.</span></span><span class="sig-name descname"><span class="pre">moved_in_v7_warning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#moved_in_v7_warning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.moved_in_v7_warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Warns the user that they are using old code</p>
+<p>In version 8 this will be upgraded to a exception and then later removed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>message</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>

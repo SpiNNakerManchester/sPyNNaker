@@ -59,16 +59,16 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">descriptions</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints</span> <span class="kn">import</span> <span class="n">AbstractConstraint</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.placer_constraints</span> <span class="kn">import</span> <span class="n">ChipAndCoreConstraint</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_simulator</span><span class="p">,</span> <span class="n">get_not_running_simulator</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SpynnakerException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -157,9 +157,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># add objects to the SpiNNaker control class</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="n">sim</span><span class="o">.</span><span class="n">add_population</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">sim</span><span class="o">.</span><span class="n">add_application_vertex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
 
         <span class="c1"># initialise common stuff</span>
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -172,13 +170,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># things for pynn demands</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">id_counter</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">id_counter</span> <span class="o">+</span> <span class="n">size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__first_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_ids</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="c1"># update the simulators id_counter for giving a unique ID for every</span>
-        <span class="c1"># atom</span>
-        <span class="n">sim</span><span class="o">.</span><span class="n">id_counter</span> <span class="o">+=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__first_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_population</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__first_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__last_id</span><span class="p">)</span>
 
         <span class="c1"># set up initial values if given</span>
         <span class="k">if</span> <span class="n">initial_values</span><span class="p">:</span>
@@ -839,10 +833,11 @@
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
                 <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">variable</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">get_not_running_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">has_ran</span> \
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Population does not support changes after run&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s2">&quot;Population does not support changes after run&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Population.inject"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.inject">[docs]</a>    <span class="k">def</span> <span class="nf">inject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_source</span><span class="p">):</span>
@@ -887,13 +882,17 @@
 
     <span class="k">def</span> <span class="nf">_set_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Checks for various set methods.</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_settable</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Population does not have property </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">parameter</span><span class="p">))</span>
 
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_not_running_simulator</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">()</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
                 <span class="s2">&quot;Run has been called but vertex is not changable.&quot;</span><span class="p">)</span>
 
@@ -905,7 +904,7 @@
                 <span class="s2">&quot;Parameter must either be the name of a single parameter to&quot;</span>
                 <span class="s2">&quot; set, or a dict of parameter: value items to set&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_reset_last</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -925,6 +924,9 @@
 <span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
 <span class="sd">        :param value: the value of the parameter to set.</span>
 <span class="sd">        :type value: int or float or list(int) or list(float)</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_check</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
@@ -958,6 +960,9 @@
 <span class="sd">            str or dict(str, int or float or list(int) or list(float))</span>
 <span class="sd">        :param value: the value of the parameter to set.</span>
 <span class="sd">        :type value: int or float or list(int) or list(float)</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_check</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
@@ -974,20 +979,19 @@
 
         <span class="c1"># If the tools have run before, and not reset, and the read</span>
         <span class="c1"># hasn&#39;t already been done, read back the data</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">()</span>
                 <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">):</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">)):</span>
             <span class="c1"># go through each machine vertex and read the neuron parameters</span>
             <span class="c1"># it contains</span>
             <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">):</span>
                     <span class="c1"># tell the core to rewrite neuron params back to the</span>
                     <span class="c1"># SDRAM space.</span>
-                    <span class="n">placement</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+                    <span class="n">placement</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                        <span class="n">vertex</span><span class="p">)</span>
                     <span class="n">vertex</span><span class="o">.</span><span class="n">read_parameters_from_machine</span><span class="p">(</span>
-                        <span class="n">sim</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
-
+                        <span class="n">placement</span><span class="p">,</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
@@ -1004,8 +1008,11 @@
 <span class="sd">            onto which its atoms will be placed.</span>
 
 <span class="sd">        :param ~pacman.model.constraints.AbstractConstraint constraint:</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">constraint</span><span class="p">,</span> <span class="n">AbstractConstraint</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;the constraint entered is not a recognised constraint&quot;</span><span class="p">)</span>
@@ -1021,8 +1028,11 @@
 <span class="sd">        :param int x: The x-coordinate of the placement constraint</span>
 <span class="sd">        :param int y: The y-coordinate of the placement constraint</span>
 <span class="sd">        :param int p: The processor ID of the placement constraint (optional)</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">ChipAndCoreConstraint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
 
         <span class="c1"># state that something has changed in the population,</span>
@@ -1035,8 +1045,11 @@
 <span class="sd">        :param dict(str,int) constraint_dict:</span>
 <span class="sd">            A dictionary containing &quot;x&quot;, &quot;y&quot; and optionally &quot;p&quot; as keys, and</span>
 <span class="sd">            ints as values</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_placement_constraint</span><span class="p">(</span><span class="o">**</span><span class="n">constraint_dict</span><span class="p">)</span>
 
         <span class="c1"># state that something has changed in the population,</span>
@@ -1048,8 +1061,11 @@
 
 <span class="sd">        :param int max_atoms_per_core:</span>
 <span class="sd">            the new value for the max atoms per core.</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">max_atoms_per_core</span> <span class="o">&gt;</span> <span class="n">cap</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>

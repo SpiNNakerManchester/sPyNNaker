@@ -97,29 +97,18 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronRecordable.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.clear_recording">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the recorded data from the object</span>
 
 <span class="sd">        :param str variable: PyNN name of the variable</span>
-<span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronRecordable.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_data">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded data</span>
 
 <span class="sd">        :param str variable: PyNN name of the variable</span>
-<span class="sd">        :param int n_machine_time_steps:</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">        :param buffer_manager:</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
 <span class="sd">        :return: (data, recording_indices, sampling_interval)</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray,list(int),float)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

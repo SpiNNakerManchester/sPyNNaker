@@ -938,14 +938,11 @@ machine vertices on the same chip.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_partitioner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plan_n_time_steps</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_partitioner</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_partitioner" title="Permalink to this definition">¶</a></dt>
 <dd><p>a splitter partitioner that’s bespoke for spynnaker vertices.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p></li>
-<li><p><strong>plan_n_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number of time steps to run for</p></li>
-</ul>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of chips needed to satisfy this partitioning.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -955,17 +952,14 @@ machine vertices on the same chip.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector">
-<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_algorithms.splitter_components.</span></span><span class="sig-name descname"><span class="pre">spynnaker_splitter_selector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.spynnaker_splitter_selector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a splitter to every vertex that doesn’t already have one.</p>
 <blockquote>
 <div><p>default for APV is the SplitterAbstractPopulationVertexFixed        default for external device splitters are SplitterOneToOneLegacy        default for the rest is the SpynnakerSplitterFixedLegacy.</p>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>app_graph</strong> (<em>ApplicationGraph</em>) – app graph</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>PacmanConfigurationException</strong> – If a bad configuration is set</p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PacmanConfigurationException</strong> – If a bad configuration is set</p>
 </dd>
 </dl>
 </dd></dl>

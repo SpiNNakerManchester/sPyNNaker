@@ -54,9 +54,9 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationSpiNNakerLinkVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models.push_bot</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPushBotRetinaDevice</span><span class="p">)</span>
@@ -111,10 +111,7 @@
         <span class="c1"># stores for the injection aspects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.html#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload">[docs]</a>    <span class="nd">@inject_items</span><span class="p">({</span>
-        <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;RoutingInfos&quot;</span>
-    <span class="p">})</span>
-    <span class="k">def</span> <span class="nf">new_key_command_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link.html#spynnaker.pyNN.external_devices.PushBotSpiNNakerLinkRetinaDevice.new_key_command_payload">[docs]</a>    <span class="k">def</span> <span class="nf">new_key_command_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Support method to obtain the key after the key allocator has run</span>
 
@@ -122,6 +119,7 @@
 <span class="sd">        :return: the key</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
             <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)),</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">key</span></div>

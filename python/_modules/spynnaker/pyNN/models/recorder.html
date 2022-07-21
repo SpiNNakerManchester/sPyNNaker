@@ -57,11 +57,13 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">neo</span>
 <span class="kn">import</span> <span class="nn">quantities</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ordered_set</span> <span class="kn">import</span> <span class="n">OrderedSet</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spynnaker</span> <span class="kn">import</span> <span class="n">_version</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">AbstractEventRecordable</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -108,7 +110,8 @@
             <span class="s1">&#39;gsyn_exc&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;gsyn_inh&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
             <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span> <span class="o">=</span> \
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
@@ -192,9 +195,12 @@
 <span class="sd">        :type to_file: neo.io.baseio.BaseIO or str or None</span>
 <span class="sd">        :param indexes: List of indexes to record or None for all</span>
 <span class="sd">        :type indexes: list(int) or None</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="c1"># tell vertex its recording</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
@@ -278,12 +284,11 @@
 <span class="sd">            ``gsyn_exc``, ``gsyn_inh``, ``v``</span>
 <span class="sd">        :return: data, indexes, sampling_interval</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
+<span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
+<span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
+<span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-
-        <span class="n">sim</span><span class="o">.</span><span class="n">verify_not_running</span><span class="p">()</span>
-
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
         <span class="c1"># check that we&#39;re in a state to get voltages</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
@@ -294,16 +299,21 @@
                 <span class="s2">&quot;This population has not been set to record </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">variable</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;The simulation has not yet run, therefore </span><span class="si">{}</span><span class="s2"> cannot be &quot;</span>
-                <span class="s2">&quot;retrieved, hence the list will be empty&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The simulation has been reset, therefore </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;cannot be retrieved, hence the list/last segment list &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;will be empty&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The simulation has not yet run, therefore </span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;cannot be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">sampling_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_neuron_sampling_interval</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
                 <span class="s2">&quot;truly ran, hence the list will be empty&quot;</span><span class="p">)</span>
@@ -314,9 +324,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># assuming we got here, everything is ok, so we should go get the</span>
             <span class="c1"># data</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
-                <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">no_machine_time_steps</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span>
-                <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
             <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="n">results</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span></div>
@@ -336,13 +344,17 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;This population has not been set to record spikes&quot;</span><span class="p">)</span>
 
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;The simulation has not yet run, therefore spikes cannot &quot;</span>
-                <span class="s2">&quot;be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The simulation has reset, therefore spikes cannot &quot;</span>
+                    <span class="s2">&quot;be retrieved, hence the list/ last segment will be empty&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The simulation has not yet run, therefore spikes cannot &quot;</span>
+                    <span class="s2">&quot;be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
                 <span class="s2">&quot;truly ran, hence the spike list will be empty&quot;</span><span class="p">)</span>
@@ -350,7 +362,7 @@
 
         <span class="c1"># assuming we got here, everything is OK, so we should go get the</span>
         <span class="c1"># spikes</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Recorder.get_events"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; How to get rewiring events (of a post-population) from recorder</span>
@@ -367,20 +379,23 @@
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;This population has not been set to record rewires&quot;</span><span class="p">)</span>
 
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sim</span><span class="o">.</span><span class="n">has_ran</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;The simulation has not yet run, therefore rewires cannot &quot;</span>
-                <span class="s2">&quot;be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The simulation has been reset, therefore rewires cannot &quot;</span>
+                    <span class="s2">&quot;be retrieved, hence the list/last segment will be empty&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;The simulation has not yet run, therefore rewires &quot;</span>
+                    <span class="s2">&quot;cannot be retrieved, hence the list will be empty&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;The simulation is using a virtual machine and so has not &quot;</span>
                 <span class="s2">&quot;truly ran, hence the rewires list will be empty&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span>
-            <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">get_events</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Recorder.turn_off_all_recording"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.recorder.Recorder.turn_off_all_recording">[docs]</a>    <span class="k">def</span> <span class="nf">turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying ``.record()``</span>
@@ -413,7 +428,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">block</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Block</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">previous</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">segment_counter</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">previous</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_append_previous_segment</span><span class="p">(</span>
                 <span class="n">block</span><span class="p">,</span> <span class="n">previous</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">)</span>
 
@@ -458,7 +473,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_recording_variables</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">variables</span><span class="p">:</span>
-            <span class="n">segment_number</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">segment_counter</span>
+            <span class="n">segment_number</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Caching data for segment </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">segment_number</span><span class="p">)</span>
 
             <span class="n">data_cache</span> <span class="o">=</span> <span class="n">DataCache</span><span class="p">(</span>
@@ -466,7 +481,7 @@
                 <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span>
                 <span class="n">segment_number</span><span class="o">=</span><span class="n">segment_number</span><span class="p">,</span>
                 <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
-                <span class="n">t</span><span class="o">=</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">t</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">=</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">())</span>
 
             <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
@@ -522,7 +537,7 @@
     <span class="k">def</span> <span class="nf">__append_current_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">view_indexes</span><span class="p">,</span> <span class="n">clear</span><span class="p">):</span>
         <span class="c1"># build segment for the current data to be gathered in</span>
         <span class="n">segment</span> <span class="o">=</span> <span class="n">neo</span><span class="o">.</span><span class="n">Segment</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">segment_counter</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;segment</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_segment_counter</span><span class="p">()),</span>
             <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">describe</span><span class="p">(),</span>
             <span class="n">rec_datetime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 
@@ -534,7 +549,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__read_in_spikes</span><span class="p">(</span>
                     <span class="n">segment</span><span class="o">=</span><span class="n">segment</span><span class="p">,</span>
                     <span class="n">spikes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(),</span>
-                    <span class="n">t</span><span class="o">=</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">get_current_time</span><span class="p">(),</span>
+                    <span class="n">t</span><span class="o">=</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_current_run_time_ms</span><span class="p">(),</span>
                     <span class="n">n_neurons</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
                     <span class="n">recording_start_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_recording_start_time</span><span class="p">,</span>
                     <span class="n">sampling_interval</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__spike_sampling_interval</span><span class="p">,</span>
@@ -661,28 +676,19 @@
             <span class="s1">&#39;first_id&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">first_id</span><span class="p">),</span>
             <span class="s1">&#39;last_id&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">last_id</span><span class="p">),</span>
             <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
-            <span class="s1">&#39;simulator&#39;</span><span class="p">:</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;simulator&#39;</span><span class="p">:</span> <span class="n">_version</span><span class="o">.</span><span class="n">_NAME</span><span class="p">,</span>  <span class="c1"># pylint: disable=protected-access</span>
         <span class="p">}</span>
         <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">annotations</span><span class="p">)</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">dt</span>
-        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;mpi_processes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">num_processes</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;mpi_processes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># meaningless on Spinnaker</span>
         <span class="k">return</span> <span class="n">metadata</span>
 
     <span class="k">def</span> <span class="nf">_clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">SPIKES</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">(</span>
-                    <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">MEMBRANE_POTENTIAL</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">GSYN_EXCIT</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">variable</span> <span class="o">==</span> <span class="n">GSYN_INHIB</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">(</span>
-                    <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_spike_recording</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">variable</span> <span class="ow">in</span> <span class="p">[</span><span class="n">MEMBRANE_POTENTIAL</span><span class="p">,</span> <span class="n">GSYN_EXCIT</span><span class="p">,</span> <span class="n">GSYN_INHIB</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">clear_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">InvalidParameterType</span><span class="p">(</span>
                     <span class="s2">&quot;The variable </span><span class="si">{}</span><span class="s2"> is not a recordable value&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>

@@ -56,6 +56,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">FULL_MASK</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="c1">#: number of elements</span>
@@ -193,7 +194,7 @@
 
 
 <div class="viewcode-block" id="write_bitfield_init_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">[docs]</a><span class="k">def</span> <span class="nf">write_bitfield_init_data</span><span class="p">(</span>
-        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
         <span class="n">bit_field_builder_region</span><span class="p">,</span> <span class="n">master_pop_region_id</span><span class="p">,</span>
         <span class="n">synaptic_matrix_region_id</span><span class="p">,</span> <span class="n">direct_matrix_region_id</span><span class="p">,</span>
         <span class="n">bit_field_region_id</span><span class="p">,</span> <span class="n">bit_field_key_map_region_id</span><span class="p">,</span>
@@ -206,7 +207,6 @@
 <span class="sd">        The projections to generate bitfields for</span>
 <span class="sd">    :param ~pacman.model.graphs.common.slice vertex_slice:</span>
 <span class="sd">        The slice of the target vertex</span>
-<span class="sd">    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys</span>
 <span class="sd">    :param int bit_field_builder_region: the region id for the bitfield builder</span>
 <span class="sd">    :param int master_pop_region_id: the region id for the master pop table</span>
 <span class="sd">    :param int synaptic_matrix_region_id: the region id for the synaptic matrix</span>
@@ -243,6 +243,7 @@
             <span class="n">seen_app_edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span>
                        <span class="s2">&quot;is_direct_poisson_source&quot;</span><span class="p">):</span>
+                <span class="c1"># pylint: disable=protected-access</span>
                 <span class="n">s_info</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_synapse_information</span>
                 <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">is_direct_poisson_source</span><span class="p">(</span>
                         <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span>
@@ -264,6 +265,7 @@
     <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">))</span>
 
     <span class="c1"># load in key to max atoms map</span>
+    <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">,</span> <span class="n">n_atoms_per_core</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
         <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
             <span class="n">source_vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>

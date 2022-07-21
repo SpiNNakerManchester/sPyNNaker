@@ -55,9 +55,8 @@
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">.abstract_current_source</span> <span class="kn">import</span> <span class="n">AbstractCurrentSource</span><span class="p">,</span> <span class="n">CurrentSourceIDs</span>
 
@@ -89,9 +88,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__amplitude</span>
         <span class="c1"># Convert to integers i.e. timesteps</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="n">machine_ts</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span>
-        <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_ts</span>
+        <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">*</span> <span class="n">time_convert_ms</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">*</span> <span class="n">time_convert_ms</span>
 

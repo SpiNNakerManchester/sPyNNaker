@@ -56,15 +56,15 @@
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">pyNN</span> <span class="kn">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">pynn_common</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">pyNN.recording.files</span> <span class="kn">import</span> <span class="n">StandardTextFile</span>
 <span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">Space</span> <span class="k">as</span> <span class="n">PyNNSpace</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_simulator</span><span class="p">,</span> <span class="n">machine_time_step_ms</span><span class="p">,</span> <span class="n">machine_time_step_per_ms</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">)</span>
@@ -125,7 +125,6 @@
                 <span class="s2">&quot;sPyNNaker </span><span class="si">{}</span><span class="s2"> does not yet support multi-compartmental &quot;</span>
                 <span class="s2">&quot;cells.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">))</span>
 
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
@@ -143,8 +142,8 @@
                     <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
                     <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">connector</span><span class="p">))</span>
             <span class="c1"># give an auto generated label for the underlying edge</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;projection edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">none_labelled_edge_count</span><span class="p">)</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">increment_none_labelled_edge_count</span><span class="p">()</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;projection edge </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_next_none_labelled_edge_number</span><span class="p">())</span>
 
         <span class="c1"># Handle default synapse type</span>
         <span class="k">if</span> <span class="n">synapse_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -187,9 +186,10 @@
         <span class="k">if</span> <span class="p">((</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">))</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">,</span> <span class="nb">str</span><span class="p">))):</span>
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">set_delay</span><span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>
-                           <span class="n">machine_time_step_per_ms</span><span class="p">())</span> <span class="o">*</span>
-                <span class="n">machine_time_step_ms</span><span class="p">())</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span> <span class="o">*</span>
+                    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">())</span> <span class="o">*</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">())</span>
 
         <span class="c1"># set the plasticity dynamics for the post pop (allows plastic stuff</span>
         <span class="c1">#  when needed)</span>
@@ -201,8 +201,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">SynapseInformation</span><span class="p">(</span>
             <span class="n">connector</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
             <span class="n">pre_is_view</span><span class="p">,</span> <span class="n">post_is_view</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">,</span>
-            <span class="n">synaptic_type</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">,</span>
-            <span class="n">synapse_type_from_dynamics</span><span class="p">,</span>
+            <span class="n">synaptic_type</span><span class="p">,</span> <span class="n">receptor_type</span><span class="p">,</span> <span class="n">synapse_type_from_dynamics</span><span class="p">,</span>
             <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
 
         <span class="c1"># Set projection information in connector</span>
@@ -221,16 +220,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="n">ProjectionApplicationEdge</span><span class="p">(</span>
                 <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span>
                 <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
         <span class="c1"># add projection to the SpiNNaker control system</span>
-        <span class="n">sim</span><span class="o">.</span><span class="n">add_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="c1"># If there is a virtual board, we need to hold the data in case the</span>
         <span class="c1"># user asks for it</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__virtual_connection_list</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Machine&quot;</span><span class="p">,</span> <span class="s2">&quot;virtual_board&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__virtual_connection_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
             <span class="n">connection_holder</span> <span class="o">=</span> <span class="n">ConnectionHolder</span><span class="p">(</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
@@ -479,9 +478,9 @@
 <span class="sd">        :rtype: ~.ApplicationEdge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Find edges ending at the postsynaptic vertex</span>
-        <span class="n">partitions</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">original_application_graph</span><span class="o">.</span>\
-            <span class="n">get_outgoing_edge_partitions_starting_at_vertex</span><span class="p">(</span>
-            <span class="n">pre_synaptic_vertex</span><span class="p">)</span>
+        <span class="n">partitions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_outgoing_edge_partitions_starting_at_vertex</span><span class="p">(</span>
+                <span class="n">pre_synaptic_vertex</span><span class="p">))</span>
 
         <span class="c1"># Partitions and Partition.edges will be OrderedSet but may be empty</span>
         <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
@@ -521,7 +520,7 @@
 
         <span class="c1"># If we haven&#39;t run, add the holder to get connections, and return it</span>
         <span class="c1"># and set up a callback for after run to fill in this connection holder</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">has_ran</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">(</span>
                 <span class="n">connection_holder</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">connection_holder</span>
@@ -529,7 +528,6 @@
         <span class="c1"># Otherwise, get the connections now, as we have ran and therefore can</span>
         <span class="c1"># get them</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
-            <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">connections</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">connection_holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>

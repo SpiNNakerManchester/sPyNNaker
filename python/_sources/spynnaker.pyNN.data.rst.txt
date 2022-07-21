@@ -1,0 +1,10 @@
+spynnaker.pyNN.data package
+===========================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.data
+   :members:
+   :undoc-members:
+   :show-inheritance:

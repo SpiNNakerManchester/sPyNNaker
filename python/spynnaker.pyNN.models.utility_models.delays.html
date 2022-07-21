@@ -260,14 +260,13 @@ created. If None, there is no such application vertex.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification">
-<span class="sig-name descname"><span class="pre">generate_data_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_infos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.generate_data_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_data_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.generate_data_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a data specification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
 <li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – The placement the vertex is located at</p></li>
-<li><p><strong>routing_infos</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v6.0)"><em>RoutingInfo</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -304,7 +303,8 @@ created. If None, there is no such application vertex.</p></li>
 <dd><p>Get the number of keys required by the given partition of edges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The identifier of the partition</p>
+<dd class="field-odd"><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The identifier of the partition
+partition_id param is only used by some MachineVertex clases</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of keys required</p>

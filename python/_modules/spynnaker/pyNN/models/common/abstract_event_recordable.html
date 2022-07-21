@@ -93,27 +93,17 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractEventRecordable.clear_event_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractEventRecordable.clear_event_recording">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">clear_event_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clear_event_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the recorded data from the object</span>
 
-<span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractEventRecordable.get_events"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractEventRecordable.get_events">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded events from the object</span>
 
 <span class="sd">        :param str variable: The variable to get the event data for</span>
-<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
-<span class="sd">            the placements object</span>
-<span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :type buffer_manager:</span>
-<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
 <span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)</span>
 <span class="sd">            ordered by time, one element per event</span>
 <span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>

@@ -56,6 +56,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 
@@ -477,11 +478,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_index</span>
 
 <div class="viewcode-block" id="SynapticMatrix.read_connections"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.synaptic_matrix.SynapticMatrix.read_connections">[docs]</a>    <span class="k">def</span> <span class="nf">read_connections</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">,</span> <span class="n">single_address</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">,</span> <span class="n">single_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections from the machine</span>
 
-<span class="sd">        :param ~spinnman.transciever.Transceiver transceiver:</span>
-<span class="sd">            How to read the data from the machine</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
@@ -496,11 +495,9 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_single</span><span class="p">:</span>
-                <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_single_block</span><span class="p">(</span>
-                    <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">single_address</span><span class="p">)</span>
+                <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_single_block</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">single_address</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_block</span><span class="p">(</span>
-                    <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
+                <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_block</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
@@ -509,8 +506,7 @@
                 <span class="kc">False</span><span class="p">,</span> <span class="n">splitter</span><span class="o">.</span><span class="n">max_support_delay</span><span class="p">()))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_delayed_block</span><span class="p">(</span>
-                <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_delayed_block</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">)</span>
             <span class="n">splitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">splitter</span>
             <span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">convert_to_connections</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_slice</span><span class="p">,</span>
@@ -526,11 +522,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for undelayed synapses</span>
 
-<span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
-<span class="sd">            How to read the data from the machine</span>
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
@@ -540,15 +534,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span>
         <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">+</span> <span class="n">synapses_address</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__matrix_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="o">=</span> <span class="n">block</span>
         <span class="k">return</span> <span class="n">block</span>
 
-    <span class="k">def</span> <span class="nf">__get_delayed_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_delayed_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">synapses_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for delayed synapses</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
@@ -557,15 +550,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span>
         <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_syn_mat_offset</span> <span class="o">+</span> <span class="n">synapses_address</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_matrix_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_received_block</span> <span class="o">=</span> <span class="n">block</span>
         <span class="k">return</span> <span class="n">block</span>
 
-    <span class="k">def</span> <span class="nf">__get_single_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">single_address</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_single_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">single_address</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a block of data for &quot;direct&quot; or &quot;single&quot; synapses</span>
 
-<span class="sd">        :param Transceiver transceiver: How to read the data from the machine</span>
 <span class="sd">        :param Placement placement: Where the matrix is on the machine</span>
 <span class="sd">        :param int single_address:</span>
 <span class="sd">            The base address of the &quot;direct&quot; or &quot;single&quot; matrix region</span>
@@ -574,7 +566,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__received_block</span>
         <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__syn_mat_offset</span> <span class="o">+</span> <span class="n">single_address</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__single_matrix_size</span><span class="p">)</span>
         <span class="n">numpy_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
         <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">numpy_data</span><span class="p">)</span>

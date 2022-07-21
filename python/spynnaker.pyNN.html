@@ -56,6 +56,10 @@
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.connections.html#module-spynnaker.pyNN.connections">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.data.html">spynnaker.pyNN.data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.data.html#module-spynnaker.pyNN.data">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.external_devices.html">spynnaker.pyNN.external_devices package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.external_devices.html#module-spynnaker.pyNN.external_devices">Module contents</a></li>
 </ul>
@@ -203,11 +207,18 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>executable_finder</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.executable_finder.ExecutableFinder" title="(in SpiNNUtils v6.0)"><em>ExecutableFinder</em></a>) – How to find APLX files to deploy to SpiNNaker</p></li>
-<li><p><strong>graph_label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A label for the overall application graph</p></li>
-<li><p><strong>database_socket_addresses</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.socket_address.SocketAddress" title="(in SpiNNUtils v6.0)"><em>SocketAddress</em></a><em>) or </em><em>None</em>) – How to talk to notification databases</p></li>
-<li><p><strong>n_chips_required</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Overrides the number of chips to allocate from spalloc</p></li>
-<li><p><strong>n_boards_required</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Overrides the number of boards to allocate from spalloc</p></li>
+<li><p><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – multiplicative factor to the machine time step
+(does not affect the neuron models accuracy)</p></li>
+<li><p><strong>min_delay</strong> – </p></li>
+<li><p><strong>graph_label</strong> – </p></li>
+<li><p><strong>n_chips_required</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – Deprecated! Use n_boards_required instead.
+Must be None if n_boards_required specified.</p></li>
+<li><p><strong>n_boards_required</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – if you need to be allocated a machine (for spalloc) before
+building your graph, then fill this in with a general idea of
+the number of boards you need so that the spalloc system can
+allocate you a machine big enough for your needs.</p></li>
+<li><p><strong>timestep</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><em>None</em>) – the time step of the simulations in micro seconds
+if None the cfg value is used</p></li>
 </ul>
 </dd>
 </dl>
@@ -452,17 +463,6 @@ external device will receive the database is ready command</p></li>
 <li><p><strong>reserve_reverse_ip_tag</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – True if a reverse IP tag is to be
 used, False if SDP is to be used (default)</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.add_socket_address">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_socket_address</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/spynnaker_external_device_plugin_manager.html#SpynnakerExternalDevicePluginManager.add_socket_address"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.spynnaker_external_device_plugin_manager.SpynnakerExternalDevicePluginManager.add_socket_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a socket address to the list to be checked by the            notification protocol.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>socket_address</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.socket_address.SocketAddress" title="(in SpiNNUtils v6.0)"><em>SocketAddress</em></a>) – the socket address</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3407,6 +3407,13 @@ instantiated object.</p></li>
 <li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The processor ID of the placement constraint (optional)</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -3881,6 +3888,13 @@ pass through method</p></li>
 <li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – the value of the parameter to set.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -3891,6 +3905,13 @@ pass through method</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>constraint</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a>) – </p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -3912,6 +3933,13 @@ pass through method</p></li>
 <dd class="field-odd"><p><strong>constraint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – A dictionary containing “x”, “y” and optionally “p” as keys, and
 ints as values</p>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -3922,6 +3950,13 @@ ints as values</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the new value for the max atoms per core.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>SimulatorRunningException</strong> – If sim.run is currently running</p></li>
+<li><p><strong>SimulatorNotSetupException</strong> – If called before sim.setup</p></li>
+<li><p><strong>SimulatorShutdownException</strong> – If called after sim.end</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

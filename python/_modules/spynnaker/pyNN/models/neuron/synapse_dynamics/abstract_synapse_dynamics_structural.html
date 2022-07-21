@@ -77,7 +77,7 @@
 <div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synaptic_matrices</span><span class="p">):</span>
+            <span class="n">synaptic_matrices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -88,8 +88,6 @@
 <span class="sd">            The target application vertex</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the target vertex to generate for</span>
-<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
-<span class="sd">            Routing information for all edges</span>
 <span class="sd">        :param SynapticMatrices synaptic_matrices:</span>
 <span class="sd">            The synaptic matrices for this vertex</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

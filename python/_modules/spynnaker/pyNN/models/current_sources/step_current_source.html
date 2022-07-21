@@ -55,9 +55,8 @@
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">.abstract_current_source</span> <span class="kn">import</span> <span class="n">AbstractCurrentSource</span><span class="p">,</span> <span class="n">CurrentSourceIDs</span>
 
@@ -75,13 +74,7 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># There&#39;s probably no need to actually store these as you can&#39;t</span>
         <span class="c1"># access them directly in pynn anyway</span>
-        <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">amplitudes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-        <span class="n">machine_ts</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span>
-        <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_ts</span>
+        <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_per_ms</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__times</span> <span class="o">=</span> <span class="p">[</span><span class="n">times</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">time_convert_ms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">))]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__amplitudes</span> <span class="o">=</span> <span class="n">amplitudes</span>
 
@@ -113,11 +106,10 @@
                 <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;times&#39;</span><span class="p">:</span>
-                    <span class="n">sim</span> <span class="o">=</span> <span class="n">get_simulator</span><span class="p">()</span>
-                    <span class="n">machine_ts</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span>
-                    <span class="n">convert_ms</span> <span class="o">=</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="n">machine_ts</span>
+                    <span class="n">time_convert_ms</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span>\
+                        <span class="n">get_simulation_time_step_per_ms</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__times</span> <span class="o">=</span> <span class="p">[</span>
-                        <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">convert_ms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">))]</span>
+                        <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">time_convert_ms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">))]</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__times</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Check length: if longer, need to remap</span>

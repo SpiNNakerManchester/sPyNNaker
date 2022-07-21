@@ -60,6 +60,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="n">ProvenanceWriter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ReceivesSynapticInputsOverSDRAM</span><span class="p">,</span> <span class="n">SendsSynapticInputsOverSDRAM</span><span class="p">)</span>
@@ -196,7 +197,6 @@
             <span class="n">SynapseProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span> <span class="o">+</span> <span class="n">SpikeProcessingFastProvenance</span><span class="o">.</span><span class="n">N_ITEMS</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_binary_file_name</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_to_synapse_edge</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__partition_id</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -258,13 +258,11 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">get_config_int</span><span class="p">(</span>
             <span class="s2">&quot;Simulation&quot;</span><span class="p">,</span> <span class="s2">&quot;transfer_overhead_clocks&quot;</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_write_key_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_key_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write key config region</span>
 
 <span class="sd">        :param DataSpecificationGenerator spec:</span>
 <span class="sd">            The generator of the specification to write</span>
-<span class="sd">        :param RoutingInfo routing_info:</span>
-<span class="sd">            Container of keys and masks for edges</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
             <span class="n">region</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">REGIONS</span><span class="o">.</span><span class="n">KEY_REGION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">KEY_CONFIG_SIZE</span><span class="p">,</span>
@@ -277,6 +275,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">routing_info</span> <span class="o">=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_routing_infos</span><span class="p">()</span>
             <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_from_pre_vertex</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition_id</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span><span class="p">)</span>
