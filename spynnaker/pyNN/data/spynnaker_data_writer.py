@@ -63,7 +63,8 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         """
 
         :param simulation_time_step_us:
-            An explicitly specified time step for the simulation in .
+            An explicitly specified time step for the simulation in
+            microseconds.
             If None, the value is read from the config
         :type simulation_time_step_us: int or None
         :param time_scale_factor:
@@ -104,7 +105,7 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         if abs(rounded - raw) > 0.00001:
             raise ConfigurationException(
                 f'invalid min_delay {min_delay} '
-                f'must at multiple of simulation time step in microseconds '
+                f'must be a multiple of simulation time step in microseconds '
                 f' {self.get_simulation_time_step_ms()}')
 
         self.__spy_data._min_delay = min_delay
