@@ -49,37 +49,30 @@ class _DelaySupportAdder(object):
 
     __slots__ = [
         "_app_to_delay_map",
-        "_delay_post_edge_map",
-        "_new_edges",
-        "_new_vertices"
-        ]
+        "_delay_post_edge_map"]
 
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
-        self._new_edges = list()
-        self._new_vertices = list()
 
     def _run(self):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
         """
-        app_graph = SpynnakerDataView.get_runtime_graph()
-        for vertex in app_graph.vertices:
-            if isinstance(vertex, DelayExtensionVertex):
-                self._app_to_delay_map[vertex.partition] = vertex
-                for edge in vertex.outgoing_edges:
-                    self._delay_post_edge_map[(vertex, edge.post_vertex)] = \
-                        edge
-
-        progress = ProgressBar(
-            len(list(app_graph.outgoing_edge_partitions)),
+        progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
             "Adding delay extensions as required")
 
-        # go through all partitions.
+        for vertex in SpynnakerDataView.get_vertices_by_type(
+                DelayExtensionVertex):
+            self._app_to_delay_map[vertex.partition] = vertex
+            for edge in vertex.outgoing_edges:
+                self._delay_post_edge_map[(vertex, edge.post_vertex)] = edge
+        progress.update(1)
+
+        # go through all partitions. Use the Clone so we can add during iter
         for app_outgoing_edge_partition in progress.over(
-                app_graph.outgoing_edge_partitions):
+                SpynnakerDataView.get_partitions_clone()):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
 
@@ -101,21 +94,6 @@ class _DelaySupportAdder(object):
                         self._create_post_delay_edge(
                             delay_app_vertex, app_edge)
 
-        # avoids mutating the list of outgoing partitions. add them afterwards
-        self._add_to_graph(app_graph)
-
-    def _add_to_graph(self, app_graph):
-        """ adds new edges to the app graph. avoids mutating the arrays being\
-            iterated over previously.
-
-        :param ApplicationGraph app_graph: app graph
-        :rtype: None
-        """
-        for vertex in self._new_vertices:
-            app_graph.add_vertex(vertex)
-        for edge in self._new_edges:
-            app_graph.add_edge(edge, constants.SPIKE_PARTITION_ID)
-
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores\
             for future loading to the app graph when safe to do so.
@@ -136,7 +114,7 @@ class _DelaySupportAdder(object):
                 undelayed_edge=app_edge)
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
-            self._new_edges.append(delay_edge)
+            SpynnakerDataView.add(delay_edge)
             app_edge.delay_edge = delay_edge
             delay_app_vertex.add_outgoing_edge(delay_edge)
 
@@ -167,7 +145,7 @@ class _DelaySupportAdder(object):
 
             # set trackers
             delay_app_vertex.splitter = SplitterDelayVertexSlice()
-            self._new_vertices.append(delay_app_vertex)
+            SpynnakerDataView.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)
 
@@ -176,7 +154,7 @@ class _DelaySupportAdder(object):
                 app_edge.pre_vertex, delay_app_vertex,
                 label="{}_to_DelayExtension".format(
                     app_edge.pre_vertex.label))
-            self._new_edges.append(delay_pre_edge)
+            SpynnakerDataView.add_edge(delay_pre_edge)
         else:
             delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
                 n_delay_stages, delay_per_stage)
