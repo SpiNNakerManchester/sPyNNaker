@@ -16,6 +16,7 @@
 import math
 from pacman.utilities.constants import FULL_MASK
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 #: number of elements
@@ -153,7 +154,7 @@ def reserve_bit_field_regions(
 
 
 def write_bitfield_init_data(
-        spec, incoming_projections, vertex_slice, routing_info,
+        spec, incoming_projections, vertex_slice,
         bit_field_builder_region, master_pop_region_id,
         synaptic_matrix_region_id, direct_matrix_region_id,
         bit_field_region_id, bit_field_key_map_region_id,
@@ -166,7 +167,6 @@ def write_bitfield_init_data(
         The projections to generate bitfields for
     :param ~pacman.model.graphs.common.slice vertex_slice:
         The slice of the target vertex
-    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
     :param int bit_field_builder_region: the region id for the bitfield builder
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix
@@ -203,6 +203,7 @@ def write_bitfield_init_data(
             seen_app_edges.add(in_edge)
             if hasattr(in_edge.post_vertex.splitter,
                        "is_direct_poisson_source"):
+                # pylint: disable=protected-access
                 s_info = proj._synapse_information
                 if in_edge.post_vertex.splitter.is_direct_poisson_source(
                         in_edge.pre_vertex, s_info.connector,
@@ -224,6 +225,7 @@ def write_bitfield_init_data(
     spec.write_value(len(sources))
 
     # load in key to max atoms map
+    routing_info = SpynnakerDataView.get_routing_infos()
     for source_vertex, n_atoms, n_atoms_per_core in sources:
         r_info = routing_info.get_routing_info_from_pre_vertex(
             source_vertex, SPIKE_PARTITION_ID)

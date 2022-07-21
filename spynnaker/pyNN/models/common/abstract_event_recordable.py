@@ -53,27 +53,17 @@ class AbstractEventRecordable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def clear_event_recording(self, buffer_manager, placements):
+    def clear_event_recording(self):
         """ Clear the recorded data from the object
 
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :rtype: None
         """
 
     @abstractmethod
-    def get_events(self, variable, placements, buffer_manager):
+    def get_events(self, variable):
         """ Get the recorded events from the object
 
         :param str variable: The variable to get the event data for
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
-        :param buffer_manager: the buffer manager object
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))

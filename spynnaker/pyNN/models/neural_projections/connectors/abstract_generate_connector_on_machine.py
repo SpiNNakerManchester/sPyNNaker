@@ -316,6 +316,7 @@ class AbstractGenerateConnectorOnMachine(
         :rtype: tuple(int,int)
         """
         # Evil forward reference to subpackage implementation of type!
+        # pylint: disable=protected-access
         indexes = view._indexes
         view_lo = indexes[0]
         view_hi = indexes[-1]
