@@ -60,7 +60,7 @@ class _DelaySupportAdder(object):
             splitter objects have been set.
 
         """
-        progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
+        progress = ProgressBar(2 + SpynnakerDataView.get_n_partitions(),
             "Adding delay extensions as required")
 
         for vertex in SpynnakerDataView.get_vertices_by_type(
@@ -70,9 +70,12 @@ class _DelaySupportAdder(object):
                 self._delay_post_edge_map[(vertex, edge.post_vertex)] = edge
         progress.update(1)
 
-        # go through all partitions. Use the Clone so we can add during iter
-        for app_outgoing_edge_partition in progress.over(
-                SpynnakerDataView.get_partitions_clone()):
+        # Get a shallow copy of the partitions so we can add during iteration
+        partitions = list(SpynnakerDataView.iterate_partitions())
+        progress.update(1)
+
+        # go through all partitions.
+        for app_outgoing_edge_partition in progress.over(partitions):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
 
