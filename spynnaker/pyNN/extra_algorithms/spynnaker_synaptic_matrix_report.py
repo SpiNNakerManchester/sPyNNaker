@@ -18,9 +18,7 @@ import os
 import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -32,7 +30,7 @@ class SpYNNakerSynapticMatrixReport(object):
     """ Generate the synaptic matrices for reporting purposes.
     """
 
-    def __call__(self, connection_holder, dsg_targets):
+    def __call__(self, connection_holder):
         """ Convert synaptic matrix for every application edge.
 
         :param connection_holder: where the synaptic matrices are stored
@@ -40,20 +38,15 @@ class SpYNNakerSynapticMatrixReport(object):
         :type connection_holder:
             dict(tuple(ProjectionApplicationEdge, SynapseInformation),
             ConnectionHolder)
-        :param dsg_targets: used to check if connection holders are populated
         """
 
         # Update the print options to display everything
         print_opts = numpy.get_printoptions()
         numpy.set_printoptions(threshold=numpy.nan)
 
-        if dsg_targets is None:
-            raise SynapticConfigurationException(
-                "dsg_targets should not be none, used as a check for "
-                "connection holder data to be generated")
-
         # generate folder for synaptic reports
-        top_level_folder = os.path.join(report_default_directory(), _DIRNAME)
+        top_level_folder = os.path.join(
+            SpynnakerDataView.get_run_dir_path(), _DIRNAME)
         if not os.path.exists(top_level_folder):
             os.mkdir(top_level_folder)
 

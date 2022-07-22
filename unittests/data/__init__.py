@@ -12,13 +12,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-def make_missing_string(missing):
-    """
-    :param iterable(~pacman.model.placements.Placement) missing:
-    :rtype: str
-    """
-    return "; ".join(
-        "({}, {}, {})".format(placement.x, placement.y, placement.p)
-        for placement in missing)

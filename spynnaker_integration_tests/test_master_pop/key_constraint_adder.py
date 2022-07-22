@@ -18,14 +18,16 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 
 
 class KeyConstraintAdder(object):
 
-    def __call__(self, app_graph):
-        for partition in app_graph.outgoing_edge_partitions:
+    def __call__(self):
+        graph = SpynnakerDataView.get_runtime_graph()
+        for partition in graph.outgoing_edge_partitions:
             for vertex in partition.pre_vertex.splitter.get_out_going_vertices(
                     partition.identifier):
                 if isinstance(

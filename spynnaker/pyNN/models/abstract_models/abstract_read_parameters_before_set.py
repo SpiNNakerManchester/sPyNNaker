@@ -26,12 +26,9 @@ class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
+    def read_parameters_from_machine(self, placement, vertex_slice):
         """ Read the parameters from the machine before any are changed.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            the SpinnMan interface
         :param ~pacman.model.placements.Placement placement:
             the placement of a vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:

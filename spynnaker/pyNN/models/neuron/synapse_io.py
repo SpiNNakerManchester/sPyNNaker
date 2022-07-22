@@ -16,8 +16,7 @@
 import numpy
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms, machine_time_step_per_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -132,7 +131,8 @@ def get_maximum_delay_supported_in_ms(post_vertex_max_delay_ticks):
     :param int post_vertex_max_delay_ticks: post vertex max delay
     :rtype: int
     """
-    return post_vertex_max_delay_ticks * machine_time_step_ms()
+    return (post_vertex_max_delay_ticks *
+            SpynnakerDataView.get_simulation_time_step_ms())
 
 
 def get_max_row_info(
@@ -297,7 +297,8 @@ def get_synapses(
 
     # Convert delays to timesteps
     connections["delay"] = numpy.rint(
-        connections["delay"] * machine_time_step_per_ms())
+        connections["delay"] *
+        SpynnakerDataView.get_simulation_time_step_per_ms())
 
     # Scale weights
     if not synapse_info.synapse_type_from_dynamics:
@@ -672,7 +673,8 @@ def _rescale_connections(
         The synapse information of the connections
     """
     # Return the delays values to milliseconds
-    connections["delay"] /= machine_time_step_per_ms()
+    connections["delay"] /= \
+        SpynnakerDataView.get_simulation_time_step_per_ms()
     # Undo the weight scaling
     connections["weight"] /= weight_scales[synapse_info.synapse_type]
     return connections

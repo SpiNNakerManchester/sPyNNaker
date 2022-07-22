@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import write_mfvn_lut
@@ -133,8 +132,8 @@ class TimingDependenceMFVN(AbstractTimingDependence):
     def write_parameters(
             self, spec, global_weight_scale, synapse_weight_scales):
         # Check timestep is valid
-        machine_time_step = machine_time_step_ms()
-        if machine_time_step != 1:
+        time_step = SpynnakerDataView.get_simulation_time_step_ms()
+        if time_step != 1:
             raise NotImplementedError(
                 "exp cos LUT generation currently only supports 1ms timesteps")
 
