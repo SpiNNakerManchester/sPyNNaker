@@ -545,6 +545,7 @@ class Population(PopulationBase):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
+        self._read_parameters()
         return InitialValuesHolder(variable, self.__vertex, selector)
 
     def set_initial_value(self, variable, value, selector=None):
@@ -927,20 +928,26 @@ class Population(PopulationBase):
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
         sim = get_simulator()
-        if (sim.has_ran
-                and not self.__has_read_neuron_parameters_this_run
+        if (not self.__has_read_neuron_parameters_this_run
                 and not sim.use_virtual_board):
-            # go through each machine vertex and read the neuron parameters
-            # it contains
-            for vertex in self.__vertex.machine_vertices:
-                if isinstance(vertex, AbstractReadParametersBeforeSet):
-                    # tell the core to rewrite neuron params back to the
-                    # SDRAM space.
-                    placement = sim.placements.get_placement_of_vertex(vertex)
-                    vertex.read_parameters_from_machine(
-                        sim.transceiver, placement)
+            if not sim.has_ran:
+                # If we haven't run yet, just request that the initial values
+                # are read
+                self.__vertex.request_store_initial_values()
+            else:
 
-            self.__has_read_neuron_parameters_this_run = True
+                # go through each machine vertex and read the neuron parameters
+                # it contains
+                for vertex in self.__vertex.machine_vertices:
+                    if isinstance(vertex, AbstractReadParametersBeforeSet):
+                        # tell the core to rewrite neuron params back to the
+                        # SDRAM space.
+                        placement = sim.placements.get_placement_of_vertex(
+                            vertex)
+                        vertex.read_parameters_from_machine(
+                            sim.transceiver, placement)
+
+                self.__has_read_neuron_parameters_this_run = True
 
     @property
     def structure(self):

@@ -35,3 +35,14 @@ class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
             the placement of a vertex
         :rtype: None
         """
+
+    @abstractmethod
+    def request_read_initial_parameters(self):
+        """ Request that initial parameters are read from the machine
+        """
+
+    @abstractmethod
+    def reset_read_initial_parameters(self):
+        """ Indicate that initial parameters have been read and don't need
+            to be read again
+        """
