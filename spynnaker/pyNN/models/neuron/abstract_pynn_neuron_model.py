@@ -18,7 +18,7 @@ from spynnaker.pyNN.models.neuron.pynn_partition_vertex import PyNNPartitionVert
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 #Must be a power of 2!!!
-DEFAULT_MAX_ATOMS_PER_NEURON_CORE = 64
+DEFAULT_MAX_ATOMS_PER_NEURON_CORE = 128
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
