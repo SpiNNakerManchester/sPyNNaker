@@ -20,8 +20,7 @@ from pacman.model.routing_info import BaseKeyAndMask
 from data_specification.enums.data_type import DataType
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_per_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -171,7 +170,7 @@ class SynapticMatrices(object):
         return (self.__on_chip_generated_block_addr -
                 self.__host_generated_block_addr)
 
-    def generate_data(self, routing_info):
+    def generate_data(self):
         # If the data has already been generated, stop
         if self.__data_generated:
             return
@@ -202,11 +201,10 @@ class SynapticMatrices(object):
         for proj in self.__app_vertex.incoming_projections:
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
-            app_key_info = self.__app_key_and_mask(app_edge, routing_info)
+            app_key_info = self.__app_key_and_mask(app_edge)
             if app_key_info is None:
                 continue
-            d_app_key_info = self.__delay_app_key_and_mask(
-                app_edge, routing_info)
+            d_app_key_info = self.__delay_app_key_and_mask(app_edge)
             app_matrix = SynapticMatrixApp(
                 synapse_info, app_edge, self.__n_synapse_types,
                 self.__regions.synaptic_matrix, self.__max_atoms_per_core,
@@ -247,7 +245,7 @@ class SynapticMatrices(object):
         self.__bit_field_size = get_sdram_for_bit_field_region(
             self.__app_vertex.incoming_projections)
         self.__bit_field_key_map = get_bitfield_key_map_data(
-            self.__app_vertex.incoming_projections, routing_info)
+            self.__app_vertex.incoming_projections)
         self.__generated_data_size += (
             len(self.__bit_field_key_map) * BYTES_PER_WORD)
 
@@ -332,8 +330,8 @@ class SynapticMatrices(object):
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(0)  # TODO: The index if needed
         spec.write_value(self.__n_synapse_types)
-        spec.write_value(
-            DataType.S1615.encode_as_int(machine_time_step_per_ms()))
+        spec.write_value(DataType.S1615.encode_as_int(
+            SpynnakerDataView.get_simulation_time_step_per_ms()))
         # Per-Population RNG
         spec.write_array(self.__app_vertex.pop_seed)
         # Per-Core RNG
@@ -369,20 +367,21 @@ class SynapticMatrices(object):
         return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
                            mask_size, n_atoms * n_stages)
 
-    def __app_key_and_mask(self, app_edge, routing_info):
+    def __app_key_and_mask(self, app_edge):
         """ Get a key and mask for an incoming application vertex as a whole
 
         :param PopulationApplicationEdge app_edge:
             The application edge to get the key and mask of
         :param RoutingInfo routing_info: The routing information of all edges
         """
+        routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             app_edge.pre_vertex, SPIKE_PARTITION_ID)
         if r_info is None:
             return None
         return self.__get_app_key_and_mask(r_info, 1)
 
-    def __delay_app_key_and_mask(self, app_edge, routing_info):
+    def __delay_app_key_and_mask(self, app_edge):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or return None if no delay edge exists
 
@@ -393,49 +392,37 @@ class SynapticMatrices(object):
         delay_edge = app_edge.delay_edge
         if delay_edge is None:
             return None
+        routing_info = SpynnakerDataView.get_routing_infos()
         r_info = routing_info.get_routing_info_from_pre_vertex(
             delay_edge.pre_vertex, SPIKE_PARTITION_ID)
 
         return self.__get_app_key_and_mask(r_info, app_edge.n_delay_stages)
 
-    def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info,
-            post_vertex_slice):
+    def get_connections_from_machine(self, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            Used to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             Where the vertices are on the machine
         :param ProjectionApplicationEdge app_edge:
             The application edge of the projection
         :param SynapseInformation synapse_info:
             The synapse information of the projection
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         :return: A list of arrays of connections, each with dtype
             AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         matrix = self.__matrices[app_edge, synapse_info]
-        return matrix.get_connections(
-            transceiver, placement, post_vertex_slice)
+        return matrix.get_connections(placement)
 
-    def read_generated_connection_holders(
-            self, transceiver, placement, post_vertex_slice):
+    def read_generated_connection_holders(self, placement):
         """ Fill in any pre-run connection holders for data which is generated
             on the machine, after it has been generated
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the data from the machine
         :param ~pacman.model.placements.Placement placement:
             where the data is to be read from
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The slice of the post-vertex the matrix is for
         """
         for matrix in self.__matrices.values():
-            matrix.read_generated_connection_holders(
-                transceiver, placement, post_vertex_slice)
+            matrix.read_generated_connection_holders(placement)
 
     @property
     def gen_on_machine(self):

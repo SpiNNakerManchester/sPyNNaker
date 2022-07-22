@@ -78,7 +78,9 @@ class InitialValuesHolder(object):
         # If there is just one item to return, return the values stored
         params = self.__data_items_to_return
         if is_singleton(self.__data_items_to_return):
-            params = [self.__data_items_to_return]
+            self.__data_items = self._safe_read_values(
+                self.__data_items_to_return)
+            return self.__data_items
 
         # If there are multiple items to return, form a list
         self.__data_items = {param: self._safe_read_values(param)
@@ -109,6 +111,14 @@ class InitialValuesHolder(object):
     def __contains__(self, item):
         data = self._get_data_items()
         return item in data
+
+    def __eq__(self, other):
+        data = self._get_data_items()
+        return data == other
+
+    def __hash__(self):
+        data = self._get_data_items()
+        return hash(data)
 
     def keys(self):
         data = self._get_data_items()

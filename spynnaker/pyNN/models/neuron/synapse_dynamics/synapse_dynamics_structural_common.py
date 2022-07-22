@@ -22,8 +22,7 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -88,7 +87,7 @@ class SynapseDynamicsStructuralCommon(
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, weight_scales, app_vertex,
-            vertex_slice, routing_info, synaptic_matrices):
+            vertex_slice, synaptic_matrices):
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
 
@@ -103,7 +102,7 @@ class SynapseDynamicsStructuralCommon(
 
         # Write the pre-population info
         pop_index, subpop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_projections, routing_info,
+            spec, app_vertex, structural_projections,
             weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
@@ -162,20 +161,21 @@ class SynapseDynamicsStructuralCommon(
         :return: None
         :rtype: None
         """
+        time_step_us = SpynnakerDataView.get_simulation_time_step_us()
         spec.comment("Writing common rewiring data")
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
+                time_step_us / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(data=int(
-                machine_time_step() / (
+                time_step_us / (
                     self.p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(data=int((
                 self.p_rew * MICRO_TO_SECOND_CONVERSION) /
-                machine_time_step()))
+                time_step_us))
         # write s_max
         spec.write_value(data=int(self.s_max))
         # write total number of atoms in the application vertex
@@ -213,13 +213,13 @@ class SynapseDynamicsStructuralCommon(
         :type machine_edges_by_app:
             dict(~pacman.model.graphs.application.ApplicationEdge,
             list(~pacman.model.graphs.machine.MachineEdge))
-        :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param SynapticMatrices synaptic_matrices:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
         spec.comment("Writing pre-population info")
         pop_index = dict()
+        routing_info = SpynnakerDataView.get_routing_infos()
         subpop_index = dict()
         index = 0
         for proj in structural_projections:
@@ -241,9 +241,7 @@ class SynapseDynamicsStructuralCommon(
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
-            delay_scale = (
-                    MICRO_TO_MILLISECOND_CONVERSION /
-                    machine_time_step())
+            delay_scale = SpynnakerDataView.get_simulation_time_step_per_ms()
             if isinstance(dynamics.initial_delay, Iterable):
                 spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
@@ -446,9 +444,10 @@ class SynapseDynamicsStructuralCommon(
     def get_max_rewires_per_ts(self):
         max_rewires_per_ts = 1
         if (self.p_rew * MICRO_TO_MILLISECOND_CONVERSION <
-                machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION):
+                SpynnakerDataView.get_simulation_time_step_ms()):
             # fast rewiring, so need to set max_rewires_per_ts
-            max_rewires_per_ts = int(machine_time_step() / (
-                self.p_rew * MICRO_TO_SECOND_CONVERSION))
+            max_rewires_per_ts = int(
+                SpynnakerDataView.get_simulation_time_step_us() / (
+                        self.p_rew * MICRO_TO_SECOND_CONVERSION))
 
         return max_rewires_per_ts

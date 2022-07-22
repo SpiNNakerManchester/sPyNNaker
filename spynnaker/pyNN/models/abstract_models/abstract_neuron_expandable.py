@@ -50,11 +50,9 @@ class AbstractNeuronExpandable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def read_generated_initial_values(self, transceiver, placement):
+    def read_generated_initial_values(self, placement):
         """ Fill in any requested initial values
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How the data is to be read
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
         """

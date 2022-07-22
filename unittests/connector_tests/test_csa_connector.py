@@ -32,7 +32,7 @@ def test_csa_one_to_one_connector():
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None, is_virtual_machine=False,
+            synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(synapse_info)
     post_vertex_slice = Slice(0, 10)
@@ -54,7 +54,7 @@ def test_csa_from_list_connector():
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None, is_virtual_machine=False,
+            synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(mock_synapse_info)
     post_vertex_slice = Slice(0, 10)
@@ -78,7 +78,7 @@ def test_csa_random_connector():
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None, is_virtual_machine=False,
+            synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False, weights=weight, delays=delay)
     connector.set_projection_information(mock_synapse_info)
     post_vertex_slice = Slice(0, 10)
@@ -102,7 +102,7 @@ def test_csa_block_connector():
             connector=None, pre_population=MockPopulation(10, "Pre"),
             post_population=MockPopulation(10, "Post"), prepop_is_view=False,
             postpop_is_view=False, rng=None, synapse_dynamics=None,
-            synapse_type=None, receptor_type=None, is_virtual_machine=False,
+            synapse_type=None, receptor_type=None,
             synapse_type_from_dynamics=False,
             weights=weight, delays=delay)
 

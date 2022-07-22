@@ -17,8 +17,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 TIME_STEP = "time_step"
 
@@ -42,7 +41,7 @@ class InputTypeDelta(AbstractInputType):
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TIME_STEP] = machine_time_step_ms()
+        parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):

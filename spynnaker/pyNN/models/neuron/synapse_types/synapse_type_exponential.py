@@ -17,8 +17,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_I = 'tau_syn_I'
@@ -74,7 +73,8 @@ class SynapseTypeExponential(AbstractSynapseType):
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
         parameters[TAU_SYN_I] = self.__tau_syn_I
-        parameters[TIMESTEP_MS] = machine_time_step_ms()
+        parameters[TIMESTEP_MS] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):

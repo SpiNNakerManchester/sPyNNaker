@@ -18,8 +18,7 @@ from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 V = "v"
 V_REST = "v_rest"
@@ -112,7 +111,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
-        parameters[TIMESTEP] = machine_time_step_ms()
+        parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):

@@ -92,7 +92,7 @@ def test_connector(
         connector=None, pre_population=MockPopulation(10, "Pre"),
         post_population=MockPopulation(10, "Post"), prepop_is_view=False,
         postpop_is_view=False, rng=None, synapse_dynamics=None,
-        synapse_type=None, receptor_type=None, is_virtual_machine=False,
+        synapse_type=None, receptor_type=None,
         synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
         [post_slice], post_slice, 1, synapse_info)

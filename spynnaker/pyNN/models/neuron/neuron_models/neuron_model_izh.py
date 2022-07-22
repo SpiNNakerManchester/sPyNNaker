@@ -17,8 +17,7 @@ from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 A = 'a'
 B = 'b'
@@ -97,13 +96,14 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
         parameters[C] = self.__c
         parameters[D] = self.__d
         parameters[I_OFFSET] = self.__i_offset
-        parameters[TIMESTEP] = machine_time_step_ms()
+        parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[U] = self.__u_init
-        state_variables[NEXT_H] = machine_time_step_ms()
+        state_variables[NEXT_H] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
 
     @property
     def a(self):

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from enum import Enum
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SIMULATION_N_BYTES
 from spinn_utilities.overrides import overrides
@@ -24,6 +23,7 @@ from spinn_front_end_common.interface.provenance import (
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
@@ -227,15 +227,9 @@ class DelayExtensionMachineVertex(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    @inject_items({
-        "routing_infos": "RoutingInfos"})
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_infos"})
-    def generate_data_specification(self, spec, placement, routing_infos):
-        """
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
 
         vertex = placement.vertex
@@ -266,6 +260,7 @@ class DelayExtensionMachineVertex(
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
+        routing_infos = SpynnakerDataView.get_routing_infos()
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 

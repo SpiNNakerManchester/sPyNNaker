@@ -17,10 +17,10 @@ from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -55,7 +55,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         self.__weight = weight
         self.__tau_c = tau_c
         self.__tau_d = tau_d
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
         self.__tau_c_data = get_exp_lut_array(
             ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
         self.__tau_d_data = get_exp_lut_array(

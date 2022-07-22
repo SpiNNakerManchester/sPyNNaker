@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"
@@ -110,7 +108,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         state_variables[INH_RESPONSE] = self.__inh_response
         state_variables[INH_EXP_RESPONSE] = self.__inh_exp_response
         state_variables[Q_INH] = 0
-        state_variables[TIMESTEP_MS] = machine_time_step_ms()
+        state_variables[TIMESTEP_MS] = (
+            SpynnakerDataView.get_simulation_time_step_ms())
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

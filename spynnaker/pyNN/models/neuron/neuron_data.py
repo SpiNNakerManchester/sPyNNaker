@@ -20,6 +20,7 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spynnaker.pyNN.utilities.struct import StructRepeat
 from spinn_utilities.helpful_functions import is_singleton
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 def _all_one_val_gen(rd):
@@ -233,7 +234,7 @@ class NeuronData(object):
             n_structs, vertex_slice.n_atoms
         ], dtype="uint32")
 
-    def read_data(self, transceiver, placement):
+    def read_data(self, placement):
         """ Read the current state of the data from the machine
 
         :param Transceiver transceiver: The transceiver to read the data with
@@ -243,16 +244,14 @@ class NeuronData(object):
         state_vars = self.__app_vertex.state_variables
         merged_dict = _MergedDict(params, state_vars)
         self.__do_read_data(
-            transceiver, placement, self.__neuron_regions.neuron_params,
-            merged_dict)
+            placement, self.__neuron_regions.neuron_params, merged_dict)
 
-    def __do_read_data(self, transceiver, placement, region, results):
-        address = locate_memory_region_for_placement(
-            placement, region, transceiver)
+    def __do_read_data(self, placement, region, results):
+        address = locate_memory_region_for_placement(placement, region)
         vertex_slice = placement.vertex.vertex_slice
         data_size = self.__app_vertex.get_sdram_usage_for_neuron_params(
             vertex_slice.n_atoms)
-        block = transceiver.read_memory(
+        block = SpynnakerDataView.read_memory(
             placement.x, placement.y, address, data_size)
         offset = 0
         for struct in self.__app_vertex.neuron_impl.structs:

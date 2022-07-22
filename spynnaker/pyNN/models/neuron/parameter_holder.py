@@ -86,13 +86,10 @@ class ParameterHolder(object):
             return self.__data_items
 
         # If there are multiple items to return, form a list
-        self.__data_items = [
-            self._safe_read_values(param)
-            for param in self.__data_items_to_return]
+        self.__data_items = {
+            param: self._safe_read_values(param)
+            for param in self.__data_items_to_return}
 
-        # If it turns out there really is just one, return it
-        if len(self.__data_items) == 1:
-            return self.__data_items[0]
         return self.__data_items
 
     def __getitem__(self, s):
@@ -118,3 +115,11 @@ class ParameterHolder(object):
     def __getattr__(self, name):
         data = self._get_data_items()
         return getattr(data, name)
+
+    def __eq__(self, other):
+        data = self._get_data_items()
+        return data == other
+
+    def __hash__(self):
+        data = self._get_data_items()
+        return hash(data)

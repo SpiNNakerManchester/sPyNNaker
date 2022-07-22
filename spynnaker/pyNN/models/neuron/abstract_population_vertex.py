@@ -32,7 +32,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     TDMAAwareApplicationVertex)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size)
@@ -41,9 +41,7 @@ from spinn_front_end_common.interface.buffer_management\
        get_recording_header_size, get_recording_data_constant_size)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
-
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable,
     NeuronRecorder)
@@ -529,16 +527,14 @@ class AbstractPopulationVertex(
             variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self):
         return self.__neuron_recorder.get_spikes(
-            self.label, buffer_manager, placements, self,
-            NeuronRecorder.SPIKES)
+            self.label, self, NeuronRecorder.SPIKES)
 
     @overrides(AbstractEventRecordable.get_events)
-    def get_events(
-            self, variable, placements, buffer_manager):
+    def get_events(self, variable):
         return self.__synapse_recorder.get_events(
-            self.label, buffer_manager, placements, self, variable)
+            self.label, self, variable)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -577,18 +573,14 @@ class AbstractPopulationVertex(
             self.__raise_var_not_supported(variable)
         self.__change_requires_mapping = not self.is_recording(variable)
 
-    @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(
-            self, variable, n_machine_time_steps, placements, buffer_manager):
+    def get_data(self, variable):
         # pylint: disable=too-many-arguments
         if self.__neuron_recorder.is_recordable(variable):
             return self.__neuron_recorder.get_matrix_data(
-                self.label, buffer_manager, placements, self, variable,
-                n_machine_time_steps)
+                self.label, self, variable)
         elif self.__synapse_recorder.is_recordable(variable):
             return self.__synapse_recorder.get_matrix_data(
-                self.label, buffer_manager, placements, self, variable,
-                n_machine_time_steps)
+                self.label, self, variable)
         self.__raise_var_not_supported(variable)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
@@ -742,7 +734,7 @@ class AbstractPopulationVertex(
         self.__connection_cache.clear()
 
     @overrides(AbstractNeuronRecordable.clear_recording)
-    def clear_recording(self, variable, buffer_manager, placements):
+    def clear_recording(self, variable):
         if variable == NeuronRecorder.SPIKES:
             index = len(self.__neuron_impl.get_recordable_variables())
         elif variable == NeuronRecorder.REWIRING:
@@ -750,31 +742,28 @@ class AbstractPopulationVertex(
         else:
             index = (
                 self.__neuron_impl.get_recordable_variable_index(variable))
-        self._clear_recording_region(buffer_manager, placements, index)
+        self._clear_recording_region(index)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_spike_recording(self):
         self._clear_recording_region(
-            buffer_manager, placements,
             len(self.__neuron_impl.get_recordable_variables()))
 
     @overrides(AbstractEventRecordable.clear_event_recording)
-    def clear_event_recording(self, buffer_manager, placements):
+    def clear_event_recording(self):
         self._clear_recording_region(
-            buffer_manager, placements,
             len(self.__neuron_impl.get_recordable_variables()) + 1)
 
-    def _clear_recording_region(
-            self, buffer_manager, placements, recording_region_id):
+    def _clear_recording_region(self, recording_region_id):
         """ Clear a recorded data region from the buffer manager.
 
-        :param buffer_manager: the buffer manager object
-        :param placements: the placements object
         :param recording_region_id: the recorded region ID for clearing
         :rtype: None
         """
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
 
@@ -898,9 +887,9 @@ class AbstractPopulationVertex(
         :rtype: float
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
         average_spikes_per_timestep = (
-            float(n_synapses_in * spikes_per_second) / steps_per_second)
+            float(n_synapses_in * spikes_per_second) /
+            SpynnakerDataView.get_simulation_time_step_per_s())
 
         # Exact variance contribution from inherent Poisson variation
         poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
@@ -961,7 +950,7 @@ class AbstractPopulationVertex(
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_time_step()
+        steps_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
 
         for proj in incoming_projections:
             # pylint: disable=protected-access
@@ -1074,7 +1063,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placements, app_edge, synapse_info):
+            self, app_edge, synapse_info):
         # If we already have connections cached, return them
         if (app_edge, synapse_info) in self.__connection_cache:
             return self.__connection_cache[app_edge, synapse_info]
@@ -1088,9 +1077,10 @@ class AbstractPopulationVertex(
                 app_edge.pre_vertex.label, app_edge.post_vertex.label))
         for post_vertex in progress.over(self.machine_vertices):
             if isinstance(post_vertex, HasSynapses):
-                placement = placements.get_placement_of_vertex(post_vertex)
+                placement = SpynnakerDataView.get_placement_of_vertex(
+                    post_vertex)
                 connections.extend(post_vertex.get_connections_from_machine(
-                    transceiver, placement, app_edge, synapse_info))
+                    placement, app_edge, synapse_info))
         all_connections = numpy.concatenate(connections)
         self.__connection_cache[app_edge, synapse_info] = all_connections
         return all_connections

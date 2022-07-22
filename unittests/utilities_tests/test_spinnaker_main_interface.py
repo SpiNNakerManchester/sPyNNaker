@@ -16,10 +16,9 @@
 import os
 import sys
 import unittest
+from spinn_utilities.exceptions import SimulatorShutdownException
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN.config_setup import unittest_setup
 
 
@@ -47,20 +46,20 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
         print(path)
-        AbstractSpinnakerBase(ExecutableFinder())
+        AbstractSpinnakerBase()
 
     def test_stop_init(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
 
-        interface = AbstractSpinnakerBase(ExecutableFinder())
+        interface = AbstractSpinnakerBase()
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)
         interface.stop()
         self.assertTrue(mock_contoller.closed)
-        with self.assertRaises(ConfigurationException):
+        with self.assertRaises(SimulatorShutdownException):
             interface.stop()
 
 

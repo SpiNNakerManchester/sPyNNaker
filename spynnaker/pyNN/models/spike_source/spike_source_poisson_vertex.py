@@ -31,10 +31,9 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
+    SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling import profile_utils
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from .spike_source_poisson_machine_vertex import (
@@ -387,8 +386,7 @@ class SpikeSourcePoissonVertex(
                 machine_vertex.set_reload_required(True)
 
     def max_spikes_per_ts(self):
-        ts_per_second = (MICRO_TO_SECOND_CONVERSION /
-                         machine_time_step())
+        ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -492,7 +490,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
@@ -518,16 +516,18 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed[vertex_slice] = seed
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager,
+            self.label,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, self)
+            self)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)

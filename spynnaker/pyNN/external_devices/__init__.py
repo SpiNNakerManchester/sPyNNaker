@@ -37,6 +37,7 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
     SpynnakerLiveSpikesConnection, SpynnakerPoissonControlConnection)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.external_devices_models.push_bot.control import (
     PushBotLifEthernet, PushBotLifSpinnakerLink)
 from spynnaker.pyNN.external_devices_models.push_bot.spinnaker_link import (
@@ -51,7 +52,6 @@ from spynnaker.pyNN.external_devices_models.push_bot.parameters import (
     PushBotLaser, PushBotLED, PushBotMotor, PushBotRetinaResolution,
     PushBotSpeaker, PushBotRetinaViewer)
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.spinnaker import SpiNNaker
 from spynnaker.pyNN.spynnaker_external_device_plugin_manager import (
     SpynnakerExternalDevicePluginManager as
     Plugins)
@@ -66,7 +66,7 @@ activate_live_output_to = Plugins.activate_live_output_to
 activate_live_output_for = Plugins.activate_live_output_for
 add_poisson_live_rate_control = Plugins.add_poisson_live_rate_control
 
-SpiNNaker.register_binary_search_path(
+SpynnakerDataView.register_binary_search_path(
     os.path.dirname(model_binaries.__file__))
 spynnaker_external_devices = Plugins()
 
@@ -148,7 +148,7 @@ def register_database_notification_request(hostname, notify_port, ack_port):
     :param int notify_port: port num for the notify command
     :param int ack_port: port num for the acknowledge command
     """
-    spynnaker_external_devices.add_socket_address(
+    SpynnakerDataView.add_database_socket_address(
         SocketAddress(hostname, notify_port, ack_port))
 
 

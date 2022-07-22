@@ -17,11 +17,11 @@ from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
 from spinn_utilities.config_holder import (get_config_int, get_config_str)
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.populations import Population
@@ -48,17 +48,6 @@ class SpynnakerExternalDevicePluginManager(object):
             simulation should start.
         :type database_ack_port_num: int or None
         """
-        if database_notify_port_num is None:
-            database_notify_port_num = get_config_int(
-                "Database", "notify_port")
-        if database_notify_host is None:
-            database_notify_host = get_config_str(
-                "Database", "notify_hostname")
-        elif database_notify_host == "0.0.0.0":
-            database_notify_host = "localhost"
-        if database_ack_port_num is None:
-            database_ack_port_num = get_config_int("Database", "listen_port")
-
         # build the database socket address used by the notification interface
         database_socket = SocketAddress(
             listen_port=database_ack_port_num,
@@ -66,8 +55,7 @@ class SpynnakerExternalDevicePluginManager(object):
             notify_port_no=database_notify_port_num)
 
         # update socket interface with new demands.
-        SpynnakerExternalDevicePluginManager.add_socket_address(
-            database_socket)
+        SpynnakerDataView.add_database_socket_address(database_socket)
 
     @staticmethod
     def activate_live_output_for(
@@ -190,16 +178,6 @@ class SpynnakerExternalDevicePluginManager(object):
             population._vertex, device_vertex, partition_id)
 
     @staticmethod
-    def add_socket_address(socket_address):
-        """ Add a socket address to the list to be checked by the\
-            notification protocol.
-
-        :param ~spinn_utilities.socket_address.SocketAddress socket_address:
-            the socket address
-        """
-        get_simulator().add_socket_address(socket_address)
-
-    @staticmethod
     def update_live_packet_gather_tracker(
             vertex_to_record_from, params, partition_ids):
         """ Add an edge from a vertex to the live packet gatherer, builds as\
@@ -230,7 +208,7 @@ class SpynnakerExternalDevicePluginManager(object):
         """
 
         # add to the tracker
-        get_simulator().add_live_packet_gatherer_parameters(
+        SpynnakerDataView.add_live_packet_gatherer_parameters(
             params, vertex_to_record_from, partition_ids)
 
     @staticmethod
@@ -290,11 +268,10 @@ class SpynnakerExternalDevicePluginManager(object):
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets
         """
-        _spinnaker = get_simulator()
         edge = ApplicationEdge(vertex, device_vertex)
-        _spinnaker.add_application_edge(edge, partition_id)
+        SpynnakerDataView.add_edge(edge, partition_id)
         return edge
 
     @staticmethod
     def add_application_vertex(vertex):
-        get_simulator().add_application_vertex(vertex)
+        SpynnakerDataView.add_vertex(vertex)

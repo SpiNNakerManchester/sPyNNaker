@@ -13,13 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_additional_input import AbstractAdditionalInput
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"
@@ -65,7 +63,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def add_parameters(self, parameters):
         parameters[TAU_CA2] = self.__tau_ca2
         parameters[I_ALPHA] = self.__i_alpha
-        parameters[TIME_STEP] = machine_time_step_ms()
+        parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):

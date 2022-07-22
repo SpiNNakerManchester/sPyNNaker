@@ -26,23 +26,10 @@ class AbstractReadParametersBeforeSet(object, metaclass=AbstractBase):
     __slots__ = ()
 
     @abstractmethod
-    def read_parameters_from_machine(self, transceiver, placement):
+    def read_parameters_from_machine(self, placement):
         """ Read the parameters from the machine before any are changed.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            the SpinnMan interface
         :param ~pacman.model.placements.Placement placement:
             the placement of a vertex
         :rtype: None
-        """
-
-    @abstractmethod
-    def request_read_initial_parameters(self):
-        """ Request that initial parameters are read from the machine
-        """
-
-    @abstractmethod
-    def reset_read_initial_parameters(self):
-        """ Indicate that initial parameters have been read and don't need
-            to be read again
         """

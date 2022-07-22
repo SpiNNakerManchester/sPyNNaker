@@ -21,11 +21,9 @@ class HasSynapses(object):
 
     @abstractmethod
     def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info):
+            self, placement, app_edge, synapse_info):
         """ Get the connections from the machine for this vertex.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the connection data
         :param ~pacman.model.placement.Placement placement:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:

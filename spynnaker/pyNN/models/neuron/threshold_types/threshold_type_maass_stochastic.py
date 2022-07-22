@@ -17,8 +17,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
 from spynnaker.pyNN.utilities.struct import Struct
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
@@ -72,7 +71,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         parameters[DU_TH] = self.__du_th
         parameters[TAU_TH] = self.__tau_th
         parameters[V_THRESH] = self.__v_thresh
-        parameters[TIMESTEP] = machine_time_step_ms()
+        parameters[TIMESTEP] = SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):

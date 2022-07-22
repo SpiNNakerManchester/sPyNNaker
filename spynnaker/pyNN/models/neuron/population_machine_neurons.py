@@ -18,6 +18,7 @@ from collections import namedtuple
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -147,17 +148,16 @@ class PopulationMachineNeurons(
             db.insert_core(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
-    def _write_neuron_data_spec(self, spec, routing_info, ring_buffer_shifts):
+    def _write_neuron_data_spec(self, spec, ring_buffer_shifts):
         """ Write the data specification of the neuron data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information to read the key from
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
+        routing_info = SpynnakerDataView.get_routing_infos()
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
@@ -326,8 +326,8 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(self, transceiver, placement):
-        self._neuron_data.read_data(transceiver, placement)
+    def read_parameters_from_machine(self, placement):
+        self._neuron_data.read_data(placement)
 
     @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
     def gen_neurons_on_machine(self):
@@ -339,6 +339,6 @@ class PopulationMachineNeurons(
         return self._neuron_regions.neuron_builder
 
     @overrides(AbstractNeuronExpandable.read_generated_initial_values)
-    def read_generated_initial_values(self, transceiver, placement):
-        self._neuron_data.read_data(transceiver, placement)
+    def read_generated_initial_values(self, placement):
+        self._neuron_data.read_data(placement)
         self._app_vertex.copy_initial_state_variables(self._vertex_slice)

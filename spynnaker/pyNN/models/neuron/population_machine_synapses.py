@@ -91,31 +91,27 @@ class PopulationMachineSynapses(
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                bit_field_base_address)
-    def bit_field_base_address(self, transceiver, placement):
+    def bit_field_base_address(self, placement):
         return locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.bitfield_filter)
+            placement=placement, region=self._synapse_regions.bitfield_filter)
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
+    def regeneratable_sdram_blocks_and_sizes(self, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=self._synapse_regions.synaptic_matrix)
+            placement=placement, region=self._synapse_regions.synaptic_matrix)
         return [(
             self._synaptic_matrices.host_generated_block_addr +
             synaptic_matrix_base_address,
             self._synaptic_matrices.on_chip_generated_matrix_size)]
 
     def _write_synapse_data_spec(
-            self, spec, routing_info, ring_buffer_shifts, weight_scales,
+            self, spec, ring_buffer_shifts, weight_scales,
             structural_sz):
         """ Write the data specification for the synapse data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information to read the key from
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         :param list(int) weight_scales:
@@ -129,7 +125,7 @@ class PopulationMachineSynapses(
         self._write_synapse_parameters(spec, ring_buffer_shifts)
 
         # Write the synaptic matrices
-        self._synaptic_matrices.generate_data(routing_info)
+        self._synaptic_matrices.generate_data()
         self._synaptic_matrices.write_synaptic_data(
             spec, self._vertex_slice, self._synapse_references)
 
@@ -159,7 +155,7 @@ class PopulationMachineSynapses(
             synapse_dynamics.write_structural_parameters(
                 spec, self._synapse_regions.structural_dynamics,
                 weight_scales, self._app_vertex, self._vertex_slice,
-                routing_info, self._synaptic_matrices)
+                self._synaptic_matrices)
         elif self._synapse_references.structural_dynamics is not None:
             # If there is a reference for this region, we have to create it!
             spec.reserve_memory_region(
@@ -205,9 +201,8 @@ class PopulationMachineSynapses(
         return self._synaptic_matrices.gen_on_machine
 
     @overrides(AbstractSynapseExpandable.read_generated_connection_holders)
-    def read_generated_connection_holders(self, transceiver, placement):
-        self._synaptic_matrices.read_generated_connection_holders(
-            transceiver, placement, self._vertex_slice)
+    def read_generated_connection_holders(self, placement):
+        self._synaptic_matrices.read_generated_connection_holders(placement)
 
     @property
     @overrides(AbstractSynapseExpandable.connection_generator_region)
@@ -215,11 +210,9 @@ class PopulationMachineSynapses(
         return self._synapse_regions.connection_builder
 
     def get_connections_from_machine(
-            self, transceiver, placement, app_edge, synapse_info):
+            self, placement, app_edge, synapse_info):
         """ Get the connections from the machine for this vertex.
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How to read the connection data
         :param ~pacman.model.placement.Placement placements:
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
@@ -228,7 +221,7 @@ class PopulationMachineSynapses(
             The specific projection within the edge
         """
         return self._synaptic_matrices.get_connections_from_machine(
-            transceiver, placement, app_edge, synapse_info, self._vertex_slice)
+            placement, app_edge, synapse_info)
 
     @property
     @overrides(AbstractSynapseExpandable.max_gen_data)
