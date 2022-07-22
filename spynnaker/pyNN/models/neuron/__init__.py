@@ -29,6 +29,8 @@ from .population_machine_synapses_provenance import SynapseProvenance
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
+from .parameter_holder import ParameterHolder
+from .initial_values_holder import InitialValuesHolder
 
 __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
            "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
@@ -36,4 +38,5 @@ __all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
            "NeuronProvenance", "PopulationSynapsesMachineVertexCommon",
            "PopulationSynapsesMachineVertexLead",
            "PopulationSynapsesMachineVertexShared", "SynapseProvenance",
-           "SpikeProcessingProvenance", "SpikeProcessingFastProvenance"]
+           "SpikeProcessingProvenance", "SpikeProcessingFastProvenance",
+           "ParameterHolder", "InitialValuesHolder"]

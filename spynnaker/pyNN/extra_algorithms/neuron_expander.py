@@ -48,7 +48,8 @@ def neuron_expander(
     neuron_bin = executable_finder.get_executable_path(NEURON_EXPANDER_APLX)
 
     # Find the places where the neuron expander should run
-    expander_cores = _plan_expansion(placements, neuron_bin, transceiver)
+    expander_cores, expanded_pop_vertices = _plan_expansion(
+        placements, neuron_bin, transceiver)
 
     progress = ProgressBar(expander_cores.total_processors,
                            "Expanding Neuron Data")
@@ -59,6 +60,8 @@ def neuron_expander(
         "neuron_expander_on_{}_{}_{}.txt", progress_bar=progress,
         logger=logger)
     progress.end()
+
+    _fill_in_initial_data(expanded_pop_vertices, transceiver)
 
 
 def _plan_expansion(placements, synapse_expander_bin, transceiver):
@@ -73,6 +76,7 @@ def _plan_expansion(placements, synapse_expander_bin, transceiver):
     :rtype: (ExecutableTargets, list(MachineVertex, Placement))
     """
     expander_cores = ExecutableTargets()
+    expanded_pop_vertices = list()
 
     progress = ProgressBar(len(placements), "Preparing to Expand Neuron Data")
     for placement in progress.over(placements):
@@ -81,6 +85,7 @@ def _plan_expansion(placements, synapse_expander_bin, transceiver):
         vertex = placement.vertex
         if isinstance(vertex, AbstractNeuronExpandable):
             if vertex.gen_neurons_on_machine():
+                expanded_pop_vertices.append((vertex, placement))
                 expander_cores.add_processor(
                     synapse_expander_bin,
                     placement.x, placement.y, placement.p,
@@ -90,4 +95,20 @@ def _plan_expansion(placements, synapse_expander_bin, transceiver):
                     transceiver, placement.x, placement.y, placement.p,
                     vertex.neuron_generator_region)
 
-    return expander_cores
+    return expander_cores, expanded_pop_vertices
+
+
+def _fill_in_initial_data(expanded_pop_vertices, transceiver):
+    """ Once expander has run, fill in the connection data
+
+    :param list(MachineVertex, Placement) expanded_pop_vertices:
+        List of machine vertices to read data from
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine
+
+    :rtype: None
+    """
+    progress = ProgressBar(
+        len(expanded_pop_vertices), "Getting initial values")
+    for vertex, placement in progress.over(expanded_pop_vertices):
+        vertex.read_generated_initial_values(transceiver, placement)

@@ -127,6 +127,13 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """ The amount each row should pad to, or None if not specified
         """
 
+    @abstractproperty
+    def is_single_core_capable(self):
+        """ Determine if the synapse dynamics can run on a single core
+
+        :rtype: bool
+        """
+
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
 

@@ -141,8 +141,11 @@ class Test_IDMixin(BaseTestCase):
                                         parameters_pos=[-65.0, -55.0],
                                         rng=NumpyRNG(seed=85524))
         view.initialize(v=rand_distr)
-        self.assertEqual([-64.43349869042906, -63.663421790102184],
-                         view.initial_values["v"])
+        sim.run(0)
+        for val in view.initial_values["v"]:
+            self.assertGreaterEqual(val, -65.0)
+            self.assertLessEqual(val, -55.0)
+        sim.reset()
         view.initialize(v=lambda i: -65 + i / 10.0)
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()

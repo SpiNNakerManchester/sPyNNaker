@@ -79,6 +79,7 @@ class PopulationNeuronsMachineVertex(
         NEURON_RECORDING = 7
         SDRAM_EDGE_PARAMS = 8
         NEURON_BUILDER = 9
+        INITIAL_VALUES = 10
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -93,7 +94,8 @@ class PopulationNeuronsMachineVertex(
         neuron_params=REGIONS.NEURON_PARAMS.value,
         current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value
+        neuron_builder=REGIONS.NEURON_BUILDER.value,
+        initial_values=REGIONS.INITIAL_VALUES.value
     )
 
     _PROFILE_TAG_LABELS = {

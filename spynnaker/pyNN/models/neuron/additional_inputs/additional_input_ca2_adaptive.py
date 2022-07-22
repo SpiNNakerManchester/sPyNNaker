@@ -18,11 +18,13 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_additional_input import AbstractAdditionalInput
 from spynnaker.pyNN.utilities.struct import Struct
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"
 TAU_CA2 = "tau_ca2"
-EXP_TAU_CA2 = "exp_tau_ca2"
+TIME_STEP = "time_step"
 
 
 class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
@@ -45,9 +47,10 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         """
         super().__init__(
             [Struct([
-                 (DataType.S1615, EXP_TAU_CA2),   # e^(-ts / tau_ca2)
+                 (DataType.S1615, TAU_CA2),
                  (DataType.S1615, I_CA2),
-                 (DataType.S1615, I_ALPHA)])],
+                 (DataType.S1615, I_ALPHA),
+                 (DataType.S1615, TIME_STEP)])],
             {I_ALPHA: "nA", I_CA2: "nA", TAU_CA2: "ms"})
         self.__tau_ca2 = tau_ca2
         self.__i_ca2 = i_ca2
@@ -62,15 +65,11 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def add_parameters(self, parameters):
         parameters[TAU_CA2] = self.__tau_ca2
         parameters[I_ALPHA] = self.__i_alpha
+        parameters[TIME_STEP] = machine_time_step_ms()
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[I_CA2] = self.__i_ca2
-
-    @overrides(AbstractAdditionalInput.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        return {EXP_TAU_CA2: parameters[TAU_CA2].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x)))}
 
     @property
     def tau_ca2(self):

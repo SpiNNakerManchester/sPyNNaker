@@ -40,6 +40,7 @@ from spynnaker.pyNN.utilities.constants import SPIKES
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from .population_view import PopulationView
+from spynnaker.pyNN.models.neuron import ParameterHolder, InitialValuesHolder
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -517,12 +518,9 @@ class Population(PopulationBase):
     @property
     def initial_values(self):
         """
-        :rtype: dict
+        :rtype: InitialValuesHolder
         """
-        if not self.__vertex_population_initializable:
-            raise KeyError(
-                "Population does not support the initialisation")
-        return self._vertex.initial_values
+        return self._get_initial_values()
 
     def get_initial_value(self, variable, selector=None):
         """
@@ -541,13 +539,13 @@ class Population(PopulationBase):
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         :return: A list, or an object which acts like a list
-        :rtype: iterable
+        :rtype: InitialValuesHolder
         """
         if not self.__vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        return self._vertex.get_initial_value(variable, selector)
+        return InitialValuesHolder(variable, self.__vertex, selector)
 
     def set_initial_value(self, variable, value, selector=None):
         """
@@ -565,11 +563,12 @@ class Population(PopulationBase):
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
         :return: dictionary from variable name to initial value(s)
-        :rtype: dict(str,int or float or list(int) or list(float))
+        :rtype: InitialValuesHolder
         """
         if not self.__vertex_population_initializable:
             raise KeyError("Population does not support the initialisation")
-        return self._vertex.get_initial_values(selector)
+        return InitialValuesHolder(
+            self.__vertex.initialize_parameters, self.__vertex, selector)
 
     @property
     def positions(self):
@@ -685,7 +684,7 @@ class Population(PopulationBase):
         :return: A single list of values (or possibly a single value) if
             paramter_names is a string, or a dict of these if parameter names
             is a list.
-        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
+        :rtype: ParameterHolder
         """
         if not gather:
             warn_once(
@@ -695,13 +694,10 @@ class Population(PopulationBase):
             warn_once(
                 logger, "The simplify value is ignored if not set to true")
         if not self.__vertex_population_settable:
-            raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, str):
-            return self.__vertex.get_value(parameter_names)
-        results = dict()
-        for parameter_name in parameter_names:
-            results[parameter_name] = self.__vertex.get_value(parameter_name)
-        return results
+            raise KeyError("Population does not support getting")
+        self._read_parameters()
+        param_holder = ParameterHolder(parameter_names, self.__vertex)
+        return param_holder
 
     # NON-PYNN API CALL
     def _get_by_selector(self, selector, parameter_names):
@@ -718,18 +714,12 @@ class Population(PopulationBase):
         :return: A single list of values (or possibly a single value) if
             paramter_names is a string or a dict of these if parameter names
             is a list.
-        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
+        :rtype: ParameterHolder
         """
         if not self.__vertex_population_settable:
             raise KeyError("Population does not support setting")
-        if isinstance(parameter_names, str):
-            return self.__vertex.get_value_by_selector(
-                selector, parameter_names)
-        results = dict()
-        for parameter_name in parameter_names:
-            results[parameter_name] = self.__vertex.get_value_by_selector(
-                selector, parameter_name)
-        return results
+        self._read_parameters()
+        return ParameterHolder(parameter_names, self.__vertex, selector)
 
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -802,7 +792,9 @@ class Population(PopulationBase):
         if get_not_running_simulator().has_ran \
                 and not self.__vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
-        self._read_parameters_before_set()
+        sim = get_not_running_simulator()
+        if not sim.has_reset_last:
+            self._read_parameters()
         self.__vertex.initialize(variable, value, selector)
 
     def inject(self, current_source):
@@ -866,7 +858,7 @@ class Population(PopulationBase):
                 " set, or a dict of parameter: value items to set")
 
         if not sim.has_reset_last:
-            self._read_parameters_before_set()
+            self._read_parameters()
 
     def _set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
@@ -928,8 +920,8 @@ class Population(PopulationBase):
             for (key, value) in parameter.iteritems():
                 self.__vertex.set_value_by_selector(selector, key, value)
 
-    def _read_parameters_before_set(self):
-        """ Reads parameters from the machine before :py:meth:`set` completes
+    def _read_parameters(self):
+        """ Reads parameters from the machine
         """
 
         # If the tools have run before, and not reset, and the read
@@ -946,7 +938,7 @@ class Population(PopulationBase):
                     # SDRAM space.
                     placement = sim.placements.get_placement_of_vertex(vertex)
                     vertex.read_parameters_from_machine(
-                        sim.transceiver, placement, vertex.vertex_slice)
+                        sim.transceiver, placement)
 
             self.__has_read_neuron_parameters_this_run = True
 

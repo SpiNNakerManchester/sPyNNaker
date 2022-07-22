@@ -92,3 +92,14 @@ class AbstractPopulationInitializable(object, metaclass=AbstractBase):
         :rtype: iterable(str)
         """
         # Note: this will have been non_pynn_default_parameters
+
+    @abstractmethod
+    def request_store_initial_values(self):
+        """ Request that initial values are stored so that they can be
+            retrieved.
+        """
+
+    @abstractmethod
+    def reset_store_initial_values(self):
+        """ Reset the request to store initial values to avoid doing it again
+        """

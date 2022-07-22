@@ -22,13 +22,23 @@
 
 #include "input_type.h"
 
+struct input_type_params_t {
+	// Time step in milliseconds
+	REAL time_step;
+};
+
 struct input_type_t {
-	// scale factor (1000.0 / timestep)
+	// scale factor (1.0 / timestep)
 	REAL scale_factor;
 };
 
-//! Scaling factor (trivial!) for input currents
-static const REAL INPUT_SCALE_FACTOR = ONE;
+static inline void input_type_initialise(input_type_t *state, input_type_params_t *params) {
+	state->scale_factor = 1.0k / params->time_step;
+}
+
+static inline void input_type_save_state(UNUSED input_type_t *state,
+		UNUSED input_type_params_t *params) {
+}
 
 //! \brief Gets the actual input value. This allows any scaling to take place
 //! \param[in,out] value: The array of the receptor-based values of the input
@@ -40,11 +50,8 @@ static const REAL INPUT_SCALE_FACTOR = ONE;
 //!     scaling
 static inline input_t *input_type_get_input_value(
         input_t *restrict value, UNUSED input_type_t *input_type,
-        uint16_t num_receptors) {
-    for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i] * INPUT_SCALE_FACTOR;
-    }
-    return &value[0];
+        UNUSED uint16_t num_receptors) {
+    return value;
 }
 
 //! \brief Converts an excitatory input into an excitatory current

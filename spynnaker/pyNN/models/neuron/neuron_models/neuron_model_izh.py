@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
-from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
+from spynnaker.pyNN.utilities.struct import Struct
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 A = 'a'
 B = 'b'
@@ -27,8 +27,8 @@ D = 'd'
 V = 'v'
 U = 'u'
 I_OFFSET = 'i_offset'
-THIS_H = 'this_h'
-TS = 'timestep'
+TIMESTEP = 'timestep'
+NEXT_H = 'next_h'
 
 
 class NeuronModelIzh(AbstractStandardNeuronComponent):
@@ -66,16 +66,15 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
             (mapping) function
         """
         super().__init__(
-            [Struct([(DataType.S1615, TS)], repeat_type=StructRepeat.GLOBAL),
-             Struct([
+            [Struct([
                 (DataType.S1615, A),
                 (DataType.S1615, B),
                 (DataType.S1615, C),
                 (DataType.S1615, D),
                 (DataType.S1615, V),
                 (DataType.S1615, U),
-                (DataType.S1615, I_OFFSET),
-                (DataType.S1615, THIS_H)])],
+                (DataType.S1615, TIMESTEP),
+                (DataType.S1615, NEXT_H)])],
             {A: "ms", B: "ms", C: "mV", D: "mV/ms", V: "mV", U: "mV/ms",
              I_OFFSET: "nA"})
         self.__a = a
@@ -98,16 +97,13 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
         parameters[C] = self.__c
         parameters[D] = self.__d
         parameters[I_OFFSET] = self.__i_offset
+        parameters[TIMESTEP] = machine_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[U] = self.__u_init
-
-    @overrides(AbstractStandardNeuronComponent.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        ts_ms = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
-        return {THIS_H: ts_ms, TS: ts_ms}
+        state_variables[NEXT_H] = machine_time_step_ms()
 
     @property
     def a(self):

@@ -287,3 +287,8 @@ class SynapseDynamicsStructuralSTDP(
     def generate_on_machine(self):
         # Never generate structural connections on the machine
         return False
+
+    @property
+    @overrides(SynapseDynamicsSTDP.is_single_core_capable)
+    def is_single_core_capable(self):
+        return False

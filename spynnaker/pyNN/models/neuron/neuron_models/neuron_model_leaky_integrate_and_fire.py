@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from spynnaker.pyNN.utilities.struct import Struct
+from spinn_front_end_common.utilities.globals_variables import (
+    machine_time_step_ms)
 
 V = "v"
 V_REST = "v_rest"
@@ -27,10 +28,8 @@ CM = "cm"
 I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
-COUNT_REFRAC = "count_refrac"
-R_MEMBRANE = "r_membrane"
-EXP_TC = "exp_tc"
-INV_TAU_REFRAC = "inv_tau_refrac"
+TIMESTEP = "timestep"
+REFRACT_TIMER = "refract_timer"
 
 
 class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
@@ -80,12 +79,13 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
             [Struct([
                 (DataType.S1615, V),
                 (DataType.S1615, V_REST),
-                (DataType.S1615, R_MEMBRANE),
-                (DataType.S1615, EXP_TC),
+                (DataType.S1615, CM),
+                (DataType.S1615, TAU_M),
                 (DataType.S1615, I_OFFSET),
-                (DataType.INT32, COUNT_REFRAC),
                 (DataType.S1615, V_RESET),
-                (DataType.INT32, INV_TAU_REFRAC)])],
+                (DataType.INT32, TAU_REFRAC),
+                (DataType.INT32, REFRACT_TIMER),
+                (DataType.S1615, TIMESTEP)])],
             {V: 'mV', V_REST: 'mV', TAU_M: 'ms', CM: 'nF', I_OFFSET: 'nA',
              V_RESET: 'mV', TAU_REFRAC: 'ms'})
 
@@ -112,19 +112,12 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
+        parameters[TIMESTEP] = machine_time_step_ms()
 
     @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
-        state_variables[COUNT_REFRAC] = 0
-
-    @overrides(AbstractStandardNeuronComponent.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        return {R_MEMBRANE: parameters[TAU_M] / parameters[CM],
-                EXP_TC: parameters[TAU_M].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                INV_TAU_REFRAC: parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))}
+        state_variables[REFRACT_TIMER] = 0
 
     @property
     def v_init(self):

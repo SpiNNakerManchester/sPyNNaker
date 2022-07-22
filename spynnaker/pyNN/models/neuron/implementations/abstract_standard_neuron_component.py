@@ -82,15 +82,3 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         :param str variable: The name of the variable
         """
         return self.__units[variable]
-
-    def get_precomputed_values(self, parameters, state_variables, ts):
-        """ Get any values that are precomputed from the parameters.
-
-            See AbstractNeuronImpl.get_precomputed_values for details.
-
-        :param RangeDictionary parameters: parameter values
-        :param RangeDictionary state_variables: state variable values
-        :param float ts: The size of each time step in microseconds
-        :rtype: dict(str, AbstractList)
-        """
-        return {}

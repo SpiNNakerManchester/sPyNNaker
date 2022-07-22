@@ -149,25 +149,3 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
 
         :rtype: bool
         """
-
-    def get_precomputed_values(self, parameters, state_variables):
-        """ Get a dict of additional values calculated from the parameters
-            and state variables, where the key is the name of the field in
-            a struct.
-
-            The values of the dict are each an AbstractList instance.  Each of
-            the items in parameters and state_variables are also AbstractList
-            instances; calculations can be performed by calling apply_operation
-            on any of the items e.g.:
-                parameters[PARAM].apply_operation(lambda x: numpy.exp(-x))
-            Normal operations between parameters are also supported e.g.:
-                parameters[PARAM_1] / parameters[PARAM_2]
-
-            By default this returns an empty dict so must be overridden to
-            provide additional values.
-
-        :param RangeDictionary parameters: parameter values
-        :param RangeDictionary state_variables: state variable values
-        :rtype: dict(str, AbstractList)
-        """
-        return {}

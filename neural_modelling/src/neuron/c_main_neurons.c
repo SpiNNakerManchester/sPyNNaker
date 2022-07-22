@@ -55,7 +55,8 @@ enum regions {
     NEURON_PARAMS_REGION,
     CURRENT_SOURCE_PARAMS_REGION,
     NEURON_RECORDING_REGION,
-    SDRAM_PARAMS_REGION
+    SDRAM_PARAMS_REGION,
+	INITIAL_VALUES_REGION
 };
 
 //! From the regions, select those that are common
@@ -80,7 +81,8 @@ const struct neuron_regions NEURON_REGIONS = {
     .core_params = CORE_PARAMS_REGION,
     .neuron_params = NEURON_PARAMS_REGION,
     .current_source_params = CURRENT_SOURCE_PARAMS_REGION,
-    .neuron_recording = NEURON_RECORDING_REGION
+    .neuron_recording = NEURON_RECORDING_REGION,
+	.initial_values = INITIAL_VALUES_REGION
 };
 
 //! A region of SDRAM used to transfer synapses
@@ -150,7 +152,8 @@ void resume_callback(void) {
     recording_reset();
 
     // try resuming neuron
-    if (!neuron_resume()) {
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if (!neuron_resume(time + 1)) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }

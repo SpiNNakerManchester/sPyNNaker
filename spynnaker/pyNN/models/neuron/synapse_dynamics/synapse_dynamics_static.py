@@ -276,3 +276,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.is_single_core_capable)
+    def is_single_core_capable(self):
+        return True

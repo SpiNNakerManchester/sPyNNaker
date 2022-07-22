@@ -124,7 +124,8 @@ class AbstractPopulationVertex(
         "__current_source_id_list",
         "__rng",
         "__pop_seed",
-        "__connection_cache"]
+        "__connection_cache",
+        "__store_initial_values"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -254,6 +255,32 @@ class AbstractPopulationVertex(
         # Store connections read from machine until asked to clear
         # Key is app_edge, synapse_info
         self.__connection_cache = dict()
+        self.__store_initial_values = False
+
+    @property
+    def single_core_capable(self):
+        """ Determine if the vertex can manage to operate on a single core,
+            or if a split synapse-core is more appropriate.
+
+            Note that this is currently based only on the ITCM available, not
+            on the incoming synapses.
+
+        :rtype: bool
+        """
+        if self.__synapse_dynamics is None:
+            return True
+        return self.__synapse_dynamics.is_single_core_capable
+
+    @property
+    def n_synapse_cores_required(self):
+        """ Get the estimated number of synapse cores required.
+
+            Note this is currently hard-coded but could be updated to work
+            this out based on the number of incoming synapses
+
+        :rtype: int
+        """
+        return 1
 
     @property
     def synapse_dynamics(self):
@@ -341,6 +368,14 @@ class AbstractPopulationVertex(
         :rtype: SpyNNakerRangeDicationary
         """
         return self._state_variables
+
+    @property
+    def initial_state_variables(self):
+        """ The initial values of the state variables of the neurons
+
+        :rtype: SpyNNakerRangeDictionary
+        """
+        return self.__initial_state_variables
 
     @property
     def neuron_impl(self):
@@ -635,7 +670,7 @@ class AbstractPopulationVertex(
     def get_initial_value(self, variable, selector=None):
         parameter = self._get_parameter(variable)
 
-        ranged_list = self._state_variables[parameter]
+        ranged_list = self.__initial_state_variables[parameter]
         if selector is None:
             return ranged_list
         return ranged_list.get_values(selector)
@@ -1431,3 +1466,25 @@ class AbstractPopulationVertex(
         :rtype: list(int)
         """
         return create_mars_kiss_seeds(self.__rng)
+
+    def copy_initial_state_variables(self, vertex_slice):
+        for key in self._state_variables.keys():
+            value = self._state_variables[key][vertex_slice.as_slice]
+            self.__initial_state_variables[key].set_value_by_slice(
+                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, value)
+
+    @overrides(AbstractPopulationInitializable.request_store_initial_values)
+    def request_store_initial_values(self):
+        self.__store_initial_values = True
+
+    @overrides(AbstractPopulationInitializable.reset_store_initial_values)
+    def reset_store_initial_values(self):
+        self.__store_initial_values = False
+
+    @property
+    def store_initial_values(self):
+        """ Determine if initial values need to be stored
+
+        :rtype: bool
+        """
+        return self.__store_initial_values

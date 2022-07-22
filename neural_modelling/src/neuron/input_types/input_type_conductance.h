@@ -23,12 +23,29 @@
 #include "input_type.h"
 
 //! Conductance input parameters
-typedef struct input_type_t {
+struct input_type_params_t {
     //! reversal voltage - Excitatory [mV]
     REAL     V_rev_E;
     //! reversal voltage - Inhibitory [mV]
     REAL     V_rev_I;
-} input_type_t;
+};
+
+//! Conductance state
+struct input_type_t {
+    //! reversal voltage - Excitatory [mV]
+    REAL     V_rev_E;
+    //! reversal voltage - Inhibitory [mV]
+    REAL     V_rev_I;
+};
+
+static inline void input_type_initialise(input_type_t *state, input_type_params_t *params) {
+	state->V_rev_E = params->V_rev_E;
+	state->V_rev_I = params->V_rev_I;
+}
+
+static inline void input_type_save_state(UNUSED input_type_t *state,
+		UNUSED input_type_params_t *params) {
+}
 
 //! \brief Gets the actual input value. This allows any scaling to take place
 //! \param[in,out] value: The array of the receptor-based values of the input

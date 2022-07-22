@@ -42,8 +42,10 @@ static void neuron_impl_add_inputs(
 //! \param[in] address: SDRAM block to read parameters from
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: The number of neurons
+//! \param[in] save_initial_state: If not 0, the address to copy the state to
 static void neuron_impl_load_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons);
+        address_t address, uint32_t next, uint32_t n_neurons,
+		address_t save_initial_state);
 
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] timer_count: The timer count, used for TDMA packet spreading

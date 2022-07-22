@@ -129,13 +129,13 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t time, UNUSED pre_trace_t trace, uint32_t last_pre_time,
         UNUSED pre_trace_t last_pre_trace, uint32_t last_post_time,
         UNUSED post_trace_t last_post_trace, update_state_t previous_state) {
+	bool update_state = false;
     switch (previous_state.state) {
     case STATE_IDLE:
         // If we're idle, transition to pre-open state
         log_debug("\tOpening pre-window");
         previous_state.state = STATE_PRE_OPEN;
-        previous_state =
-                timing_recurrent_calculate_pre_window(previous_state);
+        update_state = true;
         break;
     case STATE_PRE_OPEN:
         // If we're in pre-open state
@@ -152,8 +152,7 @@ static inline update_state_t timing_apply_pre_spike(
         } else {
             // Otherwise, leave state alone (essentially re-opening window)
             log_debug("\t\tRe-opening pre-window");
-            previous_state =
-                    timing_recurrent_calculate_pre_window(previous_state);
+            update_state = true;
         }
         break;
     case STATE_POST_OPEN:
@@ -192,12 +191,15 @@ static inline update_state_t timing_apply_pre_spike(
             // straight to pre-open
             log_debug("\t\tPost-window closed - Opening pre-window");
             previous_state.state = STATE_PRE_OPEN;
-            previous_state =
-                    timing_recurrent_calculate_pre_window(previous_state);
+            update_state = true;
         }
         break;
     default:
         log_debug("\tInvalid state %u", previous_state.state);
+    }
+
+    if (update_state) {
+    	previous_state = timing_recurrent_calculate_pre_window(previous_state);
     }
 
     return previous_state;
@@ -217,13 +219,13 @@ static inline update_state_t timing_apply_post_spike(
         uint32_t time, UNUSED post_trace_t trace, uint32_t last_pre_time,
         UNUSED pre_trace_t last_pre_trace, uint32_t last_post_time,
         UNUSED post_trace_t last_post_trace, update_state_t previous_state) {
+	bool update_state = false;
     switch (previous_state.state) {
     case STATE_IDLE:
         // If we're idle, transition to post-open state
         log_debug("\tOpening post-window");
         previous_state.state = STATE_POST_OPEN;
-        previous_state =
-                timing_recurrent_calculate_post_window(previous_state);
+        update_state = true;
         break;
     case STATE_POST_OPEN:
         // If we're in post-open state
@@ -241,8 +243,7 @@ static inline update_state_t timing_apply_post_spike(
         } else {
             // Otherwise, leave state alone (essentially re-opening window)
             log_debug("\t\tRe-opening post-window");
-            previous_state =
-                    timing_recurrent_calculate_post_window(previous_state);
+            update_state = true;
         }
         break;
     case STATE_PRE_OPEN:
@@ -287,12 +288,15 @@ static inline update_state_t timing_apply_post_spike(
             // straight to pre-open
             log_debug("\t\tPre-window closed - Opening post-window");
             previous_state.state = STATE_POST_OPEN;
-            previous_state =
-                    timing_recurrent_calculate_post_window(previous_state);
+            update_state = true;
         }
         break;
     default:
         log_debug("\tInvalid state %u", previous_state.state);
+    }
+
+    if (update_state) {
+        previous_state = timing_recurrent_calculate_post_window(previous_state);
     }
 
     return previous_state;

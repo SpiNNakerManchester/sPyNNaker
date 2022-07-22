@@ -214,4 +214,15 @@ typedef unsigned long fract	UFRACT;
     __type_of__(a) _a = (a); \
     _a == ZERO? ZERO: _a * _a * _a;})
 
+extern uint64_t udiv64(uint64_t, uint64_t);
+
+//! \brief Divides two
+static inline REAL kdivk(REAL a, REAL b) {
+	return kbits((uint32_t) udiv64(((uint64_t) bitsk(a) << 15), (uint64_t) bitsk(b)));
+}
+
+static inline int32_t udivk(int32_t a, REAL b) {
+    return __LI(udiv64(__U64(a) << 15, __U64(bitsk(b))));
+}
+
 #endif  // _MATHS_UTIL_

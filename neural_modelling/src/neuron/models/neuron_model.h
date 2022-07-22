@@ -26,28 +26,31 @@
 #define _NEURON_MODEL_H_
 
 #include <common/neuron-typedefs.h>
+#include <debug.h>
 
-//! Forward declaration of neuron type (creates a definition for a pointer to a
-//! neuron parameter struct
+//! Forward declaration of neuron params type
+struct neuron_params_t;
+typedef struct neuron_params_t neuron_params_t;
+
+//! Forward declaration of neuron type
 struct neuron_t;
 typedef struct neuron_t neuron_t;
-typedef struct neuron_t* neuron_pointer_t;
-
-//! Forward declaration of global neuron parameters
-struct global_neuron_params_t;
-typedef struct global_neuron_params_t global_neuron_params_t;
-//! pointer to global neuron parameters
-typedef global_neuron_params_t* global_neuron_params_pointer_t;
 
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
 #endif // !SOMETIMES_UNUSED
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \brief set the global neuron parameters
-//! \param[in] params: The parameters to set
-void neuron_model_set_global_neuron_params(
-        const global_neuron_params_t *params);
+//! \brief initialise the structure from the parameters
+//! \param[out] state: Pointer to the state to be filled in
+//! \param[in] params: Pointer to the parameters passed in from host
+static void neuron_model_initialise(neuron_t *state, neuron_params_t *params);
+
+//! \brief save parameters and state back to SDRAM for reading by host and recovery
+//!        on restart
+//! \param[in] state: The current state
+//! \param[out] params: Pointer to structure into which parameter can be written
+static void neuron_model_save_state(neuron_t *state, neuron_params_t *params);
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief primary function called in timer loop after synaptic updates
@@ -87,11 +90,11 @@ static state_t neuron_model_get_membrane_voltage(const neuron_t *neuron);
 //! \brief printout of state variables i.e. those values that might change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
 //!     the parameters for a specific neuron
-void neuron_model_print_state_variables(const neuron_t *neuron);
+static void neuron_model_print_state_variables(const neuron_t *neuron);
 
 //! \brief printout of parameters i.e. those values that don't change
 //! \param[in] neuron: a pointer to a neuron parameter struct which contains all
 //!     the parameters for a specific neuron
-void neuron_model_print_parameters(const neuron_t *neuron);
+static void neuron_model_print_parameters(const neuron_t *neuron);
 
 #endif // _NEURON_MODEL_H_

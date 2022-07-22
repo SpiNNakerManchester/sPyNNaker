@@ -272,3 +272,8 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     @overrides(AbstractPlasticSynapseDynamics.are_weights_signed)
     def are_weights_signed(self):
         return False
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.is_single_core_capable)
+    def is_single_core_capable(self):
+        return False

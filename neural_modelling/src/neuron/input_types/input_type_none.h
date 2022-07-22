@@ -31,8 +31,19 @@
 
 #include "input_type.h"
 
+struct input_type_params_t {
+};
+
 struct input_type_t {
 };
+
+static inline void input_type_initialise(UNUSED input_type_t *state,
+		UNUSED input_type_params_t *params) {
+}
+
+static inline void input_type_save_state(UNUSED input_type_t *state,
+		UNUSED input_type_params_t *params) {
+}
 
 //! \brief Gets the actual input value. This allows any scaling to take place
 //! \details Actually does nothing; no receptors

@@ -18,7 +18,6 @@ from collections import namedtuple
 from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
-from spinn_front_end_common.utilities import helpful_functions
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -49,7 +48,7 @@ class NeuronProvenance(ctypes.LittleEndianStructure):
 NeuronRegions = namedtuple(
     "NeuronRegions",
     ["core_params", "neuron_params", "current_source_params",
-     "neuron_recording", "neuron_builder"])
+     "neuron_recording", "neuron_builder", "initial_values"])
 
 
 class PopulationMachineNeurons(
@@ -327,28 +326,8 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
-
-        # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, self._neuron_regions.neuron_params,
-                transceiver)
-
-        # get size of neuron params
-        size_of_region = self._app_vertex.get_sdram_usage_for_neuron_params(
-            vertex_slice.n_atoms)
-
-        # get data from the machine
-        byte_array = transceiver.read_memory(
-            placement.x, placement.y, neuron_region_sdram_address,
-            size_of_region)
-
-        # update python neuron parameters with the data
-        self._app_vertex.neuron_impl.read_data(
-            byte_array, 0, vertex_slice, self._app_vertex.parameters,
-            self._app_vertex.state_variables)
+    def read_parameters_from_machine(self, transceiver, placement):
+        self._neuron_data.read_data(transceiver, placement)
 
     @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
     def gen_neurons_on_machine(self):
@@ -358,3 +337,8 @@ class PopulationMachineNeurons(
     @overrides(AbstractNeuronExpandable.neuron_generator_region)
     def neuron_generator_region(self):
         return self._neuron_regions.neuron_builder
+
+    @overrides(AbstractNeuronExpandable.read_generated_initial_values)
+    def read_generated_initial_values(self, transceiver, placement):
+        self._neuron_data.read_data(transceiver, placement)
+        self._app_vertex.copy_initial_state_variables(self._vertex_slice)

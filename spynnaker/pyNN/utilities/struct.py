@@ -286,6 +286,8 @@ class Struct(object):
                 raise ValueError(
                     "Repeating structures must specify an array size")
             array_size = 1
+        elif self.__repeat_type == StructRepeat.GLOBAL and array_size != 1:
+            raise ValueError("Global Structures cannot repeat more than once")
 
         if not self.__fields:
             return
@@ -299,5 +301,8 @@ class Struct(object):
             if name in values:
                 # Get the data to set for this item
                 value = data_type.decode_numpy_array(numpy_data[name])
-                values[name].set_value_by_slice(
-                    offset, offset + array_size, value)
+                if self.__repeat_type == StructRepeat.GLOBAL:
+                    values[name] = value[0]
+                else:
+                    values[name].set_value_by_slice(
+                        offset, offset + array_size, value)

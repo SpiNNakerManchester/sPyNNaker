@@ -109,6 +109,7 @@ class PopulationMachineVertex(
         NEURON_BUILDER = 13
         BIT_FIELD_FILTER = 14
         RECORDING = 15
+        INITIAL_VALUES = 16
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -123,7 +124,8 @@ class PopulationMachineVertex(
         neuron_params=REGIONS.NEURON_PARAMS.value,
         current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value,
-        neuron_builder=REGIONS.NEURON_BUILDER.value
+        neuron_builder=REGIONS.NEURON_BUILDER.value,
+        initial_values=REGIONS.INITIAL_VALUES.value
     )
 
     # Regions for this vertex used by synapse parts

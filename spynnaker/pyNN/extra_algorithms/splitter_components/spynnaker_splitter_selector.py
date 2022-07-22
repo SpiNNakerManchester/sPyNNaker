@@ -30,6 +30,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
+from spynnaker.pyNN.extra_algorithms.splitter_components.splitter_abstract_pop_vertex_neurons_synapses import SplitterAbstractPopulationVertexNeuronsSynapses
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
 
@@ -64,7 +65,12 @@ def spynakker_vertex_selector(app_vertex):
     """
     if app_vertex.splitter is None:
         if isinstance(app_vertex, AbstractPopulationVertex):
-            app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+            if app_vertex.single_core_capable:
+                app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
+            else:
+                app_vertex.splitter = (
+                    SplitterAbstractPopulationVertexNeuronsSynapses(
+                        app_vertex.n_synapse_cores_required))
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
             app_vertex.splitter = SplitterOneToOneLegacy()
         elif isinstance(app_vertex, ApplicationFPGAVertex):

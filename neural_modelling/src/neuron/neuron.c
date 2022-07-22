@@ -58,6 +58,9 @@ static void *saved_neuron_params_address;
 //! The address for the current source parameters
 static void *current_source_address;
 
+//! The address to save initial values to
+static void *saved_initial_values_address;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_core_parameters {
     uint32_t has_key;
@@ -69,18 +72,20 @@ struct neuron_core_parameters {
 };
 
 //! \brief does the memory copy for the neuron parameters
+//! \param[in] time: the current time step
 //! \return true if the memory copies worked, false otherwise
-static bool neuron_load_neuron_parameters(void) {
+static bool neuron_load_neuron_parameters(uint32_t time) {
     log_debug("loading parameters");
-    // call the neuron implementation functions to do the work
-    // Note the "next" is 0 here because we are using a saved address
-    // which has already accounted for the position of the data within
-    // the region being read.
-    neuron_impl_load_neuron_parameters(saved_neuron_params_address, 0, n_neurons);
+    address_t save_address = NULL;
+    if (time == 0) {
+    	save_address = saved_initial_values_address;
+    }
+    neuron_impl_load_neuron_parameters(saved_neuron_params_address, 0, n_neurons,
+    		save_address);
     return true;
 }
 
-bool neuron_resume(void) { // EXPORTED
+bool neuron_resume(uint32_t time) { // EXPORTED
     if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         return false;
@@ -90,13 +95,13 @@ bool neuron_resume(void) { // EXPORTED
     current_source_load_parameters(current_source_address);
 
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return neuron_load_neuron_parameters();
+    return neuron_load_neuron_parameters(time);
 }
 
 bool neuron_initialise(
         void *core_params_address, void *neuron_params_address,
         void *current_sources_address, void *recording_address,
-        uint32_t *n_rec_regions_used) {
+        void *initial_values_address, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -140,6 +145,7 @@ bool neuron_initialise(
     // Store where the actual neuron parameters start
     saved_neuron_params_address = neuron_params_address;
     current_source_address = current_sources_address;
+    saved_initial_values_address = initial_values_address;
 
     log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",
             n_neurons, n_neurons_peak, n_synapse_types);
@@ -150,7 +156,7 @@ bool neuron_initialise(
     }
 
     // load the neuron data into the allocated DTCM spaces.
-    if (!neuron_load_neuron_parameters()) {
+    if (!neuron_load_neuron_parameters(0)) {
         return false;
     }
 

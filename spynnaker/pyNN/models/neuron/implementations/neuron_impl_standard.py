@@ -17,8 +17,6 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
 from spynnaker.pyNN.utilities.struct import Struct, StructRepeat
 
 # The size of the n_steps_per_timestep parameter
@@ -156,6 +154,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.add_parameters)
     def add_parameters(self, parameters):
+        parameters[_STEPS_PER_TIMESTEP] = self.__n_steps_per_timestep
         for component in self.__components:
             component.add_parameters(parameters)
 
@@ -187,13 +186,3 @@ class NeuronImplStandard(AbstractNeuronImpl):
         # ... or fail
         raise AttributeError("'{}' object has no attribute {}".format(
             self.__class__.__name__, key))
-
-    @overrides(AbstractNeuronImpl.get_precomputed_values)
-    def get_precomputed_values(self, parameters, state_variables):
-        ts = machine_time_step()
-        ts /= self.__n_steps_per_timestep
-        values = {_STEPS_PER_TIMESTEP: self.__n_steps_per_timestep}
-        for component in self.__components:
-            values.update(component.get_precomputed_values(
-                parameters, state_variables, ts))
-        return values

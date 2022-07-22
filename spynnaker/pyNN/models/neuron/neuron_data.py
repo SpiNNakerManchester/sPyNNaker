@@ -126,18 +126,15 @@ class NeuronData(object):
 
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.state_variables
-        pre_computed = self.__app_vertex.neuron_impl.get_precomputed_values(
-            params, state_vars)
 
         # Check that all parameters and state variables have a single range
-        if (not _all_one_val_gen(params) or not _all_one_val_gen(state_vars) or
-                not _all_one_val_gen(pre_computed)):
+        if (not _all_one_val_gen(params) or not _all_one_val_gen(state_vars)):
             # Note at this point, we might still be able to generate ranges
             # on machine
             return
 
         # Go through all the structs and make all the data
-        values = _MergedDict(params, state_vars, pre_computed)
+        values = _MergedDict(params, state_vars)
         all_data = [struct.get_generator_data(values) for struct in structs]
         self.__neuron_data = numpy.concatenate(all_data)
         self.__neuron_data_n_structs = len(structs)
@@ -190,14 +187,17 @@ class NeuronData(object):
             neuron_recorder.write_neuron_recording_region(
                 spec, self.__neuron_regions.neuron_recording,
                 vertex_slice)
+        spec.reserve_memory_region(
+            region=self.__neuron_regions.initial_values,
+            size=self.__app_vertex.get_sdram_usage_for_neuron_params(
+                    vertex_slice.n_atoms),
+            label="initial_values")
 
     def __get_neuron_param_data(self, vertex_slice):
         structs = self.__app_vertex.neuron_impl.structs
         params = self.__app_vertex.parameters
         state_vars = self.__app_vertex.state_variables
-        pre_computed = self.__app_vertex.neuron_impl.get_precomputed_values(
-            params, state_vars)
-        values = _MergedDict(params, state_vars, pre_computed)
+        values = _MergedDict(params, state_vars)
         all_data = [
             self.__get_struct_data(struct, values, vertex_slice)
             for struct in structs]
@@ -233,40 +233,63 @@ class NeuronData(object):
             n_structs, vertex_slice.n_atoms
         ], dtype="uint32")
 
-    def read_data(self, transceiver, placement, vertex_slice):
+    def read_data(self, transceiver, placement):
+        """ Read the current state of the data from the machine
+
+        :param Transceiver transceiver: The transceiver to read the data with
+        :param Placement placement: The placement of the vertex to read
+        """
+        params = self.__app_vertex.parameters
+        state_vars = self.__app_vertex.state_variables
+        merged_dict = _MergedDict(params, state_vars)
+        self.__do_read_data(
+            transceiver, placement, self.__neuron_regions.neuron_params,
+            merged_dict)
+
+    def __do_read_data(self, transceiver, placement, region, results):
         address = locate_memory_region_for_placement(
-            placement, self.__neuron_regions.neuron_params, transceiver)
+            placement, region, transceiver)
+        vertex_slice = placement.vertex.vertex_slice
         data_size = self.__app_vertex.get_sdram_usage_for_neuron_params(
             vertex_slice.n_atoms)
         block = transceiver.read_memory(
             placement.x, placement.y, address, data_size)
-        # Only update data from state variables
-        state_vars = self.__app_vertex.state_variables
         offset = 0
         for struct in self.__app_vertex.neuron_impl.structs:
-            struct.read_data(block, state_vars, offset, vertex_slice.lo_atom,
-                             vertex_slice.n_atoms)
+            if struct.repeat_type == StructRepeat.GLOBAL:
+                struct.read_data(block, results, offset)
+                offset += struct.get_size_in_whole_words() * BYTES_PER_WORD
+            else:
+                struct.read_data(
+                    block, results, offset, vertex_slice.lo_atom,
+                    vertex_slice.n_atoms)
+                offset += (
+                    struct.get_size_in_whole_words(vertex_slice.n_atoms) *
+                    BYTES_PER_WORD)
 
 
 class _MergedDict(object):
     __slots__ = [
         "__params",
-        "__state_vars",
-        "__pre_calculated"
+        "__state_vars"
     ]
 
-    def __init__(self, params, state_vars, pre_calculated):
+    def __init__(self, params, state_vars):
         self.__params = params
         self.__state_vars = state_vars
-        self.__pre_calculated = pre_calculated
 
     def __contains__(self, key):
-        return (key in self.__params or key in self.__state_vars or
-                key in self.__pre_calculated)
+        return key in self.__params or key in self.__state_vars
 
     def __getitem__(self, key):
         if key in self.__params:
             return self.__params[key]
-        if key in self.__state_vars:
-            return self.__state_vars[key]
-        return self.__pre_calculated[key]
+        return self.__state_vars[key]
+
+    def __setitem__(self, key, value):
+        if key in self.__params:
+            self.__params[key] = value
+        elif key in self.__state_vars:
+            self.__state_vars[key] = value
+        else:
+            raise KeyError(f"No such key {key}")

@@ -15,17 +15,11 @@
 
 APP = $(notdir $(CURDIR))
 
-NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
-NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
-NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
-INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_conductance.h
-CURRENT_SOURCE_H = $(NEURON_DIR)/neuron/current_sources/current_source_stepnoisy_impl.h
-THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
-SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_mad_stdp.c
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_izhikevich_neuromodulation.c
-TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.h
+TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_vogels_2011_impl.c
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_vogels_2011_impl.h
 WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.c
 WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
 
-include ../neural_build.mk
+include ../synapse_build.mk

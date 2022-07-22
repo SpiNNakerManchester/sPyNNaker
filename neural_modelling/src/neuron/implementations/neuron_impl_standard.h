@@ -71,11 +71,8 @@ static additional_input_t *additional_input_array;
 //! Threshold states array
 static threshold_type_t *threshold_type_array;
 
-//! Global parameters for the neurons
-static global_neuron_params_t *global_parameters;
-
 //! The synapse shaping parameters
-static synapse_param_t *neuron_synapse_shaping_params;
+static synapse_types_t *synapse_types_array;
 
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
@@ -89,15 +86,6 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] n_neurons: The number of neurons
 //! \return True if successful
 static bool neuron_impl_initialise(uint32_t n_neurons) {
-    // allocate DTCM for the global parameter details
-    if (sizeof(global_neuron_params_t)) {
-        global_parameters = spin1_malloc(sizeof(global_neuron_params_t));
-        if (global_parameters == NULL) {
-            log_error("Unable to allocate global neuron parameters"
-                    "- Out of DTCM");
-            return false;
-        }
-    }
 
     // Allocate DTCM for neuron array
     if (sizeof(neuron_t)) {
@@ -139,12 +127,11 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     // Allocate DTCM for synapse shaping parameters
-    if (sizeof(synapse_param_t)) {
-        neuron_synapse_shaping_params =
-                spin1_malloc(n_neurons * sizeof(synapse_param_t));
-        if (neuron_synapse_shaping_params == NULL) {
-            log_error("Unable to allocate synapse parameters array"
-                    " - Out of DTCM");
+    if (sizeof(synapse_types_t)) {
+        synapse_types_array =
+                spin1_malloc(n_neurons * sizeof(synapse_types_t));
+        if (synapse_types_array == NULL) {
+            log_error("Unable to allocate synapse types array - Out of DTCM");
             return false;
         }
     }
@@ -161,8 +148,7 @@ static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
     // simple wrapper to synapse type input function
-    synapse_param_t *parameters =
-            &neuron_synapse_shaping_params[neuron_index];
+    synapse_types_t *parameters = &synapse_types_array[neuron_index];
     synapse_types_add_neuron_input(synapse_type_index,
             parameters, weights_this_timestep);
 }
@@ -179,70 +165,80 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] address: SDRAM block to read parameters from
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: number of neurons
+//! \param[in] save_initial_state: If not 0, SDRAM block to copy parameters to
 static void neuron_impl_load_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons) {
-    log_debug("reading parameters, next is %u, n_neurons is %u ",
+        address_t address, uint32_t next, uint32_t n_neurons,
+		address_t save_initial_state) {
+	log_debug("reading parameters, next is %u, n_neurons is %u ",
             next, n_neurons);
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next++];
     if (n_steps_per_timestep > 1) {
-        log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
+    	log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
     } else if (n_steps_per_timestep == 0) {
         log_error("bad number of steps per timestep: 0");
         rt_error(RTE_SWERR);
     }
 
-    if (sizeof(global_neuron_params_t)) {
-        log_debug("writing neuron global parameters");
-        spin1_memcpy(global_parameters, &address[next],
-                sizeof(global_neuron_params_t));
-        next += n_words_needed(sizeof(global_neuron_params_t));
-    }
-
     if (sizeof(neuron_t)) {
-        log_debug("reading neuron local parameters");
-        spin1_memcpy(neuron_array, &address[next],
-                n_neurons * sizeof(neuron_t));
-        next += n_words_needed(n_neurons * sizeof(neuron_t));
+    	log_debug("reading neuron local parameters from %u", next);
+        neuron_params_t *params = (neuron_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			neuron_model_initialise(&neuron_array[i], &params[i]);
+		}
+        next += n_words_needed(n_neurons * sizeof(neuron_params_t));
     }
 
     if (sizeof(input_type_t)) {
-        log_debug("reading input type parameters");
-        spin1_memcpy(input_type_array, &address[next],
-                n_neurons * sizeof(input_type_t));
-        next += n_words_needed(n_neurons * sizeof(input_type_t));
+    	log_debug("reading input type parameters from %u", next);
+        input_type_params_t *params = (input_type_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			input_type_initialise(&input_type_array[i], &params[i]);
+		}
+        next += n_words_needed(n_neurons * sizeof(input_type_params_t));
     }
 
     if (sizeof(threshold_type_t)) {
-        log_debug("reading threshold type parameters");
-        spin1_memcpy(threshold_type_array, &address[next],
-                n_neurons * sizeof(threshold_type_t));
-        next += n_words_needed(n_neurons * sizeof(threshold_type_t));
+    	log_debug("reading threshold type parameters from %u", next);
+        threshold_type_params_t *params = (threshold_type_params_t *) &address[next];
+        for (uint32_t i = 0; i < n_neurons; i++) {
+        	threshold_type_initialise(&threshold_type_array[i], &params[i]);
+        }
+        next += n_words_needed(n_neurons * sizeof(threshold_type_params_t));
     }
 
-    if (sizeof(synapse_param_t)) {
-        log_debug("reading synapse parameters");
-        spin1_memcpy(neuron_synapse_shaping_params, &address[next],
-                n_neurons * sizeof(synapse_param_t));
-        next += n_words_needed(n_neurons * sizeof(synapse_param_t));
+    if (sizeof(synapse_types_t)) {
+    	log_debug("reading synapse parameters");
+        synapse_types_params_t *params = (synapse_types_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			synapse_types_initialise(&synapse_types_array[i], &params[i]);
+		}
+        next += n_words_needed(n_neurons * sizeof(synapse_types_params_t));
     }
 
     if (sizeof(additional_input_t)) {
-        log_debug("reading additional input type parameters");
-        spin1_memcpy(additional_input_array, &address[next],
-                n_neurons * sizeof(additional_input_t));
-        next += n_words_needed(n_neurons * sizeof(additional_input_t));
+    	log_debug("reading additional input type parameters");
+        additional_input_params_t *params = (additional_input_params_t *) &address[next];
+        for (uint32_t i = 0; i < n_neurons; i++) {
+        	additional_input_initialise(&additional_input_array[i], &params[i]);
+        }
+        next += n_words_needed(n_neurons * sizeof(additional_input_params_t));
     }
 
-    neuron_model_set_global_neuron_params(global_parameters);
+    // If we are to save the initial state, copy the whole of the parameters
+    // to the initial state
+    if (save_initial_state) {
+    	spin1_memcpy(save_initial_state, address, next * sizeof(uint32_t));
+    }
 
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("-------------------------------------\n");
+    log_info("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
+        neuron_model_print_state_variables(&neuron_array[n]);
     }
-    log_debug("-------------------------------------\n");
+    log_info("-------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -264,10 +260,8 @@ static void neuron_impl_do_timestep_update(
 
         // Get threshold and additional input parameters for this neuron
         threshold_type_t *the_threshold_type = &threshold_type_array[neuron_index];
-        additional_input_t *additional_inputs =
-                &additional_input_array[neuron_index];
-        synapse_param_t *the_synapse_type =
-                &neuron_synapse_shaping_params[neuron_index];
+        additional_input_t *additional_inputs = &additional_input_array[neuron_index];
+        synapse_types_t *the_synapse_type = &synapse_types_array[neuron_index];
 
         // Loop however many times requested; do this in reverse for efficiency,
         // and because the index doesn't actually matter
@@ -372,45 +366,48 @@ static void neuron_impl_store_neuron_parameters(
     // Skip over the steps per timestep
     next += 1;
 
-    if (sizeof(global_neuron_params_t)) {
-        log_debug("writing neuron global parameters");
-        spin1_memcpy(&address[next], global_parameters,
-                sizeof(global_neuron_params_t));
-        next += n_words_needed(sizeof(global_neuron_params_t));
-    }
-
     if (sizeof(neuron_t)) {
         log_debug("writing neuron local parameters");
-        spin1_memcpy(&address[next], neuron_array,
-                n_neurons * sizeof(neuron_t));
+        neuron_params_t *params = (neuron_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			neuron_model_save_state(&neuron_array[i], &params[i]);
+		}
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
     if (sizeof(input_type_t)) {
         log_debug("writing input type parameters");
-        spin1_memcpy(&address[next], input_type_array,
-                n_neurons * sizeof(input_type_t));
+        input_type_params_t *params = (input_type_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			input_type_save_state(&input_type_array[i], &params[i]);
+		}
         next += n_words_needed(n_neurons * sizeof(input_type_t));
     }
 
     if (sizeof(threshold_type_t)) {
         log_debug("writing threshold type parameters");
-        spin1_memcpy(&address[next], threshold_type_array,
-                n_neurons * sizeof(threshold_type_t));
+        threshold_type_params_t *params = (threshold_type_params_t *) &address[next];
+        for (uint32_t i = 0; i < n_neurons; i++) {
+        	threshold_type_save_state(&threshold_type_array[i], &params[i]);
+        }
         next += n_words_needed(n_neurons * sizeof(threshold_type_t));
     }
 
-    if (sizeof(synapse_param_t)) {
+    if (sizeof(synapse_types_t)) {
         log_debug("writing synapse parameters");
-        spin1_memcpy(&address[next], neuron_synapse_shaping_params,
-                n_neurons * sizeof(synapse_param_t));
-        next += n_words_needed(n_neurons * sizeof(synapse_param_t));
+        synapse_types_params_t *params = (synapse_types_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			synapse_types_save_state(&synapse_types_array[i], &params[i]);
+		}
+        next += n_words_needed(n_neurons * sizeof(synapse_types_t));
     }
 
     if (sizeof(additional_input_t)) {
         log_debug("writing additional input type parameters");
-        spin1_memcpy(&address[next], additional_input_array,
-                n_neurons * sizeof(additional_input_t));
+        additional_input_params_t *params = (additional_input_params_t *) &address[next];
+		for (uint32_t i = 0; i < n_neurons; i++) {
+			additional_input_save_state(&additional_input_array[i], &params[i]);
+		}
         next += n_words_needed(n_neurons * sizeof(additional_input_t));
     }
 }
@@ -421,7 +418,7 @@ static void neuron_impl_store_neuron_parameters(
 void neuron_impl_print_inputs(uint32_t n_neurons) {
     bool empty = true;
     for (index_t i = 0; i < n_neurons; i++) {
-        synapse_param_t *params = &neuron_synapse_shaping_params[i];
+        synapse_types_t *params = &synapse_types_array[i];
         empty = empty && (0 == bitsk(
                 synapse_types_get_excitatory_input(params)
                 - synapse_types_get_inhibitory_input(params)));
@@ -431,7 +428,7 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
         log_debug("-------------------------------------\n");
 
         for (index_t i = 0; i < n_neurons; i++) {
-            synapse_param_t *params = &neuron_synapse_shaping_params[i];
+            synapse_types_t *params = &synapse_types_array[i];
             input_t input = synapse_types_get_excitatory_input(params)
                     - synapse_types_get_inhibitory_input(params);
             if (bitsk(input) != 0) {
@@ -449,7 +446,7 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
-        synapse_types_print_parameters(&neuron_synapse_shaping_params[n]);
+        synapse_types_print_parameters(&synapse_types_array[n]);
     }
     log_debug("-------------------------------------\n");
 }
