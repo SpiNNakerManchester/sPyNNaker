@@ -16,8 +16,7 @@
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array, get_min_lut_value)
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -54,7 +53,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
-        ts = machine_time_step_ms()
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 
@@ -158,7 +157,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.minimum_delta)
     def minimum_delta(self, max_stdp_spike_delta):
-        ts = machine_time_step_ms()
+        ts = SpynnakerDataView.get_simulation_time_step_ms()
         return [
             get_min_lut_value(self.__tau_plus_data, ts, max_stdp_spike_delta),
             get_min_lut_value(self.__tau_minus_data, ts, max_stdp_spike_delta)]

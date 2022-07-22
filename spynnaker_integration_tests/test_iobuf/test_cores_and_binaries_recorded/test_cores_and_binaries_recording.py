@@ -15,9 +15,9 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utility_models import \
     ReverseIPTagMulticastSourceMachineVertex
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 n_neurons = 200  # number of neurons in each population
@@ -39,8 +39,9 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(simtime)
 
         provenance_files = self.get_app_iobuf_files()
-        placements = globals_variables.get_simulator()._placements
-        app_graph = globals_variables.get_simulator()._application_graph
+        placements = SpynnakerDataView.get_placements()
+        # As outside of run we have to use unprotected method
+        app_graph = SpynnakerDataView.get_runtime_graph()
         sim.end()
 
         data = set()

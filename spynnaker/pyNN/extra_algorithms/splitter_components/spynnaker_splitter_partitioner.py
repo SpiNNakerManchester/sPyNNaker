@@ -16,12 +16,12 @@ from pacman.operations.partition_algorithms import splitter_partitioner
 from data_specification import ReferenceContext
 
 
-def spynnaker_splitter_partitioner(app_graph, plan_n_time_steps):
+def spynnaker_splitter_partitioner():
     """ a splitter partitioner that's bespoke for spynnaker vertices.
 
-    :param ApplicationGraph app_graph: app graph
-    :param int plan_n_time_steps: the number of time steps to run for
+    :return:
+         The number of chips needed to satisfy this partitioning.
     :rtype: int
     """
     with ReferenceContext():
-        return splitter_partitioner(app_graph, plan_n_time_steps)
+        return splitter_partitioner()

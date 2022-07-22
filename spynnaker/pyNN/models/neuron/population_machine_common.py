@@ -108,15 +108,14 @@ class PopulationMachineCommon(
         return self.__n_provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
-    def get_recording_region_base_address(self, txrx, placement):
+    def get_recording_region_base_address(self, placement):
         return locate_memory_region_for_placement(
-            placement, self.__regions.recording, txrx)
+            placement, self.__regions.recording)
 
     @overrides(AbstractHasProfileData.get_profile_data)
-    def get_profile_data(self, transceiver, placement):
+    def get_profile_data(self, placement):
         return get_profiling_data(
-            self.__regions.profile, self.__profile_tags, transceiver,
-            placement)
+            self.__regions.profile, self.__profile_tags, placement)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):

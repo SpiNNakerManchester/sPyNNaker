@@ -26,13 +26,12 @@ from spinn_utilities.config_holder import load_config
 from spinnman.model import CPUInfo
 from spinnman.transceiver import Transceiver
 from pacman.model.placements import Placement
-from pacman.executor.injection_decorator import injection_context
 from pacman.operations.routing_info_allocator_algorithms import (
     ZonedRoutingInfoAllocator)
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from data_specification.constants import MAX_MEM_REGIONS
-from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data.spynnaker_data_writer import SpynnakerDataWriter
 from spynnaker.pyNN.models.neuron.synaptic_matrices import SynapticMatrices
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
@@ -59,7 +58,7 @@ from spynnaker.pyNN.config_setup import unittest_setup
 import pyNN.spiNNaker as p
 
 
-class MockTransceiverRawData(object):
+class MockTransceiverRawData(Transceiver):
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
 
@@ -84,6 +83,7 @@ def say_false(self, weights, delays):
 
 def test_write_data_spec():
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
     SDRAM()
     # UGLY but the mock transceiver NEED generate_on_machine to be False
     AbstractGenerateConnectorOnMachine.generate_on_machine = say_false
@@ -114,15 +114,13 @@ def test_write_data_spec():
         pre_pop, post_pop, p.FromListConnector(from_list_list),
         p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
-    with (injection_context(context)):
-        delay_support_adder(app_graph)
-        spynnaker_splitter_partitioner(app_graph, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, [], flexible=False)
+    writer.start_run()
+    writer.clone_graphs()
+    writer.set_plan_n_timesteps(100)
+    delay_support_adder()
+    spynnaker_splitter_partitioner()
+    allocator = ZonedRoutingInfoAllocator()
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     post_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_vertex.vertex_slice
@@ -137,7 +135,7 @@ def test_write_data_spec():
         connection_builder_region=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=10000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        weight_scales=[32, 32])
     spec.end_specification()
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
@@ -151,12 +149,13 @@ def test_write_data_spec():
         region = executor.get_region(r)
         if region is not None:
             all_data.extend(region.region_data)
-    transceiver = MockTransceiverRawData(all_data)
+
+    writer.set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
     try:
         connections_1 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_1._projection_edge,
                 proj_one_to_one_1._synapse_information))
 
@@ -168,7 +167,7 @@ def test_write_data_spec():
 
         connections_2 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_one_to_one_2._projection_edge,
                 proj_one_to_one_2._synapse_information))
 
@@ -180,7 +179,7 @@ def test_write_data_spec():
 
         connections_3 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_all_to_all._projection_edge,
                 proj_all_to_all._synapse_information))
 
@@ -191,7 +190,7 @@ def test_write_data_spec():
 
         connections_4 = numpy.concatenate(
             synaptic_matrices.get_connections_from_machine(
-                transceiver, post_vertex_placement,
+                post_vertex_placement,
                 proj_from_list._projection_edge,
                 proj_from_list._synapse_information))
 
@@ -421,6 +420,7 @@ def test_pop_based_master_pop_table_standard(
         undelayed_indices_connected, delayed_indices_connected,
         n_pre_neurons, neurons_per_core, expect_app_keys, max_delay):
     unittest_setup()
+    writer = SpynnakerDataWriter.mock()
     SDRAM()
 
     # Build a from list connector with the delays we want
@@ -448,15 +448,13 @@ def test_pop_based_master_pop_table_standard(
     p.Projection(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
-    app_graph = globals_variables.get_simulator().original_application_graph
-    context = {
-        "ApplicationGraph": app_graph
-    }
-    with (injection_context(context)):
-        delay_support_adder(app_graph)
-        spynnaker_splitter_partitioner(app_graph, 100)
-        allocator = ZonedRoutingInfoAllocator()
-        routing_info = allocator.__call__(app_graph, [], flexible=False)
+    writer.start_run()
+    writer.clone_graphs()
+    writer.set_plan_n_timesteps(100)
+    delay_support_adder()
+    spynnaker_splitter_partitioner()
+    allocator = ZonedRoutingInfoAllocator()
+    writer.set_routing_infos(allocator.__call__([], flexible=False))
 
     post_mac_vertex = next(iter(post_pop._vertex.machine_vertices))
     post_vertex_slice = post_mac_vertex.vertex_slice
@@ -471,7 +469,7 @@ def test_pop_based_master_pop_table_standard(
         connection_builder_region=4)
     synaptic_matrices.write_synaptic_data(
         spec, post_pop._vertex.incoming_projections, all_syn_block_sz=1000000,
-        weight_scales=[32, 32], routing_info=routing_info)
+        weight_scales=[32, 32])
 
     with io.FileIO(temp_spec, "rb") as spec_reader:
         executor = DataSpecificationExecutor(

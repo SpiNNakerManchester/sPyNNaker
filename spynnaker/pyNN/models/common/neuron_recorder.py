@@ -23,8 +23,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -50,7 +49,7 @@ def get_sampling_interval(sampling_rate):
     :return: Sampling interval in microseconds
     :rtype: float
     """
-    return sampling_rate * machine_time_step_ms()
+    return sampling_rate * SpynnakerDataView.get_simulation_time_step_ms()
 
 
 class NeuronRecorder(object):
@@ -271,7 +270,7 @@ class NeuronRecorder(object):
         return fragment
 
     def _get_placement_matrix_data(
-            self, placements, vertex, region, buffer_manager, expected_rows,
+            self, vertex, region, expected_rows,
             missing_str, sampling_rate, label, data_type, n_per_timestep):
         """ processes a placement for matrix data
 
@@ -280,7 +279,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
             the vertex to read from
         :param int region: the recording region id
-        :param ~.BufferManager buffer_manager: the buffer manager
         :param int expected_rows:
             how many rows the tools think should be recorded
         :param str missing_str: string for reporting missing stuff
@@ -289,12 +287,12 @@ class NeuronRecorder(object):
         :return: placement data
         :rtype: ~numpy.ndarray
         """
-
-        placement = placements.get_placement_of_vertex(vertex)
+        placement = SpynnakerDataView.get_placement_of_vertex(vertex)
         if n_per_timestep == 0:
             return None
 
         # for buffering output info is taken form the buffer manager
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         record_raw, missing_data = buffer_manager.get_data_by_placement(
             placement, region)
         record_length = len(record_raw)
@@ -330,8 +328,9 @@ class NeuronRecorder(object):
         return placement_data
 
     def __read_data(
-            self, label, buffer_manager, placements, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps):
+            self, label, application_vertex,
+            sampling_rate, data_type, variable):
+        n_machine_time_steps = SpynnakerDataView.get_current_run_timesteps()
         vertices = (
             application_vertex.splitter.machine_vertices_for_recording(
                 variable))
@@ -357,7 +356,7 @@ class NeuronRecorder(object):
             else:
                 indexes.append(i)
             placement_data = self._get_placement_matrix_data(
-                placements, vertex, region, buffer_manager, expected_rows,
+                vertex, region, expected_rows,
                 missing_str, sampling_rate, label, data_type,
                 n_items_per_timestep)
 
@@ -379,23 +378,15 @@ class NeuronRecorder(object):
 
         return pop_level_data, indexes, sampling_interval
 
-    def get_matrix_data(
-            self, label, buffer_manager, placements,
-            application_vertex, variable, n_machine_time_steps):
+    def get_matrix_data(self, label, application_vertex, variable):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :param int n_machine_time_steps:
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray, list(int), float)
         """
@@ -414,21 +405,13 @@ class NeuronRecorder(object):
             sampling_rate = self.__sampling_rates[variable]
             data_type = self.__data_types[variable]
         return self.__read_data(
-            label, buffer_manager, placements, application_vertex,
-            sampling_rate, data_type, variable, n_machine_time_steps)
+            label, application_vertex, sampling_rate, data_type, variable)
 
-    def get_spikes(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+    def get_spikes(self, label, application_vertex, variable):
         """ Read spikes mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -450,7 +433,7 @@ class NeuronRecorder(object):
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             neurons = list(self._neurons_recording(variable, vertex_slice))
@@ -465,6 +448,7 @@ class NeuronRecorder(object):
 
             # for buffering output info is taken form the buffer manager
             region = self.__region_ids[variable]
+            buffer_manager = SpynnakerDataView.get_buffer_manager()
             record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
@@ -477,7 +461,8 @@ class NeuronRecorder(object):
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * machine_time_step_ms()
+                record_time = (raw_data[:, 0] *
+                               SpynnakerDataView.get_simulation_time_step_ms())
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
@@ -504,18 +489,11 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_events(
-            self, label, buffer_manager, placements,
-            application_vertex, variable):
+    def get_events(self, label, application_vertex, variable):
         """ Read events mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -525,8 +503,7 @@ class NeuronRecorder(object):
         """
         if variable == self.REWIRING:
             return self._get_rewires(
-                label, buffer_manager, placements, application_vertex,
-                variable)
+                label, application_vertex, variable)
         else:
             # Unspecified event variable
             msg = (
@@ -535,17 +512,11 @@ class NeuronRecorder(object):
             raise ConfigurationException(msg)
 
     def _get_rewires(
-            self, label, buffer_manager, placements, application_vertex,
-            variable):
+            self, label, application_vertex, variable):
         """ Read rewires mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
         :param str label: vertex label
-        :param buffer_manager: the manager for buffered data
-        :type buffer_manager:
-            ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param ~pacman.model.placements.Placements placements:
-            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -553,6 +524,7 @@ class NeuronRecorder(object):
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int,int,int))
         """
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         rewire_times = list()
         rewire_values = list()
         rewire_postids = list()
@@ -565,7 +537,7 @@ class NeuronRecorder(object):
         progress = ProgressBar(
             vertices, "Getting rewires for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(vertex)
             vertex_slice = vertex.vertex_slice
 
             neurons = list(
@@ -589,7 +561,9 @@ class NeuronRecorder(object):
                 raw_data = record_raw
 
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * machine_time_step_ms()
+                record_time = (
+                        raw_data[:, 0] *
+                        SpynnakerDataView.get_simulation_time_step_ms())
                 rewires_raw = raw_data[:, 1:]
                 rew_length = len(rewires_raw)
                 # rewires is 0 (elimination) or 1 (formation) in the first bit
@@ -752,7 +726,7 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = machine_time_step_ms()
+        step = SpynnakerDataView.get_simulation_time_step_ms()
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\
@@ -968,12 +942,11 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def get_region_sizes(self, vertex_slice, n_machine_time_steps):
+    def get_region_sizes(self, vertex_slice):
         """ Get the sizes of the regions for the variables, whether they are
             recorded or not, with those that are not having a size of 0
 
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
-        :param int n_machine_time_steps:
         :rtype: list(int)
         """
         values = list()
@@ -981,7 +954,7 @@ class NeuronRecorder(object):
                 self.__sampling_rates, self.__events_per_core_variables,
                 self.__per_timestep_variables):
             values.append(self.get_buffered_sdram(
-                variable, vertex_slice, n_machine_time_steps))
+                variable, vertex_slice))
         return values
 
     def write_neuron_recording_region(
@@ -1117,18 +1090,17 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(
-            self, variable, vertex_slice, n_machine_time_steps):
+            self, variable, vertex_slice):
         """ Returns the SDRAM used for this many time steps for a variable
 
         If required the total is rounded up so the space will always fit
 
         :param str variable: The PyNN variable name to get buffered sdram of
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int n_machine_time_steps:
-            how many machine time steps to run for
         :return: data size
         :rtype: int
         """
+        n_machine_time_steps = SpynnakerDataView.get_max_run_time_steps()
         # Per timestep variables can't be done at a specific rate
         if variable in self.__per_timestep_variables:
             item = self.get_buffered_sdram_per_record(variable, vertex_slice)
