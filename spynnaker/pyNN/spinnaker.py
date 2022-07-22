@@ -562,7 +562,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self):
-        if not self._data_writer.get_runtime_graph().n_vertices:
+        if self._data_writer.get_n_vertices() == 0:
             return
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
             n_chips_in_graph = spynnaker_splitter_partitioner()

@@ -114,15 +114,13 @@ class _OnChipBitFieldGenerator(object):
             the SpiNNMan instance
         """
         self.__txrx = SpynnakerDataView.get_transceiver()
-        app_graph = SpynnakerDataView.get_runtime_graph()
         # progress bar
         progress = ProgressBar(
-            app_graph.n_vertices,
+            SpynnakerDataView.get_n_vertices(),
             "Finding cores where bitfields are to be generated")
 
         # get data
-        expander_cores, max_bit_data_size = self._calculate_core_data(
-            app_graph, progress)
+        expander_cores, max_bit_data_size = self._calculate_core_data(progress)
 
         # Allow 1s per 8000 bits (=1000 bytes), minimum of 2 seconds
         timeout = max(2.0, max_bit_data_size / 1000.0)
@@ -144,26 +142,25 @@ class _OnChipBitFieldGenerator(object):
         # read in bit fields for debugging purposes
         run_dir_path = SpynnakerDataView.get_run_dir_path()
         if get_config_bool("Reports", "generate_bit_field_report"):
-            self._full_report_bit_fields(app_graph, os.path.join(
+            self._full_report_bit_fields(os.path.join(
                 run_dir_path, self._BIT_FIELD_REPORT_FILENAME))
-            self._summary_report_bit_fields(app_graph, os.path.join(
+            self._summary_report_bit_fields(os.path.join(
                 run_dir_path, self._BIT_FIELD_SUMMARY_REPORT_FILENAME))
 
-    def _summary_report_bit_fields(self, app_graph, file_path):
+    def _summary_report_bit_fields(self, file_path):
         """ summary report of the bitfields that were generated
 
-        :param ~.ApplicationGraph app_graph: app graph
         :param str file_path: Where to write to
         """
         chip_packet_count = defaultdict(int)
         chip_redundant_count = defaultdict(int)
         progress = ProgressBar(
-            app_graph.n_vertices,
+            SpynnakerDataView.get_n_vertices(),
             "reading back bitfields from chip for summary report")
         with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
-            for app_vertex in progress.over(app_graph.vertices):
-                # get machine verts
+            for app_vertex in progress.over(
+                    SpynnakerDataView.iterate_vertices()):
                 for placement in self.__bitfield_placements(app_vertex):
                     local_total = 0
                     local_redundant = 0
@@ -198,17 +195,18 @@ class _OnChipBitFieldGenerator(object):
                 total_packets, total_redundant_packets,
                 _percent(total_redundant_packets, total_packets)))
 
-    def _full_report_bit_fields(self, app_graph, file_path):
+    def _full_report_bit_fields(self, file_path):
         """ report of the bitfields that were generated
 
-        :param ~.ApplicationGraph app_graph: app graph
         :param str file_path: Where to write to
         """
         progress = ProgressBar(
-            app_graph.n_vertices, "reading back bitfields from chip")
+            SpynnakerDataView.get_n_vertices(),
+            "reading back bitfields from chip")
         with open(file_path, "w", encoding="utf-8") as output:
             # read in for each app vertex that would have a bitfield
-            for app_vertex in progress.over(app_graph.vertices):
+            for app_vertex in progress.over(
+                    SpynnakerDataView.iterate_vertices()):
                 # get machine verts
                 for placement in self.__bitfield_placements(app_vertex):
                     self.__read_back_single_core_data(placement, output)
@@ -276,10 +274,9 @@ class _OnChipBitFieldGenerator(object):
                 bitfield = []
             yield master_pop_key, n_words * _BITS_IN_A_WORD, bitfield
 
-    def _calculate_core_data(self, app_graph, progress):
+    def _calculate_core_data(self, progress):
         """ gets the data needed for the bit field expander for the machine
 
-        :param ~.ApplicationGraph app_graph: app graph
         :param ~.ProgressBar progress: progress bar
         :return: data and expander cores
         :rtype: ~.ExecutableTargets
@@ -290,7 +287,7 @@ class _OnChipBitFieldGenerator(object):
         # bit field expander executable file path
         # locate verts which can have a synaptic matrix to begin with
         max_bit_data_size = 0
-        for app_vertex in progress.over(app_graph.vertices):
+        for app_vertex in progress.over(SpynnakerDataView.iterate_vertices()):
             is_bit_fields = False
             for placement in self.__bitfield_placements(app_vertex):
                 self.__write_single_core_data(placement, expander_cores)
