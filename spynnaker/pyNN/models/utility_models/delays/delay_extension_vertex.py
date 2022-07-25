@@ -229,4 +229,3 @@ class DelayExtensionVertex(
         :rtype: list(DelayApplicationEdge)
         """
         return self.__outgoing_edges
-

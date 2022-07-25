@@ -63,7 +63,7 @@ class _DelaySupportAdder(object):
 
         """
         progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
-            "Adding delay extensions as required")
+                               "Adding delay extensions as required")
 
         for vertex in SpynnakerDataView.get_vertices_by_type(
                 DelayExtensionVertex):
