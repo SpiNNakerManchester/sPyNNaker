@@ -49,18 +49,20 @@ class _DelaySupportAdder(object):
 
     __slots__ = [
         "_app_to_delay_map",
-        "_delay_post_edge_map"]
+        "_delay_post_edge_map",
+        "_new_edges"]
 
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
+        self._new_edges = list()
 
     def _run(self):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
         """
-        progress = ProgressBar(2 + SpynnakerDataView.get_n_partitions(),
+        progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
             "Adding delay extensions as required")
 
         for vertex in SpynnakerDataView.get_vertices_by_type(
@@ -70,12 +72,9 @@ class _DelaySupportAdder(object):
                 self._delay_post_edge_map[(vertex, edge.post_vertex)] = edge
         progress.update(1)
 
-        # Get a shallow copy of the partitions so we can add during iteration
-        partitions = list(SpynnakerDataView.iterate_partitions())
-        progress.update(1)
-
         # go through all partitions.
-        for app_outgoing_edge_partition in progress.over(partitions):
+        for app_outgoing_edge_partition in progress.over(
+                SpynnakerDataView.iterate_partitions()):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
 
@@ -96,6 +95,16 @@ class _DelaySupportAdder(object):
                         # dest vertex
                         self._create_post_delay_edge(
                             delay_app_vertex, app_edge)
+        # avoids mutating the list of outgoing partitions. add them afterwards
+        self._add_new_app_edges()
+
+    def _add_new_app_edges(self):
+        """ adds new edges to the app graph. avoids mutating the arrays being\
+            iterated over previously.
+        :rtype: None
+        """
+        for edge in self._new_edges:
+            SpynnakerDataView.add_edge(edge, constants.SPIKE_PARTITION_ID)
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores\
@@ -117,7 +126,7 @@ class _DelaySupportAdder(object):
                 undelayed_edge=app_edge)
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
-            SpynnakerDataView.add(delay_edge)
+            self._new_edges.append(delay_edge)
             app_edge.delay_edge = delay_edge
             delay_app_vertex.add_outgoing_edge(delay_edge)
 
@@ -157,7 +166,7 @@ class _DelaySupportAdder(object):
                 app_edge.pre_vertex, delay_app_vertex,
                 label="{}_to_DelayExtension".format(
                     app_edge.pre_vertex.label))
-            SpynnakerDataView.add_edge(delay_pre_edge)
+            self._new_edges.append(delay_pre_edge)
         else:
             delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
                 n_delay_stages, delay_per_stage)

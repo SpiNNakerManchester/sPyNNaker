@@ -115,7 +115,6 @@ def test_write_data_spec():
         p.StaticSynapse())
 
     writer.start_run()
-    writer.clone_graphs()
     writer.set_plan_n_timesteps(100)
     delay_support_adder()
     spynnaker_splitter_partitioner()
