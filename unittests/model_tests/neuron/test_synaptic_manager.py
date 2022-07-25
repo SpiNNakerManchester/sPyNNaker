@@ -441,7 +441,6 @@ def test_pop_based_master_pop_table_standard(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
     writer.start_run()
-    writer.clone_graphs()
     writer.set_plan_n_timesteps(100)
     delay_support_adder()
     spynnaker_splitter_partitioner()
