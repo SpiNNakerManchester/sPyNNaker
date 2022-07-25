@@ -20,8 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.utilities.globals_variables import (
-    get_simulator, machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
@@ -116,7 +115,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(int spike_times:
         """
-        current_time = get_simulator().get_current_time()
+        current_time = SpynnakerDataView.get_current_run_time_ms()
         for i in range(len(spike_times)):
             if spike_times[i] < current_time:
                 logger.warning(
@@ -134,7 +133,7 @@ class SpikeSourceArrayVertex(
 
         :param iterable(iterable(int) spike_times:
         """
-        current_time = get_simulator().get_current_time()
+        current_time = SpynnakerDataView.get_current_run_time_ms()
         for neuron_id in range(0, self.n_atoms):
             id_times = spike_times[neuron_id]
             for i in range(len(id_times)):
@@ -181,21 +180,23 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager, 0, placements, self,
+            self.label, 0, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)

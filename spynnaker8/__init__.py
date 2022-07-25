@@ -21,14 +21,13 @@ and implementation for the PyNN High-level API
 This package contains the profile of that code for PyNN 0.9
 """
 # common imports
+import traceback
 import logging
 from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.random import NumpyRNG
 from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
-
-import traceback
 from spinn_utilities.log import FormatAdapter
 
 # connections

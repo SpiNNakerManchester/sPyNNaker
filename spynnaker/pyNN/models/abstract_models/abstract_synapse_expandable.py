@@ -57,11 +57,9 @@ class AbstractSynapseExpandable(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def read_generated_connection_holders(self, transceiver, placement):
+    def read_generated_connection_holders(self, placement):
         """ Fill in the connection holders
 
-        :param ~spinnman.transceiver.Transceiver transceiver:
-            How the data is to be read
         :param ~pacman.model.placements.Placement placement:
             Where the data is on the machine
         """

@@ -22,6 +22,7 @@ from pacman.utilities.utility_calls import get_field_based_keys
 
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spinn_front_end_common.utilities import helpful_functions
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -134,17 +135,16 @@ class PopulationMachineNeurons(
             db.insert_core(
                 x, y, p, "Latest_Send_time", neuron_prov.latest_send)
 
-    def _write_neuron_data_spec(self, spec, routing_info, ring_buffer_shifts):
+    def _write_neuron_data_spec(self, spec, ring_buffer_shifts):
         """ Write the data specification of the neuron data
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-            The routing information to read the key from
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
         # Get and store the key
+        routing_info = SpynnakerDataView.get_routing_infos()
         self._set_key(routing_info.get_first_key_from_pre_vertex(
             self, SPIKE_PARTITION_ID))
 
@@ -337,14 +337,12 @@ class PopulationMachineNeurons(
                             spec.write_value(data=value_convert)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
-    def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice):
+    def read_parameters_from_machine(self, placement, vertex_slice):
 
         # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
-                placement, self._neuron_regions.neuron_params,
-                transceiver)
+                placement, self._neuron_regions.neuron_params)
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
@@ -358,7 +356,7 @@ class PopulationMachineNeurons(
             vertex_slice.n_atoms) - neurons_pre_size
 
         # get data from the machine
-        byte_array = transceiver.read_memory(
+        byte_array = SpynnakerDataView.read_memory(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 

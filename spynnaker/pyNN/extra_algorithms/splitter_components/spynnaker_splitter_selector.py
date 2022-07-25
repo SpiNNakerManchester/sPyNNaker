@@ -24,6 +24,7 @@ from .splitter_abstract_pop_vertex_fixed import (
     SplitterAbstractPopulationVertexFixed)
 from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
 from .splitter_poisson_delegate import SplitterPoissonDelegate
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source.spike_source_array_vertex import (
     SpikeSourceArrayVertex)
@@ -37,19 +38,19 @@ def _is_multidimensional(app_vertex):
     return len(app_vertex.atoms_shape) > 1
 
 
-def spynnaker_splitter_selector(app_graph):
+def spynnaker_splitter_selector():
     """ Add a splitter to every vertex that doesn't already have one.
 
         default for APV is the SplitterAbstractPopulationVertexFixed\
         default for external device splitters are SplitterOneToOneLegacy\
         default for the rest is the SpynnakerSplitterFixedLegacy.
 
-    :param ApplicationGraph app_graph: app graph
     :raises PacmanConfigurationException: If a bad configuration is set
     """
+    app_graph = SpynnakerDataView.get_runtime_graph()
     progress_bar = ProgressBar(
         string_describing_what_being_progressed=PROGRESS_BAR_NAME,
-        total_number_of_things_to_do=len(app_graph.vertices))
+        total_number_of_things_to_do=app_graph.n_vertices)
 
     for app_vertex in progress_bar.over(app_graph.vertices):
         spynakker_vertex_selector(app_vertex)

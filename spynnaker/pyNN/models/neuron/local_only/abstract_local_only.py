@@ -35,14 +35,13 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
 
     @abstractmethod
     def write_parameters(
-            self, spec, region, routing_info, incoming_projections,
+            self, spec, region, incoming_projections,
             machine_vertex, weight_scales):
         """ Write the parameters to the spec
 
         :param ~data_specification.DataSpecificationGenerator spec:
             The specification to write to
         :param int region: region ID to write to
-        :param RoutingInfo routing_info: Information about routing keys
         :param list(~spynnaker.pyNN.models.projection.Projection) \
                 incoming_projections:
             List of projections that target this core

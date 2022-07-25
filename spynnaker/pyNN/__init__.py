@@ -32,13 +32,15 @@ from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
 
+from spinn_utilities.exceptions import (
+    SimulatorNotSetupException, SimulatorShutdownException)
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException, SimulatorNotSetupException,
-    SimulatorShutdownException)
+    ConfigurationException)
 from spinn_front_end_common.utilities import globals_variables
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
@@ -336,7 +338,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     pynn_common.setup(timestep, min_delay, **extra_params)
 
     # create stuff simulator
-    if globals_variables.has_simulator():
+    if SpynnakerDataView.is_setup():
         logger.warning("Calling setup a second time causes the previous "
                        "simulator to be stopped and cleared.")
         # if already exists, kill and rebuild
@@ -351,7 +353,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     # create the main object for all stuff related software
     SpiNNaker(
-        database_socket_addresses=database_socket_addresses,
         time_scale_factor=time_scale_factor, timestep=timestep,
         min_delay=min_delay, graph_label=graph_label,
         n_chips_required=n_chips_required,
@@ -364,7 +365,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     # get overloaded functions from PyNN in relation of our simulator object
     _create_overloaded_functions(globals_variables.get_simulator())
-
+    SpynnakerDataView.add_database_socket_addresses(database_socket_addresses)
     return rank()
 
 
@@ -513,7 +514,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         msg = "set_number_of_neurons_per_core call now expects " \
               "neuron_type as a class instead of as a str"
         raise ConfigurationException(msg)
-    simulator = globals_variables.get_simulator()
     max_neurons = max_permitted
     if is_singleton(max_permitted):
         # Make sure an integer value is passed in here and warn if different
@@ -524,8 +524,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
                 "integer; the value has been set to {}",
                 max_permitted, max_neurons)
 
-    simulator.set_number_of_neurons_per_core(
-        neuron_type, max_neurons)
+    SpynnakerDataView.add_number_of_neurons_per_core(neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists
@@ -544,7 +543,7 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param ~pyNN.random.NumpyRNG rng: random number generator
     """
     # pylint: disable=too-many-arguments
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 
 
@@ -557,7 +556,7 @@ def create(cellclass, cellparams=None, n=1):
     :param int n: n neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["create"](cellclass, cellparams, n)
 
 
@@ -575,7 +574,7 @@ def get_current_time():
 
     :return: returns the current time
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["get_current_time"]()
 
 
@@ -586,7 +585,7 @@ def get_min_delay():
     :return: returns the min delay of the simulation
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["get_min_delay"]()
 
 
@@ -609,7 +608,7 @@ def get_time_step():
     :return: get the time step of the simulation (in ms)
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return float(__pynn["get_time_step"]())
 
 
@@ -621,7 +620,7 @@ def initialize(cells, **initial_values):
         ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     pynn_common.initialize(cells, **initial_values)
 
 
@@ -634,7 +633,7 @@ def num_processes():
     :return: the number of MPI processes
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["num_processes"]()
 
 
@@ -647,7 +646,7 @@ def rank():
     :return: MPI rank
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["rank"]()
 
 
@@ -670,7 +669,7 @@ def record(variables, source, filename, sampling_interval=None,
     :return: neo object
     :rtype: ~neo.core.Block
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["record"](variables, source, filename, sampling_interval,
                             annotations)
 
@@ -684,7 +683,7 @@ def reset(annotations=None):
     """
     if annotations is None:
         annotations = {}
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     __pynn["reset"](annotations)
 
 
@@ -697,7 +696,7 @@ def run(simtime, callbacks=None):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["run"](simtime, callbacks=callbacks)
 
 
@@ -713,7 +712,7 @@ def run_until(tstop):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["run_until"](tstop)
 
 
@@ -723,5 +722,5 @@ def get_machine():
     :return: the machine object
     :rtype: ~spinn_machine.Machine
     """
-    globals_variables.check_simulator()
-    return globals_variables.get_simulator().machine
+    SpynnakerDataView.check_user_can_act()
+    return SpynnakerDataView.get_machine()

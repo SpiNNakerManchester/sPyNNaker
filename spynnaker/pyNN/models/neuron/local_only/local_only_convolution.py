@@ -18,8 +18,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_SHORT, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     ConvolutionConnector)
@@ -69,7 +68,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(
-            self, spec, region, routing_info, incoming_projections,
+            self, spec, region, incoming_projections,
             machine_vertex, weight_scales):
 
         # Get all the incoming vertices and keys so we can sort
@@ -84,6 +83,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
                 if s_info.connector.could_connect(
                         s_info, pre_m_vertex, machine_vertex):
+                    routing_info = SpynnakerDataView.get_routing_infos()
                     r_info = routing_info.get_routing_info_from_pre_vertex(
                         pre_m_vertex, SPIKE_PARTITION_ID)
                     vertex_slice = pre_m_vertex.vertex_slice
@@ -136,7 +136,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     @property
     @overrides(AbstractLocalOnly.delay)
     def delay(self):
-        return machine_time_step_ms()
+        return SpynnakerDataView.get_simulation_time_step_ms()
 
     @overrides(AbstractLocalOnly.set_delay)
     def set_delay(self, delay):

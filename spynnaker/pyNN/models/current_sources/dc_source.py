@@ -15,9 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
@@ -49,9 +48,7 @@ class DCSource(AbstractCurrentSource):
         self.__parameters = dict()
         self.__parameters['amplitude'] = self.__amplitude
         # Convert to integers i.e. timesteps
-        sim = get_simulator()
-        machine_ts = sim.machine_time_step
-        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
         self.__parameters['start'] = self.__start * time_convert_ms
         self.__parameters['stop'] = self.__stop * time_convert_ms
 

@@ -16,9 +16,8 @@
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
@@ -94,22 +93,23 @@ class SpikeInjectorVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager,
-            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, placements, self,
+            self.label, SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID)

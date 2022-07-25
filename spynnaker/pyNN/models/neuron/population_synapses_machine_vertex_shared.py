@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
@@ -51,23 +50,12 @@ class PopulationSynapsesMachineVertexShared(
             resources_required, label, constraints, app_vertex, vertex_slice)
         self.__synapse_references = synapse_references
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info", "data_n_time_steps"})
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
-        """
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        :param n_key_map: (injected)
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
         # Write references to shared regions
@@ -78,7 +66,7 @@ class PopulationSynapsesMachineVertexShared(
         self._write_sdram_edge_spec(spec)
 
         # Write information about keys
-        self._write_key_spec(spec, routing_info)
+        self._write_key_spec(spec)
 
         # End the writing of this specification:
         spec.end_specification()

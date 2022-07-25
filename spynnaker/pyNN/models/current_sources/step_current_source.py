@@ -15,9 +15,8 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_current_source import AbstractCurrentSource, CurrentSourceIDs
 
@@ -35,13 +34,7 @@ class StepCurrentSource(AbstractCurrentSource):
     def __init__(self, times=None, amplitudes=None):
         # There's probably no need to actually store these as you can't
         # access them directly in pynn anyway
-        if times is None:
-            times = []
-        if amplitudes is None:
-            amplitudes = []
-        sim = get_simulator()
-        machine_ts = sim.machine_time_step
-        time_convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+        time_convert_ms = SpynnakerDataView.get_simulation_time_step_per_ms()
         self.__times = [times[i] * time_convert_ms for i in range(len(times))]
         self.__amplitudes = amplitudes
 
@@ -73,11 +66,10 @@ class StepCurrentSource(AbstractCurrentSource):
                 raise SpynnakerException(msg)
             else:
                 if key == 'times':
-                    sim = get_simulator()
-                    machine_ts = sim.machine_time_step
-                    convert_ms = MICRO_TO_MILLISECOND_CONVERSION / machine_ts
+                    time_convert_ms = SpynnakerDataView.\
+                        get_simulation_time_step_per_ms()
                     self.__times = [
-                        value[i] * convert_ms for i in range(len(value))]
+                        value[i] * time_convert_ms for i in range(len(value))]
                     value = self.__times
                 else:
                     # Check length: if longer, need to remap
