@@ -16,7 +16,6 @@
 import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -31,13 +30,11 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
-        AbstractChangableAfterRun, AbstractGenerateOnMachine):
+        AbstractGenerateOnMachine):
     """ The dynamics of a synapse that does not change over time.
     """
 
     __slots__ = [
-        # Indicates if a change that has been made requires mapping
-        "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
         "__pad_to_length",
         # weight of connections
@@ -53,7 +50,6 @@ class SynapseDynamicsStatic(
         :type delay: float or None
         :param int pad_to_length:
         """
-        self.__change_requires_mapping = True
         self.__weight = weight
         if delay is None:
             delay = SpynnakerDataView.get_min_delay()
@@ -182,23 +178,6 @@ class SynapseDynamicsStatic(
 
         return connections
 
-    @property
-    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
-    def requires_mapping(self):
-        """ True if changes that have been made require that mapping be\
-            performed.  Note that this should return True the first time it\
-            is called, as the vertex must require mapping as it has been\
-            created!
-        """
-        return self.__change_requires_mapping
-
-    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
-    def mark_no_changes(self):
-        """ Marks the point after which changes are reported.  Immediately\
-            after calling this method, requires_mapping should return False.
-        """
-        self.__change_requires_mapping = False
-
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         if hasattr(self, key):
@@ -210,7 +189,7 @@ class SynapseDynamicsStatic(
     def set_value(self, key, value):
         if hasattr(self, key):
             setattr(self, key, value)
-            self.__change_requires_mapping = True
+            SpynnakerDataView.set_requires_mapping()
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 

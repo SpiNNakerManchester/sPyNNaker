@@ -27,7 +27,6 @@ from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SpynnakerException)
@@ -72,7 +71,6 @@ class Population(PopulationBase):
         "_size",
         "__structure",
         "__vertex",
-        "__vertex_changeable_after_run",
         "__vertex_contains_units",
         "__vertex_population_initializable",
         "__vertex_population_settable"]
@@ -794,9 +792,6 @@ class Population(PopulationBase):
                 "Population does not support the initialisation of {}".format(
                     variable))
         if SpynnakerDataView.is_ran_last():
-            if not self.__vertex_changeable_after_run:
-                raise Exception(
-                    "Population does not support changes after run")
             self._read_parameters_before_set()
         self.__vertex.initialize(variable, value, selector)
 
@@ -851,10 +846,6 @@ class Population(PopulationBase):
                 parameter))
 
         SpynnakerDataView.check_user_can_act()
-        if (SpynnakerDataView.is_ran_ever()
-                and not self.__vertex_changeable_after_run):
-            raise Exception(
-                "Run has been called but vertex is not changable.")
 
         if isinstance(parameter, str):
             if value is None:
@@ -1153,8 +1144,6 @@ class Population(PopulationBase):
             isinstance(self.__vertex, AbstractPopulationSettable)
         self.__vertex_population_initializable = \
             isinstance(self.__vertex, AbstractPopulationInitializable)
-        self.__vertex_changeable_after_run = \
-            isinstance(self.__vertex, AbstractChangableAfterRun)
         self.__vertex_contains_units = \
             isinstance(self.__vertex, AbstractContainsUnits)
 
