@@ -370,26 +370,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             logger.warning(
                 "****************************************************")
 
-    def _detect_if_graph_has_changed(self):
-        """ Iterate though the graph and look for changes.
-
-        """
-        changed, data_changed = super()._detect_if_graph_has_changed()
-
-        # Additionally check populations for changes
-        for population in self._data_writer.iterate_populations():
-            if population.requires_mapping:
-                changed = True
-            population.mark_no_changes()
-
-        # Additionally check projections for changes
-        for projection in self._data_writer.iterate_projections():
-            if projection.requires_mapping:
-                changed = True
-            projection.mark_no_changes()
-
-        return changed, data_changed
-
     @staticmethod
     def _count_unique_keys(commands):
         unique_keys = {command.key for command in commands}
