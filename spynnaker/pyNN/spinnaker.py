@@ -416,42 +416,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
-    def _locate_receivers_from_projections(
-            self, projections, gatherers, extra_monitors_per_chip):
-        """ Locate receivers and their corresponding monitor cores for\
-            setting router time-outs.
-
-        :param list projections: the projections going to be read
-        :param gatherers: the gatherers per Ethernet chip
-        :param extra_monitors_per_chip: the extra monitor cores per chip
-        :return: list of tuples with gatherer and its extra monitor cores
-        :rtype: list
-        """
-        # pylint: disable=protected-access
-        important_gathers = set()
-
-        machine = self._data_writer.get_machine()
-        placements = self._data_writer.get_placements()
-        # iterate though projections
-        for projection in projections:
-            # iteration though the projections machine edges to locate chips
-            for edge in projection._projection_edge.machine_edges:
-                placement = placements.get_placement_of_vertex(
-                    edge.post_vertex)
-                chip = machine.get_chip_at(placement.x, placement.y)
-
-                # locate extra monitor cores on the board of this chip
-                extra_monitor_cores_on_board = set(
-                    extra_monitors_per_chip[xy]
-                    for xy in machine.get_existing_xys_on_board(chip))
-
-                # map gatherer to extra monitor cores for board
-                important_gathers.add((
-                    gatherers[(chip.nearest_ethernet_x,
-                               chip.nearest_ethernet_y)],
-                    frozenset(extra_monitor_cores_on_board)))
-        return list(important_gathers)
-
     @overrides(AbstractSpinnakerBase._execute_graph_data_specification_writer)
     def _execute_graph_data_specification_writer(self):
         with FecTimer(DATA_GENERATION, "Spynnaker data specification writer"):
