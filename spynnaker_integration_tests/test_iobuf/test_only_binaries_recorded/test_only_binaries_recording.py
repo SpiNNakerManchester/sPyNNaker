@@ -35,14 +35,14 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(500)
 
         app_iobuf_files = self.get_app_iobuf_files()
-        placements = SpynnakerDataView.get_placements()
         sim.end()
 
         machine_verts = input._vertex.machine_vertices
         data = set()
 
         for machine_vertex in machine_verts:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             data.add(placement)
 
         false_data = list(range(0, 16))

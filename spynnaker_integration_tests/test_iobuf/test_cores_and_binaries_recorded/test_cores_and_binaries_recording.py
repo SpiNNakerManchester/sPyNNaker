@@ -39,7 +39,6 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(simtime)
 
         provenance_files = self.get_app_iobuf_files()
-        placements = SpynnakerDataView.get_placements()
         # As outside of run we have to use unprotected method
         app_graph = SpynnakerDataView.get_runtime_graph()
         sim.end()
@@ -52,7 +51,7 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                         isinstance(
                             machine_vertex,
                             ReverseIPTagMulticastSourceMachineVertex)):
-                    placement = placements.get_placement_of_vertex(
+                    placement = SpynnakerDataView.get_placement_of_vertex(
                         machine_vertex)
                     data.add(placement)
 
