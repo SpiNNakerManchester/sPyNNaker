@@ -45,7 +45,6 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.end()
 
         data = set()
-        false_data = list()
 
         for vertex in app_graph.vertices:
             for machine_vertex in vertex.machine_vertices:
@@ -57,11 +56,10 @@ class TestCoresAndBinariesRecording(BaseTestCase):
                         machine_vertex)
                     data.add(placement)
 
-        for p in range(0, 16):
-            if not placements.is_processor_occupied(0, 0, p):
-                false_data.append(p)
-            elif placements.get_placement_on_processor(0, 0, p) not in data:
-                false_data.append(p)
+        false_data = list(range(0, 16))
+        for placement in SpynnakerDataView.iterate_placements_on_core(0, 0):
+            if placement in data:
+                false_data.remove(placement.p)
 
         for placement in data:
             self.assertIn(
