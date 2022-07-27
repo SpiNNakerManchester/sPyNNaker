@@ -280,27 +280,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             "We do not support externally altering the segment counter")
 
     @property
-    def running(self):
-        """ Whether the simulation is running or has run.
-
-        .. note::
-            Ties into our has_ran parameter for automatic pause and resume.
-
-        :return: the has_ran variable from the SpiNNaker main interface
-        :rtype: bool
-        """
-        return self._has_ran
-
-    @running.setter
-    def running(self, new_value):
-        """ Setter for the has_ran parameter, only used by the PyNN interface,\
-            supports tracking where it thinks its setting this parameter.
-
-        :param bool new_value: the new value for the simulation
-        """
-        self._has_ran = new_value
-
-    @property
     def name(self):
         """ The name of the simulator. Used to ensure PyNN recording neo\
             blocks are correctly labelled.
