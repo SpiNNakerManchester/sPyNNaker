@@ -77,11 +77,11 @@
 <span class="sd">        of a neuron (typically 16 or 32)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># The parition this Delay is supporting</span>
+        <span class="s2">&quot;__partition&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_blocks&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_per_stage&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__n_atoms&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_delay_stages&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__source_vertex&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__delay_generator_data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__outgoing_edges&quot;</span><span class="p">]</span>
@@ -96,15 +96,14 @@
         <span class="s2">&quot;yet feasible. Please report it to Spinnaker user mail list.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
-            <span class="n">source_vertex</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">delay_per_stage</span><span class="p">,</span> <span class="n">n_delay_stages</span><span class="p">,</span>
+            <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;DelayExtension&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int n_neurons: the number of neurons</span>
+<span class="sd">        :param partition: The parition this Delay is supporting</span>
+<span class="sd">        :type partition:</span>
+<span class="sd">            ~pacman.mode.graph.application.ApplicationEdgePartition</span>
 <span class="sd">        :param int delay_per_stage: the delay per stage</span>
 <span class="sd">        :param int n_delay_stages: the (initial) number of delay stages needed</span>
-<span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex \</span>
-<span class="sd">                source_vertex:</span>
-<span class="sd">            where messages are coming from</span>
 <span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
 <span class="sd">                constraints:</span>
 <span class="sd">            the vertex constraints</span>
@@ -114,13 +113,10 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span><span class="p">,</span> <span class="n">splitter</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__source_vertex</span> <span class="o">=</span> <span class="n">source_vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span> <span class="o">=</span> <span class="n">partition</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_delay_stages</span> <span class="o">=</span> <span class="n">n_delay_stages</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_per_stage</span> <span class="o">=</span> <span class="n">delay_per_stage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_generator_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-
-        <span class="c1"># atom store</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">round_n_atoms</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="s2">&quot;n_neurons&quot;</span><span class="p">)</span>
 
         <span class="c1"># Dictionary of vertex_slice -&gt; delay block for data specification</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_blocks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -132,7 +128,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">drop_late_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -171,7 +167,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__source_vertex</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span><span class="o">.</span><span class="n">pre_vertex</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.add_delays"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_delays">[docs]</a>    <span class="k">def</span> <span class="nf">add_delays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">source_ids</span><span class="p">,</span> <span class="n">stages</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add delayed connections for a given vertex slice</span>
@@ -255,6 +251,10 @@
     <span class="k">def</span> <span class="nf">get_n_cores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">())</span></div>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">partition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partition</span>
+
 <div class="viewcode-block" id="DelayExtensionVertex.add_outgoing_edge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.add_outgoing_edge">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an outgoing edge to the delay extension</span>
 
@@ -308,7 +308,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>

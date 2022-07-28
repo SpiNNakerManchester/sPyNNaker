@@ -314,7 +314,6 @@
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_TIMESTEP</span><span class="p">,</span>
           <span class="n">min_delay</span><span class="o">=</span><span class="n">_pynn_control</span><span class="o">.</span><span class="n">DEFAULT_MIN_DELAY</span><span class="p">,</span>
           <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-          <span class="n">graph_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">database_socket_addresses</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
           <span class="n">n_chips_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_boards_required</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_params</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The main method needed to be called to make the PyNN 0.8 setup. Needs\</span>
@@ -329,8 +328,6 @@
 <span class="sd">    :type min_delay: float or str</span>
 <span class="sd">    :param max_delay: Ignored and logs a warning if provided</span>
 <span class="sd">    :type max_delay: float or str or None</span>
-<span class="sd">    :param graph_label: the label for the graph</span>
-<span class="sd">    :type graph_label: str or None</span>
 <span class="sd">    :param database_socket_addresses: the sockets used by external devices</span>
 <span class="sd">        for the database notification protocol</span>
 <span class="sd">    :type database_socket_addresses:</span>
@@ -377,14 +374,10 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error forcing previous simulation to clear&quot;</span><span class="p">)</span>
 
-    <span class="c1"># add default label if needed</span>
-    <span class="k">if</span> <span class="n">graph_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">graph_label</span> <span class="o">=</span> <span class="s2">&quot;PyNN0.8_graph&quot;</span>
-
     <span class="c1"># create the main object for all stuff related software</span>
     <span class="n">SpiNNaker</span><span class="p">(</span>
         <span class="n">time_scale_factor</span><span class="o">=</span><span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="n">timestep</span><span class="p">,</span>
-        <span class="n">min_delay</span><span class="o">=</span><span class="n">min_delay</span><span class="p">,</span> <span class="n">graph_label</span><span class="o">=</span><span class="n">graph_label</span><span class="p">,</span>
+        <span class="n">min_delay</span><span class="o">=</span><span class="n">min_delay</span><span class="p">,</span>
         <span class="n">n_chips_required</span><span class="o">=</span><span class="n">n_chips_required</span><span class="p">,</span>
         <span class="n">n_boards_required</span><span class="o">=</span><span class="n">n_boards_required</span><span class="p">)</span>
 
@@ -783,7 +776,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
     </div>
   </body>
 </html>
