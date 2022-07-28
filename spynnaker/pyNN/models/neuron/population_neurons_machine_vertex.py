@@ -57,7 +57,6 @@ class PopulationNeuronsMachineVertex(
     """
 
     __slots__ = [
-        "__change_requires_neuron_parameters_reload",
         "__key",
         "__sdram_partition",
         "__ring_buffer_shifts",
@@ -131,7 +130,6 @@ class PopulationNeuronsMachineVertex(
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
@@ -257,11 +255,12 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.__change_requires_neuron_parameters_reload
+        return self.app_vertex.neuron_data_needs_regeneration
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        # Ignore because the app vertex manages this
+        pass
 
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)

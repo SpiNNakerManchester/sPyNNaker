@@ -17,13 +17,14 @@ import logging
 import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
-from spinn_utilities.ranged import RangedListOfList
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
+from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models import (
+    PopulationApplicationVertex, RecordingType, ParameterHolder)
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -45,8 +46,8 @@ def _send_buffer_times(spike_times, time_step):
 
 
 class SpikeSourceArrayVertex(
-        ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun):
+        ReverseIpTagMultiCastSource, PopulationApplicationVertex,
+        AbstractChangableAfterRun):
     """ Model for play back of spikes
     """
 
@@ -58,10 +59,15 @@ class SpikeSourceArrayVertex(
         # pylint: disable=too-many-arguments
         self.__model_name = "SpikeSourceArray"
         self.__model = model
+
         if spike_times is None:
             spike_times = []
-        self._spike_times = spike_times
-        time_step = self.get_spikes_sampling_interval()
+        use_list_as_value = (
+            not len(spike_times) or not hasattr(spike_times[0], '__iter__'))
+        self._spike_times = SpynnakerRangedList(
+            n_neurons, spike_times, use_list_as_value=use_list_as_value)
+
+        time_step = SpynnakerDataView.get_simulation_time_step_us()
 
         super().__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
@@ -84,12 +90,6 @@ class SpikeSourceArrayVertex(
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__requires_mapping = False
-
-    @property
-    def spike_times(self):
-        """ The spike times of the spike source array
-        """
-        return list(self._spike_times)
 
     def _to_early_spikes_single_list(self, spike_times):
         """
@@ -129,13 +129,11 @@ class SpikeSourceArrayVertex(
                             self, current_time, float(id_times[i])))
                     return
 
-    @spike_times.setter
-    def spike_times(self, spike_times):
-        """ Set the spike source array's spike times. Not an extend, but an\
-            actual change
+    def __set_spike_buffer_times(self, spike_times):
+        """ Set the spike source array's buffer spike times
 
         """
-        time_step = self.get_spikes_sampling_interval()
+        time_step = SpynnakerDataView.get_simulation_time_step_us()
         # warn the user if they are asking for a spike time out of range
         if spike_times:  # in case of empty list do not check
             if hasattr(spike_times[0], '__iter__'):
@@ -143,31 +141,70 @@ class SpikeSourceArrayVertex(
             else:
                 self._to_early_spikes_single_list(spike_times)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
-        self._spike_times = spike_times
 
-    @overrides(AbstractSpikeRecordable.is_recording_spikes)
-    def is_recording_spikes(self):
-        return self.__spike_recorder.record
+    def __read_parameter(self, name, selector):
+        # This can only be spike times
+        return self._spike_times.get_values(selector)
 
-    @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
+    @overrides(PopulationApplicationVertex.get_parameter_values)
+    def get_parameter_values(self, names, selector=None):
+        self._check_parameters(names, {"spike_times"})
+        return ParameterHolder(names, self.__read_parameter, selector)
+
+    @overrides(PopulationApplicationVertex.set_parameter_values)
+    def set_parameter_values(self, name, value, selector=None):
+        self._check_parameters(name, {"spike_times"})
+        self.__set_spike_buffer_times(value)
+        use_list_as_value = (
+            not len(value) or not hasattr(value[0], '__iter__'))
+        self._spike_times.set_value_by_selector(
+            selector, value, use_list_as_value)
+
+    @overrides(PopulationApplicationVertex.get_parameters)
+    def get_parameters(self):
+        return ["spike_times"]
+
+    @overrides(PopulationApplicationVertex.get_units)
+    def get_units(self, name):
+        if name == "spikes":
+            return ""
+        if name == "spike_times":
+            return "ms"
+        raise KeyError(f"Units for {name} unknown")
+
+    @overrides(PopulationApplicationVertex.get_recordable_variables)
+    def get_recordable_variables(self):
+        return ["spikes"]
+
+    @overrides(PopulationApplicationVertex.can_record)
+    def can_record(self, name):
+        return name == "spikes"
+
+    @overrides(PopulationApplicationVertex.set_recording)
+    def set_recording(self, name, sampling_interval=None, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
-        if indexes is not None:
-            logger.warning("Indexes currently not supported for "
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
                            "SpikeSourceArray so being ignored")
-        self.enable_recording(new_state)
-        self.__requires_mapping = not self.__spike_recorder.record
-        self.__spike_recorder.record = new_state
+        self.enable_recording(True)
 
-    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return SpynnakerDataView.get_simulation_time_step_us()
+    @overrides(PopulationApplicationVertex.set_not_recording)
+    def set_not_recording(self, name, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
+                           "SpikeSourceArray so being ignored")
+        self.enable_recording(False)
 
-    @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self):
+    @overrides(PopulationApplicationVertex.get_recorded_data)
+    def get_recorded_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         return self.__spike_recorder.get_spikes(
             self.label, 0, self,
             lambda vertex:
@@ -175,8 +212,28 @@ class SpikeSourceArrayVertex(
                 if vertex.virtual_key is not None
                 else 0)
 
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
+    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
+    def get_recording_sampling_interval(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return SpynnakerDataView.get_simulation_time_step_us()
+
+    @overrides(PopulationApplicationVertex.get_recording_indices)
+    def get_recording_indices(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return range(self.n_atoms)
+
+    @overrides(PopulationApplicationVertex.get_recording_type)
+    def get_recording_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.clear_recording_data)
+    def clear_recording_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
@@ -207,21 +264,3 @@ class SpikeSourceArrayVertex(
             "parameters": parameters,
         }
         return context
-
-    @overrides(SimplePopulationSettable.set_value_by_selector)
-    def set_value_by_selector(self, selector, key, value):
-        if key == "spike_times":
-            old_values = self.get_value(key)
-            if isinstance(old_values, RangedListOfList):
-                ranged_list = old_values
-            else:
-                # Keep all the setting stuff in one place by creating a
-                # RangedListofLists
-                ranged_list = RangedListOfList(
-                    size=self.n_atoms, value=old_values)
-            ranged_list.set_value_by_selector(
-                selector, value, ranged_list.is_list(value, self.n_atoms))
-            self.set_value(key, ranged_list)
-        else:
-            SimplePopulationSettable.set_value_by_selector(
-                self, selector, key, value)

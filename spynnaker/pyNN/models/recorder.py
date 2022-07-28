@@ -24,23 +24,13 @@ from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker import _version
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
-from spynnaker.pyNN.utilities.constants import (
-    SPIKES, MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB, REWIRING)
-from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.data_cache import DataCache
+from spynnaker.pyNN.models.abstract_models import RecordingType
 
 # needed as dealing with quantities
 # pylint: disable=c-extension-no-member
 
 logger = FormatAdapter(logging.getLogger(__name__))
-_DEFAULT_UNITS = {
-    SPIKES: "spikes",
-    MEMBRANE_POTENTIAL: "mV",
-    GSYN_EXCIT: "uS",
-    GSYN_INHIB: "uS",
-    REWIRING: "ms"}
 
 
 class Recorder(object):
@@ -48,9 +38,9 @@ class Recorder(object):
     """
 
     __slots__ = [
-        "_data_cache",
+        "__data_cache",
         "__population",
-        "_recording_start_time",
+        "__recording_start_time",
         "__vertex",
         "__write_to_files_indicators"]
 
@@ -70,9 +60,9 @@ class Recorder(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-        self._recording_start_time = \
+        self.__recording_start_time = \
             SpynnakerDataView.get_current_run_time_ms()
-        self._data_cache = {}
+        self.__data_cache = {}
 
     @property
     def write_to_files_indicators(self):
@@ -83,8 +73,7 @@ class Recorder(object):
         """
         return self.__write_to_files_indicators
 
-    def record(
-            self, variables, to_file, sampling_interval, indexes):
+    def record(self, variables, to_file, sampling_interval, indexes):
         """ Same as record but without non-standard PyNN warning
 
         This method is non-standard PyNN and is intended only to be called by
@@ -131,7 +120,7 @@ class Recorder(object):
                     'therefore may not be portable to other simulators.')
 
                 # iterate though all possible recordings for this vertex
-                for variable in self.get_all_possible_recordable_variables():
+                for variable in self.__vertex.get_recordable_variables():
                     self.turn_on_record(
                         variable, sampling_interval, to_file, indexes)
             else:
@@ -161,21 +150,6 @@ class Recorder(object):
         """
 
         SpynnakerDataView.check_user_can_act()
-        # tell vertex its recording
-        if variable == "spikes":
-            if not isinstance(self.__vertex, AbstractSpikeRecordable):
-                raise Exception("This population does not support the "
-                                "recording of spikes!")
-            self.__vertex.set_recording_spikes(
-                sampling_interval=sampling_interval, indexes=indexes)
-        elif variable == "all":
-            raise Exception("Illegal call with all")
-        else:
-            if not isinstance(self.__vertex, AbstractNeuronRecordable):
-                raise Exception("This population does not support the "
-                                "recording of {}!".format(variable))
-            self.__vertex.set_recording(
-                variable, sampling_interval=sampling_interval, indexes=indexes)
 
         # update file writer
         self.__write_to_files_indicators[variable] = to_file
@@ -186,12 +160,17 @@ class Recorder(object):
                     logger, "You are trying to record the excitatory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
+                variable = "isyn_inh"
         elif variable == "gsyn_inh":
             if not self.__vertex.conductance_based:
                 warn_once(
                     logger, "You are trying to record the inhibitory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
+                variable = "isyn_inh"
+
+        # Tell the vertex to record
+        self.__vertex.set_recording(variable, sampling_interval, indexes)
 
     def get_recorded_pynn7(self, variable, as_matrix=False, view_indexes=None):
         """ Get recorded data in PyNN 0.7 format. Must not be spikes.
@@ -205,11 +184,12 @@ class Recorder(object):
         :type view_indexes: list(int) or None
         :rtype: ~numpy.ndarray
         """
-        if variable in [SPIKES, REWIRING]:
+        # Only matrix variables are currently supported through this function
+        if self.__vertex.get_recording_type(variable) != RecordingType.MATRIX:
             raise NotImplementedError(f"{variable} not supported")
         (data, ids, sampling_interval) = self.get_recorded_matrix(variable)
         if view_indexes is None:
-            if len(ids) != self.__population.size:
+            if len(ids) != self.__vertex.n_atoms:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = ids
         elif view_indexes == ids:
@@ -235,29 +215,32 @@ class Recorder(object):
                 numpy.tile(times, n_neurons),
                 numpy.transpose(data).reshape(column_length)))
 
-    def get_recorded_matrix(self, variable):
-        """ Perform safety checks and get the recorded data from the vertex\
-            in matrix format.
+    def __get_empty_data(self, variable):
+        """ Get an empty array for the given recording type
 
-        :param str variable:
-            The variable name to read. Supported variable names are:
-            ``gsyn_exc``, ``gsyn_inh``, ``v``
-        :return: data, indexes, sampling_interval
-        :rtype: tuple(~numpy.ndarray, list(int), float)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
+        :param str variable: the variable to get the array for
+        :rtype: ~numpy.ndarray
+        """
+        var_type = self.__vertex.get_recording_type(variable)
+        if var_type == RecordingType.MATRIX:
+            return numpy.zeros((0, 3))
+        if var_type == RecordingType.BIT_FIELD:
+            return numpy.zeros((0, 2))
+        if var_type == RecordingType.EVENT:
+            return numpy.zeros((0, 4))
+        raise ValueError(f"Unknown type {var_type}")
+
+    def get_data(self, variable):
+        """ Get the data for the given variable with safety checks
+
+        :param str variable: the variable to get the data for
+        :rtype: ~numpy.ndarray
         """
         SpynnakerDataView.check_user_can_act()
-        # check that we're in a state to get voltages
-        if not isinstance(self.__vertex, AbstractNeuronRecordable):
-            raise ConfigurationException(
-                "This population has not got the capability to record {}"
-                .format(variable))
+
         if not self.__vertex.is_recording(variable):
             raise ConfigurationException(
-                "This population has not been set to record {}".format(
-                    variable))
+                f"This population has not been set to record {variable}")
 
         if not SpynnakerDataView.is_ran_last():
             if SpynnakerDataView.is_ran_ever():
@@ -269,93 +252,15 @@ class Recorder(object):
                 logger.warning(
                     f"The simulation has not yet run, therefore {variable} "
                     f"cannot be retrieved, hence the list will be empty")
-            data = numpy.zeros((0, 3))
-            indexes = []
-            sampling_interval = self.__vertex.get_neuron_sampling_interval(
-                variable)
-        elif get_config_bool("Machine", "virtual_board"):
+            return self.__get_empty_data(variable)
+
+        if get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the list will be empty")
-            data = numpy.zeros((0, 3))
-            indexes = []
-            sampling_interval = self.__vertex.get_neuron_sampling_interval(
-                variable)
-        else:
-            # assuming we got here, everything is ok, so we should go get the
-            # data
-            results = self.__vertex.get_data(variable)
-            (data, indexes, sampling_interval) = results
+            return self.__get_empty_data(variable)
 
-        return (data, indexes, sampling_interval)
-
-    def get_spikes(self):
-        """ How to get spikes (of a population's neurons) from the recorder.
-
-        :return: the spikes (event times) from the underlying vertex
-        :rtype: ~numpy.ndarray
-        """
-
-        # check we're in a state where we can get spikes
-        if not isinstance(self.__vertex, AbstractSpikeRecordable):
-            raise ConfigurationException(
-                "This population has not got the capability to record spikes")
-        if not self.__vertex.is_recording_spikes():
-            raise ConfigurationException(
-                "This population has not been set to record spikes")
-
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-                    "The simulation has reset, therefore spikes cannot "
-                    "be retrieved, hence the list/ last segment will be empty")
-            else:
-                logger.warning(
-                    "The simulation has not yet run, therefore spikes cannot "
-                    "be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 2))
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the spike list will be empty")
-            return numpy.zeros((0, 2))
-
-        # assuming we got here, everything is OK, so we should go get the
-        # spikes
-        return self.__vertex.get_spikes()
-
-    def get_events(self, variable):
-        """ How to get rewiring events (of a post-population) from recorder
-
-        :return: the rewires (event times, values) from the underlying vertex
-        :rtype: ~numpy.ndarray
-        """
-
-        # check we're in a state where we can get rewires
-        if not isinstance(self.__vertex, AbstractEventRecordable):
-            raise ConfigurationException(
-                "This population has not got the capability to record rewires")
-        if not self.__vertex.is_recording(REWIRING):
-            raise ConfigurationException(
-                "This population has not been set to record rewires")
-
-        if not SpynnakerDataView.is_ran_last():
-            if SpynnakerDataView.is_ran_ever():
-                logger.warning(
-                    "The simulation has been reset, therefore rewires cannot "
-                    "be retrieved, hence the list/last segment will be empty")
-            else:
-                logger.warning(
-                    "The simulation has not yet run, therefore rewires "
-                    "cannot be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 4))
-        if get_config_bool("Machine", "virtual_board"):
-            logger.warning(
-                "The simulation is using a virtual machine and so has not "
-                "truly ran, hence the rewires list will be empty")
-            return numpy.zeros((0, 4))
-
-        return self.__vertex.get_events(variable)
+        return self.__vertex.get_recorded_data(variable)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -363,17 +268,8 @@ class Recorder(object):
         :param indexes:
         :type indexes: list or None
         """
-        # check for standard record which includes spikes
-        if isinstance(self.__vertex, AbstractNeuronRecordable):
-            variables = self.__vertex.get_recordable_variables()
-            for variable in variables:
-                self.__vertex.set_recording(
-                    variable, new_state=False, indexes=indexes)
-
-        # check for spikes
-        if isinstance(self.__vertex, AbstractSpikeRecordable):
-            self.__vertex.set_recording_spikes(
-                new_state=False, indexes=indexes)
+        for variable in self.__vertex.get_recordable_variables():
+            self.__vertex.set_not_recording(variable, indexes)
 
     def extract_neo_block(self, variables, view_indexes, clear, annotations):
         """ Extracts block from the vertices and puts them into a Neo block
@@ -389,7 +285,7 @@ class Recorder(object):
         block = neo.Block()
 
         for previous in range(0, SpynnakerDataView.get_segment_counter()):
-            self._append_previous_segment(
+            self.__append_previous_segment(
                 block, previous, variables, view_indexes)
 
         # add to the segments the new block
@@ -405,33 +301,10 @@ class Recorder(object):
             block.annotate(**annotations)
         return block
 
-    def _get_units(self, variable):
-        """ Get units with some safety code if the population has trouble
-
-        :param str variable: name of the variable
-        :return: type of the data
-        :rtype: str
-        """
-        try:
-            return self.__population.find_units(variable)
-        except Exception as e:
-            logger.warning("Population: {} Does not support units for {}",
-                           self.__population.label, variable)
-            if variable in _DEFAULT_UNITS:
-                return _DEFAULT_UNITS[variable]
-            raise e
-
-    @property
-    def __spike_sampling_interval(self):
-        """
-        :rtype: float
-        """
-        return self.__vertex.get_spikes_sampling_interval()
-
     def cache_data(self):
         """ Store data for later extraction
         """
-        variables = self.get_all_recording_variables()
+        variables = self.__vertex.get_recordable_variables()
         if variables:
             segment_number = SpynnakerDataView.get_segment_counter()
             logger.info("Caching data for segment {:d}", segment_number)
@@ -440,39 +313,22 @@ class Recorder(object):
                 label=self.__population.label,
                 description=self.__population.describe(),
                 segment_number=segment_number,
-                recording_start_time=self._recording_start_time,
+                recording_start_time=self.__recording_start_time,
                 t=SpynnakerDataView.get_current_run_time_ms())
 
             for variable in variables:
-                if variable == SPIKES:
-                    data = self.get_spikes()
-                    sampling_interval = self.__spike_sampling_interval
-                    indexes = None
-                elif variable == REWIRING:
-                    data = self.get_events(variable)
-                    sampling_interval = None
-                    indexes = None
-                else:
-                    (data, indexes, sampling_interval) = \
-                        self.get_recorded_matrix(variable)
+                samp_interval = self.__vertex.get_recording_sampling_interval(
+                    variable)
+                indexes = self.__vertex.get_recording_indices(variable)
+                data = self.get_data(variable)
                 data_cache.save_data(
                     variable=variable, data=data, indexes=indexes,
                     n_neurons=self.__population.size,
-                    units=self._get_units(variable),
-                    sampling_interval=sampling_interval)
-            self._data_cache[segment_number] = data_cache
+                    units=self.__vertex.get_units(variable),
+                    sampling_interval=samp_interval)
+            self.__data_cache[segment_number] = data_cache
 
-    def _filter_recorded(self, filter_ids):
-        # TODO: unused?
-        record_ids = list()
-        for neuron_id in range(0, len(filter_ids)):
-            if filter_ids[neuron_id]:
-                # add population first ID to ensure all atoms have a unique
-                # identifier (PyNN enforcement)
-                record_ids.append(neuron_id + self.__population.first_id)
-        return record_ids
-
-    def _clean_variables(self, variables):
+    def __clean_variables(self, variables):
         """ Sorts out variables for processing usage
 
         :param variables: list of variables names, or 'all', or single.
@@ -491,7 +347,7 @@ class Recorder(object):
         if 'all' in variables:
             variables = OrderedSet(variables)
             variables.remove('all')
-            variables.update(self.get_all_recording_variables())
+            variables.update(self.__vertex.get_recordable_variables())
         return variables
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
@@ -502,47 +358,44 @@ class Recorder(object):
             rec_datetime=datetime.now())
 
         # sort out variables for using
-        variables = self._clean_variables(variables)
+        variables = self.__clean_variables(variables)
 
         for variable in variables:
-            if variable == SPIKES:
-                self.__read_in_spikes(
-                    segment=segment,
-                    spikes=self.get_spikes(),
+            data = self.get_data(variable)
+            s_intrval = self.__vertex.get_recording_sampling_interval(variable)
+            indices = self.__vertex.get_recording_indices(variable)
+            var_type = self.__vertex.get_recording_type(variable)
+            if var_type == RecordingType.BIT_FIELD:
+                self.__add_neo_spiketrains(
+                    segment=segment, spikes=data,
                     t=SpynnakerDataView.get_current_run_time_ms(),
                     n_neurons=self.__population.size,
-                    recording_start_time=self._recording_start_time,
-                    sampling_interval=self.__spike_sampling_interval,
-                    indexes=view_indexes,
+                    recording_start_time=self.__recording_start_time,
+                    sampling_interval=s_intrval, indexes=indices,
                     label=self.__population.label)
-            elif variable == REWIRING:
-                self.__read_in_event(
-                    segment=segment,
-                    event_array=self.get_events(variable),
+            elif var_type == RecordingType.EVENT:
+                self.__add_neo_events(
+                    segment=segment, event_array=data, variable=variable,
+                    recording_start_time=self.__recording_start_time)
+            elif var_type == RecordingType.MATRIX:
+                self.__add_neo_analog_signals(
+                    segment=segment, block=block, signal_array=data,
+                    data_indexes=indices, view_indexes=view_indexes,
                     variable=variable,
-                    recording_start_time=self._recording_start_time)
+                    recording_start_time=self.__recording_start_time,
+                    sampling_interval=s_intrval,
+                    units=self.__vertex.get_units(variable),
+                    label=self.__population.label)
             else:
-                (data, data_indexes, sampling_interval) = \
-                    self.get_recorded_matrix(variable)
-                self.__read_in_signal(
-                    segment=segment,
-                    block=block,
-                    signal_array=data,
-                    data_indexes=data_indexes,
-                    view_indexes=view_indexes,
-                    variable=variable,
-                    recording_start_time=self._recording_start_time,
-                    sampling_interval=sampling_interval,
-                    units=self._get_units(variable),
-                    label=self.__population.label)
+                raise ValueError(f"Unknown recording type {var_type}")
         block.segments.append(segment)
 
         if clear:
-            self._clear_recording(variables)
+            self.__clear_recording(variables)
 
-    def _append_previous_segment(
+    def __append_previous_segment(
             self, block, segment_number, variables, view_indexes):
-        if segment_number not in self._data_cache:
+        if segment_number not in self.__data_cache:
             logger.warning("No Data available for Segment {}", segment_number)
             segment = neo.Segment(
                 name="segment{}".format(segment_number),
@@ -551,10 +404,10 @@ class Recorder(object):
             block.segments.append(segment)
             return
 
-        data_cache = self._data_cache[segment_number]
+        data_cache = self.__data_cache[segment_number]
 
         # sort out variables
-        variables = self._clean_variables(variables)
+        variables = self.__clean_variables(variables)
 
         # build segment for the previous data to be gathered in
         segment = neo.Segment(
@@ -568,65 +421,30 @@ class Recorder(object):
                                segment_number, variable)
                 continue
             variable_cache = data_cache.get_data(variable)
-            if variable == SPIKES:
-                self.__read_in_spikes(
-                    segment=segment,
-                    spikes=variable_cache.data,
-                    t=data_cache.t,
-                    n_neurons=variable_cache.n_neurons,
+            var_type = self.__vertex.get_recording_type(variable)
+            if var_type == RecordingType.BIT_FIELD:
+                self.__add_neo_spiketrains(
+                    segment=segment, spikes=variable_cache.data,
+                    t=data_cache.t, n_neurons=variable_cache.n_neurons,
                     recording_start_time=data_cache.recording_start_time,
                     sampling_interval=variable_cache.sampling_interval,
-                    indexes=view_indexes,
-                    label=data_cache.label)
-            elif variable == REWIRING:
-                self.__read_in_event(
-                    segment=segment,
-                    event_array=variable_cache.data,
+                    indexes=view_indexes, label=data_cache.label)
+            elif var_type == RecordingType.EVENT:
+                self.__add_neo_events(
+                    segment=segment, event_array=variable_cache.data,
                     variable=variable,
                     recording_start_time=data_cache.recording_start_time)
-            else:
-                self.__read_in_signal(
-                    segment=segment,
-                    block=block,
+            elif var_type == RecordingType.MATRIX:
+                self.__add_neo_analog_signals(
+                    segment=segment, block=block,
                     signal_array=variable_cache.data,
                     data_indexes=variable_cache.indexes,
-                    view_indexes=view_indexes,
-                    variable=variable,
+                    view_indexes=view_indexes, variable=variable,
                     recording_start_time=data_cache.recording_start_time,
                     sampling_interval=variable_cache.sampling_interval,
-                    units=variable_cache.units,
-                    label=data_cache.label)
+                    units=variable_cache.units, label=data_cache.label)
 
         block.segments.append(segment)
-
-    def get_all_possible_recordable_variables(self):
-        """ All variables that could be recorded.
-
-        :rtype: set(str)
-        """
-        variables = OrderedSet()
-        if isinstance(self.__vertex, AbstractSpikeRecordable):
-            variables.add(SPIKES)
-        if isinstance(self.__vertex, AbstractNeuronRecordable):
-            variables.update(self.__vertex.get_recordable_variables())
-        return variables
-
-    def get_all_recording_variables(self):
-        """ All variables that have been set to record.
-
-        :rtype: set(str)
-        """
-        possibles = self.get_all_possible_recordable_variables()
-        variables = OrderedSet()
-        for possible in possibles:
-            if possible == SPIKES:
-                if isinstance(self.__vertex, AbstractSpikeRecordable) \
-                        and self.__vertex.is_recording_spikes():
-                    variables.add(possible)
-            elif isinstance(self.__vertex, AbstractNeuronRecordable) \
-                    and self.__vertex.is_recording(possible):
-                variables.add(possible)
-        return variables
 
     def __metadata(self):
         metadata = {
@@ -643,21 +461,14 @@ class Recorder(object):
         metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
 
-    def _clear_recording(self, variables):
+    def __clear_recording(self, variables):
         for variable in variables:
-            if variable == SPIKES:
-                self.__vertex.clear_spike_recording()
-            elif variable in [MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB]:
-                self.__vertex.clear_recording(variable)
-            else:
-                raise InvalidParameterType(
-                    "The variable {} is not a recordable value".format(
-                        variable))
+            self.__vertex.clear_recording_data(variable)
 
-    def __read_in_spikes(
+    def __add_neo_spiketrains(
             self, segment, spikes, t, n_neurons, recording_start_time,
             sampling_interval, indexes, label):
-        """ Converts the data into SpikeTrains and saves them to the segment.
+        """ Adds data that is spike-train-like to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add spikes to
         :param ~numpy.ndarray spikes: Spike data in raw sPyNNaker format
@@ -669,9 +480,6 @@ class Recorder(object):
         :param str label: recording elements label
         """
         # pylint: disable=too-many-arguments
-        # Safety check in case spikes are an empty list
-        if len(spikes) == 0:
-            spikes = numpy.empty(shape=(0, 2))
 
         # Put the times for each neuron into the right place
         times = [[] for _ in range(n_neurons)]
@@ -692,7 +500,6 @@ class Recorder(object):
                 source_population=label,
                 source_id=self.__population.index_to_id(index),
                 source_index=index)
-            # get times per atom
             segment.spiketrains.append(spiketrain)
 
     _SELECTIVE_RECORDED_MSG = (
@@ -700,11 +507,10 @@ class Recorder(object):
         "active will result in only the requested neurons being returned "
         "in numerical order and without repeats.")
 
-    def __read_in_signal(
+    def __add_neo_analog_signals(
             self, segment, block, signal_array, data_indexes, view_indexes,
             variable, recording_start_time, sampling_interval, units, label):
-        """ Reads in a data item that's not spikes (likely v, gsyn e, gsyn i)\
-            and saves this data to the segment.
+        """ Adds a data item that is an analog signal to a neo segment
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~neo.core.Block block: neo block
@@ -753,10 +559,9 @@ class Recorder(object):
         segment.analogsignals.append(data_array)
         channel_index.analogsignals.append(data_array)
 
-    def __read_in_event(
+    def __add_neo_events(
             self, segment, event_array, variable, recording_start_time):
-        """ Reads in a data item that is an event (i.e. rewiring form/elim)\
-            and saves this data to the segment.
+        """ Adds data that is events to a neo segment.
 
         :param ~neo.core.Segment segment: Segment to add data to
         :param ~numpy.ndarray signal_array: the raw "event" data
@@ -817,17 +622,3 @@ class Recorder(object):
             name="Index {}".format(count), index=ids)
         block.channel_indexes.append(channel_index)
         return channel_index
-
-
-def _convert_extracted_data_into_neo_expected_format(signal_array, indexes):
-    """ Converts data between sPyNNaker format and Neo format
-
-    :param ~numpy.ndarray signal_array: Draw data in sPyNNaker format
-    :param list(int) indexes:
-    :rtype: ~numpy.ndarray
-    """
-    processed_data = [
-        signal_array[:, 2][signal_array[:, 0] == index]
-        for index in indexes]
-    processed_data = numpy.vstack(processed_data).T
-    return processed_data

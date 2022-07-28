@@ -37,7 +37,6 @@
 #include "c_main_common.h"
 #include "profile_tags.h"
 #include "dma_common.h"
-#include <tdma_processing.h>
 #include <spin1_api_params.h>
 
 //! values for the priority for each callback

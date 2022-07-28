@@ -31,6 +31,9 @@ from .receives_synaptic_inputs_over_sdram import (
 from .has_synapses import HasSynapses
 from .abstract_neuron_expandable import (
     AbstractNeuronExpandable, NEURON_EXPANDER_APLX)
+from .parameter_holder import ParameterHolder
+from .population_application_vertex import (
+    PopulationApplicationVertex, RecordingType)
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
@@ -39,4 +42,5 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractSettable", "AbstractSynapseExpandable",
            "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
            "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
-           "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX"]
+           "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
+           "ParameterHolder", "PopulationApplicationVertex", "RecordingType"]

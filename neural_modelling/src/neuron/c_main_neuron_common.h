@@ -19,7 +19,6 @@
 #include <debug.h>
 
 #include <data_specification.h>
-#include <tdma_processing.h>
 
 #include "neuron.h"
 
@@ -91,7 +90,7 @@ extern uint32_t earliest_send_time;
 //! \param[out] prov: The data structure to store provenance data in
 static inline void store_neuron_provenance(struct neuron_provenance *prov) {
     prov->current_timer_tick = time;
-    prov->n_tdma_mises = tdma_processing_times_behind();
+    prov->n_tdma_mises = 0;
     prov->earliest_send = earliest_send_time;
     prov->latest_send = latest_send_time;
 }

@@ -19,8 +19,6 @@ from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import AbstractNeuronExpandable
@@ -53,8 +51,7 @@ NeuronRegions = namedtuple(
 
 
 class PopulationMachineNeurons(
-        AbstractReadParametersBeforeSet, AbstractNeuronExpandable,
-        allow_derivation=True):
+        AbstractNeuronExpandable, allow_derivation=True):
     """ Mix-in for machine vertices that have neurons in them
     """
 
@@ -178,7 +175,6 @@ class PopulationMachineNeurons(
         :param list(int) ring_buffer_shifts:
             The shifts to apply to convert ring buffer values to S1615 values
         """
-        self._app_vertex.set_has_run()
 
         # pylint: disable=too-many-arguments
         n_atoms = self._vertex_slice.n_atoms
@@ -191,11 +187,6 @@ class PopulationMachineNeurons(
             region=self._neuron_regions.core_params, size=params_size,
             label='Neuron Core Params')
         spec.switch_write_focus(self._neuron_regions.core_params)
-
-        # store the tdma data here for this slice.
-        data = self._app_vertex.generate_tdma_data_specification_data(
-            self._slice_index)
-        spec.write_array(data)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -325,9 +316,21 @@ class PopulationMachineNeurons(
                                 value, cs_data_types[key]).view("uint32")
                             spec.write_value(data=value_convert)
 
-    @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(self, placement):
+        """ Read the parameters and state of the neurons from the machine
+            at the current time
+
+        :param Placement placement: Where to read the data from
+        """
         self._neuron_data.read_data(placement)
+
+    def read_initial_parameters_from_machine(self, placement):
+        """ Read the parameters and state of the neurons from the machine
+            as they were at the last time 0
+
+        :param Placement placement: Where to read the data from
+        """
+        self._neuron_data.read_initial_data(placement)
 
     @overrides(AbstractNeuronExpandable.gen_neurons_on_machine)
     def gen_neurons_on_machine(self):
@@ -340,5 +343,10 @@ class PopulationMachineNeurons(
 
     @overrides(AbstractNeuronExpandable.read_generated_initial_values)
     def read_generated_initial_values(self, placement):
-        self._neuron_data.read_data(placement)
-        self._app_vertex.copy_initial_state_variables(self._vertex_slice)
+        # Only do this if we actually need the data now i.e. if someone has
+        # requested that the data be read before calling run
+        if self._app_vertex.read_initial_values:
+
+            # If we do decide to read now, we can also copy the initial values
+            self._neuron_data.read_data(placement)
+            self._app_vertex.copy_initial_state_variables(self._vertex_slice)

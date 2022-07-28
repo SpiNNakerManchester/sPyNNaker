@@ -23,6 +23,7 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ranged.abstract_sized import AbstractSized
 from .idmixin import IDMixin
 from .population_base import PopulationBase
+from spinn_utilities.overrides import overrides
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -47,13 +48,17 @@ class PopulationView(PopulationBase):
         "__label",
         "__mask",
         "__parent",
-        "__population"]
+        "__population",
+        "__vertex",
+        "__recorder"]
 
     def __init__(self, parent, selector, label=None):
         """
         :param parent: the population or view to make the view from
         :type parent: ~spynnaker.pyNN.models.populations.Population or
             ~spynnaker.pyNN.models.populations.PopulationView
+        :param PopulationApplicationVertex vertex: The actual underlying vertex
+        :param Recorder recorder: The recorder of the Population
         :param selector: a slice or numpy mask array.
             The mask array should either be a boolean array (ideally) of the
             same size as the parent,
@@ -85,6 +90,12 @@ class PopulationView(PopulationBase):
         self.__label = label
         self.__annotations = dict()
 
+        # Get these two objects to make access easier
+        # pylint: disable=protected-access
+        self.__vertex = self.__population._vertex
+        # pylint: disable=protected-access
+        self.__recorder = self.__population._recorder
+
     @property
     def size(self):
         """ The total number of neurons in the Population View.
@@ -107,16 +118,16 @@ class PopulationView(PopulationBase):
 
         :rtype: AbstractPyNNModel
         """
-        return self.__population.celltype
+        return self.__parent.celltype
 
     @property
     def initial_values(self):
         """ A dict containing the initial values of the state variables.
 
-        :rtype: dict(str, ...)
+        :rtype: InitialValuesHolder
         """
-        # pylint: disable=protected-access
-        return self.__population._get_initial_values(selector=self.__indexes)
+        return self.__vertex.get_initial_state_values(
+            self.__vertex.get_state_variables(), self.__indexes)
 
     @property
     def parent(self):
@@ -148,11 +159,6 @@ class PopulationView(PopulationBase):
     def _indexes(self):
         return tuple(self.__indexes)
 
-    @property
-    def _vertex(self):
-        # pylint: disable=protected-access
-        return self.__population._vertex
-
     def __getitem__(self, index):
         """ Return either a single cell (ID object) from the Population,\
             if index is an integer, or a subset of the cells\
@@ -168,7 +174,7 @@ class PopulationView(PopulationBase):
         """
         if isinstance(index, int):
             return IDMixin(self.__population, index)
-        return PopulationView(self, index, label=self.label+"_" + str(index))
+        return PopulationView(self, index, label=self.label + "_" + str(index))
 
     def __iter__(self):
         """ Iterator over cell IDs (on the local node).
@@ -176,7 +182,7 @@ class PopulationView(PopulationBase):
         :rtype: iterable(~.IDMixin)
         """
         for idx in self.__indexes:
-            yield IDMixin(self, idx)
+            yield IDMixin(self.__population, idx)
 
     def __len__(self):
         """ Return the total number of cells in the population (all nodes).
@@ -191,14 +197,14 @@ class PopulationView(PopulationBase):
         :rtype: iterable(~.IDMixin)
         """
         for idx in self.__indexes:
-            yield IDMixin(self, idx)
+            yield IDMixin(self.__population, idx)
 
     def can_record(self, variable):
         """ Determine whether variable can be recorded from this population.
 
         :rtype: bool
         """
-        return self.__population.can_record(variable)
+        return self.__vertex.can_record(variable)
 
     @property
     def conductance_based(self):
@@ -207,17 +213,15 @@ class PopulationView(PopulationBase):
 
         :rtype: bool
         """
-        return self.__population.conductance_based
+        return self.__vertex.conductance_based
 
     def inject(self, current_source):
         """ Injects the specified current_source into this PopulationView.
 
-        :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\
+        :param ~pyNN.standardmodels.electrodes.StandardCurrentSource\
             current_source: the CurrentSource to be injected
         """
-        self._vertex.inject(current_source, self.__indexes)
-        current_source.set_population(self.__population)
-        self.__population.requires_mapping = True
+        self.__vertex.inject(current_source, self.__indexes)
 
     def describe(self, template='populationview_default.txt',
                  engine='default'):
@@ -251,7 +255,7 @@ class PopulationView(PopulationBase):
         :return: The units of the variable
         :rtype: str
         """
-        return self.__population.find_units(variable)
+        return self.__vertex.get_units(variable)
 
     def get(self, parameter_names, gather=False, simplify=True):
         """ Get the values of the given parameters for every local cell in\
@@ -268,7 +272,7 @@ class PopulationView(PopulationBase):
         :type parameter_names: str or list(str)
         :param bool gather:
         :param bool simplify:
-        :rtype: iterable(float)
+        :rtype: ParameterHolder
         """
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
@@ -276,9 +280,8 @@ class PopulationView(PopulationBase):
         if simplify is not True:
             logger.warning("The simplify value is ignored if not set to true")
 
-        # pylint: disable=protected-access
-        return self.__population._get_by_selector(
-            self.__indexes, parameter_names)
+        return self.__vertex.get_parameter_values(
+            parameter_names, self.__indexes)
 
     def get_data(
             self, variables='all', gather=True, clear=False, annotations=None):
@@ -316,8 +319,15 @@ class PopulationView(PopulationBase):
                 logger, "Annotations parameter is not standard PyNN so may "
                 "not be supported by all platforms.")
 
-        return self.__population.get_data_by_indexes(
-            variables, self.__indexes, clear=clear)
+        return self.__recorder.extract_neo_block(
+            variables, self.__indexes, clear, annotations)
+
+    def spinnaker_get_spikes(self):
+        """ Pulic accessor for getting spikes as a numpy array, instead of\
+            the neo based object
+        """
+        spikes = self.__recorder.get_data("spikes")
+        return spikes[numpy.isin(spikes[:, 0], self.__indexes)]
 
     def spinnaker_get_data(self, variable, as_matrix=False):
         """ Public accessor for getting data as a numpy array, instead of\
@@ -328,7 +338,10 @@ class PopulationView(PopulationBase):
         :return: array of the data
         :rtype: ~numpy.ndarray
         """
-        return self.__population.spinnaker_get_data(
+        warn_once(
+            logger, "spinnaker_get_data is non-standard PyNN and therefore "
+            "will not be portable to other simulators.")
+        return self.__recorder.get_recorded_pynn7(
             variable, as_matrix, self.__indexes)
 
     def get_spike_counts(self, gather=True):
@@ -414,8 +427,9 @@ class PopulationView(PopulationBase):
             p.initialize(v=rand_distr, gsyn_exc=0.0)
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
+
         for variable, value in initial_values.items():
-            self.__population._initialize(  # pylint: disable=protected-access
+            self.__vertex.set_initial_state_values(
                 variable, value, self.__indexes)
 
     def record(self, variables,  to_file=None, sampling_interval=None):
@@ -436,7 +450,7 @@ class PopulationView(PopulationBase):
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
         """
-        self.__population._record(  # pylint: disable=protected-access
+        self.__recorder.record(
             variables, to_file, sampling_interval, self.__indexes)
 
     def sample(self, n, rng=None):
@@ -452,7 +466,7 @@ class PopulationView(PopulationBase):
         indices = rng.permutation(
             numpy.arange(len(self), dtype=numpy.int))[0:n]
         return PopulationView(
-            self, indices,
+            self, self.__vertex, self.__recorder, indices,
             label="Random sample size {} from {}".format(n, self.label))
 
     def set(self, **parameters):
@@ -479,8 +493,8 @@ class PopulationView(PopulationBase):
             p.set(cm=rand_distr, tau_m=lambda i: 10 + i / 10.0)
         """
         for (parameter, value) in parameters.items():
-            self.__population.set_by_selector(
-                selector=self.__indexes, parameter=parameter, value=value)
+            self.__vertex.set_parameter_values(
+                parameter, value, self.__indexes)
 
     def write_data(self, io, variables='all', gather=True, clear=False,
                    annotations=None):
@@ -515,11 +529,21 @@ class PopulationView(PopulationBase):
         if not gather:
             logger.warning("SpiNNaker only supports gather=True. We will run "
                            "as if gather was set to True.")
-        data = self.__population.get_data_by_indexes(
-            variables, self.__indexes, clear=clear)
+        data = self.__recorder.extract_neo_block(
+            variables, self.__indexes, clear, annotations)
 
         if isinstance(io, str):
             io = neo.get_io(io)
 
         # write the neo block to the file
         io.write(data)
+
+    @property
+    @overrides(PopulationBase._vertex)
+    def _vertex(self):
+        return self.__vertex
+
+    @property
+    @overrides(PopulationBase._recorder)
+    def _recorder(self):
+        return self.__recorder

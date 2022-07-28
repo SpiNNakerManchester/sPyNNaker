@@ -23,7 +23,7 @@
  */
 
 #include <common/maths-util.h>
-
+#include <common/send_mc.h>
 #include <data_specification.h>
 #include <recording.h>
 #include <debug.h>
@@ -33,7 +33,6 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
-#include <tdma_processing.h>
 #include <circular_buffer.h>
 
 #include "profile_tags.h"
@@ -87,7 +86,6 @@ typedef enum region {
     SPIKE_HISTORY_REGION, //!< spike history recording region
     PROVENANCE_REGION,    //!< provenance region
     PROFILER_REGION,      //!< profiling region
-    TDMA_REGION,          //!< tdma processing region
     SDRAM_PARAMS_REGION,  //!< SDRAM transfer parameters region
     EXPANDER_REGION       //!< Expanding of parameters
 } region;
@@ -398,7 +396,7 @@ static void store_provenance_data(address_t provenance_region) {
     struct poisson_extension_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    prov->times_tdma_fell_behind = tdma_processing_times_behind();
+    prov->times_tdma_fell_behind = 0;
     log_debug("finished other provenance data");
 }
 
@@ -693,12 +691,6 @@ static bool initialize(void) {
         return false;
     }
 
-    // set up tdma processing
-    void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
-    if (!tdma_processing_initialise(&data_addr)) {
-        return false;
-    }
-
     // print spike sources for debug purposes
 #if LOG_LEVEL >= LOG_DEBUG
     print_spike_sources();
@@ -811,9 +803,7 @@ static inline void record_spikes(uint32_t time) {
 //! \brief Handle a fast spike source
 //! \param s_id: Source ID
 //! \param source: Source descriptor
-//! \param[in] timer_count: Time to send spike at
-static void process_fast_source(
-        index_t s_id, spike_source_t *source, uint timer_count) {
+static void process_fast_source(index_t s_id, spike_source_t *source) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)) {
         // Get number of spikes to send this tick
         uint32_t num_spikes = 0;
@@ -848,8 +838,7 @@ static void process_fast_source(
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
-                tdma_processing_send_packet(
-                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
+                send_spike_mc_payload(spike_key, num_spikes);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * num_spikes;
@@ -861,9 +850,7 @@ static void process_fast_source(
 //! \brief Handle a slow spike source
 //! \param s_id: Source ID
 //! \param source: Source descriptor
-//! \param[in] timer_count: Time to send spike at
-static void process_slow_source(
-        index_t s_id, spike_source_t *source, uint timer_count) {
+static void process_slow_source(index_t s_id, spike_source_t *source) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
             && (source->mean_isi_ticks != 0)) {
         uint32_t count = 0;
@@ -887,8 +874,7 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                tdma_processing_send_packet(
-                    ssp_params.key | s_id, count, WITH_PAYLOAD, timer_count);
+                send_spike_mc_payload(ssp_params.key | s_id, count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
                      sdram_inputs->weights[s_id] * count;
@@ -906,7 +892,7 @@ static void process_slow_source(
 //! \param[in] unused: for consistency sake of the API always returning two
 //!     parameters, this parameter has no semantics currently and thus
 //!     is set to 0
-static void timer_callback(uint timer_count, UNUSED uint unused) {
+static void timer_callback(UNUSED uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
@@ -950,14 +936,13 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 
     // Loop through spike sources
-    tdma_processing_reset_phase();
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
         // If this spike source is active this tick
         spike_source_t *spike_source = &source[s_id];
         if (spike_source->is_fast_source) {
-            process_fast_source(s_id, spike_source, timer_count);
+            process_fast_source(s_id, spike_source);
         } else {
-            process_slow_source(s_id, spike_source, timer_count);
+            process_slow_source(s_id, spike_source);
         }
 
         if ((time + 1) >= spike_source->next_ticks) {

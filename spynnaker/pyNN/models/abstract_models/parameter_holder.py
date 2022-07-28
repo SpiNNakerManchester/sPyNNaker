@@ -14,10 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
-import numpy
 
 
-class InitialValuesHolder(object):
+class ParameterHolder(object):
     """ Holds a set of parameters and state variables to be returned in a
         PyNN-specific format
     """
@@ -26,8 +25,8 @@ class InitialValuesHolder(object):
         # A list of items of data that are to be present in each element
         "__data_items_to_return",
 
-        # The vertex for which the parameters are to be retrieved
-        "__vertex",
+        # Function call to get the values
+        "__get_call",
 
         # The merged parameters formed just before the data is read
         "__data_items",
@@ -36,12 +35,12 @@ class InitialValuesHolder(object):
         "__selector"
     )
 
-    def __init__(self, data_items_to_return, vertex, selector=None):
+    def __init__(self, data_items_to_return, get_call, selector=None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(str) or tuple(str)
-        :param AbstractPopulationSettable vertex:
-            The vertex from which data can be obtained
+        :param get_call: A function to call to read a value
+        :type get_call: function(str, selector=None)->list
         :param selector: a description of the subrange to accept, or None for
             all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
@@ -49,23 +48,21 @@ class InitialValuesHolder(object):
         """
         # pylint: disable=too-many-arguments
         self.__data_items_to_return = data_items_to_return
-        self.__vertex = vertex
+        self.__get_call = get_call
         self.__data_items = None
         self.__selector = selector
 
     def _safe_read_values(self, parameter):
-        values = self.__vertex.get_initial_value(parameter, self.__selector)
+        values = self.__get_call(parameter, self.__selector)
 
         # The values must be a single item, a list or a random distribution;
         # if a random distribution we must not have generated yet!
         if isinstance(values, RandomDistribution):
             raise ValueError(
-                f"Although it is possible to request the initial values"
+                f"Although it is possible to request the values"
                 " before the simulation has run, it is not possible to read"
                 " those values until after the simulation has run.  Please run"
                 f" the simulation before reading {parameter}.")
-        if is_singleton(values):
-            return numpy.full(self.__vertex.n_atoms, values)
         return values
 
     def _get_data_items(self):
@@ -76,15 +73,15 @@ class InitialValuesHolder(object):
             return self.__data_items
 
         # If there is just one item to return, return the values stored
-        params = self.__data_items_to_return
         if is_singleton(self.__data_items_to_return):
             self.__data_items = self._safe_read_values(
                 self.__data_items_to_return)
             return self.__data_items
 
         # If there are multiple items to return, form a list
-        self.__data_items = {param: self._safe_read_values(param)
-                             for param in params}
+        self.__data_items = {
+            param: self._safe_read_values(param)
+            for param in self.__data_items_to_return}
 
         return self.__data_items
 
@@ -111,6 +108,10 @@ class InitialValuesHolder(object):
     def __contains__(self, item):
         data = self._get_data_items()
         return item in data
+
+    def __getattr__(self, name):
+        data = self._get_data_items()
+        return getattr(data, name)
 
     def __eq__(self, other):
         data = self._get_data_items()

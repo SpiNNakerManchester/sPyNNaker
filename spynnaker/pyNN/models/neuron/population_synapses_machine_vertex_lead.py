@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from .population_machine_common import PopulationMachineCommon
 from .population_machine_synapses import PopulationMachineSynapses
 from .population_synapses_machine_vertex_common import (
@@ -24,7 +24,8 @@ from .population_synapses_machine_vertex_common import (
 class PopulationSynapsesMachineVertexLead(
         PopulationSynapsesMachineVertexCommon,
         PopulationMachineSynapses,
-        AbstractGeneratesDataSpecification):
+        AbstractGeneratesDataSpecification,
+        AbstractRewritesDataSpecification):
     """ A synaptic machine vertex that leads other Synaptic machine vertices,
         writing shared areas.
     """
@@ -118,3 +119,18 @@ class PopulationSynapsesMachineVertexLead(
     def _parse_synapse_provenance(self, label, x, y, p, provenance_data):
         return PopulationMachineSynapses._parse_synapse_provenance(
             self, label, x, y, p, provenance_data)
+
+    @overrides(AbstractRewritesDataSpecification.regenerate_data_specification)
+    def regenerate_data_specification(self, spec, placement):
+        # We don't need to do anything here because the originally written
+        # data can be used again
+        pass
+
+    @overrides(AbstractRewritesDataSpecification.reload_required)
+    def reload_required(self):
+        return self._app_vertex.synapse_data_needs_regeneration
+
+    @overrides(AbstractRewritesDataSpecification.set_reload_required)
+    def set_reload_required(self, new_value):
+        # Handled by the app vertex
+        pass

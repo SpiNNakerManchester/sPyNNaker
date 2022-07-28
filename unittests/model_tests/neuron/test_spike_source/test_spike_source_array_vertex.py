@@ -27,16 +27,17 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
         v = SpikeSourceArrayVertex(
             n_neurons=5, spike_times=[], constraints=None, label="test",
             max_atoms_per_core=None, model=None, splitter=None)
-        v.spike_times = []
-        v.set_value_by_selector([1, 3], "spike_times", [1, 2, 3])
+        v.set_parameter_values("spike_times", [])
+        v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
         self.assertListEqual(
-            [[], [1, 2, 3], [], [1, 2, 3], []], v.spike_times)
+            [[], [1, 2, 3], [], [1, 2, 3], []],
+            v.get_parameter_values("spike_times"))
 
     def test_singleton_list(self):
         v = SpikeSourceArrayVertex(
             n_neurons=5, spike_times=[1, 11, 22], constraints=None,
             label="test", max_atoms_per_core=None, model=None, splitter=None)
-        v.spike_times = [2, 12, 32]
+        v.set_parameter_values("spike_times", [2, 12, 32])
 
     def test_double_list(self):
         SpikeSourceArrayVertex(

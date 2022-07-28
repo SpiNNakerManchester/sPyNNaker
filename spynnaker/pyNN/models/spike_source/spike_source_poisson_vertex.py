@@ -24,22 +24,20 @@ from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_utilities.config_holder import get_config_int
-from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractRewritesDataSpecification)
-from spinn_front_end_common.abstract_models.impl import (
-    TDMAAwareApplicationVertex)
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
+from spynnaker.pyNN.models.common import MultiSpikeRecorder
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes, get_expander_rates_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.models.abstract_models import (
+    PopulationApplicationVertex, ParameterHolder, RecordingType)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -60,8 +58,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 
 class SpikeSourcePoissonVertex(
-        TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        AbstractChangableAfterRun, SimplePopulationSettable,
+        PopulationApplicationVertex, AbstractChangableAfterRun,
         LegacyPartitionerAPI):
     """ A Poisson Spike source object
     """
@@ -82,7 +79,8 @@ class SpikeSourcePoissonVertex(
         "__data",
         "__is_variable_rate",
         "__outgoing_projections",
-        "__incoming_control_edge"]
+        "__incoming_control_edge",
+        "__allowed_parameters"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -247,6 +245,11 @@ class SpikeSourcePoissonVertex(
         self.__outgoing_projections = list()
         self.__incoming_control_edge = None
 
+        if self.__is_variable_rate:
+            self.__allowed_parameters = {"rates", "durations", "starts"}
+        else:
+            self.__allowed_parameters = {"rate", "duration", "start"}
+
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
 
@@ -267,105 +270,6 @@ class SpikeSourcePoissonVertex(
         return self.__n_profile_samples
 
     @property
-    def rate(self):
-        if self.__is_variable_rate:
-            raise Exception("Get variable rate poisson rates with .rates")
-        return list(_flatten(self.__data["rates"]))
-
-    @rate.setter
-    def rate(self, rate):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set rate of a variable rate poisson")
-        for m_vertex in self.machine_vertices:
-            m_vertex.set_rate_changed()
-        # Normalise parameter
-        if hasattr(rate, "__len__"):
-            # Single rate per neuron for whole simulation
-            self.__data["rates"].set_value([numpy.array([r]) for r in rate])
-        else:
-            # Single rate for all neurons for whole simulation
-            self.__data["rates"].set_value(
-                numpy.array([rate]), use_list_as_value=True)
-        all_rates = list(_flatten(self.__data["rates"]))
-        new_max = 0
-        if len(all_rates):
-            new_max = numpy.amax(all_rates)
-        if self.__max_rate is None:
-            self.__max_rate = new_max
-        # Setting record forces reset so OK to go over if not recording
-        elif self.__spike_recorder.record and new_max > self.__max_rate:
-            logger.info('Increasing spike rate while recording requires a '
-                        '"reset unless additional_parameters "max_rate" is '
-                        'set')
-            self.__change_requires_mapping = True
-            self.__max_rate = new_max
-
-    @property
-    def start(self):
-        return self.__data["starts"]
-
-    @start.setter
-    def start(self, start):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set start of a variable rate poisson")
-        # Normalise parameter
-        if hasattr(start, "__len__"):
-            # Single start per neuron for whole simulation
-            self.__data["starts"].set_value([numpy.array([s]) for s in start])
-        else:
-            # Single start for all neurons for whole simulation
-            self.__data["starts"].set_value(
-                numpy.array([start]), use_list_as_value=True)
-
-    @property
-    def duration(self):
-        return self.__data["durations"]
-
-    @duration.setter
-    def duration(self, duration):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set duration of a variable rate poisson")
-        # Normalise parameter
-        if hasattr(duration, "__len__"):
-            # Single duration per neuron for whole simulation
-            self.__data["durations"].set_value(
-                [numpy.array([d]) for d in duration])
-        else:
-            # Single duration for all neurons for whole simulation
-            self.__data["durations"].set_value(
-                numpy.array([duration]), use_list_as_value=True)
-
-    @property
-    def rates(self):
-        return self.__data["rates"]
-
-    @rates.setter
-    def rates(self, _rates):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set rates of a variable rate poisson")
-        raise Exception("Set the rate of a Poisson source using rate")
-
-    @property
-    def starts(self):
-        return self.__data["starts"]
-
-    @starts.setter
-    def starts(self, _starts):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set starts of a variable rate poisson")
-        raise Exception("Set the start of a Poisson source using start")
-
-    @property
-    def durations(self):
-        return self.__data["durations"]
-
-    @durations.setter
-    def durations(self, _durations):
-        if self.__is_variable_rate:
-            raise Exception("Cannot set durations of a variable rate poisson")
-        raise Exception("Set the duration of a Poisson source using duration")
-
-    @property
     def time_to_spike(self):
         return self.__data["time_to_spike"]
 
@@ -378,12 +282,121 @@ class SpikeSourcePoissonVertex(
     def mark_no_changes(self):
         self.__change_requires_mapping = False
 
-    @overrides(SimplePopulationSettable.set_value)
-    def set_value(self, key, value):
-        super().set_value(key, value)
+    def __read_parameter(self, name, selector):
+        return self.__data[name].get_values(selector)
+
+    def __fix_names(self, names):
+        if self.__is_variable_rate:
+            return names
+        return [f"{name}s" for name in self._as_list(names)]
+
+    @overrides(PopulationApplicationVertex.get_parameter_values)
+    def get_parameter_values(self, names, selector=None):
+        self._check_parameters(names, self.__allowed_parameters)
+        return ParameterHolder(
+            self.__fix_names(names), self.__read_parameter, selector)
+
+    @overrides(PopulationApplicationVertex.set_parameter_values)
+    def set_parameter_values(self, name, value, selector=None):
+        self._check_parameters(name, self.__allowed_parameters)
+        if self.__is_variable_rate:
+            raise KeyError(f"Cannot set the {name} of a variable rate Poisson")
+
+        # Must be parameter without the s
+        fixed_name = f"{name}s"
+        if hasattr(value, "__len__"):
+            # Single start per neuron for whole simulation
+            self.__data[fixed_name].set_value_by_selector(
+                selector, [numpy.array([s]) for s in value])
+        else:
+            # Single start for all neurons for whole simulation
+            self.__data[fixed_name].set_value_by_selector(
+                selector, numpy.array([value]), use_list_as_value=True)
+
+    @overrides(PopulationApplicationVertex.get_parameters)
+    def get_parameters(self):
+        return self.__allowed_parameters
+
+    @overrides(PopulationApplicationVertex.get_units)
+    def get_units(self, name):
+        if name == "spikes":
+            return ""
+        if name == "rates" or name == "rates":
+            return "Hz"
+        if (name == "duration" or name == "start" or name == "durations" or
+                name == "starts"):
+            return "ms"
+        raise KeyError(f"Units for {name} unknown")
+
+    @overrides(PopulationApplicationVertex.get_recordable_variables)
+    def get_recordable_variables(self):
+        return ["spikes"]
+
+    @overrides(PopulationApplicationVertex.can_record)
+    def can_record(self, name):
+        return name == "spikes"
+
+    @overrides(PopulationApplicationVertex.set_recording)
+    def set_recording(self, name, sampling_interval=None, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        if sampling_interval is not None:
+            logger.warning("Sampling interval currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+        if not self.__spike_recorder.record:
+            self.__change_requires_mapping = True
+        self.__spike_recorder.record = True
+
+    @overrides(PopulationApplicationVertex.set_not_recording)
+    def set_not_recording(self, name, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
+                           "SpikeSourceArray so being ignored")
+        self.__spike_recorder.record = False
+
+    @overrides(PopulationApplicationVertex.get_recorded_data)
+    def get_recorded_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return self.__spike_recorder.get_spikes(
+            self.label,
+            SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
+            self)
+
+    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
+    def get_recording_sampling_interval(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return SpynnakerDataView.get_simulation_time_step_us()
+
+    @overrides(PopulationApplicationVertex.get_recording_indices)
+    def get_recording_indices(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return range(self.n_atoms)
+
+    @overrides(PopulationApplicationVertex.get_recording_type)
+    def get_recording_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.clear_recording_data)
+    def clear_recording_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            if isinstance(machine_vertex, AbstractRewritesDataSpecification):
-                machine_vertex.set_reload_required(True)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def max_spikes_per_ts(self):
         ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
@@ -471,26 +484,7 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed = dict()
         self.__rng = numpy.random.RandomState(seed)
 
-    @overrides(AbstractSpikeRecordable.is_recording_spikes)
-    def is_recording_spikes(self):
-        return self.__spike_recorder.record
 
-    @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
-        if sampling_interval is not None:
-            logger.warning("Sampling interval currently not supported for "
-                           "SpikeSourcePoisson so being ignored")
-        if indexes is not None:
-            logger.warning("indexes not supported for "
-                           "SpikeSourcePoisson so being ignored")
-        if new_state and not self.__spike_recorder.record:
-            self.__change_requires_mapping = True
-        self.__spike_recorder.record = new_state
-
-    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return SpynnakerDataView.get_simulation_time_step_us()
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
@@ -514,23 +508,6 @@ class SpikeSourcePoissonVertex(
         :rtype: None
         """
         self.__kiss_seed[vertex_slice] = seed
-
-    @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self):
-        return self.__spike_recorder.get_spikes(
-            self.label,
-            SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            self)
-
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
-        buffer_manager = SpynnakerDataView.get_buffer_manager()
-        for machine_vertex in self.machine_vertices:
-            placement = SpynnakerDataView.get_placement_of_vertex(
-                machine_vertex)
-            buffer_manager.clear_recorded_data(
-                placement.x, placement.y, placement.p,
-                SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
 
     def describe(self):
         """ Return a human-readable description of the cell or synapse type.
@@ -556,10 +533,6 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
         return context
-
-    @overrides(TDMAAwareApplicationVertex.get_n_cores)
-    def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices())
 
     def set_live_poisson_control_edge(self, edge):
         if self.__incoming_control_edge is not None:

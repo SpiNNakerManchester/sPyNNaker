@@ -39,7 +39,6 @@ enum send_type {
 #include <neuron/synapse_types/synapse_types_exponential_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
-#include "tdma_processing.h"
 
 #include <neuron/current_sources/current_source_impl.h>
 #include <neuron/current_sources/current_source.h>
@@ -326,7 +325,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] time: The time step of the update
 //! \param[in] n_neurons: The number of neurons
 static void neuron_impl_do_timestep_update(
-        uint32_t timer_count, UNUSED uint32_t time, uint32_t n_neurons) {
+        UNUSED uint32_t timer_count, UNUSED uint32_t time, uint32_t n_neurons) {
 
     for (uint32_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         // Get the neuron itself
@@ -425,16 +424,10 @@ static void neuron_impl_do_timestep_update(
 
                     log_debug("Sending key=0x%08x payload=0x%08x",
                             the_packet_firing->key, payload);
-
-                    tdma_processing_send_packet(
-                        the_packet_firing->key, payload,
-                        WITH_PAYLOAD, timer_count);
+                    send_spike_mc_payload(the_packet_firing->key, payload);
                 } else {
                     log_debug("Sending key=0x%08x", the_packet_firing->key);
-
-                    tdma_processing_send_packet(
-                        the_packet_firing->key, 0,
-                        NO_PAYLOAD, timer_count);
+                    send_spike_mc(the_packet_firing->key);
                 }
             }
 

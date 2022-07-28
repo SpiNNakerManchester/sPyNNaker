@@ -19,28 +19,21 @@ import neo
 import inspect
 from pyNN import descriptions
 from pyNN.random import NumpyRNG
-from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import (
-    InvalidParameterType, SpynnakerException)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractContainsUnits, AbstractReadParametersBeforeSet,
-    AbstractPopulationInitializable, AbstractPopulationSettable)
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.recorder import Recorder
 from spynnaker.pyNN.utilities.constants import SPIKES
 from .idmixin import IDMixin
 from .population_base import PopulationBase
 from .population_view import PopulationView
-from spynnaker.pyNN.models.neuron import ParameterHolder, InitialValuesHolder
+from spynnaker.pyNN.models.abstract_models import PopulationApplicationVertex
 
 logger = FormatAdapter(logging.getLogger(__file__))
 
@@ -60,23 +53,16 @@ class Population(PopulationBase):
     """
 
     __slots__ = [
-        "_all_ids",
-        "_annotations",
-        "_celltype",
+        "__annotations",
+        "__celltype",
         "__change_requires_mapping",
-        "__delay_vertex",
         "__first_id",
-        "__has_read_neuron_parameters_this_run",
         "__last_id",
-        "_positions",
-        "_recorder",
-        "_size",
+        "__positions",
+        "__recorder",
+        "__size",
         "__structure",
-        "__vertex",
-        "__vertex_changeable_after_run",
-        "__vertex_contains_units",
-        "__vertex_population_initializable",
-        "__vertex_population_settable"]
+        "__vertex"]
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
@@ -107,15 +93,13 @@ class Population(PopulationBase):
         size = self.__roundsize(size, label)
         self.__create_vertex(
             model, size, label, constraints, additional_parameters)
-        self._recorder = Recorder(population=self, vertex=self.__vertex)
-
-        self.__delay_vertex = None
+        self.__recorder = Recorder(population=self, vertex=self.__vertex)
 
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
-        self._positions = None
+        self.__positions = None
 
         # add objects to the SpiNNaker control class
         SpynnakerDataView.add_vertex(self.__vertex)
@@ -123,27 +107,25 @@ class Population(PopulationBase):
         # initialise common stuff
         if size is None:
             size = self.__vertex.n_atoms
-        self._size = size
-        self._annotations = dict()
+        self.__size = size
+        self.__annotations = dict()
 
         # parameter
         self.__change_requires_mapping = True
-        self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
         self.__first_id, self.__last_id = SpynnakerDataView.add_population(
             self)
-        self._all_ids = numpy.arange(self.__first_id, self.__last_id)
 
         # set up initial values if given
         if initial_values:
             for variable, value in initial_values.items():
-                self._initialize(variable, value)
+                self.__vertex.set_initial_state_values(variable, value)
 
     def __iter__(self):
         """ Iterate over local cells
         """
-        for _id in range(self._size):
+        for _id in range(self.__size):
             yield IDMixin(self, _id)
 
     def __getitem__(self, index_or_slice):
@@ -158,7 +140,7 @@ class Population(PopulationBase):
 
         :rtype: iterable(IDMixin)
         """
-        for _id in range(self._size):
+        for _id in range(self.__size):
             yield IDMixin(self, _id)
 
     @property
@@ -167,7 +149,7 @@ class Population(PopulationBase):
 
         :rtype: dict(str, ...)
         """
-        return self._annotations
+        return self.__annotations
 
     @property
     def celltype(self):
@@ -176,7 +158,7 @@ class Population(PopulationBase):
         :return: The celltype this property has been set to
         :rtype: AbstractPyNNModel
         """
-        return self._celltype
+        return self.__celltype
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
@@ -184,8 +166,7 @@ class Population(PopulationBase):
         :param str variable: The variable to answer the question about
         :rtype: bool
         """
-        return variable in \
-            self._recorder.get_all_possible_recordable_variables()
+        return self.__vertex.can_record(variable)
 
     @overrides(PopulationBase.record, extend_doc=False)
     def record(self, variables, to_file=None, sampling_interval=None):
@@ -203,32 +184,8 @@ class Population(PopulationBase):
         :param int sampling_interval: a value in milliseconds, and an integer
             multiple of the simulation timestep.
         """
-        self._recorder.record(
+        self.__recorder.record(
             variables, to_file, sampling_interval, indexes=None)
-
-    def _record(
-            self, variables, to_file, sampling_interval, indexes):
-        """ Record the specified variable or variables for all cells in the\
-            Population or view.
-
-        :param variables: either a single variable name or a list of variable
-            names. For a given celltype class, ``celltype.recordable`` contains
-            a list of variables that can be recorded for that celltype.
-            Can also be ``None`` to reset the list of variables.
-        :type variables: str or list(str) or None
-        :param to_file: a file to automatically record to (optional).
-            :py:meth:`write_data` will be automatically called when
-            `sim.end()` is called.
-        :type to_file: ~neo.io or ~neo.rawio or str
-        :param int sampling_interval: a value in milliseconds, and an integer
-            multiple of the simulation timestep.
-        :param indexes: The indexes of neurons to record from.
-            This is non-standard PyNN and equivalent to creating a view with
-            these indexes and asking the View to record.
-        :type indexes: None or list(int)
-        """
-        self._recorder.record(
-            variables, to_file, sampling_interval, indexes=indexes)
 
     def sample(self, n, rng=None):
         """ Randomly sample `n` cells from the Population, and return a\
@@ -284,7 +241,7 @@ class Population(PopulationBase):
         if isinstance(io, str):
             io = neo.get_io(io)
 
-        data = self._recorder.extract_neo_block(
+        data = self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
         # write the neo block to the file
         io.write(data)
@@ -304,7 +261,7 @@ class Population(PopulationBase):
         :type engine: str or ~pyNN.descriptions.TemplateEngine or None
         :rtype: str or dict
         """
-        vertex_context = self._vertex.describe()
+        vertex_context = self.__vertex.describe()
 
         context = {
             "label": self.label,
@@ -315,22 +272,22 @@ class Population(PopulationBase):
             "first_id": self.first_id,
             "last_id": self.last_id,
         }
-        context.update(self._annotations)
+        context.update(self.__annotations)
         if self.size > 0:
             context.update({
                 "local_first_id": self.first_id,
                 "cell_parameters": {}})
-        if self._structure:
-            context["structure"] = self._structure.describe(template=None)
+        if self.__structure:
+            context["structure"] = self.__structure.describe(template=None)
         return descriptions.render(engine, template, context)
 
     def _end(self):
         """ Do final steps at the end of the simulation
         """
-        for variable in self._recorder.write_to_files_indicators:
-            if self._recorder.write_to_files_indicators[variable]:
+        for variable in self.__recorder.write_to_files_indicators:
+            if self.__recorder.write_to_files_indicators[variable]:
                 self.write_data(
-                    io=self._recorder.write_to_files_indicators[variable],
+                    io=self.__recorder.write_to_files_indicators[variable],
                     variables=[variable])
 
     @overrides(PopulationBase.get_data, extend_doc=False)
@@ -369,32 +326,8 @@ class Population(PopulationBase):
                 logger, "annotations parameter is not standard PyNN so may "
                         "not be supported by all platforms.")
 
-        return self._recorder.extract_neo_block(
+        return self.__recorder.extract_neo_block(
             variables, None, clear, annotations)
-
-    def get_data_by_indexes(
-            self, variables, indexes, clear=False, annotations=None):
-        """ Return a Neo `Block` containing the data\
-            (spikes, state variables) recorded from the Assembly.
-
-        :param variables: either a single variable name or a list of variable
-            names. Variables must have been previously recorded, otherwise an
-            Exception will be raised.
-        :type variables: str or list(str)
-        :param list(int) indexes: List of neuron indexes to include in the
-            data. Clearly only neurons recording will actually have any data.
-            If None will be taken as all recording as in :meth:`get_data`
-        :param bool clear: Whether recorded data will be deleted.
-        :param annotations: annotations to put on the neo block
-        :type annotations: dict(str, ...)
-        :rtype: ~neo.core.Block
-        :raises \
-            ~spinn_front_end_common.utilities.exceptions.ConfigurationException:
-            If the variable or variables have not been previously set to
-            record.
-        """
-        return self._recorder.extract_neo_block(
-            variables, indexes, clear, annotations)
 
     def spinnaker_get_data(self, variable, as_matrix=False, view_indexes=None):
         """ Public accessor for getting data as a numpy array, instead of\
@@ -419,11 +352,11 @@ class Population(PopulationBase):
         if variable == SPIKES:
             if as_matrix:
                 logger.warning(f"Ignoring as matrix for {SPIKES}")
-            spikes = self._recorder.get_spikes()
+            spikes = self.__recorder.get_data("spikes")
             if view_indexes is None:
                 return spikes
             return spikes[numpy.isin(spikes[:, 0], view_indexes)]
-        return self._recorder.get_recorded_pynn7(
+        return self.__recorder.get_recorded_pynn7(
             variable, as_matrix, view_indexes)
 
     @overrides(PopulationBase.get_spike_counts, extend_doc=False)
@@ -432,7 +365,7 @@ class Population(PopulationBase):
 
         :rtype: ~numpy.ndarray
         """
-        spikes = self._recorder.get_spikes()
+        spikes = self.__recorder.get_data("spikes")
         return self._get_spike_counts(spikes, gather)
 
     def _get_spike_counts(self, spikes, gather=True):
@@ -463,28 +396,36 @@ class Population(PopulationBase):
         :return: The units of the variable
         :rtype: str
         """
-        return self._get_variable_unit(variable)
+        return self.__vertex.get_units(variable)
 
     def set(self, **parameters):
         """ Set parameters of this population.
 
         :param parameters: The parameters to set.
         """
-        for parameter, value in parameters.items():
-            try:
-                self._set(parameter, value)
-            except InvalidParameterType:
-                self._initialize(parameter, value)
+        """ Set one or more parameters for every cell in the population.
 
-    @overrides(PopulationBase.tset)
-    def tset(self, **kwargs):
-        logger.warning(
-            "This function is deprecated; call pop.set(...) instead")
-        for parameter, value in kwargs.items():
-            try:
-                self._set(parameter, value)
-            except InvalidParameterType:
-                self._initialize(parameter, value)
+        ``parameter`` can be a dict, in which case ``value`` should not be
+        supplied, or a string giving the parameter name, in which case
+        ``value`` is the parameter value. ``value`` can be a numeric value, or
+        list of such (e.g. for setting spike times)::
+
+            p._set("tau_m", 20.0).
+            p._set({'tau_m':20, 'v_rest':-65})
+
+        :param parameter:
+            the parameter to set or dictionary of parameters to set
+        :type parameter:
+            str or dict(str, int or float or list(int) or list(float))
+        :param value: the value of the parameter to set.
+        :type value: int or float or list(int) or list(float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
+        """
+        SpynnakerDataView.check_user_can_act()
+        for (parameter, value) in parameters.items():
+            self.__vertex.set_parameter_values(parameter, value)
 
     def initialize(self, **kwargs):
         """ Set initial values of state variables, e.g. the membrane\
@@ -506,89 +447,39 @@ class Population(PopulationBase):
             p.initialize(v=rand_distr, gsyn_exc=0.0)
             p.initialize(v=lambda i: -65 + i / 10.0)
         """
-        for parameter, value in kwargs.items():
-            self._initialize(parameter, value)
+        SpynnakerDataView.check_user_can_act()
+        for variable, value in kwargs.items():
+            self.__vertex.set_initial_state_values(variable, value)
 
     @property
     def initial_values(self):
         """
         :rtype: InitialValuesHolder
         """
-        return self._get_initial_values()
-
-    def get_initial_value(self, variable, selector=None):
-        """
-        .. deprecated:: 6.0
-            Use :py:meth:`initial_values` instead.
-        """
-        raise NotImplementedError(REMOVED_V6.format(
-            "get_initial_value", "initial_values"))
-
-    def _get_initial_value(self, variable, selector):
-        """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_value`
-
-        :param str variable: variable name with or without ``_init`` suffix
-        :param selector: a description of the subrange to accept, or ``None``
-            for all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
-        :return: A list, or an object which acts like a list
-        :rtype: InitialValuesHolder
-        """
-        if not self.__vertex_population_initializable:
-            raise KeyError(
-                "Population does not support the initialisation of {}".format(
-                    variable))
-        self._read_parameters()
-        return InitialValuesHolder(variable, self.__vertex, selector)
-
-    def set_initial_value(self, variable, value, selector=None):
-        """
-        .. deprecated:: 6.0
-            Use :py:meth:`initialize` instead.
-        """
-        raise NotImplementedError(REMOVED_V6.format(
-            "set_initial_value", "initialize"))
-
-    def _get_initial_values(self, selector=None):
-        """ See :py:meth:`~.AbstractPopulationInitializable.get_initial_values`
-
-        :param selector: a description of the subrange to accept, or ``None``
-            for all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: None or slice or int or list(bool) or list(int)
-        :return: dictionary from variable name to initial value(s)
-        :rtype: InitialValuesHolder
-        """
-        if not self.__vertex_population_initializable:
-            raise KeyError("Population does not support the initialisation")
-        return InitialValuesHolder(
-            self.__vertex.initialize_parameters, self.__vertex, selector)
+        SpynnakerDataView.check_user_can_act()
+        return self.__vertex.get_initial_state_values(
+            self.__vertex.get_state_variables())
 
     @property
     def positions(self):
         """ Return the position array for structured populations.
 
-        :return: a 2D array, one row per cell.
-            Each row is three long, for X,Y,Z
+        :return: a 3xN array
         :rtype: ~numpy.ndarray
         """
-        if self._positions is None:
-            if self._structure is None:
+        if self.__positions is None:
+            if self.__structure is None:
                 raise ValueError("attempted to retrieve positions "
                                  "for an unstructured population")
-            self._positions = self._structure.generate_positions(
-                self._vertex.n_atoms)
-        return self._positions.T  # change of order in pyNN 0.8
+            self.__positions = self.__structure.generate_positions(
+                self.__vertex.n_atoms)
+        return self.__positions
 
     @positions.setter
     def positions(self, positions):
         """ Sets all the positions in the population.
         """
-        self._positions = positions
-
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
+        self.__positions = positions
 
     @property
     def all_cells(self):
@@ -596,7 +487,7 @@ class Population(PopulationBase):
         :rtype: list(~spynnaker.pyNN.models.populations.IDMixin)
         """
         cells = []
-        for _id in range(self._size):
+        for _id in range(self.__size):
             cells.append(IDMixin(self, _id))
         return cells
 
@@ -626,18 +517,18 @@ class Population(PopulationBase):
         return self.__last_id
 
     @property
-    def _structure(self):
-        """
-        :rtype: ~pyNN.space.BaseStructure or None
-        """
-        return self.__structure
-
-    @property
     def _vertex(self):
         """
         :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """
         return self.__vertex
+
+    @property
+    def _recorder(self):
+        """
+        :rtype: Recorder
+        """
+        return self.__recorder
 
     @property
     def requires_mapping(self):
@@ -655,7 +546,6 @@ class Population(PopulationBase):
         """ Mark this population as not having changes to be mapped.
         """
         self.__change_requires_mapping = False
-        self.__has_read_neuron_parameters_this_run = False
 
     @property
     def conductance_based(self):
@@ -663,9 +553,7 @@ class Population(PopulationBase):
 
         :rtype: bool
         """
-        if hasattr(self.__vertex, "conductance_based"):
-            return self.__vertex.conductance_based
-        return False
+        return self.__vertex.conductance_based
 
     def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
@@ -688,33 +576,8 @@ class Population(PopulationBase):
         if simplify is not True:
             warn_once(
                 logger, "The simplify value is ignored if not set to true")
-        if not self.__vertex_population_settable:
-            raise KeyError("Population does not support getting")
-        self._read_parameters()
-        param_holder = ParameterHolder(parameter_names, self.__vertex)
-        return param_holder
 
-    # NON-PYNN API CALL
-    def _get_by_selector(self, selector, parameter_names):
-        """ Get the values of a parameter for the selected cell in the\
-            population.
-
-        :param selector: a description of the subrange to accept.
-            Or None for all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: slice or int or iterable(bool) or iterable(int)
-        :param parameter_names: Name of parameter. This is either a
-            single string or a list of strings
-        :type parameter_names: str or iterable(str)
-        :return: A single list of values (or possibly a single value) if
-            paramter_names is a string or a dict of these if parameter names
-            is a list.
-        :rtype: ParameterHolder
-        """
-        if not self.__vertex_population_settable:
-            raise KeyError("Population does not support setting")
-        self._read_parameters()
-        return ParameterHolder(parameter_names, self.__vertex, selector)
+        return self.__vertex.get_parameter_values(parameter_names)
 
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -768,30 +631,6 @@ class Population(PopulationBase):
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
 
-    def _initialize(self, variable, value, selector=None):
-        """ Set the initial value of one of the state variables of the neurons\
-            in this population.
-
-        :param str variable:
-        :param value:
-        :type value: float or int or list(float) or list(int)
-        :param selector: a description of the subrange to accept.
-            Or None for all. See:
-            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
-        :type selector: slice or int or iterable(bool) or iterable(int)
-        """
-        if not self.__vertex_population_initializable:
-            raise KeyError(
-                "Population does not support the initialisation of {}".format(
-                    variable))
-        if SpynnakerDataView.is_ran_last():
-            if not self.__vertex_changeable_after_run:
-                raise Exception(
-                    "Population does not support changes after run")
-        if not SpynnakerDataView.is_hard_reset():
-            self._read_parameters()
-        self.__vertex.initialize(variable, value, selector)
-
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
 
@@ -799,15 +638,12 @@ class Population(PopulationBase):
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Pass this into the vertex
-        self.__vertex.inject(current_source, [n for n in range(self._size)])
-        current_source.set_population(self)
-        # Must remap if called between runs (with reset)
-        self.__change_requires_mapping = True
+        self.__vertex.inject(current_source, [n for n in range(self.__size)])
 
     def __len__(self):
         """ Get the total number of cells in the population.
         """
-        return self._size
+        return self.__size
 
     @property
     def label(self):
@@ -815,7 +651,7 @@ class Population(PopulationBase):
 
         :rtype: str
         """
-        return self._vertex.label
+        return self.__vertex.label
 
     @label.setter
     def label(self, label):
@@ -830,126 +666,7 @@ class Population(PopulationBase):
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Doesn't make much sense on SpiNNaker
-        return self._size
-
-    def _set_check(self, parameter, value):
-        """ Checks for various set methods.
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        if not self.__vertex_population_settable:
-            raise KeyError("Population does not have property {}".format(
-                parameter))
-
-        SpynnakerDataView.check_user_can_act()
-        if (SpynnakerDataView.is_ran_ever()
-                and not self.__vertex_changeable_after_run):
-            raise Exception(
-                "Run has been called but vertex is not changable.")
-
-        if isinstance(parameter, str):
-            if value is None:
-                raise Exception("A value (not None) must be specified")
-        elif type(parameter) is not dict:
-            raise Exception(
-                "Parameter must either be the name of a single parameter to"
-                " set, or a dict of parameter: value items to set")
-
-        if not SpynnakerDataView.is_hard_reset():
-            self._read_parameters()
-
-    def _set(self, parameter, value=None):
-        """ Set one or more parameters for every cell in the population.
-
-        ``parameter`` can be a dict, in which case ``value`` should not be
-        supplied, or a string giving the parameter name, in which case
-        ``value`` is the parameter value. ``value`` can be a numeric value, or
-        list of such (e.g. for setting spike times)::
-
-            p._set("tau_m", 20.0).
-            p._set({'tau_m':20, 'v_rest':-65})
-
-        :param parameter:
-            the parameter to set or dictionary of parameters to set
-        :type parameter:
-            str or dict(str, int or float or list(int) or list(float))
-        :param value: the value of the parameter to set.
-        :type value: int or float or list(int) or list(float)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        self._set_check(parameter, value)
-
-        # set new parameters
-        if isinstance(parameter, str):
-            if value is None:
-                raise Exception("A value (not None) must be specified")
-            self.__vertex.set_value(parameter, value)
-            return
-        for (key, value) in parameter.iteritems():
-            self.__vertex.set_value(key, value)
-
-    # NON-PYNN API CALL
-    def set_by_selector(self, selector, parameter, value=None):
-        """ Set one or more parameters for selected cell in the population.
-
-        param can be a dict, in which case value should not be supplied, or a
-        string giving the parameter name, in which case value is the parameter
-        value. value can be a numeric value, or list of such
-        (e.g. for setting spike times)::
-
-            p.set_by_selector(1, "tau_m", 20.0).
-            p.set_by_selector(1, {'tau_m':20, 'v_rest':-65})
-
-        :param selector:
-            See :py:meth:`RangedList.set_value_by_selector` as this is just a
-            pass through method
-        :param parameter:
-            the parameter to set or dictionary of parameters to set
-        :type parameter:
-            str or dict(str, int or float or list(int) or list(float))
-        :param value: the value of the parameter to set.
-        :type value: int or float or list(int) or list(float)
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        self._set_check(parameter, value)
-
-        # set new parameters
-        if type(parameter) is str:
-            self.__vertex.set_value_by_selector(selector, parameter, value)
-        else:
-            for (key, value) in parameter.iteritems():
-                self.__vertex.set_value_by_selector(selector, key, value)
-
-    def _read_parameters(self):
-        """ Reads parameters from the machine
-        """
-
-        # If the tools have run before, and not reset, and the read
-        # hasn't already been done, read back the data
-        if (not self.__has_read_neuron_parameters_this_run
-                and not get_config_bool("Machine", "virtual_board")):
-            if not SpynnakerDataView.is_ran_last():
-                # If we haven't run yet, just request that the initial values
-                # are read
-                self.__vertex.request_store_initial_values()
-            else:
-
-                # go through each machine vertex and read the neuron parameters
-                # it contains
-                for vertex in self.__vertex.machine_vertices:
-                    if isinstance(vertex, AbstractReadParametersBeforeSet):
-                        # tell the core to rewrite neuron params back to the
-                        # SDRAM space.
-                        placement = SpynnakerDataView.get_placement_of_vertex(
-                            vertex)
-                        vertex.read_parameters_from_machine(placement)
-
-                self.__has_read_neuron_parameters_this_run = True
+        return self.__size
 
     @property
     def structure(self):
@@ -1040,34 +757,10 @@ class Population(PopulationBase):
         """
         return self.__vertex.n_atoms
 
-    @property
-    def _internal_delay_vertex(self):
-        """
-        :rtype: DelayExtensionVertex
-        """
-        return self.__delay_vertex
-
-    @_internal_delay_vertex.setter
-    def _internal_delay_vertex(self, delay_vertex):
-        self.__delay_vertex = delay_vertex
-        self.__change_requires_mapping = True
-
-    def _get_variable_unit(self, parameter_name):
-        """ Helper method for getting units from a parameter used by the vertex
-
-        :param str parameter_name: the parameter name to find the units for
-        :return: the units in string form
-        :rtype: str
-        """
-        if self.__vertex_contains_units:
-            return self.__vertex.get_units(parameter_name)
-        raise ConfigurationException(
-            "This population does not support describing its units")
-
     def _cache_data(self):
         """ Store data for later extraction
         """
-        self._recorder.cache_data()
+        self.__recorder.cache_data()
 
     @staticmethod
     def __create_model(cellclass, cellparams):
@@ -1107,7 +800,7 @@ class Population(PopulationBase):
         :type additional_parameters: dict(str, ...)
         """
         # pylint: disable=too-many-arguments
-        self._celltype = model
+        self.__celltype = model
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
             if size is not None and size <= 0:
@@ -1123,7 +816,7 @@ class Population(PopulationBase):
                 size, label, constraints, **population_parameters)
 
         # Use a provided application vertex directly
-        elif isinstance(model, ApplicationVertex):
+        elif isinstance(model, PopulationApplicationVertex):
             if additional_parameters is not None:
                 raise ConfigurationException(
                     "Cannot accept additional parameters {} when the cell is"
@@ -1142,18 +835,8 @@ class Population(PopulationBase):
         # Fail on anything else
         else:
             raise ConfigurationException(
-                "Model must be either an AbstractPyNNModel or an"
-                " ApplicationVertex")
-
-        # Introspect properties of the vertex
-        self.__vertex_population_settable = \
-            isinstance(self.__vertex, AbstractPopulationSettable)
-        self.__vertex_population_initializable = \
-            isinstance(self.__vertex, AbstractPopulationInitializable)
-        self.__vertex_changeable_after_run = \
-            isinstance(self.__vertex, AbstractChangableAfterRun)
-        self.__vertex_contains_units = \
-            isinstance(self.__vertex, AbstractContainsUnits)
+                "Model must be either an AbstractPyNNModel or a"
+                " PopulationApplicationVertex")
 
     @staticmethod
     def create(cellclass, cellparams=None, n=1):

@@ -24,7 +24,6 @@
 #include "implementations/neuron_impl.h"
 #include "current_sources/current_source.h"
 #include "plasticity/synapse_dynamics.h"
-#include "tdma_processing.h"
 #include <debug.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
@@ -104,12 +103,8 @@ bool neuron_initialise(
         void *initial_values_address, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
-    // init the TDMA
-    void *data_addr = core_params_address;
-    tdma_processing_initialise(&data_addr);
-
-    // cast left over SDRAM into neuron struct.
-    struct neuron_core_parameters *params = data_addr;
+    // Read the neuron parameters
+    struct neuron_core_parameters *params = core_params_address;
 
     // Check if there is a key to use
     use_key = params->has_key;
@@ -187,15 +182,10 @@ void neuron_pause(void) { // EXPORTED
 
 void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
-    // the phase in this timer tick im in (not tied to neuron index)
-    // tdma_processing_reset_phase();
-
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
     neuron_impl_do_timestep_update(timer_count, time, n_neurons);
-
-    log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
     // Record the recorded variables
     neuron_recording_record(time);

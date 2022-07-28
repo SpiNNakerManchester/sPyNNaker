@@ -26,16 +26,26 @@ class IDMixin(object):
 
     where ``p`` is a Population object.
     """
-    __slots__ = ("__id", "__population")
-    __realslots__ = tuple("_IDMixin" + item for item in __slots__)
+    __slots__ = [
+        "__id",
+        "__population",
+        "__vertex",
+        "__recorder"
+    ]
 
-    def __init__(self, population, id):  # pylint: disable=redefined-builtin
+    def __init__(self, population, identifier):
         """
         :param ~spynnaker.pyNN.models.populations.Population population:
         :param int id:
         """
-        self.__id = id
+        self.__id = identifier
         self.__population = population
+
+        # Get these two objects to make access easier
+        # pylint: disable=protected-access
+        self.__vertex = self.__population._vertex
+        # pylint: disable=protected-access
+        self.__recorder = self.__population._recorder
 
     # NON-PYNN API CALLS
     @property
@@ -44,10 +54,6 @@ class IDMixin(object):
         :rtype: int
         """
         return self.__id
-
-    @property
-    def _population(self):
-        return self.__population
 
     def record(self, variables, to_file=None, sampling_interval=None):
         """ Record the given variable(s) of this cell.
@@ -64,58 +70,36 @@ class IDMixin(object):
             should be a value in milliseconds, and an integer multiple of the
             simulation timestep.
         """
-        self.__population.record(variables, to_file, sampling_interval,
-                                 [self.__id])
+        self.__recorder.record(
+            variables, to_file, sampling_interval, [self.__id])
+
+    @property
+    def initial_values(self):
+        return self.__vertex.get_initial_state_values(
+            self.__vertex.get_state_variables(), self.__id)
 
     def __getattr__(self, name):
-        if name == "initial_values":
-            return self.__population._get_initial_values(self.__id)
-        try:
-            return self.__population._get_by_selector(
-                selector=self.__id, parameter_names=name)[0]
-        except Exception as e:
-            try:
-                # try initialisable variable
-                return self.__population._get_initial_value(
-                    selector=self.__id, variable=name)[0]
-            except Exception:  # pylint: disable=broad-except
-                # that failed too so raise the better original exception
-                pass
-            raise e
+        if name == "__vertex":
+            raise KeyError("Shouldn't come through here!")
+        return self.__vertex.get_parameter_values(name, self.__id)
 
-    def __setattr__(self, name, value):
-        if name in self.__realslots__:
-            object.__setattr__(self, name, value)
-            return
-        try:
-            self.__population.set_by_selector(self.__id, name, value)
-        except Exception as e:
-            try:
-                # try initialisable variable
-                return self.__population._initialize(
-                    selector=self.__id, variable=name, value=value)
-            except Exception:  # pylint: disable=broad-except
-                # that failed too so raise the better original exception
-                pass
-            raise e
+    # def __setattr__(self, name, value):
+    #    return self.__vertex.set_parameter_values(name, value, self.__id)
 
     def set_parameters(self, **parameters):
         """ Set cell parameters, given as a sequence of parameter=value\
             arguments.
         """
         for (name, value) in parameters.items():
-            self.__population.set_by_selector(self.__id, name, value)
+            self.__vertex.set_parameter_values(name, value, self.__id)
 
     def get_parameters(self):
         """ Return a dict of all cell parameters.
 
         :rtype: dict(str, ...)
         """
-        results = dict()
-        for name in self.celltype.get_parameter_names():
-            # pylint: disable=protected-access
-            results[name] = self.__population._get_by_selector(self.__id, name)
-        return results
+        return self.__vertex.get_parameter_values(
+            self.__vertex.get_parameters(), self.__id)
 
     @property
     def celltype(self):
@@ -131,13 +115,8 @@ class IDMixin(object):
         """
         raise NotImplementedError  # pragma: no cover
 
-    def _set_position(self, pos):
-        """ Set the cell position in 3D space.\
-            Cell positions are stored in an array in the parent Population.
-        """
-        self.__population.positions[self.__id] = pos   # pragma: no cover
-
-    def _get_position(self):
+    @property
+    def position(self):
         """ Return the cell position in 3D space.\
             Cell positions are stored in an array in the parent Population,\
             if any, or within the ID object otherwise. Positions are generated\
@@ -147,7 +126,12 @@ class IDMixin(object):
         """
         return self.__population.positions[:, self.__id]   # pragma: no cover
 
-    position = property(_get_position, _set_position)
+    @position.setter
+    def position(self, pos):
+        """ Set the cell position in 3D space.\
+            Cell positions are stored in an array in the parent Population.
+        """
+        self.__population.positions[self.__id] = pos   # pragma: no cover
 
     @property
     def local(self):
@@ -155,7 +139,8 @@ class IDMixin(object):
 
         :rtype: bool
         """
-        return self.__population.is_local(self.__id)
+        # There are no MPI nodes!
+        return True
 
     def inject(self, current_source):
         """ Inject current from a current source object into the cell.
@@ -163,10 +148,7 @@ class IDMixin(object):
         :param ~pyNN.neuron.standardmodels.electrodes.NeuronCurrentSource\
             current_source:
         """
-        # pylint: disable=protected-access
-        self.__population._vertex.inject(current_source, [self.__id])
-        current_source.set_population(self.__population)
-        self.__population.requires_mapping = True
+        self.__vertex.inject(current_source, [self.__id])
 
     def get_initial_value(self, variable):
         """ Get the initial value of a state variable of the cell.
@@ -174,37 +156,33 @@ class IDMixin(object):
         :param str variable: The name of the variable
         :rtype: float
         """
-        # pylint: disable=protected-access
-        return self.__population._get_initial_value(variable, self.__id)
+        return self.__vertex.get_initial_state_values(variable, self.__id)
 
     def set_initial_value(self, variable, value):
         """ Set the initial value of a state variable of the cell.
         :param str variable: The name of the variable
         :param float value: The value of the variable
         """
-        # pylint: disable=protected-access
-        self.__population._initialize(variable, value, self.__id)
+        self.__vertex.set_initial_state_values(variable, value, self.__id)
 
     def initialize(self, **initial_values):
         """ Set the initial value of a state variable of the cell.
 
         """
         for variable, value in initial_values.items():
-            # pylint: disable=protected-access
-            self.__population._initialize(variable, value, self.__id)
+            self.__vertex.set_initial_state_values(variable, value, self.__id)
 
     def as_view(self):
         """ Return a PopulationView containing just this cell.
 
         :rtype: ~spynnaker.pyNN.models.populations.PopulationView
         """
-        return self.__population[self.__id]
+        return self.__population[self.__id:self.__id+1]
 
     def __eq__(self, other):
         if not isinstance(other, IDMixin):
             return False
-        return self.__population == other._population and \
-            self.__id == other.id
+        return self.__vertex == other.__vertex and self.__id == other.id
 
     def __ne__(self, other):
         if not isinstance(other, IDMixin):
@@ -212,7 +190,7 @@ class IDMixin(object):
         return not self.__eq__(other)
 
     def __str__(self):
-        return str(self.__population) + "[" + str(self.__id) + "]"
+        return str(self.__vertex) + "[" + str(self.__id) + "]"
 
     def __repr__(self):
-        return repr(self.__population) + "[" + str(self.__id) + "]"
+        return repr(self.__vertex) + "[" + str(self.__id) + "]"

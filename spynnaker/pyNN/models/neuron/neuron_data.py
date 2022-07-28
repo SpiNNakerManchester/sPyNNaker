@@ -237,7 +237,6 @@ class NeuronData(object):
     def read_data(self, placement):
         """ Read the current state of the data from the machine
 
-        :param Transceiver transceiver: The transceiver to read the data with
         :param Placement placement: The placement of the vertex to read
         """
         params = self.__app_vertex.parameters
@@ -245,6 +244,17 @@ class NeuronData(object):
         merged_dict = _MergedDict(params, state_vars)
         self.__do_read_data(
             placement, self.__neuron_regions.neuron_params, merged_dict)
+
+    def read_initial_data(self, placement):
+        """ Read the initial state of the data from the machine
+
+        :param Placement placement: The placement of the vertex to read
+        """
+        params = self.__app_vertex.parameters
+        state_vars = self.__app_vertex.initial_state_variables
+        merged_dict = _MergedDict(params, state_vars)
+        self.__do_read_data(
+            placement, self.__neuron_regions.initial_values, merged_dict)
 
     def __do_read_data(self, placement, region, results):
         address = locate_memory_region_for_placement(placement, region)
@@ -265,6 +275,12 @@ class NeuronData(object):
                 offset += (
                     struct.get_size_in_whole_words(vertex_slice.n_atoms) *
                     BYTES_PER_WORD)
+
+    def reset_generation(self):
+        """ Reset generation so it is done again
+        """
+        self.__gen_on_machine = None
+        self.__generation_done = False
 
 
 class _MergedDict(object):

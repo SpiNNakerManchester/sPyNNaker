@@ -24,6 +24,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spynnaker.pyNN.data import SpynnakerDataView
+from spynnaker.pyNN.models.abstract_models import RecordingType
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -180,6 +181,14 @@ class NeuronRecorder(object):
 
         self.__offset_added = True
 
+    def get_region(self, variable):
+        """ Get the region of a variable
+
+        :param str variable: The variable to get the region of
+        :rtype: int
+        """
+        return self.__region_ids[variable]
+
     def _count_recording_per_slice(
             self, variable, vertex_slice):
         """
@@ -331,6 +340,30 @@ class NeuronRecorder(object):
             sampling_rate, label, placement_data, region)
         return placement_data
 
+    def get_recorded_indices(self, application_vertex, variable):
+        """ Get the indices being recorded for a given variable
+
+        :param ApplicationVertex application_vertex: The vertex being recorded
+        :param str variable: The name of the variable to get the indices of
+        :rtype: list(int)
+        """
+        if variable not in self.__sampling_rates:
+            return []
+        if variable not in self.__indexes:
+            return range(application_vertex.n_atoms)
+        return self.__indexes[variable]
+
+    def get_sampling_interval(self, variable):
+        """ Get the sampling interval of a variable
+
+        :param str variable: The variable to get the sampling interval of
+        :rtype: float
+        """
+        if variable in self.__per_timestep_variables:
+            return get_sampling_interval(1)
+
+        return get_sampling_interval(self.__sampling_rates[variable])
+
     def __read_data(
             self, label, application_vertex,
             sampling_rate, data_type, variable):
@@ -341,13 +374,11 @@ class NeuronRecorder(object):
         region = self.__region_ids[variable]
         missing_str = ""
         pop_level_data = None
-        sampling_interval = get_sampling_interval(sampling_rate)
 
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
 
-        indexes = []
-        for i, vertex in enumerate(progress.over(vertices)):
+        for vertex in progress.over(vertices):
             expected_rows = int(
                 math.ceil(n_machine_time_steps / sampling_rate))
 
@@ -356,9 +387,6 @@ class NeuronRecorder(object):
                 neurons = self._neurons_recording(
                     variable, vertex.vertex_slice)
                 n_items_per_timestep = len(neurons)
-                indexes.extend(neurons)
-            else:
-                indexes.append(i)
             placement_data = self._get_placement_matrix_data(
                 vertex, region, expected_rows,
                 missing_str, sampling_rate, label, data_type,
@@ -380,7 +408,36 @@ class NeuronRecorder(object):
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}", label, region, missing_str)
 
-        return pop_level_data, indexes, sampling_interval
+        return pop_level_data
+
+    def get_recorded_data(self, label, application_vertex, variable):
+        """ Get recorded data based on type
+
+        :param str label: vertex label
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
+        :rtype: ~numpy.ndarray
+        """
+        if not self.is_recording(variable):
+            raise KeyError(f"Variable {variable} was not recorded")
+        if variable in self.__bitfield_variables:
+            return self.get_spikes(label, application_vertex, variable)
+        if variable in self.__events_per_core_variables:
+            return self.get_events(label, application_vertex, variable)
+        if variable in self.__sampling_rates:
+            return self.get_matrix_data(label, application_vertex, variable)
+        raise KeyError(f"This vertex cannot record {variable}")
+
+    def get_recorded_data_type(self, variable):
+        if variable in self.__bitfield_variables:
+            return RecordingType.BIT_FIELD
+        if variable in self.__events_per_core_variables:
+            return RecordingType.EVENT
+        if variable in self.__sampling_rates:
+            return RecordingType.MATRIX
+        raise KeyError(f"This vertex cannot record {variable}")
 
     def get_matrix_data(self, label, application_vertex, variable):
         """ Read a data mapped to time and neuron IDs from the SpiNNaker\
@@ -391,8 +448,7 @@ class NeuronRecorder(object):
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
-        :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(~numpy.ndarray, list(int), float)
+        :rtype: ~numpy.ndarray
         """
         if variable in self.__bitfield_variables:
             msg = ("Variable {} is not supported by get_matrix_data, use "

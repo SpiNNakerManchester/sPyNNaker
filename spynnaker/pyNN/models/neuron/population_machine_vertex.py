@@ -71,7 +71,6 @@ class PopulationMachineVertex(
     """
 
     __slots__ = [
-        "__change_requires_neuron_parameters_reload",
         "__synaptic_matrices",
         "__neuron_data",
         "__key",
@@ -177,7 +176,6 @@ class PopulationMachineVertex(
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
         self.__key = None
-        self.__change_requires_neuron_parameters_reload = False
         self.__slice_index = slice_index
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
@@ -306,22 +304,24 @@ class PopulationMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
-        # write the current source params into the new DSG region
-        self._write_current_source_parameters(spec)
+        self._write_synapse_data_spec(
+            spec, self.__ring_buffer_shifts,
+            self.__weight_scales, self.__structural_sz)
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.__change_requires_neuron_parameters_reload
+        return (self._app_vertex.neuron_data_needs_regeneration or
+                self._app_vertex.synapse_data_needs_regeneration)
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        # Ignored as managed by the app vertex
+        pass
 
     def _parse_spike_processing_provenance(
             self, label, x, y, p, provenance_data):
