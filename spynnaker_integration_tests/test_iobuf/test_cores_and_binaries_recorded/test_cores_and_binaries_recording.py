@@ -40,20 +40,18 @@ class TestCoresAndBinariesRecording(BaseTestCase):
 
         provenance_files = self.get_app_iobuf_files()
         # As outside of run we have to use unprotected method
-        app_graph = SpynnakerDataView.get_runtime_graph()
         sim.end()
 
         data = set()
 
-        for vertex in app_graph.vertices:
-            for machine_vertex in vertex.machine_vertices:
-                if (isinstance(machine_vertex, PopulationMachineVertex) or
-                        isinstance(
-                            machine_vertex,
-                            ReverseIPTagMulticastSourceMachineVertex)):
-                    placement = SpynnakerDataView.get_placement_of_vertex(
-                        machine_vertex)
-                    data.add(placement)
+        for machine_vertex in SpynnakerDataView.iterate_machine_vertices():
+            if (isinstance(machine_vertex, PopulationMachineVertex) or
+                    isinstance(
+                        machine_vertex,
+                        ReverseIPTagMulticastSourceMachineVertex)):
+                placement = SpynnakerDataView.get_placement_of_vertex(
+                    machine_vertex)
+                data.add(placement)
 
         false_data = list(range(0, 16))
         for placement in SpynnakerDataView.iterate_placements_on_core(0, 0):
