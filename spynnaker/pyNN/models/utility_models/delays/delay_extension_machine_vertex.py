@@ -40,7 +40,7 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources",
+        "__sdram",
         "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
@@ -98,7 +98,7 @@ class DelayExtensionMachineVertex(
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
-        self.__resources = resources_required
+        self.__sdram = resources_required
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -112,9 +112,9 @@ class DelayExtensionMachineVertex(
         return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)

@@ -102,7 +102,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             vertex = self.create_machine_vertex(
                 source_app_vertex, vertex_slice, constraints)
             self._governed_app_vertex.remember_machine_vertex(vertex)
-            chip_counter.add_core(vertex.resources_required)
+            chip_counter.add_core(vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):

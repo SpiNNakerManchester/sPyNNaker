@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineVertex
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.resources import ConstantSDRAM
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary)
 from spinn_front_end_common.abstract_models import (
@@ -92,13 +91,11 @@ class MachineMunichMotorDevice(
         self.__continue_if_not_different = bool(continue_if_not_different)
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return ResourceContainer(
-            sdram=ConstantSDRAM(
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self._PARAMS_SIZE +
-                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS)),
-            dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
+                self.get_provenance_data_size(self._PROVENANCE_ELEMENTS))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

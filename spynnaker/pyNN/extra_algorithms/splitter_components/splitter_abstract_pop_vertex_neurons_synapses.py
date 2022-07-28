@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 The University of Manchester
+# Copyright (c) 2020-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             added_poisson_vertices = list()
             for poisson_vertex, _possion_edge in poisson_vertices:
                 added_poisson_vertices.append(poisson_vertex)
-                chip_counter.add_core(poisson_vertex.resources_required)
+                chip_counter.add_core(poisson_vertex.sdram_required)
 
             # Create an SDRAM edge partition
             source_vertices = added_poisson_vertices + synapse_vertices
