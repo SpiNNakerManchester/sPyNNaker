@@ -461,13 +461,13 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
+            self, vertex_slice, sdram_required, label=None,
             constraints=None):
         # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
-            resources_required, self.__spike_recorder.record,
+            sdram_required, self.__spike_recorder.record,
             constraints, label, self, vertex_slice, index)
 
     @property

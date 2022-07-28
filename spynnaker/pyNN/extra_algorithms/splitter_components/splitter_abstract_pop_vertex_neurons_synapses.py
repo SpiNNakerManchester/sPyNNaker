@@ -478,12 +478,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
-                    resources = pre_vertex.get_resources_used_by_atoms(
+                    sdram_required = pre_vertex.get_resources_used_by_atoms(
                         vertex_slice)
                     poisson_label = "{}_Poisson:{}-{}".format(
                         label, vertex_slice.lo_atom, vertex_slice.hi_atom)
                     poisson_m_vertex = pre_vertex.create_machine_vertex(
-                        vertex_slice, resources, label=poisson_label)
+                        vertex_slice, sdram_required, label=poisson_label)
                     pre_vertex.remember_machine_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, proj._projection_edge))
