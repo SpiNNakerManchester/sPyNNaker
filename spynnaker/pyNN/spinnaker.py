@@ -67,7 +67,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     __slots__ = []
 
     def __init__(
-            self, time_scale_factor, min_delay, graph_label,
+            self, time_scale_factor, min_delay,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         """
 
@@ -76,7 +76,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             (does not affect the neuron models accuracy)
         :type time_scale_factor: int or None
         :param min_delay:
-        :param graph_label:
         :param n_chips_required:
             Deprecated! Use n_boards_required instead.
             Must be None if n_boards_required specified.
@@ -116,7 +115,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
-            graph_label=graph_label,
             data_writer_cls=SpynnakerDataWriter)
 
         self._data_writer.set_n_required(n_boards_required, n_chips_required)
@@ -565,7 +563,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self):
-        if not self._data_writer.get_runtime_graph().n_vertices:
+        if self._data_writer.get_n_vertices() == 0:
             return
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
             n_chips_in_graph = spynnaker_splitter_partitioner()
