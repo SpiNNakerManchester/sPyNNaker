@@ -37,7 +37,7 @@ class TestViews(BaseTestCase):
             -65., -63.04931641, -61.19375610, -59.42868042, -57.74966431,
             -60., -58.29315186, -56.66952515, -55.12509155, -53.65597534,
             -65., -64.02465820, -63.09686279, -62.21432495, -61.37481689]
-        assert(numpy.allclose(v1[:, 2], expected))
+        assert numpy.allclose(v1[:, 2], expected)
 
     def test_set_with_views(self):
         self.runsafe(self.set_with_views)
