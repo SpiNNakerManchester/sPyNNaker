@@ -17,9 +17,7 @@ import logging
 from collections import defaultdict
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.resources import (
-    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM)
+from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.model.graphs.common.slice import Slice
@@ -234,12 +232,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             atoms_per_core, app_vertex.incoming_projections), BYTES_PER_WORD)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
-        lead_synapse_resources = self.__get_synapse_resources(
+        sdram = self.__get_synapse_resources(
             atoms_per_core, shared_synapse_sdram)
         shared_synapse_resources = self.__get_synapse_resources(atoms_per_core)
 
         # Keep track of the SDRAM for each group of vertices
-        total_sdram = neuron_resources.sdram + lead_synapse_resources.sdram
+        total_sdram = neuron_resources.sdram + sdram
         for _ in range(self.__n_synapse_vertices - 1):
             total_sdram += shared_synapse_resources.sdram
 
@@ -260,9 +258,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             synapse_references, syn_label, feedback_partition = \
                 self.__add_lead_synapse_core(
                     vertex_slice, all_syn_block_sz, structural_sz,
-                    lead_synapse_resources, label, rb_shifts, weight_scales,
+                    sdram, label, rb_shifts, weight_scales,
                     synapse_vertices, neuron_vertex, constraints)
-            chip_counter.add_core(lead_synapse_resources)
+            chip_counter.add_core(sdram)
 
             # Do the remaining synapse cores
             for i in range(1, self.__n_synapse_vertices):
@@ -343,14 +341,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
     def __add_lead_synapse_core(
             self, vertex_slice, all_syn_block_sz, structural_sz,
-            lead_synapse_resources, label, rb_shifts, weight_scales,
+            sdram, label, rb_shifts, weight_scales,
             synapse_vertices, neuron_vertex, constraints):
         """ Add the first synapse core for a neuron core.  This core will
             generate all the synaptic data required.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons on the neuron core
-        :param int independent_synapse_sdram:
+        :param int sdram:
             The SDRAM that will be used by every lead synapse core
         :param int proj_dependent_sdram:
             The SDRAM that will be used by the synapse core to handle a given
@@ -380,7 +378,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Do the lead synapse core
         lead_synapse_vertex = PopulationSynapsesMachineVertexLead(
-            lead_synapse_resources, "{}(0)".format(syn_label), constraints,
+            sdram, "{}(0)".format(syn_label), constraints,
             self._governed_app_vertex, vertex_slice, rb_shifts, weight_scales,
             all_syn_block_sz, structural_sz, synapse_references)
         self._governed_app_vertex.remember_machine_vertex(lead_synapse_vertex)
@@ -650,18 +648,8 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             len(PopulationNeuronsMachineVertex.REGIONS) + 1, sdram_edge_sdram)
 
-        dtcm = app_vertex.get_common_dtcm()
-        dtcm += app_vertex.get_neuron_dtcm(n_atoms)
-        cpu_cycles = app_vertex.get_common_cpu()
-        cpu_cycles += app_vertex.get_neuron_cpu(n_atoms)
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=sdram, dtcm=DTCMResource(dtcm),
-            cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
-
         # return the total resources.
-        return container
+        return sdram
 
     def __shared_synapse_sdram(
             self, independent_synapse_sdram, proj_dependent_sdram,
@@ -730,18 +718,9 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             variable_sdram)
         if shared_sdram is not None:
             sdram.merge(shared_sdram)
-        dtcm = app_vertex.get_common_dtcm()
-        dtcm += app_vertex.get_synapse_dtcm(n_atoms)
-        cpu_cycles = app_vertex.get_common_cpu()
-        cpu_cycles += app_vertex.get_synapse_cpu(n_atoms)
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=sdram, dtcm=DTCMResource(dtcm),
-            cpu_cycles=CPUCyclesPerTickResource(cpu_cycles))
 
         # return the total resources.
-        return container
+        return sdram
 
     def __independent_synapse_sdram(self):
         """ Get the SDRAM used by all synapse cores independent of projections

@@ -14,9 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.resources import (
-    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM)
+from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities\
@@ -149,13 +147,8 @@ class SplitterAbstractPopulationVertexFixed(
         sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
         sdram.merge(constant_sdram)
 
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=sdram, dtcm=self.__get_dtcm_cost(n_atoms),
-            cpu_cycles=self.__get_cpu_cost(n_atoms))
-
         # return the total resources.
-        return container
+        return sdram
 
     def __get_variable_sdram(self, n_atoms):
         """ returns the variable sdram from the recorders
@@ -242,28 +235,6 @@ class SplitterAbstractPopulationVertexFixed(
             PopulationMachineVertex.SYNAPSE_REGIONS.bitfield_builder,
             exact_sdram_for_bit_field_builder_region())
         return sdram
-
-    def __get_dtcm_cost(self, n_atoms):
-        """ get the dtcm cost for the slice of atoms
-
-        :param int n_atoms: How many atoms to account for
-        :rtype: DTCMResource
-        """
-        return DTCMResource(
-            self._governed_app_vertex.get_common_dtcm() +
-            self._governed_app_vertex.get_neuron_dtcm(n_atoms) +
-            self._governed_app_vertex.get_synapse_dtcm(n_atoms))
-
-    def __get_cpu_cost(self, n_atoms):
-        """ get cpu cost for a slice of atoms
-
-        :param int n_atoms: How many atoms to account for
-        :rtype: CPUCyclesPerTickResourcer
-        """
-        return CPUCyclesPerTickResource(
-            self._governed_app_vertex.get_common_cpu() +
-            self._governed_app_vertex.get_neuron_cpu(n_atoms) +
-            self._governed_app_vertex.get_synapse_cpu(n_atoms))
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

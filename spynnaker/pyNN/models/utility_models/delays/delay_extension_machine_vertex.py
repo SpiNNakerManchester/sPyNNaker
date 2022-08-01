@@ -81,11 +81,11 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, resources_required, label, vertex_slice,
-                 constraints=None, app_vertex=None):
+    def __init__(self, sdram, label, vertex_slice, constraints=None,
+                 app_vertex=None):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources required by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram required by the vertex
         :param str label: The name of the vertex
         :param Slice vertex_slice: The slice of the vertex
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
@@ -98,7 +98,7 @@ class DelayExtensionMachineVertex(
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
-        self.__sdram = resources_required
+        self.__sdram = sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
