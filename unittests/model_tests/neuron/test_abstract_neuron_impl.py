@@ -47,9 +47,9 @@ def test_max_atoms_per_core():
     _MyPyNNModelImpl.set_model_max_atoms_per_core(100)
     _MyNeuronModelImpl.set_model_max_atoms_per_core(20)
     _MyOtherNeuronModel.set_model_max_atoms_per_core(50)
-    assert(_MyPyNNModelImpl.get_max_atoms_per_core() == 100)
-    assert(_MyNeuronModelImpl.get_max_atoms_per_core() == 20)
-    assert(_MyOtherNeuronModel.get_max_atoms_per_core() == 50)
+    assert _MyPyNNModelImpl.get_max_atoms_per_core() == 100
+    assert _MyNeuronModelImpl.get_max_atoms_per_core() == 20
+    assert _MyOtherNeuronModel.get_max_atoms_per_core() == 50
 
 
 def test_reset_max_atoms_per_core():
@@ -58,14 +58,14 @@ def test_reset_max_atoms_per_core():
     _MyNeuronModelImpl.set_model_max_atoms_per_core()
     _MyPyNNModelImpl.set_model_max_atoms_per_core(100)
     _MyPyNNModelImpl.set_model_max_atoms_per_core()
-    assert(_MyNeuronModelImpl.get_max_atoms_per_core() ==
-           DEFAULT_MAX_ATOMS_PER_CORE)
-    assert(_MyPyNNModelImpl.get_max_atoms_per_core() == sys.maxsize)
+    assert (_MyNeuronModelImpl.get_max_atoms_per_core() ==
+            DEFAULT_MAX_ATOMS_PER_CORE)
+    assert _MyPyNNModelImpl.get_max_atoms_per_core() == sys.maxsize
 
 
 def test_defaults():
     unittest_setup()
-    assert(_MyPyNNModelImpl.default_initial_values == {"svar": 2.0})
-    assert(_MyPyNNModelImpl.default_parameters == {"param": 1.0})
-    assert(_MyPyNNModelImpl.default_initial_values == {"svar": 2.0})
-    assert(_MyPyNNModelImpl.default_parameters == {"param": 1.0})
+    assert _MyPyNNModelImpl.default_initial_values == {"svar": 2.0}
+    assert _MyPyNNModelImpl.default_parameters == {"param": 1.0}
+    assert _MyPyNNModelImpl.default_initial_values == {"svar": 2.0}
+    assert _MyPyNNModelImpl.default_parameters == {"param": 1.0}

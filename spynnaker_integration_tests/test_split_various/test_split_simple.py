@@ -64,12 +64,12 @@ def run_simple_split():
     # The only actual spikes received should be from the random source
     all_source_spikes = numpy.unique(numpy.sort(numpy.concatenate(
         source_spikes)))
-    assert(numpy.allclose(all_source_spikes, target_ppts))
+    assert numpy.allclose(all_source_spikes, target_ppts)
 
     # A target spike should be caused by a source spike (though not all sources
     # will cause a target spike)
     for s, t in zip(source_spikes, target_spikes):
-        assert(len(t) <= len(s))
+        assert len(t) <= len(s)
 
 
 class TestSplitSimple(BaseTestCase):
