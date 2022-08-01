@@ -334,7 +334,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         neuron_label = "{}_Neurons:{}-{}".format(
             label, vertex_slice.lo_atom, vertex_slice.hi_atom)
         neuron_vertex = PopulationNeuronsMachineVertex(
-            neuron_resources, neuron_label, constraints, app_vertex,
+            sdram, neuron_label, constraints, app_vertex,
             vertex_slice, index, rb_shifts, weight_scales)
         app_vertex.remember_machine_vertex(neuron_vertex)
         self.__neuron_vertices.append(neuron_vertex)
@@ -478,12 +478,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 # Create the direct Poisson vertices here; the splitter
                 # for the Poisson will create any others as needed
                 for vertex_slice in self.__get_fixed_slices():
-                    sdram_required = pre_vertex.get_sdram_used_by_atoms(
-                        vertex_slice)
+                    sdram = pre_vertex.get_sdram_used_by_atoms(vertex_slice)
                     poisson_label = "{}_Poisson:{}-{}".format(
                         label, vertex_slice.lo_atom, vertex_slice.hi_atom)
                     poisson_m_vertex = pre_vertex.create_machine_vertex(
-                        vertex_slice, sdram_required, label=poisson_label)
+                        vertex_slice, sdram, label=poisson_label)
                     pre_vertex.remember_machine_vertex(poisson_m_vertex)
                     incoming_direct_poisson[vertex_slice].append(
                         (poisson_m_vertex, proj._projection_edge))

@@ -88,16 +88,16 @@ class SplitterAbstractPopulationVertexFixed(
             max_atoms_per_core, projections)
         structural_sz = app_vertex.get_structural_dynamics_size(
             max_atoms_per_core, projections)
-        resources = self.get_resources_used_by_atoms(
+        sdram = self.get_sdram_used_by_atoms(
             max_atoms_per_core, all_syn_block_sz, structural_sz)
 
         self.__create_slices()
 
         for index, vertex_slice in enumerate(self.__slices):
-            chip_counter.add_core(resources)
+            chip_counter.add_core(sdram)
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, resources, label, constraints, all_syn_block_sz,
+                vertex_slice, sdram, label, constraints, all_syn_block_sz,
                 structural_sz, ring_buffer_shifts, weight_scales, index)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
@@ -124,17 +124,17 @@ class SplitterAbstractPopulationVertexFixed(
         return self._governed_app_vertex.machine_vertices
 
     def create_machine_vertex(
-            self, vertex_slice, resources, label, remaining_constraints,
+            self, vertex_slice, sdram, label, remaining_constraints,
             all_syn_block_sz, structural_sz, ring_buffer_shifts,
             weight_scales, index):
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            resources, label, remaining_constraints,
+            sdram, label, remaining_constraints,
             self._governed_app_vertex, vertex_slice, index, ring_buffer_shifts,
             weight_scales, all_syn_block_sz, structural_sz)
 
-    def get_resources_used_by_atoms(
+    def get_sdram_used_by_atoms(
             self, n_atoms, all_syn_block_sz, structural_sz):
         """  Gets the resources of a slice of atoms
 
