@@ -54,10 +54,10 @@ def run_forever_recorded():
     spikes = pop.get_data("spikes").segments[0].spiketrains
     sim.end()
     for spiketrain in spikes:
-        assert(len(spiketrain) > 0)
+        assert len(spiketrain) > 0
         for spike, source in zip(spiketrain, source_spikes[:len(spiketrain)]):
-            assert(spike > source)
-            assert(spike < source + 10)
+            assert spike > source
+            assert spike < source + 10
 
 
 class MyTestCase(BaseTestCase):
