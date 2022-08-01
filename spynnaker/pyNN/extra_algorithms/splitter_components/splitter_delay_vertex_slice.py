@@ -20,8 +20,7 @@ from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
+from pacman.model.resources import ConstantSDRAM
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import (

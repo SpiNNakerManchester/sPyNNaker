@@ -220,7 +220,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram_edge_sdram = edge_sdram * n_incoming
 
         # Get maximum resources for neurons for each split
-        neuron_resources = self.__get_neuron_resources(
+        neuron_sdram = self.__get_neuron_sdram(
             atoms_per_core, sdram_edge_sdram)
 
         # Get resources for synapses
@@ -232,22 +232,22 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             atoms_per_core, app_vertex.incoming_projections), BYTES_PER_WORD)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
-        sdram = self.__get_synapse_resources(
+        sdram = self.__get_synapse_sdram(
             atoms_per_core, shared_synapse_sdram)
-        shared_synapse_resources = self.__get_synapse_resources(atoms_per_core)
+        shared_synapse_sdram = self.__get_synapse_sdram(atoms_per_core)
 
         # Keep track of the SDRAM for each group of vertices
-        total_sdram = neuron_resources.sdram + sdram
+        total_sdram = neuron_sdram + sdram
         for _ in range(self.__n_synapse_vertices - 1):
-            total_sdram += shared_synapse_resources.sdram
+            total_sdram += shared_synapse_sdram
 
         for index, vertex_slice in enumerate(self.__get_fixed_slices()):
 
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
-                vertex_slice, neuron_resources, label, index, rb_shifts,
+                vertex_slice, total_sdram, label, index, rb_shifts,
                 weight_scales, constraints)
-            chip_counter.add_core(neuron_resources)
+            chip_counter.add_core(total_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
             # resources used by each core (neuron core is added later)
@@ -309,12 +309,13 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__neuromodulators.add(proj._projection_edge.pre_vertex)
 
     def __add_neuron_core(
-            self, vertex_slice, neuron_resources, label, index, rb_shifts,
+            self, vertex_slice, sdram, label, index, rb_shifts,
             weight_scales, constraints):
         """ Add a neuron core for for a slice of neurons
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of neurons to put on the core
+        :param ~pacman.model.resources.MultiRegionSDRAM sdram:
         :param str label: The name to give the core
         :param int index: The index of the slice in the ordered list of slices
         :param list(int) rb_shifts:
@@ -325,8 +326,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints to add
         :return: The neuron vertex created and the resources used
-        :rtype: tuple(PopulationNeuronsMachineVertex, \
-                      ~pacman.model.resources.ResourceContainer)
+        :rtype: PopulationNeuronsMachineVertex
         """
         app_vertex = self._governed_app_vertex
         neuron_label = "{}_Neurons:{}-{}".format(
@@ -359,8 +359,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             back to S1615 values
         :param list(int) weight_scales:
             The scale to apply to weights to encode them in the 16-bit synapses
-        :param list(~pacman.model.resources.ResourceContainer) all_resources:
-            A list to add the resources of the vertex to
         :param list(~pacman.model.graphs.machine.MachineVertex) \
                 synapse_vertices:
             A list to add the core to
@@ -402,8 +400,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             The slice of neurons on the neuron core
         :param SynapseRegions synapse_references:
             References to the synapse regions
-        :param list(~pacman.model.resources.ResourceContainer) all_resources:
-            A list to add the resources of the vertex to
         :param list(~pacman.model.graphs.machine.MachineVertex) \
                 synapse_vertices:
             A list to add the core to
@@ -624,12 +620,12 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 len(PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS))]
         return SynapseRegions(*references)
 
-    def __get_neuron_resources(self, n_atoms, sdram_edge_sdram):
+    def __get_neuron_sdram(self, n_atoms, sdram_edge_sdram):
         """  Gets the resources of the neurons of a slice of atoms from a given
              app vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         app_vertex = self._governed_app_vertex
         n_record = len(app_vertex.neuron_recordables)
@@ -688,14 +684,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             independent_synapse_sdram, proj_dependent_sdram,
             all_syn_block_sz, structural_sz, dynamics_sz)
 
-    def __get_synapse_resources(self, n_atoms, shared_sdram=None):
+    def __get_synapse_sdram(self, n_atoms, shared_sdram=None):
         """  Get the resources of the synapses of a slice of atoms from a
              given app vertex.
 
         :param ~pacman.model.graphs.common.Slice vertex_slice: the slice
         :param ~pacman.model.resources.MultiRegionSDRAM shared_sdram:
             The SDRAM shared between cores, if this is to be included
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         app_vertex = self._governed_app_vertex
         n_record = len(app_vertex.synapse_recordables)

@@ -137,7 +137,7 @@ class SplitterAbstractPopulationVertexFixed(
         """  Gets the resources of a slice of atoms
 
         :param int n_atoms
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ
         variable_sdram = self.__get_variable_sdram(n_atoms)
