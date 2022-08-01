@@ -108,12 +108,12 @@ def split_potentiation_and_depression():
     print("Pre neuron spikes at: {}".format(pre_spikes))
     print("Post-neuron spikes at: {}".format(post_spikes))
     target_spikes = [1014,  1032, 1053]
-    assert(all(s1 == s2
-               for s1, s2 in zip(list(post_spikes), target_spikes)))
+    assert all(s1 == s2
+               for s1, s2 in zip(list(post_spikes), target_spikes))
     print("New weight exact: {}".format(new_weight_exact))
     print("New weight SpiNNaker: {}".format(weights))
 
-    assert(numpy.allclose(weights, new_weight_exact, rtol=0.001))
+    assert numpy.allclose(weights, new_weight_exact, rtol=0.001)
 
 
 class TestSTDPPairAdditive(BaseTestCase):

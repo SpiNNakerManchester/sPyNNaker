@@ -96,23 +96,23 @@ def run_script():
 
 def check_params(param, result):
     if not isinstance(param, p.RandomDistribution):
-        assert(all(param == value for value in result))
+        assert all(param == value for value in result)
     else:
         # Check the values are "random" (yes I know they might be the same,
         # but the chances are quite small!)
         minimum = numpy.amin(result)
         maximum = numpy.amax(result)
-        assert(minimum != maximum)
+        assert minimum != maximum
 
         if "low" in param.parameters:
-            assert(param.parameters["low"] <= minimum)
+            assert param.parameters["low"] <= minimum
         if "high" in param.parameters:
-            assert(param.parameters["high"] >= maximum)
+            assert param.parameters["high"] >= maximum
 
 
 def check_one_to_one(n, conns):
-    assert(len(conns) == n)
-    assert(all(pre == post for pre, post in conns))
+    assert len(conns) == n
+    assert all(pre == post for pre, post in conns)
 
 
 def conns_by_pre(conns):
@@ -131,13 +131,12 @@ def conns_by_post(conns):
 
 def check_all_to_all(n, allow_self, conns):
     cbp = conns_by_pre(conns)
-    assert(len(cbp) == n)
+    assert len(cbp) == n
     for pre in cbp:
         if allow_self:
-            assert(numpy.array_equal(
-                sorted(cbp[pre]), range(n)))
+            assert numpy.array_equal(sorted(cbp[pre]), range(n))
         else:
-            assert(numpy.array_equal(
+            assert (numpy.array_equal(
                 sorted(cbp[pre]),
                 [i for i in range(n) if i != pre]))
 
@@ -149,14 +148,14 @@ def check_fixed_prob(n, prob, n_per_core, conns):
     error = math.sqrt(expected)
     avgpre = sum(len(cbpre[pre]) for pre in cbpre) / float(n)
     avgpost = sum(len(cbpost[post]) for post in cbpost) / float(n)
-    assert(avgpre >= (expected - error))
-    assert(avgpre <= (expected + error))
-    assert(avgpost >= (expected - error))
-    assert(avgpost <= (expected + error))
+    assert avgpre >= (expected - error)
+    assert avgpre <= (expected + error)
+    assert avgpost >= (expected - error)
+    assert avgpost <= (expected + error)
 
 
 def check_fixed_total(n, total, conns):
-    assert(len(conns) == total)
+    assert len(conns) == total
 
 
 def run_bad_normal_clipping():

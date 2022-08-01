@@ -70,21 +70,21 @@ def test_connector(
 
     connector = FromFileConnector(temp.name)
     if expected_clist is not None:
-        assert(numpy.array_equal(connector.conn_list, expected_clist))
+        assert numpy.array_equal(connector.conn_list, expected_clist)
     else:
-        assert(numpy.array_equal(connector.conn_list, clist))
+        assert numpy.array_equal(connector.conn_list, clist)
 
     # Check extra parameters are as expected
     extra_params = connector.get_extra_parameters()
     extra_param_names = connector.get_extra_parameter_names()
-    assert(numpy.array_equal(extra_params, expected_extra_parameters))
-    assert(numpy.array_equal(
-        extra_param_names, expected_extra_parameter_names))
+    assert numpy.array_equal(extra_params, expected_extra_parameters)
+    assert numpy.array_equal(
+        extra_param_names, expected_extra_parameter_names)
     if extra_params is not None:
-        assert(len(extra_params.shape) == 2)
-        assert(extra_params.shape[1] == len(extra_param_names))
+        assert len(extra_params.shape) == 2
+        assert extra_params.shape[1] == len(extra_param_names)
         for i in range(len(extra_param_names)):
-            assert(extra_params[:, i].shape == (len(clist), ))
+            assert extra_params[:, i].shape == (len(clist), )
 
     # Check weights and delays are used or ignored as expected
     pre_slice = Slice(0, 10)
@@ -97,5 +97,5 @@ def test_connector(
         synapse_type_from_dynamics=False, weights=weights, delays=delays)
     block = connector.create_synaptic_block(
         [pre_slice], [post_slice], pre_slice, post_slice, 1, synapse_info)
-    assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
-    assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
+    assert numpy.array_equal(block["weight"], numpy.array(expected_weights))
+    assert numpy.array_equal(block["delay"], numpy.array(expected_delays))
