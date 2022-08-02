@@ -358,7 +358,7 @@ def name():
 
     :rtype: str
     """
-    return globals_variables.get_last_simulator().name
+    return SpynnakerDataView.get_sim_name()
 
 
 def Projection(
