@@ -19,8 +19,6 @@ from pacman.model.resources import (
     MultiRegionSDRAM)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import get_remaining_constraints
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex)
 from spynnaker.pyNN.models.neuron.population_machine_vertex import (
@@ -81,7 +79,6 @@ class SplitterAbstractPopulationVertexFixed(
             app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         projections = app_vertex.incoming_projections
-        constraints = get_remaining_constraints(app_vertex)
         ring_buffer_shifts = app_vertex.get_ring_buffer_shifts(projections)
         weight_scales = app_vertex.get_weight_scales(ring_buffer_shifts)
         all_syn_block_sz = app_vertex.get_synapses_size(
@@ -97,8 +94,9 @@ class SplitterAbstractPopulationVertexFixed(
             chip_counter.add_core(resources)
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, resources, label, constraints, all_syn_block_sz,
-                structural_sz, ring_buffer_shifts, weight_scales, index)
+                vertex_slice, resources, label, app_vertex.constraints,
+                all_syn_block_sz, structural_sz, ring_buffer_shifts,
+                weight_scales, index)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
