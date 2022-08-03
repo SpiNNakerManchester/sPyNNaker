@@ -26,8 +26,7 @@ from spynnaker.pyNN.models.utility_models.delays import (
 class KeyConstraintAdder(object):
 
     def __call__(self):
-        graph = SpynnakerDataView.get_runtime_graph()
-        for partition in graph.outgoing_edge_partitions:
+        for partition in SpynnakerDataView.iterate_partitions():
             for vertex in partition.pre_vertex.splitter.get_out_going_vertices(
                     partition.identifier):
                 if isinstance(

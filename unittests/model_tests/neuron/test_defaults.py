@@ -29,9 +29,9 @@ def test_nothing():
     class _AClass(object):
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {
+    assert (_AClass.default_parameters == {
         "param_1": 1, "param_2": 2, "param_3": 3})
-    assert(_AClass.default_initial_values == {})
+    assert _AClass.default_initial_values == {}
 
 
 def test_parameters():
@@ -43,8 +43,8 @@ def test_parameters():
         @default_parameters({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {"param_1": 1})
-    assert(_AClass.default_initial_values == {"param_2": 2, "param_3": 3})
+    assert _AClass.default_parameters == {"param_1": 1}
+    assert _AClass.default_initial_values == {"param_2": 2, "param_3": 3}
 
 
 def test_state_variables():
@@ -56,8 +56,8 @@ def test_state_variables():
         @default_initial_values({"param_1"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_initial_values == {"param_1": 1})
-    assert(_AClass.default_parameters == {"param_2": 2, "param_3": 3})
+    assert _AClass.default_initial_values == {"param_1": 1}
+    assert _AClass.default_parameters == {"param_2": 2, "param_3": 3}
 
 
 def test_both():
@@ -78,10 +78,10 @@ def test_both():
         @default_parameters({"param_2"})
         def __init__(self, param_1=1, param_2=2, param_3=3):
             pass
-    assert(_AClass.default_parameters == {"param_1": 1})
-    assert(_AClass.default_initial_values == {"param_2": 2})
-    assert(_AnotherClass.default_parameters == {"param_2": 2})
-    assert(_AnotherClass.default_initial_values == {"param_1": 1})
+    assert _AClass.default_parameters == {"param_1": 1}
+    assert _AClass.default_initial_values == {"param_2": 2}
+    assert _AnotherClass.default_parameters == {"param_2": 2}
+    assert _AnotherClass.default_initial_values == {"param_1": 1}
 
 
 def test_abstract():
@@ -108,8 +108,8 @@ def test_abstract():
         def __init__(self, param="test"):
             pass
 
-    assert(_AClass.default_parameters == {"param": "test"})
-    assert(_AClass.default_initial_values == {})
+    assert _AClass.default_parameters == {"param": "test"}
+    assert _AClass.default_initial_values == {}
     _AClass()
 
 
@@ -162,5 +162,5 @@ def _check_warnings(lc, expected, not_expected):
             warning_variables.add(match.group(1))
 
     print("Found warnings for variables {}".format(warning_variables))
-    assert(all(item in warning_variables for item in expected))
-    assert(all(item not in warning_variables for item in not_expected))
+    assert all(item in warning_variables for item in expected)
+    assert all(item not in warning_variables for item in not_expected)
