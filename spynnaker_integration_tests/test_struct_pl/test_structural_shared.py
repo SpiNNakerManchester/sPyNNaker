@@ -102,14 +102,14 @@ def structural_shared():
         pre_spikes, spikes_3[0], w_init_stdp, delay_init_stdp,
         A_plus, A_minus, tau_plus, tau_minus)
 
-    assert(len(conns) == 1)
-    assert(conns[0][2] >= w_init - 0.01 and
-           conns[0][2] <= w_init + 0.01)
-    assert(len(conns_2) == 0)
-    assert(len(conns_3) == 1)
-    assert(conns_3[0][2] >= w_final_1 - 0.01 and
-           conns_3[0][2] <= w_final_1 + 0.01)
-    assert(len(conns_4) == 0)
+    assert len(conns) == 1
+    assert (conns[0][2] >= w_init - 0.01 and
+            conns[0][2] <= w_init + 0.01)
+    assert len(conns_2) == 0
+    assert len(conns_3) == 1
+    assert (conns_3[0][2] >= w_final_1 - 0.01 and
+            conns_3[0][2] <= w_final_1 + 0.01)
+    assert len(conns_4) == 0
 
 
 class TestStructuralShared(BaseTestCase):

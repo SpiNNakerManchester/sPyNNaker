@@ -74,10 +74,10 @@ def post_spike_same_time():
 #     print(weights_2)
 #     print(new_weight_exact)
 
-    assert(len(weights_1) == 1)
-    assert(len(weights_2) == 1)
-    assert(weights_1[0] == weights_2[0])
-    assert(numpy.allclose(weights_1, new_weight_exact, rtol=0.001))
+    assert len(weights_1) == 1
+    assert len(weights_2) == 1
+    assert weights_1[0] == weights_2[0]
+    assert numpy.allclose(weights_1, new_weight_exact, rtol=0.001)
 
 
 def potentiation_and_depression():
@@ -163,12 +163,12 @@ def potentiation_and_depression():
     print("Pre neuron spikes at: {}".format(pre_spikes))
     print("Post-neuron spikes at: {}".format(post_spikes))
     target_spikes = [1014,  1032, 1053]
-    assert(all(s1 == s2
-               for s1, s2 in zip(list(post_spikes), target_spikes)))
+    assert all(s1 == s2
+               for s1, s2 in zip(list(post_spikes), target_spikes))
     print("New weight exact: {}".format(new_weight_exact))
     print("New weight SpiNNaker: {}".format(weights))
 
-    assert(numpy.allclose(weights, new_weight_exact, rtol=0.001))
+    assert numpy.allclose(weights, new_weight_exact, rtol=0.001)
 
 
 class TestSTDPPairMultiplicative(BaseTestCase):

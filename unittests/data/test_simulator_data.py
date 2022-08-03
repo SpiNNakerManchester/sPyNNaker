@@ -81,7 +81,6 @@ class TestSimulatorData(unittest.TestCase):
 
     def test_populations_and_projections(self):
         writer = SpynnakerDataWriter.setup()
-        writer.create_graphs("test")
         writer.set_up_timings_and_delay(1000, 1, 1)
         self.assertListEqual(
             [], list(SpynnakerDataView.iterate_populations()))
