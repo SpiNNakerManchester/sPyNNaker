@@ -507,5 +507,5 @@ def test_pop_based_master_pop_table_standard(
         expected_n_entries += 2 * len(delayed_indices_connected)
         expected_n_addresses += 2 * len(delayed_indices_connected)
 
-    assert(n_entries == expected_n_entries)
-    assert(n_addresses == expected_n_addresses)
+    assert n_entries == expected_n_entries
+    assert n_addresses == expected_n_addresses

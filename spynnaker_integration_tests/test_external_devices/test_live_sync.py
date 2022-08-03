@@ -85,4 +85,4 @@ def test_live_sync():
     # 20 spikes should be in each range, but some could get lost, so check
     # for a range
     for i in range(5):
-        assert(n_spikes[i] >= 10 and n_spikes[i] <= 20)
+        assert n_spikes[i] >= 10 and n_spikes[i] <= 20
