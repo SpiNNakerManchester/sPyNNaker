@@ -15,24 +15,11 @@
 
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
-from spinn_front_end_common.data import FecTimer
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .key_constraint_adder import KeyConstraintAdder
-
-
-def fancy_do_load(graph_changed):
-    with FecTimer("WEIRD", "KeyConstraintAdder"):
-        simulator = get_simulator()
-        adder = KeyConstraintAdder()
-        adder()
-    simulator.do_load_normal(graph_changed)
 
 
 def do_run():
     sim.setup(1.0)
-    simulator = get_simulator()
-    simulator.do_load_normal = simulator._do_load
-    simulator._do_load = fancy_do_load
 
     # Break up the pre population as that is where delays happen
     sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, 50)
@@ -47,12 +34,30 @@ def do_run():
         pop1, pop2, conn, synapse_type=synapse_type)
     delays = projection.get(["delay"], "list")
 
+    # Run once to create what the KeyConstraintAdder needs
     sim.run(30)
+    sim.reset()
     # There are 100 connections, as there are 10 for each post-neuron
     assert (len(delays) == 100)
     # If the delays are done right, all pre-spikes should arrive at the
     # same time causing each neuron in the post-population to spike
     spikes = pop2.get_data("spikes").segments[0].spiketrains
+    for s in spikes:
+        assert (len(s) == 1)
+
+    # TODO work out if the KeyConstraintAdder is actually needed
+    # Now run with the KeyConstraintAdder
+    # Force a hard reset
+    sim.get_machine()
+    adder = KeyConstraintAdder()
+    adder()
+    sim.run(30)
+
+    # There are 100 connections, as there are 10 for each post-neuron
+    assert (len(delays) == 100)
+    # If the delays are done right, all pre-spikes should arrive at the
+    # same time causing each neuron in the post-population to spike
+    spikes = pop2.get_data("spikes").segments[1].spiketrains
     for s in spikes:
         assert (len(s) == 1)
     sim.end()
