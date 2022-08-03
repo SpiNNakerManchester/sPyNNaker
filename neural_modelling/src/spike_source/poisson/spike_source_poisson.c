@@ -598,7 +598,7 @@ static bool initialize(void) {
 
     // Allocate buffer to allow rate change (2 ints) per source
     rate_change_buffer = circular_buffer_initialize(
-    		ssp_params.n_spike_sources * 2);
+    		(ssp_params.n_spike_sources * 2) + 1);
     if (rate_change_buffer == NULL) {
     	log_error("Could not allocate rate change buffer!");
     	return false;
@@ -860,7 +860,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused) {
     }
 
     // Do any rate changes
-    while (circular_buffer_size(rate_change_buffer) >= 2) {
+    while (circular_buffer_size(rate_change_buffer) > 0) {
     	uint32_t id = 0;
     	REAL rate = 0.0k;
     	circular_buffer_get_next(rate_change_buffer, &id);
