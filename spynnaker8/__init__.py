@@ -211,9 +211,9 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           min_delay=_pynn_control.DEFAULT_MIN_DELAY,
           max_delay=None,
-          graph_label=None,
           database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
+    # pylint: disable=unused-argument
     """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
         to be called before any other function
 
@@ -223,7 +223,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     """
     use_spynnaker_pynn()
     return sim.setup(
-        timestep, min_delay, max_delay, graph_label,
+        timestep, min_delay, max_delay,
         database_socket_addresses, time_scale_factor, n_chips_required,
         n_boards_required, **extra_params)
 

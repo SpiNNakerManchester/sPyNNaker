@@ -35,7 +35,8 @@ N_GEN_PARAMS = 6
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
                                 AbstractGenerateConnectorOnHost,
                                 AbstractConnectorSupportsViewsOnMachine):
-    """ For each pair of pre-post cells, the connection probability is constant.
+    """ For each pair of pre-post cells, the connection probability is \
+        constant.
     """
 
     __slots__ = [
