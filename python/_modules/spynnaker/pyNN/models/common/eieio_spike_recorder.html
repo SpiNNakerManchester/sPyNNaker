@@ -98,22 +98,6 @@
                            <span class="s2">&quot;SpikeSourceArray so being ignored&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__record</span> <span class="o">=</span> <span class="n">new_state</span></div>
 
-<div class="viewcode-block" id="EIEIOSpikeRecorder.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="n">BYTES_PER_WORD</span></div>
-
-<div class="viewcode-block" id="EIEIOSpikeRecorder.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
-        <span class="k">return</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="mi">4</span></div>
-
 <div class="viewcode-block" id="EIEIOSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
                    <span class="n">application_vertex</span><span class="p">,</span> <span class="n">base_key_function</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded spikes from the object</span>

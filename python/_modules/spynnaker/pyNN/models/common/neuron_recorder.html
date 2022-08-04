@@ -1267,45 +1267,6 @@
                 <span class="n">variable</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">VariableSDRAM</span><span class="p">(</span><span class="n">fixed_sdram</span><span class="p">,</span> <span class="n">per_timestep_sdram</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NeuronRecorder.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Note: Per-timestep variables uses no DTCM</span>
-        <span class="c1"># *_rate + n_neurons_recording_* + *_indexes</span>
-        <span class="n">usage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span>
-
-        <span class="c1"># *_count + *_increment</span>
-        <span class="n">usage</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_PER_POINTER</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_PER_COUNT</span> <span class="o">+</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_PER_INCREMENT</span><span class="p">))</span>
-
-        <span class="c1"># out_spikes, *_values</span>
-        <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bitfield_variables</span><span class="p">:</span>
-                <span class="n">out_spike_words</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">))</span>
-                <span class="n">out_spike_bytes</span> <span class="o">=</span> <span class="n">out_spike_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
-                <span class="n">usage</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_FOR_TIMESTAMP</span> <span class="o">+</span> <span class="n">out_spike_bytes</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_types</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">size</span>
-                <span class="n">usage</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_FOR_TIMESTAMP</span> <span class="o">+</span> <span class="p">(</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">size</span><span class="p">)</span>
-
-        <span class="c1"># *_size</span>
-        <span class="n">usage</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sampling_rates</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_PER_SIZE</span>
-
-        <span class="c1"># n_recordings_outstanding</span>
-        <span class="n">usage</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_BYTES_PER_OUTSTANDING_RECORDING</span>
-        <span class="k">return</span> <span class="n">usage</span></div>
-
-<div class="viewcode-block" id="NeuronRecorder.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.NeuronRecorder.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_CPU_CYCLES_PER_NEURON</span> <span class="o">*</span> \
-            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recording_variables</span><span class="p">)</span></div>
-
     <span class="k">def</span> <span class="nf">__add_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="n">n_recording</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list(~numpy.ndarray) data:</span>

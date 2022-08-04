@@ -90,11 +90,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicator</span> <span class="o">=</span> <span class="n">multiplicator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__inh_input_previous</span> <span class="o">=</span> <span class="n">inh_input_previous</span>
 
-<div class="viewcode-block" id="InputTypeCurrentSEMD.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.get_n_cpu_cycles">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="c1"># A bit of a guess</span>
-        <span class="k">return</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
-
 <div class="viewcode-block" id="InputTypeCurrentSEMD.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.InputTypeCurrentSEMD.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractInputType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">MULTIPLICATOR</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicator</span></div>

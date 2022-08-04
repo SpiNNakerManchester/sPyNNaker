@@ -80,7 +80,7 @@
         <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">):</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__sdram&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__drop_late_spikes&quot;</span><span class="p">]</span>
 
     <span class="k">class</span> <span class="nc">_DELAY_EXTENSION_REGIONS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
@@ -121,11 +121,11 @@
     <span class="n">BACKGROUND_OVERLOADS_NAME</span> <span class="o">=</span> <span class="s2">&quot;Times_the_background_queue_overloaded&quot;</span>
     <span class="n">BACKGROUND_MAX_QUEUED_NAME</span> <span class="o">=</span> <span class="s2">&quot;Max_backgrounds_queued&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
-                 <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param ~pacman.model.resources.ResourceContainer resources_required:</span>
-<span class="sd">            The resources required by the vertex</span>
+<span class="sd">        :param ~pacman.model.resources.AbstractSDRAM sdram:</span>
+<span class="sd">            The sdram required by the vertex</span>
 <span class="sd">        :param str label: The name of the vertex</span>
 <span class="sd">        :param Slice vertex_slice: The slice of the vertex</span>
 <span class="sd">        :param iterable(~pacman.model.constraints.AbstractConstraint) \</span>
@@ -138,7 +138,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
             <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sdram</span> <span class="o">=</span> <span class="n">sdram</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>
@@ -152,9 +152,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span>
 
     <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">resources_required</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">resources_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">sdram_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sdram_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram</span>
 
 <div class="viewcode-block" id="DelayExtensionMachineVertex.parse_extra_provenance_items"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.parse_extra_provenance_items">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
                <span class="n">parse_extra_provenance_items</span><span class="p">)</span>

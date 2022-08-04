@@ -151,7 +151,7 @@
         <span class="s2">&quot;__buffered_sdram_per_timestep&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_recording&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__minimum_buffer_sdram&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__resources&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__sdram&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__sdram_partition&quot;</span><span class="p">]</span>
 
@@ -209,14 +209,14 @@
     <span class="n">SEED_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="mi">4</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">is_recording</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">sdram</span><span class="p">,</span> <span class="n">is_recording</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slice_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
             <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__is_recording</span> <span class="o">=</span> <span class="n">is_recording</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sdram</span> <span class="o">=</span> <span class="n">sdram</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__slice_index</span> <span class="o">=</span> <span class="n">slice_index</span>
@@ -225,9 +225,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__sdram_partition</span> <span class="o">=</span> <span class="n">sdram_partition</span></div>
 
     <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">resources_required</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">resources_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">sdram_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sdram_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sdram</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>

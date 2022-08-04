@@ -95,11 +95,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span> <span class="o">=</span> <span class="n">i_ca2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span> <span class="o">=</span> <span class="n">i_alpha</span>
 
-<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_n_cpu_cycles">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="c1"># A bit of a guess</span>
-        <span class="k">return</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
-
 <div class="viewcode-block" id="AdditionalInputCa2Adaptive.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span>

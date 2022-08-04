@@ -159,10 +159,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__exc2_old</span> <span class="o">=</span> <span class="n">exc2_old</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__scaling_factor</span> <span class="o">=</span> <span class="n">scaling_factor</span>
 
-<div class="viewcode-block" id="SynapseTypeSEMD.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.get_n_cpu_cycles">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
-
 <div class="viewcode-block" id="SynapseTypeSEMD.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.add_parameters">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseType</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_SYN_E</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_syn_E</span>
