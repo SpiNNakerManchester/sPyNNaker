@@ -114,11 +114,11 @@ class PopulationMachineLocalOnlyCombinedVertex(
         2: "INCOMING_SPIKE"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -136,7 +136,7 @@ class PopulationMachineLocalOnlyCombinedVertex(
         :param int structural_sz: The size of the structural data
         """
         super(PopulationMachineLocalOnlyCombinedVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, constraints, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS +
             LocalOnlyProvenance.N_ITEMS + MainProvenance.N_ITEMS,
