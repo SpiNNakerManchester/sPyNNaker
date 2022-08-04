@@ -58,22 +58,6 @@ class EIEIOSpikeRecorder(object):
                            "SpikeSourceArray so being ignored")
         self.__record = new_state
 
-    def get_dtcm_usage_in_bytes(self):
-        """
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return BYTES_PER_WORD
-
-    def get_n_cpu_cycles(self, n_neurons):
-        """
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return n_neurons * 4
-
     def get_spikes(self, label, region,
                    application_vertex, base_key_function):
         """ Get the recorded spikes from the object

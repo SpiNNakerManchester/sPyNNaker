@@ -57,10 +57,6 @@ class SynapseTypeExpIzhikevichNeuromodulated(AbstractSynapseType):
         self._isyn_exc = isyn_exc
         self._isyn_inh = isyn_inh
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self._tau_syn_E
