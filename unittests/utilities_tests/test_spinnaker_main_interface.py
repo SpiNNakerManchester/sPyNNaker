@@ -20,20 +20,31 @@ from spinn_utilities.exceptions import SimulatorShutdownException
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spynnaker.pyNN.config_setup import unittest_setup
+from spinn_front_end_common.abstract_models.impl import (
+    MachineAllocationController)
 
 
-class Close_Once(object):
-
+class Close_Once(MachineAllocationController):
     __slots__ = ["closed"]
 
     def __init__(self):
+        super().__init__("close-once")
         self.closed = False
+
+    def _wait(self):
+        return False
 
     def close(self):
         if self.closed:
             raise Exception("Close called twice")
-        else:
-            self.closed = True
+        self.closed = True
+        super().close()
+
+    def extend_allocation(self, new_total_run_time):
+        pass
+
+    def where_is_machine(self, chip_x, chip_y):
+        return (0, 0, 0)
 
 
 class TestSpinnakerMainInterface(unittest.TestCase):
@@ -55,7 +66,8 @@ class TestSpinnakerMainInterface(unittest.TestCase):
 
         interface = AbstractSpinnakerBase()
         mock_contoller = Close_Once()
-        interface._machine_allocation_controller = mock_contoller
+        # pylint: disable=protected-access
+        interface._data_writer.set_allocation_controller(mock_contoller)
         self.assertFalse(mock_contoller.closed)
         interface.stop()
         self.assertTrue(mock_contoller.closed)
