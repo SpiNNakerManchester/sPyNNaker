@@ -19,9 +19,9 @@ import unittest
 from spinn_utilities.exceptions import SimulatorShutdownException
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
-from spynnaker.pyNN.config_setup import unittest_setup
 from spinn_front_end_common.abstract_models.impl import (
     MachineAllocationController)
+from spynnaker.pyNN.config_setup import unittest_setup
 
 
 class Close_Once(MachineAllocationController):
