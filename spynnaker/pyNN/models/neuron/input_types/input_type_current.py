@@ -27,10 +27,6 @@ class InputTypeCurrent(AbstractInputType):
         """
         super().__init__([])
 
-    @overrides(AbstractInputType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 0
-
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
         pass
