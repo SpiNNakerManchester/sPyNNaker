@@ -42,22 +42,6 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         """
         return self.__struct
 
-    @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        """ Get the number of CPU cycles required to update the state
-
-        :param int n_neurons: The number of neurons to get the cycles for
-        :rtype: int
-        """
-
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        """ Get the DTCM memory usage required
-
-        :param int n_neurons: The number of neurons to get the usage for
-        :rtype: int
-        """
-        return self.struct.get_size_in_whole_words(n_neurons) * BYTES_PER_WORD
-
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the SDRAM memory usage required
 

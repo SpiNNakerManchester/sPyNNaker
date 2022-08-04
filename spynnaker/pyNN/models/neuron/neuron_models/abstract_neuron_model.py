@@ -60,11 +60,6 @@ class AbstractNeuronModel(
         """
         return self.__global_struct.get_size_in_whole_words() * BYTES_PER_WORD
 
-    @overrides(AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        usage = super().get_dtcm_usage_in_bytes(n_neurons)
-        return usage + self.__global_size
-
     @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
         usage = super().get_sdram_usage_in_bytes(n_neurons)

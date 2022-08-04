@@ -60,23 +60,6 @@ class MultiSpikeRecorder(object):
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
-    def get_dtcm_usage_in_bytes(self):
-        """
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return BYTES_PER_WORD
-
-    def get_n_cpu_cycles(self, n_neurons):
-        """
-        :param int n_neurons:
-        :rtype: int
-        """
-        if not self.__record:
-            return 0
-        return n_neurons * 4
-
     def get_spikes(self, label, region, application_vertex):
         """
         :param str label:

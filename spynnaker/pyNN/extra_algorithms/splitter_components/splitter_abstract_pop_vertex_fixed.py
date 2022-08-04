@@ -15,9 +15,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.resources import (
-    ResourceContainer, DTCMResource, CPUCyclesPerTickResource,
-    MultiRegionSDRAM)
+from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities\
@@ -105,16 +103,18 @@ class SplitterAbstractPopulationVertexFixed(
         app_vertex = self._governed_app_vertex
         app_vertex.synapse_recorder.add_region_offset(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
+
         self.__create_slices()
         constraints = get_remaining_constraints(app_vertex)
         self.__edge_map = dict()
         self.__vertices = list()
         for vertex_slice in self.__slices:
-            resources = self.get_resources_used_by_atoms(vertex_slice)
-            chip_counter.add_core(resources)
+            sdram = self.get_sdram_used_by_atoms(vertex_slice)
+            chip_counter.add_core(sdram)
+
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, resources, label, constraints)
+                vertex_slice, sdram, label, constraints)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
             self.__edge_map[machine_vertex] = [MachineEdge]
             self.__vertices.append(machine_vertex)
@@ -142,7 +142,7 @@ class SplitterAbstractPopulationVertexFixed(
         return self.__vertices
 
     def create_machine_vertex(
-            self, vertex_slice, resources, label, remaining_constraints):
+            self, vertex_slice, sdram, label, remaining_constraints):
 
         if self.__ring_buffer_shifts is None:
             app_vertex = self._governed_app_vertex
@@ -158,22 +158,22 @@ class SplitterAbstractPopulationVertexFixed(
         s_dynamics = self._governed_app_vertex.synapse_dynamics
         if isinstance(s_dynamics, AbstractLocalOnly):
             return PopulationMachineLocalOnlyCombinedVertex(
-                resources, label, remaining_constraints,
+                sdram, label, remaining_constraints,
                 self._governed_app_vertex, vertex_slice, index,
                 self.__ring_buffer_shifts, self.__weight_scales)
 
         # Otherwise create a normal vertex
         return PopulationMachineVertex(
-            resources, label, remaining_constraints,
+            sdram, label, remaining_constraints,
             self._governed_app_vertex,
             vertex_slice, index, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_size(vertex_slice),
             self.__structural_size(vertex_slice))
 
-    def get_resources_used_by_atoms(self, vertex_slice):
+    def get_sdram_used_by_atoms(self, vertex_slice):
         """  Gets the resources of a slice of atoms
         :param int n_atoms
-        :rtype: ~pacman.model.resources.ResourceContainer
+        :rtype: ~pacman.model.resources.MultiRegionSDRAM
         """
         # pylint: disable=arguments-differ
         n_atoms = vertex_slice.n_atoms
@@ -183,13 +183,8 @@ class SplitterAbstractPopulationVertexFixed(
         sdram.nest(len(PopulationMachineVertex.REGIONS) + 1, variable_sdram)
         sdram.merge(constant_sdram)
 
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=sdram, dtcm=self.__get_dtcm_cost(n_atoms),
-            cpu_cycles=self.__get_cpu_cost(n_atoms))
-
         # return the total resources.
-        return container
+        return sdram
 
     def __get_variable_sdram(self, n_atoms):
         """ returns the variable sdram from the recorders
@@ -353,26 +348,6 @@ class SplitterAbstractPopulationVertexFixed(
                 exact_sdram_for_bit_field_builder_region())
             self.__bitfield_sz = sdram
         return self.__bitfield_sz
-
-    def __get_dtcm_cost(self, n_atoms):
-        """ get the dtcm cost for a slice of n_atoms
-        :param int n_atoms: How many atoms to account for
-        :rtype: DTCMResource
-        """
-        return DTCMResource(
-            self._governed_app_vertex.get_common_dtcm() +
-            self._governed_app_vertex.get_neuron_dtcm(n_atoms) +
-            self._governed_app_vertex.get_synapse_dtcm(n_atoms))
-
-    def __get_cpu_cost(self, n_atoms):
-        """ get the cpu cost for a slice of n_atoms
-        :param int n_atoms: How many atoms to account for
-        :rtype: CPUCyclesPerTickResourcer
-        """
-        return CPUCyclesPerTickResource(
-            self._governed_app_vertex.get_common_cpu() +
-            self._governed_app_vertex.get_neuron_cpu(n_atoms) +
-            self._governed_app_vertex.get_synapse_cpu(n_atoms))
 
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):

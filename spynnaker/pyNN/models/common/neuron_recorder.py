@@ -1216,45 +1216,6 @@ class NeuronRecorder(object):
                 variable, n_atoms)
         return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
-    def get_dtcm_usage_in_bytes(self, n_atoms):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: int
-        """
-        # Note: Per-timestep variables uses no DTCM
-        # *_rate + n_neurons_recording_* + *_indexes
-        usage = self.get_metadata_sdram_usage_in_bytes(n_atoms)
-
-        # *_count + *_increment
-        usage += (len(self.__sampling_rates) * (
-            self._N_BYTES_PER_POINTER + self._N_BYTES_PER_COUNT +
-            self._N_BYTES_PER_INCREMENT))
-
-        # out_spikes, *_values
-        for variable in self.__sampling_rates:
-            if variable in self.__bitfield_variables:
-                out_spike_words = int(math.ceil(n_atoms / BITS_PER_WORD))
-                out_spike_bytes = out_spike_words * BYTES_PER_WORD
-                usage += self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
-            else:
-                size = self.__data_types[variable].size
-                usage += self._N_BYTES_FOR_TIMESTAMP + (n_atoms * size)
-
-        # *_size
-        usage += len(self.__sampling_rates) * self._N_BYTES_PER_SIZE
-
-        # n_recordings_outstanding
-        usage += self._N_BYTES_PER_OUTSTANDING_RECORDING
-        return usage
-
-    def get_n_cpu_cycles(self, n_neurons):
-        """
-        :param int n_neurons:
-        :rtype: int
-        """
-        return n_neurons * self._N_CPU_CYCLES_PER_NEURON * \
-            len(self.recording_variables)
-
     def __ceil_n_indices(self, n_neurons):
         """ The number of indices rounded up to a whole number of words
 
