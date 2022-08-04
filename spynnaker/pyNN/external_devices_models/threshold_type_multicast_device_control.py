@@ -46,10 +46,6 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
             DataType.UINT32])  # type to send
         self.__device = device
 
-    @overrides(AbstractThresholdType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 10 * n_neurons
-
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
         parameters[DEVICE] = self.__device
