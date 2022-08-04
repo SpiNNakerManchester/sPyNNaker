@@ -40,7 +40,7 @@ class DelayExtensionMachineVertex(
         AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification):
 
     __slots__ = [
-        "__resources",
+        "__sdram",
         "__drop_late_spikes"]
 
     class _DELAY_EXTENSION_REGIONS(Enum):
@@ -81,11 +81,11 @@ class DelayExtensionMachineVertex(
     BACKGROUND_OVERLOADS_NAME = "Times_the_background_queue_overloaded"
     BACKGROUND_MAX_QUEUED_NAME = "Max_backgrounds_queued"
 
-    def __init__(self, resources_required, label, vertex_slice,
-                 constraints=None, app_vertex=None):
+    def __init__(self, sdram, label, vertex_slice, constraints=None,
+                 app_vertex=None):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources required by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram required by the vertex
         :param str label: The name of the vertex
         :param Slice vertex_slice: The slice of the vertex
         :param iterable(~pacman.model.constraints.AbstractConstraint) \
@@ -98,7 +98,7 @@ class DelayExtensionMachineVertex(
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
-        self.__resources = resources_required
+        self.__sdram = sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -112,9 +112,9 @@ class DelayExtensionMachineVertex(
         return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                parse_extra_provenance_items)
