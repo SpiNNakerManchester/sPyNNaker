@@ -20,8 +20,7 @@ from pacman.model.constraints.partitioner_constraints import (
     AbstractPartitionerConstraint)
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.resources import (
-    ResourceContainer, ConstantSDRAM, DTCMResource, CPUCyclesPerTickResource)
+from pacman.model.resources import ConstantSDRAM
 from pacman.utilities import utility_calls
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import (
@@ -46,8 +45,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
     __slots__ = [
         "_machine_vertex_by_slice"]
 
-    ESTIMATED_CPU_CYCLES = 128
-    WORDS_PER_ATOM = 11 + 16
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
     SPLITTER_NAME = "SplitterDelayVertexSlice"
@@ -102,7 +99,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             vertex = self.create_machine_vertex(
                 source_app_vertex, vertex_slice, constraints)
             self._governed_app_vertex.remember_machine_vertex(vertex)
-            chip_counter.add_core(vertex.resources_required)
+            chip_counter.add_core(vertex.sdram_required)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
     def get_in_coming_slices(self):
@@ -133,33 +130,16 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         :rtype: DelayExtensionMachineVertex
         """
         label = f"Delay extension for {source_app_vertex}"
-        resources = self.get_resources_used_by_atoms(vertex_slice)
+        sdram = self.get_sdram_used_by_atoms(vertex_slice)
 
         machine_vertex = DelayExtensionMachineVertex(
-            resources, label, vertex_slice, remaining_constraints,
+            sdram, label, vertex_slice, remaining_constraints,
             self._governed_app_vertex)
 
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
 
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """ ger res for a APV
-
-        :param vertex_slice: the slice
-        :rtype: ResourceContainer
-        """
-        constant_sdram = self.constant_sdram(vertex_slice)
-
-        # set resources required from this object
-        container = ResourceContainer(
-            sdram=constant_sdram,
-            dtcm=self.dtcm_cost(vertex_slice),
-            cpu_cycles=self.cpu_cost(vertex_slice))
-
-        # return the total resources.
-        return container
-
-    def constant_sdram(self, vertex_slice):
+    def get_sdram_used_by_atoms(self, vertex_slice):
         """ returns the sdram used by the delay extension
 
         :param ApplicationGraph graph: app graph
@@ -173,24 +153,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
             DelayExtensionMachineVertex.get_provenance_data_size(
                 DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +
             self._get_size_of_generator_information())
-
-    def dtcm_cost(self, vertex_slice):
-        """ returns the dtcm used by the delay extension slice.
-
-        :param Slice vertex_slice: vertex slice
-        :rtype: DTCMResource
-        """
-        return DTCMResource(
-            self.WORDS_PER_ATOM * BYTES_PER_WORD * vertex_slice.n_atoms)
-
-    def cpu_cost(self, vertex_slice):
-        """ returns the cpu cost of the delay extension for a slice of atoms
-
-        :param Slice vertex_slice: slice of atoms
-        :rtype: CPUCyclesPerTickResource
-        """
-        return CPUCyclesPerTickResource(
-            self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms)
 
     def _get_size_of_generator_information(self):
         """ Get the size of the generator data

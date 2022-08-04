@@ -103,11 +103,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
 
-    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 100 * n_neurons
-
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[V_REST] = self.__v_rest
