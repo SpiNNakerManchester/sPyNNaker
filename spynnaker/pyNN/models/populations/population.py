@@ -23,8 +23,8 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints import AbstractConstraint
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.constraints import (
+    AbstractConstraint, ChipAndCoreConstraint)
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
