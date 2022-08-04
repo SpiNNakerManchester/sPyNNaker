@@ -19,7 +19,7 @@ from .key_constraint_adder import KeyConstraintAdder
 
 
 def do_run():
-    sim.setup(1.0)
+    sim.setup(1.0, n_boards_required=1)
 
     # Break up the pre population as that is where delays happen
     sim.set_number_of_neurons_per_core(sim.SpikeSourceArray, 50)
