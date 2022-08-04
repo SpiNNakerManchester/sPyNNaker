@@ -38,22 +38,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        """ Get the number of CPU cycles required to update the state
-
-        :param int n_neurons: The number of neurons to get the cycles for
-        :rtype: int
-        """
-
-    @abstractmethod
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        """ Get the DTCM memory usage required
-
-        :param int n_neurons: The number of neurons to get the usage for
-        :rtype: int
-        """
-
-    @abstractmethod
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the SDRAM memory usage required
 
