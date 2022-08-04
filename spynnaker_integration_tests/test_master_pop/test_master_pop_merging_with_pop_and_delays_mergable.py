@@ -46,11 +46,11 @@ def do_run():
         assert (len(s) == 1)
 
     # TODO work out if the KeyConstraintAdder is actually needed
+    adder = KeyConstraintAdder()
+    adder()
     # Now run with the KeyConstraintAdder
     # Force a hard reset
     sim.get_machine()
-    adder = KeyConstraintAdder()
-    adder()
     sim.run(30)
 
     # There are 100 connections, as there are 10 for each post-neuron
