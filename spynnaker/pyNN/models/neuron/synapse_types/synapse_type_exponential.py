@@ -69,10 +69,6 @@ class SynapseTypeExponential(AbstractSynapseType):
         self.__isyn_exc = isyn_exc
         self.__isyn_inh = isyn_inh
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
