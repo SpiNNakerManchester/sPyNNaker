@@ -13,8 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
+from pacman.model.constraints import FixedKeyAndMaskConstraint
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.utility_models import (
     ReverseIPTagMulticastSourceMachineVertex)
