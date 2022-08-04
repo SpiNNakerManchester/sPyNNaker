@@ -104,28 +104,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def binary_name(self):
         return self.__binary
 
-    @overrides(AbstractNeuronImpl.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        total = self.__neuron_model.get_n_cpu_cycles(n_neurons)
-        total += self.__synapse_type.get_n_cpu_cycles(n_neurons)
-        total += self.__input_type.get_n_cpu_cycles(n_neurons)
-        total += self.__threshold_type.get_n_cpu_cycles(n_neurons)
-        if self.__additional_input_type is not None:
-            total += self.__additional_input_type.get_n_cpu_cycles(n_neurons)
-        return total
-
-    @overrides(AbstractNeuronImpl.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        total = _N_STEPS_PER_TIMESTEP_SIZE
-        total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__threshold_type.get_dtcm_usage_in_bytes(n_neurons)
-        if self.__additional_input_type is not None:
-            total += self.__additional_input_type.get_dtcm_usage_in_bytes(
-                n_neurons)
-        return total
-
     @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
         total = _N_STEPS_PER_TIMESTEP_SIZE

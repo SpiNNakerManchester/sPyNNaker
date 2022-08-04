@@ -55,11 +55,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__i_ca2 = i_ca2
         self.__i_alpha = i_alpha
 
-    @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 3 * n_neurons
-
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_CA2] = self.__tau_ca2
