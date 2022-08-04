@@ -34,9 +34,8 @@ class TestIobuffMultirun(BaseTestCase):
         pop = sim.Population(10, sim.IF_curr_exp(), label='pop_1')
         sim.run(50)
 
-        placements = SpynnakerDataView.get_placements()
         machine_verts = list(pop._vertex.machine_vertices)
-        placement = placements.get_placement_of_vertex(machine_verts[0])
+        placement = SpynnakerDataView.get_placement_of_vertex(machine_verts[0])
 
         size1 = self.check_size(prov_path, placement)
         sim.run(50)
