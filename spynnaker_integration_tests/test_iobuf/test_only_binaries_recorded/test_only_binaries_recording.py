@@ -35,22 +35,20 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(500)
 
         app_iobuf_files = self.get_app_iobuf_files()
-        placements = SpynnakerDataView.get_placements()
         sim.end()
 
         machine_verts = input._vertex.machine_vertices
         data = set()
-        false_data = list()
 
         for machine_vertex in machine_verts:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             data.add(placement)
 
-        for p in range(0, 16):
-            if not placements.is_processor_occupied(0, 0, p):
-                false_data.append(p)
-            elif placements.get_placement_on_processor(0, 0, p) not in data:
-                false_data.append(p)
+        false_data = list(range(0, 16))
+        for placement in SpynnakerDataView.iterate_placements_on_core(0, 0):
+            if placement in data:
+                false_data.remove(placement.p)
 
         for placement in data:
             self.assertIn(
