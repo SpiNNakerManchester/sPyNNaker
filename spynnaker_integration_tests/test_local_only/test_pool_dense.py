@@ -77,8 +77,8 @@ def do_run():
     dst = sim.Population(n_out, sim.IF_curr_exp, post_cfg)
     dst.record(['v', 'spikes'])
 
-    prj = sim.Projection(src, dst, conn, sim.PoolDense())
-    prj1 = sim.Projection(src1, dst, conn1, sim.PoolDense())
+    sim.Projection(src, dst, conn, sim.PoolDense())
+    sim.Projection(src1, dst, conn1, sim.PoolDense())
 
     sim.run(run_time)
 

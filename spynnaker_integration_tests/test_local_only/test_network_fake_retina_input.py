@@ -83,8 +83,8 @@ def find_square_of_spikes(x, y, time, spikes, s_label, t_label):
                         " does not have matching time in all surrounding"
                         " targets")
             found_spikes.append((x_t, y_t, target_time))
-            # print(f"Spike in source {s_label}: {x}, {y} at time {time} matches"
-            #       f" target {t_label}: {x_t}, {y_t} at time {target_time}")
+            # print(f"Spike in source {s_label}: {x}, {y} time {time} matches"
+            #       f" target {t_label}: {x_t}, {y_t} time {target_time}")
     return spikes, found_spikes
 
 

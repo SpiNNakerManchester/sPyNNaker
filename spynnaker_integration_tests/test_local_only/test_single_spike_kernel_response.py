@@ -25,10 +25,10 @@ def do_run(plot):
     n_input = int(numpy.prod(in_shape))
     print("n_input ", n_input)
 
-    stride = numpy.array([1, 1], dtype='int32')  # h, w
+    # stride = numpy.array([1, 1], dtype='int32')  # h, w
     k_shape = numpy.array([5, 5], dtype='int32')
-    kernel = (numpy.arange(
-        numpy.prod(k_shape)) - (numpy.prod(k_shape) / 2)).reshape(k_shape) * 0.1
+    kernel = (numpy.arange(numpy.prod(
+        k_shape)) - (numpy.prod(k_shape) / 2)).reshape(k_shape) * 0.1
     print(kernel)
 
     run_time = 4.
@@ -63,9 +63,8 @@ def do_run(plot):
                             structure=Grid2D(out_shape[0] / out_shape[1]))
 
     output.record('v')
-    # syn = sim.StaticSynapse(weight=ws.flatten)
 
-    proj = sim.Projection(src, output, conn, sim.Convolution())
+    sim.Projection(src, output, conn, sim.Convolution())
 
     sim.run(run_time)
 
@@ -103,7 +102,6 @@ class SingleSpikeKernelResponse(BaseTestCase):
 
     def check_run(self):
         (ratios, kernel_ratios) = do_run(plot=False)
-        diff = kernel_ratios - ratios
         is_close = numpy.isclose(ratios, kernel_ratios, rtol=0.01)
         assert (all(is_close))
 
