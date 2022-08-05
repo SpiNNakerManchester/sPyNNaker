@@ -17,8 +17,7 @@ import math
 
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import DelayExtensionException
 from spynnaker.pyNN.extra_algorithms.splitter_components import (
     AbstractSpynnakerSplitterDelay, SplitterDelayVertexSlice)
@@ -31,15 +30,14 @@ from spynnaker.pyNN.utilities import constants
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
-def delay_support_adder(app_graph):
+def delay_support_adder():
     """ adds the delay extensions to the app graph, now that all the\
         splitter objects have been set.
 
-    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        the app graph
     """
     adder = _DelaySupportAdder()
-    adder._run(app_graph)
+    # pylint: disable=protected-access
+    adder._run()
 
 
 class _DelaySupportAdder(object):
@@ -52,29 +50,31 @@ class _DelaySupportAdder(object):
     __slots__ = [
         "_app_to_delay_map",
         "_delay_post_edge_map",
-        "_delay_pre_edges"]
+        "_new_edges"]
 
     def __init__(self):
         self._app_to_delay_map = dict()
         self._delay_post_edge_map = dict()
-        self._delay_pre_edges = list()
+        self._new_edges = list()
 
-    def _run(self, app_graph):
+    def _run(self):
         """ adds the delay extensions to the app graph, now that all the\
             splitter objects have been set.
 
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-            the app graph
         """
+        progress = ProgressBar(1 + SpynnakerDataView.get_n_partitions(),
+                               "Adding delay extensions as required")
 
-        # progress abr and data holders
-        progress = ProgressBar(
-            len(list(app_graph.outgoing_edge_partitions)),
-            "Adding delay extensions as required")
+        for vertex in SpynnakerDataView.get_vertices_by_type(
+                DelayExtensionVertex):
+            self._app_to_delay_map[vertex.partition] = vertex
+            for edge in vertex.outgoing_edges:
+                self._delay_post_edge_map[(vertex, edge.post_vertex)] = edge
+        progress.update(1)
 
         # go through all partitions.
         for app_outgoing_edge_partition in progress.over(
-                app_graph.outgoing_edge_partitions):
+                SpynnakerDataView.iterate_partitions()):
             for app_edge in app_outgoing_edge_partition.edges:
                 if isinstance(app_edge, ProjectionApplicationEdge):
 
@@ -89,29 +89,22 @@ class _DelaySupportAdder(object):
                         delay_app_vertex = (
                             self._create_delay_app_vertex_and_pre_edge(
                                 app_outgoing_edge_partition, app_edge,
-                                delay_steps_per_stage, app_graph,
-                                n_delay_stages))
+                                delay_steps_per_stage, n_delay_stages))
 
                         # add the edge from the delay extension to the
                         # dest vertex
                         self._create_post_delay_edge(
                             delay_app_vertex, app_edge)
-
         # avoids mutating the list of outgoing partitions. add them afterwards
-        self._add_new_app_edges(app_graph)
+        self._add_new_app_edges()
 
-    def _add_new_app_edges(self, app_graph):
+    def _add_new_app_edges(self):
         """ adds new edges to the app graph. avoids mutating the arrays being\
             iterated over previously.
-
-        :param ApplicationGraph app_graph: app graph
         :rtype: None
         """
-        for key in self._delay_post_edge_map:
-            delay_edge = self._delay_post_edge_map[key]
-            app_graph.add_edge(delay_edge, constants.SPIKE_PARTITION_ID)
-        for edge in self._delay_pre_edges:
-            app_graph.add_edge(edge, constants.SPIKE_PARTITION_ID)
+        for edge in self._new_edges:
+            SpynnakerDataView.add_edge(edge, constants.SPIKE_PARTITION_ID)
 
     def _create_post_delay_edge(self, delay_app_vertex, app_edge):
         """ creates the edge between delay extension and post vertex. stores\
@@ -133,11 +126,13 @@ class _DelaySupportAdder(object):
                 undelayed_edge=app_edge)
             self._delay_post_edge_map[
                 (delay_app_vertex, app_edge.post_vertex)] = delay_edge
+            self._new_edges.append(delay_edge)
             app_edge.delay_edge = delay_edge
+            delay_app_vertex.add_outgoing_edge(delay_edge)
 
     def _create_delay_app_vertex_and_pre_edge(
             self, app_outgoing_edge_partition, app_edge, delay_per_stage,
-            app_graph, n_delay_stages):
+            n_delay_stages):
         """ creates the delay extension app vertex and the edge from the src\
             vertex to this delay extension. Adds to the graph, as safe to do\
             so.
@@ -147,7 +142,6 @@ class _DelaySupportAdder(object):
         :param AppEdge app_edge: the undelayed app edge.
         :param int delay_per_stage: delay for each delay stage
         :param int n_delay_stages: the number of delay stages needed
-        :param ApplicationGraph app_graph: the app graph.
         :return: the DelayExtensionAppVertex
         """
 
@@ -158,13 +152,12 @@ class _DelaySupportAdder(object):
             # build delay app vertex
             delay_name = "{}_delayed".format(app_edge.pre_vertex.label)
             delay_app_vertex = DelayExtensionVertex(
-                app_edge.pre_vertex.n_atoms, delay_per_stage, n_delay_stages,
-                app_edge.pre_vertex, label=delay_name)
+                app_outgoing_edge_partition, delay_per_stage, n_delay_stages,
+                label=delay_name)
 
             # set trackers
-            delay_app_vertex.splitter = (
-                SplitterDelayVertexSlice(app_edge.pre_vertex.splitter))
-            app_graph.add_vertex(delay_app_vertex)
+            delay_app_vertex.splitter = SplitterDelayVertexSlice()
+            SpynnakerDataView.add_vertex(delay_app_vertex)
             self._app_to_delay_map[app_outgoing_edge_partition] = (
                 delay_app_vertex)
 
@@ -173,7 +166,7 @@ class _DelaySupportAdder(object):
                 app_edge.pre_vertex, delay_app_vertex,
                 label="{}_to_DelayExtension".format(
                     app_edge.pre_vertex.label))
-            self._delay_pre_edges.append(delay_pre_edge)
+            self._new_edges.append(delay_pre_edge)
         else:
             delay_app_vertex.set_new_n_delay_stages_and_delay_per_stage(
                 n_delay_stages, delay_per_stage)
@@ -204,9 +197,9 @@ class _DelaySupportAdder(object):
                 f"and yet requires a delay support for edge {app_edge}. "
                 f"Please use a Splitter which utilises the "
                 f"AbstractSpynnakerSplitterDelay interface.")
-
         max_delay_steps = app_edge.post_vertex.splitter.max_support_delay()
-        max_delay_ms = max_delay_steps * machine_time_step_ms()
+        time_step_ms = SpynnakerDataView.get_simulation_time_step_ms()
+        max_delay_ms = max_delay_steps * time_step_ms
 
         # if does not need a delay extension, run away
         if max_delay_ms >= max_delay_needed_ms:
@@ -224,14 +217,14 @@ class _DelaySupportAdder(object):
         # needs a delay extension, check can be supported with 1 delay
         # extension. coz we dont do more than 1 at the moment
         ext_provided_ms = (DelayExtensionVertex.get_max_delay_ticks_supported(
-                max_delay_steps) * machine_time_step_ms())
+                max_delay_steps) * time_step_ms)
         total_delay_ms = ext_provided_ms + max_delay_ms
         if total_delay_ms < max_delay_needed_ms:
             raise DelayExtensionException(
                 f"Edge:{app_edge.label} "
                 f"has a max delay of {max_delay_needed_ms}. "
                 f"But at a timestep of "
-                f"{machine_time_step_ms} "
+                f"{time_step_ms} "
                 f"the max delay supported is {total_delay_ms}")
 
         # return data for building delay extensions

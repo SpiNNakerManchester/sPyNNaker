@@ -18,7 +18,7 @@ Synfirechain-like example
 """
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestCoresAndBinariesRecording(BaseTestCase):
@@ -35,22 +35,20 @@ class TestCoresAndBinariesRecording(BaseTestCase):
         sim.run(500)
 
         app_iobuf_files = self.get_app_iobuf_files()
-        placements = globals_variables.get_simulator()._placements
         sim.end()
 
         machine_verts = input._vertex.machine_vertices
         data = set()
-        false_data = list()
 
         for machine_vertex in machine_verts:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             data.add(placement)
 
-        for processor in range(0, 16):
-            if not placements.is_processor_occupied(0, 0, processor):
-                false_data.append(processor)
-            elif placements._placements[(0, 0, processor)] not in data:
-                false_data.append(processor)
+        false_data = list(range(0, 16))
+        for placement in SpynnakerDataView.iterate_placements_on_core(0, 0):
+            if placement in data:
+                false_data.remove(placement.p)
 
         for placement in data:
             self.assertIn(

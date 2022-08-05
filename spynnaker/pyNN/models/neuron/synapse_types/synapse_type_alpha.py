@@ -98,10 +98,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self.__inh_exp_response = inh_exp_response
         self.__tau_syn_I = tau_syn_I
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
@@ -129,10 +125,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
-        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa
-        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa
+        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa: E731
+        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa: E731
 
         # Add the rest of the data
         return [state_variables[EXC_RESPONSE],

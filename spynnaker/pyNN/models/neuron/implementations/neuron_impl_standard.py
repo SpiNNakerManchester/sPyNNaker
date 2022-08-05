@@ -20,8 +20,7 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 # The size of the n_steps_per_timestep parameter
 _N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
@@ -105,28 +104,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def binary_name(self):
         return self.__binary
 
-    @overrides(AbstractNeuronImpl.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        total = self.__neuron_model.get_n_cpu_cycles(n_neurons)
-        total += self.__synapse_type.get_n_cpu_cycles(n_neurons)
-        total += self.__input_type.get_n_cpu_cycles(n_neurons)
-        total += self.__threshold_type.get_n_cpu_cycles(n_neurons)
-        if self.__additional_input_type is not None:
-            total += self.__additional_input_type.get_n_cpu_cycles(n_neurons)
-        return total
-
-    @overrides(AbstractNeuronImpl.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        total = _N_STEPS_PER_TIMESTEP_SIZE
-        total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
-        total += self.__threshold_type.get_dtcm_usage_in_bytes(n_neurons)
-        if self.__additional_input_type is not None:
-            total += self.__additional_input_type.get_dtcm_usage_in_bytes(
-                n_neurons)
-        return total
-
     @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
         total = _N_STEPS_PER_TIMESTEP_SIZE
@@ -188,7 +165,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
         # Work out the time step per step
-        ts = machine_time_step()
+        ts = SpynnakerDataView.get_simulation_time_step_us()
         ts /= self.__n_steps_per_timestep
         items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
         items.extend(

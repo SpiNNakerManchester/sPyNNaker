@@ -22,10 +22,9 @@ from pyNN.random import NumpyRNG, RandomDistribution
 
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms)
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.interface.provenance import ProvenanceWriter
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -96,7 +95,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param SynapseInformation synapse_info: the synapse info
         """
         self._rng = (self._rng or NumpyRNG())
-        self.__min_delay = machine_time_step_ms()
+        self.__min_delay = SpynnakerDataView.get_simulation_time_step_ms()
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
@@ -276,7 +275,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         """ Get the maximum number of connections from any
             neuron in the pre vertex to the neurons in the post_vertex_slice,
@@ -286,7 +285,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_post_atoms:
         :param SynapseInformation synapse_info:
         :param min_delay:
         :type min_delay: int or None
@@ -582,6 +581,7 @@ class AbstractConnector(object, metaclass=AbstractBase):
         # Convert to native Python integer; provenance system assumption
         ncd = self.__n_clipped_delays.item()
         with ProvenanceWriter() as db:
+            # pylint: disable=expression-not-assigned
             db.insert_connector(
                 synapse_info.pre_population.label,
                 synapse_info.post_population.label,

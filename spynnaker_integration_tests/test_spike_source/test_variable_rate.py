@@ -171,8 +171,8 @@ def variable_rate_options():
                       " (with tolerance {}) for rate {}"
                       " for duration {}".format(
                           n_spikes, expected, tolerance, rate, (end - start)))
-                assert(n_spikes >= (expected - tolerance))
-                assert(n_spikes <= (expected + tolerance))
+                assert n_spikes >= (expected - tolerance)
+                assert n_spikes <= (expected + tolerance)
 
 
 def variable_rate_reset():
@@ -217,8 +217,8 @@ def variable_rate_reset():
     numpy.savetxt("spikesp2.txt", spikes_p_2[0])
 
     for s1, s2, s3 in zip(spikes_1, spikes_2, spikes_p_2):
-        assert(numpy.array_equal(s1, s2))
-        assert(numpy.array_equal(s2, s3))
+        assert numpy.array_equal(s1, s2)
+        assert numpy.array_equal(s2, s3)
 
 
 def variable_rate_100us():
@@ -255,8 +255,8 @@ def variable_rate_100us():
               " (with tolerance {}) for rate {}"
               " for duration {}".format(
                   n_spikes_rate, expected, tolerance, rate, (end - start)))
-        assert(n_spikes_rate >= (expected - tolerance))
-        assert(n_spikes_rate <= (expected + tolerance))
+        assert n_spikes_rate >= (expected - tolerance)
+        assert n_spikes_rate <= (expected + tolerance)
 
 
 class TestCreatePoissons(BaseTestCase):

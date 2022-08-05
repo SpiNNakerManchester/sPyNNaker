@@ -55,11 +55,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         self.__i_ca2 = i_ca2
         self.__i_alpha = i_alpha
 
-    @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 3 * n_neurons
-
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_CA2] = self.__tau_ca2
@@ -82,8 +77,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [parameters[TAU_CA2].apply_operation(
                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),

@@ -32,12 +32,14 @@ from pyNN.space import (
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure)
 from pyNN.space import distance as _pynn_distance
 
+from spinn_utilities.exceptions import (
+    SimulatorNotSetupException, SimulatorShutdownException)
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities.exceptions import (
-    ConfigurationException, SimulatorNotSetupException,
-    SimulatorShutdownException)
+    ConfigurationException)
 from spinn_front_end_common.utilities import globals_variables
 
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 # connections
@@ -108,6 +110,11 @@ from spynnaker.pyNN.models.populations import (
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.projection import Projection as SpiNNakerProjection
 
+# current sources
+# noinspection PyUnresolvedReferences
+from spynnaker.pyNN.models.current_sources import (
+    DCSource, ACSource, StepCurrentSource, NoisyCurrentSource)
+
 from spynnaker.pyNN import external_devices
 from spynnaker.pyNN import extra_models
 
@@ -155,6 +162,8 @@ __all__ = [
     'SpiNNakerProjection',
     # External devices and extra models
     'external_devices', 'extra_models',
+    # CurrentSources
+    'DCSource', 'ACSource', 'StepCurrentSource', 'NoisyCurrentSource',
     # Stuff that we define
     'end', 'setup', 'run', 'run_until', 'run_for', 'num_processes', 'rank',
     'reset', 'set_number_of_neurons_per_core',
@@ -266,7 +275,6 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           min_delay=_pynn_control.DEFAULT_MIN_DELAY,
           max_delay=None,
-          graph_label=None,
           database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
     """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
@@ -281,8 +289,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :type min_delay: float or str
     :param max_delay: Ignored and logs a warning if provided
     :type max_delay: float or str or None
-    :param graph_label: the label for the graph
-    :type graph_label: str or None
     :param database_socket_addresses: the sockets used by external devices
         for the database notification protocol
     :type database_socket_addresses:
@@ -315,12 +321,12 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         logger.warning(
             "max_delay is not supported by sPyNNaker so will be ignored")
 
-    # pylint: disable=too-many-arguments, too-many-function-args
+    # pylint: disable=too-many-arguments
     # setup PyNN common stuff
     pynn_common.setup(timestep, min_delay, **extra_params)
 
     # create stuff simulator
-    if globals_variables.has_simulator():
+    if SpynnakerDataView.is_setup():
         logger.warning("Calling setup a second time causes the previous "
                        "simulator to be stopped and cleared.")
         # if already exists, kill and rebuild
@@ -329,15 +335,10 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
 
-    # add default label if needed
-    if graph_label is None:
-        graph_label = "PyNN0.8_graph"
-
     # create the main object for all stuff related software
     SpiNNaker(
-        database_socket_addresses=database_socket_addresses,
         time_scale_factor=time_scale_factor, timestep=timestep,
-        min_delay=min_delay, graph_label=graph_label,
+        min_delay=min_delay,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
 
@@ -348,7 +349,7 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
 
     # get overloaded functions from PyNN in relation of our simulator object
     _create_overloaded_functions(globals_variables.get_simulator())
-
+    SpynnakerDataView.add_database_socket_addresses(database_socket_addresses)
     return rank()
 
 
@@ -497,8 +498,7 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
         msg = "set_number_of_neurons_per_core call now expects " \
               "neuron_type as a class instead of as a str"
         raise ConfigurationException(msg)
-    simulator = globals_variables.get_simulator()
-    simulator.set_number_of_neurons_per_core(
+    SpynnakerDataView.add_number_of_neurons_per_core(
         neuron_type, max_permitted)
 
 
@@ -518,7 +518,7 @@ def connect(pre, post, weight=0.0, delay=None, receptor_type=None, p=1,
     :param ~pyNN.random.NumpyRNG rng: random number generator
     """
     # pylint: disable=too-many-arguments
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     __pynn["connect"](pre, post, weight, delay, receptor_type, p, rng)
 
 
@@ -531,7 +531,7 @@ def create(cellclass, cellparams=None, n=1):
     :param int n: n neurons
     :rtype: ~spynnaker.pyNN.models.populations.Population
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["create"](cellclass, cellparams, n)
 
 
@@ -549,7 +549,7 @@ def get_current_time():
 
     :return: returns the current time
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["get_current_time"]()
 
 
@@ -560,7 +560,7 @@ def get_min_delay():
     :return: returns the min delay of the simulation
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["get_min_delay"]()
 
 
@@ -583,7 +583,7 @@ def get_time_step():
     :return: get the time step of the simulation (in ms)
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return float(__pynn["get_time_step"]())
 
 
@@ -595,7 +595,7 @@ def initialize(cells, **initial_values):
         ~spynnaker.pyNN.models.populations.PopulationView
     :param initial_values: the params and their values to change
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     pynn_common.initialize(cells, **initial_values)
 
 
@@ -608,7 +608,7 @@ def num_processes():
     :return: the number of MPI processes
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["num_processes"]()
 
 
@@ -621,7 +621,7 @@ def rank():
     :return: MPI rank
     :rtype: int
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["rank"]()
 
 
@@ -644,7 +644,7 @@ def record(variables, source, filename, sampling_interval=None,
     :return: neo object
     :rtype: ~neo.core.Block
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["record"](variables, source, filename, sampling_interval,
                             annotations)
 
@@ -658,7 +658,7 @@ def reset(annotations=None):
     """
     if annotations is None:
         annotations = {}
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     __pynn["reset"](annotations)
 
 
@@ -671,7 +671,7 @@ def run(simtime, callbacks=None):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["run"](simtime, callbacks=callbacks)
 
 
@@ -687,7 +687,7 @@ def run_until(tstop):
     :return: the actual simulation time that the simulation stopped at
     :rtype: float
     """
-    globals_variables.check_simulator()
+    SpynnakerDataView.check_user_can_act()
     return __pynn["run_until"](tstop)
 
 
@@ -697,5 +697,5 @@ def get_machine():
     :return: the machine object
     :rtype: ~spinn_machine.Machine
     """
-    globals_variables.check_simulator()
-    return globals_variables.get_simulator().machine
+    SpynnakerDataView.check_user_can_act()
+    return SpynnakerDataView.get_machine()

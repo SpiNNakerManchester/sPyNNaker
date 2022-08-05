@@ -15,22 +15,15 @@
 
 from spinn_front_end_common.interface.interface_functions import (
     graph_data_specification_writer)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import (
     DelayExtensionMachineVertex)
 
 
-def spynnaker_data_specification_writer(
-        placements, hostname, machine, app_id, data_n_timesteps):
+def spynnaker_data_specification_writer():
     """
     Executes data specification generation for sPyNNaker
 
-    :param ~pacman.model.placements.Placements placements:
-        placements of machine graph to cores
-    :param str hostname: SpiNNaker machine name
-    :param ~spinn_machine.Machine machine:
-        the python representation of the SpiNNaker machine
-    :param int data_n_timesteps:
-        The number of timesteps for which data space will been reserved
     :return: DSG targets (map of placement tuple and filename)
     :rtype:
         tuple(~spinn_front_end_common.interface.ds.DataSpecificationTargets,
@@ -38,17 +31,15 @@ def spynnaker_data_specification_writer(
     :raises ~spinn_front_end_common.exceptions.ConfigurationException:
         If the DSG asks to use more SDRAM than is available.
     """
-    # pylint: disable=too-many-arguments, signature-differs
+    # pylint: disable=too-many-arguments
 
     delay_extensions = list()
     placement_order = list()
-    for placement in placements.placements:
+    for placement in SpynnakerDataView.iterate_placemements():
         if isinstance(placement.vertex, DelayExtensionMachineVertex):
             delay_extensions.append(placement)
         else:
             placement_order.append(placement)
     placement_order.extend(delay_extensions)
 
-    return graph_data_specification_writer(
-        placements, hostname, machine, app_id, data_n_timesteps,
-        placement_order)
+    return graph_data_specification_writer(placement_order)

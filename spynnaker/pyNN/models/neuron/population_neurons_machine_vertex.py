@@ -16,7 +16,6 @@ from enum import Enum
 import os
 import ctypes
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
@@ -72,8 +71,9 @@ class PopulationNeuronsMachineVertex(
         PROFILING = 2
         RECORDING = 3
         NEURON_PARAMS = 4
-        NEURON_RECORDING = 5
-        SDRAM_EDGE_PARAMS = 6
+        CURRENT_SOURCE_PARAMS = 5
+        NEURON_RECORDING = 6
+        SDRAM_EDGE_PARAMS = 7
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -85,6 +85,7 @@ class PopulationNeuronsMachineVertex(
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
+        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
@@ -92,11 +93,11 @@ class PopulationNeuronsMachineVertex(
         0: "TIMER_NEURONS"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -112,7 +113,7 @@ class PopulationNeuronsMachineVertex(
             The scaling to apply to weights to store them in the synapses
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, constraints, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
@@ -194,28 +195,15 @@ class PopulationNeuronsMachineVertex(
             self.vertex_slice)
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info", "data_n_time_steps"})
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
-        """
-        :param machine_graph: (injected)
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        :param n_key_map: (injected)
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         # Write information about SDRAM
         n_neurons = self._vertex_slice.n_atoms
@@ -238,10 +226,11 @@ class PopulationNeuronsMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
 
         # close spec
         spec.end_specification()
@@ -269,16 +258,22 @@ class PopulationNeuronsMachineVertex(
     def weight_scales(self):
         return self.__weight_scales
 
-    @property
-    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
-    def n_bytes_for_transfer(self):
-        n_bytes = (2 ** get_n_bits(self.n_target_neurons) *
-                   self.n_target_synapse_types * self.N_BYTES_PER_INPUT)
+    @staticmethod
+    def get_n_bytes_for_transfer(n_neurons, n_synapse_types):
+        n_bytes = (2 ** get_n_bits(n_neurons) *
+                   n_synapse_types *
+                   ReceivesSynapticInputsOverSDRAM.N_BYTES_PER_INPUT)
         # May need to add some padding if not a round number of words
         extra_bytes = n_bytes % BYTES_PER_WORD
         if extra_bytes:
             n_bytes += BYTES_PER_WORD - extra_bytes
         return n_bytes
+
+    @property
+    @overrides(ReceivesSynapticInputsOverSDRAM.n_bytes_for_transfer)
+    def n_bytes_for_transfer(self):
+        return self.get_n_bytes_for_transfer(
+            self.n_target_neurons, self.n_target_synapse_types)
 
     @overrides(ReceivesSynapticInputsOverSDRAM.sdram_requirement)
     def sdram_requirement(self, sdram_machine_edge):

@@ -29,10 +29,6 @@ class InputTypeDelta(AbstractInputType):
         super().__init__([
             DataType.S1615])  # scale_factor, calculated from timestep
 
-    @overrides(AbstractInputType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 1 * n_neurons
-
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
         pass
@@ -43,7 +39,6 @@ class InputTypeDelta(AbstractInputType):
 
     @overrides(AbstractInputType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # pylint: disable=arguments-differ
         scale_factor = 1000.0 / float(ts)
         return [scale_factor]
 

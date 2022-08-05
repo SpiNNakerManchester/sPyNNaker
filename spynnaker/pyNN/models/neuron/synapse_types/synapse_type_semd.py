@@ -119,10 +119,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
         self.__exc2_old = exc2_old
         self.__scaling_factor = scaling_factor
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
@@ -151,7 +147,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
         tsfloat = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
 
         def decay(x):

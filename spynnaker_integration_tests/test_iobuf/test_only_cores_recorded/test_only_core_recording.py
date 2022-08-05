@@ -16,7 +16,7 @@
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
-from spinn_front_end_common.utilities import globals_variables
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class TestOnlyCoresRecording(BaseTestCase):
@@ -25,8 +25,7 @@ class TestOnlyCoresRecording(BaseTestCase):
         sim.setup(timestep=1.0, n_boards_required=1)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
 
-        machine = globals_variables.get_simulator().machine
-
+        machine = SpynnakerDataView.get_machine()
         input1 = sim.Population(
             1, sim.SpikeSourceArray(spike_times=[0]), label="input1")
         input2 = sim.Population(
@@ -38,33 +37,33 @@ class TestOnlyCoresRecording(BaseTestCase):
 
         # Make sure there is stuff at the cores specified in the cfg file
         input1.set_constraint(
-            ChipAndCoreConstraint(0, 0, 1))
+            ChipAndCoreConstraint(0, 0, 4))
         input2.set_constraint(
             ChipAndCoreConstraint(0, 0, 3))
         # While there must be a chip 0,0  chip 1,1 could be missing
         if machine.is_chip_at(1, 1):
             input3.set_constraint(
-                ChipAndCoreConstraint(1, 1, 1))
+                ChipAndCoreConstraint(1, 1, 5))
         # Make sure there is stuff at a core not specified in the cfg file
         input4.set_constraint(
-            ChipAndCoreConstraint(0, 0, 2))
+            ChipAndCoreConstraint(0, 0, 10))
 
         sim.run(500)
 
         provenance_files = self.get_app_iobuf_files()
         sim.end()
 
-        self.assertIn(
+        self.assertNotIn(
             "iobuf_for_chip_0_0_processor_id_1.txt", provenance_files)
         self.assertNotIn(
             "iobuf_for_chip_0_0_processor_id_2.txt", provenance_files)
         self.assertIn(
             "iobuf_for_chip_0_0_processor_id_3.txt", provenance_files)
-        self.assertNotIn(
+        self.assertIn(
             "iobuf_for_chip_0_0_processor_id_4.txt", provenance_files)
         if machine.is_chip_at(1, 1):
             self.assertIn(
-                "iobuf_for_chip_1_1_processor_id_1.txt", provenance_files)
+                "iobuf_for_chip_1_1_processor_id_5.txt", provenance_files)
         self.assertNotIn(
             "iobuf_for_chip_1_1_processor_id_2.txt", provenance_files)
 

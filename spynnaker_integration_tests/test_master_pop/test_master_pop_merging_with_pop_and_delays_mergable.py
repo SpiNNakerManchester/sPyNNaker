@@ -15,7 +15,7 @@
 
 from spinnaker_testbase import BaseTestCase
 import pyNN.spiNNaker as sim
-from spinn_front_end_common.utilities import FecTimer
+from spinn_front_end_common.data import FecTimer
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .key_constraint_adder import KeyConstraintAdder
 
@@ -24,7 +24,7 @@ def fancy_do_load(graph_changed):
     with FecTimer("WEIRD", "KeyConstraintAdder"):
         simulator = get_simulator()
         adder = KeyConstraintAdder()
-        adder(simulator.machine_graph)
+        adder()
     simulator.do_load_normal(graph_changed)
 
 

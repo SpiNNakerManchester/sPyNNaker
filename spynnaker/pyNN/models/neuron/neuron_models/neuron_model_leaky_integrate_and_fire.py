@@ -103,11 +103,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
 
-    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 100 * n_neurons
-
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[V_REST] = self.__v_rest
@@ -135,8 +130,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],

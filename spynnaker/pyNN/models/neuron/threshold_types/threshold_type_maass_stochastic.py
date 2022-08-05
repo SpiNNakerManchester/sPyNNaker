@@ -63,10 +63,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         self.__tau_th = tau_th
         self.__v_thresh = v_thresh
 
-    @overrides(AbstractThresholdType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 30 * n_neurons
-
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
         parameters[DU_TH] = self.__du_th
@@ -87,8 +83,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
                 parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),

@@ -16,7 +16,6 @@ from enum import Enum
 import os
 import ctypes
 
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
@@ -94,20 +93,21 @@ class PopulationMachineVertex(
         """Regions for populations."""
         SYSTEM = 0
         NEURON_PARAMS = 1
-        SYNAPSE_PARAMS = 2
-        POPULATION_TABLE = 3
-        SYNAPTIC_MATRIX = 4
-        SYNAPSE_DYNAMICS = 5
-        STRUCTURAL_DYNAMICS = 6
-        NEURON_RECORDING = 7
-        PROVENANCE_DATA = 8
-        PROFILING = 9
-        CONNECTOR_BUILDER = 10
-        DIRECT_MATRIX = 11
-        BIT_FIELD_FILTER = 12
-        BIT_FIELD_BUILDER = 13
-        BIT_FIELD_KEY_MAP = 14
-        RECORDING = 15
+        CURRENT_SOURCE_PARAMS = 2
+        SYNAPSE_PARAMS = 3
+        POPULATION_TABLE = 4
+        SYNAPTIC_MATRIX = 5
+        SYNAPSE_DYNAMICS = 6
+        STRUCTURAL_DYNAMICS = 7
+        NEURON_RECORDING = 8
+        PROVENANCE_DATA = 9
+        PROFILING = 10
+        CONNECTOR_BUILDER = 11
+        DIRECT_MATRIX = 12
+        BIT_FIELD_FILTER = 13
+        BIT_FIELD_BUILDER = 14
+        BIT_FIELD_KEY_MAP = 15
+        RECORDING = 16
 
     # Regions for this vertex used by common parts
     COMMON_REGIONS = CommonRegions(
@@ -119,6 +119,7 @@ class PopulationMachineVertex(
     # Regions for this vertex used by neuron parts
     NEURON_REGIONS = NeuronRegions(
         neuron_params=REGIONS.NEURON_PARAMS.value,
+        current_source_params=REGIONS.CURRENT_SOURCE_PARAMS.value,
         neuron_recording=REGIONS.NEURON_RECORDING.value
     )
 
@@ -144,12 +145,12 @@ class PopulationMachineVertex(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
             all_syn_block_sz, structural_sz):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -167,7 +168,7 @@ class PopulationMachineVertex(
         :param int structural_sz: The size of the structural data
         """
         super(PopulationMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, constraints, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + SynapseProvenance.N_ITEMS +
             SpikeProcessingProvenance.N_ITEMS + MainProvenance.N_ITEMS,
@@ -269,33 +270,20 @@ class PopulationMachineVertex(
             self.vertex_slice))
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "routing_info", "data_n_time_steps"
-        })
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
-        """
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
-        """
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.neuron_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         rec_regions.extend(self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps))
+            self.vertex_slice))
         self._write_common_data_spec(spec, rec_regions)
 
-        self._write_neuron_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts)
+        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
 
         self._write_synapse_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts,
+            spec, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_sz,
             self.__structural_sz)
 
@@ -305,10 +293,11 @@ class PopulationMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # pylint: disable=too-many-arguments, arguments-differ
-
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+
+        # write the current source params into the new DSG region
+        self._write_current_source_parameters(spec)
 
         # close spec
         spec.end_specification()

@@ -19,7 +19,9 @@ The code that used to be here has been merged into SpiNNaker
 This is now just a depreciation redirect hook
 """
 
-from spynnaker.pyNN.utilities.utility_calls import moved_in_v7
+from spynnaker.pyNN.utilities.utility_calls import (
+    moved_in_v7, moved_in_v7_warning)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.spinnaker import SpiNNaker
 
 moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
@@ -32,6 +34,7 @@ class AbstractSpiNNakerCommon(SpiNNaker):
             self, graph_label, database_socket_addresses, n_chips_required,
             n_boards_required, timestep, min_delay,
             time_scale_factor=None):
+        # pylint: disable=super-init-not-called
         moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
                     "spynnaker.pyNN.spinnaker")
         super(database_socket_addresses,
@@ -40,6 +43,5 @@ class AbstractSpiNNakerCommon(SpiNNaker):
 
     @staticmethod
     def register_binary_search_path(search_path):
-        moved_in_v7("spynnaker.pyNN.abstract_spinnaker_common",
-                    "spynnaker.pyNN.spinnaker")
-        SpiNNaker.register_binary_search_path(search_path)
+        moved_in_v7_warning("register_binary_search_path is now a View method")
+        SpynnakerDataView.register_binary_search_path(search_path)

@@ -17,8 +17,7 @@ import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 
 class DelayGeneratorData(object):
@@ -92,7 +91,7 @@ class DelayGeneratorData(object):
             self.__delay_per_stage,
             DataType.S1615.encode_as_int(
                 MICRO_TO_MILLISECOND_CONVERSION /
-                machine_time_step()),
+                SpynnakerDataView.get_simulation_time_step_us()),
             connector.gen_connector_id,
             connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))

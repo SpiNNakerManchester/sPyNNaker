@@ -68,7 +68,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 static state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, const input_t *exc_input,
         uint16_t num_inhibitory_inputs, const input_t *inh_input,
-        input_t external_bias, neuron_t *restrict neuron);
+        input_t external_bias, REAL current_offset, neuron_t *restrict neuron);
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief Indicates that the neuron has spiked

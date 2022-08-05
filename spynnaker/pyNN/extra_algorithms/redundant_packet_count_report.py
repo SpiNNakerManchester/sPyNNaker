@@ -18,8 +18,7 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.provenance import (
     ProvenanceReader, ProvenanceWriter)
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -77,11 +76,11 @@ def redundant_packet_count_report():
 
     :return:
     """
-    file_name = os.path.join(report_default_directory(), _FILE_NAME)
+    file_name = os.path.join(SpynnakerDataView.get_run_dir_path(), _FILE_NAME)
 
     try:
         _create_views()
-        with open(file_name, "w") as f:
+        with open(file_name, "w", encoding="utf-8") as f:
             _write_report(f)
     except Exception as e:  # pylint: disable=broad-except
         logger.exception(f"Error {e} doing redundant_packet_count_report"
@@ -98,8 +97,8 @@ def _create_views():
 def _write_report(output):
     reader = ProvenanceReader()
     for data in reader.run_query("select * from redundancy_by_core"):
-        (x, y, p, source, received, filtered, invalid, failed,
-            redundant, total, percent) = data
+        (_, _, _, source, _, filtered, invalid, _,
+         redundant, total, percent) = data
         output.write(f"\ncore {source} \n")
         output.write(f"    {total} packets received. \n")
         output.write(f"    {redundant} were detected as "

@@ -22,7 +22,6 @@ try:
 except ImportError:
     plt = None
     matplotlib_missing = True
-# pylint: disable=consider-using-enumerate
 
 
 def _precheck(data, title):
@@ -57,8 +56,7 @@ def line_plot(data_sets, title=None):
 
     print("Setting up {} sets of line plots".format(len(data_sets)))
     (numrows, numcols) = _grid(len(data_sets))
-    for index in range(len(data_sets)):
-        data = data_sets[index]
+    for data, index in enumerate(data_sets):
         plt.subplot(numrows, numcols, index+1)
         for neuron in np.unique(data[:, 0]):
             time = [i[1] for i in data if i[0] == neuron]
@@ -92,8 +90,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
 
     print("Setting up {} sets of heat graph".format(len(data_sets)))
     (numrows, numcols) = _grid(len(data_sets))
-    for index in range(len(data_sets)):
-        data = data_sets[index]
+    for data, index in enumerate(data_sets):
         plt.subplot(numrows, numcols, index+1)
         neurons = data[:, 0].astype(int)
         times = data[:, 1].astype(int)
@@ -155,9 +152,8 @@ def plot_spikes(spikes, title="spikes"):
 
     print("Plotting {} set of spikes".format(len(spikes)))
     (numrows, numcols) = _grid(len(spikes))
-    for index in range(len(spikes)):
+    for single_spikes, index in enumerate(spikes):
         plt.subplot(numrows, numcols, index+1)
-        single_spikes = spikes[index]
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]
         min_time = min(min_time, min(spike_time))
@@ -183,6 +179,6 @@ if __name__ == "__main__":
     spike_data = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spike_data)
     doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
-    for _i in range(len(doubled_spike_data)):
-        doubled_spike_data[_i][0] = doubled_spike_data[_i][0] + 5
+    for doubled_spike_data_i, _i in enumerate(doubled_spike_data):
+        doubled_spike_data_i[0] = doubled_spike_data[_i][0] + 5
     plot_spikes([spike_data, doubled_spike_data])

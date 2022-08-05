@@ -69,10 +69,6 @@ class SynapseTypeExponential(AbstractSynapseType):
         self.__isyn_exc = isyn_exc
         self.__isyn_inh = isyn_inh
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E
@@ -96,8 +92,6 @@ class SynapseTypeExponential(AbstractSynapseType):
         """
         :param int ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
         init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731

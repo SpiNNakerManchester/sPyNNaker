@@ -102,24 +102,24 @@ def structural_with_stdp():
     print(conns_4)
 
     w_final_1 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes_last_neuron, spikes_1[0], w_init_1, delay_1, w_max,
+        pre_spikes_last_neuron, spikes_1[0], w_init_1, delay_1,
         A_plus, A_minus, tau_plus, tau_minus)
     w_final_2 = calculate_spike_pair_additive_stdp_weight(
-        pre_spikes, spikes_2[0], w_init_2, delay_2, w_max, A_plus, A_minus,
+        pre_spikes, spikes_2[0], w_init_2, delay_2, A_plus, A_minus,
         tau_plus, tau_minus)
     print(w_final_1, spikes_1[0])
     print(w_final_2, spikes_2[0])
 
-    assert(len(conns) == 1)
-    assert(conns[0][3] == delay_1)
-    assert(conns[0][2] >= w_final_1 - 0.01 and
-           conns[0][2] <= w_final_1 + 0.01)
-    assert(len(conns_2) == 1)
-    assert(conns_2[0][3] == delay_2)
-    assert(conns_2[0][2] >= w_final_2 - 0.01 and
-           conns_2[0][2] <= w_final_2 + 0.01)
-    assert(len(conns_3) == 0)
-    assert(len(conns_4) == 0)
+    assert len(conns) == 1
+    assert conns[0][3] == delay_1
+    assert (conns[0][2] >= w_final_1 - 0.01 and
+            conns[0][2] <= w_final_1 + 0.01)
+    assert len(conns_2) == 1
+    assert conns_2[0][3] == delay_2
+    assert (conns_2[0][2] >= w_final_2 - 0.01 and
+            conns_2[0][2] <= w_final_2 + 0.01)
+    assert len(conns_3) == 0
+    assert len(conns_4) == 0
 
 
 class TestStructuralWithSTDP(BaseTestCase):

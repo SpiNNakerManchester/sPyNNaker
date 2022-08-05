@@ -91,11 +91,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         self.__v_init = v_init
         self.__u_init = u_init
 
-    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 150 * n_neurons
-
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[A] = self.__a
@@ -119,7 +114,6 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.get_global_values)
     def get_global_values(self, ts):
-        # pylint: disable=arguments-differ
         return [float(ts) / MICRO_TO_MILLISECOND_CONVERSION]
 
     @overrides(AbstractStandardNeuronComponent.get_values)
@@ -127,8 +121,6 @@ class NeuronModelIzh(AbstractNeuronModel):
         """
         :param ts: machine time step
         """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
