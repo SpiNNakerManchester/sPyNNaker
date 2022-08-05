@@ -17,10 +17,11 @@ import logging
 import select
 import socket
 from spinn_utilities.log import FormatAdapter
+from spinn_utilities.ping import Ping
 from spinnman.connections.abstract_classes import Listenable, Connection
-from spinnman.connections.udp_packet_connections.utils import (
-    connect_socket, get_socket_address, ping, resolve_host)
-from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
+from spinnman.utilities.socket_utils import (
+    get_tcp_socket, connect_socket, get_socket_address, resolve_host,
+    receive_message, send_message)
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -60,12 +61,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         :raise SpinnmanIOException:
             If there is an error setting up the communication channel
         """
-        try:
-            # Create a TCP Socket
-            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except Exception as e:
-            raise SpinnmanIOException(
-                "Error setting up socket: {}".format(e)) from e
+        # Create a TCP Socket
+        self.__socket = get_tcp_socket()
 
         # Get the port to connect to
         self.__remote_port = int(remote_port)
@@ -93,7 +90,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         # check if machine is active and on the network
         for _ in range(5):  # Try up to five times...
             # ping the remote address
-            if ping(self.__remote_ip_address).returncode == 0:
+            if Ping.ping(self.__remote_ip_address) == 0:
                 # ping worked
                 return True
 
@@ -146,13 +143,7 @@ class PushBotWIFIConnection(Connection, Listenable):
             If a timeout occurs before any data is received
         :raise SpinnmanIOException: If an error occurs receiving the data
         """
-        try:
-            self.__socket.settimeout(timeout)
-            return self.__socket.recv(self.RECV_SIZE)
-        except socket.timeout as e:
-            raise SpinnmanTimeoutException("receive", timeout) from e
-        except Exception as e:
-            raise SpinnmanIOException(str(e)) from e
+        return receive_message(self.__socket, timeout, self.RECV_SIZE)
 
     def send(self, data):
         """ Send data down this connection
@@ -160,10 +151,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :param bytearray data: The data to be sent
         :raise SpinnmanIOException: If there is an error sending the data
         """
-        try:
-            self.__socket.send(data)
-        except Exception as e:  # pylint: disable=broad-except
-            raise SpinnmanIOException(str(e)) from e
+        send_message(self.__socket, data)
 
     def close(self):
         """ See\
