@@ -112,9 +112,9 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
+            n_boards_required, n_chips_required,
             data_writer_cls=SpynnakerDataWriter)
 
-        self._data_writer.set_n_required(n_boards_required, n_chips_required)
         # set up machine targeted data
         self._set_up_timings(timestep, min_delay, time_scale_factor)
 
@@ -527,5 +527,4 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         if self._data_writer.get_n_vertices() == 0:
             return
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
-            n_chips_in_graph = spynnaker_splitter_partitioner()
-            self._data_writer.set_n_chips_in_graph(n_chips_in_graph)
+            return spynnaker_splitter_partitioner()
