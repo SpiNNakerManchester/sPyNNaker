@@ -134,7 +134,7 @@ def run_sync(run_time, sync_time):
 def continue_simulation():
     """ Continue a synchronised simulation
     """
-    SpynnakerDataView.check_user_can_act()
+    SpynnakerDataView.check_valid_simulator()
     __simulator.continue_simulation()
 
 
@@ -142,7 +142,7 @@ def request_stop():
     """ Request a stop in the simulation without a complete stop.  Will stop\
         after the next auto-pause-and-resume cycle
     """
-    SpynnakerDataView.check_user_can_act()
+    SpynnakerDataView.check_valid_simulator()
     __simulator.stop_run()
 
 
