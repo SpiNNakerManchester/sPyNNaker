@@ -65,7 +65,7 @@ jobs:
     - name: Create a spynnaker.cfg
       uses: ./support/actions/configure-spynnaker
       with:
-        board-address: spinn-4.cs.man.ac.uk
+        virtual: true
     - name: Test with pytest
       uses: ./support/actions/pytest
       with:
