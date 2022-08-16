@@ -350,6 +350,18 @@ class SpikeSourcePoissonVertex(
             self.__change_requires_mapping = True
         self.__spike_recorder.record = True
 
+    @overrides(PopulationApplicationVertex.get_recording_variables)
+    def get_recording_variables(self):
+        if self.__spike_recorder.record:
+            return ["spikes"]
+        return []
+
+    @overrides(PopulationApplicationVertex.is_recording_variable)
+    def is_recording_variable(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return self.__spike_recorder.record
+
     @overrides(PopulationApplicationVertex.set_not_recording)
     def set_not_recording(self, name, indices=None):
         if name != "spikes":
@@ -435,7 +447,6 @@ class SpikeSourcePoissonVertex(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz + poisson_expander_sz +
-            self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples) +

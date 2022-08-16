@@ -134,8 +134,6 @@ class PopulationMachineNeurons(
         :rtype: iterator of ProvenanceDataItem
         """
         neuron_prov = NeuronProvenance(*provenance_data)
-        self._app_vertex.get_tdma_provenance_item(
-            x, y, p, label, neuron_prov.n_tdma_misses)
         with ProvenanceWriter() as db:
             db.insert_core(
                 x, y, p, "Last_timer_tic_the_core_ran_to",

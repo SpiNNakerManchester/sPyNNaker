@@ -349,7 +349,7 @@ class NeuronRecorder(object):
         """
         if variable not in self.__sampling_rates:
             return []
-        if variable not in self.__indexes:
+        if self.__indexes[variable] is None:
             return range(application_vertex.n_atoms)
         return self.__indexes[variable]
 

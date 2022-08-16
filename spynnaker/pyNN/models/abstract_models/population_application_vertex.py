@@ -220,6 +220,22 @@ class PopulationApplicationVertex(ApplicationVertex):
         raise KeyError(
             "This Population does not support the stopping of recording")
 
+    def get_recording_variables(self):
+        """ Get a list of variables that are currently being recorded
+
+        :rtype: list(str)
+        """
+        return []
+
+    def is_recording_variable(self, name):
+        """ Indicate whether the given variable is being recorded
+
+        :param str name: The name of the variable to check the status of
+        :rtype: bool
+        :raises KeyError: if the variable is not supported
+        """
+        raise KeyError("This Population does not support recording")
+
     def get_recorded_data(self, name):
         """ Get the data recorded for a given variable
 

@@ -424,7 +424,7 @@ class Population(PopulationBase):
         :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
-        for (parameter, value) in parameters.items():
+        for parameter, value in parameters.items():
             self.__vertex.set_parameter_values(parameter, value)
 
     def initialize(self, **kwargs):

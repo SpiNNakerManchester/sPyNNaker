@@ -15,6 +15,7 @@
 
 import pytest
 import numpy
+import pyNN.spiNNaker as sim
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
@@ -116,40 +117,43 @@ class MockNeuron(AbstractPopulationVertex):
 
 def test_initializable():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize("foo", 2)
-    assert [2, 2, 2, 2, 2] == neuron.get_initial_value("foo_init")
-    assert [11, 11, 11, 11, 11] == neuron.get_initial_value("bar_init")
-    assert [11, 11, 11, 11, 11] == neuron.get_initial_value("bar")
+    assert [1, 1, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 2)
+    assert [11, 11, 11, 11, 11] == neuron.get_initial_state_values("bar")
 
 
 def test_init_by_in():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    assert [1, 1, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize(variable="foo", value=11, selector=1)
-    assert [1, 11, 1, 1, 1] == neuron.get_initial_value("foo")
-    neuron.initialize(variable="foo", value=12, selector=2)
-    assert [1, 11, 12, 1, 1] == neuron.get_initial_value("foo")
-    assert [11] == neuron.get_initial_value("bar", selector=1)
-    assert [12] == neuron.get_initial_value("foo", selector=2)
+    assert [1, 1, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 11, selector=1)
+    assert [1, 11, 1, 1, 1] == neuron.get_initial_state_values("foo")
+    neuron.set_initial_state_values("foo", 12, selector=2)
+    assert [1, 11, 12, 1, 1] == neuron.get_initial_state_values("foo")
+    assert 11 == neuron.get_initial_state_values("bar", selector=1)
+    assert 12 == neuron.get_initial_state_values("foo", selector=2)
 
 
 def test_init_bad():
     unittest_setup()
     neuron = MockNeuron()
     with pytest.raises(KeyError):
-        neuron.get_initial_value("badvariable")
+        neuron.get_initial_state_values("badvariable")
     with pytest.raises(KeyError):
-        assert 1 == neuron.initialize("anotherbad", "junk")
+        assert 1 == neuron.set_initial_state_values("anotherbad", "junk")
 
 
 def test_initial_values():
     unittest_setup()
+    sim.setup(1.0)
     neuron = MockNeuron()
-    initial_values = neuron.initial_values
+    initial_values = neuron.get_initial_state_values(
+        neuron.get_state_variables())
     assert "foo" in initial_values
     assert "bar" in initial_values
-    initial_values = neuron.get_initial_values(selector=3)
-    assert {"foo": [1], "bar": [11]} == initial_values
+    initial_values = neuron.get_initial_state_values(
+        neuron.get_state_variables(), selector=3)
+    assert {"foo": 1, "bar": 11} == initial_values

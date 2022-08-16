@@ -34,6 +34,8 @@ from .abstract_neuron_expandable import (
 from .parameter_holder import ParameterHolder
 from .population_application_vertex import (
     PopulationApplicationVertex, RecordingType)
+from .population_fpga_vertex import PopulationFPGAVertex
+from .population_spinnaker_link_vertex import PopulationSpiNNakerLinkVertex
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
@@ -43,4 +45,5 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
            "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
            "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
-           "ParameterHolder", "PopulationApplicationVertex", "RecordingType"]
+           "ParameterHolder", "PopulationApplicationVertex", "RecordingType",
+           "PopulationFPGAVertex", "PopulationSpiNNakerLinkVertex"]

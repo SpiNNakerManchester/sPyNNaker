@@ -201,6 +201,18 @@ class SpikeSourceArrayVertex(
                            "SpikeSourceArray so being ignored")
         self.enable_recording(False)
 
+    @overrides(PopulationApplicationVertex.get_recording_variables)
+    def get_recording_variables(self):
+        if self._is_recording:
+            return ["spikes"]
+        return []
+
+    @overrides(PopulationApplicationVertex.is_recording_variable)
+    def is_recording_variable(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return self._is_recording
+
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
         if name != "spikes":

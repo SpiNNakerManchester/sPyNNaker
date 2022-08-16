@@ -366,11 +366,10 @@ class PopulationView(PopulationBase):
                 "as if gather was set to True.")
         logger.info("get_spike_counts is inefficient as it just counts the "
                     "results of get_datas('spikes')")
-        neo_data = self.get_data("spikes")
-        spiketrains = neo_data.segments[len(neo_data.segments) - 1].spiketrains
-        return {
-            idx: len(spiketrains[i])
-            for i, idx in enumerate(self.__indexes)}
+        spikes = self.__recorder.get_data("spikes")
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
+                                minlength=self.__vertex.n_atoms)
+        return {i: counts[i] for i in self.__indexes}
 
     @property
     def grandparent(self):
@@ -466,7 +465,7 @@ class PopulationView(PopulationBase):
         indices = rng.permutation(
             numpy.arange(len(self), dtype=numpy.int))[0:n]
         return PopulationView(
-            self, self.__vertex, self.__recorder, indices,
+            self, indices,
             label="Random sample size {} from {}".format(n, self.label))
 
     def set(self, **parameters):

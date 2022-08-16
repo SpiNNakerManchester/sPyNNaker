@@ -63,6 +63,9 @@ class ParameterHolder(object):
                 " before the simulation has run, it is not possible to read"
                 " those values until after the simulation has run.  Please run"
                 f" the simulation before reading {parameter}.")
+
+        if self.__selector is not None and is_singleton(self.__selector):
+            return values[0]
         return values
 
     def _get_data_items(self):

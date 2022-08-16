@@ -31,7 +31,6 @@ class TestIDMixin(BaseTestCase):
         pop_1 = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop_1.all_cells
         assert 0 == cells[0].id
-        assert pop_1 == cells[0]._population
         assert len(str(cells[0])) > 0
         assert len(repr(cells[0])) > 0
         assert not(cells[1].__eq__("Not the same object"))
@@ -89,9 +88,9 @@ class TestIDMixin(BaseTestCase):
         assert [-65.0, -65.0, -65.0, -65.0] == pop.initial_values["v"]
         cells = pop.all_cells
         cells[1].set_initial_value(variable="v", value=-60)
-        assert [-60] == cells[1].get_initial_value("v")
+        assert -60 == cells[1].get_initial_value("v")
         cells[2].initialize(v=-59)
-        assert [-59] == cells[2].initial_values["v"]
+        assert -59 == cells[2].initial_values["v"]
         assert [-65.0, -60.0, -59.0, -65.0] == pop.initial_values["v"]
         sim.end()
 
@@ -99,9 +98,8 @@ class TestIDMixin(BaseTestCase):
         sim.setup(timestep=1.0)
         pop = sim.Population(N_NEURONS, sim.IF_curr_exp(), label=LABEL)
         cells = pop.all_cells
-        assert -65 == cells[1].v
-        assert -65 == cells[1].v_init
-        cells[1].v = -60
+        assert -65 == cells[1].get_initial_value("v")
+        cells[1].set_initial_value("v", -60)
         assert [-65.0, -60.0, -65.0, -65.0] == pop.initial_values["v"]
         sim.end()
 

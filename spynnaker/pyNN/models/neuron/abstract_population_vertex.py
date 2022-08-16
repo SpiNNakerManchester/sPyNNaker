@@ -519,7 +519,7 @@ class AbstractPopulationVertex(
         # when they are ready
         if not SpynnakerDataView.is_ran_last():
             self.__read_initial_values = True
-        else:
+        elif SpynnakerDataView.has_transceiver():
             self.__read_parameters_now()
         return ParameterHolder(names, self.__read_parameter, selector)
 
@@ -531,11 +531,11 @@ class AbstractPopulationVertex(
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
             self.__change_requires_neuron_data_generation = True
-        self.__parameters[name].set_value_by_selector(value, selector)
+        self.__parameters[name].set_value_by_selector(selector, value)
 
     @overrides(PopulationApplicationVertex.get_parameters)
     def get_parameters(self):
-        return self.__parameters.keys()
+        return self.__pynn_model.default_parameters.keys()
 
     def __read_initial_state_variable(self, name, selector=None):
         return self.__initial_state_variables[name].get_values(selector)
@@ -554,23 +554,26 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.set_initial_state_values)
     def set_initial_state_values(self, name, value, selector=None):
+        self._check_variables([name], set(self.__state_variables.keys()))
         # If we have run, and not reset, we need to read the values back
         # so that we don't overwrite all the state.  Note that a reset will
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView.is_ran_last():
             self.__read_initial_parameters_now()
             self.__change_requires_neuron_data_generation = True
-        self.__state_variables[name].set_value_by_selector(value, selector)
+        self.__initial_state_variables[name].set_value_by_selector(
+            selector, value)
 
     @overrides(PopulationApplicationVertex.get_state_variables)
     def get_state_variables(self):
-        return self.__state_variables.keys()
+        return self.__pynn_model.default_initial_values.keys()
 
     @overrides(PopulationApplicationVertex.get_units)
     def get_units(self, name):
         if self.__neuron_impl.is_recordable(name):
             return self.__neuron_impl.get_recordable_units(name)
-        if name not in self.__parameters:
+        if (name not in self.__parameters and
+                name not in self.__state_variables):
             raise KeyError(f"No such parameter {name}")
         return self.__neuron_impl.get_units(name)
 
@@ -612,15 +615,31 @@ class AbstractPopulationVertex(
         else:
             raise KeyError(f"It is not possible to record {name}")
 
+    @overrides(PopulationApplicationVertex.get_recording_variables)
+    def get_recording_variables(self):
+        recording = list()
+        recording.extend(self.__neuron_recorder.recording_variables)
+        recording.extend(self.__synapse_recorder.recording_variables)
+        return recording
+
+    @overrides(PopulationApplicationVertex.is_recording_variable)
+    def is_recording_variable(self, name):
+        return (
+            self.__neuron_recorder.is_recording(name) or
+            self.__synapse_recorder.is_recording(name))
+
     @overrides(PopulationApplicationVertex.get_recorded_data)
     def get_recorded_data(self, name):
-        if self.__neuron_recorder.is_recordable(name):
+        if self.__neuron_recorder.is_recording(name):
             return self.__neuron_recorder.get_recorded_data(
                 self.label, self, name)
-        if self.__synapse_recorder.is_recordable(name):
+        if self.__synapse_recorder.is_recording(name):
             return self.__synapse_recorder.get_recorded_data(
                 self.label, self, name)
-        raise KeyError(f"{name} is not a supported variable")
+        if (not self.__neuron_recorder.is_recordable(name) and
+                not self.__synapse_recorder.is_recordable(name)):
+            raise KeyError(f"{name} is not a supported variable")
+        raise KeyError(f"{name} has not been set to record")
 
     @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
     def get_recording_sampling_interval(self, name):
@@ -709,9 +728,8 @@ class AbstractPopulationVertex(
 
         :rtype: dict(str, ...)
         """
-        parameters = dict()
-        for parameter_name in self.__pynn_model.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+        parameters = dict(self.get_parameter_values(
+            self.__pynn_model.default_parameters.keys()))
 
         context = {
             "name": self.__neuron_impl.model_name,

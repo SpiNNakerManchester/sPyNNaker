@@ -341,17 +341,6 @@ class SpikeSourcePoissonMachineVertex(
             spec, self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
             self._app_vertex.n_profile_samples)
 
-        # write tdma params
-        spec.reserve_memory_region(
-            region=self.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION.value,
-            label="tdma_region",
-            size=self._app_vertex.tdma_sdram_size_in_bytes)
-        spec.switch_write_focus(
-            self.POISSON_SPIKE_SOURCE_REGIONS.TDMA_REGION.value)
-        spec.write_array(
-            self._app_vertex.generate_tdma_data_specification_data(
-                self.__slice_index))
-
         # write SDRAM edge parameters
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.SDRAM_EDGE_PARAMS.value,

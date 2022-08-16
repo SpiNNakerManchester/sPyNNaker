@@ -160,14 +160,12 @@ class Recorder(object):
                     logger, "You are trying to record the excitatory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
-                variable = "isyn_inh"
         elif variable == "gsyn_inh":
             if not self.__vertex.conductance_based:
                 warn_once(
                     logger, "You are trying to record the inhibitory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
-                variable = "isyn_inh"
 
         # Tell the vertex to record
         self.__vertex.set_recording(variable, sampling_interval, indexes)
@@ -221,6 +219,8 @@ class Recorder(object):
         :param str variable: the variable to get the array for
         :rtype: ~numpy.ndarray
         """
+        if not self.__vertex.is_recording_variable(variable):
+            raise KeyError(f"Variable {variable} is not being recorded")
         var_type = self.__vertex.get_recording_type(variable)
         if var_type == RecordingType.MATRIX:
             return numpy.zeros((0, 3))
@@ -237,10 +237,6 @@ class Recorder(object):
         :rtype: ~numpy.ndarray
         """
         SpynnakerDataView.check_user_can_act()
-
-        if not self.__vertex.is_recording(variable):
-            raise ConfigurationException(
-                f"This population has not been set to record {variable}")
 
         if not SpynnakerDataView.is_ran_last():
             if SpynnakerDataView.is_ran_ever():
@@ -304,7 +300,7 @@ class Recorder(object):
     def cache_data(self):
         """ Store data for later extraction
         """
-        variables = self.__vertex.get_recordable_variables()
+        variables = self.__vertex.get_recording_variables()
         if variables:
             segment_number = SpynnakerDataView.get_segment_counter()
             logger.info("Caching data for segment {:d}", segment_number)
@@ -347,7 +343,7 @@ class Recorder(object):
         if 'all' in variables:
             variables = OrderedSet(variables)
             variables.remove('all')
-            variables.update(self.__vertex.get_recordable_variables())
+            variables.update(self.__vertex.get_recording_variables())
         return variables
 
     def __append_current_segment(self, block, variables, view_indexes, clear):
@@ -363,7 +359,6 @@ class Recorder(object):
         for variable in variables:
             data = self.get_data(variable)
             s_intrval = self.__vertex.get_recording_sampling_interval(variable)
-            indices = self.__vertex.get_recording_indices(variable)
             var_type = self.__vertex.get_recording_type(variable)
             if var_type == RecordingType.BIT_FIELD:
                 self.__add_neo_spiketrains(
@@ -371,13 +366,14 @@ class Recorder(object):
                     t=SpynnakerDataView.get_current_run_time_ms(),
                     n_neurons=self.__population.size,
                     recording_start_time=self.__recording_start_time,
-                    sampling_interval=s_intrval, indexes=indices,
+                    sampling_interval=s_intrval, indexes=view_indexes,
                     label=self.__population.label)
             elif var_type == RecordingType.EVENT:
                 self.__add_neo_events(
                     segment=segment, event_array=data, variable=variable,
                     recording_start_time=self.__recording_start_time)
             elif var_type == RecordingType.MATRIX:
+                indices = self.__vertex.get_recording_indices(variable)
                 self.__add_neo_analog_signals(
                     segment=segment, block=block, signal_array=data,
                     data_indexes=indices, view_indexes=view_indexes,
@@ -535,7 +531,7 @@ class Recorder(object):
             if len(data_indexes) != self.__population.size:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
-        elif view_indexes == data_indexes:
+        elif list(view_indexes) == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data

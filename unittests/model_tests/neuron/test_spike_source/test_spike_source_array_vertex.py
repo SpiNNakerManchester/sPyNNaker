@@ -29,7 +29,7 @@ class TestSpikeSourceArrayVertex(unittest.TestCase):
             max_atoms_per_core=None, model=None, splitter=None)
         v.set_parameter_values("spike_times", [])
         v.set_parameter_values("spike_times", [1, 2, 3], [1, 3])
-        self.assertListEqual(
+        self.assertSequenceEqual(
             [[], [1, 2, 3], [], [1, 2, 3], []],
             v.get_parameter_values("spike_times"))
 

@@ -32,6 +32,7 @@ class IDMixin(object):
         "__vertex",
         "__recorder"
     ]
+    __realslots__ = tuple("_IDMixin" + item for item in __slots__)
 
     def __init__(self, population, identifier):
         """
@@ -81,10 +82,13 @@ class IDMixin(object):
     def __getattr__(self, name):
         if name == "__vertex":
             raise KeyError("Shouldn't come through here!")
-        return self.__vertex.get_parameter_values(name, self.__id)
+        return self.__vertex.get_parameter_values(name, self.__id)[0]
 
-    # def __setattr__(self, name, value):
-    #    return self.__vertex.set_parameter_values(name, value, self.__id)
+    def __setattr__(self, name, value):
+        if name in self.__realslots__:
+            object.__setattr__(self, name, value)
+            return
+        return self.__vertex.set_parameter_values(name, value, self.__id)
 
     def set_parameters(self, **parameters):
         """ Set cell parameters, given as a sequence of parameter=value\
