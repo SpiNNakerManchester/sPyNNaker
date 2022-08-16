@@ -75,7 +75,7 @@ class MachineTest(BaseTestCase):
             SpynnakerDataView._UtilsDataView__data._reset_status)
         self.assertFalse(
             SpynnakerDataView._MachineDataView__data._user_accessed_machine)
-        self.assertFalse(
+        self.assertTrue(
             SpynnakerDataView.get_requires_mapping(), "reset 2")
         # HACK to avoid detecting user accessed machine
         self.assertIsNone(SpynnakerDataView._MachineDataView__data._machine)
