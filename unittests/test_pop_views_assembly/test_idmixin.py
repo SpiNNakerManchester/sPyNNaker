@@ -48,10 +48,10 @@ class TestIDMixin(BaseTestCase):
         assert 2 == p_tau_m[2]
         params = cells[1].get_parameters()
         p_i_offset = pop_1.get("i_offset")
-        assert params["i_offset"][0] == p_i_offset[1]
+        assert params["i_offset"] == p_i_offset[1]
         cells[2].set_parameters(tau_m=3, i_offset=13)
         params = cells[2].get_parameters()
-        assert 13 == params["i_offset"][0]
+        assert 13 == params["i_offset"]
         sim.end()
 
     def test_bad(self):

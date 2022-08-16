@@ -82,7 +82,7 @@ class IDMixin(object):
     def __getattr__(self, name):
         if name == "__vertex":
             raise KeyError("Shouldn't come through here!")
-        return self.__vertex.get_parameter_values(name, self.__id)[0]
+        return self.__vertex.get_parameter_values(name, self.__id)
 
     def __setattr__(self, name, value):
         if name in self.__realslots__:

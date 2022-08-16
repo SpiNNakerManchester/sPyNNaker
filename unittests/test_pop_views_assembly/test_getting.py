@@ -232,8 +232,8 @@ class TestGetting(BaseTestCase):
     def test_write(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
+        pop.record(["spikes", "v"])
+        Recorder.get_data = mock_spikes
         view = SpynnakerDataView()
         # Hack method not supported
         view._FecDataView__fec_data._first_machine_time_step = \
@@ -263,6 +263,8 @@ class TestGetting(BaseTestCase):
                 "https://github.com/NeuralEnsemble/python-neo/issues/529"
                 ) from e
 
+
+        Recorder.get_data = mock_v_all
         (target, _, _) = mock_v_all(None, "any")
 
         pop.print_v("v.pkl")
@@ -285,8 +287,8 @@ class TestGetting(BaseTestCase):
     def test_spinnaker_get_data(self):
         sim.setup(timestep=1.0)
         pop = sim.Population(4, sim.IF_curr_exp(), label="a label")
-        Recorder.get_spikes = mock_spikes
-        Recorder.get_recorded_matrix = mock_v_all
+        pop.record("v")
+        Recorder.get_data = mock_v_all
         view = SpynnakerDataView()
         # Hack method not supported
         view._FecDataView__fec_data._first_machine_time_step = \

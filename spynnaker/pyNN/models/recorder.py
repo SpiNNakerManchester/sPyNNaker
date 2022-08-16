@@ -185,7 +185,10 @@ class Recorder(object):
         # Only matrix variables are currently supported through this function
         if self.__vertex.get_recording_type(variable) != RecordingType.MATRIX:
             raise NotImplementedError(f"{variable} not supported")
-        (data, ids, sampling_interval) = self.get_recorded_matrix(variable)
+        data = self.get_data(variable)
+        sampling_interval = self.__vertex.get_recording_sampling_interval(
+            variable)
+        ids = self.__vertex.get_recording_indices(variable)
         if view_indexes is None:
             if len(ids) != self.__vertex.n_atoms:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)
