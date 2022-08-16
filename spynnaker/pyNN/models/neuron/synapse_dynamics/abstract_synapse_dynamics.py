@@ -20,8 +20,7 @@ from pyNN.random import RandomDistribution
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
 from spinn_utilities.log import FormatAdapter
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step_ms, machine_time_step_per_ms)
+from spynnaker.pyNN.data import SpynnakerDataView
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -133,8 +132,9 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         if isinstance(delay, str):
             return delay
         new_delay = (
-                numpy.rint(numpy.array(delay) * machine_time_step_per_ms())
-                * machine_time_step_ms())
+                numpy.rint(numpy.array(delay) *
+                           SpynnakerDataView.get_simulation_time_step_per_ms())
+                * SpynnakerDataView.get_simulation_time_step_ms())
         if not numpy.allclose(delay, new_delay):
             logger.warning(f"Rounding up delay in f{self} "
                            f"from {delay} to {new_delay}")
