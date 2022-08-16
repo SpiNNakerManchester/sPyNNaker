@@ -15,10 +15,7 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
 
@@ -174,26 +171,33 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
 
         mask = None
-        if min_delay is None or max_delay is None or self.__delays is None:
-            mask = ((self.__targets >= post_vertex_slice.lo_atom) &
-                    (self.__targets <= post_vertex_slice.hi_atom))
-        elif self.__delays is not None:
-            mask = ((self.__targets >= post_vertex_slice.lo_atom) &
-                    (self.__targets <= post_vertex_slice.hi_atom) &
-                    (self.__delays >= min_delay) &
+        if (min_delay is not None and max_delay is not None and
+                self.__delays is not None):
+            mask = ((self.__delays >= min_delay) &
                     (self.__delays <= max_delay))
         if mask is None:
-            sources = self.__sources
+            conns = self.__conn_list.copy()
         else:
-            sources = self.__sources[mask]
-        if sources.size == 0:
+            conns = self.__conn_list[mask].copy()
+        if conns.size == 0:
             return 0
-        max_targets = numpy.max(numpy.bincount(
-            sources.astype('int64', copy=False)))
+
+        # Make targets be core indices
+        conns[:, _TARGET] //= n_post_atoms
+
+        # Split into sources
+        source_split_conns = self.__numpy_group(conns, _SOURCE)
+
+        # Split into groups by post_n_atoms
+        target_split_conns = [
+            self.__numpy_group(s, _TARGET) for s in source_split_conns]
+
+        # Find the biggest group
+        max_targets = max([len(t) for s in target_split_conns for t in s])
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
@@ -206,6 +210,18 @@ class FromListConnector(AbstractConnector):
             synapse_info.delays,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             max_targets, min_delay, max_delay, synapse_info)
+
+    def __numpy_group(self, conns, column):
+        # Sort by the column to group by
+        s = conns[conns[:, column].argsort()]
+
+        # Find split points by getting the first indices of the unique items
+        # and then removing the first (as that will be 0 and we don't want to
+        # split at 0)
+        split_points = numpy.unique(s[:, column], return_index=True)[1][1:]
+
+        # Perform the split
+        return numpy.array_split(conns, split_points)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
@@ -292,17 +308,6 @@ class FromListConnector(AbstractConnector):
         """
         return self.__conn_list
 
-    def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
-        """
-        :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int pre_hi:
-        :param int post_hi:
-        :rtype: int
-        """
-        self._split_connections(pre_slices, post_slices)
-        return (pre_hi, post_hi) in self.__split_conn_list
-
     @conn_list.setter
     def conn_list(self, conn_list):
         if conn_list is None or not len(conn_list):
@@ -360,9 +365,9 @@ class FromListConnector(AbstractConnector):
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = (numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                    MICRO_TO_MILLISECOND_CONVERSION / machine_time_step())) *
-                    (machine_time_step() / MICRO_TO_MILLISECOND_CONVERSION))
+                numpy.array(self.__conn_list[:, delay_column]) *
+                SpynnakerDataView.get_simulation_time_step_per_ms()) *
+                SpynnakerDataView.get_simulation_time_step_ms())
         except ValueError:
             pass
 
@@ -425,9 +430,9 @@ class FromListConnector(AbstractConnector):
     def could_connect(
             self, synapse_info, src_machine_vertex, dest_machine_vertex):
         pre_slices = \
-            src_machine_vertex.app_vertex.splitter.get_out_going_slices()[0]
+            src_machine_vertex.app_vertex.splitter.get_out_going_slices()
         post_slices = \
-            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()[0]
+            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
         self._split_connections(pre_slices, post_slices)
         pre_hi = src_machine_vertex.vertex_slice.hi_atom
         post_hi = dest_machine_vertex.vertex_slice.hi_atom

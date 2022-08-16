@@ -19,11 +19,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesOutgoingPartitionConstraints)
-from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -65,9 +61,7 @@ def get_spike_value_from_fpga_retina(key, mode):
 
 
 class ExternalFPGARetinaDevice(
-        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
-        AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl):
+        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex):
     __slots__ = [
         "__fixed_key",
         "__fixed_mask"]
@@ -93,18 +87,21 @@ class ExternalFPGARetinaDevice(
         :param str board_address:
         """
         # pylint: disable=too-many-arguments
+        fixed_n_neurons = self.get_n_neurons(mode, polarity)
+        super().__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+            label=label, max_atoms_per_core=fixed_n_neurons,
+            board_address=board_address)
+
         self.__fixed_key = (retina_key & 0xFFFF) << 16
         self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:
             self.__fixed_key |= 0x4000
 
-        fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self.__fixed_mask = self._get_mask(mode)
 
-        super().__init__(
-            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
-            label=label, max_atoms_per_core=fixed_n_neurons,
-            board_address=board_address)
+        self.add_constraint(FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:
@@ -159,7 +156,3 @@ class ExternalFPGARetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
     def timed_commands(self):
         return []
-
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]

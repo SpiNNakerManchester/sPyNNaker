@@ -17,11 +17,13 @@ import logging
 import numpy
 import neo
 import quantities
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker import _version
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
 from spynnaker.pyNN.utilities.constants import (
@@ -68,7 +70,8 @@ class Recorder(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-        self._recording_start_time = get_simulator().t
+        self._recording_start_time = \
+            SpynnakerDataView.get_current_run_time_ms()
         self._data_cache = {}
 
     @property
@@ -152,9 +155,12 @@ class Recorder(object):
         :type to_file: neo.io.baseio.BaseIO or str or None
         :param indexes: List of indexes to record or None for all
         :type indexes: list(int) or None
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
 
-        get_simulator().verify_not_running()
+        SpynnakerDataView.check_user_can_act()
         # tell vertex its recording
         if variable == "spikes":
             if not isinstance(self.__vertex, AbstractSpikeRecordable):
@@ -238,12 +244,11 @@ class Recorder(object):
             ``gsyn_exc``, ``gsyn_inh``, ``v``
         :return: data, indexes, sampling_interval
         :rtype: tuple(~numpy.ndarray, list(int), float)
+        :raises SimulatorRunningException: If sim.run is currently running
+        :raises SimulatorNotSetupException: If called before sim.setup
+        :raises SimulatorShutdownException: If called after sim.end
         """
-        data = None
-        sim = get_simulator()
-
-        sim.verify_not_running()
-
+        SpynnakerDataView.check_user_can_act()
         # check that we're in a state to get voltages
         if not isinstance(self.__vertex, AbstractNeuronRecordable):
             raise ConfigurationException(
@@ -254,16 +259,21 @@ class Recorder(object):
                 "This population has not been set to record {}".format(
                     variable))
 
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore {} cannot be "
-                "retrieved, hence the list will be empty".format(
-                    variable))
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    f"The simulation has been reset, therefore {variable} "
+                    f"cannot be retrieved, hence the list/last segment list "
+                    f"will be empty")
+            else:
+                logger.warning(
+                    f"The simulation has not yet run, therefore {variable} "
+                    f"cannot be retrieved, hence the list will be empty")
             data = numpy.zeros((0, 3))
             indexes = []
             sampling_interval = self.__vertex.get_neuron_sampling_interval(
                 variable)
-        elif sim.use_virtual_board:
+        elif get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the list will be empty")
@@ -274,9 +284,7 @@ class Recorder(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            results = self.__vertex.get_data(
-                variable, sim.no_machine_time_steps, sim.placements,
-                sim.buffer_manager)
+            results = self.__vertex.get_data(variable)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
@@ -296,13 +304,17 @@ class Recorder(object):
             raise ConfigurationException(
                 "This population has not been set to record spikes")
 
-        sim = get_simulator()
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore spikes cannot "
-                "be retrieved, hence the list will be empty")
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    "The simulation has reset, therefore spikes cannot "
+                    "be retrieved, hence the list/ last segment will be empty")
+            else:
+                logger.warning(
+                    "The simulation has not yet run, therefore spikes cannot "
+                    "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the spike list will be empty")
@@ -310,7 +322,7 @@ class Recorder(object):
 
         # assuming we got here, everything is OK, so we should go get the
         # spikes
-        return self.__vertex.get_spikes(sim.placements, sim.buffer_manager)
+        return self.__vertex.get_spikes()
 
     def get_events(self, variable):
         """ How to get rewiring events (of a post-population) from recorder
@@ -327,20 +339,23 @@ class Recorder(object):
             raise ConfigurationException(
                 "This population has not been set to record rewires")
 
-        sim = get_simulator()
-        if not sim.has_ran:
-            logger.warning(
-                "The simulation has not yet run, therefore rewires cannot "
-                "be retrieved, hence the list will be empty")
+        if not SpynnakerDataView.is_ran_last():
+            if SpynnakerDataView.is_ran_ever():
+                logger.warning(
+                    "The simulation has been reset, therefore rewires cannot "
+                    "be retrieved, hence the list/last segment will be empty")
+            else:
+                logger.warning(
+                    "The simulation has not yet run, therefore rewires "
+                    "cannot be retrieved, hence the list will be empty")
             return numpy.zeros((0, 4))
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             logger.warning(
                 "The simulation is using a virtual machine and so has not "
                 "truly ran, hence the rewires list will be empty")
             return numpy.zeros((0, 4))
 
-        return self.__vertex.get_events(
-            variable, sim.placements, sim.buffer_manager)
+        return self.__vertex.get_events(variable)
 
     def turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying ``.record()``
@@ -373,7 +388,7 @@ class Recorder(object):
         """
         block = neo.Block()
 
-        for previous in range(0, get_simulator().segment_counter):
+        for previous in range(0, SpynnakerDataView.get_segment_counter()):
             self._append_previous_segment(
                 block, previous, variables, view_indexes)
 
@@ -418,7 +433,7 @@ class Recorder(object):
         """
         variables = self.get_all_recording_variables()
         if variables:
-            segment_number = get_simulator().segment_counter
+            segment_number = SpynnakerDataView.get_segment_counter()
             logger.info("Caching data for segment {:d}", segment_number)
 
             data_cache = DataCache(
@@ -426,7 +441,7 @@ class Recorder(object):
                 description=self.__population.describe(),
                 segment_number=segment_number,
                 recording_start_time=self._recording_start_time,
-                t=get_simulator().t)
+                t=SpynnakerDataView.get_current_run_time_ms())
 
             for variable in variables:
                 if variable == SPIKES:
@@ -482,7 +497,7 @@ class Recorder(object):
     def __append_current_segment(self, block, variables, view_indexes, clear):
         # build segment for the current data to be gathered in
         segment = neo.Segment(
-            name="segment{}".format(get_simulator().segment_counter),
+            name="segment{}".format(SpynnakerDataView.get_segment_counter()),
             description=self.__population.describe(),
             rec_datetime=datetime.now())
 
@@ -494,7 +509,7 @@ class Recorder(object):
                 self.__read_in_spikes(
                     segment=segment,
                     spikes=self.get_spikes(),
-                    t=get_simulator().get_current_time(),
+                    t=SpynnakerDataView.get_current_run_time_ms(),
                     n_neurons=self.__population.size,
                     recording_start_time=self._recording_start_time,
                     sampling_interval=self.__spike_sampling_interval,
@@ -621,28 +636,19 @@ class Recorder(object):
             'first_id': int(self.__population.first_id),
             'last_id': int(self.__population.last_id),
             'label': self.__population.label,
-            'simulator': get_simulator().name,
+            'simulator': _version._NAME,  # pylint: disable=protected-access
         }
         metadata.update(self.__population.annotations)
-        metadata['dt'] = get_simulator().dt
-        metadata['mpi_processes'] = get_simulator().num_processes
+        metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
+        metadata['mpi_processes'] = 1  # meaningless on Spinnaker
         return metadata
 
     def _clear_recording(self, variables):
-        sim = get_simulator()
         for variable in variables:
             if variable == SPIKES:
-                self.__vertex.clear_spike_recording(
-                    sim.buffer_manager, sim.placements)
-            elif variable == MEMBRANE_POTENTIAL:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
-            elif variable == GSYN_EXCIT:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
-            elif variable == GSYN_INHIB:
-                self.__vertex.clear_recording(
-                    variable, sim.buffer_manager, sim.placements)
+                self.__vertex.clear_spike_recording()
+            elif variable in [MEMBRANE_POTENTIAL, GSYN_EXCIT, GSYN_INHIB]:
+                self.__vertex.clear_recording(variable)
             else:
                 raise InvalidParameterType(
                     "The variable {} is not a recordable value".format(
@@ -667,13 +673,18 @@ class Recorder(object):
         if len(spikes) == 0:
             spikes = numpy.empty(shape=(0, 2))
 
+        # Put the times for each neuron into the right place
+        times = [[] for _ in range(n_neurons)]
+        for neuron_id, time in spikes:
+            times[int(neuron_id)].append(time)
+
         t_stop = t * quantities.ms
 
         if indexes is None:
             indexes = range(n_neurons)
         for index in indexes:
             spiketrain = neo.SpikeTrain(
-                times=spikes[spikes[:, 0] == index][:, 1],
+                times=times[index],
                 t_start=recording_start_time,
                 t_stop=t_stop,
                 units='ms',

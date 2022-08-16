@@ -45,9 +45,9 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         # Packets at the destination arrive one timestep after src spike_times
         for n in range(runtime):
             if (n - 1) in spike_times:
-                assert(pps_array[n] == n_neurons)
+                assert pps_array[n] == n_neurons
             else:
-                assert(pps_array[n] == 0)
+                assert pps_array[n] == 0
 
         sim.end()
 
@@ -81,7 +81,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
         totalpackets = sum(
             pps.segments[0].filter(name='packets-per-timestep')[0])
 
-        assert(totalpackets == n_neurons * (runtime // spikegap))
+        assert totalpackets == n_neurons * (runtime // spikegap)
 
         sim.end()
 
@@ -121,7 +121,7 @@ class TestRecordPacketsPerTimestep(BaseTestCase):
             pps.segments[0].filter(name='packets-per-timestep')[0]) + sum(
                 pps.segments[1].filter(name='packets-per-timestep')[0])
 
-        assert(totalpackets == n_neurons * (runtime // spikegap))
+        assert totalpackets == n_neurons * (runtime // spikegap)
 
         sim.end()
 

@@ -12,7 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification)
@@ -39,12 +38,12 @@ class PopulationSynapsesMachineVertexLead(
         "__synapse_references"]
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, ring_buffer_shifts, weight_scales, all_syn_block_sz,
             structural_sz, synapse_references):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -54,7 +53,7 @@ class PopulationSynapsesMachineVertexLead(
             The slice of the population that this implements
         """
         super(PopulationSynapsesMachineVertexLead, self).__init__(
-            resources_required, label, constraints, app_vertex, vertex_slice)
+            sdram, label, constraints, app_vertex, vertex_slice)
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
         self.__all_syn_block_sz = all_syn_block_sz
@@ -85,26 +84,19 @@ class PopulationSynapsesMachineVertexLead(
             self.vertex_slice)
         return ids
 
-    @inject_items({
-        "routing_info": "RoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
-    })
     @overrides(
-        AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={"routing_info", "data_n_time_steps"})
-    def generate_data_specification(
-            self, spec, placement, routing_info, data_n_time_steps):
+        AbstractGeneratesDataSpecification.generate_data_specification)
+    def generate_data_specification(self, spec, placement):
         """
         :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
         """
         # pylint: disable=arguments-differ
         rec_regions = self._app_vertex.synapse_recorder.get_region_sizes(
-            self.vertex_slice, data_n_time_steps)
+            self.vertex_slice)
         self._write_common_data_spec(spec, rec_regions)
 
         self._write_synapse_data_spec(
-            spec, routing_info, self.__ring_buffer_shifts,
+            spec, self.__ring_buffer_shifts,
             self.__weight_scales, self.__all_syn_block_sz,
             self.__structural_sz)
 
@@ -112,7 +104,7 @@ class PopulationSynapsesMachineVertexLead(
         self._write_sdram_edge_spec(spec)
 
         # Write information about keys
-        self._write_key_spec(spec, routing_info)
+        self._write_key_spec(spec)
 
         # End the writing of this specification:
         spec.end_specification()

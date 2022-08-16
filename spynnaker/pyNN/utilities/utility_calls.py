@@ -20,6 +20,7 @@ import logging
 import os
 import math
 import numpy
+from math import isnan
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.log import FormatAdapter
@@ -218,7 +219,13 @@ def get_probable_maximum_selected(
         with a probability of selection of selection_prob
     """
     prob = 1.0 - (chance / float(n_total_trials))
-    return binom.ppf(prob, n_trials, selection_prob)
+    val = binom.ppf(prob, n_trials, selection_prob)
+    if isnan(val):
+        raise Exception(
+            f"Could not find maximum selected from {n_trials} out of"
+            f" {n_total_trials} trials, with selection probability of"
+            f" {selection_prob} and chance {chance}.  Final chance = {prob}.")
+    return val
 
 
 def get_probable_minimum_selected(
@@ -367,6 +374,19 @@ def moved_in_v7(old_location, new_location):
     logger.warning("File {} moved to {}. Please fix your imports. "
                    "In version 8 this will fail completely."
                    "".format(old_location, new_location))
+
+
+def moved_in_v7_warning(message):
+    """
+    Warns the user that they are using old code
+
+    In version 8 this will be upgraded to a exception and then later removed
+
+    :param str message:
+    """
+    if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
+        raise NotImplementedError(message)
+    logger.warning(f"{message} In version 8 old call will fail completely.")
 
 
 def get_time_to_write_us(n_bytes, n_cores):

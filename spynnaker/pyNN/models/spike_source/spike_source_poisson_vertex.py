@@ -20,23 +20,18 @@ import scipy.stats
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.resources import ConstantSDRAM
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl, TDMAAwareApplicationVertex)
+    TDMAAwareApplicationVertex)
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, MICRO_TO_SECOND_CONVERSION)
+    SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.interface.profiling import profile_utils
-from spinn_front_end_common.utilities.globals_variables import (
-    machine_time_step)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from .spike_source_poisson_machine_vertex import (
@@ -68,9 +63,8 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl, LegacyPartitionerAPI):
+        LegacyPartitionerAPI):
     """ A Poisson Spike source object
     """
 
@@ -93,7 +87,8 @@ class SpikeSourcePoissonVertex(
         "__n_profile_samples",
         "__data",
         "__is_variable_rate",
-        "__outgoing_projections"]
+        "__outgoing_projections",
+        "__incoming_control_edge"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -266,6 +261,7 @@ class SpikeSourcePoissonVertex(
 
         # Keep track of how many outgoing projections exist
         self.__outgoing_projections = list()
+        self.__incoming_control_edge = None
 
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
@@ -410,8 +406,7 @@ class SpikeSourcePoissonVertex(
                 machine_vertex.set_reload_required(True)
 
     def max_spikes_per_ts(self):
-        ts_per_second = (MICRO_TO_SECOND_CONVERSION /
-                         machine_time_step())
+        ts_per_second = SpynnakerDataView.get_simulation_time_step_per_s()
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -433,11 +428,8 @@ class SpikeSourcePoissonVertex(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
 
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
+    @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
+    def get_sdram_used_by_atoms(self, vertex_slice):
         poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
@@ -450,14 +442,7 @@ class SpikeSourcePoissonVertex(
             sdram_sz)
 
         recording = self.get_recording_sdram_usage(vertex_slice)
-        # build resources as i currently know
-        container = ResourceContainer(
-            sdram=recording + other,
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms()),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms()))
-
-        return container
+        return recording + other
 
     @property
     def n_atoms(self):
@@ -465,13 +450,12 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
-            resources_required, self.__spike_recorder.record,
+            sdram, self.__spike_recorder.record,
             constraints, label, self, vertex_slice, index)
 
     @property
@@ -507,15 +491,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return machine_time_step()
-
-    @staticmethod
-    def get_dtcm_usage_for_atoms():
-        return 0
-
-    @staticmethod
-    def get_cpu_usage_for_atoms():
-        return 0
+        return SpynnakerDataView.get_simulation_time_step_us()
 
     def kiss_seed(self, vertex_slice):
         if vertex_slice not in self.__kiss_seed:
@@ -533,21 +509,18 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed[vertex_slice] = seed
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self, placements, buffer_manager):
+    def get_spikes(self):
         return self.__spike_recorder.get_spikes(
-            self.label, buffer_manager,
+            self.label,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, self)
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        return [ContiguousKeyRangeContraint()]
+            self)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements):
+    def clear_spike_recording(self):
+        buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
+            placement = SpynnakerDataView.get_placement_of_vertex(
+                machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID)
@@ -579,4 +552,13 @@ class SpikeSourcePoissonVertex(
 
     @overrides(TDMAAwareApplicationVertex.get_n_cores)
     def get_n_cores(self):
-        return len(self._splitter.get_out_going_slices()[0])
+        return len(self._splitter.get_out_going_slices())
+
+    def set_live_poisson_control_edge(self, edge):
+        if self.__incoming_control_edge is not None:
+            raise Exception("The Poisson can only be controlled by one source")
+        self.__incoming_control_edge = edge
+
+    @property
+    def incoming_control_edge(self):
+        return self.__incoming_control_edge

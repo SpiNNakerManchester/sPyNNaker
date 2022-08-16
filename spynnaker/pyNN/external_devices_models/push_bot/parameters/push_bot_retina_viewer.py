@@ -17,6 +17,8 @@ import math
 import socket
 from threading import Thread
 import numpy
+from spinnman.utilities.socket_utils import (
+    get_udp_socket, get_socket_address, bind_socket)
 
 # Value of brightest pixel to show
 _DISPLAY_MAX = 33.0
@@ -81,12 +83,12 @@ class PushBotRetinaViewer(Thread):
     def _init_socket(self, port):
         """ Open socket to receive UDP.
         """
-        self.__spike_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__spike_socket.bind(("0.0.0.0", port))
+        self.__spike_socket = get_udp_socket()
+        bind_socket(self.__spike_socket, "0.0.0.0", port)
         self.__spike_socket.setblocking(False)
 
-        self.__local_host, self.__local_port = \
-            self.__spike_socket.getsockname()
+        self.__local_host, self.__local_port = get_socket_address(
+            self.__spike_socket)
 
     @property
     def local_host(self):
@@ -95,9 +97,6 @@ class PushBotRetinaViewer(Thread):
     @property
     def local_port(self):
         return self.__local_port
-
-    def __recv_data(self, size=_BUFFER_SIZE):
-        return self.__spike_socket.recv(size)
 
     def _close(self):
         self.__spike_socket.close()
@@ -117,7 +116,7 @@ class PushBotRetinaViewer(Thread):
         # Read all UDP messages received during last frame
         while True:
             try:
-                self._parse_raw_data(self.__recv_data())
+                self._parse_raw_data(self.__spike_socket.recv(_BUFFER_SIZE))
             except socket.error:
                 # Stop reading
                 break

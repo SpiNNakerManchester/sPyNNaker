@@ -206,11 +206,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
+            self, n_post_atoms, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
         prob_in_slice = min(
-            post_vertex_slice.n_atoms / float(
+            n_post_atoms / float(
                 synapse_info.n_post_neurons), 1.0)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,

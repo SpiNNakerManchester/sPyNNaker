@@ -52,9 +52,9 @@ class TestSTDPRandomRun(BaseTestCase):
         spikes_2 = pop.get_data("spikes").segments[1].spiketrains
         sim.end()
 
-        assert(numpy.array_equal(weights_1_1, weights_2_1))
-        assert(numpy.array_equal(weights_1_2, weights_2_2))
-        assert(numpy.array_equal(spikes_1, spikes_2))
+        assert numpy.array_equal(weights_1_1, weights_2_1)
+        assert numpy.array_equal(weights_1_2, weights_2_2)
+        assert numpy.array_equal(spikes_1, spikes_2)
 
     def test_do_run(self):
         self.runsafe(self.do_run)

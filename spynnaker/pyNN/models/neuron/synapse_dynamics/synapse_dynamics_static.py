@@ -17,7 +17,7 @@ import numpy
 from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -56,7 +56,7 @@ class SynapseDynamicsStatic(
         self.__change_requires_mapping = True
         self.__weight = weight
         if delay is None:
-            delay = get_simulator().min_delay
+            delay = SpynnakerDataView.get_min_delay()
         self.__delay = self._round_delay(delay)
         self.__pad_to_length = pad_to_length
 

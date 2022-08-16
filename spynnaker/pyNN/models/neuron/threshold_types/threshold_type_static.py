@@ -38,11 +38,6 @@ class ThresholdTypeStatic(AbstractThresholdType):
             DataType.S1615])  # v_thresh
         self.__v_thresh = v_thresh
 
-    @overrides(AbstractThresholdType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # Just a comparison, but 2 just in case!
-        return 2 * n_neurons
-
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
         parameters[V_THRESH] = self.__v_thresh

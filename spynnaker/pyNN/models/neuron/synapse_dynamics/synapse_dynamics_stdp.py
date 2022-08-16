@@ -20,7 +20,7 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
@@ -105,7 +105,7 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         if delay is None:
-            delay = get_simulator().min_delay
+           delay = SpynnakerDataView.get_min_delay()
         self.__delay = self._round_delay(delay)
         self.__backprop_delay = backprop_delay
         self.__neuromodulation = None

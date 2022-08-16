@@ -16,13 +16,14 @@
 import functools
 import logging
 import numpy
+from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from pyNN import common as pynn_common
 from pyNN.recording.files import StandardTextFile
 from pyNN.space import Space as PyNNSpace
 from spinn_utilities.logger_utils import warn_once
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
@@ -83,7 +84,6 @@ class Projection(object):
                 "sPyNNaker {} does not yet support multi-compartmental "
                 "cells.".format(__version__))
 
-        sim = get_simulator()
         self.__projection_edge = None
         self.__requires_mapping = True
         self.__label = label
@@ -101,8 +101,8 @@ class Projection(object):
                     pre_synaptic_population.label,
                     post_synaptic_population.label, connector))
             # give an auto generated label for the underlying edge
-            label = "projection edge {}".format(sim.none_labelled_edge_count)
-            sim.increment_none_labelled_edge_count()
+            label = "projection edge {}".format(
+                SpynnakerDataView.get_next_none_labelled_edge_number())
 
         # Handle default synapse type
         if synapse_type is None:
@@ -150,8 +150,7 @@ class Projection(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             pre_is_view, post_is_view, rng, synapse_dynamics,
-            synaptic_type, receptor_type, sim.use_virtual_board,
-            synapse_type_from_dynamics,
+            synaptic_type, receptor_type, synapse_type_from_dynamics,
             synapse_dynamics.weight, synapse_dynamics.delay)
 
         # Set projection information in connector
@@ -170,16 +169,16 @@ class Projection(object):
             self.__projection_edge = ProjectionApplicationEdge(
                 pre_vertex, post_vertex, self.__synapse_information,
                 label=label)
-            sim.add_application_edge(
+            SpynnakerDataView.add_edge(
                 self.__projection_edge, SPIKE_PARTITION_ID)
 
         # add projection to the SpiNNaker control system
-        sim.add_projection(self)
+        SpynnakerDataView.add_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None
-        if sim.use_virtual_board:
+        if get_config_bool("Machine", "virtual_board"):
             self.__virtual_connection_list = list()
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
@@ -428,13 +427,16 @@ class Projection(object):
         :rtype: ~.ApplicationEdge
         """
         # Find edges ending at the postsynaptic vertex
-        graph_edges = get_simulator().original_application_graph.\
-            get_edges_ending_at_vertex(post_synaptic_vertex)
+        partitions = (
+            SpynnakerDataView.get_outgoing_edge_partitions_starting_at_vertex(
+                pre_synaptic_vertex))
 
-        # Search the edges for any that start at the presynaptic vertex
-        for edge in graph_edges:
-            if edge.pre_vertex == pre_synaptic_vertex:
-                return edge
+        # Partitions and Partition.edges will be OrderedSet but may be empty
+        for partition in partitions:
+            for edge in partition.edges:
+                if edge.post_vertex == post_synaptic_vertex:
+                    return edge
+
         return None
 
     def _get_synaptic_data(
@@ -467,7 +469,7 @@ class Projection(object):
 
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
-        if not get_simulator().has_ran:
+        if not SpynnakerDataView.is_ran_ever():
             self.__synapse_information.add_pre_run_connection_holder(
                 connection_holder)
             return connection_holder
@@ -475,7 +477,6 @@ class Projection(object):
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
         connections = post_vertex.get_connections_from_machine(
-            get_simulator().transceiver, get_simulator().placements,
             self.__projection_edge, self.__synapse_information)
         if connections is not None:
             connection_holder.add_connections(connections)

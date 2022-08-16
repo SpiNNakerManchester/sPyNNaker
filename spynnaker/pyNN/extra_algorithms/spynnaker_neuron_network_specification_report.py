@@ -17,8 +17,7 @@ import os
 from spinn_utilities.config_holder import get_config_str
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_front_end_common.utilities.globals_variables import (
-    report_default_directory)
+from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -47,23 +46,20 @@ def _get_diagram(label):
             graphviz.backend.ExecutableNotFound)
 
 
-def spynnaker_neuron_graph_network_specification_report(application_graph):
+def spynnaker_neuron_graph_network_specification_report():
     """
     Produces a report describing the graph created from the neural \
         populations and projections.
 
     :param str report_folder: the report folder to put figure into
-    :param ~pacman.model.graphs.application.ApplicationGraph \
-            application_graph:
-        the app graph
     """
     # create holders for data
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str("Reports", "network_graph_format")
     if graph_format is None:
-        if (application_graph.n_vertices +
-                application_graph.n_outgoing_edge_partitions) > CUTOFF:
+        if (SpynnakerDataView.get_n_vertices() +
+                SpynnakerDataView.get_n_partitions()) > CUTOFF:
             logger.warning(
                 "cfg write_network_graph ignored as network_graph_format "
                 "is None and the network is big")
@@ -72,20 +68,18 @@ def spynnaker_neuron_graph_network_specification_report(application_graph):
             graph_format = _GRAPH_FORMAT
     # build progress bar for the vertices, edges, and rendering
     progress = ProgressBar(
-        application_graph.n_vertices +
-        application_graph.n_outgoing_edge_partitions + 1,
+        SpynnakerDataView.get_n_vertices() +
+        SpynnakerDataView.get_n_partitions() + 1,
         "generating the graphical representation of the neural network")
 
     # write vertices into dot diagram
-    vertex_ids = _generate_vertices(
-        application_graph, dot_diagram, progress)
+    vertex_ids = _generate_vertices(dot_diagram, progress)
     # write edges into dot diagram
-    _generate_edges(
-        application_graph, dot_diagram, vertex_ids, progress)
+    _generate_edges(dot_diagram, vertex_ids, progress)
 
     # write dot file and generate pdf
     file_to_output = os.path.join(
-        report_default_directory(), _GRAPH_NAME)
+        SpynnakerDataView.get_run_dir_path(), _GRAPH_NAME)
     try:
         dot_diagram.render(file_to_output, view=False, format=graph_format)
     except exeNotFoundExn:
@@ -94,16 +88,15 @@ def spynnaker_neuron_graph_network_specification_report(application_graph):
     progress.end()
 
 
-def _generate_vertices(graph, dot_diagram, progress):
+def _generate_vertices(dot_diagram, progress):
     """
-    :param ~.ApplicationGraph graph:
     :param ~graphviz.Digraph dot_diagram:
     :param ~.ProgressBar progress:
     :rtype: dict(~.ApplicationVertex,str)
     """
     vertex_ids = dict()
     for vertex_counter, vertex in progress.over(
-            enumerate(graph.vertices), False):
+            enumerate(SpynnakerDataView.iterate_vertices()), False):
         # Arbitrary labels used inside dot
         vertex_id = str(vertex_counter)
         dot_diagram.node(
@@ -112,14 +105,14 @@ def _generate_vertices(graph, dot_diagram, progress):
     return vertex_ids
 
 
-def _generate_edges(graph, dot_diagram, vertex_ids, progress):
+def _generate_edges(dot_diagram, vertex_ids, progress):
     """
-    :param ~.ApplicationGraph graph:
     :param ~graphviz.Digraph dot_diagram:
     :param dict(~.ApplicationVertex,str) vertex_ids:
     :param ~.ProgressBar progress:
     """
-    for partition in progress.over(graph.outgoing_edge_partitions, False):
+    for partition in progress.over(
+            SpynnakerDataView.iterate_partitions(), False):
         for edge in partition.edges:
             source_vertex_id = vertex_ids[edge.pre_vertex]
             dest_vertex_id = vertex_ids[edge.post_vertex]
