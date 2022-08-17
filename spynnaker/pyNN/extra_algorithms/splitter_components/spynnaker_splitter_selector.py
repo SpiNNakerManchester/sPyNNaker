@@ -23,13 +23,13 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from .splitter_abstract_pop_vertex_fixed import (
     SplitterAbstractPopulationVertexFixed)
-from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
-from .splitter_poisson_delegate import SplitterPoissonDelegate
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.spike_source import (
     SpikeSourceArrayVertex, SpikeSourcePoissonVertex)
-from spynnaker.pyNN.extra_algorithms.splitter_components import (
+from .spynnaker_splitter_fixed_legacy import SpynnakerSplitterFixedLegacy
+from .splitter_poisson_delegate import SplitterPoissonDelegate
+from .splitter_abstract_pop_vertex_neurons_synapses import (
     SplitterAbstractPopulationVertexNeuronsSynapses)
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
