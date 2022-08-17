@@ -97,6 +97,7 @@ class NeuronData(object):
         self.__neuron_recording_data = None
         self.__generation_done = False
         self.__gen_on_machine = None
+        self.__neuron_data_n_structs = 0
 
     @property
     def gen_on_machine(self):

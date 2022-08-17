@@ -132,6 +132,7 @@ class SynapticMatrices(object):
         self.__data_generated = False
         self.__max_gen_data = 0
         self.__on_host_matrices = None
+        self.__generated_data = None
         self.__generated_data_size = 0
         self.__n_generated_matrices = 0
         self.__master_pop_data = None

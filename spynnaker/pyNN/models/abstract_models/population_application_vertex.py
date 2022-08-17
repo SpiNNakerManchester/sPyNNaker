@@ -15,9 +15,7 @@
 from pacman.model.graphs.application import ApplicationVertex
 from enum import Enum
 from spinn_utilities.helpful_functions import is_singleton
-
-# Stop Pylint complaining about NotImplementedError
-# pylint: disable=W0223
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class RecordingType(Enum):
@@ -195,6 +193,7 @@ class PopulationApplicationVertex(ApplicationVertex):
         :param str name: The name of the variable to test
         :rtype: bool
         """
+        # pylint: disable=unused-argument
         return False
 
     def set_recording(self, name, sampling_interval=None, indices=None):
@@ -290,6 +289,8 @@ class PopulationApplicationVertex(ApplicationVertex):
             for all. See:
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: None or slice or int or list(bool) or list(int)
-        :raise NotImplementedError: if the population doesn't support injection
+        :raise ConfigurationException:
+            if the population doesn't support injection
         """
-        raise NotImplementedError("This Population doesn't support injection")
+        raise ConfigurationException(
+            "This Population doesn't support injection")

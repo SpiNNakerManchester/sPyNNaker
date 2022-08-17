@@ -71,7 +71,6 @@ class SpikeSourcePoissonVertex(
         "__seed",
         "__spike_recorder",
         "__kiss_seed",  # dict indexed by vertex slice
-        "__n_subvertices",
         "__max_rate",
         "__max_n_rates",
         "__n_profile_samples",
@@ -113,7 +112,6 @@ class SpikeSourcePoissonVertex(
         self.__model = model
         self.__seed = seed
         self.__kiss_seed = dict()
-        self.__n_subvertices = 0
 
         # check for changes parameters
         self.__change_requires_mapping = True
@@ -459,11 +457,9 @@ class SpikeSourcePoissonVertex(
     def create_machine_vertex(
             self, vertex_slice, sdram, label=None, constraints=None):
         # pylint: disable=arguments-differ
-        index = self.__n_subvertices
-        self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
-            constraints, label, self, vertex_slice, index)
+            constraints, label, self, vertex_slice)
 
     @property
     def max_rate(self):

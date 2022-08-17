@@ -189,7 +189,7 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, sdram, is_recording, constraints=None,
-            label=None, app_vertex=None, vertex_slice=None, slice_index=None):
+            label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
