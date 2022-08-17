@@ -748,9 +748,6 @@ class AbstractPopulationVertex(
 
     @overrides(PopulationApplicationVertex.inject)
     def inject(self, current_source, selector=None):
-        """ Inject method from population to set up current source
-
-        """
         self.__current_sources.append(current_source)
         self.__current_source_id_list[current_source] = selector
         # set the associated vertex (for multi-run case)
