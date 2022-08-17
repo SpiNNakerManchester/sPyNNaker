@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.populations import PopulationView
 import pyNN.spiNNaker as sim

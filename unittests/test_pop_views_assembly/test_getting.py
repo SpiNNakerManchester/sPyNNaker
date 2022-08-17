@@ -263,7 +263,6 @@ class TestGetting(BaseTestCase):
                 "https://github.com/NeuralEnsemble/python-neo/issues/529"
                 ) from e
 
-
         Recorder.get_data = mock_v_all
         (target, _, _) = mock_v_all(None, "any")
 

@@ -156,7 +156,7 @@ def test_write_data_spec():
         if region is not None:
             all_data.extend(region.region_data)
         if r == regions.synaptic_matrix:
-            assert(len(region.region_data) > 0)
+            assert len(region.region_data) > 0
 
     writer.set_transceiver(MockTransceiverRawData(all_data))
     report_folder = mkdtemp()
