@@ -91,10 +91,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self.__inh_exp_response = inh_exp_response
         self.__tau_syn_I = tau_syn_I
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 100 * n_neurons
-
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TAU_SYN_E] = self.__tau_syn_E

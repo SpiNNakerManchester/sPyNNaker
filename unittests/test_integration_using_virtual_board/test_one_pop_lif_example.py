@@ -38,7 +38,7 @@ def do_run(nNeurons):
     p.run(3000)
 
     neo = pop1.get_data()
-    assert(neo is not None)
+    assert neo is not None
 
     p.end()
 

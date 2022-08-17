@@ -35,10 +35,6 @@ class InputTypeDelta(AbstractInputType):
             [Struct([(DataType.S1615, TIME_STEP)])],
             dict())
 
-    @overrides(AbstractInputType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 1 * n_neurons
-
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
         parameters[TIME_STEP] = SpynnakerDataView.get_simulation_time_step_ms()

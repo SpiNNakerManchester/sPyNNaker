@@ -28,9 +28,9 @@ class SpiNNaker(_BaseClass):
     def __init__(
             self, time_scale_factor, min_delay, graph_label,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments, too-many-locals, unused-argument
         moved_in_v7("spynnaker8.spinnaker",
                     "spynnaker.pyNN.spinnaker")
         super(SpiNNaker, self).__init__(
-            time_scale_factor, min_delay, graph_label,
+            time_scale_factor, min_delay,
             n_chips_required, n_boards_required, timestep)

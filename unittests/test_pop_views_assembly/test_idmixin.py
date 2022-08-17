@@ -33,7 +33,7 @@ class TestIDMixin(BaseTestCase):
         assert 0 == cells[0].id
         assert len(str(cells[0])) > 0
         assert len(repr(cells[0])) > 0
-        assert not(cells[1].__eq__("Not the same object"))
+        assert not cells[1].__eq__("Not the same object")
         sim.end()
 
     def test_get_set(self):

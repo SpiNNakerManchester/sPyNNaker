@@ -112,10 +112,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
         structs.extend(s for c in self.__components for s in c.structs)
         return structs
 
-    @overrides(AbstractNeuronImpl.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return sum(c.get_n_cpu_cycles(n_neurons) for c in self.__components)
-
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
     def get_global_weight_scale(self):
         return self.__input_type.get_global_weight_scale()

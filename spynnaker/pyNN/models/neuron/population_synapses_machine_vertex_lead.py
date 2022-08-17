@@ -39,13 +39,13 @@ class PopulationSynapsesMachineVertexLead(
         "__max_atoms_per_core"]
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, ring_buffer_shifts, weight_scales,
             structural_sz, synapse_references, max_atoms_per_core,
             synaptic_matrices):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -55,7 +55,7 @@ class PopulationSynapsesMachineVertexLead(
             The slice of the population that this implements
         """
         super(PopulationSynapsesMachineVertexLead, self).__init__(
-            resources_required, label, constraints, app_vertex, vertex_slice)
+            sdram, label, constraints, app_vertex, vertex_slice)
         self.__ring_buffer_shifts = ring_buffer_shifts
         self.__weight_scales = weight_scales
         self.__structural_sz = structural_sz

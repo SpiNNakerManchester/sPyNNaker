@@ -66,7 +66,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
     __slots__ = []
 
     def __init__(
-            self, time_scale_factor, min_delay, graph_label,
+            self, time_scale_factor, min_delay,
             n_chips_required=None, n_boards_required=None, timestep=0.1):
         """
 
@@ -75,7 +75,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             (does not affect the neuron models accuracy)
         :type time_scale_factor: int or None
         :param min_delay:
-        :param graph_label:
         :param n_chips_required:
             Deprecated! Use n_boards_required instead.
             Must be None if n_boards_required specified.
@@ -112,7 +111,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
             os.path.dirname(model_binaries.__file__))
 
         super().__init__(
-            graph_label=graph_label,
             data_writer_cls=SpynnakerDataWriter)
 
         self._data_writer.set_n_required(n_boards_required, n_chips_required)
@@ -415,42 +413,6 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         moved_in_v7_warning("register_binary_search_path is now a View method")
         SpynnakerDataView.register_binary_search_path(search_path)
 
-    def _locate_receivers_from_projections(
-            self, projections, gatherers, extra_monitors_per_chip):
-        """ Locate receivers and their corresponding monitor cores for\
-            setting router time-outs.
-
-        :param list projections: the projections going to be read
-        :param gatherers: the gatherers per Ethernet chip
-        :param extra_monitors_per_chip: the extra monitor cores per chip
-        :return: list of tuples with gatherer and its extra monitor cores
-        :rtype: list
-        """
-        # pylint: disable=protected-access
-        important_gathers = set()
-
-        machine = self._data_writer.get_machine()
-        placements = self._data_writer.get_placements()
-        # iterate though projections
-        for projection in projections:
-            # iteration though the projections machine edges to locate chips
-            for edge in projection._projection_edge.machine_edges:
-                placement = placements.get_placement_of_vertex(
-                    edge.post_vertex)
-                chip = machine.get_chip_at(placement.x, placement.y)
-
-                # locate extra monitor cores on the board of this chip
-                extra_monitor_cores_on_board = set(
-                    extra_monitors_per_chip[xy]
-                    for xy in machine.get_existing_xys_on_board(chip))
-
-                # map gatherer to extra monitor cores for board
-                important_gathers.add((
-                    gatherers[(chip.nearest_ethernet_x,
-                               chip.nearest_ethernet_y)],
-                    frozenset(extra_monitor_cores_on_board)))
-        return list(important_gathers)
-
     def _execute_spynnaker_ordered_covering_compressor(self):
         with FecTimer(
                 LOADING,
@@ -555,7 +517,7 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
 
     @overrides(AbstractSpinnakerBase._execute_splitter_partitioner)
     def _execute_splitter_partitioner(self):
-        if not self._data_writer.get_runtime_graph().n_vertices:
+        if self._data_writer.get_n_vertices() == 0:
             return
         with FecTimer(MAPPING, "SpynnakerSplitterPartitioner"):
             n_chips_in_graph = spynnaker_splitter_partitioner()

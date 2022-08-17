@@ -141,11 +141,10 @@ class PopulationSynapsesMachineVertexCommon(
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
-            vertex_slice):
+            self, sdram, label, constraints, app_vertex,  vertex_slice):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -155,7 +154,7 @@ class PopulationSynapsesMachineVertexCommon(
             The slice of the population that this implements
         """
         super(PopulationSynapsesMachineVertexCommon, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, constraints, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             SynapseProvenance.N_ITEMS + SpikeProcessingFastProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))

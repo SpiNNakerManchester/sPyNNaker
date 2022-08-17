@@ -44,14 +44,6 @@ class AbstractStandardNeuronComponent(object, metaclass=AbstractBase):
         return self.__structs
 
     @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        """ Get the number of CPU cycles required to update the state
-
-        :param int n_neurons: The number of neurons to get the cycles for
-        :rtype: int
-        """
-
-    @abstractmethod
     def add_parameters(self, parameters):
         """ Add the initial values of the parameters to the parameter holder
 

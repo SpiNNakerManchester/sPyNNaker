@@ -137,7 +137,7 @@ class SpikeSourcePoissonMachineVertex(
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
-        "__resources",
+        "__sdram",
         "__change_requires_neuron_parameters_reload",
         "__sdram_partition",
         "__rate_changed"]
@@ -188,14 +188,14 @@ class SpikeSourcePoissonMachineVertex(
     SEED_SIZE_BYTES = 4 * 4
 
     def __init__(
-            self, resources_required, is_recording, constraints=None,
+            self, sdram, is_recording, constraints=None,
             label=None, app_vertex=None, vertex_slice=None, slice_index=None):
         # pylint: disable=too-many-arguments
         super().__init__(
             label, constraints=constraints, app_vertex=app_vertex,
             vertex_slice=vertex_slice)
         self.__is_recording = is_recording
-        self.__resources = resources_required
+        self.__sdram = sdram
         self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
         self.__slice_index = slice_index
@@ -205,9 +205,9 @@ class SpikeSourcePoissonMachineVertex(
         self.__sdram_partition = sdram_partition
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)

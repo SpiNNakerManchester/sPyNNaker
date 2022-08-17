@@ -45,14 +45,6 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        """ Get the number of CPU cycles required to update the state
-
-        :param int n_neurons: The number of neurons to get the cycles for
-        :rtype: int
-        """
-
-    @abstractmethod
     def get_global_weight_scale(self):
         """ Get the weight scaling required by this model
 

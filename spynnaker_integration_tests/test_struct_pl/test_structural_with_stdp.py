@@ -110,16 +110,16 @@ def structural_with_stdp():
     print(w_final_1, spikes_1[0])
     print(w_final_2, spikes_2[0])
 
-    assert(len(conns) == 1)
-    assert(conns[0][3] == delay_1)
-    assert(conns[0][2] >= w_final_1 - 0.01 and
-           conns[0][2] <= w_final_1 + 0.01)
-    assert(len(conns_2) == 1)
-    assert(conns_2[0][3] == delay_2)
-    assert(conns_2[0][2] >= w_final_2 - 0.01 and
-           conns_2[0][2] <= w_final_2 + 0.01)
-    assert(len(conns_3) == 0)
-    assert(len(conns_4) == 0)
+    assert len(conns) == 1
+    assert conns[0][3] == delay_1
+    assert (conns[0][2] >= w_final_1 - 0.01 and
+            conns[0][2] <= w_final_1 + 0.01)
+    assert len(conns_2) == 1
+    assert conns_2[0][3] == delay_2
+    assert (conns_2[0][2] >= w_final_2 - 0.01 and
+            conns_2[0][2] <= w_final_2 + 0.01)
+    assert len(conns_3) == 0
+    assert len(conns_4) == 0
 
 
 class TestStructuralWithSTDP(BaseTestCase):

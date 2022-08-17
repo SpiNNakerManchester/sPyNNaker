@@ -21,8 +21,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged import RangeDictionary, RangedList
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
-from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.resources import ConstantSDRAM
 from spinn_utilities.config_holder import get_config_int
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.interface.buffer_management import (
@@ -433,11 +432,8 @@ class SpikeSourcePoissonVertex(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
 
-    @overrides(LegacyPartitionerAPI.get_resources_used_by_atoms)
-    def get_resources_used_by_atoms(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        """
+    @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
+    def get_sdram_used_by_atoms(self, vertex_slice):
         poisson_params_sz = get_rates_bytes(
             vertex_slice.n_atoms, vertex_slice.n_atoms * self.__max_n_rates)
         poisson_expander_sz = get_expander_rates_bytes(
@@ -453,14 +449,7 @@ class SpikeSourcePoissonVertex(
             sdram_sz)
 
         recording = self.get_recording_sdram_usage(vertex_slice)
-        # build resources as i currently know
-        container = ResourceContainer(
-            sdram=recording + other,
-            dtcm=DTCMResource(self.get_dtcm_usage_for_atoms()),
-            cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms()))
-
-        return container
+        return recording + other
 
     @property
     def n_atoms(self):
@@ -468,13 +457,12 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, label=None,
-            constraints=None):
+            self, vertex_slice, sdram, label=None, constraints=None):
         # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
-            resources_required, self.__spike_recorder.record,
+            sdram, self.__spike_recorder.record,
             constraints, label, self, vertex_slice, index)
 
     @property
@@ -494,16 +482,6 @@ class SpikeSourcePoissonVertex(
         self.__seed = seed
         self.__kiss_seed = dict()
         self.__rng = numpy.random.RandomState(seed)
-
-
-
-    @staticmethod
-    def get_dtcm_usage_for_atoms():
-        return 0
-
-    @staticmethod
-    def get_cpu_usage_for_atoms():
-        return 0
 
     def kiss_seed(self, vertex_slice):
         if vertex_slice not in self.__kiss_seed:

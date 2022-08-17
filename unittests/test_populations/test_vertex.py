@@ -29,9 +29,6 @@ class EmptyNeuronComponent(AbstractStandardNeuronComponent):
     def __init__(self):
         super().__init__([], [])
 
-    def get_n_cpu_cycles(self, n_neurons):
-        return 0
-
     def add_parameters(self, parameters):
         pass
 
@@ -67,9 +64,6 @@ class _MyNeuronModel(AbstractStandardNeuronComponent):
         super().__init__([], [])
         self._foo = foo
         self._bar = bar
-
-    def get_n_cpu_cycles(self, n_neurons):
-        return 0
 
     def add_parameters(self, parameters):
         pass

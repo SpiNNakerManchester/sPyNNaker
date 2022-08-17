@@ -84,11 +84,6 @@ class NeuronModelIzh(AbstractStandardNeuronComponent):
         self.__v_init = v_init
         self.__u_init = u_init
 
-    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        # A bit of a guess
-        return 150 * n_neurons
-
     @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[A] = self.__a

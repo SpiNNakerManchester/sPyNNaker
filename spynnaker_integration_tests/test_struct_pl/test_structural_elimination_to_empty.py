@@ -54,10 +54,10 @@ def structural_eliminate_to_empty():
     p.end()
 
     # These should have no connections since all should be eliminated
-    assert(len(conns) == 0)
-    assert(num_elims == 81)
-    assert(num_forms == 0)
-    assert(first_elim == "7_5_elimination")
+    assert len(conns) == 0
+    assert num_elims == 81
+    assert num_forms == 0
+    assert first_elim == "7_5_elimination"
 
 
 class TestStructuralEliminateToEmpty(BaseTestCase):

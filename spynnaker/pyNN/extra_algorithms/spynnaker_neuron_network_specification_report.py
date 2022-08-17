@@ -54,13 +54,12 @@ def spynnaker_neuron_graph_network_specification_report():
     :param str report_folder: the report folder to put figure into
     """
     # create holders for data
-    application_graph = SpynnakerDataView.get_runtime_graph()
     dot_diagram, exeNotFoundExn = _get_diagram(_GRAPH_TITLE)
 
     graph_format = get_config_str("Reports", "network_graph_format")
     if graph_format is None:
-        if (application_graph.n_vertices +
-                application_graph.n_outgoing_edge_partitions) > CUTOFF:
+        if (SpynnakerDataView.get_n_vertices() +
+                SpynnakerDataView.get_n_partitions()) > CUTOFF:
             logger.warning(
                 "cfg write_network_graph ignored as network_graph_format "
                 "is None and the network is big")
@@ -69,16 +68,14 @@ def spynnaker_neuron_graph_network_specification_report():
             graph_format = _GRAPH_FORMAT
     # build progress bar for the vertices, edges, and rendering
     progress = ProgressBar(
-        application_graph.n_vertices +
-        application_graph.n_outgoing_edge_partitions + 1,
+        SpynnakerDataView.get_n_vertices() +
+        SpynnakerDataView.get_n_partitions() + 1,
         "generating the graphical representation of the neural network")
 
     # write vertices into dot diagram
-    vertex_ids = _generate_vertices(
-        application_graph, dot_diagram, progress)
+    vertex_ids = _generate_vertices(dot_diagram, progress)
     # write edges into dot diagram
-    _generate_edges(
-        application_graph, dot_diagram, vertex_ids, progress)
+    _generate_edges(dot_diagram, vertex_ids, progress)
 
     # write dot file and generate pdf
     file_to_output = os.path.join(
@@ -91,16 +88,15 @@ def spynnaker_neuron_graph_network_specification_report():
     progress.end()
 
 
-def _generate_vertices(graph, dot_diagram, progress):
+def _generate_vertices(dot_diagram, progress):
     """
-    :param ~.ApplicationGraph graph:
     :param ~graphviz.Digraph dot_diagram:
     :param ~.ProgressBar progress:
     :rtype: dict(~.ApplicationVertex,str)
     """
     vertex_ids = dict()
     for vertex_counter, vertex in progress.over(
-            enumerate(graph.vertices), False):
+            enumerate(SpynnakerDataView.iterate_vertices()), False):
         # Arbitrary labels used inside dot
         vertex_id = str(vertex_counter)
         dot_diagram.node(
@@ -109,14 +105,14 @@ def _generate_vertices(graph, dot_diagram, progress):
     return vertex_ids
 
 
-def _generate_edges(graph, dot_diagram, vertex_ids, progress):
+def _generate_edges(dot_diagram, vertex_ids, progress):
     """
-    :param ~.ApplicationGraph graph:
     :param ~graphviz.Digraph dot_diagram:
     :param dict(~.ApplicationVertex,str) vertex_ids:
     :param ~.ProgressBar progress:
     """
-    for partition in progress.over(graph.outgoing_edge_partitions, False):
+    for partition in progress.over(
+            SpynnakerDataView.iterate_partitions(), False):
         for edge in partition.edges:
             source_vertex_id = vertex_ids[edge.pre_vertex]
             dest_vertex_id = vertex_ids[edge.post_vertex]

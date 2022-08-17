@@ -85,16 +85,16 @@ def run_delayed_split():
     print(from_list_border_spikes)
 
     # Check the delays worked out
-    assert(numpy.array_equal(from_list_delays,
-                             [0.1 + (a * 10) for a in range(10)]))
-    assert(all(d == 34.0 for d in fixed_prob_delays))
-    assert(all(d == 2.0 for d in fixed_total_delays))
-    assert(all(d == 4.0 for d in from_list_border_delays))
+    assert numpy.array_equal(from_list_delays,
+                             [0.1 + (a * 10) for a in range(10)])
+    assert all(d == 34.0 for d in fixed_prob_delays)
+    assert all(d == 2.0 for d in fixed_total_delays)
+    assert all(d == 4.0 for d in from_list_border_delays)
 
     for d, s in zip(from_list_delays, from_list_spikes):
-        assert(s > d)
+        assert s > d
     for s in from_list_border_spikes:
-        assert(s > 4.0)
+        assert s > 4.0
 
 
 class TestSplitDelays(BaseTestCase):

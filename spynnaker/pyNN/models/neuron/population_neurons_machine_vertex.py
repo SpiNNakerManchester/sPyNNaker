@@ -100,12 +100,12 @@ class PopulationNeuronsMachineVertex(
         0: "TIMER_NEURONS"}
 
     def __init__(
-            self, resources_required, label, constraints, app_vertex,
+            self, sdram, label, constraints, app_vertex,
             vertex_slice, slice_index, ring_buffer_shifts, weight_scales,
             neuron_data, max_atoms_per_core):
         """
-        :param ~pacman.model.resources.ResourceContainer resources_required:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param str label: The label of the vertex
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints for the vertex
@@ -125,7 +125,7 @@ class PopulationNeuronsMachineVertex(
             The maximum number of atoms per core
         """
         super(PopulationNeuronsMachineVertex, self).__init__(
-            label, constraints, app_vertex, vertex_slice, resources_required,
+            label, constraints, app_vertex, vertex_slice, sdram,
             self.COMMON_REGIONS,
             NeuronProvenance.N_ITEMS + NeuronMainProvenance.N_ITEMS,
             self._PROFILE_TAG_LABELS, self.__get_binary_file_name(app_vertex))
