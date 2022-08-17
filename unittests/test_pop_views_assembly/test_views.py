@@ -137,15 +137,6 @@ class Test_IDMixin(BaseTestCase):
         self.assertEqual([-65, -60, -65, -60, -65], pop.initial_values["v"])
         self.assertEqual([-60, -60], view.initial_values["v"])
         self.assertEqual([-60, -65], view2.initial_values["v"])
-        rand_distr = RandomDistribution("uniform",
-                                        parameters_pos=[-65.0, -55.0],
-                                        rng=NumpyRNG(seed=85524))
-        view.initialize(v=rand_distr)
-        sim.run(0)
-        for val in view.initial_values["v"]:
-            self.assertGreaterEqual(val, -65.0)
-            self.assertLessEqual(val, -55.0)
-        sim.reset()
         view.initialize(v=lambda i: -65 + i / 10.0)
         self.assertEqual([-64.9, -64.7], view.initial_values["v"])
         sim.end()
