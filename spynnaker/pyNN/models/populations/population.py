@@ -632,6 +632,9 @@ class Population(PopulationBase):
         """
         return self.__vertex
 
+    def _reset_has_read_neuron_parameters_this_run(self):
+        self.__has_read_neuron_parameters_this_run = False
+
     @property
     def conductance_based(self):
         """ True if the population uses conductance inputs

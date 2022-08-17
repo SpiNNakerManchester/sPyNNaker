@@ -138,11 +138,15 @@ class SpiNNaker(AbstractSpinnakerBase, pynn_control.BaseState):
         """
         # pylint: disable=protected-access
 
-        # extra post run algorithms
+        # extra post prerun algorithms
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
+        if self._data_writer.is_ran_ever():
+            for population in self._data_writer.iterate_populations():
+                population._reset_has_read_neuron_parameters_this_run()
 
         super(SpiNNaker, self).run(run_time, sync_time)
+        # extra post run algorithms
         for projection in self._data_writer.iterate_projections():
             projection._clear_cache()
 
