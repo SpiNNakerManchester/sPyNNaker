@@ -86,8 +86,6 @@ typedef enum {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-
-
 static inline void synapse_types_initialise(synapse_types_t *state,
 		synapse_types_params_t *params) {
     decay_and_init(&state->exc, &params->exc, params->timestep_ms);

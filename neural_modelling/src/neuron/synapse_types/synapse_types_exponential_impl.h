@@ -79,12 +79,11 @@ static inline void synapse_types_initialise(synapse_types_t *state,
     decay_and_init(&state->inh, &params->inh, params->time_step_ms);
 }
 
-static inline void synapse_types_save_state(synapse_types_t *state, synapse_types_params_t *params) {
+static inline void synapse_types_save_state(synapse_types_t *state,
+		synapse_types_params_t *params) {
 	params->exc.init_input = state->exc.synaptic_input_value;
 	params->inh.init_input = state->inh.synaptic_input_value;
 }
-
-
 
 //! \brief decays the stuff thats sitting in the input buffers as these have not
 //!     yet been processed and applied to the neuron.
