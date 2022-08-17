@@ -199,7 +199,7 @@ class SynapseDynamicsStructuralCommon(
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_projections, routing_info,
+            self, spec, app_vertex, structural_projections,
             weight_scales, synaptic_matrices):
         """
         :param ~data_specification.DataSpecificationGenerator spec:

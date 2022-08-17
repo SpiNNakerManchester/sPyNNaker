@@ -746,12 +746,13 @@ class AbstractPopulationVertex(
         """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
-    def inject(self, current_source, neuron_list):
+    @overrides(PopulationApplicationVertex.inject)
+    def inject(self, current_source, selector):
         """ Inject method from population to set up current source
 
         """
         self.__current_sources.append(current_source)
-        self.__current_source_id_list[current_source] = neuron_list
+        self.__current_source_id_list[current_source] = selector
         # set the associated vertex (for multi-run case)
         current_source.set_app_vertex(self)
         # set to reload for multi-run case

@@ -511,9 +511,7 @@ class SpikeSourcePoissonVertex(
         :rtype: dict(str, ...)
         """
 
-        parameters = dict()
-        for parameter_name in self.__model.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+        parameters = self.get_parameter_values(self.__model.default_parameters)
 
         context = {
             "name": self.__model_name,

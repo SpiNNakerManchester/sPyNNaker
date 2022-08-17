@@ -198,7 +198,6 @@ class SpikeSourcePoissonMachineVertex(
         self.__sdram = sdram
         self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
-        self.__slice_index = slice_index
         self.__rate_changed = True
 
     def set_sdram_partition(self, sdram_partition):
@@ -535,7 +534,7 @@ class SpikeSourcePoissonMachineVertex(
                 # Skip the count and index
                 offset += PARAMS_WORDS_PER_NEURON * BYTES_PER_WORD
                 rates = list()
-                for j in range(n_rates):
+                for _ in range(n_rates):
                     rate_int = _ONE_WORD.unpack_from(byte_array, offset)
                     rates.append(rate_int / DataType.S1615.scale)
                     # Skip the start and duration as they can't change

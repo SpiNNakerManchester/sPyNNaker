@@ -143,6 +143,7 @@ class SpikeSourceArrayVertex(
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
 
     def __read_parameter(self, name, selector):
+        # pylint: disable=unused-argument
         # This can only be spike times
         return self._spike_times.get_values(selector)
 
@@ -265,9 +266,7 @@ class SpikeSourceArrayVertex(
         context will be returned.
         """
 
-        parameters = dict()
-        for parameter_name in self.__model.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+        parameters = self.get_parameter_values(self.__model.default_parameters)
 
         context = {
             "name": self.__model_name,

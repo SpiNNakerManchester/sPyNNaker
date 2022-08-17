@@ -34,7 +34,6 @@ class DelayExtensionVertex(
     __slots__ = [
         # The parition this Delay is supporting
         "__partition",
-        "__delay_blocks",
         "__delay_per_stage",
         "__n_delay_stages",
         "__drop_late_spikes",
@@ -70,9 +69,6 @@ class DelayExtensionVertex(
         self.__partition = partition
         self.__n_delay_stages = n_delay_stages
         self.__delay_per_stage = delay_per_stage
-
-        # Dictionary of vertex_slice -> delay block for data specification
-        self.__delay_blocks = dict()
 
         self.__drop_late_spikes = get_config_bool(
             "Simulation", "drop_late_spikes")

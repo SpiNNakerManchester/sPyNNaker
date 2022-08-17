@@ -16,6 +16,9 @@ from pacman.model.graphs.application import ApplicationVertex
 from enum import Enum
 from spinn_utilities.helpful_functions import is_singleton
 
+# Stop Pylint complaining about NotImplementedError
+#pylint: disable=W0223
+
 
 class RecordingType(Enum):
     """ The type of data being recorded

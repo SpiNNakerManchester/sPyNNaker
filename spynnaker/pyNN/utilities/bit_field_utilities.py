@@ -90,6 +90,7 @@ def get_bitfield_key_map_data(incoming_projections):
     routing_infos = SpynnakerDataView.get_routing_infos()
     sources = OrderedSet()
     for proj in incoming_projections:
+        # pylint: disable=protected-access
         in_edge = proj._projection_edge
         if in_edge not in sources:
             key = routing_infos.get_first_key_from_pre_vertex(

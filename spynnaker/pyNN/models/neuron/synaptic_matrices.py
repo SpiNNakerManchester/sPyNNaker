@@ -131,6 +131,12 @@ class SynapticMatrices(object):
         self.__gen_on_machine = False
         self.__data_generated = False
         self.__max_gen_data = 0
+        self.__on_host_matrices = None
+        self.__generated_data_size = 0
+        self.__n_generated_matrices = 0
+        self.__master_pop_data = None
+        self.__bit_field_size = 0
+        self.__bit_field_key_map = None
 
     @property
     def max_gen_data(self):
@@ -199,6 +205,7 @@ class SynapticMatrices(object):
 
         # For each incoming machine vertex, reserve pop table space
         for proj in self.__app_vertex.incoming_projections:
+            # pylint: disable=protected-access
             app_edge = proj._projection_edge
             synapse_info = proj._synapse_information
             app_key_info = self.__app_key_and_mask(app_edge)

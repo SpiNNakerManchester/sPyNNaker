@@ -196,7 +196,7 @@ class PopulationNeuronsMachineVertex(
     @overrides(PopulationMachineCommon.parse_extra_provenance_items)
     def parse_extra_provenance_items(self, label, x, y, p, provenance_data):
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
 
         neuron_prov = NeuronMainProvenance(
             *provenance_data[-NeuronMainProvenance.N_ITEMS:])
@@ -244,8 +244,8 @@ class PopulationNeuronsMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        # write the neuron params into the new DSG region
-        self._write_neuron_parameters(spec, self.__ring_buffer_shifts)
+        # Write the other parameters
+        self._neuron_data.write_data(spec, self._vertex_slice)
 
         # write the current source params into the new DSG region
         self._write_current_source_parameters(spec)

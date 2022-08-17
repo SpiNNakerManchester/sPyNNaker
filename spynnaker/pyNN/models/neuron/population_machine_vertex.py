@@ -245,7 +245,7 @@ class PopulationMachineVertex(
         proc_offset = syn_offset + SynapseProvenance.N_ITEMS
         end_proc_offset = proc_offset + SpikeProcessingProvenance.N_ITEMS
         self._parse_neuron_provenance(
-            label, x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
+            x, y, p, provenance_data[:NeuronProvenance.N_ITEMS])
         self._parse_synapse_provenance(
             label, x, y, p, provenance_data[syn_offset:proc_offset])
         self._parse_spike_processing_provenance(

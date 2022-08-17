@@ -399,10 +399,6 @@ class Population(PopulationBase):
         return self.__vertex.get_units(variable)
 
     def set(self, **parameters):
-        """ Set parameters of this population.
-
-        :param parameters: The parameters to set.
-        """
         """ Set one or more parameters for every cell in the population.
 
         ``parameter`` can be a dict, in which case ``value`` should not be
@@ -413,9 +409,9 @@ class Population(PopulationBase):
             p._set("tau_m", 20.0).
             p._set({'tau_m':20, 'v_rest':-65})
 
-        :param parameter:
+        :param parameters:
             the parameter to set or dictionary of parameters to set
-        :type parameter:
+        :type parameters:
             str or dict(str, int or float or list(int) or list(float))
         :param value: the value of the parameter to set.
         :type value: int or float or list(int) or list(float)

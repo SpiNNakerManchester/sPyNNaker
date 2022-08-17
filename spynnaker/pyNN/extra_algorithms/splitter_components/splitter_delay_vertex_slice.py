@@ -122,7 +122,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         :rtype: DelayExtensionMachineVertex
         """
         label = f"Delay extension for {source_app_vertex}"
-        sdram = self.get_sdram_used_by_atoms(vertex_slice)
+        sdram = self.get_sdram_used_by_atoms()
 
         machine_vertex = DelayExtensionMachineVertex(
             sdram, label, vertex_slice, remaining_constraints,
@@ -131,10 +131,9 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         self._machine_vertex_by_slice[vertex_slice] = machine_vertex
         return machine_vertex
 
-    def get_sdram_used_by_atoms(self, vertex_slice):
+    def get_sdram_used_by_atoms(self):
         """ returns the sdram used by the delay extension
 
-        :param Slice vertex_slice: The slice to get the size of
         :rtype: ConstantSDRAM
         """
         return ConstantSDRAM(

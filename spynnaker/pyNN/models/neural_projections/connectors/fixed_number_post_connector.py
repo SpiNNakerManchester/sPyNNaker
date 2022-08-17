@@ -35,8 +35,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement",
-        "__post_connector_seed"]
+        "__with_replacement"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False,
@@ -77,7 +76,6 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
-        self.__post_connector_seed = dict()
         self._rng = rng
 
     def set_projection_information(self, synapse_info):

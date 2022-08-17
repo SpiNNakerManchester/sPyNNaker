@@ -121,11 +121,9 @@ class PopulationMachineNeurons(
         :rtype: int
         """
 
-    def _parse_neuron_provenance(
-            self, label, x, y, p, provenance_data):
+    def _parse_neuron_provenance(self, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
 
-        :param str label: The label of the node
         :param int x: x coordinate of the chip where this core
         :param int y: y coordinate of the core where this core
         :param int p: virtual id of the core

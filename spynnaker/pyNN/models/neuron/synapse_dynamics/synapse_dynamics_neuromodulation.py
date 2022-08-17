@@ -225,6 +225,7 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def gen_matrix_params(
             self, synaptic_matrix_offset, delayed_matrix_offset, app_edge,
             synapse_info, max_row_info, max_atoms_per_core):
+        # pylint: disable=unused-argument
         synapse_type = synapse_info.synapse_type
         return numpy.array([
             synaptic_matrix_offset, max_row_info.undelayed_max_words,

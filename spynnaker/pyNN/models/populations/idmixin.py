@@ -48,6 +48,10 @@ class IDMixin(object):
         # pylint: disable=protected-access
         self.__recorder = self.__population._recorder
 
+    @property
+    def _vertex(self):
+        return self.__vertex
+
     # NON-PYNN API CALLS
     @property
     def id(self):
@@ -186,7 +190,7 @@ class IDMixin(object):
     def __eq__(self, other):
         if not isinstance(other, IDMixin):
             return False
-        return self.__vertex == other.__vertex and self.__id == other.id
+        return self.__vertex == other._vertex and self.__id == other.id
 
     def __ne__(self, other):
         if not isinstance(other, IDMixin):
