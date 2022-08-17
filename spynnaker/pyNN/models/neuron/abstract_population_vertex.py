@@ -747,7 +747,7 @@ class AbstractPopulationVertex(
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
     @overrides(PopulationApplicationVertex.inject)
-    def inject(self, current_source, selector):
+    def inject(self, current_source, selector=None):
         """ Inject method from population to set up current source
 
         """
