@@ -40,8 +40,7 @@ from spinn_front_end_common.interface.profiling import (
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractMaxSpikes, AbstractReadParametersBeforeSet)
+from spynnaker.pyNN.models.abstract_models import AbstractMaxSpikes
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     SendsSynapticInputsOverSDRAM, ReceivesSynapticInputsOverSDRAM)
@@ -130,7 +129,7 @@ class SpikeSourcePoissonMachineVertex(
         ProvidesProvenanceDataFromMachineImpl,
         AbstractHasProfileData,
         AbstractHasAssociatedBinary, AbstractRewritesDataSpecification,
-        AbstractGeneratesDataSpecification, AbstractReadParametersBeforeSet,
+        AbstractGeneratesDataSpecification,
         SendsSynapticInputsOverSDRAM):
 
     __slots__ = [
@@ -138,7 +137,6 @@ class SpikeSourcePoissonMachineVertex(
         "__is_recording",
         "__minimum_buffer_sdram",
         "__sdram",
-        "__change_requires_neuron_parameters_reload",
         "__sdram_partition",
         "__rate_changed"]
 
@@ -196,7 +194,6 @@ class SpikeSourcePoissonMachineVertex(
             vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__sdram = sdram
-        self.__change_requires_neuron_parameters_reload = False
         self.__sdram_partition = None
         self.__rate_changed = True
 
@@ -264,13 +261,14 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
         # pylint: disable=arguments-differ
-        if self.__change_requires_neuron_parameters_reload:
+        if self.app_vertex.data_needs_regeneration:
             return True
         return SpynnakerDataView.get_first_machine_time_step() == 0
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        self.__change_requires_neuron_parameters_reload = new_value
+        # Handled by app vertex
+        pass
 
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
@@ -504,8 +502,6 @@ class SpikeSourcePoissonMachineVertex(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
-    @overrides(
-        AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(self, placement):
 
         # It is only worth updating the rates when there is a control edge

@@ -494,6 +494,7 @@ class AbstractPopulationVertex(
         if self.__last_parameter_read_time == current_time:
             return
 
+        self.__last_parameter_read_time = current_time
         for m_vertex in self.machine_vertices:
             if isinstance(m_vertex, PopulationMachineNeurons):
                 placement = SpynnakerDataView.get_placement_of_vertex(m_vertex)

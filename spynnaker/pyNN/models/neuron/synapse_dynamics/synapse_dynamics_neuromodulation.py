@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    SynapticConfigurationException, InvalidParameterType)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     STDP_FIXED_POINT_ONE, get_exp_lut_array)
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -132,6 +133,21 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
         # Write the LUT arrays
         spec.write_array(self.__tau_c_data)
         spec.write_array(self.__tau_d_data)
+
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
+    def get_value(self, key):
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
+    def set_value(self, key, value):
+        if hasattr(self, key):
+            setattr(self, key, value)
+            self.__change_requires_mapping = True
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPlasticSynapseDynamics
                .get_n_words_for_plastic_connections)

@@ -64,6 +64,8 @@ class SpikeSourcePoissonVertex(
 
     __slots__ = [
         "__change_requires_mapping",
+        "__change_requires_data_generation",
+        "__last_rate_read_time",
         "__model",
         "__model_name",
         "__n_atoms",
@@ -115,6 +117,7 @@ class SpikeSourcePoissonVertex(
 
         # check for changes parameters
         self.__change_requires_mapping = True
+        self.__change_requires_data_generation = True
 
         self.__spike_recorder = MultiSpikeRecorder()
 
@@ -247,6 +250,8 @@ class SpikeSourcePoissonVertex(
         else:
             self.__allowed_parameters = {"rate", "duration", "start"}
 
+        self.__last_rate_read_time = None
+
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
 
@@ -275,11 +280,31 @@ class SpikeSourcePoissonVertex(
     def requires_mapping(self):
         return self.__change_requires_mapping
 
+    @property
+    @overrides(AbstractChangableAfterRun.requires_data_generation)
+    def requires_data_generation(self):
+        return self.__change_requires_data_generation
+
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__change_requires_mapping = False
+        self.__change_requires_data_generation = False
+
+    def __read_parameters_now(self):
+        # If we already read the parameters at this time, don't do it again
+        current_time = SpynnakerDataView().get_current_run_time_ms()
+        if self.__last_rate_read_time == current_time:
+            return
+
+        self.__last_rate_read_time = current_time
+        for m_vertex in self.machine_vertices:
+            placement = SpynnakerDataView.get_placement_of_vertex(m_vertex)
+            m_vertex.read_parameters_from_machine(placement)
 
     def __read_parameter(self, name, selector):
+        if (SpynnakerDataView.is_ran_last() and
+                SpynnakerDataView.has_transceiver()):
+            self.__read_parameters_now()
         return self.__data[name].get_values(selector)
 
     def __fix_names(self, names):
@@ -298,6 +323,11 @@ class SpikeSourcePoissonVertex(
         self._check_parameters(name, self.__allowed_parameters)
         if self.__is_variable_rate:
             raise KeyError(f"Cannot set the {name} of a variable rate Poisson")
+
+        # If we have just run, we need to read parameters to avoid overwrite
+        if SpynnakerDataView().is_ran_last():
+            self.__read_parameters_now()
+            self.__change_requires_data_generation = True
 
         # Must be parameter without the s
         fixed_name = f"{name}s"
@@ -529,3 +559,11 @@ class SpikeSourcePoissonVertex(
     @property
     def data(self):
         return self.__data
+
+    @property
+    def data_needs_regeneration(self):
+        """ Determine if a change requires that data is regenerated
+
+        :rtype: bool
+        """
+        return self.__change_requires_data_generation

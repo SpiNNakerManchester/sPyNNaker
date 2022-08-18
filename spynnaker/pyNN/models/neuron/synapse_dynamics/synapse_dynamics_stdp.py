@@ -21,7 +21,6 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
@@ -43,7 +42,7 @@ NEUROMODULATION_TARGETS = {
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractSettable,
+        AbstractPlasticSynapseDynamics,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     """ The dynamics of a synapse that changes over time using a \
         Spike Timing Dependent Plasticity (STDP) rule.
@@ -181,7 +180,7 @@ class SynapseDynamicsSTDP(
         """
         self.__change_requires_mapping = False
 
-    @overrides(AbstractSettable.get_value)
+    @overrides(AbstractPlasticSynapseDynamics.get_value)
     def get_value(self, key):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
@@ -189,7 +188,7 @@ class SynapseDynamicsSTDP(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractSettable.set_value)
+    @overrides(AbstractPlasticSynapseDynamics.set_value)
     def set_value(self, key, value):
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):

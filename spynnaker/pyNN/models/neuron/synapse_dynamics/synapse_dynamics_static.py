@@ -18,7 +18,6 @@ from pyNN.standardmodels.synapses import StaticSynapse
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
@@ -30,7 +29,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class SynapseDynamicsStatic(
-        AbstractStaticSynapseDynamics, AbstractSettable,
+        AbstractStaticSynapseDynamics,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     """ The dynamics of a synapse that does not change over time.
     """
@@ -94,6 +93,21 @@ class SynapseDynamicsStatic(
             self, spec, region, global_weight_scale, synapse_weight_scales):
         # Nothing to do here
         pass
+
+    @overrides(AbstractStaticSynapseDynamics.get_value)
+    def get_value(self, key):
+        if hasattr(self, key):
+            return getattr(self, key)
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractStaticSynapseDynamics.set_value)
+    def set_value(self, key, value):
+        if hasattr(self, key):
+            setattr(self, key, value)
+            self.__change_requires_mapping = True
+        raise InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
@@ -200,21 +214,6 @@ class SynapseDynamicsStatic(
             after calling this method, requires_mapping should return False.
         """
         self.__change_requires_mapping = False
-
-    @overrides(AbstractSettable.get_value)
-    def get_value(self, key):
-        if hasattr(self, key):
-            return getattr(self, key)
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
-
-    @overrides(AbstractSettable.set_value)
-    def set_value(self, key, value):
-        if hasattr(self, key):
-            setattr(self, key, value)
-            self.__change_requires_mapping = True
-        raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):

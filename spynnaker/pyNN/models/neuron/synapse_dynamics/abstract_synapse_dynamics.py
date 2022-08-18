@@ -134,6 +134,23 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         :rtype: bool
         """
 
+    @abstractmethod
+    def get_value(self, key):
+        """ Get a property
+
+        :param str key: the name of the property
+        :rtype: Any or float or int or list(float) or list(int)
+        """
+
+    @abstractmethod
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param str key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        :type value: Any or float or int or list(float) or list(int)
+        """
+
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
 

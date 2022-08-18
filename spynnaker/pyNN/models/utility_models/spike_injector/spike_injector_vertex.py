@@ -18,16 +18,16 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spynnaker.pyNN.data import SpynnakerDataView
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
+from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.abstract_models import (
+    PopulationApplicationVertex, RecordingType)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpikeInjectorVertex(
-        ReverseIpTagMultiCastSource, SimplePopulationSettable,
-        AbstractSpikeRecordable):
+        ReverseIpTagMultiCastSource, PopulationApplicationVertex):
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
@@ -75,28 +75,55 @@ class SpikeInjectorVertex(
     def virtual_key(self, virtual_key):
         self.__virtual_key = virtual_key
 
-    @overrides(AbstractSpikeRecordable.is_recording_spikes)
-    def is_recording_spikes(self):
+    @overrides(PopulationApplicationVertex.get_recordable_variables)
+    def get_recordable_variables(self):
+        return ["spikes"]
+
+    @overrides(PopulationApplicationVertex.can_record)
+    def can_record(self, name):
+        return name == "spikes"
+
+    @overrides(PopulationApplicationVertex.set_recording)
+    def set_recording(self, name, sampling_interval=None, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        if sampling_interval is not None:
+            logger.warning("Sampling interval currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+        if not self.__spike_recorder.record:
+            self.__change_requires_mapping = True
+        self.enable_recording(True)
+        self.__spike_recorder.record = True
+
+    @overrides(PopulationApplicationVertex.get_recording_variables)
+    def get_recording_variables(self):
+        if self.__spike_recorder.record:
+            return ["spikes"]
+        return []
+
+    @overrides(PopulationApplicationVertex.is_recording_variable)
+    def is_recording_variable(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         return self.__spike_recorder.record
 
-    @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
-        if sampling_interval is not None:
-            logger.warning("Sampling interval currently not supported "
-                           "so being ignored")
-        if indexes is not None:
-            logger.warning("Indexes currently not supported "
-                           "so being ignored")
-        self.enable_recording(new_state)
-        self.__spike_recorder.record = new_state
+    @overrides(PopulationApplicationVertex.set_not_recording)
+    def set_not_recording(self, name, indices=None):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        if indices is not None:
+            logger.warning("Indices currently not supported for "
+                           "SpikeSourceArray so being ignored")
+        self.enable_recording(False)
+        self.__spike_recorder.record = False
 
-    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return SpynnakerDataView.get_simulation_time_step_us()
-
-    @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(self):
+    @overrides(PopulationApplicationVertex.get_recorded_data)
+    def get_recorded_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         return self.__spike_recorder.get_spikes(
             self.label, SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, self,
             lambda vertex:
@@ -104,8 +131,28 @@ class SpikeInjectorVertex(
                 if vertex.virtual_key is not None
                 else 0)
 
-    @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self):
+    @overrides(PopulationApplicationVertex.get_recording_sampling_interval)
+    def get_recording_sampling_interval(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return SpynnakerDataView.get_simulation_time_step_us()
+
+    @overrides(PopulationApplicationVertex.get_recording_indices)
+    def get_recording_indices(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return range(self.n_atoms)
+
+    @overrides(PopulationApplicationVertex.get_recording_type)
+    def get_recording_type(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
+        return RecordingType.BIT_FIELD
+
+    @overrides(PopulationApplicationVertex.clear_recording_data)
+    def clear_recording_data(self, name):
+        if name != "spikes":
+            raise KeyError(f"Cannot record {name}")
         buffer_manager = SpynnakerDataView.get_buffer_manager()
         for machine_vertex in self.machine_vertices:
             placement = SpynnakerDataView.get_placement_of_vertex(
@@ -126,9 +173,7 @@ class SpikeInjectorVertex(
         will be returned.
         """
 
-        parameters = dict()
-        for parameter_name in self.default_parameters:
-            parameters[parameter_name] = self.get_value(parameter_name)
+        parameters = self.get_parameter_values(self.default_parameters)
 
         context = {
             "name": "SpikeInjector",

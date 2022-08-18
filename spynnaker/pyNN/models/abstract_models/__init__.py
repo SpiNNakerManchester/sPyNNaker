@@ -14,17 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_accepts_incoming_synapses import AbstractAcceptsIncomingSynapses
-from .abstract_contains_units import AbstractContainsUnits
 from .abstract_has_delay_stages import AbstractHasDelayStages
 from .abstract_max_spikes import AbstractMaxSpikes
-from .abstract_population_initializable import AbstractPopulationInitializable
-from .abstract_population_settable import AbstractPopulationSettable
-from .abstract_read_parameters_before_set import (
-    AbstractReadParametersBeforeSet)
-from .abstract_settable import AbstractSettable
 from .abstract_synapse_expandable import (
     AbstractSynapseExpandable, SYNAPSE_EXPANDER_APLX)
-from .abstract_weight_updatable import AbstractWeightUpdatable
 from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .receives_synaptic_inputs_over_sdram import (
     ReceivesSynapticInputsOverSDRAM)
@@ -37,12 +30,9 @@ from .population_application_vertex import (
 from .population_fpga_vertex import PopulationFPGAVertex
 from .population_spinnaker_link_vertex import PopulationSpiNNakerLinkVertex
 
-__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
-           "AbstractHasDelayStages",
-           "AbstractMaxSpikes", "AbstractPopulationInitializable",
-           "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
-           "AbstractSettable", "AbstractSynapseExpandable",
-           "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
+__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractHasDelayStages",
+           "AbstractMaxSpikes", "AbstractSynapseExpandable",
+           "SYNAPSE_EXPANDER_APLX",
            "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
            "HasSynapses", "AbstractNeuronExpandable", "NEURON_EXPANDER_APLX",
            "ParameterHolder", "PopulationApplicationVertex", "RecordingType",
