@@ -145,7 +145,6 @@ class SynapseDynamicsNeuromodulation(AbstractPlasticSynapseDynamics):
     def set_value(self, key, value):
         if hasattr(self, key):
             setattr(self, key, value)
-            self.__change_requires_mapping = True
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 

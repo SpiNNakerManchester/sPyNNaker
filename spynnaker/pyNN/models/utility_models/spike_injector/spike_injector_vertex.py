@@ -93,8 +93,6 @@ class SpikeInjectorVertex(
         if indices is not None:
             logger.warning("Indices currently not supported for "
                            "SpikeSourcePoisson so being ignored")
-        if not self.__spike_recorder.record:
-            self.__change_requires_mapping = True
         self.enable_recording(True)
         self.__spike_recorder.record = True
 
