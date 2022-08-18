@@ -1275,13 +1275,12 @@ class AbstractPopulationVertex(
         :param NeuronRegions neuron_regions: Region IDs
         :rtype: int
         """
+        params_cost = self.get_sdram_usage_for_neuron_params(n_atoms)
         sdram = MultiRegionSDRAM()
         sdram.add_cost(
             neuron_regions.core_params,
             self.get_sdram_usage_for_core_neuron_params())
-        sdram.add_cost(
-            neuron_regions.neuron_params,
-            self.get_sdram_usage_for_neuron_params(n_atoms))
+        sdram.add_cost(neuron_regions.neuron_params, params_cost)
         sdram.add_cost(
             neuron_regions.current_source_params,
             self.get_sdram_usage_for_current_source_params(n_atoms))
@@ -1292,6 +1291,7 @@ class AbstractPopulationVertex(
         sdram.add_cost(
             neuron_regions.neuron_builder,
             self.get_sdram_usage_for_neuron_generation(n_atoms))
+        sdram.add_cost(neuron_regions.initial_values, params_cost)
         return sdram
 
     @property
