@@ -63,7 +63,8 @@ class PopulationNeuronsMachineVertex(
         "__weight_scales",
         "__slice_index",
         "__neuron_data",
-        "__max_atoms_per_core"]
+        "__max_atoms_per_core",
+        "__regenerate_data"]
 
     class REGIONS(Enum):
         """Regions for populations."""
@@ -136,6 +137,7 @@ class PopulationNeuronsMachineVertex(
         self.__weight_scales = weight_scales
         self.__neuron_data = neuron_data
         self.__max_atoms_per_core = max_atoms_per_core
+        self.__regenerate_data = False
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -255,12 +257,11 @@ class PopulationNeuronsMachineVertex(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self.app_vertex.neuron_data_needs_regeneration
+        return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        # Ignore because the app vertex manages this
-        pass
+        self.__regenerate_data = new_value
 
     @property
     @overrides(ReceivesSynapticInputsOverSDRAM.weight_scales)
@@ -292,3 +293,7 @@ class PopulationNeuronsMachineVertex(
             return self.n_bytes_for_transfer
         raise SynapticConfigurationException(
             "Unknown pre vertex type in edge {}".format(sdram_machine_edge))
+
+    @overrides(PopulationMachineNeurons.do_neuron_regeneration)
+    def do_neuron_regeneration(self):
+        self.__regenerate_data = True

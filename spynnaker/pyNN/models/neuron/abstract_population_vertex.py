@@ -51,6 +51,8 @@ from spynnaker.pyNN.utilities.bit_field_utilities import get_sdram_for_keys
 from spynnaker.pyNN.utilities.struct import StructRepeat
 from spynnaker.pyNN.models.common.param_generator_data import MAX_PARAMS_BYTES
 from .population_machine_neurons import PopulationMachineNeurons
+from .population_machine_synapses import PopulationMachineSynapses
+
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -87,8 +89,7 @@ class AbstractPopulationVertex(
 
     __slots__ = [
         "__change_requires_mapping",
-        "__change_requires_neuron_data_generation",
-        "__change_requires_synapse_data_generation",
+        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -217,8 +218,7 @@ class AbstractPopulationVertex(
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
-        self.__change_requires_neuron_data_generation = False
-        self.__change_requires_synapse_data_generation = False
+        self.__change_requires_data_generation = False
 
         # Current sources for this vertex
         self.__current_sources = []
@@ -412,14 +412,12 @@ class AbstractPopulationVertex(
     @property
     @overrides(AbstractChangableAfterRun.requires_data_generation)
     def requires_data_generation(self):
-        return (self.__change_requires_neuron_data_generation or
-                self.__change_requires_synapse_data_generation)
+        return self.__change_requires_data_generation
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__change_requires_mapping = False
-        self.__change_requires_neuron_data_generation = False
-        self.__change_requires_synapse_data_generation = False
+        self.__change_requires_data_generation = False
 
     def get_sdram_usage_for_core_neuron_params(self):
         return (
@@ -531,7 +529,8 @@ class AbstractPopulationVertex(
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
-            self.__change_requires_neuron_data_generation = True
+            self.__change_requires_data_generation = True
+            self.__tell_neuron_vertices_to_regenerate()
         self.__parameters[name].set_value_by_selector(selector, value)
 
     @overrides(PopulationApplicationVertex.get_parameters)
@@ -561,7 +560,8 @@ class AbstractPopulationVertex(
         # then make this a waste, but we can't see the future...
         if SpynnakerDataView.is_ran_last():
             self.__read_parameters_now()
-            self.__change_requires_neuron_data_generation = True
+            self.__change_requires_data_generation = True
+            self.__tell_neuron_vertices_to_regenerate()
             self.__state_variables[name].set_value_by_selector(
                 selector, value)
         else:
@@ -786,13 +786,15 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Mark that reset has been done, and reload state variables
         self.__state_variables.copy_into(self.__initial_state_variables)
-        self.__change_requires_neuron_data_generation = True
+        self.__change_requires_data_generation = True
+        self.__tell_neuron_vertices_to_regenerate()
 
         # If synapses change during the run also regenerate these to get
         # back to the initial state
         if (self.__synapse_dynamics is not None and
                 self.__synapse_dynamics.changes_during_run):
-            self.__change_requires_synapse_data_generation = True
+            self.__change_requires_data_generation = True
+            self.__tell_synapse_vertices_to_regenerate()
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -1347,18 +1349,12 @@ class AbstractPopulationVertex(
         """
         return self.__read_initial_values
 
-    @property
-    def neuron_data_needs_regeneration(self):
-        """ Determine if a change requires that neuron data is regenerated
+    def __tell_neuron_vertices_to_regenerate(self):
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, PopulationMachineNeurons):
+                vertex.do_neuron_regeneration()
 
-        :rtype: bool
-        """
-        return self.__change_requires_neuron_data_generation
-
-    @property
-    def synapse_data_needs_regeneration(self):
-        """ Determine if a change requires that synapse data is regenerated
-
-        :rtype: bool
-        """
-        return self.__change_requires_synapse_data_generation
+    def __tell_synapse_vertices_to_regenerate(self):
+        for vertex in self.machine_vertices:
+            if isinstance(vertex, PopulationMachineSynapses):
+                vertex.do_synapse_regeneration()

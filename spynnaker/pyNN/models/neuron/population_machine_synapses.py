@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -79,6 +79,11 @@ class PopulationMachineSynapses(
         """ The maximum number of atoms on any core targetted by these synapses
 
         :rtype: int
+        """
+
+    @abstractmethod
+    def do_synapse_regeneration(self):
+        """ Indicates that synaptic data regeneration is required
         """
 
     @property

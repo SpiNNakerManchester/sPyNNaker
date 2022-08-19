@@ -78,7 +78,9 @@ class PopulationMachineVertex(
         "__weight_scales",
         "__structural_sz",
         "__slice_index",
-        "__max_atoms_per_core"]
+        "__max_atoms_per_core",
+        "__regenerate_neuron_data",
+        "__regenerate_synapse_data"]
 
     INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
     DMA_COMPLETE = "DMA's that were completed"
@@ -183,6 +185,8 @@ class PopulationMachineVertex(
         self.__max_atoms_per_core = max_atoms_per_core
         self.__synaptic_matrices = synaptic_matrices
         self.__neuron_data = neuron_data
+        self.__regenerate_neuron_data = False
+        self.__regenerate_synapse_data = False
 
     @property
     @overrides(PopulationMachineNeurons._slice_index)
@@ -304,23 +308,26 @@ class PopulationMachineVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification)
     def regenerate_data_specification(self, spec, placement):
-        self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+        if self.__regenerate_neuron_data:
+            self._write_neuron_data_spec(spec, self.__ring_buffer_shifts)
+            self.__regenerate_neuron_data = False
 
-        self._write_synapse_data_spec(
-            spec, self.__ring_buffer_shifts,
-            self.__weight_scales, self.__structural_sz)
+        if self.__regenerate_synapse_data:
+            self._write_synapse_data_spec(
+                spec, self.__ring_buffer_shifts,
+                self.__weight_scales, self.__structural_sz)
+            self.__regenerate_synapse_data = False
 
         # close spec
         spec.end_specification()
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return (self._app_vertex.neuron_data_needs_regeneration or
-                self._app_vertex.synapse_data_needs_regeneration)
+        return self.__regenerate_neuron_data or self.__regenerate_synapse_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        # Ignored as managed by the app vertex
+        # These are set elsewhere once data is generated
         pass
 
     def _parse_spike_processing_provenance(
@@ -383,3 +390,11 @@ class PopulationMachineVertex(
             db.insert_core(
                 x, y, p, self.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME,
                 prov.max_size_input_buffer)
+
+    @overrides(PopulationMachineNeurons.do_neuron_regeneration)
+    def do_neuron_regeneration(self):
+        self.__regenerate_neuron_data = True
+
+    @overrides(PopulationMachineSynapses.do_synapse_regeneration)
+    def do_synapse_regeneration(self):
+        self.__regenerate_synapse_data = True

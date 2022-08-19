@@ -36,7 +36,8 @@ class PopulationSynapsesMachineVertexLead(
         "__weight_scales",
         "__structural_sz",
         "__synapse_references",
-        "__max_atoms_per_core"]
+        "__max_atoms_per_core",
+        "__regenerate_data"]
 
     def __init__(
             self, sdram, label, constraints, app_vertex,
@@ -61,6 +62,7 @@ class PopulationSynapsesMachineVertexLead(
         self.__structural_sz = structural_sz
         self.__synapse_references = synapse_references
         self.__max_atoms_per_core = max_atoms_per_core
+        self.__regenerate_data = False
 
         # Need to do this last so that the values above can be used
         self.__synaptic_matrices = synaptic_matrices
@@ -128,9 +130,12 @@ class PopulationSynapsesMachineVertexLead(
 
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
-        return self._app_vertex.synapse_data_needs_regeneration
+        return self.__regenerate_data
 
     @overrides(AbstractRewritesDataSpecification.set_reload_required)
     def set_reload_required(self, new_value):
-        # Handled by the app vertex
-        pass
+        self.__regenerate_data = new_value
+
+    @overrides(PopulationMachineSynapses.do_synapse_regeneration)
+    def do_synapse_regeneration(self):
+        self.__regenerate_data = True

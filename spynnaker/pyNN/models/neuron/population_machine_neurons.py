@@ -121,6 +121,11 @@ class PopulationMachineNeurons(
         :rtype: int
         """
 
+    @abstractmethod
+    def do_neuron_regeneration(self):
+        """ Indicate that data re-generation of neuron parameters is required
+        """
+
     def _parse_neuron_provenance(self, x, y, p, provenance_data):
         """ Extract and yield neuron provenance
 
