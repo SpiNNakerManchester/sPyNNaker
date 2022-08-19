@@ -260,7 +260,7 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRewritesDataSpecification.reload_required)
     def reload_required(self):
         # pylint: disable=arguments-differ
-        if self.app_vertex.data_needs_regeneration:
+        if self.__rate_changed:
             return True
         return SpynnakerDataView.get_first_machine_time_step() == 0
 

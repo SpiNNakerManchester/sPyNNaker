@@ -328,6 +328,8 @@ class SpikeSourcePoissonVertex(
         if SpynnakerDataView().is_ran_last():
             self.__read_parameters_now()
             self.__change_requires_data_generation = True
+            for m_vertex in self.machine_vertices:
+                m_vertex.set_rate_changed()
 
         # Must be parameter without the s
         fixed_name = f"{name}s"
@@ -559,11 +561,3 @@ class SpikeSourcePoissonVertex(
     @property
     def data(self):
         return self.__data
-
-    @property
-    def data_needs_regeneration(self):
-        """ Determine if a change requires that data is regenerated
-
-        :rtype: bool
-        """
-        return self.__change_requires_data_generation
