@@ -61,7 +61,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     " of Convolution")
             app_edge = incoming._projection_edge
             n_incoming = len(
-                app_edge.pre_vertex.splitter.get_out_going_slices()[0])
+                app_edge.pre_vertex.splitter.get_out_going_slices())
             n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
         return (6 * BYTES_PER_SHORT) + BYTES_PER_WORD + n_bytes
