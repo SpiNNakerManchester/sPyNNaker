@@ -74,12 +74,12 @@ def structural_shared():
     print(conns_3)
     print(conns_4)
 
-    assert(len(conns) == 1)
-    assert(tuple(conns[0]) == (0, 0, w_init, delay_init))
-    assert(len(conns_2) == 1)
-    assert(tuple(conns_2[0]) == (0, 0, w_init, delay_init))
-    assert(len(conns_3) == 0)
-    assert(len(conns_4) == 0)
+    assert len(conns) == 1
+    assert tuple(conns[0]) == (0, 0, w_init, delay_init)
+    assert len(conns_2) == 1
+    assert tuple(conns_2[0]) == (0, 0, w_init, delay_init)
+    assert len(conns_3) == 0
+    assert len(conns_4) == 0
 
 
 class TestStructuralShared(BaseTestCase):

@@ -275,7 +275,6 @@ def distance(src, tgt, mask=None, scale_factor=1.0, offset=0.0,
 def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
           min_delay=_pynn_control.DEFAULT_MIN_DELAY,
           max_delay=None,
-          graph_label=None,
           database_socket_addresses=None, time_scale_factor=None,
           n_chips_required=None, n_boards_required=None, **extra_params):
     """ The main method needed to be called to make the PyNN 0.8 setup. Needs\
@@ -290,8 +289,6 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
     :type min_delay: float or str
     :param max_delay: Ignored and logs a warning if provided
     :type max_delay: float or str or None
-    :param graph_label: the label for the graph
-    :type graph_label: str or None
     :param database_socket_addresses: the sockets used by external devices
         for the database notification protocol
     :type database_socket_addresses:
@@ -338,14 +335,10 @@ def setup(timestep=_pynn_control.DEFAULT_TIMESTEP,
         except Exception:  # pylint: disable=broad-except
             logger.exception("Error forcing previous simulation to clear")
 
-    # add default label if needed
-    if graph_label is None:
-        graph_label = "PyNN0.8_graph"
-
     # create the main object for all stuff related software
     SpiNNaker(
         time_scale_factor=time_scale_factor, timestep=timestep,
-        min_delay=min_delay, graph_label=graph_label,
+        min_delay=min_delay,
         n_chips_required=n_chips_required,
         n_boards_required=n_boards_required)
 

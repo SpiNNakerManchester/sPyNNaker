@@ -52,8 +52,8 @@ class PopulationMachineCommon(
     """
 
     __slots__ = [
-        # Resources used by the machine vertex
-        "__resources",
+        # Sdram used by the machine vertex
+        "__sdram",
         # Regions to be used
         "__regions",
         # The total number of provenance items returned by this core
@@ -65,7 +65,7 @@ class PopulationMachineCommon(
     ]
 
     def __init__(
-            self, label, constraints, app_vertex, vertex_slice, resources,
+            self, label, constraints, app_vertex, vertex_slice, sdram,
             regions, n_provenance_items, profile_tags, binary_file_name):
         """
         :param str label: The label of the vertex
@@ -75,8 +75,8 @@ class PopulationMachineCommon(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
-        :param ~pacman.model.resources.ResourceContainer resources:
-            The resources used by the vertex
+        :param ~pacman.model.resources.AbstractSDRAM sdram:
+            The sdram used by the vertex
         :param .CommonRegions regions: The regions to be assigned
         :param int n_provenance_items:
             The number of additional provenance items to be read
@@ -86,16 +86,16 @@ class PopulationMachineCommon(
         """
         super(PopulationMachineCommon, self).__init__(
             label, constraints, app_vertex, vertex_slice)
-        self.__resources = resources
+        self.__sdram = sdram
         self.__regions = regions
         self.__n_provenance_items = n_provenance_items
         self.__profile_tags = profile_tags
         self.__binary_file_name = binary_file_name
 
     @property
-    @overrides(MachineVertex.resources_required)
-    def resources_required(self):
-        return self.__resources
+    @overrides(MachineVertex.sdram_required)
+    def sdram_required(self):
+        return self.__sdram
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)

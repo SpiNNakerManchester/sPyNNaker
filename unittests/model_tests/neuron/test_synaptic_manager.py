@@ -115,7 +115,6 @@ def test_write_data_spec():
         p.StaticSynapse())
 
     writer.start_run()
-    writer.clone_graphs()
     writer.set_plan_n_timesteps(100)
     delay_support_adder()
     spynnaker_splitter_partitioner()
@@ -446,7 +445,6 @@ def test_pop_based_master_pop_table_standard(
         pre_pop, post_pop, p.FromListConnector(connections), p.StaticSynapse())
 
     writer.start_run()
-    writer.clone_graphs()
     writer.set_plan_n_timesteps(100)
     delay_support_adder()
     spynnaker_splitter_partitioner()
@@ -509,5 +507,5 @@ def test_pop_based_master_pop_table_standard(
         expected_n_entries += 2 * len(delayed_indices_connected)
         expected_n_addresses += 2 * len(delayed_indices_connected)
 
-    assert(n_entries == expected_n_entries)
-    assert(n_addresses == expected_n_addresses)
+    assert n_entries == expected_n_entries
+    assert n_addresses == expected_n_addresses

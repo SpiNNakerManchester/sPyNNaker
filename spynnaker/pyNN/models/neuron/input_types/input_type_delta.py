@@ -29,10 +29,6 @@ class InputTypeDelta(AbstractInputType):
         super().__init__([
             DataType.S1615])  # scale_factor, calculated from timestep
 
-    @overrides(AbstractInputType.get_n_cpu_cycles)
-    def get_n_cpu_cycles(self, n_neurons):
-        return 1 * n_neurons
-
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
         pass

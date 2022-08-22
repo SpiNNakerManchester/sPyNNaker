@@ -23,7 +23,7 @@ def finish_connection_holders():
 
     :param ~pacman.model.graphs.application.ApplicationGraph application_graph:
     """
-    edges = SpynnakerDataView.get_runtime_graph().edges
+    edges = SpynnakerDataView.get_edges()
     progress = ProgressBar(len(edges), "Finalising Retrieved Connections")
     for edge in progress.over(edges):
         if isinstance(edge, ProjectionApplicationEdge):
