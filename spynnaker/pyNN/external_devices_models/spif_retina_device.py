@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.graphs.application import Application2DFPGAVertex
 from pacman.model.graphs.application import FPGAConnection
 from pacman.model.routing_info import BaseKeyAndMask
@@ -278,11 +276,8 @@ class SPIFRetinaDevice(
         self.__index_by_slice[link.fpga_link_id, vertex_slice] = index
         return vertex_slice
 
-    @overrides(Application2DFPGAVertex.set_constraints)
-    def set_constraints(self, partition):
-        # Add constraint
-        # TO DO: check this still works
-        machine_vertex = partition.pre_vertex
+    @overrides(Application2DFPGAVertex.get_machine_fixed_key_and_mask)
+    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
         fpga_link_id = machine_vertex.fpga_link_id
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[fpga_link_id, vertex_slice]
@@ -295,27 +290,13 @@ class SPIFRetinaDevice(
             (fpga_y << self._source_y_shift) +
             (fpga_x << self._source_x_shift))
         fpga_mask = key_and_mask.mask | self.__spif_mask
-        self.add_constraint(FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(fpga_key, fpga_mask)]))
+        return BaseKeyAndMask(fpga_key, fpga_mask)
 
-    # @overrides(AbstractProvidesOutgoingPartitionConstraints.
-    #            get_outgoing_partition_constraints)
-    # def get_outgoing_partition_constraints(self, partition):
-    #     machine_vertex = partition.pre_vertex
-    #     fpga_link_id = machine_vertex.fpga_link_id
-    #     vertex_slice = machine_vertex.vertex_slice
-    #     index = self.__index_by_slice[fpga_link_id, vertex_slice]
-    #     key_and_mask = self._get_key_and_mask(self.__base_key, index)
-    #
-    #     fpga_x, fpga_y = self.__fpga_indices(fpga_link_id)
-    #
-    #     # Finally we build the key from the components
-    #     fpga_key = key_and_mask.key + (
-    #         (fpga_y << self._source_y_shift) +
-    #         (fpga_x << self._source_x_shift))
-    #     fpga_mask = key_and_mask.mask | self.__spif_mask
-    #     return [FixedKeyAndMaskConstraint(
-    #         [BaseKeyAndMask(fpga_key, fpga_mask)])]
+    @overrides(Application2DFPGAVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        n_key_bits = BITS_IN_KEY - self._key_shift
+        key_mask = ((1 << n_key_bits) - 1) << self._key_shift
+        return BaseKeyAndMask(self.__base_key, key_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)

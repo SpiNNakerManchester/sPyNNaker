@@ -19,8 +19,7 @@ from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
 from pacman.utilities.algorithm_utilities\
-    .partition_algorithm_utilities import (
-        get_multidimensional_slices, get_remaining_constraints)
+    .partition_algorithm_utilities import get_multidimensional_slices
 from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, PopulationMachineVertex,
     PopulationMachineLocalOnlyCombinedVertex, LocalOnlyProvenance)
@@ -105,7 +104,6 @@ class SplitterAbstractPopulationVertexFixed(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
         self.__create_slices()
-        constraints = get_remaining_constraints(app_vertex)
         self.__edge_map = dict()
         self.__vertices = list()
         for vertex_slice in self.__slices:
@@ -114,7 +112,7 @@ class SplitterAbstractPopulationVertexFixed(
 
             label = f"Slice {vertex_slice} of {app_vertex.label}"
             machine_vertex = self.create_machine_vertex(
-                vertex_slice, sdram, label, constraints)
+                vertex_slice, sdram, label, app_vertex.constraints)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
             self.__edge_map[machine_vertex] = [MachineEdge]
             self.__vertices.append(machine_vertex)

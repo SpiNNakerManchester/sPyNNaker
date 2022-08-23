@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import (
@@ -113,8 +111,9 @@ class MunichRetinaDevice(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, board_address=board_address)
 
-        self.add_constraint(FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)]))
+    @overrides(ApplicationSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        return BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)

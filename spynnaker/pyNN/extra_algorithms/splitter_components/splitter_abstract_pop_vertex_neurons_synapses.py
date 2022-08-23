@@ -25,8 +25,6 @@ from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge,
     MulticastEdgePartition)
-from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import get_remaining_constraints
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -178,7 +176,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     def create_machine_vertices(self, chip_counter):
         app_vertex = self._governed_app_vertex
         label = app_vertex.label
-        constraints = get_remaining_constraints(app_vertex)
 
         # Structural plasticity can only be run on a single synapse core
         if (isinstance(app_vertex.synapse_dynamics,
@@ -247,7 +244,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             # Create the neuron vertex for the slice
             neuron_vertex = self.__add_neuron_core(
                 vertex_slice, total_sdram, label, index, rb_shifts,
-                weight_scales, constraints)
+                weight_scales, app_vertex.constraints)
             chip_counter.add_core(total_sdram)
 
             # Keep track of synapse vertices for each neuron vertex and
@@ -260,7 +257,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__add_lead_synapse_core(
                     vertex_slice, all_syn_block_sz, structural_sz,
                     sdram, label, rb_shifts, weight_scales,
-                    synapse_vertices, neuron_vertex, constraints)
+                    synapse_vertices, neuron_vertex, app_vertex.constraints)
             chip_counter.add_core(sdram)
 
             # Do the remaining synapse cores
@@ -268,7 +265,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 self.__add_shared_synapse_core(
                     syn_label, i, vertex_slice, synapse_references,
                     shared_synapse_sdram, feedback_partition,
-                    synapse_vertices, neuron_vertex, constraints)
+                    synapse_vertices, neuron_vertex, app_vertex.constraints)
                 chip_counter.add_core(shared_synapse_sdram)
 
             # Add resources for Poisson vertices up to core limit

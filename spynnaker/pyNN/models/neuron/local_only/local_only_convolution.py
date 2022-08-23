@@ -80,14 +80,16 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
-            for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
+            pre = app_edge.pre_vertex
+            for pre_m_vertex in pre.splitter.get_out_going_vertices(
+                    SPIKE_PARTITION_ID):
                 if s_info.connector.could_connect(
                         s_info, pre_m_vertex, machine_vertex):
                     routing_info = SpynnakerDataView.get_routing_infos()
                     r_info = routing_info.get_routing_info_from_pre_vertex(
                         pre_m_vertex, SPIKE_PARTITION_ID)
                     vertex_slice = pre_m_vertex.vertex_slice
-                    key = (app_edge.pre_vertex, vertex_slice)
+                    key = (pre, vertex_slice)
                     edges_for_source[key].append((pre_m_vertex, r_info))
 
             # Merge edges with the same source

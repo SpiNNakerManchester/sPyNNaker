@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints import (
-    FixedKeyAndMaskConstraint)
 from pacman.model.graphs.application import Application2DSpiNNakerLinkVertex
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
+from pacman.utilities.constants import BITS_IN_KEY
 
 
 class ICUBRetinaDevice(
@@ -64,24 +64,17 @@ class ICUBRetinaDevice(
         self.__index_by_slice[vertex_slice] = index
         return vertex_slice
 
-    @overrides(Application2DSpiNNakerLinkVertex.set_constraints)
-    def set_constraints(self, partition):
-        # Add constraint
-        # TO DO: check this still works
-        machine_vertex = partition.pre_vertex
+    @overrides(Application2DSpiNNakerLinkVertex.get_machine_fixed_key_and_mask)
+    def get_machine_fixed_key_and_mask(self, machine_vertex, partition_id):
         vertex_slice = machine_vertex.vertex_slice
         index = self.__index_by_slice[vertex_slice]
-        self.add_constraint(FixedKeyAndMaskConstraint([
-            self._get_key_and_mask(self.__base_key, index)]))
+        return self._get_key_and_mask(self.__base_key, index)
 
-    # @overrides(AbstractProvidesOutgoingPartitionConstraints.
-    #            get_outgoing_partition_constraints)
-    # def get_outgoing_partition_constraints(self, partition):
-    #     machine_vertex = partition.pre_vertex
-    #     vertex_slice = machine_vertex.vertex_slice
-    #     index = self.__index_by_slice[vertex_slice]
-    #     return [FixedKeyAndMaskConstraint([
-    #         self._get_key_and_mask(self.__base_key, index)])]
+    @overrides(Application2DSpiNNakerLinkVertex.get_fixed_key_and_mask)
+    def get_fixed_key_and_mask(self, partition_id):
+        n_key_bits = BITS_IN_KEY - self._key_shift
+        key_mask = ((1 << n_key_bits) - 1) << self._key_shift
+        return BaseKeyAndMask(self.__base_key, key_mask)
 
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
