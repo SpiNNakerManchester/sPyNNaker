@@ -47,8 +47,6 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
 
     _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
-    SPLITTER_NAME = "SplitterDelayVertexSlice"
-
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterDelayVertexSlice as"
@@ -68,7 +66,7 @@ class SplitterDelayVertexSlice(AbstractSplitterCommon):
         """ splitter for delay extensions
 
         """
-        super().__init__(self.SPLITTER_NAME)
+        super().__init__()
         self._machine_vertex_by_slice = dict()
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)

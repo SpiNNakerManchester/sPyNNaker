@@ -110,8 +110,6 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         "__neuromodulators"
         ]
 
-    SPLITTER_NAME = "SplitterAbstractPopulationVertexNeuronsSynapses"
-
     INVALID_POP_ERROR_MESSAGE = (
         "The vertex {} cannot be supported by the "
         "SplitterAbstractPopVertexNeuronsSynapses as"
@@ -138,8 +136,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             whether delay extensions should be needed.
         :type allow_delay_extension: bool or None
         """
-        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__(
-            self.SPLITTER_NAME)
+        super(SplitterAbstractPopulationVertexNeuronsSynapses, self).__init__()
         AbstractSpynnakerSplitterDelay.__init__(self)
         self.__n_synapse_vertices = n_synapse_vertices
         self.__max_delay = max_delay
