@@ -74,7 +74,7 @@ class ICUBRetinaDevice(
     def get_fixed_key_and_mask(self, partition_id):
         n_key_bits = BITS_IN_KEY - self._key_shift
         key_mask = ((1 << n_key_bits) - 1) << self._key_shift
-        return BaseKeyAndMask(self.__base_key, key_mask)
+        return BaseKeyAndMask(self.__base_key << self._key_shift, key_mask)
 
     @overrides(HasShapeKeyFields.get_shape_key_fields)
     def get_shape_key_fields(self, vertex_slice):
