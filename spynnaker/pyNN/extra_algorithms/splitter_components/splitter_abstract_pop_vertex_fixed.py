@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from spinn_utilities.overrides import overrides
 from pacman.exceptions import PacmanConfigurationException
-from pacman.model.graphs.machine import MachineEdge
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
@@ -36,6 +35,7 @@ from spynnaker.pyNN.utilities.bit_field_utilities import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from collections import defaultdict
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -59,8 +59,6 @@ class SplitterAbstractPopulationVertexFixed(
         "__bitfield_sz",
         # The next index to use for a synapse core
         "__next_index",
-        # A map of vertices to edge type
-        "__edge_map",
         # The pre-calculated slices of the vertex
         "__slices",
         # All the machine vertices
@@ -88,7 +86,6 @@ class SplitterAbstractPopulationVertexFixed(
         self.__bitfield_sz = None
         self.__next_index = 0
         self.__slices = None
-        self.__edge_map = None
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -104,7 +101,6 @@ class SplitterAbstractPopulationVertexFixed(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
         self.__create_slices()
-        self.__edge_map = dict()
         self.__vertices = list()
         for vertex_slice in self.__slices:
             sdram = self.get_sdram_used_by_atoms(vertex_slice)
@@ -114,7 +110,6 @@ class SplitterAbstractPopulationVertexFixed(
             machine_vertex = self.create_machine_vertex(
                 vertex_slice, sdram, label, app_vertex.constraints)
             self._governed_app_vertex.remember_machine_vertex(machine_vertex)
-            self.__edge_map[machine_vertex] = [MachineEdge]
             self.__vertices.append(machine_vertex)
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -129,11 +124,33 @@ class SplitterAbstractPopulationVertexFixed(
 
     @overrides(AbstractSplitterCommon.get_out_going_vertices)
     def get_out_going_vertices(self, partition_id):
-        return self.__edge_map
+        return self.__vertices
 
     @overrides(AbstractSplitterCommon.get_in_coming_vertices)
     def get_in_coming_vertices(self, partition_id):
-        return self.__edge_map
+        return self.__vertices
+
+    @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
+    def get_source_specific_in_coming_vertices(
+            self, source_vertex, partition_id):
+        splitter = source_vertex.splitter
+        targets = defaultdict(list)
+        all_connected = True
+        for proj in self.__incoming_from_source(source_vertex):
+            s_info = proj._synapse_information
+            for srce in splitter.get_out_going_vertices(partition_id):
+                for tgt in self.__vertices:
+                    if s_info.connector.could_connect(s_info, srce, tgt):
+                        targets[tgt].append(srce)
+                    else:
+                        all_connected = False
+        return [(m_vertex, tgts) for m_vertex, tgts in targets.items()]
+        if all_connected:
+            return super.get_source_specific_in_coming_vertices(self)
+
+    def __incoming_from_source(self, source_vertex):
+        return [proj for proj in self.governed_app_vertex.incoming_projections
+                if proj._projection_edge.pre_vertex == source_vertex]
 
     @overrides(AbstractSplitterCommon.machine_vertices_for_recording)
     def machine_vertices_for_recording(self, variable_to_record):
@@ -356,7 +373,6 @@ class SplitterAbstractPopulationVertexFixed(
         self.__structural_sz = dict()
         self.__next_index = 0
         self.__slices = None
-        self.__edge_map = None
 
     def __create_slices(self):
         """ Create slices if not already done

@@ -15,7 +15,6 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
-from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -59,8 +58,7 @@ def are_dynamics_neuromodulation(synapse_dynamics):
 
 
 class ProjectionApplicationEdge(
-        ApplicationEdge, AbstractSlicesConnect,
-        AbstractProvidesLocalProvenanceData):
+        ApplicationEdge, AbstractProvidesLocalProvenanceData):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -149,19 +147,6 @@ class ProjectionApplicationEdge(
         if self.__delay_edge is None:
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
-
-    @overrides(AbstractSlicesConnect.could_connect)
-    def could_connect(self, src_machine_vertex, dest_machine_vertex):
-        if not self.__filter:
-            return False
-        for synapse_info in self.__synapse_information:
-            # Structual Plasticity can learn connection not originally included
-            if are_dynamics_structural(synapse_info.synapse_dynamics):
-                return True
-            if synapse_info.connector.could_connect(
-                    synapse_info, src_machine_vertex, dest_machine_vertex):
-                return True
-        return False
 
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
