@@ -45,7 +45,7 @@ install_requires = [
     'spalloc == 1!6.0.1',
     'SpiNNFrontEndCommon == 1!6.0.1',
     "matplotlib < 3.4; python_version <= '3.6'",
-    "matplotlib < 3.6; python_version == '3.7'",
+    "matplotlib < 3.5.99; python_version == '3.7'",
     "matplotlib; python_version >= '3.8'",
     'pyparsing>=2.2.1,<3.0.0',
     'quantities >= 0.12.1',
