@@ -223,9 +223,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         post_lo = 0
         post_hi = target_vertex.n_atoms - 1
         if s_info.prepop_is_view:
+            # pylint: disable=protected-access
             pre_lo = s_info.pre_population._indexes[0]
             pre_hi = s_info.pre_population._indexes[-1]
         if s_info.postpop_is_view:
+            # pylint: disable=protected-access
             post_lo = s_info.post_population._indexes[0]
             post_hi = s_info.post_population._indexes[-1]
 

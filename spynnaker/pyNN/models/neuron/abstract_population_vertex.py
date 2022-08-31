@@ -295,9 +295,9 @@ class AbstractPopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
         self.__max_row_info.clear()
+        # pylint: disable=protected-access
         pre_vertex = projection._projection_edge.pre_vertex
         self.__incoming_projections[pre_vertex].append(projection)
-        # pylint: disable=protected-access
         if pre_vertex == self:
             self.__self_projection = projection
 
@@ -1338,6 +1338,7 @@ class _Stats(object):
         self.ring_buffer_sigma = ring_buffer_sigma
 
     def add_projection(self, proj):
+        # pylint: disable=protected-access
         s_dynamics = proj._synapse_information.synapse_dynamics
         if isinstance(s_dynamics, AbstractSupportsSignedWeights):
             self.__add_signed_projection(proj)
@@ -1345,6 +1346,7 @@ class _Stats(object):
             self.__add_unsigned_projection(proj)
 
     def __add_signed_projection(self, proj):
+        # pylint: disable=protected-access
         s_info = proj._synapse_information
         connector = s_info.connector
         s_dynamics = s_info.synapse_dynamics
@@ -1367,6 +1369,7 @@ class _Stats(object):
             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
 
     def __add_unsigned_projection(self, proj):
+        # pylint: disable=protected-access
         s_info = proj._synapse_information
         s_type = s_info.synapse_type
         s_dynamics = s_info.synapse_dynamics
@@ -1396,6 +1399,7 @@ class _Stats(object):
         spikes_per_tick = max(
             1.0, self.default_spikes_per_second / self.steps_per_second)
         spikes_per_second = self.default_spikes_per_second
+        # pylint: disable=protected-access
         pre_vertex = proj._projection_edge.pre_vertex
         if isinstance(pre_vertex, AbstractMaxSpikes):
             rate = pre_vertex.max_spikes_per_second()
@@ -1410,6 +1414,7 @@ class _Stats(object):
 
         stats = self.running_totals[s_type]
         rates = self.rate_stats[s_type]
+        # pylint: disable=protected-access
         w_max = AbstractPopulationVertex._ring_buffer_expected_upper_bound(
             stats.mean, stats.standard_deviation, rates.mean,
             stats.n_items, self.ring_buffer_sigma)

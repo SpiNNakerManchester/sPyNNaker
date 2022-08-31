@@ -53,11 +53,13 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, n_atoms, incoming_projections):
         n_bytes = 0
         for incoming in incoming_projections:
+            # pylint: disable=protected-access
             s_info = incoming._synapse_information
             if not isinstance(s_info.connector, PoolDenseConnector):
                 raise SynapticConfigurationException(
                     "Only PoolDenseConnector can be used with a synapse type"
                     " of PoolDense")
+            # pylint: disable=protected-access
             app_edge = incoming._projection_edge
             in_slices = app_edge.pre_vertex.splitter.get_out_going_slices()
             n_bytes += s_info.connector.local_only_n_bytes(
@@ -75,6 +77,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         routing_info = SpynnakerDataView.get_routing_infos()
         edge_info = list()
         for incoming in incoming_projections:
+            # pylint: disable=protected-access
             app_edge = incoming._projection_edge
             s_info = incoming._synapse_information
             # Keep track of all the same source squares, so they can be
@@ -91,7 +94,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             for (_, vertex_slice), edge_list in edges_for_source.items():
                 group_key = edge_list[0][1].first_key
                 group_mask = edge_list[0][1].first_mask
-                for edge, r_info in edge_list:
+                for _, r_info in edge_list:
                     group_key, group_mask = self.__merge_key_and_mask(
                         group_key, group_mask, r_info.first_key,
                         r_info.first_mask)
@@ -112,6 +115,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Write spec for each connector, sorted by key
         edge_info.sort(key=lambda e: e[3])
         for incoming, vertex_slice, key, mask in edge_info:
+            # pylint: disable=protected-access
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
@@ -142,18 +146,21 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
     def get_positive_synapse_index(self, incoming_projection):
+        # pylint: disable=protected-access
         post = incoming_projection._projection_edge.post_vertex
         conn = incoming_projection._synapse_information.connector
         return post.get_synapse_id_by_target(conn.positive_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
     def get_negative_synapse_index(self, incoming_projection):
+        # pylint: disable=protected-access
         post = incoming_projection._projection_edge.post_vertex
         conn = incoming_projection._synapse_information.connector
         return post.get_synapse_id_by_target(conn.negative_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
     def get_maximum_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         # We know the connector doesn't care about the argument
         max_weight = numpy.amax(conn.weights)
@@ -161,6 +168,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
     def get_minimum_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         # This is different because the connector happens to support this
         min_weight = numpy.amin(conn.weights)
@@ -168,6 +176,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
     def get_mean_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         pos_weights = conn.weights[conn.weights > 0]
         if not len(pos_weights):
@@ -176,6 +185,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
     def get_mean_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         neg_weights = conn.weights[conn.weights < 0]
         if not len(neg_weights):
@@ -184,6 +194,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
     def get_variance_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         pos_weights = conn.weights[conn.weights > 0]
         if not len(pos_weights):
@@ -192,6 +203,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
     def get_variance_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         neg_weights = conn.weights[conn.weights < 0]
         if not len(neg_weights):

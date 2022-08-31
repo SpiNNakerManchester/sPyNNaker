@@ -88,6 +88,7 @@ class SplitterAbstractPopulationVertexFixed(
         self.__bitfield_sz = None
         self.__next_index = 0
         self.__slices = None
+        self.__vertices = list()
 
     @overrides(AbstractSplitterCommon.set_governed_app_vertex)
     def set_governed_app_vertex(self, app_vertex):
@@ -103,7 +104,6 @@ class SplitterAbstractPopulationVertexFixed(
             len(app_vertex.neuron_recorder.get_recordable_variables()))
 
         self.__create_slices()
-        self.__vertices = list()
         for vertex_slice in self.__slices:
             sdram = self.get_sdram_used_by_atoms(vertex_slice)
             chip_counter.add_core(sdram)
@@ -137,10 +137,12 @@ class SplitterAbstractPopulationVertexFixed(
             self, source_vertex, partition_id):
         if partition_id != SPIKE_PARTITION_ID:
             return super(SplitterAbstractPopulationVertexFixed, self)\
-                .get_source_specific_in_coming_vertices(partition_id)
+                .get_source_specific_in_coming_vertices(
+                    source_vertex, partition_id)
         targets = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 source_vertex):
+            # pylint: disable=protected-access
             s_info = proj._synapse_information
             for (tgt, srcs) in s_info.connector.get_connected_vertices(
                     s_info, source_vertex, self.governed_app_vertex):
@@ -364,6 +366,7 @@ class SplitterAbstractPopulationVertexFixed(
         self.__structural_sz = dict()
         self.__next_index = 0
         self.__slices = None
+        self.__vertices = list()
 
     def __create_slices(self):
         """ Create slices if not already done

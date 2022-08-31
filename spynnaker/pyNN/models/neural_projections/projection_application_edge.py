@@ -64,7 +64,6 @@ class ProjectionApplicationEdge(
     __slots__ = [
         "__delay_edge",
         "__synapse_information",
-        "__filter",
         "__is_neuromodulation"
     ]
 
@@ -88,9 +87,6 @@ class ProjectionApplicationEdge(
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge = None
-
-        # By default, allow filtering
-        self.__filter = True
 
     def add_synapse_information(self, synapse_information):
         """
@@ -131,13 +127,6 @@ class ProjectionApplicationEdge(
         :rtype: bool
         """
         return self.__is_neuromodulation
-
-    def set_filter(self, do_filter):
-        """ Set the ability to filter or not
-
-        @param bool do_filter: Whether to allow filtering
-        """
-        self.__filter = do_filter
 
     @property
     def n_delay_stages(self):

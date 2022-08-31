@@ -66,11 +66,13 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, n_atoms, incoming_projections):
         n_bytes = 0
         for incoming in incoming_projections:
+            # pylint: disable=protected-access
             s_info = incoming._synapse_information
             if not isinstance(s_info.connector, ConvolutionConnector):
                 raise SynapticConfigurationException(
                     "Only ConvolutionConnector can be used with a synapse type"
                     " of Convolution")
+            # pylint: disable=protected-access
             app_edge = incoming._projection_edge
             n_incoming = len(
                 app_edge.pre_vertex.splitter.get_out_going_slices())
@@ -110,6 +112,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         # Write spec for each incoming source
         for source in sources_for_m_vertex:
             incoming = source.projection
+            # pylint: disable=protected-access
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
@@ -136,6 +139,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             seen_pre_vertices = set()
             sources_for_target = defaultdict(list)
             for incoming in app_vertex.incoming_projections:
+                # pylint: disable=protected-access
                 app_edge = incoming._projection_edge
                 s_info = incoming._synapse_information
                 source_vertex = app_edge.pre_vertex
@@ -202,18 +206,21 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_positive_synapse_index)
     def get_positive_synapse_index(self, incoming_projection):
+        # pylint: disable=protected-access
         post = incoming_projection._projection_edge.post_vertex
         conn = incoming_projection._synapse_information.connector
         return post.get_synapse_id_by_target(conn.positive_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_negative_synapse_index)
     def get_negative_synapse_index(self, incoming_projection):
+        # pylint: disable=protected-access
         post = incoming_projection._projection_edge.post_vertex
         conn = incoming_projection._synapse_information.connector
         return post.get_synapse_id_by_target(conn.negative_receptor_type)
 
     @overrides(AbstractSupportsSignedWeights.get_maximum_positive_weight)
     def get_maximum_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         # We know the connector doesn't care about the argument
         max_weight = numpy.amax(conn.kernel_weights)
@@ -221,6 +228,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_minimum_negative_weight)
     def get_minimum_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         # This is different because the connector happens to support this
         min_weight = numpy.amin(conn.kernel_weights)
@@ -228,6 +236,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_mean_positive_weight)
     def get_mean_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if not len(pos_weights):
@@ -236,6 +245,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_mean_negative_weight)
     def get_mean_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if not len(neg_weights):
@@ -244,6 +254,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_variance_positive_weight)
     def get_variance_positive_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         pos_weights = conn.kernel_weights[conn.kernel_weights > 0]
         if not len(pos_weights):
@@ -252,6 +263,7 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
     @overrides(AbstractSupportsSignedWeights.get_variance_negative_weight)
     def get_variance_negative_weight(self, incoming_projection):
+        # pylint: disable=protected-access
         conn = incoming_projection._synapse_information.connector
         neg_weights = conn.kernel_weights[conn.kernel_weights < 0]
         if not len(neg_weights):
