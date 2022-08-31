@@ -434,9 +434,13 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         pre_slices = source_vertex.splitter.get_out_going_slices()
         post_slices = target_vertex.splitter.get_in_coming_slices()
         self._split_connections(pre_slices, post_slices)
+
+        pre_vertices = source_vertex.splitter.get_out_going_vertices(
+            SPIKE_PARTITION_ID)
         return [
-            (m_vert, [src_slice for src_slice in pre_slices
-                      if (src_slice, m_vert.vertex_slice) in
+            (m_vert, [s_vert for s_vert in pre_vertices
+                      if (s_vert.vertex_slice.hi_atom,
+                          m_vert.vertex_slice.hi_atom) in
                       self.__split_conn_list])
             for m_vert in target_vertex.splitter.get_in_coming_vertices(
                 SPIKE_PARTITION_ID)
