@@ -37,6 +37,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spinn_utilities.ordered_set import OrderedSet
 from spynnaker.pyNN.models.neuron.population_synapses_machine_vertex_common \
     import (SDRAM_PARAMS_SIZE as SYNAPSES_SDRAM_PARAMS_SIZE, KEY_CONFIG_SIZE,
             SynapseRegions)
@@ -552,6 +553,16 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             return [(v, [source_vertex])
                     for s in self.__incoming_vertices for v in s]
 
+        # Get the set of connected sources overall
+        targets = defaultdict(OrderedSet)
+        for proj in self.governed_app_vertex.get_incoming_projections_from(
+                pre_vertex):
+            # pylint: disable=protected-access
+            s_info = proj._synapse_information
+            for (tgt, srcs) in s_info.connector.get_connected_vertices(
+                    s_info, pre_vertex, self.governed_app_vertex):
+                targets[tgt].update(srcs)
+
         # Split the incoming machine vertices so that they are in ~power of 2
         # groups
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
@@ -571,7 +582,11 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             end = min(start + sources_per_vertex, n_sources)
             source_range = sources[start:end]
             for s_vertex in self.__incoming_vertices[index]:
-                result.append((s_vertex, source_range))
+                targets_filtered = targets[s_vertex]
+                filtered = [s for s in source_range
+                            if (s in targets_filtered or
+                                s.app_vertex in targets_filtered)]
+                result.append((s_vertex, filtered))
             index = (index + 1) % self.__n_synapse_vertices
 
         return result
