@@ -38,6 +38,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from collections import defaultdict
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 
 class SplitterAbstractPopulationVertexFixed(
@@ -135,17 +136,21 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
+        if isinstance(source_vertex, DelayExtensionVertex):
+            pre_vertex = source_vertex.source_vertex
+        else:
+            pre_vertex = source_vertex
         if partition_id != SPIKE_PARTITION_ID:
             return super(SplitterAbstractPopulationVertexFixed, self)\
                 .get_source_specific_in_coming_vertices(
                     source_vertex, partition_id)
         targets = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
-                source_vertex):
+                pre_vertex):
             # pylint: disable=protected-access
             s_info = proj._synapse_information
             for (tgt, srcs) in s_info.connector.get_connected_vertices(
-                    s_info, source_vertex, self.governed_app_vertex):
+                    s_info, pre_vertex, self.governed_app_vertex):
                 targets[tgt].update(srcs)
         return [(m_vertex, tgts) for m_vertex, tgts in targets.items()]
 
