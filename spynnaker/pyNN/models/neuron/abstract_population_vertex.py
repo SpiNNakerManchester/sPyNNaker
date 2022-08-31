@@ -19,6 +19,7 @@ import numpy
 from scipy import special  # @UnresolvedImport
 import operator
 from functools import reduce
+from collections import defaultdict
 
 from pyNN.space import Grid2D, Grid3D
 
@@ -55,7 +56,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
-from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
+from spynnaker.pyNN.utilities.constants import (
+    POSSION_SIGMA_SUMMATION_LIMIT, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -246,7 +248,7 @@ class AbstractPopulationVertex(
             "Reports", "n_profile_samples")
 
         # Set up for incoming
-        self.__incoming_projections = list()
+        self.__incoming_projections = defaultdict(list)
         self.__max_row_info = dict()
         self.__self_projection = None
 
@@ -293,9 +295,10 @@ class AbstractPopulationVertex(
         # Reset the ring buffer shifts as a projection has been added
         self.__change_requires_mapping = True
         self.__max_row_info.clear()
-        self.__incoming_projections.append(projection)
+        pre_vertex = projection._projection_edge.pre_vertex
+        self.__incoming_projections[pre_vertex].append(projection)
         # pylint: disable=protected-access
-        if projection._projection_edge.pre_vertex == self:
+        if pre_vertex == self:
             self.__self_projection = projection
 
     @property
@@ -919,7 +922,7 @@ class AbstractPopulationVertex(
         return ((average_spikes_per_timestep * weight_mean) +
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
-    def get_ring_buffer_shifts(self, incoming_projections):
+    def get_ring_buffer_shifts(self):
         """ Get the shift of the ring buffers for transfer of values into the
             input buffers for this model.
 
@@ -930,7 +933,7 @@ class AbstractPopulationVertex(
         stats = _Stats(self.__neuron_impl, self.__spikes_per_second,
                        self.__ring_buffer_sigma)
 
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             # Skip if this is a synapse dynamics synapse type
@@ -1021,12 +1024,12 @@ class AbstractPopulationVertex(
 
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return self.__synapse_dynamics.get_parameters_usage_in_bytes(
-                self.__incoming_projections)
+                self.incoming_projections)
 
         return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
             n_atoms, self.__neuron_impl.get_n_synapse_types())
 
-    def get_structural_dynamics_size(self, n_atoms, incoming_projections):
+    def get_structural_dynamics_size(self, n_atoms):
         """ Get the size of the structural dynamics region
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
@@ -1043,9 +1046,9 @@ class AbstractPopulationVertex(
 
         return self.__synapse_dynamics\
             .get_structural_parameters_sdram_usage_in_bytes(
-                incoming_projections, n_atoms)
+                self.incoming_projections, n_atoms)
 
-    def get_synapses_size(self, n_post_atoms, incoming_projections):
+    def get_synapses_size(self, n_post_atoms):
         """ Get the maximum SDRAM usage for the synapses on a vertex slice
 
         :param int n_post_atoms: The number of atoms projected to
@@ -1053,7 +1056,7 @@ class AbstractPopulationVertex(
             The projections to consider in the calculations
         """
         addr = 2 * BYTES_PER_WORD
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             addr = self.__add_matrix_size(addr, proj, n_post_atoms)
         return addr
 
@@ -1110,15 +1113,13 @@ class AbstractPopulationVertex(
         self.__max_row_info[key] = max_row_info
         return max_row_info
 
-    def get_synapse_expander_size(self, incoming_projections):
+    def get_synapse_expander_size(self):
         """ Get the size of the synapse expander region in bytes
 
-        :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
-            The projections to consider in the calculations
         :rtype: int
         """
         size = 0
-        for proj in incoming_projections:
+        for proj in self.incoming_projections:
             # pylint: disable=protected-access
             synapse_info = proj._synapse_information
             app_edge = proj._projection_edge
@@ -1287,9 +1288,17 @@ class AbstractPopulationVertex(
     def incoming_projections(self):
         """ The projections that target this population vertex
 
-        :rtype: list(~spynnaker.pyNN.models.projection.Projection)
+        :rtype: iterable(~spynnaker.pyNN.models.projection.Projection)
         """
-        return self.__incoming_projections
+        for proj_list in self.__incoming_projections.values():
+            for proj in proj_list:
+                yield proj
+
+    def get_incoming_projections_from(self, source_vertex):
+        """ Get the projections that target this population vertex from
+            the given source
+        """
+        return self.__incoming_projections[source_vertex]
 
 
 class _Stats(object):

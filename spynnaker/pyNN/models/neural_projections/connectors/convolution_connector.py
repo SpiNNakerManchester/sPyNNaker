@@ -26,6 +26,7 @@ from collections.abc import Iterable
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class ConvolutionConnector(AbstractConnector):
@@ -266,35 +267,43 @@ class ConvolutionConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         return numpy.amax(self.__kernel_weights)
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        pre_slice = src_machine_vertex.vertex_slice
-        post_slice = dest_machine_vertex.vertex_slice
-        pre_slice_x = pre_slice.get_slice(0)
-        pre_slice_y = pre_slice.get_slice(1)
-        post_slice_x = post_slice.get_slice(0)
-        post_slice_y = post_slice.get_slice(1)
+    @overrides(AbstractConnector.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        pre_vertices = numpy.array(
+            source_vertex.splitter.get_out_going_vertices(SPIKE_PARTITION_ID))
+        pre_slices = [m_vertex.vertex_slice for m_vertex in pre_vertices]
+        pre_slices_x = [vtx_slice.get_slice(0) for vtx_slice in pre_slices]
+        pre_slices_y = [vtx_slice.get_slice(1) for vtx_slice in pre_slices]
+        pre_ranges = [[[px.start, py.start], [px.stop - 1, py.stop - 1]]
+                      for px, py in zip(pre_slices_x, pre_slices_y)]
+        pres_as_posts = self.__pre_as_post(pre_ranges)
         hlf_k_w, hlf_k_h = numpy.array(self.__kernel_weights.shape) // 2
 
-        # Get ranges allowed in post
-        min_x = post_slice_x.start - hlf_k_w
-        max_x = (post_slice_x.stop + hlf_k_w) - 1
-        min_y = post_slice_y.start - hlf_k_h
-        max_y = (post_slice_y.stop + hlf_k_h) - 1
+        connected = list()
+        for post in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID):
+            post_slice = post.vertex_slice
+            post_slice_x = post_slice.get_slice(0)
+            post_slice_y = post_slice.get_slice(1)
 
-        # Get pre-coordinates as post-coordinates
-        (pre_x_min, pre_y_min), (pre_x_max, pre_y_max) = self.__pre_as_post(
-            [[pre_slice_x.start, pre_slice_y.start],
-             [pre_slice_x.stop - 1, pre_slice_y.stop - 1]])
+            # Get ranges allowed in post
+            min_x = post_slice_x.start - hlf_k_w
+            max_x = (post_slice_x.stop + hlf_k_w) - 1
+            min_y = post_slice_y.start - hlf_k_h
+            max_y = (post_slice_y.stop + hlf_k_h) - 1
 
-        # No part of the pre square overlaps the post-square, don't connect
-        if (pre_x_max < min_x or pre_x_min > max_x or
-                pre_y_max < min_y or pre_y_min > max_y):
-            return False
+            # Test that the start coords are in range i.e. less than max
+            start_in_range = numpy.logical_not(
+                numpy.any(pres_as_posts[:, 0] > [max_x, max_y], axis=1))
+            # Test that the end coords are in range i.e. more than min
+            end_in_range = numpy.logical_not(
+                numpy.any(pres_as_posts[:, 1] < [min_x, min_y], axis=1))
+            # When both things are true, we have a vertex in range
+            pre_in_range = pre_vertices[
+                numpy.logical_and(start_in_range, end_in_range)]
+            connected.append((post, pre_in_range))
 
-        # Otherwise, they do
-        return True
+        return connected
 
     def __pre_as_post(self, pre_coords):
         """ Write pre coords as post coords.

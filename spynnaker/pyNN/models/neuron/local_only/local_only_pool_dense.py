@@ -72,6 +72,7 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
 
         # Get all the incoming vertices and keys so we can sort
         # TO DO: now this uses vertices rather than edges some renaming needed
+        routing_info = SpynnakerDataView.get_routing_infos()
         edge_info = list()
         for incoming in incoming_projections:
             app_edge = incoming._projection_edge
@@ -80,14 +81,11 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
             for pre_m_vertex in app_edge.pre_vertex.machine_vertices:
-                if s_info.connector.could_connect(
-                        s_info, pre_m_vertex, machine_vertex):
-                    routing_info = SpynnakerDataView.get_routing_infos()
-                    r_info = routing_info.get_routing_info_from_pre_vertex(
-                        pre_m_vertex, SPIKE_PARTITION_ID)
-                    vertex_slice = pre_m_vertex.vertex_slice
-                    key = (app_edge.pre_vertex, vertex_slice)
-                    edges_for_source[key].append((pre_m_vertex, r_info))
+                r_info = routing_info.get_routing_info_from_pre_vertex(
+                    pre_m_vertex, SPIKE_PARTITION_ID)
+                vertex_slice = pre_m_vertex.vertex_slice
+                key = (app_edge.pre_vertex, vertex_slice)
+                edges_for_source[key].append((pre_m_vertex, r_info))
 
             # Merge edges with the same source
             for (_, vertex_slice), edge_list in edges_for_source.items():

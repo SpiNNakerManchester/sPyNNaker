@@ -206,8 +206,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         incoming_direct_poisson = self.__handle_poisson_sources(label)
 
         # Work out the ring buffer shifts based on all incoming things
-        rb_shifts = app_vertex.get_ring_buffer_shifts(
-            app_vertex.incoming_projections)
+        rb_shifts = app_vertex.get_ring_buffer_shifts()
         weight_scales = app_vertex.get_weight_scales(rb_shifts)
 
         # We add the SDRAM edge SDRAM to the neuron resources so it is
@@ -223,11 +222,10 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
 
         # Get resources for synapses
         structural_sz = max(
-            app_vertex.get_structural_dynamics_size(
-                atoms_per_core, app_vertex.incoming_projections),
+            app_vertex.get_structural_dynamics_size(atoms_per_core),
             BYTES_PER_WORD)
-        all_syn_block_sz = max(app_vertex.get_synapses_size(
-            atoms_per_core, app_vertex.incoming_projections), BYTES_PER_WORD)
+        all_syn_block_sz = max(
+            app_vertex.get_synapses_size(atoms_per_core), BYTES_PER_WORD)
         shared_synapse_sdram = self.__get_shared_synapse_sdram(
             atoms_per_core, all_syn_block_sz, structural_sz)
         sdram = self.__get_synapse_sdram(
@@ -750,7 +748,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS
             .connection_builder,
-            max(app_vertex.get_synapse_expander_size(incoming_projections),
+            max(app_vertex.get_synapse_expander_size(),
                 BYTES_PER_WORD))
         sdram.add_cost(
             PopulationSynapsesMachineVertexLead.SYNAPSE_REGIONS

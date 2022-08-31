@@ -23,6 +23,7 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL)
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
@@ -476,9 +477,16 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_params_size_in_bytes(self):
         return N_KERNEL_PARAMS * BYTES_PER_WORD
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
+    @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        return [
+            (t_vert,
+             [s_vert for s_vert in source_vertex.get_out_going_vertices(
+                 SPIKE_PARTITION_ID) if self.__connects(s_vert, t_vert)])
+            for t_vert in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID)]
+
+    def __connects(self, src_machine_vertex, dest_machine_vertex):
         # If the pre- and post-slices are not 2-dimensional slices, we have
         # to let them pass
         pre_slice = src_machine_vertex.vertex_slice

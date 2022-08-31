@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -27,10 +27,22 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from .abstract_local_only import AbstractLocalOnly
 
+Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])
+
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
     """
+
+    __slots__ = [
+        "__cached_2d_overlaps"
+    ]
+
+    def __init__(self):
+        # Store the overlaps between 2d vertices to avoid recalculation
+        self.__cached_2d_overlaps = dict()
+
+        # Store the merged keys for sources to avoid recalculation
 
     @overrides(AbstractLocalOnly.merge)
     def merge(self, synapse_dynamics):
@@ -71,37 +83,11 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
             self, spec, region, incoming_projections,
             machine_vertex, weight_scales):
 
-        # Get all the incoming vertices and keys so we can sort
-        # TO DO: now this uses vertices rather than edges some renaming needed
-        edge_info = list()
-        for incoming in incoming_projections:
-            app_edge = incoming._projection_edge
-            s_info = incoming._synapse_information
-            # Keep track of all the same source squares, so they can be
-            # merged; this will make sure the keys line up!
-            edges_for_source = defaultdict(list)
-            pre = app_edge.pre_vertex
-            for pre_m_vertex in pre.splitter.get_out_going_vertices(
-                    SPIKE_PARTITION_ID):
-                if s_info.connector.could_connect(
-                        s_info, pre_m_vertex, machine_vertex):
-                    routing_info = SpynnakerDataView.get_routing_infos()
-                    r_info = routing_info.get_routing_info_from_pre_vertex(
-                        pre_m_vertex, SPIKE_PARTITION_ID)
-                    vertex_slice = pre_m_vertex.vertex_slice
-                    key = (pre, vertex_slice)
-                    edges_for_source[key].append((pre_m_vertex, r_info))
-
-            # Merge edges with the same source
-            for (_, vertex_slice), edge_list in edges_for_source.items():
-                group_key = edge_list[0][1].first_key
-                group_mask = edge_list[0][1].first_mask
-                for edge, r_info in edge_list:
-                    group_key, group_mask = self.__merge_key_and_mask(
-                        group_key, group_mask, r_info.first_key,
-                        r_info.first_mask)
-                edge_info.append(
-                    (incoming, vertex_slice, group_key, group_mask))
+        # Get incoming sources for this machine vertex, and sort by key
+        app_vertex = machine_vertex.app_vertex
+        sources_for_targets = self.__get_sources_for_target(app_vertex)
+        sources_for_m_vertex = sources_for_targets[machine_vertex]
+        sources_for_m_vertex.sort(key=lambda s: s.key)
 
         size = self.get_parameters_usage_in_bytes(
             machine_vertex.vertex_slice, incoming_projections)
@@ -119,21 +105,84 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
         spec.write_value(post_end[0], data_type=DataType.INT16)
         spec.write_value(post_shape[1], data_type=DataType.INT16)
         spec.write_value(post_shape[0], data_type=DataType.INT16)
-        spec.write_value(len(edge_info), data_type=DataType.UINT32)
+        spec.write_value(len(sources_for_m_vertex), data_type=DataType.UINT32)
 
-        # Write spec for each connector, sorted by key
-        edge_info.sort(key=lambda e: e[3])
-        for incoming, vertex_slice, key, mask in edge_info:
+        # Write spec for each incoming source
+        for source in sources_for_m_vertex:
+            incoming = source.projection
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
             s_info.connector.write_local_only_data(
-                spec, app_edge, vertex_slice, key, mask, weight_scales)
+                spec, app_edge, source.vertex_slice, source.key,
+                source.mask, weight_scales)
 
     def __merge_key_and_mask(self, key_a, mask_a, key_b, mask_b):
         new_xs = ~(key_a ^ key_b)
         mask = mask_a & mask_b & new_xs
         key = (key_a | key_b) & mask
         return key, mask
+
+    def __get_sources_for_target(self, app_vertex):
+        """ Get all the machine vertex sources that will hit the given
+            application vertex
+
+        :param AbstractPopulationVertex app_vertex:
+            The vertex being targeted
+        :rtype: dict(MachineVertex, list(Sources))
+        """
+        sources_for_target = self.__cached_2d_overlaps.get(app_vertex)
+        if sources_for_target is None:
+            key_cache = dict()
+            seen_pre_vertices = set()
+            sources_for_target = defaultdict(list)
+            for incoming in app_vertex.incoming_projections:
+                app_edge = incoming._projection_edge
+                s_info = incoming._synapse_information
+                source_vertex = app_edge.pre_vertex
+                if source_vertex not in seen_pre_vertices:
+                    seen_pre_vertices.add(source_vertex)
+                    for tgt, srcs in s_info.connector.get_connected_vertices(
+                            s_info, source_vertex, app_vertex):
+                        r_info = self.__get_rinfo_for_sources(
+                            key_cache, srcs, incoming)
+                        sources_for_target[tgt].extend(r_info)
+            self.__cached_2d_overlaps[app_vertex] = sources_for_target
+        return sources_for_target
+
+    def __get_rinfo_for_sources(self, key_cache, srcs, incoming):
+        """ Get the routing information for sources, merging sources that have
+            the same vertex slice (note this happens in retinas from FPGAs).
+
+        :rtype: list(Source)
+        """
+        routing_info = SpynnakerDataView.get_routing_infos()
+
+        # Group sources by vertex slice
+        sources = defaultdict(list)
+        for source in srcs:
+            sources[source.vertex_slice].append(source)
+
+        # For each slice, merge the keys
+        keys = list()
+        for vertex_slice, slice_sources in sources.items():
+            if vertex_slice in key_cache:
+                keys.append(key_cache.get(vertex_slice))
+            else:
+                r_info = routing_info.get_routing_info_from_pre_vertex(
+                    slice_sources[0], SPIKE_PARTITION_ID)
+                group_key = r_info.first_key
+                group_mask = r_info.first_mask
+                for source in slice_sources:
+                    r_info = routing_info.get_routing_info_from_pre_vertex(
+                        source, SPIKE_PARTITION_ID)
+                    group_key, group_mask = self.__merge_key_and_mask(
+                        group_key, group_mask, r_info.first_key,
+                        r_info.first_mask)
+                key_source = Source(
+                    incoming, vertex_slice, group_key, group_mask)
+                key_cache[vertex_slice] = key_source
+                keys.append(key_source)
+        return keys
 
     @property
     @overrides(AbstractLocalOnly.delay)

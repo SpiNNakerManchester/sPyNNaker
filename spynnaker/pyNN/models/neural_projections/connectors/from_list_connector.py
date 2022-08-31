@@ -20,6 +20,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_host import (
     AbstractGenerateConnectorOnHost)
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -428,17 +429,18 @@ class FromListConnector(AbstractConnector, AbstractGenerateConnectorOnHost):
         """
         return self.__extra_parameter_names
 
-    @overrides(AbstractConnector.could_connect)
-    def could_connect(
-            self, synapse_info, src_machine_vertex, dest_machine_vertex):
-        pre_slices = \
-            src_machine_vertex.app_vertex.splitter.get_out_going_slices()
-        post_slices = \
-            dest_machine_vertex.app_vertex.splitter.get_in_coming_slices()
+    @overrides(AbstractConnector.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        pre_slices = source_vertex.splitter.get_out_going_slices()
+        post_slices = target_vertex.splitter.get_in_coming_slices()
         self._split_connections(pre_slices, post_slices)
-        pre_hi = src_machine_vertex.vertex_slice.hi_atom
-        post_hi = dest_machine_vertex.vertex_slice.hi_atom
-        return (pre_hi, post_hi) in self.__split_conn_list
+        return [
+            (m_vert, [src_slice for src_slice in pre_slices
+                      if (src_slice, m_vert.vertex_slice) in
+                      self.__split_conn_list])
+            for m_vert in target_vertex.splitter.get_in_coming_vertices(
+                SPIKE_PARTITION_ID)
+        ]
 
     def _apply_parameters_to_synapse_type(self, synapse_type):
         """
