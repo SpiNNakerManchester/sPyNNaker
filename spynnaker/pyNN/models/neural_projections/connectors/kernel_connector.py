@@ -479,9 +479,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractGenerateConnectorOnMachine.get_connected_vertices)
     def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        src_splitter = source_vertex.splitter
         return [
             (t_vert,
-             [s_vert for s_vert in source_vertex.get_out_going_vertices(
+             [s_vert for s_vert in src_splitter.get_out_going_vertices(
                  SPIKE_PARTITION_ID) if self.__connects(s_vert, t_vert)])
             for t_vert in target_vertex.splitter.get_in_coming_vertices(
                 SPIKE_PARTITION_ID)]
