@@ -57,7 +57,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
 from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT, SPIKE_PARTITION_ID)
+    POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
