@@ -536,7 +536,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
     @overrides(AbstractSplitterCommon.get_source_specific_in_coming_vertices)
     def get_source_specific_in_coming_vertices(
             self, source_vertex, partition_id):
-        # If the edge is delayed, get the real edge
+        # If delayed get the real pre-vertex
         if isinstance(source_vertex, DelayExtensionVertex):
             pre_vertex = source_vertex.source_vertex
         else:
@@ -553,18 +553,21 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
             return [(v, [source_vertex])
                     for s in self.__incoming_vertices for v in s]
 
-        # Get the set of connected sources overall
+        # Get the set of connected sources overall using the real pre-vertex
         targets = defaultdict(OrderedSet)
         for proj in self.governed_app_vertex.get_incoming_projections_from(
                 pre_vertex):
             # pylint: disable=protected-access
             s_info = proj._synapse_information
+            # Use the original source vertex here to ensure the actual machine
+            # vertices of the source vertex make it in
             for (tgt, srcs) in s_info.connector.get_connected_vertices(
-                    s_info, pre_vertex, self.governed_app_vertex):
+                    s_info, source_vertex, self.governed_app_vertex):
                 targets[tgt].update(srcs)
 
         # Split the incoming machine vertices so that they are in ~power of 2
-        # groups
+        # groups, using the original source vertex to get the right machine
+        # vertices
         sources = source_vertex.splitter.get_out_going_vertices(partition_id)
         n_sources = len(sources)
         if n_sources < self.__n_synapse_vertices:
