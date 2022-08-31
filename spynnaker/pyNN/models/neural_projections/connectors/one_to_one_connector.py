@@ -245,11 +245,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         # Check range of slices
         if pre_slice.hi_atom < pre_lo:
             return False
-        if post_slice.hi_atom < pre_lo:
+        if post_slice.hi_atom < post_lo:
             return False
         if pre_slice.lo_atom > pre_hi:
             return False
-        if post_slice.hi_atom > pre_hi:
+        if post_slice.hi_atom > post_hi:
             return False
 
         # Get slice range relative to view
