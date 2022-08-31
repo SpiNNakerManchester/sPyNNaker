@@ -229,8 +229,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             post_lo = s_info.post_population._indexes[0]
             post_hi = s_info.post_population._indexes[-1]
 
+        src_splitter = source_vertex.splitter
         return [(t_vert,
-                 [s_vert for s_vert in source_vertex.get_out_going_vertices(
+                 [s_vert for s_vert in src_splitter.get_out_going_vertices(
                               SPIKE_PARTITION_ID)
                   if self.__connects(
                       s_vert, pre_lo, pre_hi, t_vert, post_lo, post_hi)])
