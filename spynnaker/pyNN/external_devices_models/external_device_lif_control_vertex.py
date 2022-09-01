@@ -34,6 +34,7 @@ class ExternalDeviceLifControlVertex(
     __slots__ = [
         "__dependent_vertices",
         "__devices",
+        "__indices",
         "__message_translator"]
 
     # all commands will use this mask
@@ -78,6 +79,8 @@ class ExternalDeviceLifControlVertex(
 
         self.__devices = {dev.device_control_partition_id: dev
                           for dev in devices}
+        self.__indices = {dev.device_control_partition_id: i
+                          for i, dev in enumerate(devices)}
         self.__message_translator = translator
 
         # Add the edges to the devices if required
@@ -113,9 +116,9 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(HasCustomAtomKeyMap.get_atom_key_map)
     def get_atom_key_map(self, pre_vertex, partition_id, routing_info):
-        for i, device in enumerate(self.__devices.keys()):
-            if device.device_control_partition_id == partition_id:
-                return [(i, device.device_control_key)]
+        index = self.__indices[partition_id]
+        device = self.__devices[partition_id]
+        return [(index, device.device_control_key)]
 
     @overrides(AbstractPopulationVertex.get_fixed_key_and_mask)
     def get_fixed_key_and_mask(self, partition_id):
