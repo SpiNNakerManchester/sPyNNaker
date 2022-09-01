@@ -68,18 +68,21 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         return (2 * BYTES_PER_WORD) + n_bytes
 
     @overrides(AbstractLocalOnly.write_parameters)
-    def write_parameters(
-            self, spec, region, incoming_projections,
-            machine_vertex, weight_scales):
+    def write_parameters(self, spec, region, machine_vertex, weight_scales):
 
         # Get all the incoming vertices and keys so we can sort
-        # TO DO: now this uses vertices rather than edges some renaming needed
         routing_info = SpynnakerDataView.get_routing_infos()
-        edge_info = list()
-        for incoming in incoming_projections:
+        incoming_info = list()
+        seen_pre_vertices = set()
+        for incoming in machine_vertex.app_vertex.incoming_projections:
             # pylint: disable=protected-access
             app_edge = incoming._projection_edge
             s_info = incoming._synapse_information
+
+            if app_edge.pre_vertex in seen_pre_vertices:
+                continue
+            seen_pre_vertices.add(app_edge.pre_vertex)
+
             # Keep track of all the same source squares, so they can be
             # merged; this will make sure the keys line up!
             edges_for_source = defaultdict(list)
@@ -98,11 +101,12 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
                     group_key, group_mask = self.__merge_key_and_mask(
                         group_key, group_mask, r_info.first_key,
                         r_info.first_mask)
-                edge_info.append(
+                incoming_info.append(
                     (incoming, vertex_slice, group_key, group_mask))
 
         size = self.get_parameters_usage_in_bytes(
-            machine_vertex.vertex_slice.n_atoms, incoming_projections)
+            machine_vertex.vertex_slice.n_atoms,
+            machine_vertex.app_vertex.incoming_projections)
         spec.reserve_memory_region(region, size, label="LocalOnlyConvolution")
         spec.switch_write_focus(region)
 
@@ -110,11 +114,11 @@ class LocalOnlyPoolDense(AbstractLocalOnly, AbstractSupportsSignedWeights):
         post_slice = machine_vertex.vertex_slice
         n_post = numpy.prod(post_slice.shape)
         spec.write_value(n_post, data_type=DataType.UINT32)
-        spec.write_value(len(edge_info), data_type=DataType.UINT32)
+        spec.write_value(len(incoming_info), data_type=DataType.UINT32)
 
         # Write spec for each connector, sorted by key
-        edge_info.sort(key=lambda e: e[3])
-        for incoming, vertex_slice, key, mask in edge_info:
+        incoming_info.sort(key=lambda e: e[3])
+        for incoming, vertex_slice, key, mask in incoming_info:
             # pylint: disable=protected-access
             s_info = incoming._synapse_information
             app_edge = incoming._projection_edge
