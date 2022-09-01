@@ -25,6 +25,7 @@ from .synapse_dynamics_structural_common import (
     DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
     DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -284,3 +285,10 @@ class SynapseDynamicsStructuralSTDP(
     def generate_on_machine(self):
         # Never generate structural connections on the machine
         return False
+
+    @overrides(SynapseDynamicsSTDP.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        # Things change, so assume all connected
+        return [(m_vertex, [source_vertex])
+                for m_vertex in target_vertex.splitter.get_in_coming_vertices(
+                    SPIKE_PARTITION_ID)]

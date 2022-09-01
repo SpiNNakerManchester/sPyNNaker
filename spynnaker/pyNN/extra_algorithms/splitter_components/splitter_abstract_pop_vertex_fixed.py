@@ -149,7 +149,7 @@ class SplitterAbstractPopulationVertexFixed(
             s_info = proj._synapse_information
             # Use the original source vertex to get the connected vertices,
             # as the real source machine vertices must make it in to this array
-            for (tgt, srcs) in s_info.connector.get_connected_vertices(
+            for (tgt, srcs) in s_info.synapse_dynamics.get_connected_vertices(
                     s_info, source_vertex, self.governed_app_vertex):
                 targets[tgt].update(srcs)
         return [(m_vertex, tgts) for m_vertex, tgts in targets.items()]

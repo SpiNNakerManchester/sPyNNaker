@@ -132,3 +132,18 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         """
         # pylint: disable=unused-argument
         return None
+
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        """ Get the machine vertices that are connected to each other with
+            this connector
+
+        :param SynapseInformation s_info:
+            The synapse information of the connection
+        :param ApplicationVertex source_vertex: The source of the spikes
+        :param ApplicationVertex target_vertex: The target of the spikes
+        :return: A list of tuples of (target machine vertex, source
+        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))
+        """
+        # By default, just ask the connector
+        return s_info.connector.get_connected_vertices(
+            s_info, source_vertex, target_vertex)
