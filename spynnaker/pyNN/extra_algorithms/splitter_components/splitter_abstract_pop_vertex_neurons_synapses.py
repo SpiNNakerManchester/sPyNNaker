@@ -573,7 +573,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         if n_sources < self.__n_synapse_vertices:
             sources_per_vertex = 1
         else:
-            sources_per_vertex = int(2 ** math.ceil(math.log(
+            sources_per_vertex = int(2 ** math.ceil(math.log2(
                 n_sources / self.__n_synapse_vertices)))
 
         # Start on a different index each time to "even things out"

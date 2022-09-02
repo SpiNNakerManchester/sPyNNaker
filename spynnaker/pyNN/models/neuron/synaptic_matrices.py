@@ -472,7 +472,7 @@ class SynapticMatrices(object):
         # Get the key as the first key and the mask as the mask that covers
         # enough keys
         key = keys[0][0]
-        n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
+        n_extra_mask_bits = int(math.ceil(math.log2(len(keys))))
         core_mask = (2 ** n_extra_mask_bits) - 1
         new_mask = mask & ~(core_mask << mask_size)
 

@@ -949,7 +949,7 @@ class AbstractPopulationVertex(
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            0 if w <= 0 else int(math.ceil(max(0, math.log2(w))))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
