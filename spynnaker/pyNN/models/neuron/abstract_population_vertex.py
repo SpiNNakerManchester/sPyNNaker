@@ -294,9 +294,10 @@ class AbstractPopulationVertex(
             max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
             if numpy.prod(new_value) > max_atoms:
                 raise SpynnakerException(
-                    "In the current configuration, the maximum number of neurons"
-                    " for each dimension must be such that the total number of"
-                    f" neurons per core is less than or equal to {max_atoms}")
+                    "In the current configuration, the maximum number of"
+                    " neurons for each dimension must be such that the total"
+                    " number of neurons per core is less than or equal to"
+                    f" {max_atoms}")
         super().set_max_atoms_per_dimension_per_core(new_value)
 
     @overrides(SupportsStructure.set_structure)
