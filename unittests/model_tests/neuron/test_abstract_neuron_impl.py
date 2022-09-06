@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+import sys
 from spinn_utilities.classproperty import classproperty
 from spynnaker.pyNN.config_setup import unittest_setup
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
-    DEFAULT_MAX_ATOMS_PER_CORE, AbstractPyNNNeuronModel)
+    AbstractPyNNNeuronModel)
 from spynnaker.pyNN.models.defaults import default_initial_values, defaults
 from spynnaker.pyNN.exceptions import SpynnakerException
 
@@ -76,7 +77,7 @@ def test_reset_max_atoms_per_core():
     _MyPyNNModelImpl.set_model_max_atoms_per_dimension_per_core(100)
     _MyPyNNModelImpl.set_model_max_atoms_per_dimension_per_core()
     assert (_MyNeuronModelImpl.get_model_max_atoms_per_dimension_per_core() ==
-            DEFAULT_MAX_ATOMS_PER_CORE)
+            sys.maxsize)
     assert (_MyPyNNModelImpl.get_model_max_atoms_per_dimension_per_core() ==
             1000)
 

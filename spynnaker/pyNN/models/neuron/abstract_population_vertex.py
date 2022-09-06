@@ -53,7 +53,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
     HasSynapses, SupportsStructure)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
 from spynnaker.pyNN.utilities.constants import (
@@ -257,6 +257,47 @@ class AbstractPopulationVertex(
         self.__synapse_dynamics = None
 
         self.__structure = None
+
+    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_core)
+    def get_max_atoms_per_core(self):
+        max_atoms = super().get_max_atoms_per_core()
+
+        if self.__synapse_dynamics is None:
+            return max_atoms
+
+        # Dynamically adjust depending on the needs of the synapse dynamics
+        return min(
+            max_atoms, self.__synapse_dynamics.absolute_max_atoms_per_core)
+
+    @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_dimension_per_core)
+    def get_max_atoms_per_dimension_per_core(self):
+        max_atoms = self.get_max_atoms_per_core()
+
+        # If single dimensional, we can use the max atoms calculation
+        if len(self.atoms_shape) == 1:
+            return (max_atoms, )
+
+        # If not, the user has to be more specific if the total number of
+        # atoms is not small enough to fit on one core
+        max_per_dim = super().get_max_atoms_per_dimension_per_core()
+        if numpy.prod(max_per_dim) > max_atoms:
+            raise SpynnakerException(
+                "When using a multi-dimensional vertex, a maximum number of"
+                " neurons for each dimension must be provided such that the"
+                " total number of neurons per core is less than or equal to"
+                f" {max_atoms}")
+        return max_per_dim
+
+    @overrides(TDMAAwareApplicationVertex.set_max_atoms_per_dimension_per_core)
+    def set_max_atoms_per_dimension_per_core(self, new_value):
+        if self.__synapse_dynamics is not None:
+            max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
+            if numpy.prod(new_value) > max_atoms:
+                raise SpynnakerException(
+                    "In the current configuration, the maximum number of neurons"
+                    " for each dimension must be such that the total number of"
+                    f" neurons per core is less than or equal to {max_atoms}")
+        super().set_max_atoms_per_dimension_per_core(new_value)
 
     @overrides(SupportsStructure.set_structure)
     def set_structure(self, structure):

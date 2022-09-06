@@ -15,6 +15,7 @@
 
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 
 class AbstractSynapseDynamics(object, metaclass=AbstractBase):
@@ -147,3 +148,11 @@ class AbstractSynapseDynamics(object, metaclass=AbstractBase):
         # By default, just ask the connector
         return s_info.connector.get_connected_vertices(
             s_info, source_vertex, target_vertex)
+
+    @property
+    def absolute_max_atoms_per_core(self):
+        """ The absolute maximum number of atoms per core supported by this
+            synapse dynamics object
+        """
+        # By default, we can only support the maximum row length per core
+        return POP_TABLE_MAX_ROW_LENGTH

@@ -45,10 +45,6 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def _model(self):
         return self.__model
 
-    @classproperty
-    def absolute_max_atoms_per_core(cls):  # pylint: disable=no-self-argument
-        return DEFAULT_MAX_ATOMS_PER_CORE
-
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(

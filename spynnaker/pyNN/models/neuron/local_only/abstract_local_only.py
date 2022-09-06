@@ -43,3 +43,9 @@ class AbstractLocalOnly(AbstractSynapseDynamics):
         :param MachineVertex machine_vertex: The machine vertex being targeted
         :param list(float) weight_scales: Scale factors to apply to the weights
         """
+
+    @property
+    def absolute_max_atoms_per_core(self):
+        # A bit of an estimate for these local-only systems, which don't use
+        # the master population table and so don't have the same limit
+        return 2048
