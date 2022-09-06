@@ -114,4 +114,4 @@ class SpynnakerDataWriter(FecDataWriter, SpynnakerDataView):
         FecDataWriter.shut_down(self)
         # Clears all previously added ceiling on the number of neurons per core
         for neuron_type in self.__spy_data._neurons_per_core_set:
-            neuron_type.set_model_max_atoms_per_core()
+            neuron_type.set_model_max_atoms_per_dimension_per_core()

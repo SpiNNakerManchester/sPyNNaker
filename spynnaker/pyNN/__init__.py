@@ -497,27 +497,37 @@ def list_standard_models():
 
 
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
-    """ Sets a ceiling on the number of neurons of a given type that can be\
+    """ Sets a ceiling on the number of neurons of a given model that can be\
         placed on a single core.
+        This can be overridden by the individual Population.
+        The new value can be None, meaning that the maximum is the same as
+        the number of atoms, an int, meaning all Populations of this model
+        must have one dimension, or a tuple of n integers, meaning all
+        Populations of this model must have n dimensions.
+        If not all Populations of this model have the same number of
+        dimensions, it is recommended to set this to None here and then
+        set the maximum on each Population.
 
     :param type(AbstractPopulationVertex) neuron_type: neuron type
     :param int max_permitted: the number to set to
     """
     if isinstance(neuron_type, str):
-        msg = "set_number_of_neurons_per_core call now expects " \
-              "neuron_type as a class instead of as a str"
-        raise ConfigurationException(msg)
+        raise ConfigurationException(
+            "set_number_of_neurons_per_core call now expects "
+            "neuron_type as a class instead of as a str")
     max_neurons = max_permitted
     if is_singleton(max_permitted):
+        max_neurons = (max_permitted, )
+    for m in max_neurons:
         # Make sure an integer value is passed in here and warn if different
-        max_neurons = int(max_permitted)
-        if (max_neurons - max_permitted) != 0:
+        m_int = int(m)
+        if (m_int - m) != 0:
             logger.warning(
-                "The number of neurons per core requested {} is not an "
-                "integer; the value has been set to {}",
-                max_permitted, max_neurons)
+                f"The number of neurons per core requested {m} is not an "
+                f"integer; the value has been set to {m_int}")
 
-    SpynnakerDataView.add_number_of_neurons_per_core(neuron_type, max_neurons)
+    SpynnakerDataView.set_number_of_neurons_per_dimension_per_core(
+        neuron_type, max_neurons)
 
 
 # These methods will defer to PyNN methods if a simulator exists

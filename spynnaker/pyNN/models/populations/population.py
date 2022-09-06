@@ -1020,21 +1020,22 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(self, max_atoms_per_core):
-        """ Supports the setting of this population's max atoms per core
+        """ Supports the setting of this population's max atoms per
+            dimension per core
 
         :param int max_atoms_per_core:
-            the new value for the max atoms per core.
+            the new value for the max atoms per dimension per core.
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
-        cap = self.celltype.get_max_atoms_per_core()
-        if max_atoms_per_core > cap:
+        cap = self.celltype.absolute_max_atoms_per_core
+        if numpy.prod(max_atoms_per_core) > cap:
             raise SpynnakerException(
                 f"Set the max_atoms_per_core to {max_atoms_per_core} blocked "
                 f"as the current limit for the model is {cap}")
-        self.__vertex.set_max_atoms_per_core(max_atoms_per_core)
+        self.__vertex.set_max_atoms_per_dimension_per_core(max_atoms_per_core)
         # state that something has changed in the population
         self.__change_requires_mapping = True
 

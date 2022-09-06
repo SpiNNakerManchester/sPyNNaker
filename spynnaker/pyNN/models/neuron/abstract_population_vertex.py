@@ -1078,9 +1078,7 @@ class AbstractPopulationVertex(
 
         vertex = app_edge.pre_vertex
         max_atoms = vertex.get_max_atoms_per_core()
-        if isinstance(max_atoms, int):
-            max_atoms = (max_atoms,)
-        n_sub_atoms = int(min(_prod(max_atoms), vertex.n_atoms))
+        n_sub_atoms = int(min(max_atoms, vertex.n_atoms))
         n_sub_edges = int(math.ceil(vertex.n_atoms / n_sub_atoms))
 
         if max_row_info.undelayed_max_n_synapses > 0:

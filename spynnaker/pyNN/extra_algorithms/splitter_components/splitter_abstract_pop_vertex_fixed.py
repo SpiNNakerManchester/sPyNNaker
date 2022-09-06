@@ -378,6 +378,4 @@ class SplitterAbstractPopulationVertexFixed(
         """
         if self.__slices is not None:
             return
-        n_atoms = self._governed_app_vertex.atoms_shape
-        self.__slices = get_multidimensional_slices(
-            n_atoms, self._governed_app_vertex.get_max_atoms_per_core())
+        self.__slices = get_multidimensional_slices(self._governed_app_vertex)

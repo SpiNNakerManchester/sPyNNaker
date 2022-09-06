@@ -21,10 +21,12 @@ from pacman.exceptions import PacmanConfigurationException
 from pacman.model.resources import MultiRegionSDRAM
 from pacman.model.partitioner_splitters.abstract_splitters import (
     AbstractSplitterCommon)
-from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine import (
     MachineEdge, SourceSegmentedSDRAMMachinePartition, SDRAMMachineEdge,
     MulticastEdgePartition)
+from pacman.utilities.utility_calls import get_n_bits_for_fields
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import get_multidimensional_slices
 from spynnaker.pyNN.models.neuron import (
     PopulationNeuronsMachineVertex, PopulationSynapsesMachineVertexLead,
     PopulationSynapsesMachineVertexShared, NeuronProvenance, SynapseProvenance,
@@ -188,23 +190,25 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
                 " of synapse cores is set to 1")
 
         # Do some checks to make sure everything is likely to fit
-        atoms_per_core = min(
-            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
+        n_atom_bits = self.__n_atom_bits()
         n_synapse_types = app_vertex.neuron_impl.get_n_synapse_types()
-        if (get_n_bits(atoms_per_core) + get_n_bits(n_synapse_types) +
+        if (n_atom_bits + get_n_bits(n_synapse_types) +
                 get_n_bits(self.max_support_delay())) > MAX_RING_BUFFER_BITS:
             raise SynapticConfigurationException(
                 "The combination of the number of neurons per core ({}), "
                 "the number of synapse types ({}), and the maximum delay per "
                 "core ({}) will require too much DTCM.  Please reduce one or "
                 "more of these values.".format(
-                    atoms_per_core, n_synapse_types, self.max_support_delay()))
+                    n_atom_bits, n_synapse_types, self.max_support_delay()))
 
         self.__neuron_vertices = list()
         self.__synapse_vertices = list()
         self.__synapse_verts_by_neuron = defaultdict(list)
 
         incoming_direct_poisson = self.__handle_poisson_sources(label)
+
+        atoms_per_core = min(
+            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms)
 
         # Work out the ring buffer shifts based on all incoming things
         rb_shifts = app_vertex.get_ring_buffer_shifts()
@@ -511,10 +515,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         """
         if self.__slices is not None:
             return self.__slices
-        atoms_per_core = self._governed_app_vertex.get_max_atoms_per_core()
-        n_atoms = self._governed_app_vertex.n_atoms
-        self.__slices = [Slice(low, min(low + atoms_per_core - 1, n_atoms - 1))
-                         for low in range(0, n_atoms, atoms_per_core)]
+        self.__slices = get_multidimensional_slices(self._governed_app_vertex)
         return self.__slices
 
     @overrides(AbstractSplitterCommon.get_in_coming_slices)
@@ -795,8 +796,7 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         max_delay_bits = get_n_bits(max_delay_steps)
 
         # Find the maximum possible delay
-        n_atom_bits = get_n_bits(min(
-            app_vertex.get_max_atoms_per_core(), app_vertex.n_atoms))
+        n_atom_bits = self.__n_atom_bits()
         n_synapse_bits = get_n_bits(
             app_vertex.neuron_impl.get_n_synapse_types())
         n_delay_bits = MAX_RING_BUFFER_BITS - (n_atom_bits + n_synapse_bits)
@@ -806,6 +806,14 @@ class SplitterAbstractPopulationVertexNeuronsSynapses(
         self.__max_delay = 2 ** final_n_delay_bits
         if self.__user_allow_delay_extension is None:
             self.__expect_delay_extension = max_delay_bits > final_n_delay_bits
+
+    def __n_atom_bits(self):
+        app_vertex = self._governed_app_vertex
+        field_sizes = [
+            min(max_atoms, n) for max_atoms, n in zip(
+                app_vertex.get_max_atoms_per_dimension_per_core(),
+                app_vertex.atoms_shape)]
+        return get_n_bits_for_fields(field_sizes)
 
     @overrides(AbstractSpynnakerSplitterDelay.max_support_delay)
     def max_support_delay(self):
