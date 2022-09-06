@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
