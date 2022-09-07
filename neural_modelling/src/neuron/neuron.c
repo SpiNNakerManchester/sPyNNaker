@@ -65,7 +65,7 @@ struct neuron_parameters {
     uint32_t n_neurons_peak;
     uint32_t n_synapse_types;
     uint32_t ring_buffer_shifts[];
-    // Also here is:
+    // Following this struct in memory (as it can't be expressed in C) is:
     // uint32_t neuron_keys[n_neurons_to_simulate];
 };
 
