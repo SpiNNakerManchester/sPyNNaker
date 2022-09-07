@@ -149,7 +149,7 @@ def do_run():
     return (capture_spikes, layer_1_spikes, layer_2_spikes)
 
 
-class SingleSpikeKernelResponse(BaseTestCase):
+class NetworkFakeRetinaInput(BaseTestCase):
 
     def check_run(self):
         (capture_spikes, layer_1_spikes, layer_2_spikes) = do_run()
