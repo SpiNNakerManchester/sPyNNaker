@@ -63,6 +63,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .synapse_io import get_max_row_info
 from .master_pop_table import MasterPopTableAsBinarySearch
 from .generator_data import GeneratorData
@@ -252,18 +253,14 @@ class AbstractPopulationVertex(
         self.__max_row_info = dict()
         self.__self_projection = None
 
-        # Prepare for dealing with STDP - there can only be one (non-static)
-        # synapse dynamics per vertex at present
-        self.__synapse_dynamics = None
+        # Keep track of the synapse dynamics for the vertex overall
+        self.__synapse_dynamics = SynapseDynamicsStatic()
 
         self.__structure = None
 
     @overrides(TDMAAwareApplicationVertex.get_max_atoms_per_core)
     def get_max_atoms_per_core(self):
         max_atoms = super().get_max_atoms_per_core()
-
-        if self.__synapse_dynamics is None:
-            return max_atoms
 
         # Dynamically adjust depending on the needs of the synapse dynamics
         return min(
@@ -300,14 +297,13 @@ class AbstractPopulationVertex(
 
     @overrides(TDMAAwareApplicationVertex.set_max_atoms_per_dimension_per_core)
     def set_max_atoms_per_dimension_per_core(self, new_value):
-        if self.__synapse_dynamics is not None:
-            max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
-            if numpy.prod(new_value) > max_atoms:
-                raise SpynnakerException(
-                    "In the current configuration, the maximum number of"
-                    " neurons for each dimension must be such that the total"
-                    " number of neurons per core is less than or equal to"
-                    f" {max_atoms}")
+        max_atoms = self.__synapse_dynamics.absolute_max_atoms_per_core
+        if numpy.prod(new_value) > max_atoms:
+            raise SpynnakerException(
+                "In the current configuration, the maximum number of"
+                " neurons for each dimension must be such that the total"
+                " number of neurons per core is less than or equal to"
+                f" {max_atoms}")
         super().set_max_atoms_per_dimension_per_core(new_value)
 
     @overrides(SupportsStructure.set_structure)
@@ -332,11 +328,8 @@ class AbstractPopulationVertex(
         :param AbstractSynapseDynamics synapse_dynamics:
             The synapse dynamics to set
         """
-        if self.__synapse_dynamics is None:
-            self.__synapse_dynamics = synapse_dynamics
-        else:
-            self.__synapse_dynamics = self.__synapse_dynamics.merge(
-                synapse_dynamics)
+        self.__synapse_dynamics = self.__synapse_dynamics.merge(
+            synapse_dynamics)
 
     def add_incoming_projection(self, projection):
         """ Add a projection incoming to this vertex
@@ -895,8 +888,7 @@ class AbstractPopulationVertex(
                 vertex.set_reload_required(True)
 
         # If synapses change during the run,
-        if (self.__synapse_dynamics is not None and
-                self.__synapse_dynamics.changes_during_run):
+        if self.__synapse_dynamics.changes_during_run:
             self.__change_requires_data_generation = True
             for vertex in self.machine_vertices:
                 if isinstance(vertex, AbstractRewritesDataSpecification):
@@ -1071,8 +1063,6 @@ class AbstractPopulationVertex(
             The slice of the vertex to get the usage of
         :rtype: int
         """
-        if self.__synapse_dynamics is None:
-            return 0
 
         if isinstance(self.__synapse_dynamics, AbstractLocalOnly):
             return self.__synapse_dynamics.get_parameters_usage_in_bytes(
@@ -1089,8 +1079,6 @@ class AbstractPopulationVertex(
         :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
             The projections to consider in the calculations
         """
-        if self.__synapse_dynamics is None:
-            return 0
 
         if not isinstance(
                 self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -1218,8 +1206,6 @@ class AbstractPopulationVertex(
 
         :rtype: str
         """
-        if self.__synapse_dynamics is None:
-            return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     @property
