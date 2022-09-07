@@ -408,9 +408,11 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
             ssp_params.slow_rate_per_tick_cutoff);
     log_info("fast_rate_per_tick_cutoff = %k\n",
             ssp_params.fast_rate_per_tick_cutoff);
+#if LOG_LEVEL >= LOG_DEBUG
     for (uint32_t i = 0; i < ssp_params.n_spike_sources; i++) {
-        log_info("Key %u: 0x%08x", i, keys[i]);
+        log_debug("Key %u: 0x%08x", i, keys[i]);
     }
+#endif
 
     log_info("read_global_parameters: completed successfully");
     return true;
