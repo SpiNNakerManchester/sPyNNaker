@@ -280,12 +280,22 @@ class AbstractPopulationVertex(
         # If not, the user has to be more specific if the total number of
         # atoms is not small enough to fit on one core
         max_per_dim = super().get_max_atoms_per_dimension_per_core()
-        if numpy.prod(max_per_dim) > max_atoms:
+
+        total_max_atoms = numpy.prod(max_per_dim)
+        if self.n_atoms < total_max_atoms:
+            total_max_atoms = self.n_atoms
+        if total_max_atoms > max_atoms:
             raise SpynnakerException(
-                "When using a multi-dimensional vertex, a maximum number of"
-                " neurons for each dimension must be provided such that the"
-                " total number of neurons per core is less than or equal to"
-                f" {max_atoms}")
+                "When using a multidimensional Population, a maximum number of"
+                " neurons per core for each dimension must be provided such"
+                " that the total number of neurons per core is less than or"
+                f" equal to {max_atoms}")
+        if len(max_per_dim) != len(self.atoms_shape):
+            raise SpynnakerException(
+                "When using a multidimensional Population, a maximum number of"
+                " neurons per core must be provided for each dimension (in"
+                " this case, please set a max neurons per core with"
+                f" {len(self.atoms_shape)} dimensions)")
         return max_per_dim
 
     @overrides(TDMAAwareApplicationVertex.set_max_atoms_per_dimension_per_core)
