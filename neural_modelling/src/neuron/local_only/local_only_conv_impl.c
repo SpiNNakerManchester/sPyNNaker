@@ -130,7 +130,7 @@ bool local_only_impl_initialise(void *address){
                 connectors[i]->kernel.width, connectors[i]->kernel.height);
 
         // Move to the next connector; because it is dynamically sized,
-        // this comes after the last weight in the last connector
+        // this comes after the last weight in the previous connector
         conn = (connector *) &conn->weights[n_weights];
     }
 
@@ -186,8 +186,7 @@ static inline void do_convolution_operation(
                 continue;
             }
 
-            // This the neuron id on this core specifically; the neuron
-            // will know how to send the spike correctly
+            // This the neuron id relative to the neurons on this core
             uint32_t post_index =
                 ((tmp_row - config.post_start.row) * config.post_shape.width)
                     + (tmp_col - config.post_start.col);
