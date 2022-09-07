@@ -29,6 +29,9 @@ from .abstract_local_only import AbstractLocalOnly
 
 Source = namedtuple("Source", ["projection", "vertex_slice", "key", "mask"])
 
+#: Number of shorts in the conv_config struct
+CONV_CONFIG_N_SHORTS = 6
+
 
 class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
     """ A convolution synapse dynamics that can process spikes with only DTCM
@@ -78,7 +81,8 @@ class LocalOnlyConvolution(AbstractLocalOnly, AbstractSupportsSignedWeights):
                 app_edge.pre_vertex.splitter.get_out_going_slices())
             n_bytes += s_info.connector.local_only_n_bytes * n_incoming
 
-        return (6 * BYTES_PER_SHORT) + BYTES_PER_WORD + n_bytes
+        return ((CONV_CONFIG_N_SHORTS * BYTES_PER_SHORT) + BYTES_PER_WORD +
+                n_bytes)
 
     @overrides(AbstractLocalOnly.write_parameters)
     def write_parameters(self, spec, region, machine_vertex, weight_scales):
