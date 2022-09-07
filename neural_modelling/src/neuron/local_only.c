@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implements the "local-only" handling of synapses, that is the
+//!        processing of spikes without the use of transfers from SDRAM
+
 #include "local_only.h"
 #include "local_only/local_only_impl.h"
 #include <debug.h>
@@ -22,38 +26,58 @@
 #include <recording.h>
 #include <spin1_api.h>
 
+//: The configuration of the local only model
 struct local_only_config {
+	//! Log_2 of the number of neurons
     uint32_t log_n_neurons;
+    //! Log_2 of the number of synapse types
     uint32_t log_n_synapse_types;
+    //! Log_2 of the maximum delay supported
     uint32_t log_max_delay;
+    //! The size to reserve for the input buffer of spikes
     uint32_t input_buffer_size;
+    //! Whether to clear the input buffer
     uint32_t clear_input_buffer;
 };
 
+//! A local copy of the configuration
 static struct local_only_config config;
 
+//! The input buffer for spikes received
 static circular_buffer input_buffer;
 
+//! Ring buffers to add weights to on spike processing
 static uint16_t *ring_buffers;
 
+//! Whether the loop of processing is currently running
+//! (if not, it needs to be restarted on the next spike received)
 static volatile bool process_loop_running = false;
 
+//! The number of spikes received in total in the last time step
 static uint32_t n_spikes_received = 0;
 
+//! The maximum number of spikes received in any time step
 static uint32_t max_spikes_received = 0;
 
+//! The number of spikes discarded in total during the run
 static uint32_t n_spikes_dropped = 0;
 
+//! The maximum size of the input buffer during the run
 static uint32_t max_input_buffer_size = 0;
 
+//! The local time step counter
 static uint32_t local_time;
 
+//! The mask to get the synaptic delay from a "synapse"
 uint32_t synapse_delay_mask;
 
+//! The number of bits used by the synapse type and post-neuron index
 uint32_t synapse_type_index_bits;
 
+//! The number of bits used by just the post-neuron index
 uint32_t synapse_index_bits;
 
+//! The region where packets-per-timestep are stored
 uint32_t p_per_ts_region;
 
 
@@ -63,13 +87,14 @@ static struct {
     uint32_t packets_this_time_step;
 } p_per_ts_struct;
 
-
+//! \brief Start the process loop
 static inline void run_next_process_loop(void) {
     if (spin1_trigger_user_event(local_time, 0)) {
         process_loop_running = true;
     }
 }
 
+//! \brief Update the maximum size of the input buffer
 static inline void update_max_input_buffer(void) {
     uint32_t sz = circular_buffer_size(input_buffer);
     if (sz > max_input_buffer_size) {
@@ -77,41 +102,65 @@ static inline void update_max_input_buffer(void) {
     }
 }
 
+//! \brief Multicast packet without payload received callback
+//! \param[in] key The key received
+//! \param[in] unused Should be 0
 void mc_rcv_callback(uint key, UNUSED uint unused) {
     n_spikes_received += 1;
+
+    // If there is space in the buffer, add the packet, update the counters
     if (circular_buffer_add(input_buffer, key)) {
         update_max_input_buffer();
+
+        // Start the loop running if not already
         if (!process_loop_running) {
             run_next_process_loop();
         }
     }
 }
 
+//! \brief Multicast packet with payload received callback
+//! \param[in] key The key received
+//! \param[in] n_spikes The payload; the number of times to repeat the key
 void mc_rcv_payload_callback(uint key, uint n_spikes) {
     n_spikes_received += 1;
+
+    // Check of any one spike can be added to the circular buffer
     bool added = false;
     for (uint32_t i = n_spikes; i > 0; i--) {
         added |= circular_buffer_add(input_buffer, key);
     }
+
+    // If any spikes were added, update the buffer maximum
     if (added) {
         update_max_input_buffer();
+
+        // Start the loop running if not already
         if (!process_loop_running) {
             run_next_process_loop();
         }
     }
 }
 
+//! \brief User callback; performs spike processing loop
 void process_callback(uint time, UNUSED uint unused1) {
     uint32_t spike;
     uint32_t cspr = spin1_int_disable();
+
+    // While there is a spike to process, pull it out of the buffer
     while (process_loop_running && circular_buffer_get_next(input_buffer, &spike)) {
         spin1_mode_restore(cspr);
+
+        // Process the spike using the specific local-only implementation
         local_only_impl_process_spike(time, spike, ring_buffers);
         cspr = spin1_int_disable();
     }
     process_loop_running = false;
     spin1_mode_restore(cspr);
 }
+
+// -----------------------------------------
+// Implementations of interface (see local_only.h file for details)
 
 bool local_only_initialise(void *local_only_addr, void *local_only_params_addr,
         uint32_t n_rec_regions_used, uint16_t **ring_buffers_ptr) {

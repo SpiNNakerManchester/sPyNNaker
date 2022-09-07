@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+//! \file
+//! \brief Defines the "local-only" processing of spikes, that is, the
+//!        processing of spikes without using transfers from SDRAM
 #ifndef __LOCAL_ONLY_H__
 #define __LOCAL_ONLY_H__
 
@@ -21,9 +24,13 @@
 
 //: Provenance data for local-only processing
 struct local_only_provenance {
+	//! The maximum number of spikes received in a time step
     uint32_t max_spikes_received_per_timestep;
+    //! The number of spikes dropped due to running out of time in a time step
     uint32_t n_spikes_dropped;
+    //! The number of spikes dropped due to the queue having no space
     uint32_t n_spikes_lost_from_input;
+    //! The maximum size of the spike input queue at any time
     uint32_t max_input_buffer_size;
 };
 
