@@ -93,7 +93,7 @@ def do_run():
     return (v, spikes)
 
 
-class SingleSpikeKernelResponse(BaseTestCase):
+class TestPoolDense(BaseTestCase):
 
     def check_run(self):
         (v, spikes) = do_run()
