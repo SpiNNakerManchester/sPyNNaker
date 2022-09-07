@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
 import pyNN.spiNNaker as sim
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinnaker_testbase import BaseTestCase
@@ -41,7 +40,7 @@ class Test_Max_Cores(BaseTestCase):
         pop = sim.Population(500, sim.IF_curr_exp)
         vertex = pop._Population__vertex
         # Initially there is no limit because there are no projections
-        self.assertEqual(sys.maxsize, vertex.get_max_atoms_per_core())
+        self.assertEqual(256, vertex.get_max_atoms_per_core())
 
         pop_2 = sim.Population(500, sim.IF_curr_exp)
         sim.Projection(pop_2, pop, sim.OneToOneConnector(),
@@ -67,7 +66,7 @@ class Test_Max_Cores(BaseTestCase):
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 50)
         pop2 = sim.Population(500, sim.IF_curr_exp)
         vertex1 = pop1._Population__vertex
-        self.assertEqual(sys.maxsize, vertex1.get_max_atoms_per_core())
+        self.assertEqual(256, vertex1.get_max_atoms_per_core())
         vertex2 = pop2._Population__vertex
         self.assertEqual(50, vertex2.get_max_atoms_per_core())
         sim.end()
@@ -77,7 +76,7 @@ class Test_Max_Cores(BaseTestCase):
         pop1 = sim.Population(500, sim.IF_curr_exp)
         sim.set_number_of_neurons_per_core(sim.IF_curr_exp, 100)
         vertex1 = pop1._Population__vertex
-        self.assertEqual(sys.maxsize, vertex1.get_max_atoms_per_core())
+        self.assertEqual(256, vertex1.get_max_atoms_per_core())
         pop1.set_max_atoms_per_core(50)
         self.assertEqual(50, vertex1.get_max_atoms_per_core())
         pop1.set_max_atoms_per_core(100)
