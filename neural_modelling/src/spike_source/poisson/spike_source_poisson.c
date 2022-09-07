@@ -787,10 +787,10 @@ static void process_slow_source(
             if (ssp_params.has_key) {
                 // Send package
                 tdma_processing_send_packet(
-                        keys[s_id], count, WITH_PAYLOAD, timer_count);
+                    keys[s_id], count, WITH_PAYLOAD, timer_count);
             } else if (sdram_inputs->address != 0) {
                 input_this_timestep[sdram_inputs->offset + s_id] +=
-                     sdram_inputs->weights[s_id] * count;
+                    sdram_inputs->weights[s_id] * count;
             }
         }
 
