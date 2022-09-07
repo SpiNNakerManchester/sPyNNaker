@@ -228,8 +228,8 @@ class ConvolutionConnector(AbstractConnector):
         if len(pre.atoms_shape) != 2 or len(post.atoms_shape) != 2:
             raise ConfigurationException(
                 "The ConvolutionConnector only works where the Populations"
-                " of a Projection are both 2D.  Please ensure that the"
-                " Populations uses a Grid2D structure.")
+                " of a Projection are both 2D.  Please ensure that both the"
+                " Populations use a Grid2D structure.")
         expected_post_shape = tuple(self.get_post_shape(pre.atoms_shape))
         if expected_post_shape != post.atoms_shape:
             raise ConfigurationException(
