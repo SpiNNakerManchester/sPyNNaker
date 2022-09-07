@@ -28,6 +28,13 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.abstract_models import HasShapeKeyFields
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
+#: The number of 32-bit words in the source_key_info struct
+SOURCE_KEY_INFO_WORDS = 6
+
+#: The number of 16-bit shorts in the connector struct,
+#: ignoring the source_key_info struct and the weights (which are dynamic)
+CONNECTOR_CONFIG_SHORTS = 12
+
 
 class ConvolutionConnector(AbstractConnector):
     """
@@ -327,8 +334,8 @@ class ConvolutionConnector(AbstractConnector):
             n_weights += 1
 
         return (
-            (6 * BYTES_PER_WORD) +
-            (12 * BYTES_PER_SHORT) +
+            (SOURCE_KEY_INFO_WORDS * BYTES_PER_WORD) +
+            (CONNECTOR_CONFIG_SHORTS * BYTES_PER_SHORT) +
             (n_weights * BYTES_PER_SHORT))
 
     def write_local_only_data(
