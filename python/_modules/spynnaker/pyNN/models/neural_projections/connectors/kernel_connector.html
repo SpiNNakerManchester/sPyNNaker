@@ -61,6 +61,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
 <span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">,</span> <span class="n">PARAM_TYPE_KERNEL</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="n">HEIGHT</span><span class="p">,</span> <span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
 <span class="n">N_KERNEL_PARAMS</span> <span class="o">=</span> <span class="mi">8</span>
@@ -75,7 +78,8 @@
             <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">(</span><span class="n">sw</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFFFF</span><span class="p">))</span>
 
 
-<span class="k">class</span> <span class="nc">KernelConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">KernelConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
+                      <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D\</span>
 <span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\</span>
@@ -406,7 +410,7 @@
         <span class="k">return</span> <span class="s2">&quot;KernelConnector(shape_kernel[</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">])&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
 
-<div class="viewcode-block" id="KernelConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="KernelConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -512,6 +516,45 @@
         <span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_params_size_in_bytes</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">gen_connector_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">N_KERNEL_PARAMS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+<div class="viewcode-block" id="KernelConnector.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.KernelConnector.get_connected_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">get_connected_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="n">src_splitter</span> <span class="o">=</span> <span class="n">source_vertex</span><span class="o">.</span><span class="n">splitter</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">t_vert</span><span class="p">,</span>
+             <span class="p">[</span><span class="n">s_vert</span> <span class="k">for</span> <span class="n">s_vert</span> <span class="ow">in</span> <span class="n">src_splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+                 <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connects</span><span class="p">(</span><span class="n">s_vert</span><span class="p">,</span> <span class="n">t_vert</span><span class="p">)])</span>
+            <span class="k">for</span> <span class="n">t_vert</span> <span class="ow">in</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_vertices</span><span class="p">(</span>
+                <span class="n">SPIKE_PARTITION_ID</span><span class="p">)]</span></div>
+
+    <span class="k">def</span> <span class="nf">__connects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
+        <span class="c1"># If the pre- and post-slices are not 2-dimensional slices, we have</span>
+        <span class="c1"># to let them pass</span>
+        <span class="n">pre_slice</span> <span class="o">=</span> <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="n">post_slice</span> <span class="o">=</span> <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span>
+                <span class="n">post_slice</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">pre_slice_x</span> <span class="o">=</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">pre_slice_y</span> <span class="o">=</span> <span class="n">pre_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">post_slice_x</span> <span class="o">=</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">post_slice_y</span> <span class="o">=</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">min_pre_x</span> <span class="o">=</span> <span class="n">post_slice_x</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hlf_k_w</span>
+        <span class="n">max_pre_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_slice_x</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hlf_k_w</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">min_pre_y</span> <span class="o">=</span> <span class="n">post_slice_y</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hlf_k_h</span>
+        <span class="n">max_pre_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_slice_y</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hlf_k_h</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># No part of the pre square overlaps the post-square, don&#39;t connect</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pre_slice_x</span><span class="o">.</span><span class="n">stop</span> <span class="o">&lt;=</span> <span class="n">min_pre_x</span> <span class="ow">or</span>
+                <span class="n">pre_slice_x</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">max_pre_x</span> <span class="ow">or</span>
+                <span class="n">pre_slice_y</span><span class="o">.</span><span class="n">stop</span> <span class="o">&lt;=</span> <span class="n">min_pre_y</span> <span class="ow">or</span>
+                <span class="n">pre_slice_y</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">max_pre_y</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Otherwise, they do</span>
+        <span class="k">return</span> <span class="kc">True</span>
 </pre></div>
 
             <div class="clearer"></div>

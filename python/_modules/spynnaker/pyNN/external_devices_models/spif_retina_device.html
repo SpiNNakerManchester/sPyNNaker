@@ -1,0 +1,462 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.external_devices_models.spif_retina_device &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.spif_retina_device</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.external_devices_models.spif_retina_device</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021-2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">Application2DFPGAVertex</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">FPGAConnection</span>
+<span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
+<span class="kn">from</span> <span class="nn">pacman.utilities.constants</span> <span class="kn">import</span> <span class="n">BITS_IN_KEY</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">MultiCastCommand</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+
+<span class="n">_REPEATS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">_DELAY_BETWEEN_REPEATS</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1">#: Base key to send packets to SpiNNaker FPGA (add register offset)</span>
+<span class="n">_LC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFE00</span>
+
+<span class="c1">#: Base key to send packets to SPIF (add register offset)</span>
+<span class="n">_RC_KEY</span> <span class="o">=</span> <span class="mh">0xFFFFFF00</span>
+
+<span class="c1">#: The number of pipes</span>
+<span class="n">_N_PIPES</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1">#: The number of fields supported for each pipe</span>
+<span class="n">_N_FIELDS</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1">#: The number of filters supported for each pipe</span>
+<span class="n">_N_FILTERS</span> <span class="o">=</span> <span class="mi">8</span>
+
+
+<span class="k">class</span> <span class="nc">_SPIFRegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">REPLY_KEY</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">IR_KEY_BASE</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">IR_MASK_BASE</span> <span class="o">=</span> <span class="mi">32</span>
+    <span class="n">IR_ROUTE_BASE</span> <span class="o">=</span> <span class="mi">48</span>
+    <span class="n">OUT_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">64</span>
+    <span class="n">CONFIG_PKT_CNT</span> <span class="o">=</span> <span class="mi">65</span>
+    <span class="n">DROPPED_PKT_CNT</span> <span class="o">=</span> <span class="mi">66</span>
+    <span class="n">IN_PERIPH_PKT_CNT</span> <span class="o">=</span> <span class="mi">67</span>
+    <span class="n">MP_KEY_BASE</span> <span class="o">=</span> <span class="mi">80</span>
+    <span class="n">MP_FLD_MASK_BASE</span> <span class="o">=</span> <span class="mi">96</span>
+    <span class="n">MP_FLD_SHIFT_BASE</span> <span class="o">=</span> <span class="mi">112</span>
+    <span class="n">MP_FLD_LIMIT_BASE</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">FL_VALUE_BASE</span> <span class="o">=</span> <span class="mi">144</span>
+    <span class="n">FL_MASK_BASE</span> <span class="o">=</span> <span class="mi">176</span>
+
+    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
+            <span class="n">_RC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">index</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
+            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_mapper_key</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">pipe</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_field_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_field_shift</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">shift</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_SHIFT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">shift</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_field_limit</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">limit</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">MP_FLD_LIMIT_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">limit</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FIELDS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_filter_value</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">FL_VALUE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_filter_mask</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">FL_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span>
+        <span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="n">pipe</span> <span class="o">*</span> <span class="n">_N_FILTERS</span><span class="p">)</span> <span class="o">+</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_input_key</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_KEY_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_input_mask</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_MASK_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">set_input_route</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">route</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IR_ROUTE_BASE</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="n">route</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_SpiNNFPGARegister</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">P_KEY</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">P_MASK</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">LC_KEY</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">LC_MASK</span> <span class="o">=</span> <span class="mi">13</span>
+    <span class="n">RC_KEY</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="n">RC_MASK</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">STOP</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">START</span> <span class="o">=</span> <span class="mi">17</span>
+
+    <span class="k">def</span> <span class="nf">cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">MultiCastCommand</span><span class="p">(</span>
+            <span class="n">_LC_KEY</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="n">_REPEATS</span><span class="p">,</span>
+            <span class="n">delay_between_repeats</span><span class="o">=</span><span class="n">_DELAY_BETWEEN_REPEATS</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SPIFRetinaDevice</span><span class="p">(</span>
+        <span class="n">Application2DFPGAVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
+        <span class="n">HasShapeKeyFields</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A retina device connected to SpiNNaker using a SPIF board.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: SPIF outputs to 8 FPGA output links, so we split into (2 x 4), meaning</span>
+    <span class="c1">#: a mask of (1 x 3)</span>
+    <span class="n">Y_MASK</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1">#: See Y_MASK for description</span>
+    <span class="n">X_MASK</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="c1">#: The number of X values per row</span>
+    <span class="n">X_PER_ROW</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="c1">#: The number of devices in existence, to work out the key</span>
+    <span class="n">__n_devices</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__spif_mask&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__index_by_slice&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__base_key&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__pipe&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__input_y_mask&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__input_y_shift&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__input_x_mask&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__input_x_shift&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipe</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">sub_width</span><span class="p">,</span> <span class="n">sub_height</span><span class="p">,</span>
+                 <span class="n">base_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">input_x_shift</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">input_y_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">board_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">chip_coords</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param int pipe: Which pipe on SPIF the retina is connected to</span>
+<span class="sd">        :param int width: The width of the retina in pixels</span>
+<span class="sd">        :param int height: The height of the retina in pixels</span>
+<span class="sd">        :param int sub_width:</span>
+<span class="sd">            The width of rectangles to split the retina into for efficiency of</span>
+<span class="sd">            sending</span>
+<span class="sd">        :param int sub_height:</span>
+<span class="sd">            The height of rectangles to split the retina into for efficiency of</span>
+<span class="sd">            sending</span>
+<span class="sd">        :param base_key:</span>
+<span class="sd">            The key that is common over the whole vertex,</span>
+<span class="sd">            or None to use the pipe number as the key</span>
+<span class="sd">        :type base_key: int or None</span>
+<span class="sd">        :param int input_x_shift:</span>
+<span class="sd">            The shift to get the x coordinate from the input keys sent to SPIF</span>
+<span class="sd">        :param int input_y_shift:</span>
+<span class="sd">            The shift to get the y coordinate from the input keys sent to SPIF</span>
+<span class="sd">        :param board_address:</span>
+<span class="sd">            The IP address of the board to which the FPGA is connected, or None</span>
+<span class="sd">            to use the default board or chip_coords.  Note chip_coords will be</span>
+<span class="sd">            used first if both are specified, with board_address then being</span>
+<span class="sd">            used if the coordinates don&#39;t connect to an FPGA.</span>
+<span class="sd">        :type board_address: str or None</span>
+<span class="sd">        :param chip_coords:</span>
+<span class="sd">            The coordinates of the chip to which the FPGA is connected, or</span>
+<span class="sd">            None to use the default board or board_address.   Note chip_coords</span>
+<span class="sd">            will be used first if board_address is also specified, with</span>
+<span class="sd">            board_address then being used if the coordinates don&#39;t connect to</span>
+<span class="sd">            an FPGA.</span>
+<span class="sd">        :type chip_coords: tuple(int, int) or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Do some checks</span>
+        <span class="k">if</span> <span class="n">sub_width</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_MASK</span> <span class="ow">or</span> <span class="n">sub_height</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y_MASK</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The sub-squares must be &gt;=4 x &gt;= 2&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">sub_width</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="n">sub_height</span><span class="si">}</span><span class="s2"> specified)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pipe</span> <span class="o">&gt;=</span> <span class="n">_N_PIPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Pipe </span><span class="si">{</span><span class="n">pipe</span><span class="si">}</span><span class="s2"> is bigger than maximum allowed </span><span class="si">{</span><span class="n">_N_PIPES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Call the super</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">sub_width</span><span class="p">,</span> <span class="n">sub_height</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_fpgas</span><span class="p">(</span><span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_fpga</span><span class="p">(</span><span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">))</span>
+
+        <span class="c1"># The mask is going to be made up of:</span>
+        <span class="c1"># | K | P | Y_I | Y_0 | Y_F | X_I | X_0 | X_F |</span>
+        <span class="c1"># K = base key</span>
+        <span class="c1"># P = polarity (0 as not cared about)</span>
+        <span class="c1"># Y_I = y index of sub-square</span>
+        <span class="c1"># Y_0 = 0s for values not cared about in Y</span>
+        <span class="c1"># Y_F = FPGA y index</span>
+        <span class="c1"># X_I = x index of sub-square</span>
+        <span class="c1"># X_0 = 0s for values not cared about in X</span>
+        <span class="c1"># X_F = FPGA x index</span>
+        <span class="c1"># Now - go calculate:</span>
+        <span class="n">x_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x_bits</span>
+        <span class="n">y_bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y_bits</span>
+
+        <span class="c1"># Mask to apply to route packets at input</span>
+        <span class="n">n_key_bits</span> <span class="o">=</span> <span class="n">BITS_IN_KEY</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span>
+        <span class="n">key_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_key_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spif_mask</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">key_mask</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y_MASK</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_y_shift</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_MASK</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_x_shift</span><span class="p">))</span>
+
+        <span class="c1"># A dictionary to get vertex index from FPGA and slice</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index_by_slice</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">=</span> <span class="n">pipe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">=</span> <span class="n">base_key</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">=</span> <span class="n">SPIFRetinaDevice</span><span class="o">.</span><span class="n">__n_devices</span>
+        <span class="n">SPIFRetinaDevice</span><span class="o">.</span><span class="n">__n_devices</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Generate the shifts and masks to convert the SPIF Ethernet inputs to</span>
+        <span class="c1"># PYX format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__input_x_mask</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">x_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">input_x_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__input_x_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unsigned</span><span class="p">(</span>
+            <span class="n">input_x_shift</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__input_y_mask</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">y_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">input_y_shift</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__input_y_shift</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unsigned</span><span class="p">(</span>
+            <span class="n">input_y_shift</span> <span class="o">-</span> <span class="n">x_bits</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unsigned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">n</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
+
+    <span class="k">def</span> <span class="nf">__incoming_fpgas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the incoming FPGA connections</span>
+
+<span class="sd">        :rtype: list(FPGAConnection)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># We use every other odd link</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">FPGAConnection</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__outgoing_fpga</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the outgoing FPGA connection</span>
+
+<span class="sd">        :rtype: FGPA_Connection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">FPGAConnection</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">board_address</span><span class="p">,</span> <span class="n">chip_coords</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__fpga_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fpga_link_id</span><span class="p">):</span>
+        <span class="c1"># We use every other odd link, so we can work out the &quot;index&quot; of the</span>
+        <span class="c1"># link in the list as follows, and we can then split the index into</span>
+        <span class="c1"># x and y components</span>
+        <span class="n">fpga_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">fpga_link_id</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">fpga_x_index</span> <span class="o">=</span> <span class="n">fpga_index</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_PER_ROW</span>
+        <span class="n">fpga_y_index</span> <span class="o">=</span> <span class="n">fpga_index</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_PER_ROW</span>
+        <span class="k">return</span> <span class="n">fpga_x_index</span><span class="p">,</span> <span class="n">fpga_y_index</span>
+
+<div class="viewcode-block" id="SPIFRetinaDevice.get_incoming_slice_for_link"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_incoming_slice_for_link">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">Application2DFPGAVertex</span><span class="o">.</span><span class="n">get_incoming_slice_for_link</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_incoming_slice_for_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">vertex_slice</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
+            <span class="n">SPIFRetinaDevice</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_incoming_slice_for_link</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index_by_slice</span><span class="p">[</span><span class="n">link</span><span class="o">.</span><span class="n">fpga_link_id</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="k">return</span> <span class="n">vertex_slice</span></div>
+
+<div class="viewcode-block" id="SPIFRetinaDevice.get_machine_fixed_key_and_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_machine_fixed_key_and_mask">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">Application2DFPGAVertex</span><span class="o">.</span><span class="n">get_machine_fixed_key_and_mask</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_machine_fixed_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="n">fpga_link_id</span> <span class="o">=</span> <span class="n">machine_vertex</span><span class="o">.</span><span class="n">fpga_link_id</span>
+        <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index_by_slice</span><span class="p">[</span><span class="n">fpga_link_id</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">]</span>
+        <span class="n">key_and_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+
+        <span class="n">fpga_x</span><span class="p">,</span> <span class="n">fpga_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fpga_indices</span><span class="p">(</span><span class="n">fpga_link_id</span><span class="p">)</span>
+
+        <span class="c1"># Build the key from the components</span>
+        <span class="n">fpga_key</span> <span class="o">=</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">fpga_y</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_y_shift</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">fpga_x</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_x_shift</span><span class="p">))</span>
+        <span class="n">fpga_mask</span> <span class="o">=</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spif_mask</span>
+        <span class="k">return</span> <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="n">fpga_key</span><span class="p">,</span> <span class="n">fpga_mask</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SPIFRetinaDevice.get_fixed_key_and_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_fixed_key_and_mask">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">Application2DFPGAVertex</span><span class="o">.</span><span class="n">get_fixed_key_and_mask</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_fixed_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="n">n_key_bits</span> <span class="o">=</span> <span class="n">BITS_IN_KEY</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span>
+        <span class="n">key_mask</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_key_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span>
+        <span class="k">return</span> <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span><span class="p">,</span> <span class="n">key_mask</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">start_resume_commands</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">start_resume_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Make sure everything has stopped</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
+
+        <span class="c1"># Clear the counters</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">OUT_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">CONFIG_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">DROPPED_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SPIFRegister</span><span class="o">.</span><span class="n">IN_PERIPH_PKT_CNT</span><span class="o">.</span><span class="n">cmd</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Configure the creation of packets from fields to keys using the</span>
+        <span class="c1"># &quot;standard&quot; input to SPIF (X | P | Y) and convert to (Y | X)</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="n">set_field_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_x_mask</span><span class="p">),</span>
+            <span class="n">set_field_shift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_x_shift</span><span class="p">),</span>
+            <span class="n">set_field_limit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_x_shift</span><span class="p">),</span>
+            <span class="n">set_field_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_y_mask</span><span class="p">),</span>
+            <span class="n">set_field_shift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_y_shift</span><span class="p">),</span>
+            <span class="n">set_field_limit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_y_shift</span><span class="p">),</span>
+            <span class="c1"># These are unused but set them to be sure</span>
+            <span class="n">set_field_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">set_field_shift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">set_field_limit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">set_field_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">set_field_shift</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">set_field_limit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="c1"># Don&#39;t filter</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="n">set_filter_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_N_FILTERS</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+            <span class="n">set_filter_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_N_FILTERS</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="c1"># Configure the output routing key</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">set_mapper_key</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span><span class="p">))</span>
+
+        <span class="c1"># Configure the links to send packets to the 8 FPGAs using the</span>
+        <span class="c1"># lower bits</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_key</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">__spif_key</span><span class="p">(</span><span class="mi">15</span> <span class="o">-</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)))</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_mask</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spif_mask</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">set_input_route</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pipe</span> <span class="o">*</span> <span class="mi">8</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+
+        <span class="c1"># Send the start signal</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">START</span><span class="o">.</span><span class="n">cmd</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">commands</span>
+
+    <span class="k">def</span> <span class="nf">__spif_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fpga_indices</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__base_key</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_shift</span><span class="p">)</span> <span class="o">+</span>
+                <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_x_shift</span><span class="p">)</span> <span class="o">+</span>
+                <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source_y_shift</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">pause_stop_commands</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">pause_stop_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Send the stop signal</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_SpiNNFPGARegister</span><span class="o">.</span><span class="n">STOP</span><span class="o">.</span><span class="n">cmd</span><span class="p">()]</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="o">.</span><span class="n">timed_commands</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">timed_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="SPIFRetinaDevice.get_shape_key_fields"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.SPIFRetinaDevice.get_shape_key_fields">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">HasShapeKeyFields</span><span class="o">.</span><span class="n">get_shape_key_fields</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_shape_key_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_fields</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.external_devices_models.spif_retina_device</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

@@ -56,7 +56,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.data</span> <span class="kn">import</span> <span class="n">FecDataView</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="c1"># pylint: disable=protected-access</span>
@@ -259,27 +259,23 @@
         <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">first_id</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_id_counter</span></div>
 
-<div class="viewcode-block" id="SpynnakerDataView.add_number_of_neurons_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">add_number_of_neurons_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerDataView.set_number_of_neurons_per_dimension_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">set_number_of_neurons_per_dimension_per_core</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets a ceiling on the number of neurons of a given type that can be\</span>
-<span class="sd">        placed on a single core.</span>
+<span class="sd">        placed on a single core for each dimension.</span>
 
 <span class="sd">        :param AbstractPopulationVertex neuron_type: neuron type</span>
-<span class="sd">        :param int max_permitted: the number to set to</span>
+<span class="sd">        :param max_permitted: the number to set to</span>
+<span class="sd">        :type max_permitted: int or tuple or None</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;set_model_max_atoms_per_core&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">neuron_type</span><span class="si">}</span><span class="s2"> is not a Vertex type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="n">AbstractPyNNModel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">neuron_type</span><span class="si">}</span><span class="s2"> is not an AbstractPyNNModel&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="s2">&quot;get_max_atoms_per_core&quot;</span><span class="p">):</span>
-            <span class="n">previous</span> <span class="o">=</span> <span class="n">neuron_type</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">previous</span> <span class="o">&lt;</span> <span class="n">max_permitted</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Attempt to increase number_of_neurons_per_core &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">previous</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">max_permitted</span><span class="si">}</span><span class="s2"> not supported&quot;</span><span class="p">)</span>
-        <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span><span class="n">max_permitted</span><span class="p">)</span>
+        <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_dimension_per_core</span><span class="p">(</span><span class="n">max_permitted</span><span class="p">)</span>
         <span class="bp">cls</span><span class="o">.</span><span class="n">__spy_data</span><span class="o">.</span><span class="n">_neurons_per_core_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpynnakerDataView.get_segment_counter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.data.html#spynnaker.pyNN.data.SpynnakerDataView.get_segment_counter">[docs]</a>    <span class="nd">@classmethod</span>

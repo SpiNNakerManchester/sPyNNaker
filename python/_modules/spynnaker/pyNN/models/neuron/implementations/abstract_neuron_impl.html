@@ -170,7 +170,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractNeuronImpl.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.get_data">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the data *to be written to the machine* for this model</span>
 
 <span class="sd">        :param ~spinn_utilities.ranged.RangeDictionary parameters:</span>
@@ -179,6 +179,7 @@
 <span class="sd">            The holder of the state variables</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">            The slice of the vertex to generate parameters for</span>
+<span class="sd">        :param tuple(int) atoms_shape: The shape of the atoms in the vertex</span>
 <span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 

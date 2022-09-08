@@ -776,7 +776,7 @@
 <span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
 <span class="sd">            Where the matrix is on the machine</span>
 <span class="sd">        :return: A list of arrays of connections, each with dtype</span>
-<span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># This might happen if the matrix is never actually generated</span>
@@ -825,7 +825,7 @@
 <span class="sd">        :param int synapses_address:</span>
 <span class="sd">            The base address of the synaptic matrix region</span>
 <span class="sd">        :return: A list of arrays of connections, each with dtype</span>
-<span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pre_slice</span> <span class="o">=</span> <span class="n">Slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>

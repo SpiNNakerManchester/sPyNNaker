@@ -11,6 +11,7 @@ Subpackages
    spynnaker.pyNN.models.neuron.builds
    spynnaker.pyNN.models.neuron.implementations
    spynnaker.pyNN.models.neuron.input_types
+   spynnaker.pyNN.models.neuron.local_only
    spynnaker.pyNN.models.neuron.neuron_models
    spynnaker.pyNN.models.neuron.plasticity
    spynnaker.pyNN.models.neuron.structural_plasticity

@@ -100,6 +100,10 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.local_only.html">spynnaker.pyNN.models.neuron.local_only package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.local_only.html#module-spynnaker.pyNN.models.neuron.local_only">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html">spynnaker.pyNN.models.neuron.neuron_models package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models">Module contents</a></li>
 </ul>
@@ -178,6 +182,11 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.</span></span><span class="sig-name descname"><span class="pre">AbstractPyNNModel</span></span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A Model that can be passed in to a Population object in PyNN</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.absolute_max_atoms_per_core">
+<span class="sig-name descname"><span class="pre">absolute_max_atoms_per_core</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">9223372036854775807</span></em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.absolute_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -224,12 +233,15 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_max_atoms_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum number of atoms per core for this model</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_model_max_atoms_per_dimension_per_core">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_model_max_atoms_per_dimension_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_model_max_atoms_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_model_max_atoms_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum number of atoms per dimension per core for this</dt><dd><p>model</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -260,12 +272,22 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_model_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.set_model_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the maximum number of atoms per core for this model</p>
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_dimension_per_core">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_model_max_atoms_per_dimension_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.set_model_max_atoms_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Set the default maximum number of atoms per dimension per core for</dt><dd><p>this model.  This can be overridden by the individual Population.
+The new value can be None, meaning that the maximum is the same as
+the number of atoms, an int, meaning all Populations of this model
+must have one dimension, or a tuple of n integers, meaning all
+Populations of this model must have n dimensions.
+If not all Populations of this model have the same number of
+dimensions, it is recommended to set this to None here and then
+set the maximum on each Population.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
+<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
 </dd>
 </dl>
 </dd></dl>
@@ -568,7 +590,7 @@ are calculated automatically.</p>
 <dd class="field-even"><p>The Neo block</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.11)"><em>Block</em></a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -112,7 +112,7 @@ $(function() {
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> <a class="codeRef" href="http://spinnakermanchester.github.io/spinn_common/pair_8h.html#a4a228f49a30f09ef05548b421868a382">pair</a>;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">struct </span>{</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#a445182712b36c41ebb26ca639423c0cc">payload_t</a> payload;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#a07a71b4e2eedce7fe0dcc3077107f7ac">key_t</a> <a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#a07a71b4e2eedce7fe0dcc3077107f7ac">key_t</a> <a class="code" href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    };</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
@@ -150,6 +150,7 @@ $(function() {
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __NEURON_TYPEDEFS_H__ */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="acommon-typedefs_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html">common-typedefs.h</a></div></div>
+<div class="ttc" id="adelay__extension_8c_html_a6d4ec8e4f3148d51041635da9986c3fa"><div class="ttname"><a href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a></div><div class="ttdeci">static uint32_t key</div><div class="ttdoc">Base multicast key for sending messages.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00082">delay_extension.c:82</a></div></div>
 <div class="ttc" id="amaths-util_8h_html"><div class="ttname"><a href="maths-util_8h.html">maths-util.h</a></div><div class="ttdoc">maths-util.h - first created 7/10/2013 version 0.1</div></div>
 <div class="ttc" id="amaths-util_8h_html_a67277c5a9b43a598ef8c22aea7dbe1b6"><div class="ttname"><a href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></div><div class="ttdeci">accum REAL</div><div class="ttdoc">Type used for &quot;real&quot; numbers.</div><div class="ttdef"><b>Definition:</b> <a href="maths-util_8h_source.html#l00090">maths-util.h:90</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_a07a71b4e2eedce7fe0dcc3077107f7ac"><div class="ttname"><a href="neuron-typedefs_8h.html#a07a71b4e2eedce7fe0dcc3077107f7ac">key_t</a></div><div class="ttdeci">uint32_t key_t</div><div class="ttdoc">The type of a SpiNNaker multicast message key word.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00040">neuron-typedefs.h:40</a></div></div>
@@ -160,12 +161,11 @@ $(function() {
 <div class="ttc" id="aneuron-typedefs_8h_html_ab5816efea940631eca6d71dd4ca99c17"><div class="ttname"><a href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a></div><div class="ttdeci">REAL state_t</div><div class="ttdoc">The type of a state variable.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00125">neuron-typedefs.h:125</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_ac412098e688b864e8f4e2f3c0ed86591"><div class="ttname"><a href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></div><div class="ttdeci">REAL input_t</div><div class="ttdoc">The type of an input.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00122">neuron-typedefs.h:122</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_adca4ceace8e60559a8953bc89a616d70"><div class="ttname"><a href="neuron-typedefs_8h.html#adca4ceace8e60559a8953bc89a616d70">spike_key</a></div><div class="ttdeci">static key_t spike_key(spike_t s)</div><div class="ttdoc">helper method to retrieve the key from a spike</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00084">neuron-typedefs.h:84</a></div></div>
-<div class="ttc" id="aneuron_8c_html_ac8861193246fc34d8f29ac9d57b6791a"><div class="ttname"><a href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a></div><div class="ttdeci">key_t key</div><div class="ttdoc">The key to be used for this core (will be ORed with neuron ID)</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00031">neuron.c:31</a></div></div>
 <div class="ttc" id="apair_8h_html_a4a228f49a30f09ef05548b421868a382"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/pair_8h.html#a4a228f49a30f09ef05548b421868a382">pair</a></div><div class="ttdeci">#define pair(x, y)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:28 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

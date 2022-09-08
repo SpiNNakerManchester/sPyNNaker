@@ -58,6 +58,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">pacman.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_field_based_index</span>
 <span class="kn">from</span> <span class="nn">spinnman.messages.eieio.data_messages</span> <span class="kn">import</span> <span class="n">EIEIODataHeader</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">recording_utils</span>
@@ -141,8 +142,8 @@
                 <span class="k">if</span> <span class="n">data_missing</span><span class="p">:</span>
                     <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_process_spike_data</span><span class="p">(</span>
-                    <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">raw_spike_data</span><span class="p">,</span> <span class="n">base_key_function</span><span class="p">(</span><span class="n">vertex</span><span class="p">),</span>
-                    <span class="n">results</span><span class="p">)</span>
+                    <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">,</span>
+                    <span class="n">raw_spike_data</span><span class="p">,</span> <span class="n">base_key_function</span><span class="p">(</span><span class="n">vertex</span><span class="p">),</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
             <span class="n">missing_str</span> <span class="o">=</span> <span class="n">recording_utils</span><span class="o">.</span><span class="n">make_missing_string</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span>
@@ -155,7 +156,8 @@
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">result</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">result</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))]</span></div>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_process_spike_data</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="n">spike_data</span><span class="p">,</span> <span class="n">base_key</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_process_spike_data</span><span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">spike_data</span><span class="p">,</span> <span class="n">base_key</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
 <span class="sd">        :param bytearray spike_data:</span>
@@ -164,6 +166,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">number_of_bytes_written</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_data</span><span class="p">)</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">get_field_based_index</span><span class="p">(</span><span class="n">base_key</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
+        <span class="n">slice_ids</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">get_raster_ids</span><span class="p">(</span><span class="n">atoms_shape</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="n">number_of_bytes_written</span><span class="p">:</span>
             <span class="n">length</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="n">spike_data</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">time</span> <span class="o">*=</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()</span>
@@ -180,8 +184,8 @@
             <span class="n">keys</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
                 <span class="n">spike_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key_bytes</span><span class="p">),</span>
                 <span class="n">count</span><span class="o">=</span><span class="n">eieio_header</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">data_offset</span><span class="p">)</span>
-
-            <span class="n">neuron_ids</span> <span class="o">=</span> <span class="p">(</span><span class="n">keys</span> <span class="o">-</span> <span class="n">base_key</span><span class="p">)</span> <span class="o">+</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="n">local_ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">indices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">])</span>
+            <span class="n">neuron_ids</span> <span class="o">=</span> <span class="n">slice_ids</span><span class="p">[</span><span class="n">local_ids</span><span class="p">]</span>
             <span class="n">offset</span> <span class="o">+=</span> <span class="n">length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">neuron_ids</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">))[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>

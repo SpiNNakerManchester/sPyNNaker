@@ -56,9 +56,11 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">SmallWorldConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SmallWorldConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A connector that uses connection statistics based on the Small World\</span>
 <span class="sd">        network connectivity model.</span>
 
@@ -195,7 +197,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SmallWorldConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.SmallWorldConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="SmallWorldConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.SmallWorldConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>

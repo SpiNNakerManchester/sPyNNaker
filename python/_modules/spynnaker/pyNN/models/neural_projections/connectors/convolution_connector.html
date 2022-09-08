@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.neural_projections.connectors.convolution_connector &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../../" id="documentation_options" src="../../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../../_static/jquery.js"></script>
+    <script src="../../../../../../_static/underscore.js"></script>
+    <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.convolution_connector</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neural_projections.connectors.convolution_connector</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) The University of Sussex, Garibaldi Pineda Garcia,</span>
+<span class="c1"># James Turner, James Knight and Thomas Nowotny</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">get_n_bits</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">HasShapeKeyFields</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
+
+<span class="c1">#: The number of 32-bit words in the source_key_info struct</span>
+<span class="n">SOURCE_KEY_INFO_WORDS</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="c1">#: The number of 16-bit shorts in the connector struct,</span>
+<span class="c1">#: ignoring the source_key_info struct and the weights (which are dynamic)</span>
+<span class="n">CONNECTOR_CONFIG_SHORTS</span> <span class="o">=</span> <span class="mi">12</span>
+
+
+<span class="k">class</span> <span class="nc">ConvolutionConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Where the pre- and post-synaptic populations are considered as a 2D\</span>
+<span class="sd">    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\</span>
+<span class="sd">    through a (kernel) set of weights and/or delays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__kernel_weights&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__strides&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__padding_shape&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__pool_shape&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__pool_stride&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__positive_receptor_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__negative_receptor_type&quot;</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernel_weights</span><span class="p">,</span> <span class="n">kernel_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">padding</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pool_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pool_stride</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">positive_receptor_type</span><span class="o">=</span><span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
+                 <span class="n">negative_receptor_type</span><span class="o">=</span><span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param kernel_weights:</span>
+<span class="sd">            The synaptic strengths, shared by neurons in the post population.</span>
+<span class="sd">            Can be:</span>
+<span class="sd">            * single value: kernel_shape must be provided;\</span>
+<span class="sd">                            the same value will be used for all weights</span>
+<span class="sd">            * simple list: kernel_shape must be provided; the list must\</span>
+<span class="sd">                           be sized shape width * height</span>
+<span class="sd">            * 2D list: If kernel_shape is provided, it must match</span>
+<span class="sd">            * numpy.ndarray: As above for simple or 2D list</span>
+<span class="sd">            * RandomDistribution: kernel_shape must be provided; weights\</span>
+<span class="sd">                                  will be drawn from the distribution</span>
+<span class="sd">        :type kernel_weights:</span>
+<span class="sd">            int or list or 2D-list or numpy.ndarray or RandomDistribution</span>
+<span class="sd">        :param kernel_shape:</span>
+<span class="sd">            The shape of the kernel if it cannot be determined from</span>
+<span class="sd">            kernel_weights. If a single value is provided, a square kernel will</span>
+<span class="sd">            be assumed.  If two values are provided, it will be assumed to be</span>
+<span class="sd">            (n_rows, n_columns)</span>
+<span class="sd">        :type kernel_shape: int or tuple(int,int)</span>
+<span class="sd">        :param strides:</span>
+<span class="sd">            Spatial sampling frequency, jumps between the post neurons.</span>
+<span class="sd">            This matches the meaning of standard ML packages.  If a single</span>
+<span class="sd">            value is provided, the same stride will be used for rows and</span>
+<span class="sd">            columns.  If two values are provided it will be assumed to be</span>
+<span class="sd">            (stride_rows, stride_columns)</span>
+<span class="sd">        :type strides: int or tuple(int, int)</span>
+<span class="sd">        :param padding:</span>
+<span class="sd">            How many &#39;extra pixels&#39; around the pre population will be added,</span>
+<span class="sd">            only zero-valued pixels are currently supported.  If a single</span>
+<span class="sd">            value is provided, the same padding will be used for rows and</span>
+<span class="sd">            columns.  If two values are provided it will be assumed to be</span>
+<span class="sd">            (padding_rows, padding_columns).  If True, automatic padding will</span>
+<span class="sd">            be used based on the kernel shape.  If False or None, no padding</span>
+<span class="sd">            will be used.</span>
+<span class="sd">        :type padding: bool or int or tuple(int, int) or None</span>
+<span class="sd">        :param pool_shape:</span>
+<span class="sd">            Area of pooling, only average pooling is supported (and seems to</span>
+<span class="sd">            make sense). If a single value is provided, the pooling area will</span>
+<span class="sd">            be square.  If two values are provided it will be assumed to be</span>
+<span class="sd">            (pooling_rows, pooling_columns).</span>
+<span class="sd">        :type pool_shape: int or tuple(int, int) or None</span>
+<span class="sd">        :param pool_stride:</span>
+<span class="sd">            Jumps between pooling regions. If a single value is provided, the</span>
+<span class="sd">            same stride will be used for rows and columns.  If two values are</span>
+<span class="sd">            provided it will be assumed to be (stride_rows, stride_columns)</span>
+<span class="sd">        :type pool_stride: int or tuple(int, int) or None</span>
+<span class="sd">        :param str positive_receptor_type:</span>
+<span class="sd">            The receptor type to add the positive weights to.  By default this</span>
+<span class="sd">            is &quot;excitatory&quot;.</span>
+<span class="sd">        :param str negative_receptor_type:</span>
+<span class="sd">            The receptor type to add the negative weights to.  By default this</span>
+<span class="sd">            is &quot;inhibitory&quot;.</span>
+<span class="sd">        :param bool safe: (ignored)</span>
+<span class="sd">        :param bool verbose: (ignored)</span>
+<span class="sd">        :param callable callback: (ignored)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConvolutionConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">safe</span><span class="o">=</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__decode_kernel</span><span class="p">(</span><span class="n">kernel_weights</span><span class="p">,</span> <span class="n">kernel_shape</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__decode_padding</span><span class="p">(</span><span class="n">padding</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">strides</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">strides</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__strides</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_2d_shape</span><span class="p">(</span><span class="n">strides</span><span class="p">,</span> <span class="s2">&quot;strides&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_2d_shape</span><span class="p">(</span><span class="n">pool_shape</span><span class="p">,</span> <span class="s2">&quot;pool_shape&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_2d_shape</span><span class="p">(</span><span class="n">pool_stride</span><span class="p">,</span> <span class="s2">&quot;pool_stride&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span> <span class="o">/=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span> <span class="o">=</span> <span class="n">positive_receptor_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span> <span class="o">=</span> <span class="n">negative_receptor_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positive_receptor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">negative_receptor_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">kernel_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span>
+
+    <span class="k">def</span> <span class="nf">__get_kernel_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;kernel_shape must be provided&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">shape</span>
+        <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown kernel_shape: </span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__decode_kernel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_kernel_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">lst</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">w</span><span class="p">):</span>
+                <span class="c1"># 2D list</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">w</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                        <span class="s2">&quot;kernel_weights must be a 2D array with every row the&quot;</span>
+                        <span class="s2">&quot; same length&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 1D list</span>
+                <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_kernel_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">w</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_kernel_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="n">w</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown combination of kernel_weights (</span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s2">) and&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; kernel_shape (</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__to_2d_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">param_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">shape</span><span class="p">,</span> <span class="n">shape</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2"> must be an int or a tuple(int, int)&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__decode_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">padding</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_2d_shape</span><span class="p">(</span><span class="n">padding</span><span class="p">,</span> <span class="s2">&quot;padding&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">padding</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">padding</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">padding</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unrecognized padding </span><span class="si">{</span><span class="n">padding</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_post_shape"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_post_shape">[docs]</a>    <span class="k">def</span> <span class="nf">get_post_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the shape of the post image given the pre-image shape</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">post_pool_shape</span> <span class="o">=</span> <span class="n">shape</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pool_shape</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_pool_shape</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">kernel_shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">post_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape</span> <span class="o">-</span> <span class="p">(</span><span class="n">kernel_shape</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
+                      <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+            <span class="n">post_shape</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">__strides</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.validate_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.validate_connection">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">validate_connection</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="n">application_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="n">application_edge</span><span class="o">.</span><span class="n">post_vertex</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The ConvolutionConnector only works where the Populations&quot;</span>
+                <span class="s2">&quot; of a Projection are both 2D.  Please ensure that both the&quot;</span>
+                <span class="s2">&quot; Populations use a Grid2D structure.&quot;</span><span class="p">)</span>
+        <span class="n">expected_post_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_post_shape</span><span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">expected_post_shape</span> <span class="o">!=</span> <span class="n">post</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;With a source population with shape </span><span class="si">{</span><span class="n">pre</span><span class="o">.</span><span class="n">atoms_shape</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="s2">&quot;for a Convolution connector with the given parameters, &quot;</span>
+                <span class="s2">&quot;the post-population must have a shape &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">expected_post_shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">post</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The post population doesn&#39;t have a synaptic receptor type of&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">post</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;The post population doesn&#39;t have a synaptic receptor type of&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_delay_minimum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_delay_minimum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_minimum</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_delay_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># All delays are 1 timestep</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_delay_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># All delays are 1 timestep</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_post_atoms</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">w</span> <span class="o">*</span> <span class="n">h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_weight_maximum">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ConvolutionConnector.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.get_connected_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_connected_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="n">pre_vertices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="n">source_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">))</span>
+        <span class="n">pre_slices</span> <span class="o">=</span> <span class="p">[</span><span class="n">m_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">pre_vertices</span><span class="p">]</span>
+        <span class="n">pre_slices_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">vtx_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">vtx_slice</span> <span class="ow">in</span> <span class="n">pre_slices</span><span class="p">]</span>
+        <span class="n">pre_slices_y</span> <span class="o">=</span> <span class="p">[</span><span class="n">vtx_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">vtx_slice</span> <span class="ow">in</span> <span class="n">pre_slices</span><span class="p">]</span>
+        <span class="n">pre_ranges</span> <span class="o">=</span> <span class="p">[[[</span><span class="n">px</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">start</span><span class="p">],</span> <span class="p">[</span><span class="n">px</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span>
+                      <span class="k">for</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">pre_slices_x</span><span class="p">,</span> <span class="n">pre_slices_y</span><span class="p">)]</span>
+        <span class="n">pres_as_posts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_as_post</span><span class="p">(</span><span class="n">pre_ranges</span><span class="p">)</span>
+        <span class="n">hlf_k_w</span><span class="p">,</span> <span class="n">hlf_k_h</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+        <span class="n">connected</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">post</span> <span class="ow">in</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_vertices</span><span class="p">(</span>
+                <span class="n">SPIKE_PARTITION_ID</span><span class="p">):</span>
+            <span class="n">post_slice</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">vertex_slice</span>
+            <span class="n">post_slice_x</span> <span class="o">=</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">post_slice_y</span> <span class="o">=</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Get ranges allowed in post</span>
+            <span class="n">min_x</span> <span class="o">=</span> <span class="n">post_slice_x</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">hlf_k_w</span>
+            <span class="n">max_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_slice_x</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="n">hlf_k_w</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">min_y</span> <span class="o">=</span> <span class="n">post_slice_y</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">hlf_k_h</span>
+            <span class="n">max_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">post_slice_y</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="n">hlf_k_h</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+            <span class="c1"># Test that the start coords are in range i.e. less than max</span>
+            <span class="n">start_in_range</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">pres_as_posts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="p">[</span><span class="n">max_x</span><span class="p">,</span> <span class="n">max_y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1"># Test that the end coords are in range i.e. more than min</span>
+            <span class="n">end_in_range</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">pres_as_posts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">[</span><span class="n">min_x</span><span class="p">,</span> <span class="n">min_y</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1"># When both things are true, we have a vertex in range</span>
+            <span class="n">pre_in_range</span> <span class="o">=</span> <span class="n">pre_vertices</span><span class="p">[</span>
+                <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">start_in_range</span><span class="p">,</span> <span class="n">end_in_range</span><span class="p">)]</span>
+            <span class="n">connected</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">post</span><span class="p">,</span> <span class="n">pre_in_range</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">connected</span></div>
+
+    <span class="k">def</span> <span class="nf">__pre_as_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_coords</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write pre coords as post coords.</span>
+
+<span class="sd">        :param Iterable pre_coords: An iterable of (x, y) coordinates</span>
+<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pre_coords</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">//=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span>
+
+        <span class="n">kernel_shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">-</span> <span class="n">kernel_shape</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span>
+        <span class="n">coords</span> <span class="o">//=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__strides</span>
+        <span class="k">return</span> <span class="n">coords</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">local_only_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">size</span>
+        <span class="k">if</span> <span class="n">n_weights</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">n_weights</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">SOURCE_KEY_INFO_WORDS</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">CONNECTOR_CONFIG_SHORTS</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_weights</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ConvolutionConnector.write_local_only_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.ConvolutionConnector.write_local_only_data">[docs]</a>    <span class="k">def</span> <span class="nf">write_local_only_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+        <span class="c1"># Get info about things</span>
+        <span class="n">kernel_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">ps_x</span><span class="p">,</span> <span class="n">ps_y</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ps_x</span><span class="p">,</span> <span class="n">ps_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pool_stride</span>
+
+        <span class="c1"># Write source key info</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+
+        <span class="c1"># Write the column and row mask and shifts to extract the column and</span>
+        <span class="c1"># row from the incoming spike</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">HasShapeKeyFields</span><span class="p">):</span>
+            <span class="p">(</span><span class="n">c_start</span><span class="p">,</span> <span class="n">c_mask</span><span class="p">,</span> <span class="n">c_shift</span><span class="p">),</span> <span class="p">(</span><span class="n">r_start</span><span class="p">,</span> <span class="n">r_mask</span><span class="p">,</span> <span class="n">r_shift</span><span class="p">)</span> <span class="o">=</span> \
+                <span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_shape_key_fields</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">c_start</span><span class="p">,</span> <span class="n">r_start</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">c_mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">c_shift</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_shift</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">start</span>
+            <span class="n">n_bits_col</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">col_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_bits_col</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">n_bits_row</span> <span class="o">=</span> <span class="n">get_n_bits</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">row_mask</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">n_bits_row</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">n_bits_col</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">col_mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">row_mask</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_bits_col</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">)</span>
+
+        <span class="c1"># Write remaining connector details</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">kernel_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">kernel_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__padding_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__strides</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                         <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__strides</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                         <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="n">ps_y</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recip</span><span class="p">(</span><span class="n">ps_x</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT16</span><span class="p">)</span>
+
+        <span class="c1"># Write synapse information</span>
+        <span class="n">pos_synapse_type</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__positive_receptor_type</span><span class="p">)</span>
+        <span class="n">neg_synapse_type</span> <span class="o">=</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__negative_receptor_type</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">pos_synapse_type</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">neg_synapse_type</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
+
+        <span class="c1"># Encode weights with weight scaling</span>
+        <span class="n">encoded_kernel_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__kernel_weights</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoded_kernel_weights</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">encoded_kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">encoded_kernel_weights</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">neg_weights</span> <span class="o">=</span> <span class="n">encoded_kernel_weights</span> <span class="o">&lt;</span> <span class="mi">0</span>
+        <span class="n">pos_weights</span> <span class="o">=</span> <span class="n">encoded_kernel_weights</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">encoded_kernel_weights</span><span class="p">[</span><span class="n">neg_weights</span><span class="p">]</span> <span class="o">*=</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">neg_synapse_type</span><span class="p">]</span>
+        <span class="n">encoded_kernel_weights</span><span class="p">[</span><span class="n">pos_weights</span><span class="p">]</span> <span class="o">*=</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">pos_synapse_type</span><span class="p">]</span>
+        <span class="n">kernel_weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">encoded_kernel_weights</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">kernel_weights</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__recip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Compute the reciprocal of a number as an signed 1-bit integer,</span>
+<span class="sd">            14-bit fractional fixed point number, encoded in an integer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)))</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.neural_projections.connectors.convolution_connector</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

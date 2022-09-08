@@ -60,23 +60,6 @@
 <p>Use this class weherever possible as it inherits all methods from all View
 classes.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_number_of_neurons_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_number_of_neurons_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets a ceiling on the number of neurons of a given type that can be        placed on a single core.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>neuron_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – neuron type</p></li>
-<li><p><strong>max_permitted</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the number to set to</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.add_population">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.add_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.add_population" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called by each population to add itself to the list.</p>
@@ -197,6 +180,23 @@ to raise an exception</p>
 <dl class="field-list simple">
 <dt class="field-odd">Rtpye<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(Projection)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_number_of_neurons_per_dimension_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/data/spynnaker_data_view.html#SpynnakerDataView.set_number_of_neurons_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.data.SpynnakerDataView.set_number_of_neurons_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a ceiling on the number of neurons of a given type that can be        placed on a single core for each dimension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neuron_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – neuron type</p></li>
+<li><p><strong>max_permitted</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em> or </em><em>None</em>) – the number to set to</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
 </dd>
 </dl>
 </dd></dl>

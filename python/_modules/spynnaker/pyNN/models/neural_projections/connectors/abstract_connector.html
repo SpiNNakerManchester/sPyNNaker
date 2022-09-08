@@ -67,6 +67,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="c1"># global objects</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
@@ -591,29 +592,6 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clip_delays</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AbstractConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.create_synaptic_block">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Create a synaptic block from the data.</span>
-
-<span class="sd">        :param weights:</span>
-<span class="sd">        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float</span>
-<span class="sd">            or list(int) or list(float)</span>
-<span class="sd">        :param delays:</span>
-<span class="sd">        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float</span>
-<span class="sd">            or list(int) or list(float)</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) pre_slices:</span>
-<span class="sd">        :param list(~pacman.model.graphs.common.Slice) post_slices:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
-<span class="sd">        :param AbstractSynapseType synapse_type:</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">        :returns:</span>
-<span class="sd">            The synaptic matrix data to go to the machine, as a Numpy array</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
 <div class="viewcode-block" id="AbstractConnector.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param SynapseInformation synapse_info:</span>
@@ -689,26 +667,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Checks if a pre slice and a post slice could connect.</span>
+<div class="viewcode-block" id="AbstractConnector.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.get_connected_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the machine vertices that are connected to each other with</span>
+<span class="sd">            this connector</span>
 
-<span class="sd">        Typically used to determine if a Machine Edge should be created by</span>
-<span class="sd">        checking that at least one of the indexes in the pre slice could</span>
-<span class="sd">        over time connect to at least one of the indexes in the post slice.</span>
-
-<span class="sd">        .. note::</span>
-<span class="sd">            This method should never return a false negative,</span>
-<span class="sd">            but may return a false positives</span>
-
-<span class="sd">        :param SynapseInformation synapse_info:</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex src_machine_vertexx:</span>
-<span class="sd">        :param ~pacman.model.graphs.machine.MachineVertex dest_machine_vertex:</span>
-<span class="sd">        :rtype: bool</span>
+<span class="sd">        :param SynapseInformation s_info:</span>
+<span class="sd">            The synapse information of the connection</span>
+<span class="sd">        :param ApplicationVertex source_vertex: The source of the spikes</span>
+<span class="sd">        :param ApplicationVertex target_vertex: The target of the spikes</span>
+<span class="sd">        :return: A list of tuples of (target machine vertex, source</span>
+<span class="sd">        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Unless we know for sure we must say they could connect</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+        <span class="c1"># By default, just return that the whole target connects to the</span>
+        <span class="c1"># whole source</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">m_vertex</span><span class="p">,</span> <span class="p">[</span><span class="n">source_vertex</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_vertices</span><span class="p">(</span>
+                    <span class="n">SPIKE_PARTITION_ID</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="AbstractConnector.connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Apply this connector to a projection.</span>
@@ -743,6 +717,17 @@
             <span class="k">return</span> <span class="n">temp</span>
         <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
             <span class="s2">&quot;Size of </span><span class="si">{}</span><span class="s2"> must be an int, received </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+
+<div class="viewcode-block" id="AbstractConnector.validate_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.validate_connection">[docs]</a>    <span class="k">def</span> <span class="nf">validate_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Checks that the edge supports the connector.  By default this does</span>
+<span class="sd">            nothing i.e. assumes the edge is OK, but can be overridden if the</span>
+<span class="sd">            connector has rules that need to be checked.  Returns nothing; it</span>
+<span class="sd">            is assumed that an Exception will be raised if anything is wrong.</span>
+
+<span class="sd">        :param ApplicationEdge application_edge: The edge of the connection</span>
+<span class="sd">        :param SynapseInformation synapse_info: The synaptic information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
 </pre></div>
 
             <div class="clearer"></div>

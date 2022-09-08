@@ -3311,6 +3311,195 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>local_only.c</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>local__only_8c.html</filename>
+    <includes id="local__only_8h" name="local_only.h" local="yes" imported="no">local_only.h</includes>
+    <class kind="struct">local_only_config</class>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>run_next_process_loop</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a8831701fff5eb90d0b555d7f31d43042</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>update_max_input_buffer</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>acee9489bdd8e17e846dcb3c74d2da3ed</anchor>
+      <arglist>(void)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>mc_rcv_callback</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>ac2e3ea3a78c3647c61f22207ce5672ab</anchor>
+      <arglist>(uint key, uint unused)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>mc_rcv_payload_callback</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a3949ac26c77264d95a9def6a6f5bcf4b</anchor>
+      <arglist>(uint key, uint n_spikes)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>process_callback</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>ad8723ad85d322f095cad1bfdaaef4553</anchor>
+      <arglist>(uint time, uint unused1)</arglist>
+    </member>
+    <member kind="function">
+      <type>bool</type>
+      <name>local_only_initialise</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>ab5b33e9b7701dae5e7428563d1a0ef3f</anchor>
+      <arglist>(void *local_only_addr, void *local_only_params_addr, uint32_t n_rec_regions_used, uint16_t **ring_buffers_ptr)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>local_only_clear_input</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a3386391863364f7ac04343b0757a094f</anchor>
+      <arglist>(uint32_t time)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>local_only_store_provenance</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>aae2aae4e4f0eda250ae9e657f3ff76f6</anchor>
+      <arglist>(struct local_only_provenance *prov)</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static struct local_only_config</type>
+      <name>config</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>af0b65a4ae84767d39f100caae218e388</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static circular_buffer</type>
+      <name>input_buffer</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>ace70899ad78873f586a55a1cce68769c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint16_t *</type>
+      <name>ring_buffers</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a498672d434f86e3eafe7ba5dfe9723f9</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static volatile bool</type>
+      <name>process_loop_running</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a00274a0a6ae804ced8644de7977d1991</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_spikes_received</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>ab44a4c12259e8ce83d97b8aee67e06d3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>max_spikes_received</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a3e80365227aacafec58fa5b3568b7232</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>n_spikes_dropped</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a23c1f67726948c3a4106832e5143a269</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>max_input_buffer_size</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a570999fa4da7904a54b2ec7aa4163b49</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint32_t</type>
+      <name>local_time</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a8acaea2ca079944abe8a79230097072e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_delay_mask</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a2ef4427415ac67eb603a14ca1bb86f83</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_type_index_bits</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a4cb72a09cb7c84f5c82c07d17bcb0516</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>synapse_index_bits</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a840b87d6e981394dff1224fc0b8cd9c3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>p_per_ts_region</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a940ad8bd79b6fbdb1fbce1341f2edf92</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static struct @8</type>
+      <name>p_per_ts_struct</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>abee386e9b7c91432c51b469b547918cc</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
+    <name>local_only.h</name>
+    <path>/github/workspace/neural_modelling/src/neuron/</path>
+    <filename>local__only_8h.html</filename>
+    <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
+    <class kind="struct">local_only_provenance</class>
+    <member kind="function">
+      <type>bool</type>
+      <name>local_only_initialise</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>aca5b2563f560424809ba0d64c22da063</anchor>
+      <arglist>(void *local_only_addr, void *local_only_params_addr, uint32_t n_rec_regions_used, uint16_t **ring_buffers)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>local_only_clear_input</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>a3386391863364f7ac04343b0757a094f</anchor>
+      <arglist>(uint32_t time)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>local_only_store_provenance</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>aae2aae4e4f0eda250ae9e657f3ff76f6</anchor>
+      <arglist>(struct local_only_provenance *prov)</arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>neuron_model.h</name>
     <path>/github/workspace/neural_modelling/src/neuron/models/</path>
     <filename>neuron__model_8h.html</filename>
@@ -3593,10 +3782,10 @@
       <arglist>(uint32_t synapse_type)</arglist>
     </member>
     <member kind="variable">
-      <type>key_t</type>
-      <name>key</name>
+      <type>uint32_t *</type>
+      <name>neuron_keys</name>
       <anchorfile>neuron_8c.html</anchorfile>
-      <anchor>ac8861193246fc34d8f29ac9d57b6791a</anchor>
+      <anchor>aeca2f0c73d9a6fa91f83208ea4e13ef4</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -3734,16 +3923,16 @@
     <class kind="struct">neuron_recording_header_t</class>
     <member kind="define">
       <type>#define</type>
-      <name>FLOOR_TO_4</name>
+      <name>FLOOR_TO_2</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>ac891e5a719d1f4e09038f831374b18fc</anchor>
+      <anchor>a403b173ad583ec922758a7edc380fa3c</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>CEIL_TO_4</name>
+      <name>CEIL_TO_2</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a116ca5cd8794f7ac7266ed798720a3d6</anchor>
+      <anchor>aa2d4795fc5236852254c8bebccde5764</anchor>
       <arglist></arglist>
     </member>
     <member kind="function" static="yes">
@@ -3796,17 +3985,17 @@
       <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="variable">
-      <type>uint8_t **</type>
+      <type>uint16_t **</type>
       <name>neuron_recording_indexes</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a7cc034f7ab8027e4b9ce66791b2365ff</anchor>
+      <anchor>a7d71204655340d9946d301dd396b3cfe</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint8_t **</type>
+      <type>uint16_t **</type>
       <name>bitfield_recording_indexes</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a2edd162fb9940477e5363386ba417f9e</anchor>
+      <anchor>a8e8050b4ec719ade7df406f544d1eb30</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -3932,17 +4121,17 @@
       <arglist>(void *recording_address, uint32_t n_neurons, uint32_t *n_rec_regions_used)</arglist>
     </member>
     <member kind="variable">
-      <type>uint8_t **</type>
+      <type>uint16_t **</type>
       <name>neuron_recording_indexes</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a7cc034f7ab8027e4b9ce66791b2365ff</anchor>
+      <anchor>a7d71204655340d9946d301dd396b3cfe</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint8_t **</type>
+      <type>uint16_t **</type>
       <name>bitfield_recording_indexes</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a2edd162fb9940477e5363386ba417f9e</anchor>
+      <anchor>a8e8050b4ec719ade7df406f544d1eb30</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -4280,8 +4469,8 @@
     <class kind="struct">nm_final_state_t</class>
     <class kind="struct">synapse_row_plastic_data_t</class>
     <class kind="struct">nm_params_t</class>
-    <class kind="union">synapse_row_plastic_data_t.__unnamed9__</class>
-    <class kind="struct">synapse_row_plastic_data_t.__unnamed9__.__unnamed11__</class>
+    <class kind="union">synapse_row_plastic_data_t.__unnamed10__</class>
+    <class kind="struct">synapse_row_plastic_data_t.__unnamed10__.__unnamed12__</class>
     <member kind="function" static="yes">
       <type>static nm_final_state_t</type>
       <name>izhikevich_neuromodulation_plasticity_update_synapse</name>
@@ -6721,10 +6910,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static struct @12</type>
+      <type>static struct @13</type>
       <name>p_per_ts_struct</name>
       <anchorfile>spike__processing_8c.html</anchorfile>
-      <anchor>abefe87510a3f795bba6841523bc4718f</anchor>
+      <anchor>ae80be56b85b664a136cb072f52835c12</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -7148,13 +7337,13 @@
     <member kind="enumvalue">
       <name>ELIM_FLAG</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>a16af7b253440dadd46a80a4b9fddba4dae6ee7be3fbd9056d0d38e36762f50da7</anchor>
+      <anchor>aba01db17f4a2bfbc3db60dc172972a25ae6ee7be3fbd9056d0d38e36762f50da7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FORM_FLAG</name>
       <anchorfile>topographic__map__impl_8c.html</anchorfile>
-      <anchor>a16af7b253440dadd46a80a4b9fddba4da77fb1f2705b16e5d115198616780afb6</anchor>
+      <anchor>aba01db17f4a2bfbc3db60dc172972a25a77fb1f2705b16e5d115198616780afb6</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9174,6 +9363,13 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
+      <type>static uint32_t *</type>
+      <name>keys</name>
+      <anchorfile>spike__source__poisson_8c.html</anchorfile>
+      <anchor>a803a94ccf2c3fa0146b8c2316fdb850a</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
       <type>static source_info **</type>
       <name>source_data</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
@@ -9348,49 +9544,49 @@
     <member kind="enumvalue">
       <name>ONE_TO_ONE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25adaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fceadaccc17f840cc67d0e9c1a9a331b2fb4</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>ALL_TO_ALL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25a403e4025d2925f132293a50eae7381fe</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fcea403e4025d2925f132293a50eae7381fe</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PROBABILITY</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25a8f6a6db47b5476cf11f24317f14ee4a7</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fcea8f6a6db47b5476cf11f24317f14ee4a7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_TOTAL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25a8338dcf5840ce1a01a4c26d9c49dc560</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fcea8338dcf5840ce1a01a4c26d9c49dc560</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_PRE</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25aa667dfec30c43a0320c7bd76b99bd4c7</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fceaa667dfec30c43a0320c7bd76b99bd4c7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>FIXED_POST</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25aa130e7b038fc0ede3b0203931063b116</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fceaa130e7b038fc0ede3b0203931063b116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25a53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fcea53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_CONNECTION_GENERATORS</name>
       <anchorfile>connection__generator_8c.html</anchorfile>
-      <anchor>aba01db17f4a2bfbc3db60dc172972a25ab1144285d7382feeb4687af0263e2467</anchor>
+      <anchor>aaf105ae5beaca1dee30ae54530691fceab1144285d7382feeb4687af0263e2467</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -9782,25 +9978,25 @@
     <member kind="enumvalue">
       <name>STATIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>aaf105ae5beaca1dee30ae54530691fceaf14f18f5ed2665f8cb095c1363fc9848</anchor>
+      <anchor>a80155586fa275b28773c9b203f52cabaaf14f18f5ed2665f8cb095c1363fc9848</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>PLASTIC_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>aaf105ae5beaca1dee30ae54530691fcea08b27fbab7a770bae071d9defb278782</anchor>
+      <anchor>a80155586fa275b28773c9b203f52cabaa08b27fbab7a770bae071d9defb278782</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NEUROMODULATION_MATRIX_GENERATOR</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>aaf105ae5beaca1dee30ae54530691fcea6b120ed291bedd7072f69611ed7f1732</anchor>
+      <anchor>a80155586fa275b28773c9b203f52cabaa6b120ed291bedd7072f69611ed7f1732</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_MATRIX_GENERATORS</name>
       <anchorfile>matrix__generator_8c.html</anchorfile>
-      <anchor>aaf105ae5beaca1dee30ae54530691fceaba9a03e4fd023b2837469ea1ff6225a3</anchor>
+      <anchor>a80155586fa275b28773c9b203f52cabaaba9a03e4fd023b2837469ea1ff6225a3</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -10027,49 +10223,49 @@
     <member kind="enumvalue">
       <name>CONSTANT</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaa83972670b57415508523b5641bb46116</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaa83972670b57415508523b5641bb46116</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>UNIFORM</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaa8f44784d154005a214e0fe94119d28ef</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaa8f44784d154005a214e0fe94119d28ef</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaa50d1448013c6f17125caee18aa418af7</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaa50d1448013c6f17125caee18aa418af7</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaac40cefd2a096660da3f41d6ee6352889</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaac40cefd2a096660da3f41d6ee6352889</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>NORMAL_CLIPPED_BOUNDARY</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaaca06c44d4221f47f9d61534ca1e35752</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaaca06c44d4221f47f9d61534ca1e35752</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>EXPONENTIAL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaaa6055a3a8ab1aed0594419b51d9ec15e</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaaa6055a3a8ab1aed0594419b51d9ec15e</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>KERNEL</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaa53c6e691e7db9eceefc0fb37cb724cd2</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaa53c6e691e7db9eceefc0fb37cb724cd2</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
       <name>N_PARAM_GENERATORS</name>
       <anchorfile>param__generator_8c.html</anchorfile>
-      <anchor>a80155586fa275b28773c9b203f52cabaab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
+      <anchor>a6b7b47dd702d9e331586d485013fd1eaab8047ff7dfdb2c76ef1e78a7e6347777</anchor>
       <arglist></arglist>
     </member>
     <member kind="function">
@@ -10681,19 +10877,18 @@
   </compound>
   <compound kind="struct">
     <name>combined_provenance</name>
-    <filename>c__main_8c.html</filename>
-    <anchor>structcombined__provenance</anchor>
+    <filename>structcombined__provenance.html</filename>
     <member kind="variable">
       <type>uint32_t</type>
       <name>max_backgrounds_queued</name>
-      <anchorfile>c__main_8c.html</anchorfile>
+      <anchorfile>structcombined__provenance.html</anchorfile>
       <anchor>a9381d8e99b4a3369d547b4acd10c3b3d</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>n_background_queue_overloads</name>
-      <anchorfile>c__main_8c.html</anchorfile>
+      <anchorfile>structcombined__provenance.html</anchorfile>
       <anchor>ad8a8981effe382266cc0a6387e818005</anchor>
       <arglist></arglist>
     </member>
@@ -10797,6 +10992,14 @@
     <name>connection_generator</name>
     <filename>connection__generator_8c.html</filename>
     <anchor>structconnection__generator</anchor>
+  </compound>
+  <compound kind="struct">
+    <name>connector</name>
+    <filename>structconnector.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>conv_config</name>
+    <filename>structconv__config.html</filename>
   </compound>
   <compound kind="struct">
     <name>cs_id_index_t</name>
@@ -11047,6 +11250,10 @@
       <anchor>a338e5d451991384eced053db6a2b7942</anchor>
       <arglist></arglist>
     </member>
+  </compound>
+  <compound kind="struct">
+    <name>dimension</name>
+    <filename>structdimension.html</filename>
   </compound>
   <compound kind="struct">
     <name>direct_matrix_data_t</name>
@@ -11407,13 +11614,6 @@
     </member>
     <member kind="variable">
       <type>uint32_t</type>
-      <name>key</name>
-      <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>aa6b9e979acf123b1713136e5931c3b78</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
       <name>set_rate_neuron_id_mask</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
       <anchor>ab4adadbc1d477b4c51e123cf3a454d26</anchor>
@@ -11659,6 +11859,87 @@
       <name>self_connected</name>
       <anchorfile>spike__processing__fast_8h.html</anchorfile>
       <anchor>a62e84dad881a32b0dc9621b7404d8405</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>lc_coord_t</name>
+    <filename>structlc__coord__t.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>lc_shape_t</name>
+    <filename>structlc__shape__t.html</filename>
+  </compound>
+  <compound kind="struct">
+    <name>local_only_config</name>
+    <filename>local__only_8c.html</filename>
+    <anchor>structlocal__only__config</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>log_n_neurons</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>acd8bf03864a1753052ee74726b4854d0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>log_n_synapse_types</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a25b1870522b9ec44a3a3193ad54697ba</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>log_max_delay</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a19c890902fe8ff50831447e457d24047</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>input_buffer_size</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a7e00c9c42dc3e89601f803347a85b8e5</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>clear_input_buffer</name>
+      <anchorfile>local__only_8c.html</anchorfile>
+      <anchor>a2b3b85de200ef85472a80d9b3007ade8</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
+    <name>local_only_provenance</name>
+    <filename>local__only_8h.html</filename>
+    <anchor>structlocal__only__provenance</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_spikes_received_per_timestep</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>ae3c329f63bc4ea6940b93712c1de6f9c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_spikes_dropped</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>ae17c734c99ed4f4b6f64123dba8660ab</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>n_spikes_lost_from_input</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>ab8f54ed3e9a7c237fe137d083dda8161</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>max_input_buffer_size</name>
+      <anchorfile>local__only_8h.html</anchorfile>
+      <anchor>a6d3e0cb5b61c58cdfd3b43e66226e01c</anchor>
       <arglist></arglist>
     </member>
   </compound>
@@ -12962,6 +13243,10 @@
     </member>
   </compound>
   <compound kind="struct">
+    <name>source_key_info</name>
+    <filename>structsource__key__info.html</filename>
+  </compound>
+  <compound kind="struct">
     <name>spike_processing_fast_provenance</name>
     <filename>spike__processing__fast_8h.html</filename>
     <anchor>structspike__processing__fast__provenance</anchor>
@@ -13443,9 +13728,9 @@
     </member>
   </compound>
   <compound kind="union">
-    <name>synapse_row_plastic_data_t.__unnamed9__</name>
+    <name>synapse_row_plastic_data_t.__unnamed10__</name>
     <filename>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</filename>
-    <anchor>unionsynapse__row__plastic__data__t_8____unnamed9____</anchor>
+    <anchor>unionsynapse__row__plastic__data__t_8____unnamed10____</anchor>
     <member kind="variable">
       <type>neuromodulation_data_t</type>
       <name>neuromodulation</name>
@@ -13455,9 +13740,9 @@
     </member>
   </compound>
   <compound kind="struct">
-    <name>synapse_row_plastic_data_t.__unnamed9__.__unnamed11__</name>
+    <name>synapse_row_plastic_data_t.__unnamed10__.__unnamed12__</name>
     <filename>synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html</filename>
-    <anchor>structsynapse__row__plastic__data__t_8____unnamed9_____8____unnamed11____</anchor>
+    <anchor>structsynapse__row__plastic__data__t_8____unnamed10_____8____unnamed12____</anchor>
     <member kind="variable">
       <type>pre_event_history_t</type>
       <name>history</name>

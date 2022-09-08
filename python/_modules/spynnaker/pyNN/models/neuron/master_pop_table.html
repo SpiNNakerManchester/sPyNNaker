@@ -389,13 +389,12 @@
 <span class="sd">        :return: the size the master pop table will take in SDRAM (in bytes)</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># There will be an address list entry for each incoming projection</span>
-        <span class="n">n_entries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">incoming_projections</span><span class="p">)</span>
-
         <span class="c1"># Count the pre-machine-vertices</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">n_vertices</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">seen_edges</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">incoming_projections</span><span class="p">:</span>
+            <span class="n">n_entries</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">in_edge</span> <span class="o">=</span> <span class="n">proj</span><span class="o">.</span><span class="n">_projection_edge</span>
 

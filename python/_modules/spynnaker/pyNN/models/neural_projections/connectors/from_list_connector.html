@@ -58,6 +58,9 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 <span class="c1"># Indices of the source and target in the connection list array</span>
 <span class="n">_SOURCE</span> <span class="o">=</span> <span class="mi">0</span>
@@ -65,7 +68,7 @@
 <span class="n">_FIRST_PARAM</span> <span class="o">=</span> <span class="mi">2</span>
 
 
-<span class="k">class</span> <span class="nc">FromListConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">FromListConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Make connections according to a list.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -297,7 +300,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__weights</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FromListConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="FromListConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
@@ -466,17 +469,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra_parameter_names</span></div>
 
-<div class="viewcode-block" id="FromListConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
-        <span class="n">pre_slices</span> <span class="o">=</span> \
-            <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
-        <span class="n">post_slices</span> <span class="o">=</span> \
-            <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
+<div class="viewcode-block" id="FromListConnector.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.FromListConnector.get_connected_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_connected_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="n">pre_slices</span> <span class="o">=</span> <span class="n">source_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
+        <span class="n">post_slices</span> <span class="o">=</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_slices</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split_connections</span><span class="p">(</span><span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">)</span>
-        <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">src_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
-        <span class="n">post_hi</span> <span class="o">=</span> <span class="n">dest_machine_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span></div>
+
+        <span class="n">pre_vertices</span> <span class="o">=</span> <span class="n">source_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_vertices</span><span class="p">(</span>
+            <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">m_vert</span><span class="p">,</span> <span class="p">[</span><span class="n">s_vert</span> <span class="k">for</span> <span class="n">s_vert</span> <span class="ow">in</span> <span class="n">pre_vertices</span>
+                      <span class="k">if</span> <span class="p">(</span><span class="n">s_vert</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">,</span>
+                          <span class="n">m_vert</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)</span> <span class="ow">in</span>
+                      <span class="bp">self</span><span class="o">.</span><span class="n">__split_conn_list</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">m_vert</span> <span class="ow">in</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_vertices</span><span class="p">(</span>
+                <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+        <span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

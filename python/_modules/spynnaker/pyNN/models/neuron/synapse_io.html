@@ -61,7 +61,7 @@
     <span class="n">AbstractConnector</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapseRowTooBigException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractStaticSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamics</span><span class="p">)</span>
+    <span class="n">AbstractStaticSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSDRAMSynapseDynamics</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.master_pop_table</span> <span class="kn">import</span> <span class="n">MasterPopTableAsBinarySearch</span>
 
 <span class="n">_N_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">3</span>
@@ -496,13 +496,13 @@
 <span class="sd">    :param int post_vertex_max_delay_ticks:</span>
 <span class="sd">            max delayed ticks supported from post vertex</span>
 <span class="sd">    :return: The connections read from the data; the dtype is</span>
-<span class="sd">        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># If there is no data, return nothing</span>
     <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
 
     <span class="c1"># Translate the data into rows</span>
     <span class="n">row_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
@@ -523,7 +523,7 @@
     <span class="c1"># There might still be no connections if the row was all padding</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">connections</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
 
     <span class="c1"># Convert 0 delays to max delays</span>
     <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">][</span><span class="n">connections</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
@@ -559,7 +559,7 @@
 <span class="sd">    :param MaxRowInfo max_row_info:</span>
 <span class="sd">        The maximum information for each of the rows</span>
 <span class="sd">    :return: The connections read from the data; the dtype is</span>
-<span class="sd">        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
@@ -616,12 +616,12 @@
 <span class="sd">    :param bool delayed: True if data should be considered delayed</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex delay maximum</span>
 <span class="sd">    :return: the connections read with dtype</span>
-<span class="sd">        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: list(~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">row_data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">row_data</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
     <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span> <span class="o">=</span> <span class="n">_parse_static_data</span><span class="p">(</span><span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">read_static_synaptic_data</span><span class="p">(</span>
         <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ff_size</span><span class="p">,</span> <span class="n">ff_data</span><span class="p">)</span>
@@ -681,12 +681,12 @@
 <span class="sd">    :param bool delayed: True if data should be considered delayed</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex delay maximum</span>
 <span class="sd">    :return: the connections read with dtype</span>
-<span class="sd">        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :rtype: list(~numpy.ndarray)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">row_data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">row_data</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AbstractSDRAMSynapseDynamics</span><span class="o">.</span><span class="n">NUMPY_CONNECTORS_DTYPE</span><span class="p">)</span>
     <span class="n">pp_size</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span> <span class="o">=</span> <span class="n">_parse_plastic_data</span><span class="p">(</span>
         <span class="n">row_data</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span>
     <span class="n">connections</span> <span class="o">=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">read_plastic_synaptic_data</span><span class="p">(</span>
@@ -731,7 +731,7 @@
 <span class="sd">        The slice of atoms in the pre-vertex</span>
 <span class="sd">    :param ~numpy.ndarray delayed_connections:</span>
 <span class="sd">        The connections to convert of dtype</span>
-<span class="sd">        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">    :param int post_vertex_max_delay_ticks: post vertex delay maximum</span>
 <span class="sd">    :return: The converted connection with the same dtype</span>
 <span class="sd">    :rtype: ~numpy.ndarray</span>

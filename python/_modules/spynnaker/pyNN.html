@@ -74,6 +74,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SimulatorNotSetupException</span><span class="p">,</span> <span class="n">SimulatorShutdownException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ConfigurationException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
@@ -89,7 +90,8 @@
     <span class="n">FixedNumberPreConnector</span><span class="p">,</span> <span class="n">FixedProbabilityConnector</span><span class="p">,</span>
     <span class="n">FromFileConnector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">,</span> <span class="n">IndexBasedProbabilityConnector</span><span class="p">,</span>
     <span class="n">KernelConnector</span><span class="p">,</span> <span class="n">MultapseConnector</span> <span class="k">as</span> <span class="n">FixedTotalNumberConnector</span><span class="p">,</span>
-    <span class="n">OneToOneConnector</span><span class="p">,</span> <span class="n">SmallWorldConnector</span><span class="p">)</span>
+    <span class="n">OneToOneConnector</span><span class="p">,</span> <span class="n">SmallWorldConnector</span><span class="p">,</span> <span class="n">ConvolutionConnector</span><span class="p">,</span>
+    <span class="n">PoolDenseConnector</span><span class="p">)</span>
 <span class="c1"># synapse structures</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseDynamicsStatic</span> <span class="k">as</span> <span class="n">StaticSynapse</span><span class="p">)</span>
@@ -116,6 +118,11 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis</span>\
     <span class="o">.</span><span class="n">elimination</span> <span class="kn">import</span> <span class="p">(</span>
         <span class="n">RandomByWeightElimination</span><span class="p">)</span>
+
+<span class="c1"># local-only synapses</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.local_only</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LocalOnlyConvolution</span> <span class="k">as</span> <span class="n">Convolution</span><span class="p">,</span>
+    <span class="n">LocalOnlyPoolDense</span> <span class="k">as</span> <span class="n">PoolDense</span><span class="p">)</span>
 
 <span class="c1"># neuron stuff</span>
 <span class="c1"># noinspection PyUnresolvedReferences</span>
@@ -182,7 +189,9 @@
     <span class="s1">&#39;FixedNumberPreConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;FixedProbabilityConnector&#39;</span><span class="p">,</span>
     <span class="s1">&#39;FromFileConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;FromListConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;IndexBasedProbabilityConnector&#39;</span><span class="p">,</span>
     <span class="s1">&#39;FixedTotalNumberConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;KernelConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;OneToOneConnector&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;SmallWorldConnector&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SmallWorldConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;ConvolutionConnector&#39;</span><span class="p">,</span> <span class="s1">&#39;PoolDenseConnector&#39;</span><span class="p">,</span>
+    <span class="c1"># Local-only</span>
+    <span class="s1">&#39;Convolution&#39;</span><span class="p">,</span> <span class="s1">&#39;PoolDense&#39;</span><span class="p">,</span>
     <span class="c1"># synapse structures</span>
     <span class="s1">&#39;StaticSynapse&#39;</span><span class="p">,</span>
     <span class="c1"># plastic stuff</span>
@@ -527,18 +536,37 @@
 
 
 <div class="viewcode-block" id="set_number_of_neurons_per_core"><a class="viewcode-back" href="../../spynnaker.pyNN.html#spynnaker.pyNN.set_number_of_neurons_per_core">[docs]</a><span class="k">def</span> <span class="nf">set_number_of_neurons_per_core</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Sets a ceiling on the number of neurons of a given type that can be\</span>
+    <span class="sd">&quot;&quot;&quot; Sets a ceiling on the number of neurons of a given model that can be\</span>
 <span class="sd">        placed on a single core.</span>
+<span class="sd">        This can be overridden by the individual Population.</span>
+<span class="sd">        The new value can be None, meaning that the maximum is the same as</span>
+<span class="sd">        the number of atoms, an int, meaning all Populations of this model</span>
+<span class="sd">        must have one dimension, or a tuple of n integers, meaning all</span>
+<span class="sd">        Populations of this model must have n dimensions.</span>
+<span class="sd">        If not all Populations of this model have the same number of</span>
+<span class="sd">        dimensions, it is recommended to set this to None here and then</span>
+<span class="sd">        set the maximum on each Population.</span>
 
 <span class="sd">    :param type(AbstractPopulationVertex) neuron_type: neuron type</span>
 <span class="sd">    :param int max_permitted: the number to set to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">neuron_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;set_number_of_neurons_per_core call now expects &quot;</span> \
-              <span class="s2">&quot;neuron_type as a class instead of as a str&quot;</span>
-        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_number_of_neurons_per_core</span><span class="p">(</span>
-        <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_permitted</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
+            <span class="s2">&quot;set_number_of_neurons_per_core call now expects &quot;</span>
+            <span class="s2">&quot;neuron_type as a class instead of as a str&quot;</span><span class="p">)</span>
+    <span class="n">max_neurons</span> <span class="o">=</span> <span class="n">max_permitted</span>
+    <span class="k">if</span> <span class="n">is_singleton</span><span class="p">(</span><span class="n">max_permitted</span><span class="p">):</span>
+        <span class="n">max_neurons</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_permitted</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">max_neurons</span><span class="p">:</span>
+        <span class="c1"># Make sure an integer value is passed in here and warn if different</span>
+        <span class="n">m_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">m_int</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The number of neurons per core requested </span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2"> is not an &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;integer; the value has been set to </span><span class="si">{</span><span class="n">m_int</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_number_of_neurons_per_dimension_per_core</span><span class="p">(</span>
+        <span class="n">neuron_type</span><span class="p">,</span> <span class="n">max_neurons</span><span class="p">)</span></div>
 
 
 <span class="c1"># These methods will defer to PyNN methods if a simulator exists</span>

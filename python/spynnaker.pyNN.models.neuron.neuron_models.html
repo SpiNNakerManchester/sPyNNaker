@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.plasticity package" href="spynnaker.pyNN.models.neuron.plasticity.html" />
-    <link rel="prev" title="spynnaker.pyNN.models.neuron.input_types package" href="spynnaker.pyNN.models.neuron.input_types.html" /> 
+    <link rel="prev" title="spynnaker.pyNN.models.neuron.local_only package" href="spynnaker.pyNN.models.neuron.local_only.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -33,7 +33,7 @@
           <a href="spynnaker.pyNN.models.neuron.plasticity.html" title="spynnaker.pyNN.models.neuron.plasticity package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="spynnaker.pyNN.models.neuron.input_types.html" title="spynnaker.pyNN.models.neuron.input_types package"
+          <a href="spynnaker.pyNN.models.neuron.local_only.html" title="spynnaker.pyNN.models.neuron.local_only package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
@@ -71,7 +71,7 @@ that they appear</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data">
-<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atoms_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -79,6 +79,7 @@ that they appear</p></li>
 <li><p><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the parameters</p></li>
 <li><p><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v6.0)"><em>RangeDictionary</em></a>) – The holder of the state variables</p></li>
 <li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the vertex to generate parameters for</p></li>
+<li><p><strong>atoms_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The shape of the atoms in the vertex</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -573,8 +574,8 @@ that they appear</p></li>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="spynnaker.pyNN.models.neuron.input_types.html"
-                          title="previous chapter">spynnaker.pyNN.models.neuron.input_types package</a></p>
+    <p class="topless"><a href="spynnaker.pyNN.models.neuron.local_only.html"
+                          title="previous chapter">spynnaker.pyNN.models.neuron.local_only package</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -615,7 +616,7 @@ that they appear</p></li>
           <a href="spynnaker.pyNN.models.neuron.plasticity.html" title="spynnaker.pyNN.models.neuron.plasticity package"
              >next</a> |</li>
         <li class="right" >
-          <a href="spynnaker.pyNN.models.neuron.input_types.html" title="spynnaker.pyNN.models.neuron.input_types package"
+          <a href="spynnaker.pyNN.models.neuron.local_only.html" title="spynnaker.pyNN.models.neuron.local_only package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>

@@ -73,7 +73,8 @@
     <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SpynnakerException</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractContainsUnits</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
-    <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">)</span>
+    <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
+    <span class="n">SupportsStructure</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.recorder</span> <span class="kn">import</span> <span class="n">Recorder</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKES</span>
@@ -155,6 +156,8 @@
         <span class="c1"># generation of positions is deferred until needed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="n">structure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">structure</span><span class="p">)</span>
 
         <span class="c1"># add objects to the SpiNNaker control class</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_vertex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
@@ -1057,21 +1060,22 @@
 
     <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.set_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Supports the setting of this population&#39;s max atoms per core</span>
+        <span class="sd">&quot;&quot;&quot; Supports the setting of this population&#39;s max atoms per</span>
+<span class="sd">            dimension per core</span>
 
 <span class="sd">        :param int max_atoms_per_core:</span>
-<span class="sd">            the new value for the max atoms per core.</span>
+<span class="sd">            the new value for the max atoms per dimension per core.</span>
 <span class="sd">        :raises SimulatorRunningException: If sim.run is currently running</span>
 <span class="sd">        :raises SimulatorNotSetupException: If called before sim.setup</span>
 <span class="sd">        :raises SimulatorShutdownException: If called after sim.end</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">max_atoms_per_core</span> <span class="o">&gt;</span> <span class="n">cap</span><span class="p">:</span>
+        <span class="n">cap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celltype</span><span class="o">.</span><span class="n">absolute_max_atoms_per_core</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">cap</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Set the max_atoms_per_core to </span><span class="si">{</span><span class="n">max_atoms_per_core</span><span class="si">}</span><span class="s2"> blocked &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;as the current limit for the model is </span><span class="si">{</span><span class="n">cap</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_max_atoms_per_core</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_max_atoms_per_dimension_per_core</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="c1"># state that something has changed in the population</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
 

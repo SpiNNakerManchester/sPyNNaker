@@ -179,7 +179,7 @@
         <span class="c1"># as a from-list connector can have plastic parameters, grab those (</span>
         <span class="c1"># if any) and add them to the synapse dynamics object</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">):</span>
-            <span class="n">connector</span><span class="o">.</span><span class="n">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="n">synaptic_type</span><span class="p">)</span>
+            <span class="n">connector</span><span class="o">.</span><span class="n">_apply_parameters_to_synapse_type</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">)</span>
 
         <span class="c1"># round the delays to multiples of full timesteps</span>
         <span class="c1"># (otherwise SDRAM estimation calculations can go wrong)</span>
@@ -222,6 +222,10 @@
                 <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
             <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the connector is happy</span>
+        <span class="n">connector</span><span class="o">.</span><span class="n">validate_connection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span>
 
         <span class="c1"># add projection to the SpiNNaker control system</span>
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">add_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>

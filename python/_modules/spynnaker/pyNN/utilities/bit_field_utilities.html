@@ -194,7 +194,7 @@
 
 
 <div class="viewcode-block" id="write_bitfield_init_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">[docs]</a><span class="k">def</span> <span class="nf">write_bitfield_init_data</span><span class="p">(</span>
-        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
+        <span class="n">spec</span><span class="p">,</span> <span class="n">incoming_projections</span><span class="p">,</span>
         <span class="n">bit_field_builder_region</span><span class="p">,</span> <span class="n">master_pop_region_id</span><span class="p">,</span>
         <span class="n">synaptic_matrix_region_id</span><span class="p">,</span> <span class="n">direct_matrix_region_id</span><span class="p">,</span>
         <span class="n">bit_field_region_id</span><span class="p">,</span> <span class="n">bit_field_key_map_region_id</span><span class="p">,</span>
@@ -205,8 +205,6 @@
 <span class="sd">        data spec writer</span>
 <span class="sd">    :param list(~spynnaker.pyNN.models.Projection) incoming_projections:</span>
 <span class="sd">        The projections to generate bitfields for</span>
-<span class="sd">    :param ~pacman.model.graphs.common.slice vertex_slice:</span>
-<span class="sd">        The slice of the target vertex</span>
 <span class="sd">    :param int bit_field_builder_region: the region id for the bitfield builder</span>
 <span class="sd">    :param int master_pop_region_id: the region id for the master pop table</span>
 <span class="sd">    :param int synaptic_matrix_region_id: the region id for the synaptic matrix</span>

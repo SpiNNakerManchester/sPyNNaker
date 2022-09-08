@@ -1,0 +1,10 @@
+spynnaker.pyNN.models.neuron.local\_only package
+================================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.local_only
+   :members:
+   :undoc-members:
+   :show-inheritance:

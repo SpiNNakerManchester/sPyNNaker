@@ -70,6 +70,10 @@
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.neuron.local_only.html">spynnaker.pyNN.models.neuron.local_only package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.local_only.html#module-spynnaker.pyNN.models.neuron.local_only">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html">spynnaker.pyNN.models.neuron.neuron_models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models">Module contents</a></li>
 </ul>
@@ -556,7 +560,7 @@ delayed matrix</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The connections read from the data; the dtype is
-AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
+AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -670,7 +674,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The connections read from the data; the dtype is
-AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
+AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -739,7 +743,7 @@ referenceable</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of arrays of connections, each with dtype
-AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
+AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -977,7 +981,7 @@ is run again</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of arrays of connections, each with dtype
-AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
+AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -1089,7 +1093,7 @@ app edge</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A list of arrays of connections, each with dtype
-AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
+AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
@@ -1196,7 +1200,7 @@ AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.</span></span><span class="sig-name descname"><span class="pre">AbstractPopulationVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spikes_per_second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_spike_buffer_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neuron_impl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pynn_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop_late_spikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TDMAAwareApplicationVertex</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractContainsUnits</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable" title="spynnaker.pyNN.models.common.AbstractSpikeRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSpikeRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable" title="spynnaker.pyNN.models.common.AbstractNeuronRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractNeuronRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractEventRecordable" title="spynnaker.pyNN.models.common.AbstractEventRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEventRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPopulationInitializable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPopulationSettable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractChangableAfterRun</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCanReset</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TDMAAwareApplicationVertex</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractContainsUnits" title="spynnaker.pyNN.models.abstract_models.AbstractContainsUnits"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractContainsUnits</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable" title="spynnaker.pyNN.models.common.AbstractSpikeRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSpikeRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable" title="spynnaker.pyNN.models.common.AbstractNeuronRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractNeuronRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractEventRecordable" title="spynnaker.pyNN.models.common.AbstractEventRecordable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractEventRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable" title="spynnaker.pyNN.models.abstract_models.AbstractPopulationInitializable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPopulationInitializable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable" title="spynnaker.pyNN.models.abstract_models.AbstractPopulationSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPopulationSettable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractChangableAfterRun</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses" title="spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractAcceptsIncomingSynapses</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractCanReset</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.SupportsStructure" title="spynnaker.pyNN.models.abstract_models.SupportsStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">SupportsStructure</span></code></a></p>
 <p>Underlying vertex model for Neural Populations.        Not actually abstract.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1220,7 +1224,7 @@ we can set this for approximate number of saturation events.</p></li>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS">
-<span class="sig-name descname"><span class="pre">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BYTES_TILL_START_OF_GLOBAL_PARAMETERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">16</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.BYTES_TILL_START_OF_GLOBAL_PARAMETERS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1241,6 +1245,22 @@ we can set this for approximate number of saturation events.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.atoms_shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">atoms_shape</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.atoms_shape" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>The “shape” of the atoms in the vertex i.e. how the atoms are split</dt><dd><p>between the dimensions of the vertex.  By default everything is
+1-dimensional, so the return will be a 1-tuple but can be
+overridden by a vertex that supports multiple dimensions.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, …)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1321,6 +1341,17 @@ will be returned.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>, …)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.direct_matrix_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">direct_matrix_size</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.direct_matrix_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the direct matrix region in bytes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1421,6 +1452,13 @@ ordered by time, one element per event</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_projections_from">
+<span class="sig-name descname"><span class="pre">get_incoming_projections_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_incoming_projections_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_projections_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the projections that target this population vertex from
+the given source</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_initial_value">
 <span class="sig-name descname"><span class="pre">get_initial_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_initial_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_initial_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the value for any variable whose in initialize_parameters.keys</p>
@@ -1441,6 +1479,32 @@ all. See:
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_core">
+<span class="sig-name descname"><span class="pre">get_max_atoms_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the maximum number of atoms per core, which is either the            number of atoms required across the whole application vertex,            or a lower value set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_dimension_per_core">
+<span class="sig-name descname"><span class="pre">get_max_atoms_per_dimension_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_max_atoms_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_max_atoms_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Gets the maximum number of atoms per dimension per core.  This</dt><dd><p>will return a tuple with a number for each dimension of the vertex,
+which might be one if this is a single-dimension vertex</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1520,6 +1584,23 @@ all. See:
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_params_position">
+<span class="sig-name descname"><span class="pre">get_neuron_params_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_neuron_params_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_params_position" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the position of the neuron parameters themselves within the</dt><dd><p>neuron parameters region</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – the slice of atoms.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_sampling_interval">
 <span class="sig-name descname"><span class="pre">get_neuron_sampling_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_neuron_sampling_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current sampling interval for this variable</p>
@@ -1563,7 +1644,7 @@ all. See:
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_ring_buffer_shifts">
-<span class="sig-name descname"><span class="pre">get_ring_buffer_shifts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_ring_buffer_shifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_ring_buffer_shifts" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_ring_buffer_shifts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_ring_buffer_shifts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_ring_buffer_shifts" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Get the shift of the ring buffers for transfer of values into the</dt><dd><p>input buffers for this model.</p>
 </dd>
@@ -1637,7 +1718,7 @@ ordered by time, one element per event</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size">
-<span class="sig-name descname"><span class="pre">get_structural_dynamics_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_structural_dynamics_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_structural_dynamics_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_structural_dynamics_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_structural_dynamics_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the size of the structural dynamics region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1665,14 +1746,11 @@ ordered by time, one element per event</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_expander_size">
-<span class="sig-name descname"><span class="pre">get_synapse_expander_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_synapse_expander_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_expander_size" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_synapse_expander_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_synapse_expander_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapse_expander_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the size of the synapse expander region in bytes</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>incoming_projections</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><em>Projection</em><em>)</em>) – The projections to consider in the calculations</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1715,7 +1793,7 @@ ordered by time, one element per event</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size">
-<span class="sig-name descname"><span class="pre">get_synapses_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">incoming_projections</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_synapses_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_synapses_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_synapses_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_synapses_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the maximum SDRAM usage for the synapses on a vertex slice</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1779,7 +1857,7 @@ Get a property of the overall model.</p>
 <dd><p>The projections that target this population vertex</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>)</p>
+<dd class="field-odd"><p>iterable(<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection" title="spynnaker.pyNN.models.projection.Projection"><em>Projection</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2002,6 +2080,22 @@ Get a property of the overall model.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_max_atoms_per_dimension_per_core">
+<span class="sig-name descname"><span class="pre">set_max_atoms_per_dimension_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.set_max_atoms_per_dimension_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_max_atoms_per_dimension_per_core" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the maximum number of atoms per dimension per core.</p>
+<p>Can be used to raise or lower the maximum number of atoms per core
+or per dimension per core.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_value</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – Value to set.  If the vertex is n-dimensional where n &gt; 1, a tuple
+of n values must be given.  If the vertex is 1 dimensional,
+a 1-tuple or integer can be given.  If this is set to None the
+vertex will have atoms_shape as the maximum.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_recording">
 <span class="sig-name descname"><span class="pre">set_recording</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.set_recording"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_recording" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets variable to being recorded</p>
@@ -2050,6 +2144,17 @@ None will be taken as the timestep.</p></li>
 <li><p><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – The indexes of the neurons that will record spikes.
 If None the assumption is all neurons are recording</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_structure">
+<span class="sig-name descname"><span class="pre">set_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.set_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.set_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the structure of the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>pynn.space.BaseStructure</em>) – The structure to set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2201,28 +2306,6 @@ If None the assumption is all neurons are recording</p></li>
 <span class="sig-name descname"><span class="pre">default_population_parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'drop_late_spikes':</span> <span class="pre">None,</span> <span class="pre">'incoming_spike_buffer_size':</span> <span class="pre">None,</span> <span class="pre">'ring_buffer_sigma':</span> <span class="pre">None,</span> <span class="pre">'spikes_per_second':</span> <span class="pre">None,</span> <span class="pre">'splitter':</span> <span class="pre">None}</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.get_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_max_atoms_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model.html#AbstractPyNNNeuronModel.get_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.set_model_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_model_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model.html#AbstractPyNNNeuronModel.set_model_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModel.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
@@ -2330,6 +2413,41 @@ source, target, weight and delay</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.</span></span><span class="sig-name descname"><span class="pre">LocalOnlyProvenance</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance.N_ITEMS">
+<span class="sig-name descname"><span class="pre">N_ITEMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance.N_ITEMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance.max_size_input_buffer">
+<span class="sig-name descname"><span class="pre">max_size_input_buffer</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance.max_size_input_buffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance.max_spikes_per_timestep">
+<span class="sig-name descname"><span class="pre">max_spikes_per_timestep</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance.max_spikes_per_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance.n_spikes_dropped">
+<span class="sig-name descname"><span class="pre">n_spikes_dropped</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance.n_spikes_dropped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.LocalOnlyProvenance.n_spikes_lost_from_input">
+<span class="sig-name descname"><span class="pre">n_spikes_lost_from_input</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.LocalOnlyProvenance.n_spikes_lost_from_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.NeuronProvenance">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.</span></span><span class="sig-name descname"><span class="pre">NeuronProvenance</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.NeuronProvenance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
@@ -2361,6 +2479,218 @@ source, target, weight and delay</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.NeuronProvenance.n_tdma_misses">
 <span class="sig-name descname"><span class="pre">n_tdma_misses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.NeuronProvenance.n_tdma_misses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Structure/Union member</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.</span></span><span class="sig-name descname"><span class="pre">PopulationMachineLocalOnlyCombinedVertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slice_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_shifts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationMachineCommon</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">PopulationMachineNeurons</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractRewritesDataSpecification</span></code></p>
+<p>A machine vertex for PyNN Populations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sdram</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.AbstractSDRAM" title="(in PACMAN v6.0)"><em>AbstractSDRAM</em></a>) – The sdram used by the vertex</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The label of the vertex</p></li>
+<li><p><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v6.0)"><em>AbstractConstraint</em></a><em>)</em>) – Constraints for the vertex</p></li>
+<li><p><strong>app_vertex</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) – The associated application vertex</p></li>
+<li><p><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v6.0)"><em>Slice</em></a>) – The slice of the population that this implements</p></li>
+<li><p><strong>slice_index</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The index of the slice in the ordered list of slices</p></li>
+<li><p><strong>ring_buffer_shifts</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The shifts to apply to convert ring buffer values to S1615 values</p></li>
+<li><p><strong>weight_scales</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The scaling to apply to weights to store them in the synapses</p></li>
+<li><p><strong>all_syn_block_sz</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The maximum size of the synapses in bytes</p></li>
+<li><p><strong>structural_sz</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size of the structural data</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.BACKGROUND_MAX_QUEUED_NAME">
+<span class="sig-name descname"><span class="pre">BACKGROUND_MAX_QUEUED_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Max_backgrounds_queued'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.BACKGROUND_MAX_QUEUED_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.BACKGROUND_OVERLOADS_NAME">
+<span class="sig-name descname"><span class="pre">BACKGROUND_OVERLOADS_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Times_the_background_queue_overloaded'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.BACKGROUND_OVERLOADS_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.COMMON_REGIONS">
+<span class="sig-name descname"><span class="pre">COMMON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">CommonRegions(system=0,</span> <span class="pre">provenance=1,</span> <span class="pre">profile=2,</span> <span class="pre">recording=3)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.COMMON_REGIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.INPUT_BUFFER_FULL_NAME">
+<span class="sig-name descname"><span class="pre">INPUT_BUFFER_FULL_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Times_the_input_buffer_lost_packets'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.INPUT_BUFFER_FULL_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.LOCAL_ONLY_SIZE">
+<span class="sig-name descname"><span class="pre">LOCAL_ONLY_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.LOCAL_ONLY_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME">
+<span class="sig-name descname"><span class="pre">MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Max_filled_size_input_buffer'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.MAX_SPIKES_PER_TIME_STEP_NAME">
+<span class="sig-name descname"><span class="pre">MAX_SPIKES_PER_TIME_STEP_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Max_spikes_per_time_step'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.MAX_SPIKES_PER_TIME_STEP_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS">
+<span class="sig-name descname"><span class="pre">NEURON_REGIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">NeuronRegions(neuron_params=4,</span> <span class="pre">current_source_params=5,</span> <span class="pre">neuron_recording=6)</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.NEURON_REGIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.N_LATE_SPIKES_NAME">
+<span class="sig-name descname"><span class="pre">N_LATE_SPIKES_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Number_of_late_spikes'</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.N_LATE_SPIKES_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">REGIONS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.REGIONS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Regions for populations.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.CURRENT_SOURCE_PARAMS">
+<span class="sig-name descname"><span class="pre">CURRENT_SOURCE_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.CURRENT_SOURCE_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY">
+<span class="sig-name descname"><span class="pre">LOCAL_ONLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY_PARAMS">
+<span class="sig-name descname"><span class="pre">LOCAL_ONLY_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.LOCAL_ONLY_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.NEURON_PARAMS">
+<span class="sig-name descname"><span class="pre">NEURON_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.NEURON_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.NEURON_RECORDING">
+<span class="sig-name descname"><span class="pre">NEURON_RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.PROFILING">
+<span class="sig-name descname"><span class="pre">PROFILING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.PROVENANCE_DATA">
+<span class="sig-name descname"><span class="pre">PROVENANCE_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.RECORDING">
+<span class="sig-name descname"><span class="pre">RECORDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.RECORDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.SYSTEM">
+<span class="sig-name descname"><span class="pre">SYSTEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.REGIONS.SYSTEM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.generate_data_specification">
+<span class="sig-name descname"><span class="pre">generate_data_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.generate_data_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a data specification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – The data specification to write to</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – The placement the vertex is located at</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.get_recorded_region_ids">
+<span class="sig-name descname"><span class="pre">get_recorded_region_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.get_recorded_region_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.get_recorded_region_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recording region IDs that have been recorded using
+buffering</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The region numbers that have active recording</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.parse_extra_provenance_items">
+<span class="sig-name descname"><span class="pre">parse_extra_provenance_items</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">provenance_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.parse_extra_provenance_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.parse_extra_provenance_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the remaining provenance words (those not in the standard set)
+into provenance items.</p>
+<p>Called by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">get_provenance_data_from_machine()</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – A descriptive label for the vertex (derived from label and placed
+position) to be used for provenance error reporting to the user.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – x coordinate of the chip where this core</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – y coordinate of the core where this core</p></li>
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – virtual id of the core</p></li>
+<li><p><strong>provenance_data</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The list of words of raw provenance data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.regenerate_data_specification">
+<span class="sig-name descname"><span class="pre">regenerate_data_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.regenerate_data_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.regenerate_data_specification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regenerate the data specification, only generating regions that            have changed and need to be reloaded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v6.0)"><em>DataSpecificationGenerator</em></a>) – Where to write the regenerated spec</p></li>
+<li><p><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v6.0)"><em>Placement</em></a>) – Where are we regenerating for?</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.reload_required">
+<span class="sig-name descname"><span class="pre">reload_required</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.reload_required"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.reload_required" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true if any data region needs to be reloaded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.set_reload_required">
+<span class="sig-name descname"><span class="pre">set_reload_required</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_local_only_combined_vertex.html#PopulationMachineLocalOnlyCombinedVertex.set_reload_required"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineLocalOnlyCombinedVertex.set_reload_required" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that the regions have been reloaded</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_value</strong> – the new value</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

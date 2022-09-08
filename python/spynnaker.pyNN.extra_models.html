@@ -209,6 +209,11 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.extra_models.</span></span><span class="sig-name descname"><span class="pre">SpikeSourcePoissonVariable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">durations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPyNNModel</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.absolute_max_atoms_per_core">
+<span class="sig-name descname"><span class="pre">absolute_max_atoms_per_core</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.absolute_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.create_vertex">
 <span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -234,28 +239,6 @@ or </em><em>(</em><em>mapping</em><em>) </em><em>function</em>) – <span class=
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.default_population_parameters">
 <span class="sig-name descname"><span class="pre">default_population_parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'seed':</span> <span class="pre">None,</span> <span class="pre">'splitter':</span> <span class="pre">None}</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.get_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_max_atoms_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.get_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.set_model_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_model_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.set_model_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
-</dd>
-</dl>
-</dd></dl>
 
 </dd></dl>
 

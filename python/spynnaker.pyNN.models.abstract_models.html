@@ -481,6 +481,32 @@ app_vertex’s synapse_manager</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasShapeKeyFields">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">HasShapeKeyFields</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates a source that has keys in fields for each dimension of the
+source</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasShapeKeyFields.get_shape_key_fields">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_shape_key_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/has_shape_key_fields.html#HasShapeKeyFields.get_shape_key_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields.get_shape_key_fields" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the fields to be used for each dimension in the shape of the</dt><dd><p>given source vertex slice, as a list of start, mask, shift values
+in the order of the fields</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex_slice</strong> (<em>Slice</em>) – The slice of the source vertex</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.HasSynapses">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">HasSynapses</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.HasSynapses" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -582,6 +608,24 @@ of words, and with the number of neurons rounded up to a power of 2</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">SendsSynapticInputsOverSDRAM</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.SendsSynapticInputsOverSDRAM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSupportsSDRAMEdges</span></code></p>
 <p>A marker interface for an object that sends synaptic inputs over SDRAM</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.SupportsStructure">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.abstract_models.</span></span><span class="sig-name descname"><span class="pre">SupportsStructure</span></span><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.SupportsStructure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Indicates an object that supports the setting of a PyNN structure</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.models.abstract_models.SupportsStructure.set_structure">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_models/supports_structure.html#SupportsStructure.set_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_models.SupportsStructure.set_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the structure of the object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>pynn.space.BaseStructure</em>) – The structure to set</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>

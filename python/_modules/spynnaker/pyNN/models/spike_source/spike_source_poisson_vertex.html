@@ -57,6 +57,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">from</span> <span class="nn">pyNN.space</span> <span class="kn">import</span> <span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">LegacyPartitionerAPI</span>
@@ -69,7 +70,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">recording_utilities</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
+    <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
@@ -78,6 +79,7 @@
     <span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="n">_flatten</span><span class="p">,</span> <span class="n">get_rates_bytes</span><span class="p">,</span>
     <span class="n">get_sdram_edge_params_bytes</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">create_mars_kiss_seeds</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">SupportsStructure</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict</span> \
     <span class="kn">import</span> <span class="nn">SpynnakerRangeDictionary</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list</span> \
@@ -104,7 +106,7 @@
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
         <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">,</span>
-        <span class="n">LegacyPartitionerAPI</span><span class="p">):</span>
+        <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -128,7 +130,8 @@
         <span class="s2">&quot;__data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_variable_rate&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__outgoing_projections&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__incoming_control_edge&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__incoming_control_edge&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__structure&quot;</span><span class="p">]</span>
 
     <span class="n">SPIKE_RECORDING_REGION_ID</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -303,6 +306,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__outgoing_projections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__incoming_control_edge</span> <span class="o">=</span> <span class="kc">None</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="SpikeSourcePoissonVertex.set_structure"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_structure">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SupportsStructure</span><span class="o">.</span><span class="n">set_structure</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="n">structure</span></div>
+
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.add_outgoing_projection"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.add_outgoing_projection">[docs]</a>    <span class="k">def</span> <span class="nf">add_outgoing_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add an outgoing projection from this vertex</span>
 
@@ -470,12 +479,18 @@
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_sdram_used_by_atoms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_sdram_used_by_atoms">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">get_sdram_used_by_atoms</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_sdram_used_by_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="n">poisson_params_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
+        <span class="n">rates_sz</span> <span class="o">=</span> <span class="n">get_rates_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data</span><span class="p">[</span><span class="s2">&quot;rates&quot;</span><span class="p">])</span>
+        <span class="n">params_sz</span> <span class="o">=</span> <span class="n">SpikeSourcePoissonMachineVertex</span><span class="o">.</span><span class="n">PARAMS_BASE_WORDS</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
         <span class="n">sdram_sz</span> <span class="o">=</span> <span class="n">get_sdram_edge_params_bytes</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="n">other</span> <span class="o">=</span> <span class="n">ConstantSDRAM</span><span class="p">(</span>
             <span class="n">SYSTEM_BYTES_REQUIREMENT</span> <span class="o">+</span>
             <span class="n">SpikeSourcePoissonMachineVertex</span><span class="o">.</span><span class="n">get_provenance_data_size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">poisson_params_sz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
+            <span class="n">rates_sz</span> <span class="o">+</span> <span class="n">params_sz</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tdma_sdram_size_in_bytes</span> <span class="o">+</span>
             <span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_header_size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">recording_utilities</span><span class="o">.</span><span class="n">get_recording_data_constant_size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
             <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span> <span class="o">+</span>
@@ -487,6 +502,13 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">TDMAAwareApplicationVertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">atoms_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="p">,</span> <span class="p">(</span><span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="o">.</span><span class="n">calculate_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SpikeSourcePoissonVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atoms_shape</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.create_machine_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.create_machine_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">LegacyPartitionerAPI</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_machine_vertex</span><span class="p">(</span>

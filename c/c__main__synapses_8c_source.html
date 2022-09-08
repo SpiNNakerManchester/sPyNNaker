@@ -103,7 +103,7 @@ $(function() {
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">struct </span><a class="code" href="spike__processing__fast_8h.html#structspike__processing__fast__provenance">spike_processing_fast_provenance</a> spike_processing_prov;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="c__main__synapses_8c.html#a4c4786354df7358bf12c3c65069dd8b7">   54</a></span>&#160;<span class="keyword">enum</span> <a class="code" href="c__main__neurons_8c.html#a4c4786354df7358bf12c3c65069dd8b7">regions</a> {</div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="c__main__synapses_8c.html#a4c4786354df7358bf12c3c65069dd8b7">   54</a></span>&#160;<span class="keyword">enum</span> regions {</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/command__sender__multicast__source_8c.html#a6e4d67a0bd74db4da98539f8d2e5ab32ad102acc20b0123ad06640d8c591c304f">SYSTEM_REGION</a>,</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    PROVENANCE_DATA_REGION,</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    PROFILER_REGION,</div>
@@ -250,7 +250,6 @@ $(function() {
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;}</div>
 <div class="ttc" id="abit__field__expander_8c_html_af9b6824a750777e79471f086307d51b9"><div class="ttname"><a href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a></div><div class="ttdeci">uint32_t row_max_n_words</div><div class="ttdoc">Stores the max row size for DMA reads (used when extracting a synapse row from sdram.</div><div class="ttdef"><b>Definition:</b> <a href="bit__field__expander_8c_source.html#l00068">bit_field_expander.c:68</a></div></div>
 <div class="ttc" id="ac__main_8c_html_a9d013c2e9d5eddd8472bd57e9b21ff99"><div class="ttname"><a href="c__main_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a></div><div class="ttdeci">static weight_t * ring_buffers</div><div class="ttdoc">The ring buffers to be used in the simulation.</div><div class="ttdef"><b>Definition:</b> <a href="c__main_8c_source.html#l00118">c_main.c:118</a></div></div>
-<div class="ttc" id="ac__main__neurons_8c_html_a4c4786354df7358bf12c3c65069dd8b7"><div class="ttname"><a href="c__main__neurons_8c.html#a4c4786354df7358bf12c3c65069dd8b7">regions</a></div><div class="ttdeci">regions</div><div class="ttdoc">Overall regions to be used by the neuron core.</div><div class="ttdef"><b>Definition:</b> <a href="c__main__neurons_8c_source.html#l00049">c_main_neurons.c:49</a></div></div>
 <div class="ttc" id="ac__main__synapses_8c_html_a2178bb4764f423b1534a9631b0cc6e5e"><div class="ttname"><a href="c__main__synapses_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">simulation_ticks</a></div><div class="ttdeci">static uint32_t simulation_ticks</div><div class="ttdoc">The number of timer ticks to run for before being expected to exit.</div><div class="ttdef"><b>Definition:</b> <a href="c__main__synapses_8c_source.html#l00104">c_main_synapses.c:104</a></div></div>
 <div class="ttc" id="ac__main__synapses_8c_html_a65b19dabf5283c1ea37df964ca25e964"><div class="ttname"><a href="c__main__synapses_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a></div><div class="ttdeci">callback_priorities</div><div class="ttdoc">values for the priority for each callback</div><div class="ttdef"><b>Definition:</b> <a href="c__main__synapses_8c_source.html#l00043">c_main_synapses.c:43</a></div></div>
 <div class="ttc" id="ac__main__synapses_8c_html_a6a6f18428eca2d03be2d82834e642876"><div class="ttname"><a href="c__main__synapses_8c.html#a6a6f18428eca2d03be2d82834e642876">store_provenance_data</a></div><div class="ttdeci">static void store_provenance_data(address_t provenance_region)</div><div class="ttdoc">Callback to store provenance data (format: neuron_provenance).</div><div class="ttdef"><b>Definition:</b> <a href="c__main__synapses_8c_source.html#l00114">c_main_synapses.c:114</a></div></div>
@@ -315,7 +314,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:28 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

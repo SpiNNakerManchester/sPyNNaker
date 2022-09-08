@@ -113,7 +113,7 @@ $(function() {
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;} <a class="code" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a>;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="sp__structs_8h.html">   49</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    uint32_t <a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    uint32_t <a class="code" href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    uint32_t mask;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    uint32_t n_atoms;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    uint32_t lo_atom;</div>
@@ -317,11 +317,11 @@ $(function() {
 <div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
+<div class="ttc" id="adelay__extension_8c_html_a6d4ec8e4f3148d51041635da9986c3fa"><div class="ttname"><a href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a></div><div class="ttdeci">static uint32_t key</div><div class="ttdoc">Base multicast key for sending messages.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00082">delay_extension.c:82</a></div></div>
 <div class="ttc" id="aelimination__random__by__weight__impl_8h_html_structelimination__params"><div class="ttname"><a href="elimination__random__by__weight__impl_8h.html#structelimination__params">elimination_params</a></div><div class="ttdoc">Configuration of synapse elimination rule.</div><div class="ttdef"><b>Definition:</b> <a href="elimination__random__by__weight__impl_8h_source.html#l00026">elimination_random_by_weight_impl.h:26</a></div></div>
 <div class="ttc" id="aformation__distance__dependent__impl_8h_html_structformation__params"><div class="ttname"><a href="formation__distance__dependent__impl_8h.html#structformation__params">formation_params</a></div><div class="ttdoc">Configuration of synapse formation rule.</div><div class="ttdef"><b>Definition:</b> <a href="formation__distance__dependent__impl_8h_source.html#l00040">formation_distance_dependent_impl.h:40</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_a15c5afaa95cf67525970ec7c98d4a859"><div class="ttname"><a href="neuron-typedefs_8h.html#a15c5afaa95cf67525970ec7c98d4a859">synaptic_row_t</a></div><div class="ttdeci">struct synaptic_row * synaptic_row_t</div><div class="ttdoc">The type of a synaptic row.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00119">neuron-typedefs.h:119</a></div></div>
 <div class="ttc" id="aneuron-typedefs_8h_html_a6f8f96f76107734fe756b67227742b32"><div class="ttname"><a href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a></div><div class="ttdeci">uint32_t spike_t</div><div class="ttdoc">The type of a spike.</div><div class="ttdef"><b>Definition:</b> <a href="neuron-typedefs_8h_source.html#l00079">neuron-typedefs.h:79</a></div></div>
-<div class="ttc" id="aneuron_8c_html_ac8861193246fc34d8f29ac9d57b6791a"><div class="ttname"><a href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a></div><div class="ttdeci">key_t key</div><div class="ttdoc">The key to be used for this core (will be ORed with neuron ID)</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00031">neuron.c:31</a></div></div>
 <div class="ttc" id="arandom_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a></div></div>
 <div class="ttc" id="arandom_8h_html_a5ff5ed3094e34b85104b603f69f15d33"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#a5ff5ed3094e34b85104b603f69f15d33">mars_kiss64_seed</a></div><div class="ttdeci">uint32_t mars_kiss64_seed(mars_kiss64_seed_t seed)</div></div>
 <div class="ttc" id="arandom_8h_html_ad0b387766bfa2af618fb636ed7bcba6e"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/random_8h.html#ad0b387766bfa2af618fb636ed7bcba6e">mars_kiss64_seed_t</a></div><div class="ttdeci">uint32_t mars_kiss64_seed_t[4]</div></div>
@@ -355,7 +355,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:29 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

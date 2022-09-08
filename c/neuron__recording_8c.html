@@ -93,14 +93,14 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ac891e5a719d1f4e09038f831374b18fc"><td class="memItemLeft" align="right" valign="top"><a id="ac891e5a719d1f4e09038f831374b18fc"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#ac891e5a719d1f4e09038f831374b18fc">FLOOR_TO_4</a>&#160;&#160;&#160;0xFFFFFFFC</td></tr>
-<tr class="memdesc:ac891e5a719d1f4e09038f831374b18fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">When bitwise anded with a number will floor to the nearest multiple of 4. <br /></td></tr>
-<tr class="separator:ac891e5a719d1f4e09038f831374b18fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a116ca5cd8794f7ac7266ed798720a3d6"><td class="memItemLeft" align="right" valign="top"><a id="a116ca5cd8794f7ac7266ed798720a3d6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a116ca5cd8794f7ac7266ed798720a3d6">CEIL_TO_4</a>&#160;&#160;&#160;3</td></tr>
-<tr class="memdesc:a116ca5cd8794f7ac7266ed798720a3d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add to a number before applying floor to 4 to turn it into a ceil operation. <br /></td></tr>
-<tr class="separator:a116ca5cd8794f7ac7266ed798720a3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a403b173ad583ec922758a7edc380fa3c"><td class="memItemLeft" align="right" valign="top"><a id="a403b173ad583ec922758a7edc380fa3c"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a403b173ad583ec922758a7edc380fa3c">FLOOR_TO_2</a>&#160;&#160;&#160;0xFFFFFFFE</td></tr>
+<tr class="memdesc:a403b173ad583ec922758a7edc380fa3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">When bitwise anded with a number will floor to the nearest multiple of 2. <br /></td></tr>
+<tr class="separator:a403b173ad583ec922758a7edc380fa3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2d4795fc5236852254c8bebccde5764"><td class="memItemLeft" align="right" valign="top"><a id="aa2d4795fc5236852254c8bebccde5764"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#aa2d4795fc5236852254c8bebccde5764">CEIL_TO_2</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:aa2d4795fc5236852254c8bebccde5764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add to a number before applying floor to 2 to turn it into a ceil operation. <br /></td></tr>
+<tr class="separator:aa2d4795fc5236852254c8bebccde5764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -129,14 +129,14 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a7cc034f7ab8027e4b9ce66791b2365ff"><td class="memItemLeft" align="right" valign="top"><a id="a7cc034f7ab8027e4b9ce66791b2365ff"></a>
-uint8_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a7cc034f7ab8027e4b9ce66791b2365ff">neuron_recording_indexes</a></td></tr>
-<tr class="memdesc:a7cc034f7ab8027e4b9ce66791b2365ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index to record each variable to for each neuron. <br /></td></tr>
-<tr class="separator:a7cc034f7ab8027e4b9ce66791b2365ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2edd162fb9940477e5363386ba417f9e"><td class="memItemLeft" align="right" valign="top"><a id="a2edd162fb9940477e5363386ba417f9e"></a>
-uint8_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a2edd162fb9940477e5363386ba417f9e">bitfield_recording_indexes</a></td></tr>
-<tr class="memdesc:a2edd162fb9940477e5363386ba417f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index to record each bitfield variable to for each neuron. <br /></td></tr>
-<tr class="separator:a2edd162fb9940477e5363386ba417f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d71204655340d9946d301dd396b3cfe"><td class="memItemLeft" align="right" valign="top"><a id="a7d71204655340d9946d301dd396b3cfe"></a>
+uint16_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a7d71204655340d9946d301dd396b3cfe">neuron_recording_indexes</a></td></tr>
+<tr class="memdesc:a7d71204655340d9946d301dd396b3cfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index to record each variable to for each neuron. <br /></td></tr>
+<tr class="separator:a7d71204655340d9946d301dd396b3cfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e8050b4ec719ade7df406f544d1eb30"><td class="memItemLeft" align="right" valign="top"><a id="a8e8050b4ec719ade7df406f544d1eb30"></a>
+uint16_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a8e8050b4ec719ade7df406f544d1eb30">bitfield_recording_indexes</a></td></tr>
+<tr class="memdesc:a8e8050b4ec719ade7df406f544d1eb30"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index to record each bitfield variable to for each neuron. <br /></td></tr>
+<tr class="separator:a8e8050b4ec719ade7df406f544d1eb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96a8e9a2f37a358a5264aadc6bb37263"><td class="memItemLeft" align="right" valign="top"><a id="a96a8e9a2f37a358a5264aadc6bb37263"></a>
 <a class="el" href="neuron__recording_8h.html#structrecording__info__t">recording_info_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a96a8e9a2f37a358a5264aadc6bb37263">recording_info</a></td></tr>
 <tr class="memdesc:a96a8e9a2f37a358a5264aadc6bb37263"><td class="mdescLeft">&#160;</td><td class="mdescRight">An array of recording information structures. <br /></td></tr>
@@ -180,7 +180,7 @@ static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 </div><div class="memdoc">
 <div class="textblock"><p>The heading of the neuron recording region. </p>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00272">272</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00274">274</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
@@ -310,7 +310,7 @@ The number of bitfield variables to record. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool stating if the read was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00182">182</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00184">184</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
@@ -347,7 +347,7 @@ The number of bitfield variables to record. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00193">193</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00195">195</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
@@ -384,7 +384,7 @@ The number of bitfield variables to record. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00233">233</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00235">235</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
@@ -431,14 +431,14 @@ The number of bitfield variables to record. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bool stating if the init was successful or not </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00279">279</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="neuron__recording_8c_source.html#l00281">281</a> of file <a class="el" href="neuron__recording_8c_source.html">neuron_recording.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:29 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

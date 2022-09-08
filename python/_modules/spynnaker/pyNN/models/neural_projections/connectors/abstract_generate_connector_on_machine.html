@@ -57,11 +57,15 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">abstractproperty</span><span class="p">,</span> <span class="n">AbstractBase</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractConnector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
 
 <span class="c1"># Hash of the constant parameter generator</span>
 <span class="n">PARAM_TYPE_CONSTANT_ID</span> <span class="o">=</span> <span class="mi">0</span>
@@ -111,6 +115,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connector_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AbstractGenerateConnectorOnMachine.validate_connection"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractGenerateConnectorOnMachine.validate_connection">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">validate_connection</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">validate_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># If we can&#39;t generate on machine, we must be able to generate on host</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;The parameters of this connection do not allow it to be&quot;</span>
+                    <span class="s2">&quot; generated on the machine, but the connector cannot&quot;</span>
+                    <span class="s2">&quot; be generated on host!&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_generate_lists_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Checks if the connector should generate lists on machine rather\</span>

@@ -512,7 +512,7 @@
         <span class="c1"># Get the key as the first key and the mask as the mask that covers</span>
         <span class="c1"># enough keys</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">n_extra_mask_bits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">),</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="n">n_extra_mask_bits</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">))))</span>
         <span class="n">core_mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="n">n_extra_mask_bits</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">core_mask</span> <span class="o">&lt;&lt;</span> <span class="n">mask_size</span><span class="p">)</span>
 
@@ -670,7 +670,7 @@
 <span class="sd">        :param SynapseInformation synapse_info:</span>
 <span class="sd">            The synapse information of the projection</span>
 <span class="sd">        :return: A list of arrays of connections, each with dtype</span>
-<span class="sd">            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
+<span class="sd">            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__app_matrix</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>

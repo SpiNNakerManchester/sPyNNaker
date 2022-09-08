@@ -586,7 +586,7 @@ The sdram usage of the current source.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.AllToAllConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">AllToAllConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.AllToAllConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>Connects all cells in the presynaptic population to all cells in         the postsynaptic population.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -778,7 +778,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.ArrayConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">ArrayConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.ArrayConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Make connections using an array of integers based on the IDs        of the neurons in the pre- and post-populations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -935,7 +935,7 @@ where all the neurons are of the same type.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.CSAConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">CSAConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.CSAConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Make connections using a Connection Set Algebra (Djurfeldt 2012)        description between the neurons in the pre- and post-populations.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1089,6 +1089,221 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 </dd>
 </dl>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.Convolution">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">Convolution</span></span><a class="headerlink" href="#spynnaker.pyNN.Convolution" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LocalOnlyConvolution</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">ConvolutionConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernel_weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strides</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'excitatory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inhibitory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<p>Where the pre- and post-synaptic populations are considered as a 2D    array. Connect every post(row, col) neuron to many pre(row, col, kernel)    through a (kernel) set of weights and/or delays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kernel_weights</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> or </em><em>2D-list</em><em> or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference internal" href="#spynnaker.pyNN.RandomDistribution" title="spynnaker.pyNN.RandomDistribution"><em>RandomDistribution</em></a>) – The synaptic strengths, shared by neurons in the post population.
+Can be:
+* single value: kernel_shape must be provided;                            the same value will be used for all weights
+* simple list: kernel_shape must be provided; the list must                           be sized shape width * height
+* 2D list: If kernel_shape is provided, it must match
+* numpy.ndarray: As above for simple or 2D list
+* RandomDistribution: kernel_shape must be provided; weights                                  will be drawn from the distribution</p></li>
+<li><p><strong>kernel_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – The shape of the kernel if it cannot be determined from
+kernel_weights. If a single value is provided, a square kernel will
+be assumed.  If two values are provided, it will be assumed to be
+(n_rows, n_columns)</p></li>
+<li><p><strong>strides</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>)</em>) – Spatial sampling frequency, jumps between the post neurons.
+This matches the meaning of standard ML packages.  If a single
+value is provided, the same stride will be used for rows and
+columns.  If two values are provided it will be assumed to be
+(stride_rows, stride_columns)</p></li>
+<li><p><strong>padding</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – How many ‘extra pixels’ around the pre population will be added,
+only zero-valued pixels are currently supported.  If a single
+value is provided, the same padding will be used for rows and
+columns.  If two values are provided it will be assumed to be
+(padding_rows, padding_columns).  If True, automatic padding will
+be used based on the kernel shape.  If False or None, no padding
+will be used.</p></li>
+<li><p><strong>pool_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – Area of pooling, only average pooling is supported (and seems to
+make sense). If a single value is provided, the pooling area will
+be square.  If two values are provided it will be assumed to be
+(pooling_rows, pooling_columns).</p></li>
+<li><p><strong>pool_stride</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – Jumps between pooling regions. If a single value is provided, the
+same stride will be used for rows and columns.  If two values are
+provided it will be assumed to be (stride_rows, stride_columns)</p></li>
+<li><p><strong>positive_receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The receptor type to add the positive weights to.  By default this
+is “excitatory”.</p></li>
+<li><p><strong>negative_receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The receptor type to add the negative weights to.  By default this
+is “inhibitory”.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – (ignored)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – (ignored)</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – (ignored)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_connected_vertices">
+<span class="sig-name descname"><span class="pre">get_connected_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_connected_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_connected_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the machine vertices that are connected to each other with</dt><dd><p>this connector</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
+<li><p><strong>source_vertex</strong> (<em>ApplicationVertex</em>) – The source of the spikes</p></li>
+<li><p><strong>target_vertex</strong> (<em>ApplicationVertex</em>) – The target of the spikes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of (target machine vertex, source</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(MachineVertex, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(AbstractVertex)))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_delay_maximum">
+<span class="sig-name descname"><span class="pre">get_delay_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_delay_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – the synapse info</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_delay_minimum">
+<span class="sig-name descname"><span class="pre">get_delay_minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_delay_minimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum">
+<span class="sig-name descname"><span class="pre">get_n_connections_from_pre_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_n_connections_from_pre_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_n_connections_from_pre_vertex_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum number of connections from any</dt><dd><p>neuron in the pre vertex to the neurons in the post_vertex_slice,
+for connections with a delay between min_delay and max_delay
+(inclusive) if both specified (otherwise all connections).</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delays</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference internal" href="#spynnaker.pyNN.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>
+or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – </p></li>
+<li><p><strong>n_post_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
+<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_n_connections_to_post_vertex_maximum">
+<span class="sig-name descname"><span class="pre">get_n_connections_to_post_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_n_connections_to_post_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_n_connections_to_post_vertex_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum number of connections to any neuron</dt><dd><p>in the post vertex from neurons in the pre vertex.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_post_shape">
+<span class="sig-name descname"><span class="pre">get_post_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_post_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_post_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the shape of the post image given the pre-image shape</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.get_weight_maximum">
+<span class="sig-name descname"><span class="pre">get_weight_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.get_weight_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.get_weight_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum of the weights for this connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.kernel_weights">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kernel_weights</span></span><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.kernel_weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.local_only_n_bytes">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">local_only_n_bytes</span></span><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.local_only_n_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.negative_receptor_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.negative_receptor_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.positive_receptor_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">positive_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.positive_receptor_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.validate_connection">
+<span class="sig-name descname"><span class="pre">validate_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.validate_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.validate_connection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Checks that the edge supports the connector.  By default this does</dt><dd><p>nothing i.e. assumes the edge is OK, but can be overridden if the
+connector has rules that need to be checked.  Returns nothing; it
+is assumed that an Exception will be raised if anything is wrong.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application_edge</strong> (<em>ApplicationEdge</em>) – The edge of the connection</p></li>
+<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synaptic information</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.ConvolutionConnector.write_local_only_data">
+<span class="sig-name descname"><span class="pre">write_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/convolution_connector.html#ConvolutionConnector.write_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.ConvolutionConnector.write_local_only_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -1294,7 +1509,7 @@ The sdram usage of the current source.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.DistanceDependentProbabilityConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">DistanceDependentProbabilityConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.DistanceDependentProbabilityConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Make connections using a distribution which varies with distance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1464,7 +1679,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.FixedNumberPostConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">FixedNumberPostConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_replacement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.FixedNumberPostConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>Connects a fixed number of post-synaptic neurons selected at random,        to all pre-synaptic neurons.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1667,7 +1882,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.FixedNumberPreConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">FixedNumberPreConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_replacement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.FixedNumberPreConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>Connects a fixed number of pre-synaptic neurons selected at random,        to all post-synaptic neurons.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1869,7 +2084,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.FixedProbabilityConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">FixedProbabilityConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p_connect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.FixedProbabilityConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>For each pair of pre-post cells, the connection probability is         constant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2124,7 +2339,7 @@ CSV file</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.FromListConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">FromListConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.FromListConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Make connections according to a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2180,32 +2395,6 @@ If not provided, it is assumed the parameters are <code class="docutils literal 
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.FromListConnector.could_connect">
-<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.FromListConnector.could_connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if a pre slice and a post slice could connect.</p>
-<p>Typically used to determine if a Machine Edge should be created by
-checking that at least one of the indexes in the pre slice could
-over time connect to at least one of the indexes in the post slice.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This method should never return a false negative,
-but may return a false positives</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
-<li><p><strong>src_machine_vertexx</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
-<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.FromListConnector.create_synaptic_block">
 <span class="sig-name descname"><span class="pre">create_synaptic_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.create_synaptic_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.FromListConnector.create_synaptic_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a synaptic block from the data.</p>
@@ -2229,6 +2418,30 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.FromListConnector.get_connected_vertices">
+<span class="sig-name descname"><span class="pre">get_connected_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.get_connected_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.FromListConnector.get_connected_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the machine vertices that are connected to each other with</dt><dd><p>this connector</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
+<li><p><strong>source_vertex</strong> (<em>ApplicationVertex</em>) – The source of the spikes</p></li>
+<li><p><strong>target_vertex</strong> (<em>ApplicationVertex</em>) – The target of the spikes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of (target machine vertex, source</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(MachineVertex, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(AbstractVertex)))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2500,7 +2713,7 @@ to this structure.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.IndexBasedProbabilityConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">IndexBasedProbabilityConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.IndexBasedProbabilityConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Make connections using a probability distribution which varies        dependent upon the indices of the pre- and post-populations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2674,7 +2887,7 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.KernelConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">KernelConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape_pre</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_post</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_kernel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay_kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_common</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_sample_steps_in_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_start_coords_in_post</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_sample_steps_in_pre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_start_coords_in_pre</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.KernelConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>Where the pre- and post-synaptic populations are considered as a 2D    array. Connect every post(row, col) neuron to many pre(row, col, kernel)    through a (kernel) set of weights and/or delays.</p>
 <div class="admonition-todo admonition">
 <p class="admonition-title">TODO</p>
@@ -2878,6 +3091,30 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>(<em>uint32</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.KernelConnector.get_connected_vertices">
+<span class="sig-name descname"><span class="pre">get_connected_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/kernel_connector.html#KernelConnector.get_connected_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.KernelConnector.get_connected_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the machine vertices that are connected to each other with</dt><dd><p>this connector</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
+<li><p><strong>source_vertex</strong> (<em>ApplicationVertex</em>) – The source of the spikes</p></li>
+<li><p><strong>target_vertex</strong> (<em>ApplicationVertex</em>) – The target of the spikes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of (target machine vertex, source</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(MachineVertex, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(AbstractVertex)))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3158,7 +3395,7 @@ The sdram usage of the current source.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.OneToOneConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">OneToOneConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.OneToOneConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnMachine</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnectorSupportsViewsOnMachine</span></code></p>
 <p>Where the pre- and postsynaptic populations have the same size,        connect cell <em>i</em> in the presynaptic population to cell <em>i</em> in        the postsynaptic population, for all <em>i</em>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3176,32 +3413,6 @@ CSV file</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.OneToOneConnector.could_connect">
-<span class="sig-name descname"><span class="pre">could_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src_machine_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_machine_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.could_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.OneToOneConnector.could_connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if a pre slice and a post slice could connect.</p>
-<p>Typically used to determine if a Machine Edge should be created by
-checking that at least one of the indexes in the pre slice could
-over time connect to at least one of the indexes in the post slice.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This method should never return a false negative,
-but may return a false positives</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
-<li><p><strong>src_machine_vertexx</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
-<li><p><strong>dest_machine_vertex</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.OneToOneConnector.create_synaptic_block">
 <span class="sig-name descname"><span class="pre">create_synaptic_block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.create_synaptic_block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.OneToOneConnector.create_synaptic_block" title="Permalink to this definition">¶</a></dt>
@@ -3269,6 +3480,30 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.OneToOneConnector.get_connected_vertices">
+<span class="sig-name descname"><span class="pre">get_connected_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.get_connected_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.OneToOneConnector.get_connected_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the machine vertices that are connected to each other with</dt><dd><p>this connector</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synapse information of the connection</p></li>
+<li><p><strong>source_vertex</strong> (<em>ApplicationVertex</em>) – The source of the spikes</p></li>
+<li><p><strong>target_vertex</strong> (<em>ApplicationVertex</em>) – The target of the spikes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of (target machine vertex, source</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(MachineVertex, <a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(AbstractVertex)))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -3370,6 +3605,180 @@ or </em><a class="reference external" href="https://docs.python.org/3.8/library/
 </dd>
 </dl>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDense">
+<span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">PoolDense</span></span><a class="headerlink" href="#spynnaker.pyNN.PoolDense" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">LocalOnlyPoolDense</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">PoolDenseConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'excitatory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_receptor_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inhibitory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<p>Where the pre- and post-synaptic populations are considered as a 2D    array. Connect every post(row, col) neuron to many pre(row, col, kernel)    through a (kernel) set of weights and/or delays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference internal" href="#spynnaker.pyNN.RandomDistribution" title="spynnaker.pyNN.RandomDistribution"><em>RandomDistribution</em></a>) – The synaptic strengths
+Can be:
+* single value: the same value will be used for all weights
+* list: the total number of elements must be                    (num after pooling * num post)
+* numpy.ndarray: As above for list
+* RandomDistribution: weights will be drawn at random</p></li>
+<li><p><strong>pool_shape</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – Shape of average pooling. If a single value is provided, it will
+be used for every dimension, otherwise must be the same number of
+values as there are dimensions in the source.</p></li>
+<li><p><strong>pool_stride</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)"><em>tuple</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><em>None</em>) – Jumps between pooling regions. If a single value is provided, the
+same stride will be used for all dimensions, otherwise must be
+the same number of values as there are dimensions in the source.
+If None, and pool_shape is provided, pool_stride will be set to
+pool_shape.</p></li>
+<li><p><strong>positive_receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The receptor type to add the positive weights to.  By default this
+is “excitatory”.</p></li>
+<li><p><strong>negative_receptor_type</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The receptor type to add the negative weights to.  By default this
+is “inhibitory”.</p></li>
+<li><p><strong>safe</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – (ignored)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – (ignored)</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – (ignored)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_delay_maximum">
+<span class="sig-name descname"><span class="pre">get_delay_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_delay_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_delay_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum delay specified by the user in ms, or None if            unbounded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – the synapse info</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_delay_minimum">
+<span class="sig-name descname"><span class="pre">get_delay_minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_delay_minimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_delay_minimum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum delay specified by the user in ms, or None if            unbounded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_n_connections_from_pre_vertex_maximum">
+<span class="sig-name descname"><span class="pre">get_n_connections_from_pre_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_n_connections_from_pre_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_n_connections_from_pre_vertex_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum number of connections from any</dt><dd><p>neuron in the pre vertex to the neurons in the post_vertex_slice,
+for connections with a delay between min_delay and max_delay
+(inclusive) if both specified (otherwise all connections).</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>delays</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a><em> or </em><a class="reference internal" href="#spynnaker.pyNN.NumpyRNG" title="pyNN.random.NumpyRNG"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>
+or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>)</em>) – </p></li>
+<li><p><strong>n_post_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p></li>
+<li><p><strong>min_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </p></li>
+<li><p><strong>max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_n_connections_to_post_vertex_maximum">
+<span class="sig-name descname"><span class="pre">get_n_connections_to_post_vertex_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_n_connections_to_post_vertex_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_n_connections_to_post_vertex_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Get the maximum number of connections to any neuron</dt><dd><p>in the post vertex from neurons in the pre vertex.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_post_pool_shape">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_post_pool_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pre_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_stride</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_post_pool_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_post_pool_shape" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.get_weight_maximum">
+<span class="sig-name descname"><span class="pre">get_weight_maximum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.get_weight_maximum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.get_weight_maximum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum of the weights for this connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.local_only_n_bytes">
+<span class="sig-name descname"><span class="pre">local_only_n_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">incoming_slices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_post_atoms</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.local_only_n_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.local_only_n_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.negative_receptor_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">negative_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.negative_receptor_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.positive_receptor_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">positive_receptor_type</span></span><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.positive_receptor_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.validate_connection">
+<span class="sig-name descname"><span class="pre">validate_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapse_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.validate_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.validate_connection" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Checks that the edge supports the connector.  By default this does</dt><dd><p>nothing i.e. assumes the edge is OK, but can be overridden if the
+connector has rules that need to be checked.  Returns nothing; it
+is assumed that an Exception will be raised if anything is wrong.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application_edge</strong> (<em>ApplicationEdge</em>) – The edge of the connection</p></li>
+<li><p><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) – The synaptic information</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.weights">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.weights" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.PoolDenseConnector.write_local_only_data">
+<span class="sig-name descname"><span class="pre">write_local_only_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/pool_dense_connector.html#PoolDenseConnector.write_local_only_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.PoolDenseConnector.write_local_only_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -3605,7 +4014,7 @@ this parameter is True.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.11)"><em>Block</em></a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.exceptions.ConfigurationException" title="(in SpiNNFrontEndCommon v6.0)"><strong>ConfigurationException</strong></a> – If the variable or variables have not been previously set to
@@ -3632,7 +4041,7 @@ If None will be taken as all recording as in <a class="reference internal" href=
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.11)"><em>Block</em></a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.exceptions.ConfigurationException" title="(in SpiNNFrontEndCommon v6.0)"><strong>ConfigurationException</strong></a> – If the variable or variables have not been previously set to
@@ -3945,10 +4354,13 @@ ints as values</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.Population.set_max_atoms_per_core">
 <span class="sig-name descname"><span class="pre">set_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_atoms_per_core</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/populations/population.html#Population.set_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.Population.set_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supports the setting of this population’s max atoms per core</p>
+<dd><dl class="simple">
+<dt>Supports the setting of this population’s max atoms per</dt><dd><p>dimension per core</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the new value for the max atoms per core.</p>
+<dd class="field-odd"><p><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the new value for the max atoms per dimension per core.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -4224,7 +4636,7 @@ simulated on the local node.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.11)"><em>Block</em></a></p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities/#spinn_front_end_common.utilities.exceptions.ConfigurationException" title="(in SpiNNFrontEndCommon v6.0)"><strong>ConfigurationException</strong></a> – If the variable or variables have not been previously set to
@@ -4771,7 +5183,7 @@ to this structure.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.SmallWorldConnector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">SmallWorldConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rewiring</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_self_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.SmallWorldConnector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractConnector</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateConnectorOnHost</span></code></p>
 <p>A connector that uses connection statistics based on the Small World        network connectivity model.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -5033,6 +5445,11 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">SpikeSourcePoisson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPyNNModel</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.absolute_max_atoms_per_core">
+<span class="sig-name descname"><span class="pre">absolute_max_atoms_per_core</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500</span></em><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.absolute_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.create_vertex">
 <span class="sig-name descname"><span class="pre">create_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_neurons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">splitter</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -5058,28 +5475,6 @@ From <a class="reference external" href="http://projects.scipy.org/pipermail/num
 <dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.default_population_parameters">
 <span class="sig-name descname"><span class="pre">default_population_parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'max_rate':</span> <span class="pre">None,</span> <span class="pre">'seed':</span> <span class="pre">None,</span> <span class="pre">'splitter':</span> <span class="pre">None}</span></em><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.default_population_parameters" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.get_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_max_atoms_per_core</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.get_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.SpikeSourcePoisson.set_model_max_atoms_per_core">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_model_max_atoms_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.set_model_max_atoms_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.SpikeSourcePoisson.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the maximum number of atoms per core for this model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n_atoms</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The new maximum, or None for the largest possible</p>
-</dd>
-</dl>
-</dd></dl>
 
 </dd></dl>
 
@@ -5406,7 +5801,7 @@ contains a list of variables that can be recorded for that celltype.</p></li>
 <dd class="field-even"><p>neo object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.10)"><em>Block</em></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://neo.readthedocs.io/en/stable/api_reference.html#neo.core.Block" title="(in Neo v0.11)"><em>Block</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -5524,7 +5919,17 @@ contains a list of variables that can be recorded for that celltype.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="spynnaker.pyNN.set_number_of_neurons_per_core">
 <span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.</span></span><span class="sig-name descname"><span class="pre">set_number_of_neurons_per_core</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuron_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_permitted</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN.html#set_number_of_neurons_per_core"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets a ceiling on the number of neurons of a given type that can be        placed on a single core.</p>
+<dd><dl class="simple">
+<dt>Sets a ceiling on the number of neurons of a given model that can be        placed on a single core.</dt><dd><p>This can be overridden by the individual Population.
+The new value can be None, meaning that the maximum is the same as
+the number of atoms, an int, meaning all Populations of this model
+must have one dimension, or a tuple of n integers, meaning all
+Populations of this model must have n dimensions.
+If not all Populations of this model have the same number of
+dimensions, it is recommended to set this to None here and then
+set the maximum on each Population.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

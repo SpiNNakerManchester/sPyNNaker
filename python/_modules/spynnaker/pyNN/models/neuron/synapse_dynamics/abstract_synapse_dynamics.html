@@ -53,10 +53,9 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span>
 
 
 <span class="k">class</span> <span class="nc">AbstractSynapseDynamics</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
@@ -64,10 +63,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
-
-    <span class="c1">#: Type model of the basic configuration data of a connector</span>
-    <span class="n">NUMPY_CONNECTORS_DTYPE</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
-                              <span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;delay&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.merge">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -78,66 +73,11 @@
 <span class="sd">        :rtype: AbstractSynapseDynamics</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
-<div class="viewcode-block" id="AbstractSynapseDynamics.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.is_same_as">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determines if this synapse dynamics is the same as another</span>
-
-<span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.are_weights_signed"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.are_weights_signed">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">are_weights_signed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determines if the weights are signed values</span>
-
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_vertex_executable_suffix">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the executable suffix for a vertex for this dynamics</span>
 
 <span class="sd">        :rtype: str</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the SDRAM usage of the synapse dynamics parameters in bytes</span>
-
-<span class="sd">        :param int n_neurons:</span>
-<span class="sd">        :param int n_synapse_types:</span>
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.write_parameters">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">global_weight_scale</span><span class="p">,</span>
-                         <span class="n">synapse_weight_scales</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec</span>
-
-<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">            The specification to write to</span>
-<span class="sd">        :param int region: region ID to write to</span>
-<span class="sd">        :param float global_weight_scale: The weight scale applied globally</span>
-<span class="sd">        :param list(float) synapse_weight_scales:</span>
-<span class="sd">            The total weight scale applied to each synapse including the global</span>
-<span class="sd">            weight scale</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_parameter_names">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the parameter names available from the synapse \</span>
-<span class="sd">            dynamics components</span>
-
-<span class="sd">        :rtype: iterable(str)</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.get_max_synapses"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_max_synapses">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_max_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_words</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the maximum number of synapses that can be held in the given\</span>
-<span class="sd">            number of words</span>
-
-<span class="sd">        :param int n_words: The number of words the synapses must fit in</span>
-<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>
@@ -161,11 +101,6 @@
     <span class="k">def</span> <span class="nf">set_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the delay</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
-
-    <span class="nd">@abstractproperty</span>
-    <span class="k">def</span> <span class="nf">pad_to_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The amount each row should pad to, or None if not specified</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay for the synapses</span>
@@ -218,47 +153,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">connector</span><span class="o">.</span><span class="n">get_weight_variance</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AbstractSynapseDynamics.convert_per_connection_data_to_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.convert_per_connection_data_to_rows">[docs]</a>    <span class="k">def</span> <span class="nf">convert_per_connection_data_to_rows</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">max_n_synapses</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Converts per-connection data generated from connections into\</span>
-<span class="sd">            row-based data to be returned from get_synaptic_data</span>
+<div class="viewcode-block" id="AbstractSynapseDynamics.get_provenance_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the provenance data from this synapse dynamics object</span>
 
-<span class="sd">        :param ~numpy.ndarray connection_row_indices:</span>
-<span class="sd">            The index of the row that each item should go into</span>
-<span class="sd">        :param int n_rows:</span>
-<span class="sd">            The number of rows</span>
-<span class="sd">        :param ~numpy.ndarray data:</span>
-<span class="sd">            The non-row-based data</span>
-<span class="sd">        :param int max_n_synapses:</span>
-<span class="sd">            The maximum number of synapses to generate in each row</span>
-<span class="sd">        :rtype: list(~numpy.ndarray)</span>
+<span class="sd">        :param str pre_population_label:</span>
+<span class="sd">        :param str post_population_label:</span>
+<span class="sd">        :rtype:</span>
+<span class="sd">            iterable(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">data</span><span class="p">[</span><span class="n">connection_row_indices</span> <span class="o">==</span> <span class="n">i</span><span class="p">][:</span><span class="n">max_n_synapses</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">)]</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.get_n_items"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_n_items">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">,</span> <span class="n">item_size</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Get the number of items in each row as 4-byte values, given the\</span>
-<span class="sd">            item size</span>
-
-<span class="sd">        :param ~numpy.ndarray rows:</span>
-<span class="sd">        :param int item_size:</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">item_size</span><span class="p">)))</span>
-            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="AbstractSynapseDynamics.get_words"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_words">[docs]</a>    <span class="k">def</span> <span class="nf">get_words</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Convert the row data to words</span>
-
-<span class="sd">        :param ~numpy.ndarray rows:</span>
-<span class="sd">        :rtype: ~numpy.ndarray</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
-            <span class="n">row</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">4</span> <span class="o">-</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span>
-            <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">words</span></div>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="AbstractSynapseDynamics.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the index of the synapse type based on the name, or None</span>
@@ -269,6 +173,29 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=unused-argument</span>
         <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AbstractSynapseDynamics.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics.get_connected_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the machine vertices that are connected to each other with</span>
+<span class="sd">            this connector</span>
+
+<span class="sd">        :param SynapseInformation s_info:</span>
+<span class="sd">            The synapse information of the connection</span>
+<span class="sd">        :param ApplicationVertex source_vertex: The source of the spikes</span>
+<span class="sd">        :param ApplicationVertex target_vertex: The target of the spikes</span>
+<span class="sd">        :return: A list of tuples of (target machine vertex, source</span>
+<span class="sd">        :rtype: list(tuple(MachineVertex, list(AbstractVertex)))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># By default, just ask the connector</span>
+        <span class="k">return</span> <span class="n">s_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_connected_vertices</span><span class="p">(</span>
+            <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">absolute_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The absolute maximum number of atoms per core supported by this</span>
+<span class="sd">            synapse dynamics object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># By default, we can only support the maximum row length per core</span>
+        <span class="k">return</span> <span class="n">POP_TABLE_MAX_ROW_LENGTH</span>
 </pre></div>
 
             <div class="clearer"></div>

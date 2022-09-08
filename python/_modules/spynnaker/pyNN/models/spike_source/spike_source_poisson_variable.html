@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">.spike_source_poisson_vertex</span> <span class="kn">import</span> <span class="n">SpikeSourcePoissonVertex</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_pynn_model</span> <span class="kn">import</span> <span class="n">AbstractPyNNModel</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.classproperty</span> <span class="kn">import</span> <span class="n">classproperty</span>
 
 <span class="n">_population_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;splitter&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
 
@@ -70,22 +71,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_starts</span> <span class="o">=</span> <span class="n">starts</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_durations</span> <span class="o">=</span> <span class="n">durations</span>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVariable.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.set_model_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">set_model_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span><span class="n">n_atoms</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVariable.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.get_max_atoms_per_core">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span></div>
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">absolute_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
+        <span class="k">return</span> <span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVariable.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.extra_models.SpikeSourcePoissonVariable.create_vertex">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="n">default_population_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">splitter</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
-        <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
+        <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_max_atoms_per_dimension_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">(</span>
             <span class="n">n_neurons</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">max_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span>
             <span class="n">rates</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rates</span><span class="p">,</span> <span class="n">starts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_starts</span><span class="p">,</span> <span class="n">durations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_durations</span><span class="p">,</span>

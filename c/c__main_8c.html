@@ -90,9 +90,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
-<tr class="memitem:structcombined__provenance"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#structcombined__provenance">combined_provenance</a></td></tr>
-<tr class="memdesc:structcombined__provenance"><td class="mdescLeft">&#160;</td><td class="mdescRight">The combined provenance from synapses and neurons.  <a href="c__main_8c.html#structcombined__provenance">More...</a><br /></td></tr>
-<tr class="separator:structcombined__provenance"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcombined__provenance.html">combined_provenance</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The combined provenance from synapses and neurons.  <a href="structcombined__provenance.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -104,20 +104,27 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<b>SDP</b> = 1
 , <b>BACKGROUND</b> = 1
-, <b>DMA</b> = -2
-, <b>SDP</b> = 0
-, <br />
-&#160;&#160;<b>TIMER</b> = 0
 , <b>MC</b> = -1
-, <b>DMA</b> = -2
+, <b>DMA</b> = 0
+, <br />
+&#160;&#160;<b>USER</b> = 0
 , <b>TIMER</b> = 0
+, <b>SDP</b> = 1
+, <b>BACKGROUND</b> = 1
 , <br />
-&#160;&#160;<b>SDP</b> = 0
+&#160;&#160;<b>DMA</b> = -2
+, <b>SDP</b> = 0
+, <b>TIMER</b> = 0
+, <b>MC</b> = -1
+, <br />
+&#160;&#160;<b>DMA</b> = -2
+, <b>TIMER</b> = 0
+, <b>SDP</b> = 0
 , <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1
-, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0
-, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
 , <br />
-&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0
+, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1
+, <a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
  }</td></tr>
 <tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Identify the priorities for all tasks.  <a href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
@@ -136,7 +143,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__m
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a7877934d7f174e52d11945b3a893b7d7">process_ring_buffers</a> (void)</td></tr>
 <tr class="memdesc:a7877934d7f174e52d11945b3a893b7d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the ring buffers for the next time step. <br /></td></tr>
 <tr class="separator:a7877934d7f174e52d11945b3a893b7d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">background_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> local_time)</td></tr>
+<tr class="memitem:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">background_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> <a class="el" href="local__only_8c.html#a8acaea2ca079944abe8a79230097072e">local_time</a>)</td></tr>
 <tr class="memdesc:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Background activities called from timer.  <a href="c__main_8c.html#aa6bf2a62e10a1dd22d4ec7fb3716cab9">More...</a><br /></td></tr>
 <tr class="separator:aa6bf2a62e10a1dd22d4ec7fb3716cab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a217aea663c8dd444052831cbde49bd62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">timer_callback</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> timer_count, <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a91ad9478d81a7aaf2593e8d9c3d06a14">uint</a> unused)</td></tr>
@@ -208,58 +215,7 @@ static weight_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 </div>
  
 <p class="definition">Definition in file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
-</div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
-<a name="structcombined__provenance" id="structcombined__provenance"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structcombined__provenance">&#9670;&nbsp;</a></span>combined_provenance</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct combined_provenance</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The combined provenance from synapses and neurons. </p>
-
-<p class="definition">Definition at line <a class="el" href="c__main_8c_source.html#l00044">44</a> of file <a class="el" href="c__main_8c_source.html">c_main.c</a>.</p>
-</div><table class="fieldtable">
-<tr><th colspan="3">Data Fields</th></tr>
-<tr><td class="fieldtype">
-<a id="aa89d58865b1e82c11427523e4dafbb37"></a>struct <a class="el" href="structneuron__provenance.html">neuron_provenance</a></td>
-<td class="fieldname">
-neuron_provenance</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a24cc1f47ac6debb6d3f73d02d869824b"></a>struct <a class="el" href="structsynapse__provenance.html">synapse_provenance</a></td>
-<td class="fieldname">
-synapse_provenance</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="ad2701b9e94a297f0fe64d64ab562cbe9"></a>struct <a class="el" href="spike__processing_8h.html#structspike__processing__provenance">spike_processing_provenance</a></td>
-<td class="fieldname">
-spike_processing_provenance</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a9381d8e99b4a3369d547b4acd10c3b3d"></a>uint32_t</td>
-<td class="fieldname">
-max_backgrounds_queued</td>
-<td class="fielddoc">
-Maximum backgrounds queued. </td></tr>
-<tr><td class="fieldtype">
-<a id="ad8a8981effe382266cc0a6387e818005"></a>uint32_t</td>
-<td class="fieldname">
-n_background_queue_overloads</td>
-<td class="fielddoc">
-Background queue overloads. </td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a65b19dabf5283c1ea37df964ca25e964"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a65b19dabf5283c1ea37df964ca25e964">&#9670;&nbsp;</a></span>callback_priorities</h2>
 
@@ -569,7 +525,7 @@ Background queue overloads. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:29 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

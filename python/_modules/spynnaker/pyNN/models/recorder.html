@@ -252,13 +252,13 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELECTIVE_RECORDED_MSG</span><span class="p">)</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">ids</span>
-        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">):</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">ids</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># keep just the view indexes in the data</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">view_indexes</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
             <span class="c1"># keep just data columns in the view</span>
-            <span class="n">map_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+            <span class="n">map_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="n">map_indexes</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">as_matrix</span><span class="p">:</span>
@@ -769,13 +769,13 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELECTIVE_RECORDED_MSG</span><span class="p">)</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="n">data_indexes</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">view_indexes</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">):</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># keep just the view indexes in the data</span>
             <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">view_indexes</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">data_indexes</span><span class="p">]</span>
             <span class="c1"># keep just data columns in the view</span>
-            <span class="n">map_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_indexes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+            <span class="n">map_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">data_indexes</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
             <span class="n">signal_array</span> <span class="o">=</span> <span class="n">signal_array</span><span class="p">[:,</span> <span class="n">map_indexes</span><span class="p">]</span>
 
         <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">index_to_id</span><span class="p">,</span> <span class="n">indexes</span><span class="p">))</span>

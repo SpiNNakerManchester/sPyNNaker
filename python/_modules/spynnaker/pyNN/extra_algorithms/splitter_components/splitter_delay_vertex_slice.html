@@ -56,15 +56,9 @@
 
 <span class="kn">from</span> <span class="nn">pacman.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PacmanConfigurationException</span><span class="p">,</span> <span class="n">PacmanInvalidParameterException</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.partitioner_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractPartitionerConstraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.partitioner_splitters.abstract_splitters</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSplitterCommon</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">ConstantSDRAM</span>
-<span class="kn">from</span> <span class="nn">pacman.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
-<span class="kn">from</span> <span class="nn">pacman.utilities.algorithm_utilities.</span>\
-    <span class="n">partition_algorithm_utilities</span> <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">get_remaining_constraints</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
@@ -132,12 +126,12 @@
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">source_app_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">source_vertex</span>
         <span class="n">slices</span> <span class="o">=</span> <span class="n">source_app_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_out_going_slices</span><span class="p">()</span>
-        <span class="n">constraints</span> <span class="o">=</span> <span class="n">get_remaining_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">)</span>
 
         <span class="c1"># create vertices correctly</span>
         <span class="k">for</span> <span class="n">vertex_slice</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
             <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_machine_vertex</span><span class="p">(</span>
-                <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+                <span class="n">source_app_vertex</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="o">.</span><span class="n">remember_machine_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
             <span class="n">chip_counter</span><span class="o">.</span><span class="n">add_core</span><span class="p">(</span><span class="n">vertex</span><span class="o">.</span><span class="n">sdram_required</span><span class="p">)</span></div>
 
@@ -240,13 +234,6 @@
                     <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">),</span>
                 <span class="n">connector</span><span class="o">.</span><span class="n">gen_connector_params_size_in_bytes</span><span class="p">))</span>
         <span class="k">return</span> <span class="mi">0</span>
-
-<div class="viewcode-block" id="SplitterDelayVertexSlice.check_supported_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.check_supported_constraints">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">check_supported_constraints</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">check_supported_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">utility_calls</span><span class="o">.</span><span class="n">check_algorithm_can_support_constraints</span><span class="p">(</span>
-            <span class="n">constrained_vertices</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_governed_app_vertex</span><span class="p">],</span>
-            <span class="n">supported_constraints</span><span class="o">=</span><span class="p">[],</span>
-            <span class="n">abstract_constraint_type</span><span class="o">=</span><span class="n">AbstractPartitionerConstraint</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SplitterDelayVertexSlice.machine_vertices_for_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.extra_algorithms.splitter_components.html#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.machine_vertices_for_recording">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSplitterCommon</span><span class="o">.</span><span class="n">machine_vertices_for_recording</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">machine_vertices_for_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_to_record</span><span class="p">):</span>

@@ -55,7 +55,6 @@
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationEdge</span>
-<span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
@@ -99,14 +98,12 @@
 
 
 <span class="k">class</span> <span class="nc">ProjectionApplicationEdge</span><span class="p">(</span>
-        <span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">,</span>
-        <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
+        <span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An edge which terminates on an :py:class:`AbstractPopulationVertex`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__delay_edge&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__filter&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__is_neuromodulation&quot;</span>
     <span class="p">]</span>
 
@@ -130,9 +127,6 @@
         <span class="c1"># The edge from the delay extension of the pre_vertex to the</span>
         <span class="c1"># post_vertex - this might be None if no long delays are present</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># By default, allow filtering</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__filter</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ProjectionApplicationEdge.add_synapse_information"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.add_synapse_information">[docs]</a>    <span class="k">def</span> <span class="nf">add_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -174,13 +168,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_neuromodulation</span>
 
-<div class="viewcode-block" id="ProjectionApplicationEdge.set_filter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.set_filter">[docs]</a>    <span class="k">def</span> <span class="nf">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">do_filter</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Set the ability to filter or not</span>
-
-<span class="sd">        @param bool do_filter: Whether to allow filtering</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__filter</span> <span class="o">=</span> <span class="n">do_filter</span></div>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_delay_stages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -189,19 +176,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span>
-
-<div class="viewcode-block" id="ProjectionApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__filter</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
-            <span class="c1"># Structual Plasticity can learn connection not originally included</span>
-            <span class="k">if</span> <span class="n">are_dynamics_structural</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">(</span>
-                    <span class="n">synapse_info</span><span class="p">,</span> <span class="n">src_machine_vertex</span><span class="p">,</span> <span class="n">dest_machine_vertex</span><span class="p">):</span>
-                <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ProjectionApplicationEdge.get_local_provenance_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.get_local_provenance_data">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesLocalProvenanceData</span><span class="o">.</span><span class="n">get_local_provenance_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_local_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -130,7 +130,7 @@
             <span class="k">if</span> <span class="n">data_missing</span><span class="p">:</span>
                 <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_spike_data</span><span class="p">(</span>
-                <span class="n">vertex_slice</span><span class="p">,</span>
+                <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">atoms_shape</span><span class="p">,</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">)),</span>
                 <span class="n">neuron_param_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">)</span>
 
@@ -150,9 +150,11 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_process_spike_data</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">n_words</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
+            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">,</span> <span class="n">n_words</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span>
+            <span class="n">spike_times</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">        :param tuple(int) atoms_shape:</span>
 <span class="sd">        :param int n_words:</span>
 <span class="sd">        :param bytearray raw_data:</span>
 <span class="sd">        :param list(~numpy.ndarray) spike_ids:</span>
@@ -161,6 +163,7 @@
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">n_bytes_per_block</span> <span class="o">=</span> <span class="n">n_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">neurons</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">get_raster_ids</span><span class="p">(</span><span class="n">atoms_shape</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw_data</span><span class="p">):</span>
             <span class="n">time</span><span class="p">,</span> <span class="n">n_blocks</span> <span class="o">=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">unpack_from</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
             <span class="n">offset</span> <span class="o">+=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">size</span>
@@ -172,11 +175,11 @@
             <span class="n">spikes</span> <span class="o">=</span> <span class="n">spike_data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;&lt;i4&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
             <span class="n">bits</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unpackbits</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                 <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">32</span><span class="p">)))</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_bytes_per_block</span> <span class="o">*</span> <span class="mi">8</span><span class="p">))</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bits</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">local_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bits</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">neurons</span><span class="p">[</span><span class="n">local_indices</span><span class="p">]</span>
             <span class="n">times</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">time</span> <span class="o">*</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">get_simulation_time_step_ms</span><span class="p">()],</span>
                 <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span> <span class="o">+</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
             <span class="n">spike_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
             <span class="n">spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 </pre></div>

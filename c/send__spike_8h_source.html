@@ -96,9 +96,9 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api__params_8h.html">spin1_api_params.h</a>&gt;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="synapse__dynamics_8h.html">plasticity/synapse_dynamics.h</a>&quot;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">extern</span> uint32_t <a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a>;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">extern</span> uint32_t *<a class="code" href="neuron_8c.html#aeca2f0c73d9a6fa91f83208ea4e13ef4">neuron_keys</a>;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">extern</span> uint32_t <a class="code" href="neuron_8c.html#adb470808676e08ce78789a18a99da76e">earliest_send_time</a>;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
@@ -106,7 +106,7 @@ $(function() {
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#define TX_NOT_FULL_MASK 0x10000000</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> send_spike_mc(uint32_t <a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>) {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> send_spike_mc(uint32_t <a class="code" href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>) {</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">// Wait for there to be space to send</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    uint32_t n_loops = 0;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">while</span> (!(cc[CC_TCR] &amp; TX_NOT_FULL_MASK) &amp;&amp; (n_loops &lt; 10000)) {</div>
@@ -120,7 +120,7 @@ $(function() {
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="comment">// Do the send</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    cc[<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a292c556c2b3c038156a5febe8ea400f7">CC_TCR</a>] = <a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a0411cd49bb5b71852cecd93bcbf0ca2daa1c6504afe93e64fc037e0fd40a953d8">PKT_MC</a>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    cc[<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a641b07dbc5939a3c5ac455e4fc82dcf6">CC_TXKEY</a>]  = <a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    cc[<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a641b07dbc5939a3c5ac455e4fc82dcf6">CC_TXKEY</a>]  = <a class="code" href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;}</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">static</span> <span class="keyword">inline</span> <span class="keywordtype">void</span> send_spike(UNUSED uint32_t timer_count, uint32_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>,</div>
@@ -129,7 +129,7 @@ $(function() {
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="synapse__dynamics__stdp__izhikevich__neuromodulation_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a>(<a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, neuron_index);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a>) {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        send_spike_mc(<a class="code" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a> | neuron_index);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        send_spike_mc(<a class="code" href="neuron_8c.html#aeca2f0c73d9a6fa91f83208ea4e13ef4">neuron_keys</a>[neuron_index]);</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="comment">// Keep track of provenance data</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        uint32_t clocks = tc[<a class="codeRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a2af81def3304cbcdcd38221bf503ff56">T1_COUNT</a>];</div>
@@ -143,11 +143,12 @@ $(function() {
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160; </div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __SEND_SPIKE_H__</span></div>
+<div class="ttc" id="adelay__extension_8c_html_a6d4ec8e4f3148d51041635da9986c3fa"><div class="ttname"><a href="delay__extension_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a></div><div class="ttdeci">static uint32_t key</div><div class="ttdoc">Base multicast key for sending messages.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00082">delay_extension.c:82</a></div></div>
 <div class="ttc" id="adelay__extension_8c_html_ae73654f333e4363463ad8c594eca1905"><div class="ttname"><a href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></div><div class="ttdeci">static uint32_t time</div><div class="ttdoc">Simulation time.</div><div class="ttdef"><b>Definition:</b> <a href="delay__extension_8c_source.html#l00101">delay_extension.c:101</a></div></div>
 <div class="ttc" id="aneuron_8c_html_a4e6ef8511daf9c94c849796f98b2a940"><div class="ttname"><a href="neuron_8c.html#a4e6ef8511daf9c94c849796f98b2a940">latest_send_time</a></div><div class="ttdeci">uint32_t latest_send_time</div><div class="ttdoc">Latest time in a timestep that any neuron has sent a spike.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00038">neuron.c:38</a></div></div>
 <div class="ttc" id="aneuron_8c_html_ab9132b5a04a7bdb8ac2e4293c1ec96bf"><div class="ttname"><a href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a></div><div class="ttdeci">bool use_key</div><div class="ttdoc">Whether to use key from neuron.c.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00035">neuron.c:35</a></div></div>
-<div class="ttc" id="aneuron_8c_html_ac8861193246fc34d8f29ac9d57b6791a"><div class="ttname"><a href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a></div><div class="ttdeci">key_t key</div><div class="ttdoc">The key to be used for this core (will be ORed with neuron ID)</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00031">neuron.c:31</a></div></div>
 <div class="ttc" id="aneuron_8c_html_adb470808676e08ce78789a18a99da76e"><div class="ttname"><a href="neuron_8c.html#adb470808676e08ce78789a18a99da76e">earliest_send_time</a></div><div class="ttdeci">uint32_t earliest_send_time</div><div class="ttdoc">Earliest time in a timestep that any neuron has sent a spike.</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00041">neuron.c:41</a></div></div>
+<div class="ttc" id="aneuron_8c_html_aeca2f0c73d9a6fa91f83208ea4e13ef4"><div class="ttname"><a href="neuron_8c.html#aeca2f0c73d9a6fa91f83208ea4e13ef4">neuron_keys</a></div><div class="ttdeci">uint32_t * neuron_keys</div><div class="ttdoc">The keys to be used by the neurons (one per neuron)</div><div class="ttdef"><b>Definition:</b> <a href="neuron_8c_source.html#l00031">neuron.c:31</a></div></div>
 <div class="ttc" id="asark_8h_html_a24e7b80208352d98dec4cbed92522afe"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a24e7b80208352d98dec4cbed92522afe">io_printf</a></div><div class="ttdeci">void io_printf(char *stream, char *format,...)</div></div>
 <div class="ttc" id="asark_8h_html_abe2018e60bb35fb629cdbb057368a2f4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#abe2018e60bb35fb629cdbb057368a2f4">rt_error</a></div><div class="ttdeci">void rt_error(uint code,...)</div></div>
 <div class="ttc" id="aspin1__api_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a></div></div>
@@ -161,7 +162,7 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Aug 31 2022 07:01:14 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
+Generated on Thu Sep 8 2022 11:57:29 for sPyNNaker neural_modelling by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.1
 </small></address>
 </body>
 </html>

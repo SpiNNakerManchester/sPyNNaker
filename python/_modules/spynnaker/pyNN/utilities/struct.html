@@ -56,7 +56,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.ranged.ranged_list</span> <span class="kn">import</span> <span class="n">RangedList</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">convert_to</span>
 
@@ -104,7 +103,7 @@
         <span class="n">size_in_bytes</span> <span class="o">=</span> <span class="n">array_size</span> <span class="o">*</span> <span class="n">datatype</span><span class="o">.</span><span class="n">itemsize</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">size_in_bytes</span> <span class="o">+</span> <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span> <span class="n">BYTES_PER_WORD</span></div>
 
-<div class="viewcode-block" id="Struct.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">array_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="Struct.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">atoms_shape</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data for the given values</span>
 
 <span class="sd">        :param values:</span>
@@ -113,12 +112,13 @@
 <span class="sd">        :type values:</span>
 <span class="sd">            list(int or float or list(int) or list(float) or</span>
 <span class="sd">            ~spinn_utilities.ranged.RangedList)</span>
-<span class="sd">        :param int offset: The offset into each of the values where to start</span>
-<span class="sd">        :param int array_size: The number of structs to generate</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of the vertex to get values for</span>
+<span class="sd">        :param tuple(int) atoms_shape: The shape of the atoms in the vertex</span>
 <span class="sd">        :rtype: ~numpy.ndarray(dtype=&quot;uint32&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create an array to store values in</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">array_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">)</span>
 
         <span class="c1"># Go through and get the values and put them in the array</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_types</span><span class="p">)):</span>
@@ -126,24 +126,18 @@
             <span class="k">if</span> <span class="n">is_singleton</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
                 <span class="n">data_value</span> <span class="o">=</span> <span class="n">convert_to</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
                 <span class="n">data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data_value</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">RangedList</span><span class="p">):</span>
-                <span class="n">data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
-                              <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="n">offset</span><span class="p">:(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">array_size</span><span class="p">)]]</span>
-                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data_value</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">iter_ranges_by_slice</span><span class="p">(</span>
-                        <span class="n">offset</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">array_size</span><span class="p">):</span>
-                    <span class="c1"># Get the values and get them into the correct data type</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
-                        <span class="n">values</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
-                        <span class="n">data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">data_value</span> <span class="o">=</span> <span class="n">convert_to</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
-                    <span class="n">data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)][</span>
-                        <span class="n">start</span> <span class="o">-</span> <span class="n">offset</span><span class="p">:</span><span class="n">end</span> <span class="o">-</span> <span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_value</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">get_raster_ids</span><span class="p">(</span><span class="n">atoms_shape</span><span class="p">)</span>
+                <span class="n">in_values</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">values</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)],</span> <span class="n">RandomDistribution</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="n">values</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)]</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+                <span class="n">data_value</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">data_type</span><span class="p">)</span>
+                              <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">in_values</span><span class="p">]</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data_value</span>
 
         <span class="c1"># Pad to whole number of uint32s</span>
-        <span class="n">overflow</span> <span class="o">=</span> <span class="p">(</span><span class="n">array_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span>
+        <span class="n">overflow</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span>
         <span class="k">if</span> <span class="n">overflow</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span> <span class="o">-</span> <span class="n">overflow</span><span class="p">),</span> <span class="s2">&quot;constant&quot;</span><span class="p">)</span>

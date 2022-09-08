@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>spynnaker.pyNN.models.abstract_models.has_shape_key_fields &#8212; sPyNNaker 6.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/sphinxdoc.css" />
+    <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" accesskey="U">spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.abstract_models.has_shape_key_fields</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.abstract_models.has_shape_key_fields</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2021-2022 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+
+<span class="k">class</span> <span class="nc">HasShapeKeyFields</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates a source that has keys in fields for each dimension of the</span>
+<span class="sd">        source</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="HasShapeKeyFields.get_shape_key_fields"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.HasShapeKeyFields.get_shape_key_fields">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_shape_key_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the fields to be used for each dimension in the shape of the</span>
+<span class="sd">            given source vertex slice, as a list of start, mask, shift values</span>
+<span class="sd">            in the order of the fields</span>
+
+<span class="sd">        :param Slice vertex_slice: The slice of the source vertex</span>
+
+<span class="sd">        :rtype: list(tuple(int, int, int))</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker 6.0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../../../pyNN.html" >spynnaker.pyNN</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">spynnaker.pyNN.models.abstract_models.has_shape_key_fields</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2021.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+    </div>
+  </body>
+</html>

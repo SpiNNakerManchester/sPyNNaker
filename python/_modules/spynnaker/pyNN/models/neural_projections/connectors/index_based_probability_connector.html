@@ -63,6 +63,8 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.safe_eval</span> <span class="kn">import</span> <span class="n">SafeEval</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
 <span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_host</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">)</span>
 
 <span class="c1"># support for arbitrary expression for the indices</span>
 <span class="n">_index_expr_context</span> <span class="o">=</span> <span class="n">SafeEval</span><span class="p">(</span><span class="n">math</span><span class="p">,</span> <span class="n">numpy</span><span class="p">,</span> <span class="n">arccos</span><span class="p">,</span> <span class="n">arcsin</span><span class="p">,</span> <span class="n">arctan</span><span class="p">,</span> <span class="n">arctan2</span><span class="p">,</span>
@@ -71,7 +73,8 @@
                                <span class="n">tan</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">maximum</span><span class="p">,</span> <span class="n">minimum</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="n">pi</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">IndexBasedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">IndexBasedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">,</span>
+                                     <span class="n">AbstractGenerateConnectorOnHost</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Make connections using a probability distribution which varies\</span>
 <span class="sd">        dependent upon the indices of the pre- and post-populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -183,7 +186,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnHost</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
             <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>

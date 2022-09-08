@@ -54,8 +54,6 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">FixedKeyAndMaskConstraint</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationSpiNNakerLinkVertex</span>
 <span class="kn">from</span> <span class="nn">pacman.model.routing_info</span> <span class="kn">import</span> <span class="n">BaseKeyAndMask</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -130,8 +128,8 @@
         <span class="n">fixed_n_neurons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">n_atoms</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="o">=</span><span class="n">spinnaker_link_id</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="o">=</span><span class="n">fixed_n_neurons</span><span class="p">,</span>
-            <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">,</span> <span class="n">incoming</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">outgoing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">retina_key</span> <span class="o">&amp;</span> <span class="mh">0xFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span> <span class="o">=</span> <span class="mh">0xFFFF8000</span>
@@ -140,8 +138,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_mask</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
-            <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)]))</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_fixed_key_and_mask"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices.ExternalFPGARetinaDevice.get_fixed_key_and_mask">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationSpiNNakerLinkVertex</span><span class="o">.</span><span class="n">get_fixed_key_and_mask</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_fixed_key_and_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">MODE_128</span><span class="p">:</span>

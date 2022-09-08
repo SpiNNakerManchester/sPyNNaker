@@ -67,6 +67,7 @@
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_static</span> <span class="kn">import</span> <span class="n">SynapseDynamicsStatic</span>
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_stdp</span> <span class="kn">import</span> <span class="n">SynapseDynamicsSTDP</span>
 <span class="kn">from</span> <span class="nn">.synapse_dynamics_structural_stdp</span> <span class="kn">import</span> <span class="n">SynapseDynamicsStructuralSTDP</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">SPIKE_PARTITION_ID</span>
 
 
 <span class="k">class</span> <span class="nc">SynapseDynamicsStructuralStatic</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="p">,</span> <span class="n">_Common</span><span class="p">):</span>
@@ -202,11 +203,6 @@
         <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">()</span> <span class="o">+</span>
                 <span class="n">_Common</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralStatic.get_n_words_for_static_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_n_words_for_static_connections">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="o">.</span><span class="n">get_n_words_for_static_connections</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_n_words_for_static_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_n_words_for_static_connections</span><span class="p">(</span><span class="n">n_connections</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">value</span></div>
-
 <div class="viewcode-block" id="SynapseDynamicsStructuralStatic.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.set_connections">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">set_connections</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
@@ -321,6 +317,13 @@
     <span class="k">def</span> <span class="nf">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Never generate structural connections on the machine</span>
         <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="SynapseDynamicsStructuralStatic.get_connected_vertices"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralStatic.get_connected_vertices">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsStatic</span><span class="o">.</span><span class="n">get_connected_vertices</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_connected_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_info</span><span class="p">,</span> <span class="n">source_vertex</span><span class="p">,</span> <span class="n">target_vertex</span><span class="p">):</span>
+        <span class="c1"># Things change, so assume all connected</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">m_vertex</span><span class="p">,</span> <span class="p">[</span><span class="n">source_vertex</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">target_vertex</span><span class="o">.</span><span class="n">splitter</span><span class="o">.</span><span class="n">get_in_coming_vertices</span><span class="p">(</span>
+                    <span class="n">SPIKE_PARTITION_ID</span><span class="p">)]</span></div>
 </pre></div>
 
             <div class="clearer"></div>

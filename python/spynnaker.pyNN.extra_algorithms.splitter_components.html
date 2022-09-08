@@ -127,7 +127,7 @@ slices</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex">
-<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_syn_block_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ring_buffer_shifts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_scales</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_machine_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sdram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remaining_constraints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.create_machine_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -204,10 +204,38 @@ for external edges.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms">
-<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_atoms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_syn_block_sz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structural_sz</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the resources of a slice of atoms</p>
-<p>:param int n_atoms
+<span class="sig-name descname"><span class="pre">get_sdram_used_by_atoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex_slice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_sdram_used_by_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the resources of a slice of atoms
+:param int n_atoms
 :rtype: ~pacman.model.resources.MultiRegionSDRAM</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices">
+<span class="sig-name descname"><span class="pre">get_source_specific_in_coming_vertices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_vertex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">partition_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_abstract_pop_vertex_fixed.html#SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.get_source_specific_in_coming_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get machine post vertices for a given source.</p>
+<p>The input vertices are the ones that will serve as target vertices
+for external edges.  Note this method allows filtering of the targets
+for a specific source machine vertex.</p>
+<p>This default method makes every machine vertex a target for the source.
+This should be overridden if there are specific machine vertices for
+any given source vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source_vertex</strong> (<em>ApplicationVertex</em>) – The source to get incoming vertices for</p></li>
+<li><p><strong>partition_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The identifier of the incoming partition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tuples of (target machine vertex, list of source
+machine or application vertices that should hit the target)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(MachineVertex,
+<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(MachineVertex or ApplicationVertex)))</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -223,17 +251,6 @@ for external edges.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>iterable(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineVertex" title="(in PACMAN v6.0)"><em>MachineVertex</em></a>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.n_synapse_vertices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_synapse_vertices</span></span><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterAbstractPopulationVertexFixed.n_synapse_vertices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the number of synapse vertices per neuron vertex</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -558,16 +575,6 @@ machine or application vertices that should hit the target)</p>
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.SPLITTER_NAME">
 <span class="sig-name descname"><span class="pre">SPLITTER_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SplitterDelayVertexSlice'</span></em><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.SPLITTER_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.check_supported_constraints">
-<span class="sig-name descname"><span class="pre">check_supported_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/extra_algorithms/splitter_components/splitter_delay_vertex_slice.html#SplitterDelayVertexSlice.check_supported_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.check_supported_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>PacmanInvalidParameterException</strong> – When partitioner constraints are used.</p>
-</dd>
-</dl>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.extra_algorithms.splitter_components.SplitterDelayVertexSlice.create_machine_vertex">
