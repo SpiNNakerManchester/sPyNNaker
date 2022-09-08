@@ -21,8 +21,7 @@ class DelayBlock(object):
     """ A block of delays for a vertex.
     """
     __slots__ = [
-        "__delay_block",
-        "__n_delay_stages"]
+        "__delay_block"]
 
     def __init__(self, n_delay_stages, vertex_slice):
         """
