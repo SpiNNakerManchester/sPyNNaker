@@ -119,7 +119,7 @@ class ArrayConnector(AbstractConnector):
         post_neurons = []
         n_connections = 0
         pre_lo = 0
-        pre_hi = synapse_info.n_pre_neurons
+        pre_hi = synapse_info.n_pre_neurons - 1
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
         for i in range(pre_lo, pre_hi+1):
