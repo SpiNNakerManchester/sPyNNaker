@@ -97,6 +97,13 @@ def get_bitfield_key_map_data(incoming_projections):
                 in_edge.pre_vertex, SPIKE_PARTITION_ID)
             if key is not None:
                 sources.add((key, in_edge.pre_vertex.n_atoms))
+            if in_edge.delay_edge is not None:
+                delay_key = routing_infos.get_first_key_from_pre_vertex(
+                    in_edge.delay_edge.pre_vertex, SPIKE_PARTITION_ID)
+                if delay_key is not None:
+                    n_delay_atoms = (
+                        in_edge.pre_vertex.n_atoms * in_edge.n_delay_stages)
+                    sources.add((delay_key, n_delay_atoms))
 
     if not sources:
         return numpy.array([], dtype="uint32")
