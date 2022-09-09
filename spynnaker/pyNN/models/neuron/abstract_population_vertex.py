@@ -17,7 +17,7 @@ import logging
 import sys
 import math
 import numpy
-from scipy import special  # @UnresolvedImport
+# from scipy import special  # @UnresolvedImport
 import operator
 from functools import reduce
 from collections import defaultdict
@@ -56,18 +56,19 @@ from spynnaker.pyNN.models.common import (
     NeuronRecorder)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractContainsUnits, AbstractMaxSpikes,
+    AbstractPopulationSettable, AbstractContainsUnits,  # AbstractMaxSpikes,
     HasSynapses, SupportsStructure)
-from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
+from spynnaker.pyNN.exceptions import (
+    InvalidParameterType, SpynnakerException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary)
 from spynnaker.pyNN.utilities.utility_calls import float_gcd
-from spynnaker.pyNN.utilities.constants import (
-    POSSION_SIGMA_SUMMATION_LIMIT)
-from spynnaker.pyNN.utilities.running_stats import RunningStats
+# from spynnaker.pyNN.utilities.constants import (
+#     POSSION_SIGMA_SUMMATION_LIMIT)
+# from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural,
-    AbstractSupportsSignedWeights)
+    AbstractSDRAMSynapseDynamics, AbstractSynapseDynamicsStructural)
+# AbstractSupportsSignedWeights)
 from spynnaker.pyNN.models.neuron.local_only import AbstractLocalOnly
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .synapse_io import get_max_row_info
@@ -1492,21 +1493,24 @@ class AbstractPopulationVertex(
 #         s_dynamics = s_info.synapse_dynamics
 #
 #         n_conns = connector.get_n_connections_to_post_vertex_maximum(s_info)
-#         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
+#         d_var = s_dynamics.get_delay_variance(
+#             connector, s_info.delays, s_info)
 #
 #         s_type_pos = s_dynamics.get_positive_synapse_index(proj)
 #         w_mean_pos = s_dynamics.get_mean_positive_weight(proj)
 #         w_var_pos = s_dynamics.get_variance_positive_weight(proj)
 #         w_max_pos = s_dynamics.get_maximum_positive_weight(proj)
 #         self.__add_details(
-#             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos, d_var)
+#             proj, s_type_pos, n_conns, w_mean_pos, w_var_pos, w_max_pos,
+#             d_var)
 #
 #         s_type_neg = s_dynamics.get_negative_synapse_index(proj)
 #         w_mean_neg = -s_dynamics.get_mean_negative_weight(proj)
 #         w_var_neg = -s_dynamics.get_variance_negative_weight(proj)
 #         w_max_neg = -s_dynamics.get_minimum_negative_weight(proj)
 #         self.__add_details(
-#             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg, d_var)
+#             proj, s_type_neg, n_conns, w_mean_neg, w_var_neg, w_max_neg,
+#             d_var)
 #
 #     def __add_unsigned_projection(self, proj):
 #         # pylint: disable=protected-access
@@ -1520,8 +1524,10 @@ class AbstractPopulationVertex(
 #         w_var = s_dynamics.get_weight_variance(
 #             connector, s_info.weights, s_info)
 #         w_max = s_dynamics.get_weight_maximum(connector, s_info)
-#         d_var = s_dynamics.get_delay_variance(connector, s_info.delays, s_info)
-#         self.__add_details(proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
+#         d_var = s_dynamics.get_delay_variance(
+#             connector, s_info.delays, s_info)
+#         self.__add_details(
+#             proj, s_type, n_conns, w_mean, w_var, w_max, d_var)
 #
 #     def __add_details(
 #             self, proj, s_type, n_conns, w_mean, w_var, w_max, d_var):
@@ -1550,7 +1556,8 @@ class AbstractPopulationVertex(
 #
 #     def get_max_weight(self, s_type):
 #         if self.delay_running_totals[s_type].variance == 0.0:
-#             return max(self.total_weights[s_type], self.biggest_weight[s_type])
+#             return max(
+#                 self.total_weights[s_type], self.biggest_weight[s_type])
 #
 #         stats = self.running_totals[s_type]
 #         rates = self.rate_stats[s_type]
