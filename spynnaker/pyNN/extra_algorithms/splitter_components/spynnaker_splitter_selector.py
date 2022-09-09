@@ -15,8 +15,7 @@
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationFPGAVertex)
-from pacman.model.partitioner_splitters.splitter_one_to_one_legacy import (
-    SplitterOneToOneLegacy)
+from pacman.model.partitioner_splitters import SplitterExternalDevice
 from spinn_front_end_common.interface.splitter_selectors import (
     vertex_selector)
 from spynnaker.pyNN.models.abstract_models import (
@@ -33,6 +32,10 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 
 PROGRESS_BAR_NAME = "Adding Splitter selectors where appropriate"
+
+
+def _is_multidimensional(app_vertex):
+    return len(app_vertex.atoms_shape) > 1
 
 
 def spynnaker_splitter_selector():
@@ -66,13 +69,16 @@ def spynakker_vertex_selector(app_vertex):
         if isinstance(app_vertex, AbstractPopulationVertex):
             app_vertex.splitter = SplitterAbstractPopulationVertexFixed()
         elif isinstance(app_vertex, ApplicationSpiNNakerLinkVertex):
-            app_vertex.splitter = SplitterOneToOneLegacy()
+            app_vertex.splitter = SplitterExternalDevice()
         elif isinstance(app_vertex, ApplicationFPGAVertex):
-            app_vertex.splitter = SplitterOneToOneLegacy()
+            app_vertex.splitter = SplitterExternalDevice()
         elif isinstance(app_vertex, SpikeSourceArrayVertex):
             app_vertex.splitter = SpynnakerSplitterFixedLegacy()
         elif isinstance(app_vertex, SpikeSourcePoissonVertex):
-            app_vertex.splitter = SplitterPoissonDelegate()
+            if _is_multidimensional(app_vertex):
+                app_vertex.splitter = SpynnakerSplitterFixedLegacy()
+            else:
+                app_vertex.splitter = SplitterPoissonDelegate()
         else:  # go to basic selector. it might know what to do
             vertex_selector(app_vertex)
     if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):

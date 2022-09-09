@@ -227,7 +227,7 @@ static inline uint32_t get_local_neuron_id(
 //! \details For debugging
 static inline void print_master_population_table(void) {
 #if log_level >= LOG_DEBUG
-    log_info("Master_population\n");
+    log_debug("Master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         log_debug("key: 0x%08x, mask: 0x%08x", entry.key, entry.mask);
@@ -236,7 +236,7 @@ static inline void print_master_population_table(void) {
         if (entry.extra_info_flag) {
             extra_info extra = address_list[start].extra;
             start += 1;
-            log_info("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
+            log_debug("    core_mask: 0x%08x, core_shift: %u, n_neurons: %u, n_words: %u",
                     extra.core_mask, extra.mask_shift, extra.n_neurons, extra.n_words);
         }
         for (uint16_t j = start; j < (start + count); j++) {
@@ -252,7 +252,7 @@ static inline void print_master_population_table(void) {
             }
         }
     }
-    log_info("Population table has %u entries", master_population_table_length);
+    log_debug("Population table has %u entries", master_population_table_length);
 #endif
 }
 
@@ -274,12 +274,12 @@ static inline void print_bitfields(uint32_t mp_i, uint32_t start,
         uint32_t end, filter_info_t *filters) {
 #if LOG_LEVEL >= LOG_DEBUG
     // print out the bit field for debug purposes
-    log_info("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
+    log_debug("Bit field(s) for key 0x%08x:", master_population_table[mp_i].key);
     uint32_t offset = 0;
     for (uint32_t bf_i = start; bf_i < end; bf_i++) {
         uint32_t n_words = get_bit_field_size(filters[bf_i].n_atoms);
         for (uint32_t i = 0; i < n_words; i++) {
-            log_info("0x%08x", connectivity_bit_field[mp_i][offset + i]);
+            log_debug("0x%08x", connectivity_bit_field[mp_i][offset + i]);
         }
         offset += n_words;
     }

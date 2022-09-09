@@ -28,6 +28,7 @@ from .synapse_dynamics_structural_common import (
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 
 class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
@@ -163,11 +164,6 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
         return (super().get_vertex_executable_suffix() +
                 _Common.get_vertex_executable_suffix(self))
 
-    @overrides(SynapseDynamicsStatic.get_n_words_for_static_connections)
-    def get_n_words_for_static_connections(self, n_connections):
-        value = super().get_n_words_for_static_connections(n_connections)
-        return value
-
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
             self, connections, post_vertex_slice, app_edge, synapse_info,
@@ -300,3 +296,10 @@ class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, _Common):
     def generate_on_machine(self):
         # Never generate structural connections on the machine
         return False
+
+    @overrides(SynapseDynamicsStatic.get_connected_vertices)
+    def get_connected_vertices(self, s_info, source_vertex, target_vertex):
+        # Things change, so assume all connected
+        return [(m_vertex, [source_vertex])
+                for m_vertex in target_vertex.splitter.get_in_coming_vertices(
+                    SPIKE_PARTITION_ID)]

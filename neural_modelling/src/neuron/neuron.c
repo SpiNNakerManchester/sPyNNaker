@@ -27,8 +27,8 @@
 #include "tdma_processing.h"
 #include <debug.h>
 
-//! The key to be used for this core (will be ORed with neuron ID)
-key_t key;
+//! The keys to be used by the neurons (one per neuron)
+uint32_t *neuron_keys;
 
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.
@@ -64,11 +64,12 @@ static address_t current_source_address;
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t has_key;
-    uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
     uint32_t n_neurons_peak;
     uint32_t n_synapse_types;
     REAL min_weights[];
+    // Following this struct in memory (as it can't be expressed in C) is:
+    // uint32_t neuron_keys[n_neurons_to_simulate];
 };
 
 //! \brief does the memory copy for the neuron parameters
@@ -111,16 +112,6 @@ bool neuron_initialise(
     // Check if there is a key to use
     use_key = params->has_key;
 
-    // Read the spike key to use
-    key = params->transmission_key;
-
-    // output if this model is expecting to transmit
-    if (!use_key) {
-        log_debug("\tThis model is not expecting to transmit as it has no key");
-    } else {
-        log_debug("\tThis model is expected to transmit with key = %08x", key);
-    }
-
     // Read the neuron details
     n_neurons = params->n_neurons_to_simulate;
     n_neurons_peak = params->n_neurons_peak;
@@ -137,8 +128,19 @@ bool neuron_initialise(
     // read in min_weights
     spin1_memcpy(min_weights, params->min_weights, min_weights_bytes);
 
-    // Store where the actual neuron parameters start
-    saved_params_address = (address_t) &(params->min_weights[n_synapse_types]);
+    // The key list comes after the min weights
+    uint32_t *neuron_keys_sdram =
+            (uint32_t *) &params->min_weights[n_synapse_types];
+    uint32_t neuron_keys_size = n_neurons * sizeof(uint32_t);
+    neuron_keys = spin1_malloc(neuron_keys_size);
+    if (neuron_keys == NULL) {
+        log_error("Not enough memory to allocate neuron keys");
+        return false;
+    }
+    spin1_memcpy(neuron_keys, neuron_keys_sdram, neuron_keys_size);
+
+    // Store where the actual neuron parameters start, which is after the keys
+    saved_params_address = &neuron_keys_sdram[n_neurons];
     current_source_address = cs_address;
 
     log_info("\t n_neurons = %u, peak %u, n_synapse_types %u",

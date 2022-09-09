@@ -349,7 +349,7 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return int(math.ceil(math.log2(n_values)))
 
 
 def float_gcd(a, b):

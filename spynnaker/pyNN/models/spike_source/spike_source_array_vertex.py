@@ -24,6 +24,8 @@ from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
+from pyNN.space import Grid2D, Grid3D
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -46,7 +48,8 @@ def _send_buffer_times(spike_times, time_step):
 
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        SupportsStructure):
     """ Model for play back of spikes
     """
 
@@ -75,6 +78,19 @@ class SpikeSourceArrayVertex(
 
         # used for reset and rerun
         self.__requires_mapping = True
+
+        self.__structure = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
+
+    @property
+    @overrides(ReverseIpTagMultiCastSource.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.n_atoms)
+        return super(ReverseIpTagMultiCastSource, self).atoms_shape
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)

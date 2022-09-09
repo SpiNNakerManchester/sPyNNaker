@@ -45,16 +45,6 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def _model(self):
         return self.__model
 
-    @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
-        super().set_model_max_atoms_per_core(n_atoms)
-
-    @classmethod
-    def get_max_atoms_per_core(cls):
-        if cls not in super()._max_atoms_per_core:
-            return DEFAULT_MAX_ATOMS_PER_CORE
-        return super().get_max_atoms_per_core()
-
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
@@ -63,7 +53,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             drop_late_spikes, splitter, min_weights, weight_random_sigma,
             max_stdp_spike_delta):
         # pylint: disable=arguments-differ
-        max_atoms = self.get_max_atoms_per_core()
+        max_atoms = self.get_model_max_atoms_per_dimension_per_core()
         return AbstractPopulationVertex(
             n_neurons, label, constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,

@@ -286,8 +286,8 @@ bool synapses_initialise(
     spin1_memcpy(min_weights, params->min_weights, min_weights_bytes);
     *min_weights_out = min_weights;
     for (uint32_t s = 0; s < n_synapse_types; s++) {
-        log_info("synapse initialise, min_weights_out[%u] = %k %k",
-                s, min_weights_out[s], min_weights[s]);
+        log_info("synapse initialise, min_weights_out[%u] = %k",
+                s, min_weights_out[s]);
     }
 
     log_debug("synapses_initialise: completed successfully");
@@ -311,8 +311,8 @@ bool synapses_initialise(
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
     if (ring_buffers == NULL) {
-        log_error("Could not allocate %u entries for ring buffers",
-                ring_buffer_size);
+        log_error("Could not allocate %u entries for ring buffers; Biggest space %u",
+                ring_buffer_size, sark_heap_max(sark.heap, 0));
         return false;
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
