@@ -122,6 +122,11 @@ static inline bool generate_bit_field(filter_region_t *bitfield_filters,
 
             // Find the base address and row length of the address entry
             address_list_entry *entry = &address_list[pos];
+
+            // Skip invalid addresses
+            if (entry->address == INVALID_ADDRESS) {
+            	continue;
+            }
             uint32_t *address = (uint32_t *) get_address(*entry,
                     (uint32_t) synaptic_matrix);
             uint32_t row_length = get_row_length(*entry) + N_SYNAPSE_ROW_HEADER_WORDS;
