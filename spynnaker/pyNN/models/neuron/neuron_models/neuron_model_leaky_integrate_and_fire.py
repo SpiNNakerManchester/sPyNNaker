@@ -82,7 +82,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractStandardNeuronComponent):
                 (DataType.S1615, TAU_M),
                 (DataType.S1615, I_OFFSET),
                 (DataType.S1615, V_RESET),
-                (DataType.INT32, TAU_REFRAC),
+                (DataType.S1615, TAU_REFRAC),
                 (DataType.INT32, REFRACT_TIMER),
                 (DataType.S1615, TIMESTEP)])],
             {V: 'mV', V_REST: 'mV', TAU_M: 'ms', CM: 'nF', I_OFFSET: 'nA',

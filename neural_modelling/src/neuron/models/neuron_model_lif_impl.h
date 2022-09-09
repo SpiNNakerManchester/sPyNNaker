@@ -43,7 +43,7 @@ struct neuron_params_t {
     REAL     V_reset;
 
     //! refractory time of neuron [ms]
-    int32_t  T_refract_ms;
+    REAL     T_refract_ms;
 
     //! initial refractory timer value (saved)
     int32_t  refract_timer_init;
@@ -82,6 +82,16 @@ struct neuron_t {
     int32_t  T_refract;
 };
 
+static inline int32_t lif_ceil(REAL value) {
+	int32_t bits = bitsk(value);
+	int32_t integer = bits >> 15;
+	int32_t fraction = bits & 0x7FFF;
+	if (fraction > 0) {
+	    return integer + 1;
+	}
+	return integer;
+}
+
 static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *params) {
 	state->V_membrane = params->V_init;
 	state->V_rest = params->V_rest;
@@ -90,7 +100,7 @@ static inline void neuron_model_initialise(neuron_t *state, neuron_params_t *par
 	state->I_offset = params->I_offset;
     state->refract_timer = params->refract_timer_init;
 	state->V_reset = params->V_reset;
-	state->T_refract = udivk(params->T_refract_ms, params->time_step);
+	state->T_refract = lif_ceil(kdivk(params->T_refract_ms, params->time_step));
 }
 
 static inline void neuron_model_save_state(neuron_t *state, neuron_params_t *params) {
