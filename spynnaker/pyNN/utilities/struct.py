@@ -16,7 +16,6 @@
 import numpy
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
-from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 
@@ -64,7 +63,7 @@ class Struct(object):
         size_in_bytes = array_size * datatype.itemsize
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
-    def get_data(self, values, offset=0, array_size=1):
+    def get_data(self, values, vertex_slice, atoms_shape):
         """ Get a numpy array of uint32 of data for the given values
 
         :param values:
@@ -73,12 +72,13 @@ class Struct(object):
         :type values:
             list(int or float or list(int) or list(float) or
             ~spinn_utilities.ranged.RangedList)
-        :param int offset: The offset into each of the values where to start
-        :param int array_size: The number of structs to generate
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to get values for
+        :param tuple(int) atoms_shape: The shape of the atoms in the vertex
         :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Create an array to store values in
-        data = numpy.zeros(array_size, dtype=self.numpy_dtype)
+        data = numpy.zeros(vertex_slice.n_atoms, dtype=self.numpy_dtype)
 
         # Go through and get the values and put them in the array
         for i, (values, data_type) in enumerate(zip(values, self.field_types)):
@@ -86,24 +86,18 @@ class Struct(object):
             if is_singleton(values):
                 data_value = convert_to(values, data_type)
                 data["f" + str(i)] = data_value
-            elif not isinstance(values, RangedList):
-                data_value = [convert_to(v, data_type)
-                              for v in values[offset:(offset + array_size)]]
-                data["f" + str(i)] = data_value
             else:
-                for start, end, value in values.iter_ranges_by_slice(
-                        offset, offset + array_size):
-                    # Get the values and get them into the correct data type
-                    if isinstance(value, RandomDistribution):
-                        values = value.next(end - start)
-                        data_value = [convert_to(v, data_type) for v in values]
-                    else:
-                        data_value = convert_to(value, data_type)
-                    data["f" + str(i)][
-                        start - offset:end - offset] = data_value
+                indices = vertex_slice.get_raster_ids(atoms_shape)
+                in_values = [
+                    values[int(j)]
+                    if not isinstance(values[int(j)], RandomDistribution)
+                    else values[int(j)].next() for j in indices]
+                data_value = [convert_to(v, data_type)
+                              for v in in_values]
+                data["f" + str(i)] = data_value
 
         # Pad to whole number of uint32s
-        overflow = (array_size * self.numpy_dtype.itemsize) % BYTES_PER_WORD
+        overflow = (len(data) * self.numpy_dtype.itemsize) % BYTES_PER_WORD
         if overflow != 0:
             data = numpy.pad(
                 data.view("uint8"), (0, BYTES_PER_WORD - overflow), "constant")

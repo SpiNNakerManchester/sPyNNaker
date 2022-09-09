@@ -297,8 +297,8 @@ bool synapses_initialise(
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
     if (ring_buffers == NULL) {
-        log_error("Could not allocate %u entries for ring buffers",
-                ring_buffer_size);
+        log_error("Could not allocate %u entries for ring buffers; Biggest space %u",
+                ring_buffer_size, sark_heap_max(sark.heap, 0));
         return false;
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {

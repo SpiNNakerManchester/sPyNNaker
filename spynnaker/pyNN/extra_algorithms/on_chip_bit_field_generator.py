@@ -106,6 +106,7 @@ class _OnChipBitFieldGenerator(object):
         """
         self.__aplx = SpynnakerDataView.get_executable_path(
             self._BIT_FIELD_EXPANDER_APLX)
+        self.__txrx = None
 
     def _run(self):
         """ Loads and runs the bit field generator on chip.

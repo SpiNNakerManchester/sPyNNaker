@@ -29,6 +29,8 @@ from .sends_synaptic_inputs_over_sdram import SendsSynapticInputsOverSDRAM
 from .receives_synaptic_inputs_over_sdram import (
     ReceivesSynapticInputsOverSDRAM)
 from .has_synapses import HasSynapses
+from .supports_structure import SupportsStructure
+from .has_shape_key_fields import HasShapeKeyFields
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractHasDelayStages",
@@ -37,4 +39,4 @@ __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractSettable", "AbstractSynapseExpandable",
            "AbstractWeightUpdatable", "SYNAPSE_EXPANDER_APLX",
            "SendsSynapticInputsOverSDRAM", "ReceivesSynapticInputsOverSDRAM",
-           "HasSynapses"]
+           "HasSynapses", "SupportsStructure", "HasShapeKeyFields"]

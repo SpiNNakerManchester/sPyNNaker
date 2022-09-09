@@ -23,11 +23,14 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 N_GEN_PARAMS = 8
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
+                               AbstractGenerateConnectorOnHost,
                                AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
@@ -240,7 +243,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return self._get_weight_maximum(
             synapse_info.weights, n_connections, synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):

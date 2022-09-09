@@ -130,7 +130,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
         """
 
     @abstractmethod
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, atoms_shape):
         """ Get the data *to be written to the machine* for this model
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
@@ -139,6 +139,7 @@ class AbstractNeuronImpl(object, metaclass=AbstractBase):
             The holder of the state variables
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the vertex to generate parameters for
+        :param tuple(int) atoms_shape: The shape of the atoms in the vertex
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
 
