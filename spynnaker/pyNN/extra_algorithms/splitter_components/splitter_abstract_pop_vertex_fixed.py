@@ -365,7 +365,7 @@ class SplitterAbstractPopulationVertexFixed(
     @overrides(AbstractSplitterCommon.reset_called)
     def reset_called(self):
         super(SplitterAbstractPopulationVertexFixed, self).reset_called()
-        self.__ring_buffer_shifts = None
+        self.__min_weights = None
         self.__weight_scales = None
         self.__all_syn_block_sz = dict()
         self.__structural_sz = dict()
