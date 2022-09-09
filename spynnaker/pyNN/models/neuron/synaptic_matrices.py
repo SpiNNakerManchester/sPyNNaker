@@ -242,7 +242,9 @@ class SynapticMatrices(object):
             self.__n_generated_matrices = len(generate_on_machine)
             self.__generated_data = numpy.concatenate(generated_data)
         else:
-            self.__generated_data = None
+            self.__gen_on_machine = True
+            self.__n_generated_matrices = 0
+            self.__generated_data = numpy.zeros(0, dtype="uint32")
 
         self.__on_chip_generated_block_addr = block_addr
 
@@ -355,7 +357,7 @@ class SynapticMatrices(object):
         spec.write_array(self.__generated_data)
         spec.write_array(self.__bit_field_key_map)
 
-    def __get_app_key_and_mask(self, r_info, n_stages):
+    def __get_app_key_and_mask(self, r_info, n_stages, max_atoms_per_core):
         """ Get a key and mask for an incoming application vertex as a whole
 
         :param list(tuple(int, Slice)) keys:
@@ -370,7 +372,7 @@ class SynapticMatrices(object):
         mask_size = r_info.n_bits_atoms
         core_mask = (r_info.machine_mask - r_info.first_mask) >> mask_size
         pre = r_info.vertex
-        n_atoms = min(pre.get_max_atoms_per_core(), pre.n_atoms)
+        n_atoms = min(max_atoms_per_core, pre.n_atoms)
 
         return _AppKeyInfo(r_info.first_key, r_info.first_mask, core_mask,
                            mask_size, n_atoms * n_stages)
@@ -387,7 +389,8 @@ class SynapticMatrices(object):
             app_edge.pre_vertex, SPIKE_PARTITION_ID)
         if r_info is None:
             return None
-        return self.__get_app_key_and_mask(r_info, 1)
+        return self.__get_app_key_and_mask(
+            r_info, 1, app_edge.pre_vertex.get_max_atoms_per_core())
 
     def __delay_app_key_and_mask(self, app_edge):
         """ Get a key and mask for a whole incoming delayed application\
@@ -404,7 +407,11 @@ class SynapticMatrices(object):
         r_info = routing_info.get_routing_info_from_pre_vertex(
             delay_edge.pre_vertex, SPIKE_PARTITION_ID)
 
-        return self.__get_app_key_and_mask(r_info, app_edge.n_delay_stages)
+        # We use the app_edge pre-vertex max atoms here as the delay vertex
+        # is split according to this
+        return self.__get_app_key_and_mask(
+            r_info, app_edge.n_delay_stages,
+            app_edge.pre_vertex.get_max_atoms_per_core())
 
     def get_connections_from_machine(self, placement, app_edge, synapse_info):
         """ Get the synaptic connections from the machine
