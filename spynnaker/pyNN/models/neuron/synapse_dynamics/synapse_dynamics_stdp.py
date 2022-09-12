@@ -234,12 +234,6 @@ class SynapseDynamicsSTDP(
             (self.__dendritic_delay_fraction ==
              synapse_dynamics.dendritic_delay_fraction))
 
-    def are_weights_signed(self):
-        """
-        :rtype: bool
-        """
-        return False
-
     def get_vertex_executable_suffix(self):
         """
         :rtype: str

@@ -137,7 +137,7 @@ class Projection(object):
         # as a from-list connector can have plastic parameters, grab those (
         # if any) and add them to the synapse dynamics object
         if isinstance(connector, FromListConnector):
-            connector._apply_parameters_to_synapse_type(synaptic_type)
+            connector._apply_parameters_to_synapse_type(synapse_dynamics)
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
@@ -180,6 +180,10 @@ class Projection(object):
                 label=label)
             SpynnakerDataView.add_edge(
                 self.__projection_edge, SPIKE_PARTITION_ID)
+
+        # Ensure the connector is happy
+        connector.validate_connection(
+            self.__projection_edge, self.__synapse_information)
 
         # add projection to the SpiNNaker control system
         SpynnakerDataView.add_projection(self)

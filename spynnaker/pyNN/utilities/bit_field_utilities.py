@@ -154,7 +154,7 @@ def reserve_bit_field_regions(
 
 
 def write_bitfield_init_data(
-        spec, incoming_projections, vertex_slice,
+        spec, incoming_projections,
         bit_field_builder_region, master_pop_region_id,
         synaptic_matrix_region_id, direct_matrix_region_id,
         bit_field_region_id, bit_field_key_map_region_id,
@@ -165,8 +165,6 @@ def write_bitfield_init_data(
         data spec writer
     :param list(~spynnaker.pyNN.models.Projection) incoming_projections:
         The projections to generate bitfields for
-    :param ~pacman.model.graphs.common.slice vertex_slice:
-        The slice of the target vertex
     :param int bit_field_builder_region: the region id for the bitfield builder
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix

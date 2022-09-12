@@ -17,6 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
+from pyNN.space import Grid2D, Grid3D
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces import LegacyPartitionerAPI
@@ -29,7 +30,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT)
+    SYSTEM_BYTES_REQUIREMENT, BYTES_PER_WORD)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
@@ -38,6 +39,7 @@ from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex, _flatten, get_rates_bytes,
     get_sdram_edge_params_bytes)
 from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
+from spynnaker.pyNN.models.abstract_models import SupportsStructure
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
@@ -63,7 +65,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class SpikeSourcePoissonVertex(
         TDMAAwareApplicationVertex, AbstractSpikeRecordable,
-        SimplePopulationSettable, LegacyPartitionerAPI):
+        SimplePopulationSettable, LegacyPartitionerAPI, SupportsStructure):
     """ A Poisson Spike source object
     """
 
@@ -86,7 +88,8 @@ class SpikeSourcePoissonVertex(
         "__data",
         "__is_variable_rate",
         "__outgoing_projections",
-        "__incoming_control_edge"]
+        "__incoming_control_edge",
+        "__structure"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -258,6 +261,12 @@ class SpikeSourcePoissonVertex(
         self.__outgoing_projections = list()
         self.__incoming_control_edge = None
 
+        self.__structure = None
+
+    @overrides(SupportsStructure.set_structure)
+    def set_structure(self, structure):
+        self.__structure = structure
+
     def add_outgoing_projection(self, projection):
         """ Add an outgoing projection from this vertex
 
@@ -416,12 +425,18 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.get_sdram_used_by_atoms)
     def get_sdram_used_by_atoms(self, vertex_slice):
-        poisson_params_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        """
+        # pylint: disable=arguments-differ
+        rates_sz = get_rates_bytes(vertex_slice, self.__data["rates"])
+        params_sz = SpikeSourcePoissonMachineVertex.PARAMS_BASE_WORDS + (
+            vertex_slice.n_atoms * BYTES_PER_WORD)
         sdram_sz = get_sdram_edge_params_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz + self.tdma_sdram_size_in_bytes +
+            rates_sz + params_sz + self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples) +
@@ -433,6 +448,13 @@ class SpikeSourcePoissonVertex(
     @property
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    @overrides(TDMAAwareApplicationVertex.atoms_shape)
+    def atoms_shape(self):
+        if isinstance(self.__structure, (Grid2D, Grid3D)):
+            return self.__structure.calculate_size(self.__n_atoms)
+        return super(SpikeSourcePoissonVertex, self).atoms_shape
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(

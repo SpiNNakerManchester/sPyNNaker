@@ -163,13 +163,14 @@ class NeuronImplStandard(AbstractNeuronImpl):
             component.add_state_variables(state_variables)
 
     @overrides(AbstractNeuronImpl.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, atoms_shape):
         # Work out the time step per step
         ts = SpynnakerDataView.get_simulation_time_step_us()
         ts /= self.__n_steps_per_timestep
         items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
         items.extend(
-            component.get_data(parameters, state_variables, vertex_slice, ts)
+            component.get_data(
+                parameters, state_variables, vertex_slice, atoms_shape, ts)
             for component in self.__components)
         return numpy.concatenate(items)
 

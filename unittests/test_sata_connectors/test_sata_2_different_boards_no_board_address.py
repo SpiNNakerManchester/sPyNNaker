@@ -25,14 +25,18 @@ def do_run():
     # Setup
     p.setup(timestep=1.0)
 
-    p.Population(
+    src_1 = p.Population(
         None,
         p.external_devices.ArbitraryFPGADevice(
             2000, fpga_link_id=12, fpga_id=1, label="bacon"))
 
-    p.Population(
+    src_2 = p.Population(
         None, p.external_devices.ArbitraryFPGADevice(
             2000, fpga_link_id=11, fpga_id=1, label="bacon"))
+
+    tgt = p.Population(1, p.IF_curr_exp())
+    p.Projection(src_1, tgt, p.AllToAllConnector())
+    p.Projection(src_2, tgt, p.AllToAllConnector())
 
     p.run(1000)
     p.end()
