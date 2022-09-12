@@ -22,7 +22,6 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.ordered_set import OrderedSet
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker import _version
 from spynnaker.pyNN.data import SpynnakerDataView
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractEventRecordable)
@@ -636,7 +635,7 @@ class Recorder(object):
             'first_id': int(self.__population.first_id),
             'last_id': int(self.__population.last_id),
             'label': self.__population.label,
-            'simulator': _version._NAME,  # pylint: disable=protected-access
+            'simulator': SpynnakerDataView.get_sim_name()
         }
         metadata.update(self.__population.annotations)
         metadata['dt'] = SpynnakerDataView.get_simulation_time_step_ms()
