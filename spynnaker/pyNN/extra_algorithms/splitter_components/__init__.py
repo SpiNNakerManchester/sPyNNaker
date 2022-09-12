@@ -31,4 +31,5 @@ __all__ = [
     'SplitterDelayVertexSlice', 'spynnaker_splitter_partitioner',
     'spynnaker_splitter_selector', 'SpynnakerSplitterFixedLegacy',
     'SplitterAbstractPopulationVertexNeuronsSynapses',
-    'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput']
+    'SplitterPoissonDelegate', 'AbstractSupportsOneToOneSDRAMInput',
+    'SplitterAbstractPopulationVertexFixed']

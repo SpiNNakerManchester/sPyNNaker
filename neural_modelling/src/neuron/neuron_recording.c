@@ -22,10 +22,10 @@
 #include <stddef.h>
 
 //! The index to record each variable to for each neuron
-uint8_t **neuron_recording_indexes;
+uint16_t **neuron_recording_indexes;
 
 //! The index to record each bitfield variable to for each neuron
-uint8_t **bitfield_recording_indexes;
+uint16_t **bitfield_recording_indexes;
 
 //! An array of recording information structures
 recording_info_t *recording_info;
@@ -45,11 +45,11 @@ volatile uint32_t n_recordings_outstanding = 0;
 //! The address of the recording region to read on reset
 static void *reset_address;
 
-//! When bitwise anded with a number will floor to the nearest multiple of 4
-#define FLOOR_TO_4 0xFFFFFFFC
+//! When bitwise anded with a number will floor to the nearest multiple of 2
+#define FLOOR_TO_2 0xFFFFFFFE
 
-//! Add to a number before applying floor to 4 to turn it into a ceil operation
-#define CEIL_TO_4 3
+//! Add to a number before applying floor to 2 to turn it into a ceil operation
+#define CEIL_TO_2 1
 
 //! \brief resets all states back to start state.
 static void reset_record_counter(void) {
@@ -103,15 +103,16 @@ static inline uint32_t bitfield_data_size(uint32_t n_neurons) {
 static bool neuron_recording_read_in_elements(
         void *recording_address, uint32_t n_neurons) {
     // Round up the number of bytes to align at a word boundary i.e. round to
-    // the next multiple of 4
-    uint32_t ceil_n_entries = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
+    // the next multiple of 2
+    uint32_t ceil_n_entries = (n_neurons + CEIL_TO_2) & FLOOR_TO_2;
+
 
     // GCC lets you define a struct like this!
     typedef struct neuron_recording_data {
         uint32_t rate;
         uint32_t n_neurons_recording;
         uint32_t element_size;
-        uint8_t indices[ceil_n_entries];
+        uint16_t indices[ceil_n_entries];
     } neuron_recording_data_t;
 
     neuron_recording_data_t *data = recording_address;
@@ -131,7 +132,8 @@ static bool neuron_recording_read_in_elements(
         if (recording_info[i].values == NULL) {
             recording_info[i].values = spin1_malloc(alloc_size);
             if (recording_info[i].values == NULL) {
-                log_error("couldn't allocate recording data space for %d", i);
+                log_error("couldn't allocate recording data space %u for %d",
+                        alloc_size, i);
                 return false;
             }
             recording_values[i] = recording_info[i].values->data;
@@ -139,13 +141,13 @@ static bool neuron_recording_read_in_elements(
 
         // copy over the indexes
         spin1_memcpy(neuron_recording_indexes[i], data[i].indices,
-            n_neurons * sizeof(uint8_t));
+            n_neurons * sizeof(uint16_t));
     }
 
     typedef struct bitfield_recording_data {
         uint32_t rate;
         uint32_t n_neurons_recording;
-        uint8_t indices[ceil_n_entries];
+        uint16_t indices[ceil_n_entries];
     } bitfield_recording_data_t;
 
     bitfield_recording_data_t *bitfield_data =
@@ -174,7 +176,7 @@ static bool neuron_recording_read_in_elements(
 
         // copy over the indexes
         spin1_memcpy(bitfield_recording_indexes[i], bitfield_data[i].indices,
-            n_neurons * sizeof(uint8_t));
+            n_neurons * sizeof(uint16_t));
     }
     return true;
 }
@@ -199,7 +201,7 @@ static inline bool allocate_word_dtcm(uint32_t n_neurons) {
 
     // allocate dtcm for the overall holder for indexes
     neuron_recording_indexes =
-            spin1_malloc(N_RECORDED_VARS * sizeof(uint8_t *));
+            spin1_malloc(N_RECORDED_VARS * sizeof(uint16_t *));
     if (neuron_recording_indexes == NULL) {
         log_error("Could not allocate space for var_recording_indexes");
         return false;
@@ -216,7 +218,7 @@ static inline bool allocate_word_dtcm(uint32_t n_neurons) {
         recording_info[i].values = NULL;
 
         // allocate dtcm for indexes for each recording region
-        neuron_recording_indexes[i] = spin1_malloc(n_neurons * sizeof(uint8_t));
+        neuron_recording_indexes[i] = spin1_malloc(n_neurons * sizeof(uint16_t));
         if (neuron_recording_indexes[i] == NULL) {
             log_error("failed to allocate memory for recording index %d", i);
             return false;
@@ -239,7 +241,7 @@ static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
 
     // allocate dtcm for the overall holder for indexes
     bitfield_recording_indexes =
-            spin1_malloc(N_BITFIELD_VARS * sizeof(uint8_t *));
+            spin1_malloc(N_BITFIELD_VARS * sizeof(uint16_t *));
     if (bitfield_recording_indexes == NULL) {
         log_error("Could not allocate space for bitfield_recording_indexes");
         return false;
@@ -257,7 +259,7 @@ static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
 
         // allocate dtcm for indexes for each recording region
         bitfield_recording_indexes[i] =
-                spin1_malloc(n_neurons * sizeof(uint8_t));
+                spin1_malloc(n_neurons * sizeof(uint16_t));
         if (bitfield_recording_indexes[i] == NULL) {
             log_error("failed to allocate memory for bitfield index %d", i);
             return false;

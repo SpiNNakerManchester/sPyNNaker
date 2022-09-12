@@ -90,7 +90,7 @@ class MultiSpikeRecorder(object):
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
-                vertex_slice,
+                vertex_slice, application_vertex.atoms_shape,
                 int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
                 neuron_param_data, spike_ids, spike_times)
 
@@ -110,9 +110,11 @@ class MultiSpikeRecorder(object):
 
     @staticmethod
     def _process_spike_data(
-            vertex_slice, n_words, raw_data, spike_ids, spike_times):
+            vertex_slice, atoms_shape, n_words, raw_data, spike_ids,
+            spike_times):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param tuple(int) atoms_shape:
         :param int n_words:
         :param bytearray raw_data:
         :param list(~numpy.ndarray) spike_ids:
@@ -121,6 +123,7 @@ class MultiSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0
+        neurons = vertex_slice.get_raster_ids(atoms_shape)
         while offset < len(raw_data):
             time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
             offset += _TWO_WORDS.size
@@ -132,10 +135,10 @@ class MultiSpikeRecorder(object):
             spikes = spike_data.view("<i4").byteswap().view("uint8")
             bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                 (-1, 32))).reshape((-1, n_bytes_per_block * 8))
-            indices = numpy.nonzero(bits)[1]
+            local_indices = numpy.nonzero(bits)[1]
+            indices = neurons[local_indices]
             times = numpy.repeat(
                 [time * SpynnakerDataView.get_simulation_time_step_ms()],
                 len(indices))
-            indices = indices + vertex_slice.lo_atom
             spike_ids.append(indices)
             spike_times.append(times)

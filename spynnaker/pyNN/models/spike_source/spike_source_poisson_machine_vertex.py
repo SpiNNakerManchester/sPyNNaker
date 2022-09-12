@@ -25,6 +25,7 @@ from spinn_front_end_common.utilities.constants import (
     SIMULATION_N_BYTES, BYTES_PER_WORD, BYTES_PER_SHORT)
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
+from pacman.utilities.utility_calls import get_field_based_keys
 from spinn_front_end_common.abstract_models import (
     AbstractHasAssociatedBinary,
     AbstractRewritesDataSpecification, AbstractGeneratesDataSpecification)
@@ -155,18 +156,19 @@ class SpikeSourcePoissonMachineVertex(
     # between Knuth algorithm and Gaussian approx.
     FAST_RATE_PER_TICK_CUTOFF = 10
 
-    # 1. uint32_t has_key; 2. uint32_t key;
-    # 3. uint32_t set_rate_neuron_id_mask;
-    # 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;
-    # 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;
-    # 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;
-    # 10. uint32_t max_spikes_per_timestep;
-    # 11,12,13,14 mars_kiss64_seed_t (uint[4]) spike_source_seed;
-    PARAMS_BASE_WORDS = 14
+    # 1. uint32_t has_key;
+    # 2. uint32_t set_rate_neuron_id_mask;
+    # 3. UFRACT seconds_per_tick; 4. REAL ticks_per_second;
+    # 5. REAL slow_rate_per_tick_cutoff; 6. REAL fast_rate_per_tick_cutoff;
+    # 7. uint32_t first_source_id; 8. uint32_t n_spike_sources;
+    # 9. uint32_t max_spikes_per_timestep;
+    # 10-13. mars_kiss64_seed_t (uint[4]) spike_source_seed;
+    # Note keys themselves are extra
+    PARAMS_BASE_WORDS = 13
 
     # Seed offset in parameters and size on bytes
-    SEED_OFFSET_BYTES = 10 * 4
-    SEED_SIZE_BYTES = 4 * 4
+    SEED_SIZE_BYTES = 4 * BYTES_PER_WORD
+    SEED_OFFSET_BYTES = (PARAMS_BASE_WORDS * 4) - SEED_SIZE_BYTES
 
     def __init__(
             self, sdram, is_recording, constraints=None,
@@ -365,20 +367,18 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value)
 
         # Extract the data on which to work and convert to appropriate form
+        ids = self.vertex_slice.get_raster_ids(self._app_vertex.atoms_shape)
         starts = numpy.array(list(_flatten(
-            self._app_vertex.start[self.vertex_slice.as_slice]))).astype(
-                "float")
+            self._app_vertex.start.get_values(ids)))).astype("float")
         durations = numpy.array(list(_flatten(
-            self._app_vertex.duration[self.vertex_slice.as_slice]))).astype(
-                "float")
-        local_rates = self._app_vertex.rates[self.vertex_slice.as_slice]
+            self._app_vertex.duration.get_values(ids)))).astype("float")
+        local_rates = self._app_vertex.rates.get_values(ids)
         n_rates = numpy.array([len(r) for r in local_rates])
         splits = numpy.cumsum(n_rates)
         rates = numpy.array(list(_flatten(local_rates)))
         time_to_spike = numpy.array(list(_flatten(
-            self._app_vertex.time_to_spike[
-                self.vertex_slice.as_slice]))).astype("u4")
-        rate_change = self._app_vertex.rate_change[self.vertex_slice.as_slice]
+            self._app_vertex.time_to_spike.get_values(ids)))).astype("u4")
+        rate_change = self._app_vertex.rate_change[ids]
 
         # Convert start times to start time steps
         starts_scaled = self._convert_ms_to_n_timesteps(starts)
@@ -456,6 +456,7 @@ class SpikeSourcePoissonMachineVertex(
         final_data = numpy.concatenate([
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
+
         spec.write_array(final_data)
 
     def _write_poisson_parameters(self, spec, placement):
@@ -477,8 +478,12 @@ class SpikeSourcePoissonMachineVertex(
         routing_info = SpynnakerDataView.get_routing_infos()
         key = routing_info.get_first_key_from_pre_vertex(
             placement.vertex, constants.SPIKE_PARTITION_ID)
-        spec.write_value(data=1 if key is not None else 0)
-        spec.write_value(data=key if key is not None else 0)
+        if key is None:
+            spec.write_value(0)
+            keys = [0] * self.vertex_slice.n_atoms
+        else:
+            spec.write_value(1)
+            keys = get_field_based_keys(key, self.vertex_slice)
 
         # Write the incoming mask if there is one
         incoming_mask = 0
@@ -519,6 +524,8 @@ class SpikeSourcePoissonMachineVertex(
         # Write the random seed (4 words), generated randomly!
         for value in self._app_vertex.kiss_seed(self.vertex_slice):
             spec.write_value(data=value)
+
+        spec.write_array(keys)
 
     def reserve_memory_regions(self, spec, placement):
         """ Reserve memory regions for Poisson source parameters and output\
@@ -563,6 +570,15 @@ class SpikeSourcePoissonMachineVertex(
             label="sdram edge params",
             size=get_sdram_edge_params_bytes(self.vertex_slice))
 
+    @property
+    def __n_bytes_params(self):
+        """ The number of bytes for the parameters
+
+        :rtype: int
+        """
+        return (self.PARAMS_BASE_WORDS * BYTES_PER_WORD) + (
+            BYTES_PER_WORD * self.vertex_slice.n_atoms)
+
     def _reserve_poisson_params_rates_region(self, placement, spec):
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
@@ -575,7 +591,7 @@ class SpikeSourcePoissonMachineVertex(
         spec.reserve_memory_region(
             region=(
                 self.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value),
-            size=self.PARAMS_BASE_WORDS * BYTES_PER_WORD,
+            size=self.__n_bytes_params,
             label="PoissonParams")
         spec.reserve_memory_region(
             region=self.POISSON_SPIKE_SOURCE_REGIONS.RATES_REGION.value,
@@ -625,7 +641,8 @@ class SpikeSourcePoissonMachineVertex(
 
         # For each atom, read the number of rates and the rate parameters
         offset = 0
-        for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+        ids = vertex_slice.get_raster_ids(self._app_vertex.atoms_shape)
+        for i in ids:
             n_values, = _ONE_WORD.unpack_from(byte_array, offset)
             offset += 4
 

@@ -30,8 +30,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
     def __init__(self, spinnaker_link_id, board_address=None):
         super().__init__(
             n_atoms=6, spinnaker_link_id=spinnaker_link_id,
-            label="External Munich Motor", max_atoms_per_core=6,
-            board_address=board_address)
+            label="External Munich Motor", board_address=board_address)
 
 
 @defaults
