@@ -16,6 +16,8 @@
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine)
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 from .all_to_all_connector import AllToAllConnector
@@ -33,13 +35,16 @@ from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
+from .convolution_connector import ConvolutionConnector
+from .pool_dense_connector import PoolDenseConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
+           "AbstractGenerateConnectorOnHost",
            "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
            "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
-           "KernelConnector",
+           "KernelConnector", "ConvolutionConnector", "PoolDenseConnector",
            "MultapseConnector", "OneToOneConnector", "SmallWorldConnector"]

@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
 from spynnaker import _version
-from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
 # pylint: disable=protected-access
@@ -221,26 +221,22 @@ class SpynnakerDataView(FecDataView):
         return first_id, cls.__spy_data._id_counter
 
     @classmethod
-    def add_number_of_neurons_per_core(cls, neuron_type, max_permitted):
+    def set_number_of_neurons_per_dimension_per_core(
+            cls, neuron_type, max_permitted):
         """
         Sets a ceiling on the number of neurons of a given type that can be\
-        placed on a single core.
+        placed on a single core for each dimension.
 
         :param AbstractPopulationVertex neuron_type: neuron type
-        :param int max_permitted: the number to set to
+        :param max_permitted: the number to set to
+        :type max_permitted: int or tuple or None
         :return:
         """
         cls.check_valid_simulator()
-        if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
-            raise TypeError(f"{neuron_type} is not a Vertex type")
+        if not issubclass(neuron_type, AbstractPyNNModel):
+            raise TypeError(f"{neuron_type} is not an AbstractPyNNModel")
 
-        if hasattr(neuron_type, "get_max_atoms_per_core"):
-            previous = neuron_type.get_max_atoms_per_core()
-            if previous < max_permitted:
-                raise SpynnakerException(
-                    f"Attempt to increase number_of_neurons_per_core "
-                    f"from {previous} to {max_permitted} not supported")
-        neuron_type.set_model_max_atoms_per_core(max_permitted)
+        neuron_type.set_model_max_atoms_per_dimension_per_core(max_permitted)
         cls.__spy_data._neurons_per_core_set.add(neuron_type)
 
     @classmethod

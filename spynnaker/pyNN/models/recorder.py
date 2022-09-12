@@ -211,13 +211,13 @@ class Recorder(object):
             if len(ids) != self.__population.size:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = ids
-        elif view_indexes == ids:
+        elif view_indexes == list(ids):
             indexes = ids
         else:
             # keep just the view indexes in the data
             indexes = [i for i in view_indexes if i in ids]
             # keep just data columns in the view
-            map_indexes = [ids.index(i) for i in indexes]
+            map_indexes = [list(ids).index(i) for i in indexes]
             data = data[:, map_indexes]
 
         if as_matrix:
@@ -728,13 +728,13 @@ class Recorder(object):
             if len(data_indexes) != self.__population.size:
                 warn_once(logger, self._SELECTIVE_RECORDED_MSG)
             indexes = numpy.array(data_indexes)
-        elif view_indexes == data_indexes:
+        elif view_indexes == list(data_indexes):
             indexes = numpy.array(data_indexes)
         else:
             # keep just the view indexes in the data
             indexes = [i for i in view_indexes if i in data_indexes]
             # keep just data columns in the view
-            map_indexes = [data_indexes.index(i) for i in indexes]
+            map_indexes = [list(data_indexes).index(i) for i in indexes]
             signal_array = signal_array[:, map_indexes]
 
         ids = list(map(self.__population.index_to_id, indexes))

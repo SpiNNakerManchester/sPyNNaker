@@ -472,7 +472,7 @@ class SynapticMatrices(object):
         # Get the key as the first key and the mask as the mask that covers
         # enough keys
         key = keys[0][0]
-        n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
+        n_extra_mask_bits = int(math.ceil(math.log2(len(keys))))
         core_mask = (2 ** n_extra_mask_bits) - 1
         new_mask = mask & ~(core_mask << mask_size)
 
@@ -630,7 +630,7 @@ class SynapticMatrices(object):
         :param SynapseInformation synapse_info:
             The synapse information of the projection
         :return: A list of arrays of connections, each with dtype
-            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+            AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
         :rtype: ~numpy.ndarray
         """
         matrix = self.__app_matrix(app_edge, synapse_info)

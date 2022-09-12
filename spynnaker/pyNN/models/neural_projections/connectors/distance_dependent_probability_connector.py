@@ -24,6 +24,8 @@ from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities.utility_calls import (
     get_probable_maximum_selected, get_probable_minimum_selected)
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_host import (
+    AbstractGenerateConnectorOnHost)
 
 # support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
@@ -32,7 +34,8 @@ _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            maximum, minimum, e=e, pi=pi)
 
 
-class DistanceDependentProbabilityConnector(AbstractConnector):
+class DistanceDependentProbabilityConnector(
+        AbstractConnector, AbstractGenerateConnectorOnHost):
     """ Make connections using a distribution which varies with distance.
     """
 
@@ -171,7 +174,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 numpy.amax(self.__probs)),
             synapse_info)
 
-    @overrides(AbstractConnector.create_synaptic_block)
+    @overrides(AbstractGenerateConnectorOnHost.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, post_slices, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):

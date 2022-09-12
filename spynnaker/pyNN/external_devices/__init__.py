@@ -31,7 +31,8 @@ from spinn_front_end_common.utilities.utility_objs import (
 from spynnaker.pyNN.external_devices_models import (
     AbstractEthernetController, AbstractEthernetSensor,
     ArbitraryFPGADevice, ExternalCochleaDevice, ExternalFPGARetinaDevice,
-    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl)
+    MunichMotorDevice, MunichRetinaDevice, ExternalDeviceLifControl,
+    SPIFRetinaDevice, ICUBRetinaDevice)
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.connections import (
     EthernetCommandConnection, EthernetControlConnection,
@@ -75,7 +76,8 @@ __all__ = [
     # General Devices
     "ExternalCochleaDevice", "ExternalFPGARetinaDevice",
     "MunichRetinaDevice", "MunichMotorDevice", "ArbitraryFPGADevice",
-    "PushBotRetinaViewer", "ExternalDeviceLifControl",
+    "PushBotRetinaViewer", "ExternalDeviceLifControl", "SPIFRetinaDevice",
+    "ICUBRetinaDevice",
 
     # PushBot Parameters
     "MunichIoSpiNNakerLinkProtocol",
