@@ -16,6 +16,7 @@
 import logging
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.data import FecDataView
+from spynnaker import _version
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -246,3 +247,13 @@ class SpynnakerDataView(FecDataView):
         :rtype: int
         """
         return cls.__spy_data._segment_counter
+
+    @classmethod
+    def get_sim_name(cls):
+        """
+        Gets the name to be returned by pyNN.spiNNaker.name
+
+        :rtype str
+        """
+
+        return _version._NAME   # pylint: disable=protected-access
