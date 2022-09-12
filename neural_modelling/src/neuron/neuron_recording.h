@@ -60,10 +60,10 @@ typedef struct bitfield_info_t {
 } bitfield_info_t;
 
 //! The index to record each variable to for each neuron
-extern uint8_t **neuron_recording_indexes;
+extern uint16_t **neuron_recording_indexes;
 
 //! The index to record each bitfield variable to for each neuron
-extern uint8_t **bitfield_recording_indexes;
+extern uint16_t **bitfield_recording_indexes;
 
 //! An array of recording information structures
 extern recording_info_t *recording_info;

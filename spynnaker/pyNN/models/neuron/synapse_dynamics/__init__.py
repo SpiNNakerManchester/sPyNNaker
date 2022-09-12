@@ -14,11 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from .abstract_sdram_synapse_dynamics import AbstractSDRAMSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_supports_signed_weights import AbstractSupportsSignedWeights
 from .pynn_synapse_dynamics import PyNNSynapseDynamics
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
@@ -33,7 +35,7 @@ from .synapse_dynamics_neuromodulation import SynapseDynamicsNeuromodulation
 
 __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
-           "AbstractSynapseDynamicsStructural",
+           "AbstractSDRAMSynapseDynamics", "AbstractSynapseDynamicsStructural",
            "calculate_spike_pair_additive_stdp_weight",
            "calculate_spike_pair_multiplicative_stdp_weight",
            "PyNNSynapseDynamics", "SynapseDynamicsStatic",
@@ -43,4 +45,5 @@ __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "SynapseDynamicsStructuralStatic",
            "SynapseDynamicsStructuralSTDP",
            # Neuromodulation
-           "SynapseDynamicsNeuromodulation"]
+           "SynapseDynamicsNeuromodulation",
+           "AbstractSupportsSignedWeights"]
