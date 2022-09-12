@@ -66,7 +66,6 @@
 <span class="kn">from</span> <span class="nn">spinnman.messages.eieio</span> <span class="kn">import</span> <span class="n">EIEIOType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.globals_variables</span> <span class="kn">import</span> <span class="n">get_simulator</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">LivePacketGatherParameters</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.external_devices_models</span> <span class="kn">import</span> <span class="p">(</span>
@@ -147,6 +146,8 @@
     <span class="s2">&quot;run_forever&quot;</span><span class="p">,</span>
     <span class="s2">&quot;add_poisson_live_rate_control&quot;</span>
 <span class="p">]</span>
+<span class="c1"># Cache of the simulator provided by pyNN/__init__py</span>
+<span class="n">__simulator</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="run_forever"><a class="viewcode-back" href="../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.run_forever">[docs]</a><span class="k">def</span> <span class="nf">run_forever</span><span class="p">(</span><span class="n">sync_time</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -157,7 +158,8 @@
 <span class="sd">        continue the simulation</span>
 <span class="sd">    :return: when the application has started running on the SpiNNaker platform</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span></div>
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+    <span class="n">__simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">run_sync</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">):</span>
@@ -167,20 +169,23 @@
 <span class="sd">    :param float run_time: The time in milliseconds to run the simulation for</span>
 <span class="sd">    :param float sync_time: The time in milliseconds to pause before allowing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span>
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
+    <span class="n">__simulator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">,</span> <span class="n">sync_time</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">continue_simulation</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Continue a synchronised simulation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">continue_simulation</span><span class="p">()</span>
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
+    <span class="n">__simulator</span><span class="o">.</span><span class="n">continue_simulation</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">request_stop</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Request a stop in the simulation without a complete stop.  Will stop\</span>
 <span class="sd">        after the next auto-pause-and-resume cycle</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">stop_run</span><span class="p">()</span>
+    <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_valid_simulator</span><span class="p">()</span>
+    <span class="n">__simulator</span><span class="o">.</span><span class="n">stop_run</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="register_database_notification_request"><a class="viewcode-back" href="../../../spynnaker.pyNN.external_devices.html#spynnaker.pyNN.external_devices.register_database_notification_request">[docs]</a><span class="k">def</span> <span class="nf">register_database_notification_request</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="n">notify_port</span><span class="p">,</span> <span class="n">ack_port</span><span class="p">):</span>
@@ -344,6 +349,18 @@
             <span class="n">database_notify_host</span><span class="p">,</span> <span class="n">database_notify_port_num</span><span class="p">,</span>
             <span class="n">database_ack_port_num</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ExternalDeviceSpikeInjector</span><span class="p">()</span></div>
+
+
+<span class="k">def</span> <span class="nf">_set_simulator</span><span class="p">(</span><span class="n">simulator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Should only be called by pyNN/__init__py setup method.</span>
+
+<span class="sd">    Any other uses is not supported.</span>
+
+<span class="sd">    :param spynnaker.pyNN.spinnaker.SpiNNaker simulator:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">__simulator</span>
+    <span class="n">__simulator</span> <span class="o">=</span> <span class="n">simulator</span>
 </pre></div>
 
             <div class="clearer"></div>
