@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2017-2022 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pyNN import common as pynn_common
-from spinn_front_end_common.utilities import globals_variables
 
 
 class Assembly(pynn_common.Assembly):
@@ -27,7 +26,3 @@ class Assembly(pynn_common.Assembly):
         ~spynnaker.pyNN.models.populations.PopulationView
     :param kwargs: may contain `label` (a string describing the assembly)
     """
-
-    @property
-    def _simulator(self):
-        return globals_variables.get_simulator()
