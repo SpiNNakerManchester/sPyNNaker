@@ -346,7 +346,7 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return int(math.ceil(math.log2(n_values)))
 
 
 def moved_in_v6(old_location, _):
