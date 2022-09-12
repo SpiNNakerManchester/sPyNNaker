@@ -103,7 +103,7 @@ class SynapseDynamicsStructuralCommon(
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_projections,
-            weight_scales, synaptic_matrices, vertex_slice)
+            weight_scales, synaptic_matrices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -200,7 +200,7 @@ class SynapseDynamicsStructuralCommon(
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_projections,
-            weight_scales, synaptic_matrices, post_vertex_slice):
+            weight_scales, synaptic_matrices):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:

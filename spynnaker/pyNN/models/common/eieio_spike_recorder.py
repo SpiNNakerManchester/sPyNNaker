@@ -18,6 +18,7 @@ import struct
 import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+from pacman.utilities.utility_calls import get_field_based_index
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.common import recording_utils
@@ -101,8 +102,8 @@ class EIEIOSpikeRecorder(object):
                 if data_missing:
                     missing.append(placement)
                 self._process_spike_data(
-                    vertex_slice, raw_spike_data, base_key_function(vertex),
-                    results)
+                    vertex_slice, application_vertex.atoms_shape,
+                    raw_spike_data, base_key_function(vertex), results)
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -115,7 +116,8 @@ class EIEIOSpikeRecorder(object):
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     @staticmethod
-    def _process_spike_data(vertex_slice, spike_data, base_key, results):
+    def _process_spike_data(
+            vertex_slice, atoms_shape, spike_data, base_key, results):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param bytearray spike_data:
@@ -124,6 +126,8 @@ class EIEIOSpikeRecorder(object):
         """
         number_of_bytes_written = len(spike_data)
         offset = 0
+        indices = get_field_based_index(base_key, vertex_slice)
+        slice_ids = vertex_slice.get_raster_ids(atoms_shape)
         while offset < number_of_bytes_written:
             length, time = _TWO_WORDS.unpack_from(spike_data, offset)
             time *= SpynnakerDataView.get_simulation_time_step_ms()
@@ -140,7 +144,7 @@ class EIEIOSpikeRecorder(object):
             keys = numpy.frombuffer(
                 spike_data, dtype="<u{}".format(key_bytes),
                 count=eieio_header.count, offset=data_offset)
-
-            neuron_ids = (keys - base_key) + vertex_slice.lo_atom
+            local_ids = numpy.array([indices[key] for key in keys])
+            neuron_ids = slice_ids[local_ids]
             offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])

@@ -21,7 +21,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractStaticSynapseDynamics, AbstractSynapseDynamics)
+    AbstractStaticSynapseDynamics, AbstractSDRAMSynapseDynamics)
 from .master_pop_table import MasterPopTableAsBinarySearch
 
 _N_HEADER_WORDS = 3
@@ -456,13 +456,13 @@ def convert_to_connections(
     :param int post_vertex_max_delay_ticks:
             max delayed ticks supported from post vertex
     :return: The connections read from the data; the dtype is
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: ~numpy.ndarray
     """
     # If there is no data, return nothing
     if data is None or not len(data):
         return numpy.zeros(
-            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
     # Translate the data into rows
     row_data = numpy.frombuffer(data, dtype="<u4").reshape(
@@ -483,7 +483,7 @@ def convert_to_connections(
     # There might still be no connections if the row was all padding
     if not connections.size:
         return numpy.zeros(
-            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
     # Convert 0 delays to max delays
     connections["delay"][connections["delay"] == 0] = (
@@ -519,7 +519,7 @@ def read_all_synapses(
     :param MaxRowInfo max_row_info:
         The maximum information for each of the rows
     :return: The connections read from the data; the dtype is
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: ~numpy.ndarray
     """
     connections = []
@@ -576,12 +576,12 @@ def _read_static_data(
     :param bool delayed: True if data should be considered delayed
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: the connections read with dtype
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(
-            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     ff_size, ff_data = _parse_static_data(row_data, dynamics)
     connections = dynamics.read_static_synaptic_data(
         post_vertex_slice, n_synapse_types, ff_size, ff_data)
@@ -641,12 +641,12 @@ def _read_plastic_data(
     :param bool delayed: True if data should be considered delayed
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: the connections read with dtype
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :rtype: list(~numpy.ndarray)
     """
     if row_data is None or not row_data.size:
         return numpy.zeros(
-            0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+            0, dtype=AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
     pp_size, pp_data, fp_size, fp_data = _parse_plastic_data(
         row_data, dynamics)
     connections = dynamics.read_plastic_synaptic_data(
@@ -691,7 +691,7 @@ def __convert_delayed_data(
         The slice of atoms in the pre-vertex
     :param ~numpy.ndarray delayed_connections:
         The connections to convert of dtype
-        AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        AbstractSDRAMSynapseDynamics.NUMPY_CONNECTORS_DTYPE
     :param int post_vertex_max_delay_ticks: post vertex delay maximum
     :return: The converted connection with the same dtype
     :rtype: ~numpy.ndarray
