@@ -963,8 +963,8 @@ class Population(PopulationBase):
 
     # NON-PYNN API CALL
     def set_fixed_location(self, fixed_location):
-        """ Apply a fixed_location to a population that restricts the processor\
-            onto which its atoms will be placed.
+        """ Apply a fixed_location to a population that restricts the
+            processor onto which its atoms will be placed.
 
         :param ~pacman.model.graph.common.ChipAndCore fixed_location:
         :raises SimulatorRunningException: If sim.run is currently running
