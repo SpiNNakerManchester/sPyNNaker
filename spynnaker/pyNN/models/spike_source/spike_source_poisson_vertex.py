@@ -96,15 +96,11 @@ class SpikeSourcePoissonVertex(
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, constraints, label, seed,
-            max_atoms_per_core, model, rate=None, start=None,
-            duration=None, rates=None, starts=None, durations=None,
-            max_rate=None, splitter=None):
+            self, n_neurons, label, seed, max_atoms_per_core, model,
+            rate=None, start=None, duration=None, rates=None, starts=None,
+            durations=None, max_rate=None, splitter=None):
         """
         :param int n_neurons:
-        :param constraints:
-        :type constraints:
-            iterable(~pacman.model.constraints.AbstractConstraint)
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
@@ -117,7 +113,7 @@ class SpikeSourcePoissonVertex(
             ~pacman.model.partitioner_splitters.abstract_splitters.AbstractSplitterCommon
         """
         # pylint: disable=too-many-arguments
-        super().__init__(label, constraints, max_atoms_per_core, splitter)
+        super().__init__(label, max_atoms_per_core, splitter)
 
         # atoms params
         self.__n_atoms = self.round_n_atoms(n_neurons, "n_neurons")
@@ -472,13 +468,13 @@ class SpikeSourcePoissonVertex(
 
     @overrides(LegacyPartitionerAPI.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, sdram, label=None, constraints=None):
+            self, vertex_slice, sdram, label=None):
         # pylint: disable=arguments-differ
         index = self.__n_subvertices
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             sdram, self.__spike_recorder.record,
-            constraints, label, self, vertex_slice, index)
+            label, self, vertex_slice, index)
 
     @property
     def max_rate(self):

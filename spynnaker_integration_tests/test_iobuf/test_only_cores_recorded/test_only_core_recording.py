@@ -15,7 +15,7 @@
 
 import pyNN.spiNNaker as sim
 from spinnaker_testbase import BaseTestCase
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.graphs.common import ChipAndCore
 from spynnaker.pyNN.data import SpynnakerDataView
 
 

@@ -23,9 +23,8 @@ from spinn_utilities.config_holder import get_config_bool
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints import AbstractConstraint
-from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.graphs.common import ChipAndCore
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.data import SpynnakerDataView
@@ -80,8 +79,7 @@ class Population(PopulationBase):
 
     def __init__(
             self, size, cellclass, cellparams=None, structure=None,
-            initial_values=None, label=None, constraints=None,
-            additional_parameters=None):
+            initial_values=None, label=None, additional_parameters=None):
         """
         :param int size: The number of neurons in the population
         :param cellclass: The implementation of the individual neurons.
@@ -94,8 +92,6 @@ class Population(PopulationBase):
         :param dict(str,float) initial_values:
             Initial values of state variables
         :param str label: A label for the population
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Any constraints on how the population is deployed to SpiNNaker.
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
@@ -106,7 +102,7 @@ class Population(PopulationBase):
         model = self.__create_model(cellclass, cellparams)
         size = self.__roundsize(size, label)
         self.__create_vertex(
-            model, size, label, constraints, additional_parameters)
+            model, size, label, additional_parameters)
         self._recorder = Recorder(population=self, vertex=self.__vertex)
 
         self.__delay_vertex = None
@@ -966,21 +962,17 @@ class Population(PopulationBase):
         return self.__structure
 
     # NON-PYNN API CALL
-    def set_constraint(self, constraint):
-        """ Apply a constraint to a population that restricts the processor\
+    def set_fixed_location(self, fixed_location):
+        """ Apply a fixed_location to a population that restricts the processor\
             onto which its atoms will be placed.
 
-        :param ~pacman.model.constraints.AbstractConstraint constraint:
+        :param ~pacman.model.graph.common.ChipAndCore fixed_location:
         :raises SimulatorRunningException: If sim.run is currently running
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
         SpynnakerDataView.check_user_can_act()
-        if not isinstance(constraint, AbstractConstraint):
-            raise ConfigurationException(
-                "the constraint entered is not a recognised constraint")
-
-        self.__vertex.add_constraint(constraint)
+        self.__vertex.fixed_location = fixed_location
         # state that something has changed in the population,
         self.__change_requires_mapping = True
 
@@ -995,28 +987,7 @@ class Population(PopulationBase):
         :raises SimulatorNotSetupException: If called before sim.setup
         :raises SimulatorShutdownException: If called after sim.end
         """
-        SpynnakerDataView.check_user_can_act()
-        self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
-
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
-
-    # NON-PYNN API CALL
-    def set_mapping_constraint(self, constraint_dict):
-        """ Add a placement constraint - for backwards compatibility
-
-        :param dict(str,int) constraint_dict:
-            A dictionary containing "x", "y" and optionally "p" as keys, and
-            ints as values
-        :raises SimulatorRunningException: If sim.run is currently running
-        :raises SimulatorNotSetupException: If called before sim.setup
-        :raises SimulatorShutdownException: If called after sim.end
-        """
-        SpynnakerDataView.check_user_can_act()
-        self.add_placement_constraint(**constraint_dict)
-
-        # state that something has changed in the population,
-        self.__change_requires_mapping = True
+        self.set_fixed_location(ChipAndCore(x, y, p))
 
     # NON-PYNN API CALL
     def set_max_atoms_per_core(self, max_atoms_per_core):
@@ -1100,15 +1071,13 @@ class Population(PopulationBase):
         return model
 
     def __create_vertex(
-            self, model, size, label, constraints, additional_parameters):
+            self, model, size, label, additional_parameters):
         """
         :param model: The implementation of the individual neurons.
         :type model: ApplicationVertex or AbstractPyNNModel
         :param int size:
         :param label:
         :type label: str or None
-        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
-            Any constraints on how the population is deployed to SpiNNaker.
         :param additional_parameters:
             Additional parameters to pass to the vertex creation function.
         :type additional_parameters: dict(str, ...)
@@ -1127,7 +1096,7 @@ class Population(PopulationBase):
                 population_parameters = self.__process_additional_params(
                     additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
-                size, label, constraints, **population_parameters)
+                size, label, **population_parameters)
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):
@@ -1143,8 +1112,6 @@ class Population(PopulationBase):
                     "Vertex size does not match Population size")
             if label is not None:
                 self.__vertex.set_label(label)
-            if constraints is not None:
-                self.__vertex.add_constraints(constraints)
 
         # Fail on anything else
         else:
