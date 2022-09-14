@@ -98,7 +98,6 @@
     <span class="c1"># pylint: disable=redefined-builtin</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__projection_edge&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__requires_mapping&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__virtual_connection_list&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__label&quot;</span><span class="p">]</span>
@@ -126,7 +125,6 @@
                 <span class="s2">&quot;cells.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
 
         <span class="n">pre_is_view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__check_population</span><span class="p">(</span>
@@ -440,19 +438,6 @@
         <span class="k">return</span> <span class="s2">&quot;projection </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__label</span><span class="p">)</span>
 
     <span class="c1"># -----------------------------------------------------------------</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Whether this projection requires mapping.</span>
-
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span>
-
-<div class="viewcode-block" id="Projection.mark_no_changes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.projection.Projection.mark_no_changes">[docs]</a>    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Mark this projection as not having changes to be mapped.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

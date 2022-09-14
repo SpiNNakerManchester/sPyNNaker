@@ -59,7 +59,6 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged</span> <span class="kn">import</span> <span class="n">RangedListOfList</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">ReverseIpTagMultiCastSource</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">EIEIOSpikeRecorder</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">)</span>
@@ -88,8 +87,7 @@
 
 <span class="k">class</span> <span class="nc">SpikeSourceArrayVertex</span><span class="p">(</span>
         <span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
-        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">AbstractChangableAfterRun</span><span class="p">,</span>
-        <span class="n">SupportsStructure</span><span class="p">):</span>
+        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Model for play back of spikes</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -116,11 +114,6 @@
         <span class="c1"># handle recording</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span> <span class="o">=</span> <span class="n">EIEIOSpikeRecorder</span><span class="p">()</span>
 
-        <span class="c1"># used for reset and rerun</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="kc">None</span>
-
 <div class="viewcode-block" id="SpikeSourceArrayVertex.set_structure"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.set_structure">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SupportsStructure</span><span class="o">.</span><span class="n">set_structure</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span> <span class="o">=</span> <span class="n">structure</span></div>
@@ -131,15 +124,6 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="p">,</span> <span class="p">(</span><span class="n">Grid2D</span><span class="p">,</span> <span class="n">Grid3D</span><span class="p">)):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__structure</span><span class="o">.</span><span class="n">calculate_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ReverseIpTagMultiCastSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">atoms_shape</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span>
-
-<div class="viewcode-block" id="SpikeSourceArrayVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -215,7 +199,8 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Indexes currently not supported for &quot;</span>
                            <span class="s2">&quot;SpikeSourceArray so being ignored&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_recording</span><span class="p">(</span><span class="n">new_state</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">:</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">new_state</span></div>
 
 <div class="viewcode-block" id="SpikeSourceArrayVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArrayVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>

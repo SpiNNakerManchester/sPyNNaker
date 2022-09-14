@@ -64,7 +64,7 @@
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">ConstantSDRAM</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_int</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management</span> <span class="kn">import</span> <span class="p">(</span>
@@ -105,13 +105,11 @@
 
 <span class="k">class</span> <span class="nc">SpikeSourcePoissonVertex</span><span class="p">(</span>
         <span class="n">TDMAAwareApplicationVertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">,</span>
-        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">SimplePopulationSettable</span><span class="p">,</span>
-        <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
+        <span class="n">SimplePopulationSettable</span><span class="p">,</span> <span class="n">LegacyPartitionerAPI</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A Poisson Spike source object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__duration&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__model&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__model_name&quot;</span><span class="p">,</span>
@@ -166,9 +164,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__kiss_seed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="c1"># check for changes parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span> <span class="o">=</span> <span class="n">MultiSpikeRecorder</span><span class="p">()</span>
 
@@ -362,7 +357,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Increasing spike rate while recording requires a &#39;</span>
                         <span class="s1">&#39;&quot;reset unless additional_parameters &quot;max_rate&quot; is &#39;</span>
                         <span class="s1">&#39;set&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__max_rate</span> <span class="o">=</span> <span class="n">new_max</span>
 
     <span class="nd">@property</span>
@@ -437,15 +432,6 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rate_change</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rate_change</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span>
-
-<div class="viewcode-block" id="SpikeSourcePoissonVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.set_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.set_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">SimplePopulationSettable</span><span class="o">.</span><span class="n">set_value</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -548,7 +534,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;indexes not supported for &quot;</span>
                            <span class="s2">&quot;SpikeSourcePoisson so being ignored&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">new_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_recorder</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">new_state</span></div>
 
 <div class="viewcode-block" id="SpikeSourcePoissonVertex.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVertex.get_spikes_sampling_interval">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSpikeRecordable</span><span class="o">.</span><span class="n">get_spikes_sampling_interval</span><span class="p">)</span>

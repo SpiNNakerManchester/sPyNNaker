@@ -71,8 +71,7 @@
     <span class="n">get_config_int</span><span class="p">,</span> <span class="n">get_config_float</span><span class="p">,</span> <span class="n">get_config_bool</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources</span> <span class="kn">import</span> <span class="n">MultiRegionSDRAM</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractCanReset</span><span class="p">,</span>
-    <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
+    <span class="n">AbstractCanReset</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models.impl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TDMAAwareApplicationVertex</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -139,7 +138,7 @@
         <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span>
         <span class="n">AbstractEventRecordable</span><span class="p">,</span>
         <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
-        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
+        <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
         <span class="n">AbstractCanReset</span><span class="p">,</span> <span class="n">SupportsStructure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Underlying vertex model for Neural Populations.\</span>
 <span class="sd">        Not actually abstract.</span>
@@ -147,8 +146,6 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__all_single_syn_sz&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__change_requires_data_generation&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__incoming_spike_buffer_size&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_atoms&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__n_profile_samples&quot;</span><span class="p">,</span>
@@ -276,8 +273,6 @@
             <span class="p">{</span><span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING</span><span class="p">:</span> <span class="n">NeuronRecorder</span><span class="o">.</span><span class="n">REWIRING_TYPE</span><span class="p">})</span>
 
         <span class="c1"># bool for if state has changed.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Current sources for this vertex</span>
@@ -378,7 +373,7 @@
 <span class="sd">            The new projection to add</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Reset the ring buffer shifts as a projection has been added</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__max_row_info</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
@@ -506,21 +501,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_run</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_data_generation</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">requires_data_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span>
-
-<div class="viewcode-block" id="AbstractPopulationVertex.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">False</span></div>
-
 <div class="viewcode-block" id="AbstractPopulationVertex.get_neuron_params_position"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_neuron_params_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_params_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_atoms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the position of the neuron parameters themselves within the</span>
 <span class="sd">            neuron parameters region</span>
@@ -644,7 +624,8 @@
                 <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">,</span> <span class="n">indexes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__raise_var_not_supported</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_recording</span><span class="p">(</span><span class="n">variable</span><span class="p">):</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractPopulationVertex.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
@@ -929,7 +910,7 @@
 
         <span class="c1"># If synapses change during the run,</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">changes_during_run</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_data_generation</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_data_generation</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">):</span>
                     <span class="n">vertex</span><span class="o">.</span><span class="n">set_reload_required</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>

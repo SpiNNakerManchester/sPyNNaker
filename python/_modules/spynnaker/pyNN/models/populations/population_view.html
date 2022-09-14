@@ -61,6 +61,7 @@
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.logger_utils</span> <span class="kn">import</span> <span class="n">warn_once</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged.abstract_sized</span> <span class="kn">import</span> <span class="n">AbstractSized</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">.idmixin</span> <span class="kn">import</span> <span class="n">IDMixin</span>
 <span class="kn">from</span> <span class="nn">.population_base</span> <span class="kn">import</span> <span class="n">PopulationBase</span>
 
@@ -257,7 +258,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__indexes</span><span class="p">)</span>
         <span class="n">current_source</span><span class="o">.</span><span class="n">set_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="PopulationView.describe"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.PopulationView.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s1">&#39;populationview_default.txt&#39;</span><span class="p">,</span>
                  <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>

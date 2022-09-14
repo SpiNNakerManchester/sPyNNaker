@@ -57,7 +57,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.standardmodels.synapses</span> <span class="kn">import</span> <span class="n">StaticSynapse</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
@@ -84,15 +83,12 @@
 
 <span class="k">class</span> <span class="nc">SynapseDynamicsSTDP</span><span class="p">(</span>
         <span class="n">AbstractPlasticSynapseDynamics</span><span class="p">,</span> <span class="n">AbstractSettable</span><span class="p">,</span>
-        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">):</span>
+        <span class="n">AbstractGenerateOnMachine</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The dynamics of a synapse that changes over time using a \</span>
 <span class="sd">        Spike Timing Dependent Plasticity (STDP) rule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="c1"># Flag: whether there is state in this class that is not reflected on</span>
-        <span class="c1"># the SpiNNaker system</span>
-        <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
         <span class="c1"># Fraction of delay that is dendritic (instead of axonal or synaptic)</span>
         <span class="s2">&quot;__dendritic_delay_fraction&quot;</span><span class="p">,</span>
         <span class="c1"># timing dependence to use for the STDP rule</span>
@@ -141,7 +137,6 @@
         <span class="n">weight_dependence</span><span class="o">.</span><span class="n">set_a_plus_a_minus</span><span class="p">(</span>
             <span class="n">timing_dependence</span><span class="o">.</span><span class="n">A_plus</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="o">.</span><span class="n">A_minus</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dendritic_delay_fraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">dendritic_delay_fraction</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pad_to_length</span> <span class="o">=</span> <span class="n">pad_to_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight</span> <span class="o">=</span> <span class="n">weight</span>
         <span class="k">if</span> <span class="n">delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -204,23 +199,6 @@
         <span class="c1"># Otherwise, it is static or neuromodulation, so return ourselves</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-    <span class="nd">@property</span>
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">requires_mapping</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; True if changes that have been made require that mapping be\</span>
-<span class="sd">            performed.  Note that this should return True the first time it\</span>
-<span class="sd">            is called, as the vertex must require mapping as it has been\</span>
-<span class="sd">            created!</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span>
-
-<div class="viewcode-block" id="SynapseDynamicsSTDP.mark_no_changes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.mark_no_changes">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractChangableAfterRun</span><span class="o">.</span><span class="n">mark_no_changes</span><span class="p">,</span> <span class="n">extend_doc</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Marks the point after which changes are reported.  Immediately\</span>
-<span class="sd">            after calling this method, requires_mapping should return False.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
-
 <div class="viewcode-block" id="SynapseDynamicsSTDP.get_value"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.get_value">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSettable</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="p">,</span> <span class="bp">self</span><span class="p">]:</span>
@@ -234,7 +212,7 @@
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__timing_dependence</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weight_dependence</span><span class="p">,</span> <span class="bp">self</span><span class="p">]:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
                 <span class="k">return</span>
         <span class="k">raise</span> <span class="n">InvalidParameterType</span><span class="p">(</span>
             <span class="s2">&quot;Type </span><span class="si">{}</span><span class="s2"> does not have parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">))</span></div>

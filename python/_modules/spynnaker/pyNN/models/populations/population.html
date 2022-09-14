@@ -67,7 +67,6 @@
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.placer_constraints</span> <span class="kn">import</span> <span class="n">ChipAndCoreConstraint</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationVertex</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractChangableAfterRun</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.data</span> <span class="kn">import</span> <span class="n">SpynnakerDataView</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">InvalidParameterType</span><span class="p">,</span> <span class="n">SpynnakerException</span><span class="p">)</span>
@@ -103,8 +102,6 @@
         <span class="s2">&quot;_all_ids&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_annotations&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_celltype&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__delay_vertex&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__first_id&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__has_read_neuron_parameters_this_run&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__last_id&quot;</span><span class="p">,</span>
@@ -113,7 +110,6 @@
         <span class="s2">&quot;_size&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__structure&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__vertex&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__vertex_changeable_after_run&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__vertex_contains_units&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__vertex_population_initializable&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__vertex_population_settable&quot;</span><span class="p">]</span>
@@ -149,8 +145,6 @@
             <span class="n">model</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">additional_parameters</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recorder</span> <span class="o">=</span> <span class="n">Recorder</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_vertex</span> <span class="o">=</span> <span class="kc">None</span>
-
         <span class="c1"># Internal structure now supported 23 November 2014 ADR</span>
         <span class="c1"># structure should be a valid Space.py structure type.</span>
         <span class="c1"># generation of positions is deferred until needed.</span>
@@ -169,7 +163,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="c1"># parameter</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># things for pynn demands</span>
@@ -631,7 +624,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">positions</span>
 
         <span class="c1"># state that something has changed in the population,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">all_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -682,23 +675,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Whether this population requires mapping.</span>
-
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span>
-
-    <span class="nd">@requires_mapping</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="n">new_value</span>
-
-<div class="viewcode-block" id="Population.mark_no_changes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.mark_no_changes">[docs]</a>    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Mark this population as not having changes to be mapped.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span></div>
+    <span class="k">def</span> <span class="nf">_reset_has_read_neuron_parameters_this_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__has_read_neuron_parameters_this_run</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -837,9 +815,6 @@
                 <span class="s2">&quot;Population does not support the initialisation of </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">variable</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_last</span><span class="p">():</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                    <span class="s2">&quot;Population does not support changes after run&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_parameters_before_set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">selector</span><span class="p">)</span>
 
@@ -853,7 +828,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">inject</span><span class="p">(</span><span class="n">current_source</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)])</span>
         <span class="n">current_source</span><span class="o">.</span><span class="n">set_population</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="c1"># Must remap if called between runs (with reset)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the total number of cells in the population.</span>
@@ -894,10 +869,6 @@
                 <span class="n">parameter</span><span class="p">))</span>
 
         <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">check_user_can_act</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">is_ran_ever</span><span class="p">()</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s2">&quot;Run has been called but vertex is not changable.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1022,7 +993,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
         <span class="c1"># state that something has changed in the population,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
     <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.add_placement_constraint"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.add_placement_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">add_placement_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1039,7 +1010,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="n">ChipAndCoreConstraint</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
 
         <span class="c1"># state that something has changed in the population,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
     <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.set_mapping_constraint"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_mapping_constraint">[docs]</a>    <span class="k">def</span> <span class="nf">set_mapping_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint_dict</span><span class="p">):</span>
@@ -1056,7 +1027,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_placement_constraint</span><span class="p">(</span><span class="o">**</span><span class="n">constraint_dict</span><span class="p">)</span>
 
         <span class="c1"># state that something has changed in the population,</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
     <span class="c1"># NON-PYNN API CALL</span>
 <div class="viewcode-block" id="Population.set_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.populations.html#spynnaker.pyNN.Population.set_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_max_atoms_per_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">):</span>
@@ -1077,7 +1048,7 @@
                 <span class="sa">f</span><span class="s2">&quot;as the current limit for the model is </span><span class="si">{</span><span class="n">cap</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">set_max_atoms_per_dimension_per_core</span><span class="p">(</span><span class="n">max_atoms_per_core</span><span class="p">)</span>
         <span class="c1"># state that something has changed in the population</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1086,18 +1057,6 @@
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="o">.</span><span class="n">n_atoms</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">_internal_delay_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: DelayExtensionVertex</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delay_vertex</span>
-
-    <span class="nd">@_internal_delay_vertex</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">_internal_delay_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delay_vertex</span> <span class="o">=</span> <span class="n">delay_vertex</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_get_variable_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Helper method for getting units from a parameter used by the vertex</span>
@@ -1197,8 +1156,6 @@
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_population_initializable</span> <span class="o">=</span> \
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractPopulationInitializable</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_changeable_after_run</span> <span class="o">=</span> \
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractChangableAfterRun</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__vertex_contains_units</span> <span class="o">=</span> \
             <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span><span class="p">,</span> <span class="n">AbstractContainsUnits</span><span class="p">)</span>
 

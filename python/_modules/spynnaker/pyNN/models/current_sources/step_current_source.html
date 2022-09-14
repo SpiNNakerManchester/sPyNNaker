@@ -115,7 +115,7 @@
                     <span class="c1"># Check length: if longer, need to remap</span>
                     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__amplitudes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">population</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">population</span><span class="o">.</span><span class="n">requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">SpynnakerDataView</span><span class="o">.</span><span class="n">set_requires_mapping</span><span class="p">()</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">__amplitudes</span> <span class="o">=</span> <span class="n">value</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>

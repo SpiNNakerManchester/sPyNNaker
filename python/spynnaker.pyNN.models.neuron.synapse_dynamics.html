@@ -1307,7 +1307,7 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">SynapseDynamicsSTDP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timing_dependence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_dependence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_dependence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dendritic_delay_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backprop_delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractChangableAfterRun</span></code>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractPlasticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
 <p>The dynamics of a synapse that changes over time using a         Spike Timing Dependent Plasticity (STDP) rule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1593,12 +1593,6 @@ weight scale</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.mark_no_changes">
-<span class="sig-name descname"><span class="pre">mark_no_changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.mark_no_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.mark_no_changes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Marks the point after which changes are reported.  Immediately            after calling this method, requires_mapping should return False.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge">
 <span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_stdp.html#SynapseDynamicsSTDP.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.merge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge with the given synapse_dynamics and return the result, or            error if merge is not possible</p>
@@ -1655,12 +1649,6 @@ weight scale</p></li>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a></p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.requires_mapping">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requires_mapping</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsSTDP.requires_mapping" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if changes that have been made require that mapping be            performed.  Note that this should return True the first time it            is called, as the vertex must require mapping as it has been            created!</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1731,7 +1719,7 @@ weight scale</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spynnaker.pyNN.models.neuron.synapse_dynamics.</span></span><span class="sig-name descname"><span class="pre">SynapseDynamicsStatic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_to_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractStaticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractChangableAfterRun</span></code>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractStaticSynapseDynamics"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractStaticSynapseDynamics</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractSettable" title="spynnaker.pyNN.models.abstract_models.AbstractSettable"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractSettable</span></code></a>, <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractGenerateOnMachine"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractGenerateOnMachine</span></code></a></p>
 <p>The dynamics of a synapse that does not change over time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1920,12 +1908,6 @@ weight scale</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.mark_no_changes">
-<span class="sig-name descname"><span class="pre">mark_no_changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.mark_no_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.mark_no_changes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Marks the point after which changes are reported.  Immediately            after calling this method, requires_mapping should return False.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.merge">
 <span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synapse_dynamics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_dynamics/synapse_dynamics_static.html#SynapseDynamicsStatic.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.merge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Merge with the given synapse_dynamics and return the result, or            error if merge is not possible</p>
@@ -1959,12 +1941,6 @@ weight scale</p></li>
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.requires_mapping">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requires_mapping</span></span><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStatic.requires_mapping" title="Permalink to this definition">¶</a></dt>
-<dd><p>True if changes that have been made require that mapping be            performed.  Note that this should return True the first time it            is called, as the vertex must require mapping as it has been            created!</p>
 </dd></dl>
 
 <dl class="py method">
